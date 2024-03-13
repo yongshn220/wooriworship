@@ -1,4 +1,5 @@
 "use client"
+
 import Image from 'next/image'
 import Link from 'next/link'
 import {Button} from "@/components/ui/button";
@@ -12,7 +13,7 @@ export function BoardSideBar() {
   const songBoardSelected = searchParams.get(SearchParams.SONG_BOARD)
 
   return (
-    <div className="hidden lg:flex flex-col space-y-6 w-[206px] pl-5 pt-5">
+    <div className="flex flex-col space-y-6 w-[170px] lg:w-[206px] pl-5 pt-5">
       <Link href={"/"}>
         <div className="flex items-center gap-x-2">
           <Image
@@ -21,7 +22,7 @@ export function BoardSideBar() {
             height={30}
             width={30}
           />
-          <span className="font-bold">
+          <span className="text-xs lg:text-base font-bold h-full">
             WOORIWORSHIP
           </span>
         </div>
@@ -31,7 +32,7 @@ export function BoardSideBar() {
                 className="font-normal w-full justify-start px-2">
           <Link href={"/"}>
             <LayoutDashboard className="h-4 w-4 mr-2"/>
-            Team boards
+            Worship Plan
           </Link>
         </Button>
         <Button variant={songBoardSelected ? "secondary" : "ghost"} asChild size="lg"
@@ -41,7 +42,7 @@ export function BoardSideBar() {
             query: {favorites: true}
           }}>
             <LibraryBig className="h-4 w-4 mr-2"/>
-            Favorite boards
+            Song boards
           </Link>
         </Button>
       </div>
