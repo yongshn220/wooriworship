@@ -6,9 +6,10 @@ import {Button} from "@/components/ui/button";
 import {useSearchParams} from 'next/navigation'
 import {LayoutDashboard, LibraryBig} from 'lucide-react';
 import {SearchParams} from "@/components/constants/enums";
+import {TeamSelect} from "@/app/board/_components/board-sidebar/team-select";
 
 
-export function BoardSideBar() {
+export function BoardSidebar() {
   const searchParams = useSearchParams()
   const songBoardSelected = searchParams.get(SearchParams.SONG_BOARD)
 
@@ -27,7 +28,9 @@ export function BoardSideBar() {
           </span>
         </div>
       </Link>
-      <div className="space-y-1 w-full">
+
+      <div className="space-y-2 w-full">
+        <TeamSelect/>
         <Button variant={songBoardSelected ? "ghost" : "secondary"} asChild size="lg"
                 className="font-normal w-full justify-start px-2">
           <Link href={"/"}>
