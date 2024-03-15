@@ -2,7 +2,7 @@
 
 import {Plus} from 'lucide-react'
 import {
-  Dialog,
+  Dialog, DialogClose,
   DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -12,10 +12,24 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {TeamIcon} from "@/components/team-icon";
 import {useState} from "react";
+import {useSetRecoilState} from "recoil";
+import {teamListAtom} from "@/states/userState";
+import {useToast} from "@/components/ui/use-toast";
 
 
 export function NewButton() {
+  const setTeamList = useSetRecoilState(teamListAtom)
   const [teamName, setTeamName] = useState("New Team")
+  const { toast } = useToast()
+
+  function handleCreateNewTeam() {
+    setTeamList((prev) => [...prev, {id: Math.random().toString(), name: teamName}])
+
+    toast({
+      title: "New team created!",
+      description: `${teamName}`,
+    })
+  }
 
   return (
     <Dialog>
@@ -32,28 +46,27 @@ export function NewButton() {
         <DialogHeader>
           <DialogTitle className="text-2xl">Create new team</DialogTitle>
           <DialogDescription>
-            "His praise shall continually be in my mouth." - <span className="text-xs">Psalm 34:1</span>
+            &quot;His praise shall continually be in my mouth.&quot; - <span className="text-xs">Psalm 34:1</span>
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
+          <div className="flex items-center gap-4">
+            <Label htmlFor="name" className="text-left">
               Name
             </Label>
             <Input
               id="name"
               value={teamName}
-              className="col-span-3"
               onChange={(e) => {setTeamName(e.target.value)}}
             />
+            <TeamIcon name={teamName}/>
           </div>
         </div>
         <div className="w-full flex-center">
-          <TeamIcon name={teamName}/>
         </div>
-        <DialogFooter>
-          <Button type="submit">Create</Button>
-        </DialogFooter>
+        <DialogClose className="flex-end">
+          <Button type="submit" onClick={handleCreateNewTeam}>Create</Button>
+        </DialogClose>
       </DialogContent>
     </Dialog>
   )
