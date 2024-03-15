@@ -10,3 +10,9 @@ export const teamListAtom = atom({
   })
 })
 
+
+
+export const nameAtom = atom({
+  key: "nameAtom",
+  default: "Yongjung"
+})
