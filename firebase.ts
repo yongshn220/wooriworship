@@ -1,5 +1,6 @@
-import { initializeApp, getApps } from "firebase/app";
-
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth"
+import "firebase/compat/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -15,7 +16,6 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-const firebase_app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-
-export default firebase_app
-
+export const firebase_app = firebase.initializeApp(firebaseConfig);
+export const firestore = firebase.firestore();
+export const auth = firebase.auth();
