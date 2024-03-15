@@ -25,7 +25,7 @@ export function NewButton() {
           <p className="text-sm text-white">New board</p>
         </div>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] h-5/6 overflow-y-scroll">
+      <DialogContent className="sm:max-w-[600px] h-5/6 overflow-y-scroll scrollbar-hide">
         <DialogHeader>
           <DialogTitle className="text-2xl">Create new worship</DialogTitle>
           <DialogDescription>Create worship and share with your team.</DialogDescription>
