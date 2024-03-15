@@ -2,10 +2,10 @@
 
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,} from "@/components/ui/select"
 import {useRecoilValue} from "recoil";
-import {teamListAtom} from "@/states/userState";
+import {userAtom} from "@/states/userState";
 
 export function TeamSelect() {
-  const teamList = useRecoilValue(teamListAtom)
+  const user = useRecoilValue(userAtom)
 
   return (
     <Select>
@@ -16,7 +16,7 @@ export function TeamSelect() {
         <SelectGroup>
           <SelectLabel>Team</SelectLabel>
           {
-            teamList.map((team) => (
+            user.teamList.map((team) => (
               <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>
             ))
           }

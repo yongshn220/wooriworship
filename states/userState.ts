@@ -1,11 +1,14 @@
 import {atom, selector} from "recoil";
+import {tempUser} from "@/components/temp-user";
 
-export const teamListAtom = atom({
-  key: "teamListAtom",
+
+
+export const userAtom = atom({
+  key: "userAtom",
   default: selector({
-    key: "teamListAtomDefault",
+    key: "userAtomDefault",
     get: async () => {
-      return [{id: "1", name: "GVC Friday"}, {id: "2", name: "YJ Worship"}]
+      return tempUser
     }
   })
 })
