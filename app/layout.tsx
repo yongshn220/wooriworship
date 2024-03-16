@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import {Provider} from "@/components/provider/provider";
+import {Suspense} from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +17,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={inter.className}>
         <main className="h-full">
           <Provider>
-            {children}
+            <Suspense fallback={<div>loading</div>}>
+              {children}
+            </Suspense>
           </Provider>
         </main>
       </body>

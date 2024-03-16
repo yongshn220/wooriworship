@@ -12,18 +12,19 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {TeamIcon} from "@/components/team-icon";
 import {useState} from "react";
-import {useSetRecoilState} from "recoil";
-import {teamListAtom} from "@/states/userState";
+import {useRecoilState, useSetRecoilState} from "recoil";
+import {userAtom} from "@/states/userState";
 import {useToast} from "@/components/ui/use-toast";
 
 
 export function NewButton() {
-  const setTeamList = useSetRecoilState(teamListAtom)
+  const [user, setUser] = useRecoilState(userAtom)
   const [teamName, setTeamName] = useState("New Team")
   const { toast } = useToast()
 
   function handleCreateNewTeam() {
-    setTeamList((prev) => [...prev, {id: Math.random().toString(), name: teamName}])
+    const newTeamList: any = [...user.teamList, {id: Math.random().toString(), name: teamName}]
+    setUser((prev) => ({...prev, teamList: newTeamList}))
 
     toast({
       title: "New team created!",

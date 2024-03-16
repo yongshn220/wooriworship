@@ -22,7 +22,7 @@ export default function AdminPage() {
   /*-----------
    BACKEND TEST
    -----------*/
-  function handleLogin() {
+  async function handleLogin() {
     console.log(login.email)
     console.log(login.password)
   }
