@@ -1,12 +1,12 @@
 "use client"
-
-import Image from 'next/image'
 import Link from 'next/link'
 import {Button} from "@/components/ui/button";
 import {useSearchParams} from 'next/navigation'
 import {LayoutDashboard, LibraryBig} from 'lucide-react';
 import {SearchParams} from "@/components/constants/enums";
 import {TeamSelect} from "@/app/board/_components/board-sidebar/team-select";
+import {MainLogo} from "@/components/logo/main-logo";
+import {MdSidebar} from "@/components/sidebar/md-sidebar";
 
 
 export function BoardSidebar() {
@@ -14,21 +14,8 @@ export function BoardSidebar() {
   const songBoardSelected = searchParams.get(SearchParams.SONG_BOARD)
 
   return (
-    <div className="flex flex-col space-y-6 w-[170px] lg:w-[206px] pl-5 pt-5">
-      <Link href={"/"}>
-        <div className="flex items-center gap-x-2">
-          <Image
-            src={"/image/logo.png"}
-            alt="Logo"
-            height={30}
-            width={30}
-          />
-          <span className="text-xs lg:text-base font-bold h-full">
-            WOORIWORSHIP
-          </span>
-        </div>
-      </Link>
-
+    <MdSidebar>
+      <MainLogo/>
       <div className="space-y-2 w-full">
         <TeamSelect/>
         <Button variant={songBoardSelected ? "ghost" : "secondary"} asChild size="lg"
@@ -45,10 +32,10 @@ export function BoardSidebar() {
             query: {favorites: true}
           }}>
             <LibraryBig className="h-4 w-4 mr-2"/>
-            Song boards
+            Song Board
           </Link>
         </Button>
       </div>
-    </div>
+    </MdSidebar>
   )
 }
