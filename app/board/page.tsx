@@ -4,7 +4,7 @@ import {NewButton} from "@/app/board/_components/worship-plan/new-button";
 
 export default function Board() {
   return (
-    <div className="flex-1 h-[calc(100%-80px)] p-6 overflow-y-scroll">
+    <div className="flex-1 h-[calc(100%-80px)] p-6 overflow-y-scroll scrollbar-hide">
       <div className="flex-between mb-4">
         <p className="text-2xl font-semibold pb-4">
           Worship Plan
