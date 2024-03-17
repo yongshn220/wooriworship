@@ -1,9 +1,21 @@
-
+import Image from 'next/image'
 
 export default function Worship() {
   return (
-    <div className="p-6">
-      worship
+    <div className="flex-start flex-col p-6 gap-2">
+      <p className="text-sm text-gray-500">GVC Friday</p>
+      <p className="text-2xl font-semibold">GVC Friday Worship</p>
+      <div className="flex-center mt-6 gap-2">
+        <Image alt="calendar icon" src={'/icons/calendarIcon.svg'} width={25} height={25}/>
+        <p className="text-blue-900">March 16th, 2024</p>
+      </div>
+      <p className="mt-10">
+        이번 콘티의 주제 말씀은 ... 마태복음 ..... 입니다.
+        주님께서 우리에 주신 사랑과 은혜를 생각해보며.. ~~ 콘티 주제~~~ 뭐시기 주님께서 우리에 주신 사랑과 은혜를 생각해보며.. ~~ 콘티 주제~~~ 뭐시기
+      </p>
+      <div>
+
+      </div>
     </div>
   )
 }
