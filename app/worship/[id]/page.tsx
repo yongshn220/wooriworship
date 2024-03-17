@@ -1,8 +1,9 @@
 import Image from 'next/image'
+import {SongCarousel} from "@/app/worship/[id]/_components/song-carousel";
 
-export default function Worship() {
+export default function WorshipPage() {
   return (
-    <div className="flex-start flex-col p-6 gap-2">
+    <div className="flex-start flex-col w-full p-6 gap-2 scrollbar-hide">
       <p className="text-sm text-gray-500">GVC Friday</p>
       <p className="text-2xl font-semibold">GVC Friday Worship</p>
       <div className="flex-center mt-6 gap-2">
@@ -13,8 +14,8 @@ export default function Worship() {
         이번 콘티의 주제 말씀은 ... 마태복음 ..... 입니다.
         주님께서 우리에 주신 사랑과 은혜를 생각해보며.. ~~ 콘티 주제~~~ 뭐시기 주님께서 우리에 주신 사랑과 은혜를 생각해보며.. ~~ 콘티 주제~~~ 뭐시기
       </p>
-      <div>
-
+      <div className="w-full flex-center">
+        <SongCarousel/>
       </div>
     </div>
   )
