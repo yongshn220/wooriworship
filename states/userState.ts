@@ -7,6 +7,11 @@ export const userAtom = atom({
   default: tempUser
 })
 
+export const currentUserAtom = atom({
+  key: "currentUserAtom",
+  default: null
+})
+
 // export const userAtom = atom({
 //   key: "userAtom",
 //   default: selector({

@@ -1,12 +1,12 @@
 import { firestore } from "@/firebase";
 
 export default class BaseService {
-    collectionName: String;
-    constructor(collectionName: String) {
+    collectionName: string;
+    constructor(collectionName: string) {
         this.collectionName = collectionName;
     }
 
-    async getById(id) {
+    async getById(id: string) {
         const ref = firestore.collection(this.collectionName).doc(id);
         const res = await ref.get();
         if(res.exists) {
@@ -16,9 +16,9 @@ export default class BaseService {
         }
     }
 
-    async getByFilters(filters) {
-        const result = [];
-        let ref = firestore.collection(this.collectionName);
+    async getByFilters(filters: Array<any> | null) {
+        const result: Array<any> = [];
+        let ref: any = firestore.collection(this.collectionName);
         if(filters) {
             for(let i in filters) {
                 ref = ref.where(filters[i].a, filters[i].b, filters[i].c);
@@ -27,16 +27,16 @@ export default class BaseService {
         } else {
             ref = await ref.get();
         }
-        ref.forEach((element) => {
+        ref.forEach((element: any) => {
             result.push({id: element.id, ... element.data()});
         })
         return result;
     }
 
-    async queryByArray(filter) {
+    async queryByArray(filter: any) {
         if(filter) {
             const promises = [];
-            const result = [];
+            const result:any = [];
             while (filter.c.length) {
                 const subFilters = filter.c.splice(0, 10);
                 promises.push(
@@ -58,20 +58,20 @@ export default class BaseService {
     }
 
     async getAll() {
-        return await this.getByFilters();
+        return await this.getByFilters(null);
     }
 
-    async create(data) {
+    async create(data: any) {
         const ref = await firestore.collection(this.collectionName).add(data);
         const id = ref.id;
         return id;
     } 
 
-    async update(id, data) {
+    async update(id: string, data: any) {
         await firestore.collection(this.collectionName).doc(id).set(data, {merge: true});
     }
 
-    async delete(id) {
+    async delete(id: string) {
         await firestore.collection(this.collectionName).doc(id).delete();
     }
 }
