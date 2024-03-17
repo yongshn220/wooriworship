@@ -4,7 +4,7 @@ import {SongCarousel} from "@/app/worship/[id]/_components/song-carousel";
 export default function WorshipPage() {
   return (
     <div className="w-full flex-center">
-      <div className="flex-start flex-col w-full p-6 gap-2 max-w-4xl">
+      <div className="flex-start flex-col w-full px-6 gap-2 max-w-4xl">
         <p className="text-sm text-gray-500">GVC Friday</p>
         <p className="text-2xl font-semibold">GVC Friday Worship</p>
         <div className="flex-center mt-6 gap-2">

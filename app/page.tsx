@@ -4,10 +4,9 @@ import './globals.css'
 
 export default async function Home() {
 
-
   return (
-    <div className="">
-      123
+    <div className="w-full h-full flex flex-col items-center p-5 bg-blue-500">
+      <p className="mt-20 text-4xl font-bold text-white">Worship plan</p>
     </div>
   );
 }

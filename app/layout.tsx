@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import {Provider} from "@/components/provider/provider";
 import {Suspense} from "react";
+import {LandingNavBar} from "@/app/_components/landing-nav-bar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,9 +16,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={inter.className}>
-        <main className="h-full">
+        <main className="relative h-full">
           <Provider>
             <Suspense fallback={<div>loading</div>}>
+              <LandingNavBar/>
               {children}
             </Suspense>
           </Provider>
