@@ -27,7 +27,6 @@ export function Signup({setMode}: any) {
       <div className="w-full sm:max-w-lg">
         <CardHeader className="space-y-1">
           <CardTitle className="text-3xl font-bold">Sign Up</CardTitle>
-          <CardDescription>Enter your email below to login to your account</CardDescription>
         </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
