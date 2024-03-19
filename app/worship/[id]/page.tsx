@@ -2,6 +2,7 @@ import Image from 'next/image'
 import {SongCarousel} from "@/app/worship/[id]/_components/song-carousel";
 
 export default function WorshipPage() {
+
   return (
     <div className="w-full flex-center">
       <div className="flex-start flex-col w-full px-6 gap-2 max-w-4xl">

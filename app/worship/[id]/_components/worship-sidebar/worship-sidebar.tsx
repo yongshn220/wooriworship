@@ -3,9 +3,11 @@ import {Button} from "@/components/ui/button";
 import {MainLogo} from "@/components/logo/main-logo";
 import {MdSidebar} from "@/components/sidebar/md-sidebar";
 import {Label} from "@/components/ui/label";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Link from "next/link";
 import {LayoutDashboard, LibraryBig} from "lucide-react";
+import Image from "next/image";
+import {StartWorshipButton} from "@/app/worship/[id]/_components/worship-sidebar/start-worship-button";
 
 const songs = [
   {id: "1", title: "내 주를 가까이 G"},
@@ -36,6 +38,16 @@ export function WorshipSidebar() {
               </Button>
             ))
           }
+          <div className="w-full flex-start flex-col gap-2 pt-5">
+            <Image
+              alt="compose music image"
+              src="/composeMusic.svg"
+              width={80}
+              height={80}
+              className=""
+            />
+            <StartWorshipButton/>
+          </div>
         </div>
         <div className="mb-5">
           <Button variant="ghost" asChild size="lg" className="font-normal w-full justify-start px-2">
