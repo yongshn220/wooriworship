@@ -1,9 +1,13 @@
-import {atom} from "recoil";
+import {atom, selector} from "recoil";
 
 
 
 
-export const worshipNoteAtom = atom({
-  key: "worshipNoteAtom",
-  default: true
+
+export const worshipMenuAtom = atom({
+  key: "worshipMenuAtom",
+  default: {
+    note: true,
+    index: true,
+  }
 })

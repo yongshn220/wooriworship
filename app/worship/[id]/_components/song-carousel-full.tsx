@@ -40,12 +40,15 @@ export function SongCarouselFull() {
     if (!api) {
       return
     }
-
+    console.log("useEffect")
+    api.on("slidesChanged", () => {console.log("slidesChanged")})
+    api.emit("slidesChanged")
     setCount(api.scrollSnapList().length)
     setCurrent(api.selectedScrollSnap() + 1)
 
     api.on("select", () => {
       setCurrent(api.selectedScrollSnap() + 1)
+      console.log("select")
     })
   }, [api])
 

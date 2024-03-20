@@ -2,6 +2,7 @@ import {Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
 import {SongCarouselFull} from "@/app/worship/[id]/_components/song-carousel-full";
 import {WorshipViewMenu} from "@/app/worship/[id]/_components/worship-sidebar/worship-view-menu";
+import {WorshipIndexIndicator} from "@/app/worship/[id]/_components/worship-sidebar/worship-index-indicator";
 
 export function StartWorshipButton() {
 
@@ -13,6 +14,7 @@ export function StartWorshipButton() {
       <DialogContent className="flex-center w-full max-w-8xl h-full p-0">
         <SongCarouselFull/>
         <WorshipViewMenu/>
+        <WorshipIndexIndicator/>
       </DialogContent>
     </Dialog>
   )

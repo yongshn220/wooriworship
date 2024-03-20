@@ -1,23 +1,27 @@
 'use client'
 
 import NoteIcon from "@/public/icons/noteIcon.svg";
+import SquareNumberIcon from "@/public/icons/squareNumberIcon.svg"
 import UpIcon from "@/public/icons/upIcon.svg";
 import DownIcon from "@/public/icons/downIcon.svg";
 import {useState} from "react";
 import {cn} from "@/lib/utils";
 import {useRecoilState} from "recoil";
-import {worshipNoteAtom} from "@/app/worship/[id]/_states/menu";
+import {worshipMenuAtom} from "@/app/worship/[id]/_states/menu";
 
 export function WorshipViewMenu() {
   const [isOpen, setIsOpen] = useState(true)
-  const [note, setNote] = useRecoilState(worshipNoteAtom)
+  const [menu, setMenu] = useRecoilState(worshipMenuAtom)
 
   return (
     <div className="absolute flex-center flex-col w-10 gap-y-4 right-5 bottom-10">
       <div className={cn("space-y-4", {"hidden": !isOpen})}>
-        <div className={cn("cursor-pointer text-gray-500", {"text-black": note})} onClick={() => setNote((prev) => !prev)}>
+        <MenuItem state={menu.index} onClick={() => setMenu((prev) => ({...prev, index: !prev.index}))}>
+          <SquareNumberIcon/>
+        </MenuItem>
+        <MenuItem state={menu.note} onClick={() => setMenu((prev) => ({...prev, note: !prev.note}))}>
           <NoteIcon/>
-        </div>
+        </MenuItem>
       </div>
       <div onClick={() => {
         setIsOpen((prev) => !prev)
@@ -30,4 +34,11 @@ export function WorshipViewMenu() {
   )
 }
 
+function MenuItem({children, state, onClick}: any) {
+  return (
+    <div className={cn("flex-center cursor-pointer text-gray-500", {"text-black": state})} onClick={onClick}>
+      {children}
+    </div>
+  )
+}
 
