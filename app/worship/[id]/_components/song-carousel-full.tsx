@@ -10,6 +10,8 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel"
 import Image from 'next/image'
+import {useEffect, useState} from "react";
+import {WorshipNote} from "@/app/worship/[id]/_components/worship-note";
 
 const songList = [
   {
@@ -30,11 +32,11 @@ const songList = [
 ]
 
 export function SongCarouselFull() {
-  const [api, setApi] = React.useState<CarouselApi>()
-  const [current, setCurrent] = React.useState(0)
-  const [count, setCount] = React.useState(0)
+  const [api, setApi] = useState<CarouselApi>()
+  const [current, setCurrent] = useState(0)
+  const [count, setCount] = useState(0)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!api) {
       return
     }
@@ -56,7 +58,7 @@ export function SongCarouselFull() {
               <CarouselItem key={index} className="h-full">
                 <Card className="h-full">
                   <CardContent className="flex flex-col w-full h-full divide-y">
-                    <div className="w-full p-2 px-4 text-sm">인트로 A E F#m E  이후 어쩌구 저쩌구 후렴 4번 반복 첫번째 후렴 목소리로 이후 나머지 빌드업 어쩌구 인트로 A E F#m E  이후 어쩌구 저쩌구 후렴 4번 반복 첫번째 후렴 목소리로 이후 나머지 빌드업</div>
+                    <WorshipNote/>
                     <div className="flex-1 h-full flex flex-col bg-gray-50 overflow-y-scroll lg:mx-10">
                       {
                         song.urls.map((url, index) => (
