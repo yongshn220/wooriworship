@@ -2,11 +2,14 @@
 
 import {WorshipCard} from "@/app/board/_components/worship-plan/worship-card";
 import {NewButton} from "@/app/board/_components/worship-plan/new-button";
+import {PageInit} from "@/components/page/page-init";
+import {Routes} from "@/components/constants/enums";
 
 
 export default function PlanPage() {
   return (
     <div>
+      <PageInit route={Routes.PLAN}/>
       <div className="flex-between mb-4">
         <p className="text-2xl font-semibold pb-4">
           Worship Plan
