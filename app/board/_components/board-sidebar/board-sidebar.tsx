@@ -20,17 +20,14 @@ export function BoardSidebar() {
         <TeamSelect/>
         <Button variant={songBoardSelected ? "ghost" : "secondary"} asChild size="lg"
                 className="font-normal w-full justify-start px-2">
-          <Link href={Routes.BOARD}>
+          <Link href={Routes.PLAN}>
             <LayoutDashboard className="h-4 w-4 mr-2"/>
             Worship Plan
           </Link>
         </Button>
         <Button variant={songBoardSelected ? "secondary" : "ghost"} asChild size="lg"
                 className="font-normal w-full justify-start px-2">
-          <Link href={{
-            pathname: "/",
-            query: {favorites: true}
-          }}>
+          <Link href={Routes.SONG}>
             <LibraryBig className="h-4 w-4 mr-2"/>
             Song Board
           </Link>

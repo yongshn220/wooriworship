@@ -21,7 +21,7 @@ export function Login({setMode}: any) {
   async function handleLogin() {
     console.log(login.email)
     console.log(login.password)
-    router.replace(Routes.BOARD)
+    router.replace(Routes.PLAN)
   }
 
   return (

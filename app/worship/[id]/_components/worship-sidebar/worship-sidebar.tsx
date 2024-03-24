@@ -9,6 +9,7 @@ import {DownloadIcon, LayoutDashboard, LibraryBig} from "lucide-react";
 import Image from "next/image";
 import {StartWorshipButton} from "@/app/worship/[id]/_components/worship-sidebar/start-worship-button";
 import {DownloadMusicSheetButton} from "@/app/worship/[id]/_components/worship-sidebar/download-music-sheet-button";
+import {Routes} from "@/components/constants/enums";
 
 const songs = [
   {id: "1", title: "내 주를 가까이 G"},
@@ -53,16 +54,13 @@ export function WorshipSidebar() {
         </div>
         <div className="mb-5">
           <Button variant="ghost" asChild size="lg" className="font-normal w-full justify-start px-2">
-            <Link href={"/board"}>
+            <Link href={Routes.PLAN}>
               <LayoutDashboard className="h-4 w-4 mr-2"/>
               Worship Plan
             </Link>
           </Button>
           <Button variant="ghost" asChild size="lg" className="font-normal w-full justify-start px-2">
-            <Link href={{
-              pathname: "/",
-              query: {favorites: true}
-            }}>
+            <Link href={Routes.SONG}>
               <LibraryBig className="h-4 w-4 mr-2"/>
               Song Board
             </Link>
