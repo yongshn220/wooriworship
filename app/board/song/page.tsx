@@ -1,4 +1,4 @@
-import {SearchTags} from "@/app/board/song/_components/search-tags";
+import {SearchTags} from "@/app/board/_components/nav-bar/search-tags";
 import {PageInit} from "@/components/page/page-init";
 import {Routes} from "@/components/constants/enums";
 
@@ -8,7 +8,6 @@ export default function SongPage() {
   return (
     <div className="w-full h-full flex flex-col items-center">
       <PageInit route={Routes.SONG}/>
-      <SearchTags/>
       <div className="w-full m-4">
         <p className="text-2xl font-semibold pb-4">
           Songs
