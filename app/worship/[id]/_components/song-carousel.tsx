@@ -7,7 +7,7 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  type CarouselApi,
+  type CarouselApi, CarouselPrevious, CarouselNext,
 } from "@/components/ui/carousel"
 import Image from 'next/image'
 
@@ -48,7 +48,7 @@ export function SongCarousel() {
   }, [api])
 
   return (
-    <div id="song-carousel" className="w-full h-full lg:max-w-3xl mt-10">
+    <div id="song-carousel" className="w-full h-full lg:max-w-3xl">
       <Carousel setApi={setApi} className="w-full h-full">
         <CarouselContent>
           {
@@ -75,10 +75,10 @@ export function SongCarousel() {
               </CarouselItem>
           ))}
         </CarouselContent>
-        {/*<CarouselPrevious />*/}
-        {/*<CarouselNext />*/}
+        <CarouselPrevious />
+        <CarouselNext />
       </Carousel>
-      <div className="py-2 text-center text-sm text-muted-foreground">
+      <div className="py-4 text-center text-sm text-muted-foreground">
         Song {current} of {count}
       </div>
     </div>

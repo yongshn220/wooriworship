@@ -1,5 +1,7 @@
 import Image from 'next/image'
 import {SongCarousel} from "@/app/worship/[id]/_components/song-carousel";
+import {Button} from "@/components/ui/button";
+import DownloadIcon from '@/public/icons/donwloadIcon.svg'
 
 export default function WorshipPage() {
 
@@ -16,7 +18,7 @@ export default function WorshipPage() {
           이번 콘티의 주제 말씀은 ... 마태복음 ..... 입니다.
           주님께서 우리에 주신 사랑과 은혜를 생각해보며.. ~~ 콘티 주제~~~ 뭐시기 주님께서 우리에 주신 사랑과 은혜를 생각해보며.. ~~ 콘티 주제~~~ 뭐시기
         </p>
-        <div className="w-full flex-center mb-10">
+        <div className="w-full flex-center flex-col mt-10">
           <SongCarousel/>
         </div>
       </div>

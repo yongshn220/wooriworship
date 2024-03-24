@@ -1,14 +1,18 @@
 'use client'
-import {CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
 import Link from "next/link";
 import {Mode} from "@/app/page";
+import {useRouter} from "next/navigation";
+import {Routes} from "@/components/constants/enums";
 
 
 export function Login({setMode}: any) {
+  const router = useRouter()
+
   const [login, setLogin] = useState({
     email: "",
     password: "",
@@ -17,6 +21,7 @@ export function Login({setMode}: any) {
   async function handleLogin() {
     console.log(login.email)
     console.log(login.password)
+    router.replace(Routes.BOARD)
   }
 
   return (

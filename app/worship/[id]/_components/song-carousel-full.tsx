@@ -9,9 +9,10 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel"
-import Image from 'next/image'
 import {useEffect, useState} from "react";
 import {WorshipNote} from "@/app/worship/[id]/_components/worship-note";
+import {worshipIndexAtom} from "@/app/worship/[id]/_states/menu";
+import {useSetRecoilState} from "recoil";
 
 const songList = [
   {
@@ -33,24 +34,20 @@ const songList = [
 
 export function SongCarouselFull() {
   const [api, setApi] = useState<CarouselApi>()
-  const [current, setCurrent] = useState(0)
-  const [count, setCount] = useState(0)
+  const setIndex = useSetRecoilState(worshipIndexAtom)
 
   useEffect(() => {
-    if (!api) {
-      return
-    }
-    console.log("useEffect")
-    api.on("slidesChanged", () => {console.log("slidesChanged")})
-    api.emit("slidesChanged")
-    setCount(api.scrollSnapList().length)
-    setCurrent(api.selectedScrollSnap() + 1)
+    if (!api) return
+
+    setIndex({
+      total: api.scrollSnapList().length,
+      current: api.selectedScrollSnap()
+    })
 
     api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1)
-      console.log("select")
+      setIndex((prev) => ({...prev, current: api.selectedScrollSnap()}))
     })
-  }, [api])
+  }, [setIndex, api])
 
   return (
     <div id="song-carousel" className="w-full h-full">
@@ -80,12 +77,7 @@ export function SongCarouselFull() {
               </CarouselItem>
           ))}
         </CarouselContent>
-        {/*<CarouselPrevious />*/}
-        {/*<CarouselNext />*/}
       </Carousel>
-      <div className="py-2 text-center text-sm text-muted-foreground">
-        Song {current} of {count}
-      </div>
     </div>
   )
 }
