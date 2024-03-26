@@ -27,8 +27,10 @@ export function SearchTags() {
       <PopoverTrigger>
         <FilterIcon/>
       </PopoverTrigger>
-      <PopoverContent className="mt-4">
-          <div className="relative w-full space-x-2 space-y-2 bg">
+      <PopoverContent className="mt-4 w-[350px]">
+          <p className="font-semibold">Tags</p>
+          <p className="text-sm text-gray-500">Select tags you like to search the songs</p>
+          <div className="relative w-full space-x-2 space-y-2 mt-2">
             {
               tags.map((tag, i) => (
                 <Badge
