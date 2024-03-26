@@ -35,7 +35,7 @@ export function SearchTags() {
               tags.map((tag, i) => (
                 <Badge
                   key={i}
-                  className={cn("bg-[#95ABCC] hover:bg-[#8094B2] cursor-pointer", {"bg-[#607492] hover:bg-[#607492]": isTagSelected(tag)})}
+                  className={cn("bg-[#AA95CC] hover:bg-[#9780BE] cursor-pointer", {"bg-[#7357A1] hover:bg-[#7357A1]": isTagSelected(tag)})}
                   onClick={() => handleTagSelect(tag)}
                 >
                   {tag}
