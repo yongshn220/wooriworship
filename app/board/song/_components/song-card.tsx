@@ -15,11 +15,11 @@ export function SongCard() {
           <p className="font-semibold text-lg">내 주를 가까이</p>
           <p className="text-sm">Isaiah6tyone</p>
         </div>
-        <div className="flex-between bg-white p-4">
-          <div className="cursor-pointer">
+        <div className="flex-between bg-white p-2">
+          <div className="cursor-pointer hover:bg-gray-100 rounded-full p-2">
             <HeartIcon/>
           </div>
-          <div className="cursor-pointer">
+          <div className="cursor-pointer hover:bg-gray-100 rounded-full p-2">
             <LinkIcon/>
           </div>
         </div>

@@ -11,8 +11,8 @@ export function WorshipCard() {
   return (
     <div>
       <Link href={"/worship/123"}>
-        <div className="group aspect-[100/132] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC] cursor-pointer">
-          <div className="relative flex-1 flex-center flex-col text-white text-xs gap-2 p-2">
+        <div className="group aspect-[1/1] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC] cursor-pointer">
+          <div className="relative flex-1 flex-center flex-col text-white text-xs font-semibold gap-2 p-2">
             <HoverOverlay/>
             {
               songList.map((song, i) => (
@@ -20,7 +20,7 @@ export function WorshipCard() {
               ))
             }
           </div>
-          <p className="p-3 bg-white text-xs line-clamp-1">
+          <p className="p-4 bg-white text-xs line-clamp-1">
             2020/10/3 주일 찬양
           </p>
         </div>

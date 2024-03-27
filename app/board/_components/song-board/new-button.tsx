@@ -30,16 +30,14 @@ export function NewButton() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <div
-          className="group aspect-[1/1] border rounded-lg flex-center flex-col overflow-hidden bg-blue-500 hover:bg-blue-600 cursor-pointer">
-          <Plus className="h-12 w-12 text-white stroke-1"/>
-          <p className="text-sm text-white">New board</p>
-        </div>
+        <Button>
+          Add Song
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] h-5/6 overflow-y-scroll scrollbar-hide">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Create new worship</DialogTitle>
-          <DialogDescription>Create worship and share with your team.</DialogDescription>
+          <DialogTitle className="text-2xl">Add New Song</DialogTitle>
+          <DialogDescription>Create and add new song in the song board</DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
           <div className="flex-center gap-2">
@@ -52,34 +50,46 @@ export function NewButton() {
             </Label>
             <Input
               id="name"
-              className=""
-              placeholder="Title of worship"
+              placeholder="Title of song"
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="name" className="text-">
-              Date
+              Link
             </Label>
-            <DatePicker/>
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="name" className="text-">
-              Description
-            </Label>
-            <Textarea
-              className="h-40"
-              placeholder="Write the description"
+            <Input
+              id="name"
+              placeholder="Related link for the song"
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="name" className="text-">
-              Songs
+              Version
             </Label>
-            <div className="flex-center w-full flex-col gap-8">
-              <NewSongCard/>
-              <NewSongCard/>
-              <div className="rounded-full p-2 text-white bg-blue-500 hover:bg-blue-400 cursor-pointer">
-                <Plus/>
+            <Input
+              id="name"
+              placeholder="Version of the song"
+            />
+          </div>
+          <div className="flex-start flex-col items-center gap-1.5">
+            <Label htmlFor="name" className="text-">
+              Music Sheets
+            </Label>
+            <div className="flex-start w-full h-60 aspect-square border border-2 p-2 rounded-md shadow-sm">
+              <div className="h-full flex-center flex-col p-6">
+                <Plus className="h-[50px] w-[50px] rounded-full p-2 text-white bg-blue-500 hover:bg-blue-400 cursor-pointer"/>
+              </div>
+              <div className="flex w-full h-full gap-4 overflow-x-scroll scrollbar-hide">
+                <div className="flex flex-col h-full aspect-[3/4]">
+                  <div className="flex-1 bg-gray-100"/>
+                  <p className="text-center text-sm text-gray-500">1</p>
+                </div>
+
+                <div className="flex flex-col h-full aspect-[3/4]">
+                  <div className="flex-1 bg-gray-100"/>
+                  <p className="text-center text-sm text-gray-500">2</p>
+                </div>
+
               </div>
             </div>
           </div>
