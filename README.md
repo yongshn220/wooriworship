@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Woori Worship
 
-## Getting Started
+Phase 1: MFR Part 1(Minimum Functional Requirement).
+~~1. User can Log in/Log out/Register.~~
+2. User can create Team.
+3. Leader Invites Team to other users.
+4. User can add song
+5. User can create Worship
+6. Others in the team can view the worship
 
-First, run the development server:
+Phase 2: MFR Part 2 Advanced Feature
+1. User can delete Account.
+2. User can delete Team (If user is leader of the team)
+3. Add Forget Password
+4. Leader can assign other leader
+5. Leader can remove other members
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Phase 3: Quality Of Life Change.
+1. User can add their custom note to each worship.
+2. Create MObile App version for andorid/ios
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Phase 4: AI Recommendation.
+1. Each song gets a score based on various features
+2. User gets song recommendation based on the Tag
+3. User can rate the worship.
 
-You can start editing the page by modifying `app/login.tsx`. The page auto-updates as you edit the file.
+Phase M: Monetization.
+1. Only Users who paid can create team (free users can join free)
+2. User can not add more than N(10) songs per team
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Features by Role.
+1. Add song - 누구나
+2. Invite member - Leader
+3. add worship - 누구나
+4. Remove member - Leader
+5. delete Team - Leader
+6. Update Team(Team name change) - Leader
+7. update team member role - Leader
