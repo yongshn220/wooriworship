@@ -1,5 +1,6 @@
 import {atom, selector} from "recoil";
 import {tempUser} from "@/components/temp-user";
+import {User} from "@/models/user";
 
 
 export const userAtom = atom({
@@ -7,22 +8,10 @@ export const userAtom = atom({
   default: tempUser
 })
 
-export const currentUserAtom = atom({
+export const currentUserAtom = atom<User | null>({
   key: "currentUserAtom",
   default: null
 })
-
-// export const userAtom = atom({
-//   key: "userAtom",
-//   default: selector({
-//     key: "userAtomDefault",
-//     get: async () => {
-//       return tempUser
-//     }
-//   })
-// })
-
-
 
 export const nameAtom = atom({
   key: "nameAtom",

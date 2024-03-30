@@ -2,7 +2,7 @@
 
 import {Team} from "@/models/team";
 import {useRecoilValue} from "recoil";
-import {nameAtom, userAtom} from "@/states/userState";
+import {userAtom} from "@/global-states/userState";
 import {TeamIconHint} from "@/components/team-icon-hint";
 
 export function List() {
@@ -10,11 +10,11 @@ export function List() {
 
   return (
     <>
-      {
-        user.teamList.map((team: Team) => (
-          <TeamIconHint key={team.id} name={team.name}/>
-        ))
-      }
+      {/*{*/}
+      {/*  user.teamList.map((team: Team) => (*/}
+      {/*    <TeamIconHint key={team.id} name={team.name}/>*/}
+      {/*  ))*/}
+      {/*}*/}
     </>
   )
 }

@@ -2,7 +2,7 @@
 
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,} from "@/components/ui/select"
 import {useRecoilValue} from "recoil";
-import {userAtom} from "@/states/userState";
+import {userAtom} from "@/global-states/userState";
 
 
 const roles = ["Leader", "Member"]

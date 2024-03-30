@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {useState} from "react";
 import { useRecoilState } from "recoil"
-import { currentUserAtom } from "@/states/userState"
+import { currentUserAtom } from "@/global-states/userState"
 import { useRouter } from 'next/router'
 import { Routes } from "@/components/constants/enums"
 import { AuthService, UserService } from "@/apis"
@@ -60,7 +60,7 @@ export default function AdminPage() {
     if(signup.password != signup.confirmPassword) {
       console.log("password and confirm password not same");
       return;
-    } 
+    }
     if(signup.name.length == 0) {
       console.log("Name is not given")
       return;

@@ -13,7 +13,7 @@ import {Button} from "@/components/ui/button";
 import {TeamIcon} from "@/components/team-icon";
 import {useState} from "react";
 import {useRecoilState, useSetRecoilState} from "recoil";
-import {userAtom} from "@/states/userState";
+import {userAtom} from "@/global-states/userState";
 import {useToast} from "@/components/ui/use-toast";
 
 

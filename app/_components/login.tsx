@@ -9,10 +9,13 @@ import {Mode} from "@/app/page";
 import {useRouter} from "next/navigation";
 import {Routes} from "@/components/constants/enums";
 import { AuthService, UserService } from "@/apis"
+import {useSetRecoilState} from "recoil";
+import {currentUserAtom} from "@/global-states/userState";
+import {User} from "@/models/user";
 
 export function Login({setMode}: any) {
+  const setCurrentUser = useSetRecoilState(currentUserAtom)
   const router = useRouter()
-
   const [login, setLogin] = useState({
     email: "",
     password: "",
@@ -25,7 +28,7 @@ export function Login({setMode}: any) {
       alert("logged in!");
       console.log(currentUser);
       router.replace(Routes.PLAN)
-      //여기다 setCurrentUser(currentUser)
+      setCurrentUser(currentUser as User)
     }, err => {
       console.log(err.code);
     switch (err.code) {
