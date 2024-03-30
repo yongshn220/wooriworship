@@ -15,7 +15,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={inter.className}>
-        <main className="h-full">
+        <main className="relative h-full">
           <Provider>
             <Suspense fallback={<div>loading</div>}>
               {children}

@@ -1,7 +1,9 @@
 
 
 export enum Routes {
-  BOARD = "/board"
+  BOARD = "/board",
+  PLAN = "/board/plan",
+  SONG = "/board/song"
 }
 
 
