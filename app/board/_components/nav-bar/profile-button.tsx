@@ -15,7 +15,7 @@ export function ProfileButton() {
           alt="Logo"
           height={35}
           width={35}
-          className="cursor-pointer"
+          className="cursor-pointer rounded-full"
         />
       </SheetTrigger>
       <SheetContent className="flex-start flex-col pt-10 space-y-2">
