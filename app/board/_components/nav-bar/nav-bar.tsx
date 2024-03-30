@@ -15,7 +15,7 @@ export function Navbar() {
   return (
     <div className="flex-between p-5 gap-4">
       <div className="flex-1">
-        <div className={cn("hidden w-full max-w-4xl gap-4", {"flex-center": currentPage === Routes.SONG})}>
+        <div className={cn("hidden w-full max-w-xl gap-4", {"flex-center": currentPage === Routes.SONG})}>
           <SearchInput/>
           <SearchTags/>
         </div>
