@@ -3,7 +3,7 @@
 import {Plus} from 'lucide-react'
 import {
   Dialog, DialogClose,
-  DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+  DialogContent, DialogDescription, DialogHeader, DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {Hint} from "@/components/hint";
@@ -12,24 +12,23 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {TeamIcon} from "@/components/team-icon";
 import {useState} from "react";
-import {useRecoilState, useSetRecoilState} from "recoil";
-import {userAtom} from "@/global-states/userState";
 import {useToast} from "@/components/ui/use-toast";
 
 
 export function NewButton() {
-  const [user, setUser] = useRecoilState(userAtom)
   const [teamName, setTeamName] = useState("New Team")
   const { toast } = useToast()
 
-  function handleCreateNewTeam() {
-    const newTeamList: any = [...user.teamList, {id: Math.random().toString(), name: teamName}]
-    setUser((prev) => ({...prev, teamList: newTeamList}))
+  async function handleCreateNewTeam() {
+    // todo: firebase api call
 
-    toast({
-      title: "New team created!",
-      description: `${teamName}`,
-    })
+    const result = true
+    if (true) {
+      toast({
+        title: "New team created!",
+        description: `${teamName}`,
+      })
+    }
   }
 
   return (
@@ -37,7 +36,10 @@ export function NewButton() {
       <DialogTrigger asChild>
         <div className="aspect-square">
           <Hint label="Create Team" side="right" align="start" sideOffset={18}>
-            <button className="bg-blue-500/50 h-[40px] w-[40px] rounded-md flex items-center justify-center opacity-60 hover:opacity-100 transition">
+            <button
+              className="bg-blue-500/50 h-[40px] w-[40px] rounded-md flex items-center justify-center opacity-60 hover:opacity-100 transition"
+              onClick={handleCreateNewTeam}
+            >
               <Plus className="text-white"></Plus>
             </button>
           </Hint>
