@@ -3,7 +3,8 @@
 export enum Routes {
   BOARD = "/board",
   PLAN = "/board/plan",
-  SONG = "/board/song"
+  SONG = "/board/song",
+  HOME = "/"
 }
 
 

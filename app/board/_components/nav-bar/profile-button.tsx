@@ -4,9 +4,23 @@ import {SettingsIcon} from "lucide-react";
 import {Sheet, SheetContent, SheetTrigger} from "@/components/ui/sheet";
 import {Button} from "@/components/ui/button";
 import {MainLogo} from "@/components/logo/main-logo";
-
+import {useRouter} from "next/navigation";
+import {Routes} from "@/components/constants/enums";
+import { AuthService } from "@/apis"
 
 export function ProfileButton() {
+
+  const router = useRouter()
+
+  async function handleSignOut() {
+    try{
+      await AuthService.logout();
+      router.replace(Routes.HOME)
+  } catch (err: any) {
+      console.log(err.code);
+    }
+  }
+
   return (
     <Sheet>
       <SheetTrigger>
@@ -23,7 +37,7 @@ export function ProfileButton() {
         <Button variant="outline" className="w-full">
           Account Setting
         </Button>
-        <Button className="w-full">
+        <Button className="w-full" onClick={handleSignOut}>
           Sign Out
         </Button>
       </SheetContent>
