@@ -8,6 +8,7 @@ import {cn} from "@/lib/utils";
 import {Routes} from "@/components/constants/enums";
 import {useRecoilValue} from "recoil";
 import {currentPageAtom} from "@/app/board/_states/pageState";
+import {ProfileButton} from "@/app/board/_components/nav-bar/profile-button";
 
 export function Navbar() {
   const currentPage = useRecoilValue(currentPageAtom)
@@ -21,12 +22,7 @@ export function Navbar() {
       </div>
       <div className=" flex-end gap-4">
         <ManageTeamButton/>
-        <Image
-          src={"/image/profileIcon.png"}
-          alt="Logo"
-          height={35}
-          width={35}
-        />
+        <ProfileButton/>
       </div>
     </div>
   )

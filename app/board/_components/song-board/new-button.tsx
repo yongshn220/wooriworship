@@ -3,7 +3,6 @@
 import {Plus} from "lucide-react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription, DialogFooter,
   DialogHeader,
@@ -14,10 +13,8 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {TeamIcon} from "@/components/team-icon";
 import {Button} from "@/components/ui/button";
-import {Textarea} from "@/components/ui/textarea";
 import {useState} from "react";
-import {DatePicker} from "@/app/board/_components/worship-plan/date-picker";
-import {NewSongCard} from "@/app/board/_components/worship-plan/new-song-card";
+import {TagMultiSelect} from "@/app/board/_components/song-board/tag-multi-select";
 
 
 export function NewButton() {
@@ -55,6 +52,15 @@ export function NewButton() {
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="name" className="text-">
+              Version / Team
+            </Label>
+            <Input
+              id="name"
+              placeholder="Version / Team of the song"
+            />
+          </div>
+          <div className="flex-start flex-col items-center gap-1.5">
+            <Label htmlFor="name" className="text-">
               Link
             </Label>
             <Input
@@ -64,12 +70,9 @@ export function NewButton() {
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="name" className="text-">
-              Version
+              Tags
             </Label>
-            <Input
-              id="name"
-              placeholder="Version of the song"
-            />
+            <TagMultiSelect/>
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="name" className="text-">
@@ -77,7 +80,8 @@ export function NewButton() {
             </Label>
             <div className="flex-start w-full h-60 aspect-square border border-2 p-2 rounded-md shadow-sm">
               <div className="h-full flex-center flex-col p-6">
-                <Plus className="h-[50px] w-[50px] rounded-full p-2 text-white bg-blue-500 hover:bg-blue-400 cursor-pointer"/>
+                <Plus
+                  className="h-[50px] w-[50px] rounded-full p-2 text-white bg-blue-500 hover:bg-blue-400 cursor-pointer"/>
               </div>
               <div className="flex w-full h-full gap-4 overflow-x-scroll scrollbar-hide">
                 <div className="flex flex-col h-full aspect-[3/4]">
