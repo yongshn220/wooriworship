@@ -6,20 +6,54 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
 import {Mode} from "@/app/page";
-
+import { AuthService, UserService } from "@/apis"
 
 export function Signup({setMode}: any) {
     const [signup, setSignup] = useState({
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
   })
 
 
-  function handleSignup() {
+  async function handleSignup() {
+    console.log(signup.name)
     console.log(signup.email)
     console.log(signup.password)
     console.log(signup.confirmPassword)
+    if(signup.password != signup.confirmPassword) {
+      console.log("password and confirm password not same");
+      return;
+    } 
+    if(signup.name.length == 0) {
+      console.log("Name is not given")
+      return;
+    }
+    await AuthService.register(signup.email, signup.password).then(async user => {
+      if(user.user){
+        const sessionUser = await UserService.addNewUser(user.user.uid, signup.email, signup.name);
+        //여기에 userState 를 new user로 넣어야함
+        console.log(sessionUser);
+        alert("New user created");
+      } else {
+        alert("error occured");
+      }
+    }, err => {
+        console.log(err.code);
+        switch (err.code) {
+            case 'auth/invalid-email':
+                alert("email is invalid");
+                break;
+            case 'auth/email-already-in-use':
+                alert("email is already in use");
+                break;
+            default:
+                console.log(err.code);
+                alert("there was error in creating account");
+                break;
+        }
+    });
   }
 
   return (
@@ -29,6 +63,10 @@ export function Signup({setMode}: any) {
           <CardTitle className="text-3xl font-bold">Sign Up</CardTitle>
         </CardHeader>
           <CardContent className="space-y-4">
+          <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input id="signupName" required type="name" onChange={(e) => setSignup((prev) => ({...prev, name: e.target.value}))}/>
+              </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="signupEmail" placeholder="m@example.com" required type="email" onChange={(e) => setSignup((prev) => ({...prev, email: e.target.value}))}/>

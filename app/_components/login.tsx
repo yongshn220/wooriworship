@@ -8,7 +8,7 @@ import Link from "next/link";
 import {Mode} from "@/app/page";
 import {useRouter} from "next/navigation";
 import {Routes} from "@/components/constants/enums";
-
+import { AuthService, UserService } from "@/apis"
 
 export function Login({setMode}: any) {
   const router = useRouter()
@@ -21,7 +21,25 @@ export function Login({setMode}: any) {
   async function handleLogin() {
     console.log(login.email)
     console.log(login.password)
-    router.replace(Routes.PLAN)
+    await AuthService.login(login.email, login.password).then(async currentUser => {
+      alert("logged in!");
+      console.log(currentUser);
+      router.replace(Routes.PLAN)
+      //여기다 setCurrentUser(currentUser)
+    }, err => {
+      console.log(err.code);
+    switch (err.code) {
+        case 'auth/invalid-credential':
+            alert("email or password is invalid");
+            break;
+        case 'auth/user-not-found':
+            alert("User is not found");
+            break;
+        default:
+            alert("There was error in logging in");
+            break;
+    }
+    });
   }
 
   return (
