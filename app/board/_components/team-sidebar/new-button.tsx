@@ -38,7 +38,6 @@ export function NewButton() {
           <Hint label="Create Team" side="right" align="start" sideOffset={18}>
             <button
               className="bg-blue-500/50 h-[40px] w-[40px] rounded-md flex items-center justify-center opacity-60 hover:opacity-100 transition"
-              onClick={handleCreateNewTeam}
             >
               <Plus className="text-white"></Plus>
             </button>
