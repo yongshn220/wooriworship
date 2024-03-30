@@ -37,7 +37,7 @@ export function NewButton() {
       <DialogTrigger asChild>
         <div className="aspect-square">
           <Hint label="Create Team" side="right" align="start" sideOffset={18}>
-            <button className="bg-white/25 h-[40px] w-[40px] rounded-md flex items-center justify-center opacity-60 hover:opacity-100 transition">
+            <button className="bg-blue-500/50 h-[40px] w-[40px] rounded-md flex items-center justify-center opacity-60 hover:opacity-100 transition">
               <Plus className="text-white"></Plus>
             </button>
           </Hint>
