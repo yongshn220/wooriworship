@@ -3,6 +3,6 @@ export interface Team {
   name: string
   create_time: Date
   last_worship_time: Date
-  leader_id: string
+  leaders: Array<string>
   users: Array<string>
 }
