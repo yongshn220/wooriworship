@@ -1,7 +1,7 @@
 import {PageInit} from "@/components/page/page-init";
 import {Routes} from "@/components/constants/enums";
 import {SongCard} from "@/app/board/song/_components/song-card";
-import {NewButton} from "@/app/board/_components/song-board/new-button";
+import {NewButton} from "@/app/board/song/_components/new-button";
 
 
 export default function SongPage() {

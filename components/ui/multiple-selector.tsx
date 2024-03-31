@@ -310,7 +310,10 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
         );
       }
 
-      return <CommandEmpty>{emptyIndicator}</CommandEmpty>;
+      return (
+        <CommandEmpty>
+          {emptyIndicator}
+        </CommandEmpty>);
     }, [creatable, emptyIndicator, onSearch, options]);
 
     const selectables = React.useMemo<GroupOption>(
