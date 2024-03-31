@@ -2,7 +2,7 @@ Woori Worship
 
 Phase 1: MFR Part 1(Minimum Functional Requirement).  
 ~~1. User can Log in/Log out/Register.~~  
-2. User can create Team.  
+~~2. User can create Team.~~  
 3. Leader Invites Team to other users.  
 4. User can add song  
 5. User can create Worship  

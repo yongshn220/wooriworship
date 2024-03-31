@@ -16,6 +16,18 @@ export default class BaseService {
         }
     }
 
+    async getByIds(ids: Array<string>|undefined) {
+        if(null) {
+            return [];
+        }
+        return await this.queryByArray({
+            a: '__name__',
+            b: 'in',
+            c: ids
+        });
+
+    }
+
     async getByFilters(filters: Array<any> | null) {
         const result: Array<any> = [];
         let ref: any = firestore.collection(this.collectionName);
@@ -37,6 +49,7 @@ export default class BaseService {
         if(filter) {
             const promises = [];
             const result:any = [];
+            console.log(filter.c);
             while (filter.c.length) {
                 const subFilters = filter.c.splice(0, 10);
                 promises.push(

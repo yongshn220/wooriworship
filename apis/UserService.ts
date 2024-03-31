@@ -15,8 +15,17 @@ class UserService extends BaseService {
             teams: []
         }
         await this.update(userId, user);
-        const outUser: User = {...user, id: userId}
-        return outUser
+        return {...user, id: userId}
+    }
+
+    async addNewTeam(user: User, teamId: string) {
+        if(user) {
+            await this.update(user.id, {teams: [...user.teams, teamId]});
+            return teamId;
+        } else {
+            console.log("there is no currentUser")
+            return null;
+        }
     }
 }
 export default new UserService();

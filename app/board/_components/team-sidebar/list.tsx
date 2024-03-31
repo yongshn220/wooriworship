@@ -2,18 +2,29 @@
 
 import {Team} from "@/models/team";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {userAtom} from "@/global-states/userState";
+import {currentUserAtom} from "@/global-states/userState";
 import {TeamIconHint} from "@/components/team-icon-hint";
 import {useEffect, useState} from "react";
 import {currentTeamAtom} from "@/global-states/teamState";
+import {TeamService} from "@/apis"
 
 export function List() {
-  const user = useRecoilValue(userAtom)
+  const user = useRecoilValue(currentUserAtom)
   const [teams, setTeams] = useState([])
   const setCurrentTeam = useSetRecoilState(currentTeamAtom)
 
   useEffect(() => {
-    // todo: firebase api call
+    console.log(user);
+    async function getTeamsOfCurrentUser() {
+      if(user){
+        return TeamService.getByIds([...user.teams]);
+      }
+      return [];
+    } 
+    getTeamsOfCurrentUser().then((val) => {
+      console.log(val);
+    })
+    //TeamService.getTeams()
     setTeams([])
   }, [])
 
