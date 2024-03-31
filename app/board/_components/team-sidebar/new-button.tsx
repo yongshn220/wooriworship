@@ -13,21 +13,36 @@ import {Button} from "@/components/ui/button";
 import {TeamIcon} from "@/components/team-icon";
 import {useState} from "react";
 import {useToast} from "@/components/ui/use-toast";
+import { TeamService, UserService } from '@/apis';
+import { useRecoilValue } from 'recoil';
+import {useSetRecoilState} from "recoil";
+import { currentUserAtom } from '@/global-states/userState';
+import { User } from '@/models/user';
 
 
 export function NewButton() {
+  const user = useRecoilValue(currentUserAtom);
+  const setCurrentUser = useSetRecoilState(currentUserAtom);
   const [teamName, setTeamName] = useState("New Team")
   const { toast } = useToast()
 
   async function handleCreateNewTeam() {
     // todo: firebase api call
-
-    const result = true
-    if (true) {
-      toast({
-        title: "New team created!",
-        description: `${teamName}`,
-      })
+    if(user) {
+      try {
+        const teamId = await TeamService.addNewTeam(user.id, teamName);
+        await UserService.addNewTeam(user, teamId);
+        setCurrentUser((prev: any) => ({...prev, teams: [...prev.teams, teamId]}));
+        toast({
+          title: "New team created!",
+          description: `${teamName}`,
+        })
+      } catch(err) {
+        console.log(err);
+        alert({
+          title: "Error on creating New Team from Server"
+        })
+      }
     }
   }
 
