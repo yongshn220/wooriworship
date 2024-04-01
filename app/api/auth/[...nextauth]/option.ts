@@ -31,7 +31,7 @@ export const authOptions: NextAuthOptions = {
       session.user.id = currentUser?.id
       session.user.name = currentUser?.name
       session.user.email = currentUser?.email
-      session.user.last_logged_time = currentUser?.last_logged_in_time
+      session.user.last_logged_in_time = currentUser?.last_logged_in_time
       session.user.created_time = currentUser?.created_time
       session.user.teams = currentUser?.teams
 

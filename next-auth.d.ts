@@ -7,7 +7,7 @@ declare module "next-auth" {
       id: string
       name: string
       teams: Array<string>
-      last_logged_time: Date
+      last_logged_in_time: Date
       created_time: Date
     } & DefaultSession["user"]
   }
