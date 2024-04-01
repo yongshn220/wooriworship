@@ -7,14 +7,10 @@ import {useState} from "react";
 import Link from "next/link";
 import {Mode} from "@/app/page";
 import {useRouter} from "next/navigation";
+import {signIn} from "next-auth/react";
 import {Routes} from "@/components/constants/enums";
-import { AuthService, UserService } from "@/apis"
-import {useSetRecoilState} from "recoil";
-import {currentUserAtom} from "@/global-states/userState";
-import {User} from "@/models/user";
 
 export function Login({setMode}: any) {
-  const setCurrentUser = useSetRecoilState(currentUserAtom)
   const router = useRouter()
   const [login, setLogin] = useState({
     email: "",
@@ -22,27 +18,18 @@ export function Login({setMode}: any) {
   })
 
   async function handleLogin() {
-    console.log(login.email)
-    console.log(login.password)
-    await AuthService.login(login.email, login.password).then(async currentUser => {
-      alert("logged in!");
-      console.log(currentUser);
+    const res = await signIn("credentials", {
+      email: login.email,
+      password: login.password,
+      redirect: false
+    })
+    if (res?.ok) {
       router.replace(Routes.PLAN)
-      setCurrentUser(currentUser as User)
-    }, err => {
-      console.log(err.code);
-    switch (err.code) {
-        case 'auth/invalid-credential':
-            alert("email or password is invalid");
-            break;
-        case 'auth/user-not-found':
-            alert("User is not found");
-            break;
-        default:
-            alert("There was error in logging in");
-            break;
     }
-    });
+    else {
+      console.log("login fail")
+      // set error
+    }
   }
 
   return (

@@ -8,7 +8,6 @@ class AuthService extends BaseService {
 
     async login(email: string, password: string) {
         const user = await auth.signInWithEmailAndPassword(email, password);
-        
         if(user.user) {
             const serverUserInfo = await UserService.getById(user.user.uid);
             await UserService.update(user.user.uid, {last_logged_in_time: new Date()});

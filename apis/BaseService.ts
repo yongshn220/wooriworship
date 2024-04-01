@@ -28,6 +28,17 @@ export default class BaseService {
 
     }
 
+    async getByEmail(email: string) {
+        const query = await firestore.collection(this.collectionName).where('email', '==', email).get();
+        if (!query.empty) {
+            // Assuming there's only one user per email, so we're getting the first document
+            const doc = query.docs[0];
+            return { id: doc.id, ...doc.data() };
+        } else {
+            return null;
+        }
+    }
+
     async getByFilters(filters: Array<any> | null) {
         const result: Array<any> = [];
         let ref: any = firestore.collection(this.collectionName);
@@ -54,8 +65,8 @@ export default class BaseService {
                 const subFilters = filter.c.splice(0, 10);
                 promises.push(
                     firestore.collection(this.collectionName).where(
-                        filter.a, 
-                        filter.b, 
+                        filter.a,
+                        filter.b,
                         subFilters
                     ).get().then(x => {
                         x.forEach(element => {
@@ -78,7 +89,7 @@ export default class BaseService {
         const ref = await firestore.collection(this.collectionName).add(data);
         const id = ref.id;
         return id;
-    } 
+    }
 
     async update(id: string, data: any) {
         await firestore.collection(this.collectionName).doc(id).set(data, {merge: true});
