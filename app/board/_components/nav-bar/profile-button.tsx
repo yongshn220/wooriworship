@@ -1,12 +1,12 @@
 import Image from "next/image";
 
-import {SettingsIcon} from "lucide-react";
 import {Sheet, SheetContent, SheetTrigger} from "@/components/ui/sheet";
 import {Button} from "@/components/ui/button";
 import {MainLogo} from "@/components/logo/main-logo";
 import {useRouter} from "next/navigation";
 import {Routes} from "@/components/constants/enums";
 import { AuthService } from "@/apis"
+import {signOut} from "next-auth/react";
 
 export function ProfileButton() {
 
@@ -15,7 +15,8 @@ export function ProfileButton() {
   async function handleSignOut() {
     try{
       await AuthService.logout();
-      router.replace(Routes.HOME)
+      await signOut()
+
   } catch (err: any) {
       console.log(err.code);
     }

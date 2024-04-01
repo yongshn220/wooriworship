@@ -3,6 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import {Provider} from "@/components/provider/provider";
 import {Suspense} from "react";
+import {Toaster} from "@/components/ui/toaster";
+import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate";
+import {RootAuthenticate} from "@/app/_components/auth/root-authenticate";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,6 +20,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={inter.className}>
         <main className="relative h-full">
           <Provider>
+            <Toaster />
             <Suspense fallback={<div>loading</div>}>
               {children}
             </Suspense>
