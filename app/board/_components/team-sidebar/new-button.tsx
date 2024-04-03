@@ -1,11 +1,7 @@
 'use client'
 
 import {Plus} from 'lucide-react'
-import {
-  Dialog, DialogClose,
-  DialogContent, DialogDescription, DialogHeader, DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,} from "@/components/ui/dialog";
 import {Hint} from "@/components/hint";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
@@ -14,25 +10,23 @@ import {TeamIcon} from "@/components/team-icon";
 import {useState} from "react";
 import {useToast} from "@/components/ui/use-toast";
 import { TeamService, UserService } from '@/apis';
-import { useRecoilValue } from 'recoil';
-import {useSetRecoilState} from "recoil";
-import { currentUserAtom } from '@/global-states/userState';
-import { User } from '@/models/user';
+import {useSession} from "next-auth/react";
 
 
 export function NewButton() {
-  const user = useRecoilValue(currentUserAtom);
-  const setCurrentUser = useSetRecoilState(currentUserAtom);
+  const {data: session} = useSession()
   const [teamName, setTeamName] = useState("New Team")
   const { toast } = useToast()
 
+  if (!session) return <></>
+
+
   async function handleCreateNewTeam() {
-    // todo: firebase api call
-    if(user) {
+    if (session?.user) {
       try {
-        const teamId = await TeamService.addNewTeam(user.id, teamName);
-        await UserService.addNewTeam(user, teamId);
-        setCurrentUser((prev: any) => ({...prev, teams: [...prev.teams, teamId]}));
+        const teamId = await TeamService.addNewTeam(session.user.id, teamName);
+        await UserService.addNewTeam(session.user, teamId);
+
         toast({
           title: "New team created!",
           description: `${teamName}`,

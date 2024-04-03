@@ -1,11 +1,11 @@
 "use client"
 
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,} from "@/components/ui/select"
-import {useRecoilValue} from "recoil";
-import {userAtom} from "@/global-states/userState";
+import {useSession} from "next-auth/react";
 
-export function TeamSelect() {
-  const user = useRecoilValue(userAtom)
+export async function TeamSelect() {
+  const {data: session} = useSession()
+  if (!session) return <></>
 
   return (
     <Select>
@@ -16,8 +16,8 @@ export function TeamSelect() {
         <SelectGroup>
           <SelectLabel>Team</SelectLabel>
           {
-            user.teamList.map((team) => (
-              <SelectItem key={team.id} value={team.name}>{team.name}</SelectItem>
+            session.user.teams.map((team, i) => (
+              <SelectItem key={i} value={team}>{team}</SelectItem>
             ))
           }
         </SelectGroup>

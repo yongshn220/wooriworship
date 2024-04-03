@@ -6,29 +6,28 @@ import {Button} from "@/components/ui/button";
 import {useState} from "react";
 import Link from "next/link";
 import {Mode} from "@/app/page";
-import {useRouter} from "next/navigation";
 import {signIn} from "next-auth/react";
-import {Routes} from "@/components/constants/enums";
 
 export function Login({setMode}: any) {
-  const router = useRouter()
   const [login, setLogin] = useState({
     email: "",
     password: "",
   })
 
-  async function handleLogin() {
-    const res = await signIn("credentials", {
-      email: login.email,
-      password: login.password,
-      redirect: false
-    })
-    if (res?.ok) {
-      router.replace(Routes.PLAN)
+  async function handleLogin(e: any) {
+    e.preventDefault();
+    try {
+      const res = await signIn("credentials", {
+        email: login.email,
+        password: login.password,
+        redirect: false
+      })
+      if (res?.ok === false) {
+        console.log("login fail")
+      }
     }
-    else {
-      console.log("login fail")
-      // set error
+    catch (e) {
+      console.log(e)
     }
   }
 
@@ -39,17 +38,19 @@ export function Login({setMode}: any) {
           <CardTitle className="text-3xl font-bold">Login</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="loginEmail" placeholder="m@example.com" required type="email"
-                   onChange={(e) => setLogin((prev) => ({...prev, email: e.target.value}))}/>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input id="loginPassword" required type="password"
-                   onChange={(e) => setLogin((prev) => ({...prev, password: e.target.value}))}/>
-          </div>
-          <Button className="w-full" onClick={handleLogin}>Login</Button>
+          <form className="space-y-4" onSubmit={handleLogin}>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="loginEmail" placeholder="m@example.com" required type="email"
+                     onChange={(e) => setLogin((prev) => ({...prev, email: e.target.value}))}/>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="loginPassword" required type="password"
+                     onChange={(e) => setLogin((prev) => ({...prev, password: e.target.value}))}/>
+            </div>
+            <Button className="w-full" type="submit" >Login</Button>
+          </form>
           <div className="flex flex-col mt-4 text-center text-sm gap-2">
             <Link className="underline" href="#">
               Forgot your password?

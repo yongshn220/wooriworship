@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import {Button} from "@/components/ui/button";
 import {LayoutDashboard, LibraryBig} from 'lucide-react';
-import {Routes, SearchParams} from "@/components/constants/enums";
+import {Routes} from "@/components/constants/enums";
 import {TeamSelect} from "@/app/board/_components/board-sidebar/team-select";
 import {MainLogo} from "@/components/logo/main-logo";
 import {MdSidebar} from "@/components/sidebar/md-sidebar";
