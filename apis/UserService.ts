@@ -11,7 +11,7 @@ class UserService extends BaseService {
             name: name,
             email: email,
             created_time: new Date(),
-            last_logged_time: new Date(),
+            last_logged_in_time: new Date(),
             teams: []
         }
         await this.update(userId, user);
