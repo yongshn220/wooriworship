@@ -5,14 +5,9 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {useState} from "react";
-import { useRecoilState } from "recoil"
-import { currentUserAtom } from "@/global-states/userState"
-import { useRouter } from 'next/router'
-import { Routes } from "@/components/constants/enums"
 import { AuthService, UserService } from "@/apis"
 
 export default function AdminPage() {
-  //const [currentUser, setCurrentUser] = useRecoilState(currentUserAtom)
   const [login, setLogin] = useState({
     email: "",
     password: "",

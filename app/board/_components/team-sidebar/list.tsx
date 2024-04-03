@@ -1,38 +1,21 @@
-"use client"
 
 import {Team} from "@/models/team";
-import {useRecoilValue, useSetRecoilState} from "recoil";
-import {currentUserAtom} from "@/global-states/userState";
 import {TeamIconHint} from "@/components/team-icon-hint";
-import {useEffect, useState} from "react";
-import {currentTeamAtom} from "@/global-states/teamState";
 import {TeamService} from "@/apis"
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/app/api/auth/[...nextauth]/option";
 
-export function List() {
-  const user = useRecoilValue(currentUserAtom)
-  const [teams, setTeams] = useState([])
-  const setCurrentTeam = useSetRecoilState(currentTeamAtom)
+export async function List() {
+  const session = await getServerSession(authOptions)
+  if (!session) return <></>
 
-  useEffect(() => {
-    console.log(user);
-    async function getTeamsOfCurrentUser() {
-      if(user){
-        return TeamService.getByIds([...user.teams]);
-      }
-      return [];
-    } 
-    getTeamsOfCurrentUser().then((val) => {
-      console.log(val);
-    })
-    //TeamService.getTeams()
-    setTeams([])
-  }, [])
+  const teams = await TeamService.getByIds([...session.user.teams])
 
   return (
     <>
       {
         teams.map((team: Team) => (
-          <TeamIconHint key={team.id} name={team.name}/>
+          <TeamIconHint key={team.id} team={team}/>
         ))
       }
     </>

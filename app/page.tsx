@@ -23,13 +23,13 @@ export default function Home() {
           <Button variant="outline" onClick={() => setMode(Mode.SIGNUP)}>Sign Up</Button>
         </div>
         <div className="w-full h-full flex flex-col items-center p-5">
-          <p className="mt-0 sm:mt-10 text-4xl md:text-6xl text-left font-bold text-white blue_gradient">
+          <p className="mt-0 text-4xl md:text-5xl xl:text-6xl xl:mt-10 text-left font-bold text-white blue_gradient">
             Worship Team Assistant
           </p>
           <p className="text-xl mt-4 text-gray-500">
             Create set list, Plan worship, and Share with team
           </p>
-          <div className="w-full max-w-3xl flex-start flex-col sm:flex-row mt-20 gap-20">
+          <div className="w-full max-w-3xl flex-start flex-col sm:flex-row mt-10 gap-20">
             <Image
               alt="compose music image"
               src="/composeMusic.svg"
