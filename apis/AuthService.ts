@@ -16,6 +16,23 @@ class AuthService extends BaseService {
         return null;
     }
 
+    async loginTemp(email: string, password: string) {
+        const user = await auth.signInWithEmailAndPassword(email, password);
+        if (user.user) {
+            await UserService.update(user.user.uid, {last_logged_in_time: new Date()});
+            return {id: user.user.uid}
+        }
+        return null;
+    }
+
+    async loginWithCustomToken(token: string) {
+        const user = await auth.signInWithCustomToken(token);
+        if (user.user) {
+            await UserService.update(user.user.uid, {last_logged_in_time: new Date()});
+        }
+        return null;
+    }
+
     async logout() {
         await auth.signOut();
     }

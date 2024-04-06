@@ -16,8 +16,8 @@ export async function TeamSelect() {
         <SelectGroup>
           <SelectLabel>Team</SelectLabel>
           {
-            session.user.teams.map((team, i) => (
-              <SelectItem key={i} value={team}>{team}</SelectItem>
+            session.user.teams.map((teamId, i) => (
+              <SelectItem key={i} value={teamId}/>
             ))
           }
         </SelectGroup>
