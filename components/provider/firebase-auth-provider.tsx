@@ -1,6 +1,6 @@
 'use client'
 
-import {useSession} from "next-auth/react";
+import {signOut, useSession} from "next-auth/react";
 import {useEffect} from "react";
 import {Session} from "next-auth";
 import {AuthService} from "@/apis";
@@ -17,11 +17,12 @@ async function syncFirebaseAuth(session: Session) {
   }
   else {
     await AuthService.logout();
+    await signOut()
   }
 }
 
 export function FirebaseAuthProvider({children}: {children: React.ReactNode}) {
-  const {data: session} = useSession()
+  const {data: session, update} = useSession()
 
   useEffect(() => {
     if (!session) return;

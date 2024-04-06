@@ -1,16 +1,20 @@
 import {TeamIconHint} from "@/components/team-icon-hint";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/app/api/auth/[...nextauth]/option";
+import {UserService} from "@/apis";
+import {User} from "@/models/user";
 
 export async function List() {
   const session = await getServerSession(authOptions)
   if (!session) return <></>
 
-  console.log(session.user.teams)
+  const user = await UserService.getById(session.user.id) as User
+
+  console.log(user.teams)
   return (
     <>
       {
-        session.user.teams.map((teamId: string) => (
+        user.teams.map((teamId: string) => (
           <TeamIconHint key={teamId} teamId={teamId}/>
         ))
       }

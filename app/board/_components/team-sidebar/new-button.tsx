@@ -25,7 +25,7 @@ export function NewButton() {
     if (session?.user) {
       try {
         const teamId = await TeamService.addNewTeam(session.user.id, teamName);
-        await UserService.addNewTeam(session.user, teamId);
+        await UserService.addNewTeam(session.user.id, teamId);
 
         toast({
           title: "New team created!",

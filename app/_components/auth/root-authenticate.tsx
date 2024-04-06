@@ -15,8 +15,10 @@ export function RootAuthenticate({children}: Readonly<{ children: React.ReactNod
   const {status} = useSession()
   const router = useRouter()
 
+
   useEffect(() => {
     if (status === SessionType.AUTHENTICATED) {
+      console.log("root authenticate")
       router.replace(Routes.PLAN)
     }
   }, [status, router])

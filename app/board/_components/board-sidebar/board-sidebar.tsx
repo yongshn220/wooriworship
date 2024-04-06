@@ -18,15 +18,13 @@ export function BoardSidebar() {
       <MainLogo/>
       <div className="space-y-2 w-full">
         <TeamSelect/>
-        <Button variant={(currentPage === Routes.PLAN)? "secondary" : "ghost"} asChild size="lg"
-                className="font-normal w-full justify-start px-2">
+        <Button variant={(currentPage === Routes.PLAN)? "secondary" : "ghost"} asChild size="lg" className="font-normal w-full justify-start px-2">
           <Link href={Routes.PLAN}>
             <LayoutDashboard className="h-4 w-4 mr-2"/>
             Worship Plan
           </Link>
         </Button>
-        <Button variant={(currentPage === Routes.SONG) ? "secondary" : "ghost"} asChild size="lg"
-                className="font-normal w-full justify-start px-2">
+        <Button variant={(currentPage === Routes.SONG) ? "secondary" : "ghost"} asChild size="lg" className="font-normal w-full justify-start px-2">
           <Link href={Routes.SONG}>
             <LibraryBig className="h-4 w-4 mr-2"/>
             Song Board
