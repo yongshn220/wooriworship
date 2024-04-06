@@ -1,5 +1,6 @@
 import BaseService from "./BaseService"
 import { User } from "@/models/user";
+import {arrayUnion} from "@firebase/firestore";
 
 class UserService extends BaseService {
     constructor() {
@@ -18,9 +19,9 @@ class UserService extends BaseService {
         return {...user, id: userId}
     }
 
-    async addNewTeam(user: User, teamId: string) {
-        if(user) {
-            await this.update(user.id, {teams: [...user.teams, teamId]});
+    async addNewTeam(userId: string, teamId: string) {
+        if (userId) {
+            await this.update(userId, {teams: arrayUnion(teamId)});
             return teamId;
         } else {
             console.log("there is no currentUser")

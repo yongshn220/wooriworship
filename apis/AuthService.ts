@@ -20,7 +20,7 @@ class AuthService extends BaseService {
         const user = await auth.signInWithEmailAndPassword(email, password);
         if (user.user) {
             await UserService.update(user.user.uid, {last_logged_in_time: new Date()});
-            return {id: user.user.uid}
+            return {uid: user.user.uid}
         }
         return null;
     }

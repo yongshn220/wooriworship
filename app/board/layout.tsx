@@ -5,6 +5,7 @@ import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate
 
 
 export default function BoardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  console.log("board layout")
   return (
     <section className="h-full">
       <BoardAuthenticate>

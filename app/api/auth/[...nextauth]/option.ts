@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({token, user}: any) {
       if (user) {
-        token.sub = user.id
+        token.sub = user.uid
       }
       return token
     },
@@ -30,16 +30,8 @@ export const authOptions: NextAuthOptions = {
     async session({session, token}): Promise<any> {
       if (!session || !session.user || !token.sub) return null
 
-      const firebaseToken = await adminAuth.createCustomToken(token.sub)
-      const currentUser = await UserService.getById(token.sub) as User;
-
-      session.firebaseToken = firebaseToken
-      session.user.id = currentUser?.id
-      session.user.name = currentUser?.name
-      session.user.email = currentUser?.email
-      session.user.last_logged_in_time = currentUser?.last_logged_in_time
-      session.user.created_time = currentUser?.created_time
-      session.user.teams = currentUser?.teams
+      session.firebaseToken = await adminAuth.createCustomToken(token.sub)
+      session.user.id = token.sub
 
       return session
     },

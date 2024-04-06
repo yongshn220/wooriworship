@@ -1,11 +1,24 @@
 "use client"
 
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,} from "@/components/ui/select"
+import {UserService} from "@/apis";
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/app/api/auth/[...nextauth]/option";
+import {User} from "@/models/user";
 import {useSession} from "next-auth/react";
+import {useEffect, useState} from "react";
 
-export async function TeamSelect() {
+export function TeamSelect() {
   const {data: session} = useSession()
-  if (!session) return <></>
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    if (!session) return
+
+    UserService.getById(session.user.id).then((_user) => {
+      setUser(_user as User)
+    })
+  }, [session])
 
   return (
     <Select>
@@ -16,7 +29,7 @@ export async function TeamSelect() {
         <SelectGroup>
           <SelectLabel>Team</SelectLabel>
           {
-            session.user.teams.map((teamId, i) => (
+            user?.teams.map((teamId, i) => (
               <SelectItem key={i} value={teamId}/>
             ))
           }
