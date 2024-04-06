@@ -1,7 +1,7 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth"
 import "firebase/compat/firestore";
-import {getAuth} from "@firebase/auth";
+import {browserSessionPersistence, getAuth, setPersistence} from "@firebase/auth";
 
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -19,4 +19,3 @@ const firebaseConfig = {
 export const firebaseApp = firebase.initializeApp(firebaseConfig);
 export const firestore = firebase.firestore();
 export const auth = firebase.auth();
-// export const auth = getAuth(firebaseApp)

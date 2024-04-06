@@ -14,8 +14,8 @@ export function ProfileButton() {
 
   async function handleSignOut() {
     try{
-      await AuthService.logout();
       await signOut()
+      await AuthService.logout();
 
   } catch (err: any) {
       console.log(err.code);

@@ -4,15 +4,10 @@ import {WorshipCard} from "@/app/board/_components/worship-plan/worship-card";
 import {NewButton} from "@/app/board/_components/worship-plan/new-button";
 import {PageInit} from "@/components/page/page-init";
 import {Routes} from "@/components/constants/enums";
-import {useRecoilState, useRecoilValue} from "recoil";
-import {currentUserAtom} from "@/global-states/userState";
 import {useEffect, useState} from "react";
-import {currentTeamAtom} from "@/global-states/teamState";
 
 
 export default function PlanPage() {
-  const currentUser = useRecoilValue(currentUserAtom)
-  const currentTeam = useRecoilValue(currentTeamAtom)
   const [worships, setWorships] = useState([])
 
   useEffect(() => {
