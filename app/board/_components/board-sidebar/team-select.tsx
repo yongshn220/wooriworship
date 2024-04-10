@@ -1,12 +1,13 @@
-"use client"
+'use client'
 
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,} from "@/components/ui/select"
 import {UserService} from "@/apis";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/app/api/auth/[...nextauth]/option";
 import {User} from "@/models/user";
 import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
+import {TeamItem} from "@/app/board/_components/board-sidebar/team-item";
+import {Button} from "@/components/ui/button";
+import {CreateNewTeamDialog} from "@/app/board/_components/create-new-team-dialog";
 
 export function TeamSelect() {
   const {data: session} = useSession()
@@ -15,10 +16,20 @@ export function TeamSelect() {
   useEffect(() => {
     if (!session) return
 
-    UserService.getById(session.user.id).then((_user) => {
-      setUser(_user as User)
-    })
+    try {
+      UserService.getById(session.user.id).then((_user) => {
+        console.log(_user)
+        setUser(_user as User)
+      })
+    }
+    catch(e) {
+      console.log(e)
+    }
   }, [session])
+
+  function handleCreateTeam() {
+
+  }
 
   return (
     <Select>
@@ -29,10 +40,15 @@ export function TeamSelect() {
         <SelectGroup>
           <SelectLabel>Team</SelectLabel>
           {
-            user?.teams.map((teamId, i) => (
-              <SelectItem key={i} value={teamId}/>
+            user?.teams.map((teamId) => (
+              <TeamItem key={teamId} teamId={teamId}/>
             ))
           }
+          <CreateNewTeamDialog>
+            <Button variant="default" className="w-full mt-2" onClick={handleCreateTeam}>
+              Create Team
+            </Button>
+          </CreateNewTeamDialog>
         </SelectGroup>
       </SelectContent>
     </Select>

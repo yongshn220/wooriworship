@@ -9,8 +9,8 @@ export async function List() {
   if (!session) return <></>
 
   const user = await UserService.getById(session.user.id) as User
+  if (!user) return <></>
 
-  console.log(user.teams)
   return (
     <>
       {

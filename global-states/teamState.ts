@@ -13,7 +13,6 @@ export const teamAtomById = atomFamily<Team | null, string>({
   default: selectorFamily({
     key: "teamAtomById/Default",
     get: (id) => async () => {
-      console.log("teamatom", id)
       if (id) {
         return await TeamService.getById(id) as Team
       }

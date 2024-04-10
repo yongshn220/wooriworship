@@ -7,7 +7,8 @@ declare module "next-auth" {
     user: {
       id: string,
     },
-    firebaseToken: string
+    firebaseToken: string,
+    sync: boolean
   }
 
   interface Profile {
