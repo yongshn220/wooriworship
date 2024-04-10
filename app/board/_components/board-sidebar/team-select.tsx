@@ -8,8 +8,11 @@ import {useEffect, useState} from "react";
 import {TeamItem} from "@/app/board/_components/board-sidebar/team-item";
 import {Button} from "@/components/ui/button";
 import {CreateNewTeamDialog} from "@/app/board/_components/create-new-team-dialog";
+import {useRecoilState, useRecoilValue} from "recoil";
+import {currentTeamIdAtom} from "@/global-states/teamState";
 
 export function TeamSelect() {
+  const [currentTeamId, setCurrentTeamId] = useRecoilState(currentTeamIdAtom)
   const {data: session} = useSession()
   const [user, setUser] = useState<User | null>(null)
 
@@ -31,12 +34,14 @@ export function TeamSelect() {
 
   }
 
+  console.log("cct", currentTeamId)
+
   return (
-    <Select>
+    <Select value={currentTeamId.toString()} onValueChange={(teamId) => setCurrentTeamId(teamId)}>
       <SelectTrigger className="w-full mb-4">
         <SelectValue placeholder="Select a Team" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent >
         <SelectGroup>
           <SelectLabel>Team</SelectLabel>
           {
