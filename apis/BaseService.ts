@@ -7,12 +7,17 @@ export default class BaseService {
     }
 
     async getById(id: string) {
-        const ref = firestore.collection(this.collectionName).doc(id);
-        const res = await ref.get();
-        if(res.exists) {
-            return {id: id, ... res.data()};
-        } else {
-            return null;
+        try {
+            const ref = firestore.collection(this.collectionName).doc(id);
+            const res = await ref.get();
+            if(res.exists) {
+                return {id: id, ... res.data()};
+            } else {
+                return null;
+            }
+        }
+        catch (e) {
+            return null
         }
     }
 

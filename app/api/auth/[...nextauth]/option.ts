@@ -31,6 +31,7 @@ export const authOptions: NextAuthOptions = {
       if (!session || !session.user || !token.sub) return null
 
       session.firebaseToken = await adminAuth.createCustomToken(token.sub)
+      session.sync = false
       session.user.id = token.sub
 
       return session
