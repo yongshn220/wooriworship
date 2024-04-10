@@ -12,7 +12,7 @@ export function TeamItem({teamId}: Props) {
   const team = useRecoilValue(teamAtomById(teamId))
 
   return (
-    <SelectItem value={teamId}>
+    <SelectItem value={teamId.toString()}>
       {team?.name}
     </SelectItem>
   )
