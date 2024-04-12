@@ -3,7 +3,7 @@ import {HoverOverlay} from "@/components/hover-overlay";
 import LinkIcon from '@/public/icons/linkIcon.svg'
 import HeartIcon from '@/public/icons/heartIcon.svg'
 import {Badge} from "@/components/ui/badge";
-import {SongDetailCard} from "@/app/board/song/_components/song-detail-card";
+import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-card";
 import {useState} from "react";
 
 const tags = ["빠른", "신나는", "엔딩곡", "강한비트", "경쾌한", "신나는"]

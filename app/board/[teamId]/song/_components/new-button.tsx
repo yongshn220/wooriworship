@@ -14,11 +14,15 @@ import {Input} from "@/components/ui/input";
 import {TeamIcon} from "@/components/team-icon";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
-import {TagMultiSelect} from "@/app/board/song/_components/tag-multi-select";
+import {TagMultiSelect} from "@/app/board/[teamId]/song/_components/tag-multi-select";
 import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
-import MultipleImageUploader from "@/app/board/song/_components/multiple-image-uploader";
-import {MusicSheetCard} from "@/app/board/song/_components/music-sheet-card";
+import MultipleImageUploader from "@/app/board/[teamId]/song/_components/multiple-image-uploader";
+import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
+import SongService from "@/apis/SongService";
+import {useSession} from "next-auth/react";
+import {useRecoilValue} from "recoil";
+import {currentTeamIdAtom} from "@/global-states/teamState";
 
 export interface SongInput {
   title: string
@@ -27,7 +31,7 @@ export interface SongInput {
   link: string
   tags: Array<string>
   bpm: number
-  lyrics: string
+  description: string
 }
 export interface MusicSheet {
   id: string;
@@ -36,6 +40,8 @@ export interface MusicSheet {
   isLoading: boolean;
 }
 export function NewButton() {
+  const {data: session} = useSession()
+  const currentTeamId = useRecoilValue(currentTeamIdAtom)
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState<SongInput>({
@@ -45,24 +51,38 @@ export function NewButton() {
     link: "",
     tags: [],
     bpm: 0,
-    lyrics: ""
+    description: ""
   })
   const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
+  const [isLoading, setIsLoading] = useState(false)
 
   function handleCreate() {
-    // todo: firebase api call
-    console.log({
-      ...input,
-      files: musicSheets.map((musicSheet) => musicSheet.file)
-    })
-    setIsOpen(false)
-    // todo: if success
-    if (true) {
-      toast({
-        title: "New song has been added.",
-        description: "GVC Friday Worship",
+    setIsLoading(true)
+
+    if (!session?.user.id) {
+      console.log("error");
+      setIsOpen(false)
+      setIsLoading(false)
+      return;
+    }
+
+    try {
+      const songInput = {
+        ...input,
+        files: musicSheets.map((musicSheet) => musicSheet.file)
+      }
+
+      SongService.addNewSong(session?.user.id, currentTeamId, songInput).then(() => {
+        toast({
+          title: "New song has been added.",
+          description: "GVC Friday Worship",
+        })
+        setIsOpen(false)
+        setIsLoading(false)
       })
-      console.log("handle Create")
+    }
+    catch (e) {
+      console.log("err", e)
     }
   }
 
@@ -87,7 +107,7 @@ export function NewButton() {
             <Label htmlFor="name">Title</Label>
             <Input
               id="title"
-              placeholder="Title of song"
+              placeholder="ex) Amazing Grace"
               value={input.title}
               onChange={(e) => setInput((prev => ({...prev, title: e.target.value})))}
             />
@@ -96,7 +116,7 @@ export function NewButton() {
             <Label htmlFor="author">Author</Label>
             <Input
               id="author"
-              placeholder="Author of the song"
+              placeholder="ex) Isaiah6tyone"
               value={input.author}
               onChange={(e) => setInput((prev => ({...prev, author: e.target.value})))}
             />
@@ -105,7 +125,7 @@ export function NewButton() {
             <Label htmlFor="version">Version</Label>
             <Input
               id="version"
-              placeholder="Version of the song"
+              placeholder="version"
               value={input.version}
               onChange={(e) => setInput((prev => ({...prev, version: e.target.value})))}
             />
@@ -114,7 +134,7 @@ export function NewButton() {
             <Label htmlFor="link">Link</Label>
             <Input
               id="link"
-              placeholder="Related link for the song"
+              placeholder="https://youtube..."
               value={input.link}
               onChange={(e) => setInput((prev => ({...prev, link: e.target.value})))}
             />
@@ -124,13 +144,33 @@ export function NewButton() {
             <TagMultiSelect input={input} setInput={setInput}/>
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
+            <Label htmlFor="bpm">BPM</Label>
+            <Input
+              id="bpm"
+              type="number"
+              placeholder="ex) 120"
+              value={input.bpm}
+              onChange={(e) => setInput((prev => ({...prev, bpm: Number(e.target.value)})))}
+            />
+          </div>
+          <div className="flex-start flex-col items-center gap-1.5">
+            <Label htmlFor="description">
+              Description
+            </Label>
+            <Textarea
+              className="h-40"
+              placeholder="Write the description"
+            />
+          </div>
+          <div className="flex-start flex-col items-center gap-1.5">
             <Label>
               Music Sheets
             </Label>
             <div className="flex-start w-full h-60 aspect-square border-2 p-2 rounded-md shadow-sm">
               <MultipleImageUploader musicSheets={musicSheets} setMusicSheets={setMusicSheets} maxNum={5}>
                 <div className="h-full flex-center flex-col p-6">
-                  <Plus className="h-[50px] w-[50px] rounded-full p-2 text-white bg-blue-500 hover:bg-blue-400 cursor-pointer"/>
+                  <Plus
+                    className="h-[50px] w-[50px] rounded-full p-2 text-white bg-blue-500 hover:bg-blue-400 cursor-pointer"/>
                 </div>
               </MultipleImageUploader>
               <div className="flex w-full h-full gap-4 overflow-x-scroll">
@@ -143,27 +183,8 @@ export function NewButton() {
             </div>
           </div>
         </div>
-        <div className="flex-start flex-col items-center gap-1.5">
-          <Label htmlFor="bpm">BPM</Label>
-          <Input
-            id="bpm"
-            type="number"
-            placeholder="BPM"
-            value={input.bpm}
-            onChange={(e) => setInput((prev => ({...prev, bpm: Number(e.target.value)})))}
-          />
-        </div>
-        <div className="flex-start flex-col items-center gap-1.5">
-          <Label htmlFor="lyrics">Lyrics</Label>
-          <Textarea
-            className="h-40"
-            placeholder="Write the description"
-            value={input.lyrics}
-            onChange={(e) => setInput((prev => ({...prev, lyrics: e.target.value})))}
-          />
-        </div>
         <DialogFooter>
-          <Button type="submit" onClick={handleCreate}>Create</Button>
+          <Button type="submit" onClick={handleCreate}>{isLoading? "Creating..." : "Create"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

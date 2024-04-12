@@ -1,4 +1,4 @@
-import {MusicSheet} from "@/app/board/song/_components/new-button";
+import {MusicSheet} from "@/app/board/[teamId]/song/_components/new-button";
 import Image from "next/image"
 import {LoadingCircle} from "@/components/animation/loading-indicator";
 

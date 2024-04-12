@@ -3,18 +3,22 @@
 import {useSetRecoilState} from "recoil";
 import {currentPageAtom} from "@/app/board/_states/pageState";
 import {useEffect} from "react";
-import {Routes} from "@/components/constants/enums";
+import {Page} from "@/components/constants/enums";
+import {currentTeamIdAtom} from "@/global-states/teamState";
 
 interface Props {
-  route: Routes
+  teamId: string
+  page: Page
 }
 
-export function PageInit({route}: Props) {
+export function PageInit({teamId, page}: Props) {
   const setCurrentPage = useSetRecoilState(currentPageAtom)
+  const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
 
   useEffect(() => {
-    setCurrentPage(route as Routes)
-  }, [route, setCurrentPage])
+    setCurrentPage(page)
+    setCurrentTeamId(teamId)
+  }, [setCurrentPage, setCurrentTeamId, teamId, page])
 
   return(<></>)
 }
