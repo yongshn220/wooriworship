@@ -6,6 +6,8 @@ import {useRouter} from "next/navigation";
 import {Routes} from "@/components/constants/enums";
 import {useRecoilValue} from "recoil";
 import {firebaseSyncAtom} from "@/global-states/syncState";
+import {getPathBoard, getPathPlan} from "@/components/helper-function/routes";
+import {UserService} from "@/apis";
 
 const SessionType = {
   LOADING: "loading",
@@ -22,8 +24,8 @@ export function RootAuthenticate({children}: Readonly<{ children: React.ReactNod
   useEffect(() => {
     console.log(status, isFirebaseSynced)
     if (status === SessionType.AUTHENTICATED && isFirebaseSynced) {
-      console.log("root authenticate")
-      router.replace(Routes.PLAN)
+
+      router.replace(getPathBoard())
     }
   }, [status, router, isFirebaseSynced])
 

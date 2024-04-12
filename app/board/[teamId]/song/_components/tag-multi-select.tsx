@@ -1,6 +1,6 @@
 import React, {Dispatch, SetStateAction} from 'react';
 import MultipleSelector, { Option } from '@/components/ui/multiple-selector';
-import {SongInput} from "@/app/board/song/_components/new-button";
+import {SongInput} from "@/app/board/[teamId]/song/_components/new-button";
 
 interface Props {
   input: SongInput

@@ -1,8 +1,8 @@
 import {atom} from "recoil";
-import {Routes} from "@/components/constants/enums";
+import {Page, Routes} from "@/components/constants/enums";
 
 
 export const currentPageAtom = atom({
   key: "currentPageAtom",
-  default: Routes.BOARD
+  default: Page.BOARD
 })

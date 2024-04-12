@@ -2,14 +2,21 @@
 
 export enum Routes {
   BOARD = "/board",
-  PLAN = "/board/plan",
-  SONG = "/board/song",
+  PLAN = "/plan",
+  SONG = "/song",
   HOME = "/"
 }
 
+export enum Page {
+  BOARD,
+  PLAN,
+  SONG,
+  HONE,
+}
 
-export enum SearchParams {
-  SONG_BOARD = "song-board"
+
+export enum Param {
+  TEAM_ID = "teamId"
 }
 
 export enum UserRole {

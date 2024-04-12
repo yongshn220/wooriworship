@@ -5,11 +5,11 @@ export interface Song {
     id: string
     time: Date
   }
-  details: string
+  description: string
   last_used_time: Date
   lyrics: string
   original: {
-    creator: string
+    author: string
     url: string
   }
   storage_location: Array<string>

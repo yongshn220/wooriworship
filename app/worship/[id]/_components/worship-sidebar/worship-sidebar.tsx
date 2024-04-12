@@ -10,6 +10,9 @@ import Image from "next/image";
 import {StartWorshipButton} from "@/app/worship/[id]/_components/worship-sidebar/start-worship-button";
 import {DownloadMusicSheetButton} from "@/app/worship/[id]/_components/worship-sidebar/download-music-sheet-button";
 import {Routes} from "@/components/constants/enums";
+import {getPathPlan, getPathSong} from "@/components/helper-function/routes";
+import {useRecoilValue} from "recoil";
+import {currentTeamIdAtom} from "@/global-states/teamState";
 
 const songs = [
   {id: "1", title: "내 주를 가까이 G"},
@@ -20,6 +23,7 @@ const songs = [
 
 export function WorshipSidebar() {
   const [selectedSongId, setSelectedSongId] = useState(songs[0].id)
+  const currentTeamId = useRecoilValue(currentTeamIdAtom)
 
   return (
     <MdSidebar>
@@ -54,13 +58,13 @@ export function WorshipSidebar() {
         </div>
         <div className="mb-5">
           <Button variant="ghost" asChild size="lg" className="font-normal w-full justify-start px-2">
-            <Link href={Routes.PLAN}>
+            <Link href={getPathPlan(currentTeamId)}>
               <LayoutDashboard className="h-4 w-4 mr-2"/>
               Worship Plan
             </Link>
           </Button>
           <Button variant="ghost" asChild size="lg" className="font-normal w-full justify-start px-2">
-            <Link href={Routes.SONG}>
+            <Link href={getPathSong(currentTeamId)}>
               <LibraryBig className="h-4 w-4 mr-2"/>
               Song Board
             </Link>
