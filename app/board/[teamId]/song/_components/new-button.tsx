@@ -22,7 +22,7 @@ import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-
 import SongService from "@/apis/SongService";
 import {useSession} from "next-auth/react";
 import {useRecoilValue} from "recoil";
-import {currentTeamIdAtom} from "@/global-states/teamState";
+import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 
 export interface SongInput {
   title: string
@@ -42,6 +42,7 @@ export interface MusicSheet {
 export function NewButton() {
   const {data: session} = useSession()
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
+  const team = useRecoilValue(teamAtomById(currentTeamId))
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState<SongInput>({
@@ -75,7 +76,7 @@ export function NewButton() {
       SongService.addNewSong(session?.user.id, currentTeamId, songInput).then(() => {
         toast({
           title: "New song has been added.",
-          description: "GVC Friday Worship",
+          description: team?.name,
         })
         setIsOpen(false)
         setIsLoading(false)
@@ -100,8 +101,8 @@ export function NewButton() {
         </DialogHeader>
         <div className="grid gap-6 py-4">
           <div className="flex-center gap-2">
-            <TeamIcon name="GVC Friday"/>
-            <p className="font-bold text-sm">GVC Friday</p>
+            <TeamIcon name={team?.name || "Team"}/>
+            <p className="font-bold text-sm">{team?.name}</p>
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="name">Title</Label>
