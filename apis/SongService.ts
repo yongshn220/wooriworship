@@ -1,5 +1,4 @@
 import {BaseService} from ".";
-import {Song} from "@/models/song";
 import {SongInput} from "@/app/board/[teamId]/song/_components/new-button";
 
 class SongService extends BaseService {
@@ -7,9 +6,9 @@ class SongService extends BaseService {
     super("songs");
   }
 
-  async addNewSong(userId: string, team_id: string, songInput: SongInput) {
+  async addNewSong(userId: string, teamId: string, songInput: SongInput) {
     const newSong = {
-      team_id: team_id,
+      team_id: teamId,
       title: songInput.title,
       original: {
         author: songInput.author,

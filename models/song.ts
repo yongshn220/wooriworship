@@ -1,25 +1,24 @@
 export interface Song {
   id: string
-  bpm: Number
-  created_by: {
-    id: string
-    time: Date
-  }
+  team_id: string
+  title: string
   description: string
-  last_used_time: Date
-  lyrics: string
+  tags: Array<string>
+  bpm: Number
+  version: string
   original: {
     author: string
     url: string
   }
+  lyrics: string
   storage_location: Array<string>
-  tags: Array<string>
-  team_id: string
-  title: string
+  created_by: {
+    id: string
+    time: Date
+  }
+  last_used_time: Date
   updated_by: {
     id: string
     time: Date
   }
-  version: string
-  score: Number
 }
