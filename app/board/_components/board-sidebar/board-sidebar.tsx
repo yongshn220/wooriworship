@@ -27,7 +27,7 @@ export function BoardSidebar() {
             Worship Plan
           </Link>
         </Button>
-        <Button variant={(currentPage === Page.SONG) ? "secondary" : "ghost"} asChild size="lg" className="font-normal w-full justify-start px-2">
+        <Button variant={(currentPage === Page.SONG)? "secondary" : "ghost"} asChild size="lg" className="font-normal w-full justify-start px-2">
           <Link href={getPathSong(currentTeamId)}>
             <LibraryBig className="h-4 w-4 mr-2"/>
             Song Board
