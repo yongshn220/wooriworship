@@ -30,7 +30,7 @@ export interface SongInput {
   version: string
   link: string
   tags: Array<string>
-  bpm: number
+  bpm: number | null
   description: string
 }
 export interface MusicSheet {
@@ -51,7 +51,7 @@ export function NewButton() {
     version: "",
     link: "",
     tags: [],
-    bpm: 0,
+    bpm: null,
     description: ""
   })
   const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
@@ -150,7 +150,7 @@ export function NewButton() {
               id="bpm"
               type="number"
               placeholder="ex) 120"
-              value={input.bpm}
+              defaultValue={input.bpm?? ""}
               onChange={(e) => setInput((prev => ({...prev, bpm: Number(e.target.value)})))}
             />
           </div>
