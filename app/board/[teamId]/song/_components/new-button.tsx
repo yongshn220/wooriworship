@@ -41,9 +41,8 @@ export interface MusicSheet {
 }
 export function NewButton() {
   const {data: session} = useSession()
-  const currentTeamId = useRecoilValue(currentTeamIdAtom)
-  const team = useRecoilValue(teamAtomById(currentTeamId))
-  const { toast } = useToast()
+  const teamId = useRecoilValue(currentTeamIdAtom)
+  const team = useRecoilValue(teamAtomById(teamId))
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState<SongInput>({
     title: "",
@@ -56,6 +55,7 @@ export function NewButton() {
   })
   const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
   const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
 
   function handleCreate() {
     setIsLoading(true)
@@ -73,7 +73,7 @@ export function NewButton() {
         files: musicSheets.map((musicSheet) => musicSheet.file)
       }
 
-      SongService.addNewSong(session?.user.id, currentTeamId, songInput).then(() => {
+      SongService.addNewSong(session?.user.id, teamId, songInput).then(() => {
         toast({
           title: "New song has been added.",
           description: team?.name,

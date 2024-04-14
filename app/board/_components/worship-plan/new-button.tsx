@@ -3,7 +3,6 @@
 import {Plus} from "lucide-react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription, DialogFooter,
   DialogHeader,
@@ -18,13 +17,73 @@ import {Textarea} from "@/components/ui/textarea";
 import {useState} from "react";
 import {DatePicker} from "@/app/board/_components/worship-plan/date-picker";
 import {NewSongCard} from "@/app/board/_components/worship-plan/new-song-card";
+import {useRecoilValue} from "recoil";
+import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
+import {useSession} from "next-auth/react";
+import SongService from "@/apis/SongService";
+import {useToast} from "@/components/ui/use-toast";
 
+export interface WorshipInfo {
+  title: string
+  description: string
+}
+
+export interface SongInfo {
+  note: string
+  id: string | null
+}
 
 export function NewButton() {
+  const {data: session} = useSession()
+  const teamId = useRecoilValue(currentTeamIdAtom)
+  const team = useRecoilValue(teamAtomById(teamId))
   const [isOpen, setIsOpen] = useState(false)
+  const [basicInfo, setBasicInfo] = useState({
+    title: "",
+    description: "",
+  })
+  const [date, setDate] = useState<Date>()
+  const [songInfo, setSongInfo] = useState<Array<SongInfo>>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
+
 
   function handleCreate() {
-    setIsOpen(false)
+    setIsLoading(true)
+
+    if (!session?.user.id) {
+      console.log("error");
+      setIsOpen(false)
+      setIsLoading(false)
+      return;
+    }
+
+    try {
+      const worshipInput = {
+        ...basicInfo,
+        date,
+        songInfo,
+      }
+
+      console.log(worshipInput)
+      /* TODO: WorshipService
+      WorshipService.addNewWorship(session?.user.id, teamId, worshipInput).then(() => {
+        toast({
+          title: `New worship has set on ${date}.`,
+          description: team?.name,
+        })
+        setIsOpen(false)
+        setIsLoading(false)
+      })
+       */
+    }
+    catch (e) {
+      console.log("err", e)
+    }
+    finally {
+      setIsOpen(false)
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -44,35 +103,39 @@ export function NewButton() {
         <div className="grid gap-6 py-4">
           <div className="flex-center gap-2">
             <TeamIcon name="GVC Friday"/>
-            <p className="font-bold text-sm">GVC Friday</p>
+            <p className="font-bold text-sm">{team?.name}</p>
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="name" className="text-">
+            <Label htmlFor="title">
               Title
             </Label>
             <Input
               id="name"
               className=""
               placeholder="Title of worship"
+              value={basicInfo.title}
+              onChange={(e) => setBasicInfo((prev => ({...prev, title: e.target.value})))}
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="name" className="text-">
+            <Label htmlFor="date">
               Date
             </Label>
-            <DatePicker/>
+            <DatePicker date={date} setDate={setDate}/>
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="name" className="text-">
+            <Label htmlFor="description">
               Description
             </Label>
             <Textarea
               className="h-40"
               placeholder="Write the description"
+              value={basicInfo.description}
+              onChange={(e) => setBasicInfo((prev => ({...prev, description: e.target.value})))}
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="name" className="text-">
+            <Label htmlFor="songs">
               Songs
             </Label>
             <div className="flex-center w-full flex-col gap-8">
@@ -87,7 +150,7 @@ export function NewButton() {
         <div className="w-full flex-center">
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={handleCreate}>Create</Button>
+          <Button type="submit" onClick={handleCreate}>{isLoading? "Creating..." : "Create"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
