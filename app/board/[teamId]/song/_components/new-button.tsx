@@ -20,6 +20,7 @@ import {useToast} from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/app/board/[teamId]/song/_components/multiple-image-uploader";
 import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
 import SongService from "@/apis/SongService";
+import StorageService from "@/apis/StorageService";
 import {useSession} from "next-auth/react";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
@@ -56,6 +57,24 @@ export function NewButton() {
   })
   const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
   const [isLoading, setIsLoading] = useState(false)
+
+  function handleUpload() {
+    setIsLoading(true)
+
+    if (!session?.user.id) {
+      console.log("error");
+      setIsOpen(false)
+      setIsLoading(false)
+      return;
+    }
+    
+    try {
+      console.log(musicSheets);
+      StorageService.uploadFile(currentTeamId, musicSheets[0].file?.name, musicSheets[0].file);
+    } catch (e) {
+      console.log("err", e)
+    }
+  }
 
   function handleCreate() {
     setIsLoading(true)
@@ -186,6 +205,7 @@ export function NewButton() {
         </div>
         <DialogFooter>
           <Button type="submit" onClick={handleCreate}>{isLoading? "Creating..." : "Create"}</Button>
+          <Button type="submit" onClick={handleUpload}>{isLoading? "Uploading File..." : "Upload file"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app";
-import "firebase/compat/auth"
+import "firebase/compat/auth";
 import "firebase/compat/firestore";
+import "firebase/compat/storage";
 import {browserSessionPersistence, getAuth, setPersistence} from "@firebase/auth";
 
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -18,4 +19,5 @@ const firebaseConfig = {
 
 export const firebaseApp = firebase.initializeApp(firebaseConfig);
 export const firestore = firebase.firestore();
+export const storage = firebase.storage();
 export const auth = firebase.auth();

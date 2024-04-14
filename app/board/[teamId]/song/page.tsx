@@ -10,8 +10,8 @@ import {Song} from "@/models/song";
 export default async function SongPage({params}: any) {
   const teamId = params.teamId
 
-  // TODO: GetByTeamId()
-  const songList = [await SongService.getById("PjIWQd8klCOVaNRzFWMR"), await SongService.getById("KF3AzeE59mq5QK3Urjw4")] as Array<Song>
+  const songList = await SongService.getTeamSong(teamId) as Array<Song>
+
   return (
     <div className="w-full h-full flex flex-col items-center">
       <PageInit teamId={teamId} page={Page.SONG}/>
