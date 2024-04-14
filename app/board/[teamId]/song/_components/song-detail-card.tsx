@@ -9,33 +9,39 @@ import {
 } from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Badge} from "@/components/ui/badge";
+import {Song} from "@/models/song";
+import {Button} from "@/components/ui/button";
 
 
 interface Props {
   isOpen: boolean
   setIsOpen: any
+  song: Song
 }
 
-export function SongDetailCard({isOpen, setIsOpen}: Props) {
+export function SongDetailCard({isOpen, setIsOpen, song}: Props) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[600px] h-5/6 overflow-y-scroll scrollbar-hide">
         <DialogHeader>
-          <DialogTitle className="text-center text-3xl font-bold">내 주를 가까이</DialogTitle>
+          <DialogTitle className="text-center text-3xl font-bold">{song?.title}</DialogTitle>
+          <p className="text-center font-semibold text-gray-500">{song.original.author}</p>
         </DialogHeader>
         <div className="grid gap-6">
           <div className="flex-between items-center">
             <Label htmlFor="name" className="text-base font-semibold">
-              Version / Team
+              Version
             </Label>
-            <p>Isaiash6tyOne</p>
+            <p>{song?.version}</p>
           </div>
           <div className="flex-between items-center">
             <Label htmlFor="name" className="text-base font-semibold">
               Link
             </Label>
-            <p className="text-blue-500 hover:text-blue-600 cursor-pointer">https://youtube.com/watch?id=UV1S34KJ</p>
+            <p className="text-blue-500 hover:text-blue-600 cursor-pointer">
+              {song?.original.url}
+            </p>
           </div>
           <div className="flex-between items-center">
             <Label htmlFor="name" className="text-base font-semibold">
@@ -43,8 +49,8 @@ export function SongDetailCard({isOpen, setIsOpen}: Props) {
             </Label>
             <div className="w-full text-right space-x-2 pl-20">
               {
-                ["빠른", "신나는", "엔딩곡", "빠른", "재밌는", "영어", "신나는", "엔딩곡", "신나는", "엔딩곡", "빠른", "재밌는", "영어"].map((tag, i) => (
-                   <Badge key={i} variant="outline">{tag}</Badge>
+                song?.tags.map((tag, i) => (
+                  <Badge key={i} variant="outline">{tag}</Badge>
                 ))
               }
             </div>
@@ -72,6 +78,7 @@ export function SongDetailCard({isOpen, setIsOpen}: Props) {
         <div className="w-full flex-center">
         </div>
         <DialogFooter>
+          <Button>Edit</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

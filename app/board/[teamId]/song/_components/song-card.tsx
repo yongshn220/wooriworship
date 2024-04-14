@@ -17,7 +17,7 @@ export function SongCard({song}: Props) {
 
   return (
     <div className="h-full">
-      <SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen}/>
+      <SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen} song={song}/>
       <div className="aspect-[1/1] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC]">
         <div className="relative group h-full flex-center flex-col text-white cursor-pointer" onClick={() => setIsOpen(true)}>
           <HoverOverlay/>
