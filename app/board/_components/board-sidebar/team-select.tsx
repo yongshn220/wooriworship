@@ -48,7 +48,7 @@ export function TeamSelect() {
         <SelectGroup>
           <SelectLabel>Team</SelectLabel>
           {
-            user?.teams.map((teamId) => (
+            user?.teams?.map((teamId) => (
               <TeamItem key={teamId} teamId={teamId}/>
             ))
           }
