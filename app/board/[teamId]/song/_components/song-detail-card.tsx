@@ -11,6 +11,7 @@ import {Label} from "@/components/ui/label";
 import {Badge} from "@/components/ui/badge";
 import {Song} from "@/models/song";
 import {Button} from "@/components/ui/button";
+import {Textarea} from "@/components/ui/textarea";
 
 
 interface Props {
@@ -20,7 +21,7 @@ interface Props {
 }
 
 export function SongDetailCard({isOpen, setIsOpen, song}: Props) {
-
+  console.log(song)
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[600px] h-5/6 overflow-y-scroll scrollbar-hide">
@@ -54,6 +55,9 @@ export function SongDetailCard({isOpen, setIsOpen, song}: Props) {
                 ))
               }
             </div>
+          </div>
+          <div className="flex-start flex-col items-center gap-1.5">
+            <div className="h-40">{song.description}</div>
           </div>
           <div className="flex-start flex-col items-center gap-1.5 mt-4">
             <Label htmlFor="name" className="text-base font-semibold">
