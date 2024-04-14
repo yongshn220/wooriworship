@@ -161,6 +161,8 @@ export function NewButton() {
             <Textarea
               className="h-40"
               placeholder="Write the description"
+              value={input.description}
+              onChange={(e) => setInput((prev => ({...prev, description: e.target.value})))}
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
