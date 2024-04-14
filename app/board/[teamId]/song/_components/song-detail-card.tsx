@@ -57,7 +57,7 @@ export function SongDetailCard({isOpen, setIsOpen, song}: Props) {
             </div>
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
-            <div className="h-40">{song.description}</div>
+            <div className="">{song.description}</div>
           </div>
           <div className="flex-start flex-col items-center gap-1.5 mt-4">
             <Label htmlFor="name" className="text-base font-semibold">
