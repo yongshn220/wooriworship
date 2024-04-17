@@ -18,9 +18,10 @@ interface Props {
   isOpen: boolean
   setIsOpen: any
   song: Song
+  editable: boolean
 }
 
-export function SongDetailCard({isOpen, setIsOpen, song}: Props) {
+export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props) {
   console.log(song)
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -81,9 +82,12 @@ export function SongDetailCard({isOpen, setIsOpen, song}: Props) {
         </div>
         <div className="w-full flex-center">
         </div>
-        <DialogFooter>
-          <Button>Edit</Button>
-        </DialogFooter>
+        {
+          editable &&
+          <DialogFooter>
+            <Button>Edit</Button>
+          </DialogFooter>
+        }
       </DialogContent>
     </Dialog>
   )

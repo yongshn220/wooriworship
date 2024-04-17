@@ -6,19 +6,20 @@ import {Badge} from "@/components/ui/badge";
 import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-card";
 import {useState} from "react";
 import {Song} from "@/models/song";
+import {useSetRecoilState} from "recoil";
+import {selectedSongListAtom} from "@/app/board/_components/worship-plan/status";
 
 interface Props {
   song: Song
   isSelected: boolean
-  handleSelectSong: Function
 }
-export function SongSelectCard({song, isSelected, handleSelectSong}: Props) {
+export function SongSelectCard({song, isSelected}: Props) {
+  const setSelectedSongList = useSetRecoilState(selectedSongListAtom)
   const [isOpen, setIsOpen] = useState(false)
-
 
   return (
     <div className="h-full">
-      <SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen} song={song}/>
+      <SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen} song={song} editable={false}/>
       <div className="aspect-[1/1] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC]">
         <div className="relative group h-full flex-center flex-col text-white cursor-pointer" onClick={() => setIsOpen(true)}>
           <HoverOverlay/>
@@ -28,14 +29,20 @@ export function SongSelectCard({song, isSelected, handleSelectSong}: Props) {
         <div className="w-full flex-center bg-white p-2">
           {
             isSelected ?
-            <div className="w-full h-full flex justify-start items-center rounded-lg">
+            <div
+              className="w-full h-full flex justify-start items-center rounded-lg cursor-pointer"
+              onClick={() => setSelectedSongList(prev => (prev.filter(s => s.id != song.id)))}
+            >
               <div className="cursor-pointer p-2 text-blue-500">
                 <MoodCheckIcon/>
               </div>
               <p className="text-xs text-gray-500">Song added!</p>
             </div>
             :
-            <div className="w-full h-full flex justify-start items-center cursor-pointer hover:bg-gray-100 rounded-lg" onClick={() => handleSelectSong(song.id)}>
+            <div
+              className="w-full h-full flex justify-start items-center cursor-pointer hover:bg-gray-100 rounded-lg"
+              onClick={() => setSelectedSongList(prev => ([...prev, {id: song.id, note: ""}]))}
+            >
               <div className="cursor-pointer p-2">
                 <MoodNeutralIcon/>
               </div>

@@ -25,10 +25,6 @@ export function AddSongButton() {
 
   const selectedSongIds = useMemo(() => selectedSongList.map((song) => song.id), [selectedSongList])
 
-  function handleSelectSong(songId: string) {
-    setSelectedSongList(prev => ([...prev, {id:songId, note: ""}]))
-  }
-
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -52,7 +48,6 @@ export function AddSongButton() {
                   key={song.id}
                   song={JSON.parse(JSON.stringify(song))}
                   isSelected={selectedSongIds.includes(song.id)}
-                  handleSelectSong={handleSelectSong}
                 />
               ))
             }
