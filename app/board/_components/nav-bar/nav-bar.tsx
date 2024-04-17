@@ -1,6 +1,5 @@
 'use client'
 
-import Image from "next/image";
 import {ManageTeamButton} from "@/app/board/_components/nav-bar/manage-team-button";
 import {SearchInput} from "@/app/board/_components/nav-bar/search-input";
 import {SearchTags} from "@/app/board/_components/nav-bar/search-tags";

@@ -6,6 +6,17 @@ class SongService extends BaseService {
     super("songs");
   }
 
+  async getTeamSong(teamId: string) {
+    const songs = await this.getByFilters([
+      {
+        a: 'team_id',
+        b: '==',
+        c: teamId
+      }
+    ]);
+    return songs
+  }
+
   async addNewSong(userId: string, teamId: string, songInput: SongInput) {
     const newSong = {
       team_id: teamId,

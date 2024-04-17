@@ -22,6 +22,8 @@ import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {useSession} from "next-auth/react";
 import SongService from "@/apis/SongService";
 import {useToast} from "@/components/ui/use-toast";
+import {AddSongButton} from "@/app/board/_components/worship-plan/add-song-button";
+import {selectedSongListAtom} from "@/app/board/_components/worship-plan/status";
 
 export interface WorshipInfo {
   title: string
@@ -37,13 +39,13 @@ export function NewButton() {
   const {data: session} = useSession()
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtomById(teamId))
+  const selectedSongList = useRecoilValue(selectedSongListAtom)
   const [isOpen, setIsOpen] = useState(false)
   const [basicInfo, setBasicInfo] = useState({
     title: "",
     description: "",
   })
   const [date, setDate] = useState<Date>()
-  const [songInfo, setSongInfo] = useState<Array<SongInfo>>([])
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
@@ -62,7 +64,7 @@ export function NewButton() {
       const worshipInput = {
         ...basicInfo,
         date,
-        songInfo,
+        selectedSongList,
       }
 
       console.log(worshipInput)
@@ -139,11 +141,12 @@ export function NewButton() {
               Songs
             </Label>
             <div className="flex-center w-full flex-col gap-8">
-              <NewSongCard/>
-              <NewSongCard/>
-              <div className="rounded-full p-2 text-white bg-blue-500 hover:bg-blue-400 cursor-pointer">
-                <Plus/>
-              </div>
+              {
+                selectedSongList.map((songInfo, i) => (
+                  <NewSongCard key={i} index={i+1} songInfo={songInfo}/>
+                ))
+              }
+              <AddSongButton/>
             </div>
           </div>
         </div>
