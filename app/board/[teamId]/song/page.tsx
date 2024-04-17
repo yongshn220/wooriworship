@@ -10,8 +10,8 @@ import {Song} from "@/models/song";
 export default async function SongPage({params}: any) {
   const teamId = params.teamId
 
-  // TODO: GetByTeamId()
-  const songList = [await SongService.getById("PjIWQd8klCOVaNRzFWMR"), await SongService.getById("hikejJdrNcZUetb7Eqt5")] as Array<Song>
+  const songList = await SongService.getTeamSong(teamId) as Array<Song>
+
   return (
     <div className="w-full h-full flex flex-col items-center">
       <PageInit teamId={teamId} page={Page.SONG}/>
@@ -24,7 +24,7 @@ export default async function SongPage({params}: any) {
       <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10">
         {
           songList.map((song: Song) => (
-            <SongCard key={song.id} song={song}/>
+            <SongCard key={song.id} song={JSON.parse(JSON.stringify(song))}/>
           ))
         }
       </div>

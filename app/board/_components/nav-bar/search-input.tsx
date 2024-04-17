@@ -2,14 +2,8 @@
 
 import {Search} from "lucide-react";
 import {Input} from "@/components/ui/input";
-import {cn} from "@/lib/utils";
-import {Routes} from "@/components/constants/enums";
-import {useRecoilValue} from "recoil";
-import {currentPageAtom} from "@/app/board/_states/pageState";
-
 
 export function SearchInput() {
-  const currentPage = useRecoilValue(currentPageAtom)
 
   return (
     <div className="relative w-full">
