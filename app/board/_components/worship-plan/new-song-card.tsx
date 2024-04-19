@@ -7,6 +7,7 @@ import SongService from "@/apis/SongService";
 import {Song} from "@/models/song";
 import {useRecoilState} from "recoil";
 import {selectedSongListAtom} from "@/app/board/_components/worship-plan/status";
+import {SwapOrderButton} from "@/app/board/_components/worship-plan/swap-order-button";
 
 interface Props {
   index: number
@@ -34,8 +35,8 @@ export function NewSongCard({index, songInfo}: Props) {
       <div className="relative flex-center flex-col w-full h-72 bg-gray-100 rounded-md p-2 gap-4">
 
         <div className="w-full flex h-28">
-          <div className="absolute flex-center w-10 h-10 bg-gray-100 rounded-full -translate-y-1/2 -right-4 font-semibold text-sm border-4 border-white">
-            {index}
+          <div className="absolute flex-center -translate-y-1/2 -right-4">
+            <SwapOrderButton index={index}/>
           </div>
           <div className="h-full flex-center aspect-square bg-gray-300">
             <p>Score</p>
@@ -57,7 +58,10 @@ export function NewSongCard({index, songInfo}: Props) {
         </div>
 
       </div>
-      <p className="text-sm text-right text-gray-500 hover:text-gray-700 cursor-pointer" onClick={() => handleRemoveSong()}>remove</p>
+      <div className="flex-end text-smnpx shadcn-ui@latest add dropdown-menu
+">
+        <div className="text-gray-500 hover:text-gray-700 cursor-pointer" onClick={() => handleRemoveSong()}>remove</div>
+      </div>
     </div>
   )
 }
