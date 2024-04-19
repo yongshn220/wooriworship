@@ -12,6 +12,7 @@ import {Badge} from "@/components/ui/badge";
 import {Song} from "@/models/song";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
+import {EditButton} from "@/app/board/[teamId]/song/_components/edit-button";
 
 
 interface Props {
@@ -58,7 +59,7 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
             </div>
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
-            <div className="">{song.description}</div>
+            <div className="whitespace-pre-wrap">{song.description}</div>
           </div>
           <div className="flex-start flex-col items-center gap-1.5 mt-4">
             <Label htmlFor="name" className="text-base font-semibold">
@@ -85,7 +86,7 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
         {
           editable &&
           <DialogFooter>
-            <Button>Edit</Button>
+            <EditButton song={song}/>
           </DialogFooter>
         }
       </DialogContent>

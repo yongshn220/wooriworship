@@ -4,7 +4,7 @@ export interface Song {
   title: string
   description: string
   tags: Array<string>
-  bpm: Number
+  bpm: number
   version: string
   original: {
     author: string

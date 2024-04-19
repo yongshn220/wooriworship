@@ -14,7 +14,6 @@ export enum Page {
   HONE,
 }
 
-
 export enum Param {
   TEAM_ID = "teamId"
 }
@@ -22,4 +21,9 @@ export enum Param {
 export enum UserRole {
   'Leader' = 0,
   'Member' = 1
+}
+
+export enum Mode {
+  EDIT,
+  CREATE
 }
