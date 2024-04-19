@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import {Dispatch, SetStateAction} from "react";
-import {MusicSheet} from "@/app/board/[teamId]/song/_components/new-button";
+import {MusicSheet} from "@/app/board/[teamId]/song/_components/song-form";
 
 interface Props {
   musicSheets: Array<MusicSheet>;

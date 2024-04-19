@@ -7,8 +7,13 @@ import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {SongForm} from "@/app/board/[teamId]/song/_components/song-form";
 import {Mode} from "@/components/constants/enums";
+import {Song} from "@/models/song";
 
-export function NewButton() {
+interface Props {
+  song: Song
+}
+
+export function EditButton({song}: Props) {
   const {data: session} = useSession()
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtomById(teamId))
@@ -18,9 +23,9 @@ export function NewButton() {
 
   return (
     <div>
-      <SongForm mode={Mode.CREATE} isOpen={isOpen} setIsOpen={setIsOpen} song={null}/>
+      <SongForm mode={Mode.EDIT} isOpen={isOpen} setIsOpen={setIsOpen} song={song}/>
       <Button onClick={() => setIsOpen(prev => !prev)}>
-        Add Song
+        Edit
       </Button>
     </div>
   )

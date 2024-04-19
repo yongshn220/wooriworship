@@ -1,6 +1,6 @@
 import React, {Dispatch, SetStateAction} from 'react';
 import MultipleSelector, { Option } from '@/components/ui/multiple-selector';
-import {SongInput} from "@/app/board/[teamId]/song/_components/new-button";
+import {SongInput} from "@/app/board/[teamId]/song/_components/song-form";
 
 interface Props {
   input: SongInput
@@ -19,6 +19,7 @@ export function TagMultiSelect({input, setInput}: Props) {
       <MultipleSelector
         creatable
         defaultOptions={options}
+        value={options}
         placeholder="Select tags you like"
         emptyIndicator={
           <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
