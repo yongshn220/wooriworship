@@ -41,7 +41,7 @@ export function AddSongButton() {
               placeholder="Search songs"
             />
           </div>
-          <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10 mt-10">
+          <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-10 mt-10">
             {
               songList.map((song: Song) => (
                 <SongSelectCard

@@ -6,3 +6,8 @@ export const currentPageAtom = atom({
   key: "currentPageAtom",
   default: Page.BOARD
 })
+
+export const songSearchInputAtom = atom({
+  key: "songSearchInputAtom",
+  default: ""
+})
