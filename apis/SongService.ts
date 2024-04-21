@@ -1,5 +1,5 @@
 import {BaseService} from ".";
-import {SongInput} from "@/app/board/[teamId]/song/_components/new-button";
+import { MusicSheet, SongInput } from "@/app/board/[teamId]/song/_components/song-form";
 
 class SongService extends BaseService {
   constructor() {
@@ -17,7 +17,7 @@ class SongService extends BaseService {
     return songs
   }
 
-  async addNewSong(userId: string, teamId: string, songInput: SongInput) {
+  async addNewSong(userId: string, teamId: string, songInput: any) {
     const newSong = {
       team_id: teamId,
       title: songInput.title,
@@ -39,7 +39,7 @@ class SongService extends BaseService {
         time: new Date(),
       },
       last_used_time: new Date(),
-      storage_location: [],
+      storage_location: songInput.files.map((x:File) => x.name),
     }
     return await this.create(newSong);
   }

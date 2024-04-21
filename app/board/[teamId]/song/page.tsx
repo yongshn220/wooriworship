@@ -7,7 +7,6 @@ import SongService from "@/apis/SongService";
 import {Song} from "@/models/song";
 import {Button} from "@/components/ui/button";
 
-
 export default async function SongPage({params}: any) {
   const teamId = params.teamId
 
