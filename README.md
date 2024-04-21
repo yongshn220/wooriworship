@@ -5,8 +5,10 @@ Phase 1: MFR Part 1(Minimum Functional Requirement).
 ~~2. User can create Team.~~  
 3. Leader Invites Team to other users.  
 4. User can add song  
-5. User can create Worship  
-6. Others in the team can view the worship  
+5. User can Update/Delete Song
+6. User can create Worship  
+7. Others in the team can view the worship  
+8. User can Update/Delete Worship
 
 Phase 2: MFR Part 2 Advanced Feature  
 1. User can delete Account.  

@@ -16,6 +16,15 @@ export function NewButton() {
 
 
 
+  /*async function handleViewSong() {
+    const sampleUrl = '/ngAraLTxWKZCvsdc1zvO/주님의 마음 있는 곳[Bb].jpg'
+    const url = await StorageService.downloadFile(sampleUrl);
+    console.log(url);
+    const imgElement = document.getElementById('image');
+    if(imgElement != null)
+      imgElement.setAttribute('src', String(url))
+  }*/
+
   return (
     <div>
       <SongForm mode={Mode.CREATE} isOpen={isOpen} setIsOpen={setIsOpen} song={null}/>

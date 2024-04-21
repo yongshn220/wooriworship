@@ -24,6 +24,7 @@ import {useSession} from "next-auth/react";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {Song} from "@/models/song";
+import TagService from "@/apis/TagService";
 
 enum Mode {
   EDIT,
@@ -68,26 +69,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
-  function handleUpload() {
-    setIsLoading(true)
-
-    if (!session?.user.id) {
-      console.log("error");
-      setIsOpen(false)
-      setIsLoading(false)
-      return;
-    }
-
-    try {
-      console.log(musicSheets);
-      StorageService.uploadFile(teamId, musicSheets[0].file?.name, musicSheets[0].file);
-    }
-    catch (e) {
-      console.log("err", e)
-    }
-  }
-
-  function handleCreate() {
+  async function handleCreate() {
     setIsLoading(true)
 
     if (!session?.user.id) {
@@ -102,15 +84,17 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
         ...input,
         files: musicSheets.map((musicSheet) => musicSheet.file)
       }
-
-      SongService.addNewSong(session?.user.id, teamId, songInput).then(() => {
-        toast({
-          title: "New song has been added.",
-          description: team?.name,
-        })
-        setIsOpen(false)
-        setIsLoading(false)
+      const songId = await SongService.addNewSong(session?.user.id, teamId, songInput);
+      const promises = [];
+      promises.push(TagService.addNewTags(teamId, songInput.tags));
+      promises.push(StorageService.uploadFiles(teamId, songId, songInput.files));
+      await Promise.all(promises);
+      toast({
+        title: "New song has been added.",
+        description: team?.name,
       })
+      setIsOpen(false)
+      setIsLoading(false)
     }
     catch (e) {
       console.log("err", e)
@@ -127,13 +111,20 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       return;
     }
 
-    try {}
+    try {
+      const songInput = {
+        ...input,
+        files: musicSheets.map((musicSheet) => musicSheet.file)
+      }
+      console.log("input:");
+      console.log(songInput);
+    }
     catch (e) {
       console.log("err", e)
     }
     finally {
-      setIsOpen(true)
-      setIsLoading(true)
+      setIsOpen(false)
+      setIsLoading(false)
     }
   }
 
@@ -239,7 +230,6 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
             ? <Button type="submit" onClick={handleEdit}>{isLoading? "Editing..." : "Edit"}</Button>
             : <Button type="submit" onClick={handleCreate}>{isLoading? "Creating..." : "Create"}</Button>
           }
-          <Button type="submit" onClick={handleUpload}>{isLoading? "Uploading File..." : "Upload file"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

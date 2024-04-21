@@ -22,7 +22,7 @@ export default class BaseService {
     }
 
     async getByIds(ids: Array<string>|undefined) {
-        if(null) {
+        if(ids == null) {
             return [];
         }
         return await this.queryByArray({
@@ -30,7 +30,6 @@ export default class BaseService {
             b: 'in',
             c: ids
         });
-
     }
 
     async getByEmail(email: string) {

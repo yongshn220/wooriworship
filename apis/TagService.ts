@@ -21,7 +21,21 @@ class TagService extends BaseService {
         team_id: teamId,
         name: tagName
     }
-    return await this.create(newTag);
+    return await this.update(`${teamId}-스플릿-${tagName}`, newTag);
+  }
+
+  async addNewTags(teamId:string, tagNames: Array<string>) {
+    const updates = [];
+    for(let tagName of tagNames) {
+      updates.push(this.addNewTag(teamId, tagName));
+    }
+    try {
+      await Promise.all(updates);
+      console.log('Tag Upload finished');
+      return
+    } catch (err) {
+      console.error('Error occured: '+err);
+    }
   }
 }
 
