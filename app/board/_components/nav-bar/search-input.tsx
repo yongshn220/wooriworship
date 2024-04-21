@@ -2,8 +2,11 @@
 
 import {Search} from "lucide-react";
 import {Input} from "@/components/ui/input";
+import {useRecoilState} from "recoil";
+import {songSearchInputAtom} from "@/app/board/_states/pageState";
 
 export function SearchInput() {
+  const [input, setInput] = useRecoilState(songSearchInputAtom)
 
   return (
     <div className="relative w-full">
@@ -11,6 +14,8 @@ export function SearchInput() {
       <Input
         className="w-full pl-9"
         placeholder="Search songs"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
       />
     </div>
   )

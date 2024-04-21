@@ -20,10 +20,10 @@ export function SongSelectCard({song, isSelected}: Props) {
   return (
     <div className="h-full">
       <SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen} song={song} editable={false}/>
-      <div className="aspect-[1/1] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC]">
+      <div className="aspect-[5/4] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC]">
         <div className="relative group h-full flex-center flex-col text-white cursor-pointer" onClick={() => setIsOpen(true)}>
           <HoverOverlay/>
-          <p className="font-semibold text-lg">{song?.title}</p>
+          <p className="font-semibold text-sm">{song?.title}</p>
           <p className="text-sm">{song?.original.author}</p>
         </div>
         <div className="w-full flex-center bg-white p-2">
