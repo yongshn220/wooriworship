@@ -101,10 +101,11 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     }
   }
 
-  function handleEdit() {
+  async function handleEdit() {
     setIsLoading(true)
 
-    if (!session?.user.id) {
+    if (!session?.user.id || (song == null || song.id == null)) {
+      console.log(song);
       console.log("error");
       setIsOpen(false)
       setIsLoading(false)
@@ -118,6 +119,12 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       }
       console.log("input:");
       console.log(songInput);
+
+      const promises = [];
+      promises.push(SongService.updateSong(session?.user.id, song?.id, songInput));
+      promises.push(TagService.addNewTags(teamId, songInput.tags));
+      // promises.push(StorageService.uploadFiles(teamId, song.id, songInput.files));
+
     }
     catch (e) {
       console.log("err", e)

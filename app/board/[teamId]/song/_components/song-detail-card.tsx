@@ -13,7 +13,8 @@ import {Song} from "@/models/song";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
 import {EditButton} from "@/app/board/[teamId]/song/_components/edit-button";
-
+import { StorageService } from "@/apis";
+import { useEffect, useState } from "react";
 
 interface Props {
   isOpen: boolean
@@ -23,7 +24,21 @@ interface Props {
 }
 
 export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props) {
-  console.log(song)
+  const [urls, setUrls] = useState<any>([])
+
+  useEffect(() => {
+    Promise.all(song.storage_location.map(image => StorageService.downloadMusicSheet(song.team_id, song.id, image))).then(_urls => {
+      console.log("song: ");
+      console.log(song);
+      setUrls(_urls);
+      console.log(_urls);
+    })
+  }, [])
+  /*
+  const imgElement = document.getElementById('image');
+  if(imgElement != null)
+    imgElement.setAttribute('src', String(url))
+  */
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[600px] h-5/6 overflow-y-scroll scrollbar-hide">
