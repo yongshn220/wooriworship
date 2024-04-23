@@ -39,6 +39,10 @@ class StorageService {
             console.log("Error getting download url: " + err);
         }
     }
+
+    async downloadMusicSheet(team_id: string, song_id: string, sheet_name: string) {
+       return await this.downloadFile(`${team_id}/${song_id}-스플릿-${sheet_name}`);
+    }
 }
 
 export default new StorageService();
