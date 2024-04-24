@@ -1,6 +1,12 @@
-import React, {Dispatch, SetStateAction} from 'react';
+"use client"
+
+import React, {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
 import MultipleSelector, { Option } from '@/components/ui/multiple-selector';
 import {SongInput} from "@/app/board/[teamId]/song/_components/song-form";
+import {useRecoilValue} from "recoil";
+import {currentTeamIdAtom} from "@/global-states/teamState";
+import tagService from "@/apis/TagService";
+import {toast} from "@/components/ui/use-toast";
 
 interface Props {
   input: SongInput
@@ -8,18 +14,32 @@ interface Props {
 }
 
 export function TagMultiSelect({input, setInput}: Props) {
-  const options = input.tags.map(tag => ({label: tag, value: tag}))
+  const teamId = useRecoilValue(currentTeamIdAtom)
+  const [teamTags, setTeamTags] = useState<Array<string>>([])
+  const options = useMemo(() => (teamTags.map(tag => ({label: tag, value: tag}))), [teamTags])
+
+  useEffect(() => {
+    tagService.getTeamTags(teamId).then(_teamTags => {
+      setTeamTags(_teamTags.map(_tag => _tag.name))
+    })
+  }, [teamId])
 
   function handleTagChange(options: Option[]) {
     const selectedTags = options.map(options => options.value)
     setInput((prev: SongInput) => ({...prev, tags: selectedTags}))
   }
+
   return (
     <div className="w-full">
       <MultipleSelector
         creatable
-        defaultOptions={options}
-        value={options}
+        options={options}
+        maxSelected={5}
+        onMaxSelected={(maxLimit) => {
+          toast({
+            title: `You have reached max selected: ${maxLimit}`,
+          });
+        }}
         placeholder="Select tags you like"
         emptyIndicator={
           <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
@@ -32,4 +52,3 @@ export function TagMultiSelect({input, setInput}: Props) {
     </div>
   );
 }
-

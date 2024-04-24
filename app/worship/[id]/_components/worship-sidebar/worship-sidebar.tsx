@@ -10,7 +10,7 @@ import Image from "next/image";
 import {StartWorshipButton} from "@/app/worship/[id]/_components/worship-sidebar/start-worship-button";
 import {DownloadMusicSheetButton} from "@/app/worship/[id]/_components/worship-sidebar/download-music-sheet-button";
 import {Routes} from "@/components/constants/enums";
-import {getPathPlan, getPathSong} from "@/components/helper-function/routes";
+import {getPathPlan, getPathSong} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 

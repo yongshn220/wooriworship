@@ -6,10 +6,17 @@ import {User} from "@/models/user";
 
 export async function List() {
   const session = await getServerSession(authOptions)
-  if (!session) return <></>
+  if (!session) {
+    console.log("no session")
+    return <></>
+  }
 
   const user = await UserService.getById(session.user.id) as User
-  if (!user) return <></>
+  if (!user) {
+    console.log("no user")
+    return <></>
+  }
+  console.log(user.teams)
 
   return (
     <>

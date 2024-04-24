@@ -1,29 +1,26 @@
 'use client'
 
 import {Dialog, DialogClose, DialogContent, DialogTrigger} from "@/components/ui/dialog";
-import {Plus, Search} from "lucide-react";
+import {Search} from "lucide-react";
 import {Input} from "@/components/ui/input";
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useState} from "react";
 import SongService from "@/apis/SongService";
-import {useRecoilState, useRecoilValue} from "recoil";
+import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {Song} from "@/models/song";
-import {SongSelectCard} from "@/app/board/_components/worship-plan/song-select-card";
 import {Button} from "@/components/ui/button";
-import {selectedSongListAtom} from "@/app/board/_components/worship-plan/status";
+import {SongSelectCardList} from "@/app/board/_components/worship-plan/song-select-card-list";
 
 export function AddSongButton() {
   const teamId = useRecoilValue(currentTeamIdAtom)
   const [songList, setSongList] = useState<Array<Song>>([])
-  const [selectedSongList, setSelectedSongList] = useRecoilState(selectedSongListAtom)
+  const [input, setInput] = useState("")
 
   useEffect(() => {
     SongService.getTeamSong(teamId).then(songList => {
       setSongList(songList as Array<Song>)
     })
   }, [teamId])
-
-  const selectedSongIds = useMemo(() => selectedSongList.map((song) => song.id), [selectedSongList])
 
   return (
     <Dialog>
@@ -39,19 +36,11 @@ export function AddSongButton() {
             <Input
               className="w-full pl-11 py-6"
               placeholder="Search songs"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
             />
           </div>
-          <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10 mt-10">
-            {
-              songList.map((song: Song) => (
-                <SongSelectCard
-                  key={song.id}
-                  song={JSON.parse(JSON.stringify(song))}
-                  isSelected={selectedSongIds.includes(song.id)}
-                />
-              ))
-            }
-          </div>
+          <SongSelectCardList searchInput={input} songList={songList}/>
         </div>
         <DialogClose asChild>
           <div className="w-full flex-center">

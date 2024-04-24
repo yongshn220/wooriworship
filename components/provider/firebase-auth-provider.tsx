@@ -1,11 +1,12 @@
 "use client"
 
 import {Session} from "next-auth";
-import {AuthService} from "@/apis";
+import {AuthService, UserService} from "@/apis";
 import {useSession} from "next-auth/react";
 import {useEffect} from "react";
 import {useSetRecoilState} from "recoil";
 import {firebaseSyncAtom} from "@/global-states/syncState";
+import {auth} from "@/firebase";
 
 
 async function syncFirebaseAuth(session: Session) {

@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import * as React from 'react';
 import { X } from 'lucide-react';
@@ -278,9 +278,12 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
               return;
             }
             setInputValue('');
-            const newOptions = [...selected, { value, label: value }];
-            setSelected(newOptions);
-            onChange?.(newOptions);
+            const values = selected.map(obj => obj.value)
+            if (!values.includes(value)) {
+              const newOptions = [...selected, {value, label: value}];
+              setSelected(newOptions);
+              onChange?.(newOptions);
+            }
           }}
         >{`Create "${inputValue}"`}</CommandItem>
       );
