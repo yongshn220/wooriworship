@@ -23,7 +23,6 @@ interface Props {
 }
 
 export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props) {
-  console.log(song)
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[600px] h-5/6 overflow-y-scroll scrollbar-hide">
