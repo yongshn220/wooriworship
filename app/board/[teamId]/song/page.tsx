@@ -1,11 +1,10 @@
-
-import {SongCard} from "@/app/board/[teamId]/song/_components/song-card";
 import {NewButton} from "@/app/board/[teamId]/song/_components/new-button";
 import {PageInit} from "@/components/page/page-init";
 import {Page} from "@/components/constants/enums";
 import SongService from "@/apis/SongService";
 import {Song} from "@/models/song";
-import {Button} from "@/components/ui/button";
+import {SongCardList} from "@/app/board/[teamId]/song/_components/song-card-list";
+import {toPlainObject} from "@/components/helper/helper-functions";
 
 export default async function SongPage({params}: any) {
   const teamId = params.teamId
@@ -21,13 +20,7 @@ export default async function SongPage({params}: any) {
         </p>
         <NewButton/>
       </div>
-      <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10">
-        {
-          songList.map((song: Song) => (
-            <SongCard key={song.id} song={JSON.parse(JSON.stringify(song))}/>
-          ))
-        }
-      </div>
+      <SongCardList songList={toPlainObject(songList)}/>
     </div>
   )
 }

@@ -11,7 +11,7 @@ import {CreateNewTeamDialog} from "@/app/board/_components/create-new-team-dialo
 import {useRecoilState, useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {useRouter} from "next/navigation";
-import {getPathPlan} from "@/components/helper-function/routes";
+import {getPathPlan} from "@/components/helper/routes";
 
 export function TeamSelect() {
   const router = useRouter()

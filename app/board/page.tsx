@@ -5,7 +5,7 @@ import {useEffect} from "react";
 import {UserService} from "@/apis";
 import {User} from "@/models/user";
 import {useRouter} from "next/navigation";
-import {getPathPlan} from "@/components/helper-function/routes";
+import {getPathPlan} from "@/components/helper/routes";
 
 
 export default function BoardPage() {
