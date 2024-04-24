@@ -18,13 +18,11 @@ import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/app/board/[teamId]/song/_components/multiple-image-uploader";
 import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
-import SongService from "@/apis/SongService";
-import StorageService from "@/apis/StorageService";
 import {useSession} from "next-auth/react";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {Song} from "@/models/song";
-import TagService from "@/apis/TagService";
+import {SongService, StorageService, TagService}  from "@/apis";
 
 enum Mode {
   EDIT,
@@ -123,7 +121,8 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       const promises = [];
       promises.push(SongService.updateSong(session?.user.id, song?.id, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
-      // promises.push(StorageService.uploadFiles(teamId, song.id, songInput.files));
+      // @todo 여기다
+      // promises.push(StorageService.updateMusicSheets(teamId, song.id, new_sheets, delete_sheets));
 
     }
     catch (e) {

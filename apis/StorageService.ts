@@ -40,8 +40,44 @@ class StorageService {
         }
     }
 
+    async deleteFile(fileUrl: string) {
+        const fileRef = storage.ref().child(fileUrl)
+        try {
+            await fileRef.delete();
+            return fileUrl;
+        } catch (err) {
+            console.log("Delete failed: "+ err);
+            return null;
+        }
+    }
+
     async downloadMusicSheet(team_id: string, song_id: string, sheet_name: string) {
        return await this.downloadFile(`${team_id}/${song_id}-스플릿-${sheet_name}`);
+    }
+
+    async deleteMusicSheets(sheet_directories: Array<string>) {
+        const promises = [];
+        try {
+            for(let directory of sheet_directories) {
+                promises.push(this.deleteFile(directory));
+            }
+            await Promise.all(promises);
+            return sheet_directories;
+        } catch (err) {
+            return [];
+        }
+    }
+
+    async updateMusicSheets(teamId: string, songId: string, new_sheets: Array<File>, delete_sheets: Array<string>) {
+        const promises = [];
+        try{
+            promises.push(this.deleteMusicSheets(delete_sheets));
+            promises.push(this.uploadFiles(teamId, songId, new_sheets));
+            await Promise.all(promises);
+            return true;
+        } catch (err) {
+            return false;
+        }
     }
 }
 
