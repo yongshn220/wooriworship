@@ -1,11 +1,10 @@
-
-import {SongCard} from "@/app/board/[teamId]/song/_components/song-card";
 import {NewButton} from "@/app/board/[teamId]/song/_components/new-button";
 import {PageInit} from "@/components/page/page-init";
 import {Page} from "@/components/constants/enums";
 import SongService from "@/apis/SongService";
 import {Song} from "@/models/song";
 import {SongCardList} from "@/app/board/[teamId]/song/_components/song-card-list";
+import {toPlainObject} from "@/components/helper/helper-functions";
 
 
 export default async function SongPage({params}: any) {
@@ -22,7 +21,7 @@ export default async function SongPage({params}: any) {
         </p>
         <NewButton/>
       </div>
-      <SongCardList songList={songList}/>
+      <SongCardList songList={toPlainObject(songList)}/>
     </div>
   )
 }

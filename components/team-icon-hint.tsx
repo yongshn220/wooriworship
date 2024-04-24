@@ -4,7 +4,7 @@ import {Hint} from "@/components/hint";
 import {useRecoilState, useRecoilValue} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {cn} from "@/lib/utils";
-import {getPathPlan} from "@/components/helper-function/routes";
+import {getPathPlan} from "@/components/helper/routes";
 import {useRouter} from "next/navigation";
 
 

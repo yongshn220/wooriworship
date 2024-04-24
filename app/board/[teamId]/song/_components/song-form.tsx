@@ -12,7 +12,7 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {TeamIcon} from "@/components/team-icon";
 import {Button} from "@/components/ui/button";
-import {Dispatch, SetStateAction, useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {TagMultiSelect} from "@/app/board/[teamId]/song/_components/tag-multi-select";
 import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
@@ -24,6 +24,7 @@ import {useSession} from "next-auth/react";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {Song} from "@/models/song";
+import tagService from "@/apis/TagService";
 
 enum Mode {
   EDIT,

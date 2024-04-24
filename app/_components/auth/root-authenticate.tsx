@@ -6,7 +6,7 @@ import {useRouter} from "next/navigation";
 import {Routes} from "@/components/constants/enums";
 import {useRecoilValue} from "recoil";
 import {firebaseSyncAtom} from "@/global-states/syncState";
-import {getPathBoard, getPathPlan} from "@/components/helper-function/routes";
+import {getPathBoard, getPathPlan} from "@/components/helper/routes";
 import {UserService} from "@/apis";
 
 const SessionType = {

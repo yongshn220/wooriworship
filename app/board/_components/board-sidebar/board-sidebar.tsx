@@ -8,7 +8,7 @@ import {MainLogo} from "@/components/logo/main-logo";
 import {MdSidebar} from "@/components/sidebar/md-sidebar";
 import {useRecoilValue} from "recoil";
 import {currentPageAtom} from "@/app/board/_states/pageState";
-import {getPathPlan, getPathSong} from "@/components/helper-function/routes";
+import {getPathPlan, getPathSong} from "@/components/helper/routes";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 
 
