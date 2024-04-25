@@ -38,6 +38,7 @@ export interface SongInput {
   title: string
   author: string
   version: string
+  key: string
   link: string
   tags: Array<string>
   bpm: number | null
@@ -58,6 +59,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     title: (mode === Mode.EDIT)? song?.title?? "" : "",
     author: (mode === Mode.EDIT)? song?.original.author?? "" : "",
     version: (mode === Mode.EDIT)? song?.version?? "" : "",
+    key: (mode === Mode.EDIT)? song?.key?? "":"",
     link: (mode === Mode.EDIT)? song?.original.url?? "" : "",
     tags: (mode === Mode.EDIT)? song?.tags?? [] : [],
     bpm: (mode === Mode.EDIT)? song?.bpm?? null : null,

@@ -55,6 +55,12 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
           </div>
           <div className="flex-between items-center">
             <Label htmlFor="name" className="text-base font-semibold">
+              Key
+            </Label>
+            <p>{song?.key}</p>
+          </div>
+          <div className="flex-between items-center">
+            <Label htmlFor="name" className="text-base font-semibold">
               Link
             </Label>
             <p className="text-blue-500 hover:text-blue-600 cursor-pointer">
