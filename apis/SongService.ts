@@ -26,6 +26,7 @@ class SongService extends BaseService {
         url: songInput.link
       },
       version: songInput.version,
+      key: songInput.key,
       description: songInput.description,
       lyrics: "",
       bpm: songInput.bpm,
@@ -60,6 +61,7 @@ class SongService extends BaseService {
         id: userId,
         time: new Date()
       },
+      key: songInput.key
       //storage_location: songInput.files.map((x:File) => x.name),
     }
     return await this.update(songId, song);

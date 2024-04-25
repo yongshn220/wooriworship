@@ -21,4 +21,5 @@ export interface Song {
     id: string
     time: Date
   }
+  key: string
 }
