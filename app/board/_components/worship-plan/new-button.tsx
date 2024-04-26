@@ -20,7 +20,7 @@ import {NewSongCard} from "@/app/board/_components/worship-plan/new-song-card";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {useSession} from "next-auth/react";
-import SongService from "@/apis/SongService";
+import {WorshipService} from "@/apis";
 import {useToast} from "@/components/ui/use-toast";
 import {AddSongButton} from "@/app/board/_components/worship-plan/add-song-button";
 import {selectedSongListAtom} from "@/app/board/_components/worship-plan/status";
@@ -68,16 +68,16 @@ export function NewButton() {
       }
 
       console.log(worshipInput)
-      /* TODO: WorshipService
-      WorshipService.addNewWorship(session?.user.id, teamId, worshipInput).then(() => {
-        toast({
-          title: `New worship has set on ${date}.`,
-          description: team?.name,
-        })
-        setIsOpen(false)
-        setIsLoading(false)
-      })
-       */
+      // @TODO: WorshipService
+      // WorshipService.addNewWorship(session?.user.id, teamId, worshipInput).then(() => {
+      //   toast({
+      //     title: `New worship has set on ${date}.`,
+      //     description: team?.name,
+      //   })
+      //   setIsOpen(false)
+      //   setIsLoading(false)
+      // })
+       
     }
     catch (e) {
       console.log("err", e)

@@ -56,18 +56,11 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     bpm: (mode === Mode.EDIT)? song?.bpm?? null : null,
     description: (mode === Mode.EDIT)? song?.description?? "" : ""
   })
-  const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
+  const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>(song?.music_sheet_urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<MusicSheet>)
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
-  useEffect(() => {
-    if (mode === Mode.EDIT && song) {
-      Promise.all(song.storage_location.map(image => StorageService.downloadMusicSheet(song?.team_id, song?.id, image))).then(urls => {
-        setMusicSheets(urls.map((url => ({id: "", file: null, url: url, isLoading: false}))) as Array<MusicSheet>);
-      })
-    }
-  }, [mode, song])
-
+  console.log("music Sheets", musicSheets, song)
   async function handleCreate() {
     setIsLoading(true)
 
@@ -79,15 +72,19 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     }
 
     try {
+      const downloadUrls = await StorageService.uploadFiles(teamId, musicSheets.map((musicSheet) => musicSheet.file) as Array<File>);
       const songInput = {
         ...input,
-        musicSheets
+        music_sheet_urls: downloadUrls
       }
-      // const songId = await SongService.addNewSong(session?.user.id, teamId, songInput);
-      // const promises = [];
-      // promises.push(TagService.addNewTags(teamId, songInput.tags));
-      // promises.push(StorageService.uploadFiles(teamId, songId, songInput.files));
-      // await Promise.all(promises);
+      const promises = [];
+      console.log(songInput);
+      promises.push(SongService.addNewSong(session?.user.id, teamId, songInput));
+      promises.push(TagService.addNewTags(teamId, songInput.tags));
+
+      promises.push();
+      await Promise.all(promises)
+
       toast({
         title: "New song has been added.",
         description: team?.name,
@@ -104,30 +101,28 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     setIsLoading(true)
 
     if (!session?.user.id || (song == null || song.id == null)) {
-      console.log(song);
-      console.log("error");
       setIsOpen(false)
       setIsLoading(false)
       return;
     }
 
     try {
+      const curImageUrls = musicSheets.map(item => item.url)
+      const filesToAdd = musicSheets.map(item => item.file).filter(file => !!file) as Array<File>
+      const urlsToDelete = song.music_sheet_urls.filter(url => !curImageUrls.includes(url))
+      const urlsToKeep = song.music_sheet_urls.filter(url => curImageUrls.includes(url))
+
+      const newDownloadUrls = await StorageService.updateMusicSheets(teamId, filesToAdd, urlsToDelete);
       const songInput = {
         ...input,
-        files: musicSheets.map((musicSheet) => musicSheet.file)
+        music_sheet_urls: urlsToKeep.concat(newDownloadUrls)
       }
 
       const promises = [];
       promises.push(SongService.updateSong(session?.user.id, song?.id, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
 
-      const curImageUrls = musicSheets.map(item => item.url)
-      const filesToAdd = musicSheets.map(item => item.file).filter(file => !!file) as Array<File>
-
-      const urlsToDelete = song.storage_location.filter(url => !curImageUrls.includes(url))
-      const urlsToKeep = song.storage_location.filter(url => curImageUrls.includes(url))
-
-      promises.push(StorageService.updateMusicSheets(teamId, song.id, filesToAdd, urlsToDelete))
+      promises.push(StorageService.updateMusicSheets(teamId, filesToAdd, urlsToDelete))
     }
     catch (e) {
       console.log("err", e)
@@ -230,7 +225,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
               </MultipleImageUploader>
               <div className="flex w-full h-full gap-4 overflow-x-auto">
                 {
-                  musicSheets.map((musicSheet, i) => (
+                  musicSheets?.map((musicSheet, i) => (
                     <MusicSheetCard key={i} musicSheet={musicSheet} index={i} handleRemoveImage={handleRemoveImage}/>
                   ))
                 }
