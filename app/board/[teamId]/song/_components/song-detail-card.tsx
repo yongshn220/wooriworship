@@ -23,14 +23,6 @@ interface Props {
 }
 
 export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props) {
-  const [musicSheetUrls, setMusicSheetUrls] = useState<any>([])
-
-  useEffect(() => {
-    Promise.all(song.storage_location.map(image => StorageService.downloadMusicSheet(song.team_id, song.id, image))).then(_urls => {
-      setMusicSheetUrls(_urls);
-    })
-  }, [song.id, song.team_id, song.storage_location])
-
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -79,12 +71,12 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
               </div>
             </div>
             {
-              musicSheetUrls.length > 0 &&
+              song.music_sheet_urls.length > 0 &&
               <div className="flex-start flex-col w-full items-center gap-1.5">
                 <div className="flex-center w-full aspect-[2/1] p-2 rounded-md">
                   <div className="flex-start w-full h-full gap-4 overflow-x-auto">
                     {
-                      musicSheetUrls.map((url: string, i: number) => (
+                      song.music_sheet_urls.map((url: string, i: number) => (
                         <div key={i} className="flex flex-col h-full aspect-[3/4] pb-1">
                           <div className="relative flex-1 bg-gray-200 rounded-md">
                             <Image
