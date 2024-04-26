@@ -16,7 +16,8 @@ interface Props {
 export function TagMultiSelect({input, setInput}: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
   const [teamTags, setTeamTags] = useState<Array<string>>([])
-  const options = useMemo(() => (teamTags.map(tag => ({label: tag, value: tag}))), [teamTags])
+  const teamOptions = useMemo(() => (teamTags.map(tag => ({label: tag, value: tag}))), [teamTags])
+  const selectedOptions = useMemo(() => (input.tags.map(tag => ({label: tag, value: tag}))), [input.tags])
 
   useEffect(() => {
     tagService.getTeamTags(teamId).then(_teamTags => {
@@ -33,7 +34,8 @@ export function TagMultiSelect({input, setInput}: Props) {
     <div className="w-full">
       <MultipleSelector
         creatable
-        options={options}
+        options={teamOptions}
+        value={selectedOptions}
         maxSelected={5}
         onMaxSelected={(maxLimit) => {
           toast({
