@@ -11,3 +11,9 @@ export const songSearchInputAtom = atom({
   key: "songSearchInputAtom",
   default: ""
 })
+
+
+export const searchSelectedTagsAtom = atom<Array<string>>({
+  key: "searchSelectedTagsAtom",
+  default: []
+})
