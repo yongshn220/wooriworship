@@ -1,13 +1,25 @@
+"use client"
+
 import {Badge} from "@/components/ui/badge";
 import FilterIcon from '@/public/icons/filterIcon.svg'
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {cn} from "@/lib/utils";
-import {useState} from "react";
-
-const tags = ["빠른", "잔잔한", "사랑", "기쁨", "신나는", "엔딩곡", "시작곡"]
+import {useEffect, useState} from "react";
+import {useRecoilState, useRecoilValue} from "recoil";
+import {currentTeamIdAtom} from "@/global-states/teamState";
+import tagService from "@/apis/TagService";
+import {searchSelectedTagsAtom} from "@/app/board/_states/pageState";
 
 export function SearchTags() {
-  const [selectedTags, setSelectedTags] = useState<Array<string>>([])
+  const teamId = useRecoilValue(currentTeamIdAtom)
+  const [teamTags, setTeamTags] = useState<Array<string>>([])
+  const [selectedTags, setSelectedTags] = useRecoilState(searchSelectedTagsAtom)
+
+  useEffect(() => {
+    tagService.getTeamTags(teamId).then(_teamTags => {
+      setTeamTags(_teamTags.map(_tag => _tag.name))
+    })
+  }, [teamId])
 
   function isTagSelected(badge: string) {
     return selectedTags.includes(badge)
@@ -32,7 +44,7 @@ export function SearchTags() {
           <p className="text-sm text-gray-500">Select tags you like to search the songs</p>
           <div className="relative w-full space-x-2 space-y-2 mt-2">
             {
-              tags.map((tag, i) => (
+              teamTags.map((tag, i) => (
                 <Badge
                   key={i}
                   className={cn("bg-[#AA95CC] hover:bg-[#9780BE] cursor-pointer", {"bg-[#7357A1] hover:bg-[#7357A1]": isTagSelected(tag)})}

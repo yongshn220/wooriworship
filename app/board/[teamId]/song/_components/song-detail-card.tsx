@@ -28,7 +28,6 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
   useEffect(() => {
     Promise.all(song.storage_location.map(image => StorageService.downloadMusicSheet(song.team_id, song.id, image))).then(_urls => {
       setMusicSheetUrls(_urls);
-      console.log(_urls)
     })
   }, [song.id, song.team_id, song.storage_location])
 
