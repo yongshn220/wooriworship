@@ -1,18 +1,13 @@
 'use client'
 
+
 import {Plus} from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription, DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {TeamIcon} from "@/components/team-icon";
 import {Button} from "@/components/ui/button";
-import {Dispatch, SetStateAction, useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {TagMultiSelect} from "@/app/board/[teamId]/song/_components/tag-multi-select";
 import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
@@ -43,7 +38,7 @@ export interface SongInput {
 }
 export interface MusicSheet {
   id: string;
-  file: File;
+  file: File | null;
   url: string;
   isLoading: boolean;
 }
@@ -66,6 +61,14 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
+  useEffect(() => {
+    if (mode === Mode.EDIT && song) {
+      Promise.all(song.storage_location.map(image => StorageService.downloadMusicSheet(song?.team_id, song?.id, image))).then(urls => {
+        setMusicSheets(urls.map((url => ({id: "", file: null, url: url, isLoading: false}))) as Array<MusicSheet>);
+      })
+    }
+  }, [mode, song])
+
   async function handleCreate() {
     setIsLoading(true)
 
@@ -79,13 +82,13 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     try {
       const songInput = {
         ...input,
-        files: musicSheets.map((musicSheet) => musicSheet.file)
+        musicSheets
       }
-      const songId = await SongService.addNewSong(session?.user.id, teamId, songInput);
-      const promises = [];
-      promises.push(TagService.addNewTags(teamId, songInput.tags));
-      promises.push(StorageService.uploadFiles(teamId, songId, songInput.files));
-      await Promise.all(promises);
+      // const songId = await SongService.addNewSong(session?.user.id, teamId, songInput);
+      // const promises = [];
+      // promises.push(TagService.addNewTags(teamId, songInput.tags));
+      // promises.push(StorageService.uploadFiles(teamId, songId, songInput.files));
+      // await Promise.all(promises);
       toast({
         title: "New song has been added.",
         description: team?.name,
@@ -114,15 +117,16 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
         ...input,
         files: musicSheets.map((musicSheet) => musicSheet.file)
       }
-      console.log("input:");
-      console.log(songInput);
 
       const promises = [];
       promises.push(SongService.updateSong(session?.user.id, song?.id, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
-      // @todo 여기다
-      // promises.push(StorageService.updateMusicSheets(teamId, song.id, new_sheets, delete_sheets));
 
+      const curImageUrls = musicSheets.map(item => item.url)
+      const filesToAdd = musicSheets.map(item => item.file).filter(file => !!file) as Array<File>
+
+      const urlsToDelete = song.storage_location.filter(url => !curImageUrls.includes(url));
+      promises.push(StorageService.updateMusicSheets(teamId, song.id, filesToAdd, urlsToDelete));
     }
     catch (e) {
       console.log("err", e)
@@ -131,6 +135,10 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       setIsOpen(false)
       setIsLoading(false)
     }
+  }
+
+  function handleRemoveImage(index: number) {
+    setMusicSheets(item =>item.filter((_, i) => i !== index));
   }
 
   return (
@@ -219,10 +227,10 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
                     className="h-[50px] w-[50px] rounded-full p-2 text-white bg-blue-500 hover:bg-blue-400 cursor-pointer"/>
                 </div>
               </MultipleImageUploader>
-              <div className="flex w-full h-full gap-4 overflow-x-scroll">
+              <div className="flex w-full h-full gap-4 overflow-x-auto">
                 {
-                  musicSheets.map((musicSheet, id) => (
-                    <MusicSheetCard key={id} musicSheet={musicSheet} index={id}/>
+                  musicSheets.map((musicSheet, i) => (
+                    <MusicSheetCard key={i} musicSheet={musicSheet} index={i} handleRemoveImage={handleRemoveImage}/>
                   ))
                 }
               </div>
@@ -232,8 +240,8 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
         <DialogFooter>
           {
             (mode === Mode.EDIT)
-            ? <Button type="submit" onClick={handleEdit}>{isLoading? "Editing..." : "Edit"}</Button>
-            : <Button type="submit" onClick={handleCreate}>{isLoading? "Creating..." : "Create"}</Button>
+              ? <Button type="submit" onClick={handleEdit}>{isLoading ? "Editing..." : "Edit"}</Button>
+              : <Button type="submit" onClick={handleCreate}>{isLoading ? "Creating..." : "Create"}</Button>
           }
         </DialogFooter>
       </DialogContent>
