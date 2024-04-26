@@ -1,6 +1,5 @@
 'use client'
 
-
 import {Plus} from "lucide-react";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
@@ -125,8 +124,10 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       const curImageUrls = musicSheets.map(item => item.url)
       const filesToAdd = musicSheets.map(item => item.file).filter(file => !!file) as Array<File>
 
-      const urlsToDelete = song.storage_location.filter(url => !curImageUrls.includes(url));
-      promises.push(StorageService.updateMusicSheets(teamId, song.id, filesToAdd, urlsToDelete));
+      const urlsToDelete = song.storage_location.filter(url => !curImageUrls.includes(url))
+      const urlsToKeep = song.storage_location.filter(url => curImageUrls.includes(url))
+
+      promises.push(StorageService.updateMusicSheets(teamId, song.id, filesToAdd, urlsToDelete))
     }
     catch (e) {
       console.log("err", e)
