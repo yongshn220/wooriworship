@@ -80,14 +80,17 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     }
 
     try {
+      const downloadUrls = await StorageService.uploadFiles(teamId, musicSheets.map((musicSheet) => musicSheet.file));
       const songInput = {
         ...input,
-        files: musicSheets.map((musicSheet) => musicSheet.file)
+        music_sheet_urls: downloadUrls
       }
-      const songId = await SongService.addNewSong(session?.user.id, teamId, songInput);
       const promises = [];
+      console.log(songInput);
+      promises.push(SongService.addNewSong(session?.user.id, teamId, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
-      promises.push(StorageService.uploadFiles(teamId, songId, songInput.files));
+     
+      promises.push();
       await Promise.all(promises);
       toast({
         title: "New song has been added.",
@@ -113,18 +116,16 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     }
 
     try {
+      const new_sheets: File[] = [];
+      const delete_sheets: string[] = [];
+      const newDownloadUrls = await StorageService.updateMusicSheets(teamId, new_sheets, delete_sheets);
       const songInput = {
         ...input,
-        files: musicSheets.map((musicSheet) => musicSheet.file)
+        music_sheet_urls: song.music_sheet_urls.filter(element => !delete_sheets.includes(element)).concat(newDownloadUrls)
       }
-      console.log("input:");
-      console.log(songInput);
-
       const promises = [];
       promises.push(SongService.updateSong(session?.user.id, song?.id, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
-      // @todo 여기다
-      // promises.push(StorageService.updateMusicSheets(teamId, song.id, new_sheets, delete_sheets));
 
     }
     catch (e) {

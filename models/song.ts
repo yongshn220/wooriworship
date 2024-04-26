@@ -11,7 +11,7 @@ export interface Song {
     url: string
   }
   lyrics: string
-  storage_location: Array<string>
+  music_sheet_urls: Array<string>
   created_by: {
     id: string
     time: Date

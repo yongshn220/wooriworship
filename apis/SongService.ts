@@ -40,7 +40,7 @@ class SongService extends BaseService {
         time: new Date()
       },
       last_used_time: new Date(),
-      storage_location: songInput.files.map((x:File) => x.name),
+      music_sheet_urls: songInput.music_sheet_urls,
     }
     return await this.create(newSong);
   }
@@ -61,8 +61,8 @@ class SongService extends BaseService {
         id: userId,
         time: new Date()
       },
-      key: songInput.key
-      //storage_location: songInput.files.map((x:File) => x.name),
+      key: songInput.key,
+      music_sheet_urls: songInput.music_sheet_urls
     }
     return await this.update(songId, song);
   }
