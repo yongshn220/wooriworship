@@ -7,7 +7,6 @@ import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-
 import {useState} from "react";
 import {Song} from "@/models/song";
 
-const tags = ["빠른", "신나는", "엔딩곡", "강한비트", "경쾌한", "신나는"]
 
 interface Props {
   song: Song
