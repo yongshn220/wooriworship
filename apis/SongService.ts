@@ -14,6 +14,7 @@ class SongService extends BaseService {
         c: teamId
       }
     ]);
+    console.log(songs)
     return songs
   }
 

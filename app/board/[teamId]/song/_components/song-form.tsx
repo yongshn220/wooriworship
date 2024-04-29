@@ -121,8 +121,9 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       const promises = [];
       promises.push(SongService.updateSong(session?.user.id, song?.id, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
-
       promises.push(StorageService.updateMusicSheets(teamId, filesToAdd, urlsToDelete))
+      await Promise.all(promises)
+
     }
     catch (e) {
       console.log("err", e)

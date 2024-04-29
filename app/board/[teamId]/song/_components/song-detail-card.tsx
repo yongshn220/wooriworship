@@ -10,8 +10,6 @@ import {
 import {Label} from "@/components/ui/label";
 import {Badge} from "@/components/ui/badge";
 import {EditButton} from "@/app/board/[teamId]/song/_components/edit-button";
-import { StorageService } from "@/apis";
-import { useEffect, useState } from "react";
 import {Song} from "@/models/song";
 import Image from "next/image"
 
