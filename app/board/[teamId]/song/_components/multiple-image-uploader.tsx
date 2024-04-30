@@ -12,7 +12,7 @@ interface Props {
 export default function MultipleImageUploader({musicSheets, setMusicSheets, maxNum, children}: Props) {
   async function handleImageChange(e: any) {
     const files = Array.from(e.target.files) as Array<File>
-    const totalImages = musicSheets.length + files.length
+    const totalImages = musicSheets?.length + files.length
 
     try {
       if (totalImages <= maxNum) {
