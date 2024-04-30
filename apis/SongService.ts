@@ -7,6 +7,7 @@ class SongService extends BaseService {
   }
 
   async getTeamSong(teamId: string) {
+    console.log("SongService.getTeamSong")
     const songs = await this.getByFilters([
       {
         a: 'team_id',
@@ -14,7 +15,6 @@ class SongService extends BaseService {
         c: teamId
       }
     ]);
-    console.log(songs)
     return songs
   }
 

@@ -6,19 +6,28 @@ import {Badge} from "@/components/ui/badge";
 import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-card";
 import {useState} from "react";
 import {Song} from "@/models/song";
+import {useRouter} from "next/navigation";
+import {useRecoilValue} from "recoil";
+import {currentTeamIdAtom} from "@/global-states/teamState";
 
 
 interface Props {
   song: Song
 }
 export function SongCard({song}: Props) {
+  const teamId = useRecoilValue(currentTeamIdAtom)
   const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
+
+  function handleSongCardClick() {
+    router.push(`/board/${teamId}/song/${song.id}`)
+  }
 
   return (
     <div className="h-full">
-      <SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen} song={song} editable={true}/>
+      {/*<SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen} song={song} editable={true}/>*/}
       <div className="aspect-[5/4] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC]">
-        <div className="relative group h-full flex-center flex-col text-white cursor-pointer" onClick={() => setIsOpen(true)}>
+        <div className="relative group h-full flex-center flex-col text-white cursor-pointer" onClick={handleSongCardClick}>
           <HoverOverlay/>
           <p className="font-semibold text-base">{song?.title}</p>
           <p className="text-sm">{song?.original.author}</p>

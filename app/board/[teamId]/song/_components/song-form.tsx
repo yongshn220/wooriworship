@@ -6,7 +6,7 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {TeamIcon} from "@/components/team-icon";
 import {Button} from "@/components/ui/button";
-import {Dispatch, SetStateAction, useEffect, useState} from "react";
+import {Dispatch, SetStateAction, useState} from "react";
 import {TagMultiSelect} from "@/app/board/[teamId]/song/_components/tag-multi-select";
 import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
@@ -18,11 +18,13 @@ import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {Song} from "@/models/song";
 import {SongService, StorageService, TagService}  from "@/apis";
 import {Mode} from "@/components/constants/enums";
+import {revalidatePath} from "next/cache";
+import {useRouter} from "next/navigation";
 
 interface Props {
   mode: Mode
   isOpen: boolean
-  setIsOpen: Dispatch<SetStateAction<boolean>>
+  setIsOpen: Function
   song: Song | null
 }
 export interface SongInput {
@@ -59,8 +61,8 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
   const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>(song?.music_sheet_urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<MusicSheet>)
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
 
-  console.log("music Sheets", musicSheets, song)
   async function handleCreate() {
     setIsLoading(true)
 
@@ -124,6 +126,8 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       promises.push(StorageService.updateMusicSheets(teamId, filesToAdd, urlsToDelete))
       await Promise.all(promises)
 
+      // revalidatePath(`/board/[teamId]]/song`, 'page')
+
     }
     catch (e) {
       console.log("err", e)
@@ -139,7 +143,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
       <DialogContent className="sm:max-w-[600px] h-5/6 overflow-y-scroll scrollbar-hide">
         <DialogHeader>
           <DialogTitle className="text-2xl">{mode===Mode.EDIT? "Edit Song" : "Add New Song"}</DialogTitle>
