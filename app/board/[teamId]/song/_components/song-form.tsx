@@ -6,7 +6,7 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {TeamIcon} from "@/components/team-icon";
 import {Button} from "@/components/ui/button";
-import {Dispatch, SetStateAction, useState} from "react";
+import {useEffect, useState} from "react";
 import {TagMultiSelect} from "@/app/board/[teamId]/song/_components/tag-multi-select";
 import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
@@ -58,10 +58,15 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     bpm: (mode === Mode.EDIT)? song?.bpm?? null : null,
     description: (mode === Mode.EDIT)? song?.description?? "" : ""
   })
-  const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>(song?.music_sheet_urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<MusicSheet>)
+  const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
-  const router = useRouter()
+
+  useEffect(() => {
+    const _musicSheets = song?.music_sheet_urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<MusicSheet>
+    if (_musicSheets)
+      setMusicSheets(_musicSheets)
+  }, [song?.music_sheet_urls])
 
   async function handleCreate() {
     setIsLoading(true)
