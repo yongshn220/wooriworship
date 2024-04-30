@@ -12,18 +12,23 @@ import {Badge} from "@/components/ui/badge";
 import {EditButton} from "@/app/board/[teamId]/song/_components/edit-button";
 import {Song} from "@/models/song";
 import Image from "next/image"
+import {Button} from "@/components/ui/button";
+import Link from "next/link";
+import {useRecoilValue} from "recoil";
+import {currentTeamIdAtom} from "@/global-states/teamState";
 
 interface Props {
   isOpen: boolean
-  setIsOpen: any
+  setIsOpen: Function
   song: Song
   editable: boolean
 }
 
 export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props) {
+  const teamId = useRecoilValue(currentTeamIdAtom)
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
       <DialogContent className="sm:max-w-[600px] h-5/6">
         <div className="w-full h-full overflow-y-scroll scrollbar-hide">
           <DialogHeader>
@@ -98,7 +103,11 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
           {
             editable &&
             <DialogFooter className="mt-10">
-              <EditButton song={song}/>
+              <Link href={`/board/${teamId}/song/${song.id}/edit`}>
+                <Button>
+                  Edit
+                </Button>
+              </Link>
             </DialogFooter>
           }
         </div>

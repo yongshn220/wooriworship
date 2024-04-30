@@ -7,12 +7,14 @@ import {useEffect, useMemo, useState} from "react";
 import {searchSelectedTagsAtom, songSearchInputAtom} from "@/app/board/_states/pageState";
 import {useRecoilValue} from "recoil";
 
-
 interface Props {
   songList: Array<Song>
 }
 
 export function SongCardList({songList}: Props) {
+
+  //TODO filter from the server.
+
   const songSearchInput = useRecoilValue(songSearchInputAtom)
   const selectedTags = useRecoilValue(searchSelectedTagsAtom)
   const [debounced] = useDebounce(songSearchInput, 500)

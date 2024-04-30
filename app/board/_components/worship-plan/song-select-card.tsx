@@ -8,6 +8,7 @@ import {useState} from "react";
 import {Song} from "@/models/song";
 import {useSetRecoilState} from "recoil";
 import {selectedSongListAtom} from "@/app/board/_components/worship-plan/status";
+import {toPlainObject} from "@/components/helper/helper-functions";
 
 interface Props {
   song: Song
@@ -19,7 +20,7 @@ export function SongSelectCard({song, isSelected}: Props) {
 
   return (
     <div className="h-full">
-      <SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen} song={song} editable={false}/>
+      <SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen} song={toPlainObject(song)} editable={false}/>
       <div className="aspect-[5/4] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC]">
         <div className="relative group h-full flex-center flex-col text-white cursor-pointer" onClick={() => setIsOpen(true)}>
           <HoverOverlay/>
