@@ -22,7 +22,7 @@ export function SwapOrderButton({index}: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <div className="flex-center w-10 h-10 bg-gray-100 rounded-full font-semibold text-sm border-4 border-white">
+        <div className="flex-center w-10 h-10 bg-blue-900 text-white rounded-full font-semibold text-sm border-4 border-white">
           {index}
         </div>
       </DropdownMenuTrigger>

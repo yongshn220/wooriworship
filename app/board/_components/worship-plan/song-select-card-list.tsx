@@ -1,7 +1,7 @@
 import {Song} from "@/models/song";
 import {SongSelectCard} from "@/app/board/_components/worship-plan/song-select-card";
 import {useRecoilValue} from "recoil";
-import {selectedSongListAtom} from "@/app/board/_components/worship-plan/status";
+import {selectedSongInfoListAtom} from "@/app/board/_components/worship-plan/status";
 import {useMemo} from "react";
 import {useDebounce} from "use-debounce";
 
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function SongSelectCardList({searchInput, songList}: Props) {
-  const selectedSongList = useRecoilValue(selectedSongListAtom)
+  const selectedSongInfoList = useRecoilValue(selectedSongInfoListAtom)
   const [debounced] = useDebounce(searchInput, 500)
 
   const preprocessedSongList = useMemo(() => {
@@ -20,7 +20,7 @@ export function SongSelectCardList({searchInput, songList}: Props) {
     return songList.filter((song) => song.title.includes(keyword))
   }, [songList, debounced])
 
-  const selectedSongIds = useMemo(() => selectedSongList.map((song) => song.id), [selectedSongList])
+  const selectedSongIds = useMemo(() => selectedSongInfoList.map((info) => info?.song?.id), [selectedSongInfoList])
 
   return (
     <div

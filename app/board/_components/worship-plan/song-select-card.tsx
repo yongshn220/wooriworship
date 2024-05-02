@@ -7,7 +7,7 @@ import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-
 import {useState} from "react";
 import {Song} from "@/models/song";
 import {useSetRecoilState} from "recoil";
-import {selectedSongListAtom} from "@/app/board/_components/worship-plan/status";
+import {selectedSongInfoListAtom} from "@/app/board/_components/worship-plan/status";
 import {toPlainObject} from "@/components/helper/helper-functions";
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
   isSelected: boolean
 }
 export function SongSelectCard({song, isSelected}: Props) {
-  const setSelectedSongList = useSetRecoilState(selectedSongListAtom)
+  const setSelectedSongInfoList = useSetRecoilState(selectedSongInfoListAtom)
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -32,7 +32,7 @@ export function SongSelectCard({song, isSelected}: Props) {
             isSelected ?
             <div
               className="w-full h-full flex justify-start items-center rounded-lg cursor-pointer"
-              onClick={() => setSelectedSongList(prev => (prev.filter(s => s.id != song.id)))}
+              onClick={() => setSelectedSongInfoList(prev => (prev.filter(songInfo => songInfo?.song?.id != song.id)))}
             >
               <div className="cursor-pointer p-2 text-blue-500">
                 <MoodCheckIcon/>
@@ -42,7 +42,7 @@ export function SongSelectCard({song, isSelected}: Props) {
             :
             <div
               className="w-full h-full flex justify-start items-center cursor-pointer hover:bg-gray-100 rounded-lg"
-              onClick={() => setSelectedSongList(prev => ([...prev, {id: song.id, note: ""}]))}
+              onClick={() => setSelectedSongInfoList(prev => ([...prev, {song, note: song.description}]))}
             >
               <div className="cursor-pointer p-2">
                 <MoodNeutralIcon/>

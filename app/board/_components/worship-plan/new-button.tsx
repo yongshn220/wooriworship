@@ -1,14 +1,7 @@
 'use client'
 
 import {Plus} from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription, DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {TeamIcon} from "@/components/team-icon";
@@ -20,10 +13,10 @@ import {NewSongCard} from "@/app/board/_components/worship-plan/new-song-card";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {useSession} from "next-auth/react";
-import {WorshipService} from "@/apis";
 import {useToast} from "@/components/ui/use-toast";
 import {AddSongButton} from "@/app/board/_components/worship-plan/add-song-button";
-import {selectedSongListAtom} from "@/app/board/_components/worship-plan/status";
+import {selectedSongInfoListAtom} from "@/app/board/_components/worship-plan/status";
+import {Song} from "@/models/song";
 
 export interface WorshipInfo {
   title: string
@@ -32,14 +25,14 @@ export interface WorshipInfo {
 
 export interface SongInfo {
   note: string
-  id: string | null
+  song: Song
 }
 
 export function NewButton() {
   const {data: session} = useSession()
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtomById(teamId))
-  const selectedSongList = useRecoilValue(selectedSongListAtom)
+  const selectedSongInfoList = useRecoilValue(selectedSongInfoListAtom)
   const [isOpen, setIsOpen] = useState(false)
   const [basicInfo, setBasicInfo] = useState({
     title: "",
@@ -64,7 +57,7 @@ export function NewButton() {
       const worshipInput = {
         ...basicInfo,
         date,
-        selectedSongList,
+        selectedSongInfoList,
       }
 
       console.log(worshipInput)
@@ -77,7 +70,7 @@ export function NewButton() {
       //   setIsOpen(false)
       //   setIsLoading(false)
       // })
-       
+
     }
     catch (e) {
       console.log("err", e)
@@ -142,7 +135,7 @@ export function NewButton() {
             </Label>
             <div className="flex-center w-full flex-col gap-8">
               {
-                selectedSongList.map((songInfo, i) => (
+                selectedSongInfoList.map((songInfo, i) => (
                   <NewSongCard key={i} index={i+1} songInfo={songInfo}/>
                 ))
               }
