@@ -17,10 +17,13 @@ import {useToast} from "@/components/ui/use-toast";
 import {AddSongButton} from "@/app/board/_components/worship-plan/add-song-button";
 import {selectedSongInfoListAtom} from "@/app/board/_components/worship-plan/status";
 import {Song} from "@/models/song";
+import {WorshipService} from "@/apis";
 
 export interface WorshipInfo {
   title: string
   description: string
+  date: Date
+  songInfoList: Array<SongInfo>
 }
 
 export interface SongInfo {
@@ -54,23 +57,20 @@ export function NewButton() {
     }
 
     try {
-      const worshipInput = {
+      const worshipInput: WorshipInfo = {
         ...basicInfo,
         date,
-        selectedSongInfoList,
+        songInfoList: selectedSongInfoList,
       }
 
-      console.log(worshipInput)
-      // @TODO: WorshipService
-      // WorshipService.addNewWorship(session?.user.id, teamId, worshipInput).then(() => {
-      //   toast({
-      //     title: `New worship has set on ${date}.`,
-      //     description: team?.name,
-      //   })
-      //   setIsOpen(false)
-      //   setIsLoading(false)
-      // })
-
+      WorshipService.addNewWorship(session?.user.id, teamId, worshipInput).then(() => {
+        toast({
+          title: `New worship has set on ${date}.`,
+          description: team?.name,
+        })
+        setIsOpen(false)
+        setIsLoading(false)
+      })
     }
     catch (e) {
       console.log("err", e)

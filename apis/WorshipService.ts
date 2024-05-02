@@ -1,4 +1,5 @@
 import {BaseService} from ".";
+import {WorshipInfo} from "@/app/board/_components/worship-plan/new-button";
 
 class WorshipService extends BaseService {
   constructor() {
@@ -16,12 +17,12 @@ class WorshipService extends BaseService {
     return worships
   }
 
-  async addNewWorship(userId: string, teamId: string, worshipInput: any) {
+  async addNewWorship(userId: string, teamId: string, worshipInput: WorshipInfo) {
     const newWorship = {
       team_id: teamId,
       title: worshipInput.title,
-      detail: worshipInput.detail,
-      songs: worshipInput.songs,
+      description: worshipInput.description,
+      songs: worshipInput.songInfoList,
       created_by: {
         id: userId,
         time: new Date(),
@@ -30,7 +31,7 @@ class WorshipService extends BaseService {
         id: userId,
         time: new Date()
       },
-      worship_date: worshipInput.worship_date
+      worship_date: worshipInput.date
     }
     return await this.create(newWorship);
   }
