@@ -1,8 +1,8 @@
 import {Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
-import {SongCarouselFull} from "@/app/worship/[teamId]/[id]/_components/song-carousel-full";
-import {WorshipViewMenu} from "@/app/worship/[teamId]/[id]/_components/worship-sidebar/worship-view-menu";
-import {WorshipIndexIndicator} from "@/app/worship/[teamId]/[id]/_components/worship-sidebar/worship-index-indicator";
+import {SongCarouselFull} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel-full";
+import {WorshipViewMenu} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/worship-view-menu";
+import {WorshipIndexIndicator} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/worship-index-indicator";
 
 export function StartWorshipButton() {
 

@@ -12,7 +12,7 @@ import {
 import Image from 'next/image'
 import {SongInfo} from "@/app/board/[teamId]/plan/_components/new-button";
 import {useEffect} from "react";
-import {SongCarouselItem} from "@/app/worship/[teamId]/[id]/_components/song-carousel-item";
+import {SongCarouselItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel-item";
 import {SongHeader} from "@/models/worship";
 
 const songList = [
@@ -40,14 +40,12 @@ interface Props {
 export function SongCarousel({songHeaderList}: Props) {
   const [api, setApi] = React.useState<CarouselApi>()
   const [current, setCurrent] = React.useState(0)
-  const [count, setCount] = React.useState(0)
+  const [count, setCount] = React.useState(songHeaderList.length)
 
   useEffect(() => {
     if (!api) {
       return
     }
-
-    setCount(api.scrollSnapList().length)
     setCurrent(api.selectedScrollSnap() + 1)
 
     api.on("select", () => {
@@ -56,7 +54,7 @@ export function SongCarousel({songHeaderList}: Props) {
   }, [api])
 
   return (
-    <div id="song-carousel" className="w-full h-full lg:max-w-3xl">
+    <div id="song-carousel" className="w-full h-full">
       <Carousel setApi={setApi} className="w-full h-full">
         <CarouselContent>
           {

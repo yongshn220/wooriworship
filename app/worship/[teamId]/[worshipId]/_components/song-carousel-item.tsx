@@ -19,7 +19,7 @@ export function SongCarouselItem({songHeader}: Props) {
     })
   }, [songHeader.id])
 
-  if (!song || song.music_sheet_urls.length === 0) return <></>
+  if (!song) return <></>
 
   return (
     <CarouselItem >
@@ -28,17 +28,28 @@ export function SongCarouselItem({songHeader}: Props) {
           <div className="w-full py-2 text-sm">{songHeader.note}</div>
           <div className="relative h-full flex flex-col bg-gray-50 overflow-y-scroll">
             {
-              song?.music_sheet_urls.map((url, index) => (
-                <div key={index} className="flex-center w-full h-full">
+              song.music_sheet_urls.length > 0 ?
+                song?.music_sheet_urls.map((url, index) => (
+                  <div key={index} className="flex-center w-full h-full">
+                    <img
+                      alt="Music score"
+                      src={url}
+                      className="h-full object-contain rounded-md"
+                    />
+                  </div>
+                ))
+              :
+                <div className="w-full h-full flex-center flex-col">
                   <Image
-                    alt="Music score"
-                    src={url}
-                    fill
-                    sizes="20vw, 20vw, 20vw"
-                    className="h-full object-contain rounded-md"
+                    alt="compose music image"
+                    src="/noImage.svg"
+                    width={300}
+                    height={300}
                   />
+                  <p className="w-full text-center mt-4 text-lg ">
+                    No music sheet for &quot;<span className="font-semibold">{song.title}</span>&quot;
+                  </p>
                 </div>
-              ))
             }
           </div>
         </CardContent>
