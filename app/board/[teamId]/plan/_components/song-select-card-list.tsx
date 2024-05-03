@@ -1,7 +1,7 @@
 import {Song} from "@/models/song";
-import {SongSelectCard} from "@/app/board/_components/worship-plan/song-select-card";
+import {SongSelectCard} from "@/app/board/[teamId]/plan/_components/song-select-card";
 import {useRecoilValue} from "recoil";
-import {selectedSongInfoListAtom} from "@/app/board/_components/worship-plan/status";
+import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {useMemo} from "react";
 import {useDebounce} from "use-debounce";
 

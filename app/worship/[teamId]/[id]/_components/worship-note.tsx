@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useRecoilValue} from "recoil";
-import {worshipMenuAtom} from "@/app/worship/[id]/_states/menu";
+import {worshipMenuAtom} from "@/app/worship/[teamId]/[id]/_states/menu";
 import {cn} from "@/lib/utils";
 
 

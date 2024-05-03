@@ -7,8 +7,8 @@ import {useState} from "react";
 import Link from "next/link";
 import {DownloadIcon, LayoutDashboard, LibraryBig} from "lucide-react";
 import Image from "next/image";
-import {StartWorshipButton} from "@/app/worship/[id]/_components/worship-sidebar/start-worship-button";
-import {DownloadMusicSheetButton} from "@/app/worship/[id]/_components/worship-sidebar/download-music-sheet-button";
+import {StartWorshipButton} from "@/app/worship/[teamId]/[id]/_components/worship-sidebar/start-worship-button";
+import {DownloadMusicSheetButton} from "@/app/worship/[teamId]/[id]/_components/worship-sidebar/download-music-sheet-button";
 import {Routes} from "@/components/constants/enums";
 import {getPathPlan, getPathSong} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
@@ -50,7 +50,6 @@ export function WorshipSidebar() {
               src="/composeMusic.svg"
               width={80}
               height={80}
-              className=""
             />
             <DownloadMusicSheetButton/>
             <StartWorshipButton/>

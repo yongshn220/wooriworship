@@ -7,7 +7,7 @@ import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-
 import {useState} from "react";
 import {Song} from "@/models/song";
 import {useSetRecoilState} from "recoil";
-import {selectedSongInfoListAtom} from "@/app/board/_components/worship-plan/status";
+import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {toPlainObject} from "@/components/helper/helper-functions";
 
 interface Props {

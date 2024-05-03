@@ -8,14 +8,14 @@ import {TeamIcon} from "@/components/team-icon";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
 import {useState} from "react";
-import {DatePicker} from "@/app/board/_components/worship-plan/date-picker";
-import {NewSongCard} from "@/app/board/_components/worship-plan/new-song-card";
+import {DatePicker} from "@/app/board/[teamId]/plan/_components/date-picker";
+import {NewSongCard} from "@/app/board/[teamId]/plan/_components/new-song-card";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {useSession} from "next-auth/react";
 import {useToast} from "@/components/ui/use-toast";
-import {AddSongButton} from "@/app/board/_components/worship-plan/add-song-button";
-import {selectedSongInfoListAtom} from "@/app/board/_components/worship-plan/status";
+import {AddSongButton} from "@/app/board/[teamId]/plan/_components/add-song-button";
+import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {Song} from "@/models/song";
 import {WorshipService} from "@/apis";
 

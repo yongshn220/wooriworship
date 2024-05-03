@@ -130,9 +130,6 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       promises.push(TagService.addNewTags(teamId, songInput.tags));
       promises.push(StorageService.updateMusicSheets(teamId, filesToAdd, urlsToDelete))
       await Promise.all(promises)
-
-      // revalidatePath(`/board/[teamId]]/song`, 'page')
-
     }
     catch (e) {
       console.log("err", e)

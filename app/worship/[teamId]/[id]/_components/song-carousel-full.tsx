@@ -10,8 +10,8 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel"
 import {useEffect, useState} from "react";
-import {WorshipNote} from "@/app/worship/[id]/_components/worship-note";
-import {worshipIndexAtom} from "@/app/worship/[id]/_states/menu";
+import {WorshipNote} from "@/app/worship/[teamId]/[id]/_components/worship-note";
+import {worshipIndexAtom} from "@/app/worship/[teamId]/[id]/_states/menu";
 import {useSetRecoilState} from "recoil";
 
 const songList = [
