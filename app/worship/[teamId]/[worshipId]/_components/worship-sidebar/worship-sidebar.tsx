@@ -5,24 +5,20 @@ import {MdSidebar} from "@/components/sidebar/md-sidebar";
 import {Label} from "@/components/ui/label";
 import {useState} from "react";
 import Link from "next/link";
-import {DownloadIcon, LayoutDashboard, LibraryBig} from "lucide-react";
+import {LayoutDashboard, LibraryBig} from "lucide-react";
 import Image from "next/image";
-import {StartWorshipButton} from "@/app/worship/[teamId]/[id]/_components/worship-sidebar/start-worship-button";
-import {DownloadMusicSheetButton} from "@/app/worship/[teamId]/[id]/_components/worship-sidebar/download-music-sheet-button";
-import {Routes} from "@/components/constants/enums";
+import {StartWorshipButton} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/start-worship-button";
+import {DownloadMusicSheetButton} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/download-music-sheet-button";
 import {getPathPlan, getPathSong} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
+import {Song} from "@/models/song";
 
-const songs = [
-  {id: "1", title: "내 주를 가까이 G"},
-  {id: "2", title: "나의 소망 되신 주 A"},
-  {id: "3", title: "오직 예수 A"},
-  {id: "4", title: "빛 되신 주 G"},
-]
-
-export function WorshipSidebar() {
-  const [selectedSongId, setSelectedSongId] = useState(songs[0].id)
+interface Props {
+  songList: Array<Song>
+}
+export function WorshipSidebar({songList}: Props) {
+  const [selectedSongId, setSelectedSongId] = useState(songList[0]?.id?? [])
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
 
   return (
@@ -32,7 +28,7 @@ export function WorshipSidebar() {
         <div className="space-y-2 w-full ">
           <Label>Songs</Label>
           {
-            songs.map((song) => (
+            songList.map((song) => (
               <Button
                 key={song.id}
                 variant={(selectedSongId === song.id)? "secondary" : "ghost"}

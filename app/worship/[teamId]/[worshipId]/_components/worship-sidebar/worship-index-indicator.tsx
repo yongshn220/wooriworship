@@ -1,5 +1,5 @@
 import {useRecoilValue} from "recoil";
-import {worshipIndexAtom, worshipMenuAtom} from "@/app/worship/[teamId]/[id]/_states/menu";
+import {worshipIndexAtom, worshipMenuAtom} from "@/app/worship/[teamId]/[worshipId]/_states/menu";
 import {cn} from "@/lib/utils";
 import * as React from "react";
 

@@ -1,17 +1,19 @@
 import Image from 'next/image'
-import {SongCarousel} from "@/app/worship/[teamId]/[id]/_components/song-carousel";
-import {WorshipService} from "@/apis";
+import {SongCarousel} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel";
+import {TeamService, WorshipService} from "@/apis";
 import {Worship} from "@/models/worship";
 import {timestampToDate} from "@/components/helper/helper-functions";
+import {Team} from "@/models/team";
 
 export default async function WorshipPage({params}: any) {
-  const worshipId = params.id
+  const worshipId = params.worshipId
   const worship = await WorshipService.getById(worshipId) as Worship
+  const team = await TeamService.getById(worship.team_id) as Team
 
   return (
     <div className="w-full flex-center">
       <div className="flex-start flex-col w-full px-6 gap-2 max-w-4xl">
-        <p className="text-sm text-gray-500">{worship.team_id}</p>
+        <p className="text-sm text-gray-500">{team.name}</p>
         <p className="text-2xl font-semibold">{worship.title}</p>
         <div className="flex-center mt-6 gap-2">
           <Image alt="calendar icon" src={'/icons/calendarIcon.svg'} width={25} height={25}/>
