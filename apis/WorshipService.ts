@@ -1,5 +1,6 @@
 import {BaseService} from ".";
-import {WorshipInfo} from "@/app/board/_components/worship-plan/new-button";
+import {WorshipInfo} from "@/app/board/[teamId]/plan/_components/new-button";
+import {Timestamp} from "@firebase/firestore";
 
 class WorshipService extends BaseService {
   constructor() {
@@ -17,12 +18,13 @@ class WorshipService extends BaseService {
     return worships
   }
 
+  //Todo: [Naming changed] Worship.detail -> Worship.description. (please update it for rest of the codes)
   async addNewWorship(userId: string, teamId: string, worshipInput: WorshipInfo) {
     const newWorship = {
       team_id: teamId,
       title: worshipInput.title,
       description: worshipInput.description,
-      songs: worshipInput.songInfoList,
+      songs: worshipInput.songInfoList.map((songInfo) => ({id: songInfo.song.id, note: songInfo.note})),
       created_by: {
         id: userId,
         time: new Date(),
@@ -31,7 +33,7 @@ class WorshipService extends BaseService {
         id: userId,
         time: new Date()
       },
-      worship_date: worshipInput.date
+      worship_date: Timestamp.fromDate(worshipInput.date)
     }
     return await this.create(newWorship);
   }

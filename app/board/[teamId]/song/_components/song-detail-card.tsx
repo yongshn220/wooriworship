@@ -16,6 +16,7 @@ import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
+import {getPathSongEdit} from "@/components/helper/routes";
 
 interface Props {
   isOpen: boolean
@@ -103,7 +104,7 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
           {
             editable &&
             <DialogFooter className="mt-10">
-              <Link href={`/board/${teamId}/song/${song.id}/edit`}>
+              <Link href={getPathSongEdit(teamId, song.id)}>
                 <Button>
                   Edit
                 </Button>

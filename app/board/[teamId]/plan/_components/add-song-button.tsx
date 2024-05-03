@@ -9,7 +9,7 @@ import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {Song} from "@/models/song";
 import {Button} from "@/components/ui/button";
-import {SongSelectCardList} from "@/app/board/_components/worship-plan/song-select-card-list";
+import {SongSelectCardList} from "@/app/board/[teamId]/plan/_components/song-select-card-list";
 
 export function AddSongButton() {
   const teamId = useRecoilValue(currentTeamIdAtom)

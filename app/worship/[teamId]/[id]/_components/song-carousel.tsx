@@ -10,6 +10,10 @@ import {
   type CarouselApi, CarouselPrevious, CarouselNext,
 } from "@/components/ui/carousel"
 import Image from 'next/image'
+import {SongInfo} from "@/app/board/[teamId]/plan/_components/new-button";
+import {useEffect} from "react";
+import {SongCarouselItem} from "@/app/worship/[teamId]/[id]/_components/song-carousel-item";
+import {SongHeader} from "@/models/worship";
 
 const songList = [
   {
@@ -29,12 +33,16 @@ const songList = [
   }
 ]
 
-export function SongCarousel() {
+interface Props {
+  songHeaderList: Array<SongHeader>
+}
+
+export function SongCarousel({songHeaderList}: Props) {
   const [api, setApi] = React.useState<CarouselApi>()
   const [current, setCurrent] = React.useState(0)
   const [count, setCount] = React.useState(0)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!api) {
       return
     }
@@ -52,27 +60,8 @@ export function SongCarousel() {
       <Carousel setApi={setApi} className="w-full h-full">
         <CarouselContent>
           {
-            songList.map((song, index) => (
-              <CarouselItem key={index}>
-                <Card>
-                  <CardContent className="flex flex-col w-full aspect-[4/5] max-h-[800px] divide-y">
-                    <div className="w-full py-2 text-sm">인트로 A E F#m E  이후 어쩌구 저쩌구 후렴 4번 반복 첫번째 후렴 목소리로 이후 나머지 빌드업 어쩌구 인트로 A E F#m E  이후 어쩌구 저쩌구 후렴 4번 반복 첫번째 후렴 목소리로 이후 나머지 빌드업</div>
-                    <div className="relative h-full flex flex-col bg-gray-50 overflow-y-scroll">
-                      {
-                        song.urls.map((url, index) => (
-                          <div key={index} className="flex-center w-full h-full">
-                            <img
-                              alt="Music score"
-                              src={url}
-                              className="h-full object-contain rounded-md"
-                            />
-                          </div>
-                        ))
-                      }
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
+            songHeaderList.map((header, index) => (
+              <SongCarouselItem key={index} songHeader={header}/>
           ))}
         </CarouselContent>
         <CarouselPrevious />

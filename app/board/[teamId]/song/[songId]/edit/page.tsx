@@ -4,6 +4,7 @@ import {Song} from "@/models/song";
 import {SongService} from "@/apis";
 import { redirect } from 'next/navigation'
 import {toPlainObject} from "@/components/helper/helper-functions";
+import {getPathSongDetail} from "@/components/helper/routes";
 
 
 export default async  function SongEditPage({params}: any) {
@@ -16,7 +17,7 @@ export default async  function SongEditPage({params}: any) {
     "use server"
 
     if (!state) {
-      redirect(`/board/${teamId}/song/${songId}`)
+      redirect(getPathSongDetail(teamId, songId))
     }
   }
 

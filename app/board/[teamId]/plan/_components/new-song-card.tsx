@@ -1,11 +1,11 @@
 "use client"
 
 import {Textarea} from "@/components/ui/textarea";
-import {SongInfo} from "@/app/board/_components/worship-plan/new-button";
+import {SongInfo} from "@/app/board/[teamId]/plan/_components/new-button";
 import {useMemo} from "react";
 import {useRecoilState} from "recoil";
-import {selectedSongInfoListAtom} from "@/app/board/_components/worship-plan/status";
-import {SwapOrderButton} from "@/app/board/_components/worship-plan/swap-order-button";
+import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {SwapOrderButton} from "@/app/board/[teamId]/plan/_components/swap-order-button";
 import Image from "next/image";
 import {toPlainObject} from "@/components/helper/helper-functions";
 

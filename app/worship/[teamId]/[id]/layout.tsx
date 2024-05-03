@@ -1,4 +1,4 @@
-import {WorshipSidebar} from "@/app/worship/[id]/_components/worship-sidebar/worship-sidebar";
+import {WorshipSidebar} from "@/app/worship/[teamId]/[id]/_components/worship-sidebar/worship-sidebar";
 import {Navbar} from "@/app/board/_components/nav-bar/nav-bar";
 
 
