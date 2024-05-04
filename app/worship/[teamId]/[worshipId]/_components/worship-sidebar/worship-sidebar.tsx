@@ -26,17 +26,17 @@ export function WorshipSidebar({songList}: Props) {
       <MainLogo/>
       <div className="flex-between flex-col h-full">
         <div className="space-y-2 w-full ">
-          <Label>Songs</Label>
+          <Label className="font-semibold">Songs</Label>
           {
-            songList.map((song) => (
+            songList.map((song, i) => (
               <Button
                 key={song.id}
                 variant={(selectedSongId === song.id)? "secondary" : "ghost"}
                 size="lg"
-                className="w-full justify-start px-2 font-semibold"
+                className="w-full justify-start px-2 text-xs lg:text-sm overflow-hidden"
                 onClick={() => setSelectedSongId(song.id)}
               >
-                {song.title}
+                {`${i+1}. ${song.title}`}
               </Button>
             ))
           }
