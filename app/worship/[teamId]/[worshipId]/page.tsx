@@ -6,8 +6,8 @@ import {Team} from "@/models/team";
 import CalendarIcon from '@/public/icons/calendarIcon.svg'
 import {SongItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-item";
 import {Separator} from "@/components/ui/separator";
-import {SongCardWrapper} from "@/app/board/[teamId]/song/_components/song-card-wrapper";
-import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-card";
+import {MenuButton} from "@/app/worship/[teamId]/[worshipId]/_components/menu-button";
+import UsersIcon from '@/public/icons/usersIcon.svg'
 
 export default async function WorshipPage({params}: any) {
   const worshipId = params.worshipId
@@ -17,11 +17,23 @@ export default async function WorshipPage({params}: any) {
   return (
     <div className="w-full flex-center">
       <div className="flex-start flex-col w-full px-6 gap-2 max-w-4xl">
-        <p className="text-sm text-gray-500">{team.name}</p>
-        <p className="text-2xl font-semibold">{worship.title}</p>
-        <div className="flex-center mt-6 gap-2">
-          <CalendarIcon/>
-          <p className="text-blue-900">{timestampToDate(worship.worship_date)}</p>
+        <div className="flex-between w-full">
+          <p className="text-4xl font-semibold">{worship.title}</p>
+          <MenuButton title={worship.title}/>
+        </div>
+        <div className="flex-start mt-6 gap-2">
+          <div className="flex-start gap-2 w-52">
+            <UsersIcon className="text-gray-500"/>
+            <p className="text-gray-500">Team</p>
+          </div>
+          <p>{team.name}</p>
+        </div>
+        <div className="flex-start mt-2 gap-2">
+          <div className="flex-start gap-2 w-52">
+            <CalendarIcon className="text-gray-500"/>
+            <p className="text-gray-500">Worship Date</p>
+          </div>
+          <p>{timestampToDate(worship.worship_date)}</p>
         </div>
         <p className="mt-10">
           {worship.description}
