@@ -37,7 +37,11 @@ export default async function WorshipPage({params}: any) {
             ))
           }
         </div>
-        <div className="w-full flex-center flex-col mt-10">
+        <div className="w-full flex-start flex-col my-2 mt-10">
+          <p className="font-semibold">Music Sheets</p>
+          <Separator/>
+        </div>
+        <div className="w-full flex-center flex-col">
           <SongCarousel songHeaderList={worship.songs}/>
         </div>
       </div>
