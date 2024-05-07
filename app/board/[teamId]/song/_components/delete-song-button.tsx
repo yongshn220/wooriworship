@@ -1,18 +1,20 @@
 "use client"
 
+import { SongService } from "@/apis";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
 
 interface Props {
   songTitle: string
+  songId: string
 }
 
-export function DeleteSongButton({songTitle}: Props) {
+export function DeleteSongButton({songTitle, songId}: Props) {
   const [isOpen, setIsOpen] = useState(false)
 
   async function handleDeleteSong() {
-    // Todo: firebase
+    return await SongService.deleteSong(songId)
   }
 
   return (

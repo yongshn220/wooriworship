@@ -106,7 +106,7 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
           {
             editable &&
             <DialogFooter className="mt-10">
-              <DeleteSongButton songTitle={song?.title}/>
+              <DeleteSongButton songTitle={song?.title} songId={song?.id}/>
               <Link href={getPathSongEdit(teamId, song.id)}>
                 <Button>
                   Edit
