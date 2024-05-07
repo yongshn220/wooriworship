@@ -1,3 +1,4 @@
+import { MusicSheet } from "@/app/board/[teamId]/song/_components/song-form";
 import { storage } from "@/firebase"
 import {deleteObject, getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
 
@@ -20,11 +21,18 @@ class StorageService {
     //     }
     // }
 
-    async uploadFiles(folder_name: string, files: Array<File>) {
+    async uploadFiles(folder_name: string, files: Array<File>, prefixes?: Array<String> | null) {
         let uploads:Array<any> = [];
         try {
             for(const i in files) {
-                const fileRef = storage.ref().child(`${folder_name}/${files[i].name}`);
+                if(files[i] == null) {
+                    return
+                }
+                let fileName = files[i]?.name;
+                if(prefixes) {
+                    fileName = `${prefixes[i]}-스플릿-${fileName}`
+                }
+                const fileRef = storage.ref().child(`${folder_name}/${fileName}`);
                 uploads.push(fileRef.put(files[i]));
             }
             uploads = await Promise.all(uploads);
@@ -74,6 +82,16 @@ class StorageService {
     //     }
     // }
 
+    async uploadMusicSheets(team_id: string, musicSheets: Array<MusicSheet>) {
+        const files = musicSheets.map((ms) => {
+            return ms.file
+        })
+        const ids = musicSheets.map((ms) => {
+            return ms.id
+        })
+        return await this.uploadFiles(team_id, files as Array<File>, ids)
+    }
+
     async deleteMusicSheets(urls: Array<string>) {
         const promises = [];
         try {
@@ -88,10 +106,16 @@ class StorageService {
         }
     }
 
-    async updateMusicSheets(teamId: string, new_sheets: Array<File>, delete_sheets: Array<string>) {
+    async updateMusicSheets(teamId: string, new_sheets: Array<MusicSheet>, delete_sheets: Array<string>) {
         try{
+            const files = new_sheets.map((ms) => {
+                return ms.file
+            })
+            const ids = new_sheets.map((ms) => {
+                return ms.id
+            })
             await this.deleteMusicSheets(delete_sheets);
-            return await this.uploadFiles(teamId, new_sheets);
+            return await this.uploadFiles(teamId, files, ids);
         } catch (err) {
             return [];
         }
