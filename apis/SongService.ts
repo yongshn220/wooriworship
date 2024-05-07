@@ -1,4 +1,4 @@
-import {BaseService} from ".";
+import {BaseService, StorageService} from ".";
 import { MusicSheet, SongInput } from "@/app/board/[teamId]/song/_components/song-form";
 
 class SongService extends BaseService {
@@ -66,6 +66,21 @@ class SongService extends BaseService {
       music_sheet_urls: songInput.music_sheet_urls
     }
     return await this.update(songId, song);
+  }
+
+  async deleteSong(songId: string) {
+    try {
+      const song:any = await this.getById(songId);
+      if (!song) {
+        return true;
+      }
+      await StorageService.deleteMusicSheets(song.music_sheet_urls ? song.music_sheet_urls : []);
+      await this.delete(songId);
+      return true;
+    } catch (err) {
+      console.log("error occured: "+err);
+      return false;
+    }
   }
 }
 
