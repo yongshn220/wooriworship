@@ -2,36 +2,10 @@
 
 import * as React from "react"
 
-import { Card, CardContent } from "@/components/ui/card"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  type CarouselApi, CarouselPrevious, CarouselNext,
-} from "@/components/ui/carousel"
-import Image from 'next/image'
-import {SongInfo} from "@/app/board/[teamId]/plan/_components/new-button";
+import {Carousel, CarouselContent, type CarouselApi, CarouselPrevious, CarouselNext} from "@/components/ui/carousel"
 import {useEffect} from "react";
 import {SongCarouselItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel-item";
 import {SongHeader} from "@/models/worship";
-
-const songList = [
-  {
-    title: "십자가",
-    team: "J-US",
-    urls: [
-      "/test/music1-1.jpg",
-      "/test/music1-2.jpg",
-    ]
-  },
-  {
-    title: "내 주를 가까이",
-    team: "isaiah6tyone",
-    urls: [
-      "/test/music2.jpg",
-    ]
-  }
-]
 
 interface Props {
   songHeaderList: Array<SongHeader>
