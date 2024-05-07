@@ -4,8 +4,8 @@ Phase 1: MFR Part 1(Minimum Functional Requirement).
 ~~1. User can Log in/Log out/Register.~~  
 ~~2. User can create Team.~~  
 3. Leader Invites Team to other users.  
-4. User can add song  
-5. User can Update/Delete Song
+~~4. User can add song~~  
+5. User can ~~Update~~/Delete Song
 6. User can create Worship  
 7. Others in the team can view the worship  
 8. User can Update/Delete Worship

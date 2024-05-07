@@ -79,7 +79,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     }
 
     try {
-      const downloadUrls = await StorageService.uploadFiles(teamId, musicSheets.map((musicSheet) => musicSheet.file) as Array<File>);
+      const downloadUrls = await StorageService.uploadMusicSheets(teamId, musicSheets);
       const songInput = {
         ...input,
         music_sheet_urls: downloadUrls
@@ -115,7 +115,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
 
     try {
       const curImageUrls = musicSheets.map(item => item.url)
-      const filesToAdd = musicSheets.map(item => item.file).filter(file => !!file) as Array<File>
+      const filesToAdd = musicSheets.filter(url => !!url) as Array<MusicSheet>
       const urlsToDelete = song.music_sheet_urls.filter(url => !curImageUrls.includes(url))
       const urlsToKeep = song.music_sheet_urls.filter(url => curImageUrls.includes(url))
 
@@ -128,7 +128,6 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       const promises = [];
       promises.push(SongService.updateSong(session?.user.id, song?.id, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
-      promises.push(StorageService.updateMusicSheets(teamId, filesToAdd, urlsToDelete))
       await Promise.all(promises)
     }
     catch (e) {
