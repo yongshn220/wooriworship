@@ -22,7 +22,7 @@ export function WorshipSidebar({songList}: Props) {
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
 
   return (
-    <MdSidebar>
+    <MdSidebar className="px-5 shadow-lg">
       <MainLogo/>
       <div className="flex-between flex-col h-full">
         <div className="space-y-2 w-full ">
