@@ -17,6 +17,8 @@ import Link from "next/link";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {getPathSongEdit} from "@/components/helper/routes";
+import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
+import {DeleteSongButton} from "@/app/board/[teamId]/song/_components/delete-song-button";
 
 interface Props {
   isOpen: boolean
@@ -104,6 +106,7 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
           {
             editable &&
             <DialogFooter className="mt-10">
+              <DeleteSongButton songTitle={song?.title}/>
               <Link href={getPathSongEdit(teamId, song.id)}>
                 <Button>
                   Edit
