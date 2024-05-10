@@ -18,8 +18,8 @@ import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {Song} from "@/models/song";
 import {SongService, StorageService, TagService}  from "@/apis";
 import {Mode} from "@/components/constants/enums";
-import {revalidatePath} from "next/cache";
 import {useRouter} from "next/navigation";
+import {getPathSongDetail} from "@/components/helper/routes";
 
 interface Props {
   mode: Mode
@@ -61,6 +61,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
   const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
 
   useEffect(() => {
     const _musicSheets = song?.music_sheet_urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<MusicSheet>
@@ -85,22 +86,25 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
         music_sheet_urls: downloadUrls
       }
       const promises = [];
-      console.log(songInput);
       promises.push(SongService.addNewSong(session?.user.id, teamId, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
+      Promise.all(promises).then(results => {
+        const songId = results[0] as string
 
-      promises.push();
-      await Promise.all(promises)
+        toast({
+          title: "New song has been added.",
+          description: team?.name,
+        })
 
-      toast({
-        title: "New song has been added.",
-        description: team?.name,
+        router.push(getPathSongDetail(teamId, songId))
       })
-      setIsOpen(false)
-      setIsLoading(false)
     }
     catch (e) {
       console.log("err", e)
+    }
+    finally {
+      setIsOpen(false)
+      setIsLoading(false)
     }
   }
 
