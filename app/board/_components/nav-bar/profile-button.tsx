@@ -34,7 +34,7 @@ export function ProfileButton() {
         />
       </SheetTrigger>
       <SheetContent className="flex-start flex-col pt-10 space-y-2">
-        <MainLogo/>
+        <MainLogo route="*"/>
         <Button variant="outline" className="w-full">
           Account Setting
         </Button>

@@ -13,6 +13,7 @@ export function Login({setMode}: any) {
     email: "",
     password: "",
   })
+  const [error, setError] = useState(false)
 
   async function handleLogin(e: any) {
     e.preventDefault();
@@ -23,7 +24,7 @@ export function Login({setMode}: any) {
         redirect: false
       })
       if (res?.ok === false) {
-        console.log("login fail")
+        setError(true)
       }
     }
     catch (e) {
@@ -49,6 +50,10 @@ export function Login({setMode}: any) {
               <Input id="loginPassword" required type="password"
                      onChange={(e) => setLogin((prev) => ({...prev, password: e.target.value}))}/>
             </div>
+            {
+              error &&
+              <p className="text-red-500 text-sm">Wrong email or password.</p>
+            }
             <Button className="w-full" type="submit" >Login</Button>
           </form>
           <div className="flex flex-col mt-4 text-center text-sm gap-2">
