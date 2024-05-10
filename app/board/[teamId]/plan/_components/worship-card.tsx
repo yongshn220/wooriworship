@@ -3,7 +3,7 @@ import Link from "next/link";
 import {Worship} from "@/models/worship";
 import {SongService} from "@/apis";
 import {Song} from "@/models/song";
-import {timestampToDate} from "@/components/helper/helper-functions";
+import {timestampToDateString} from "@/components/helper/helper-functions";
 import {getPathWorship} from "@/components/helper/routes";
 
 
@@ -36,7 +36,7 @@ export async function WorshipCard({teamId, worship}: Props) {
         </div>
       </Link>
       <p className="w-full text-center text-sm text-gray-600 mt-1">
-        {timestampToDate(worship.worship_date)} <span className="text-xs">(Mon)</span>
+        {timestampToDateString(worship.worship_date)} <span className="text-xs">(Mon)</span>
       </p>
     </div>
   )

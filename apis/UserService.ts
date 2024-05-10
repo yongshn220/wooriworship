@@ -13,7 +13,7 @@ class UserService extends BaseService {
             email: email,
             created_time: new Date(),
             last_logged_in_time: new Date(),
-            teams: []
+            teams: [] as Array<string>
         }
         await this.update(userId, user);
         return {...user, id: userId}

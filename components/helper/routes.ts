@@ -23,3 +23,7 @@ export function getPathSongEdit(teamId: string, songId: string) {
 export function getPathWorship(teamId: string, worshipId: string) {
   return Routes.WORSHIP + `/${teamId}` + `/${worshipId}`
 }
+
+export function getPathWorshipEdit(teamId: string, worshipId: string) {
+  return Routes.BOARD + `/${teamId}` + Routes.PLAN + `/${worshipId}` + Routes.EDIT
+}
