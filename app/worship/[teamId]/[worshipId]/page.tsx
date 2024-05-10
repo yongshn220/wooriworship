@@ -1,7 +1,7 @@
 import {SongCarousel} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel";
 import {TeamService, WorshipService} from "@/apis";
 import {SongHeader, Worship} from "@/models/worship";
-import {timestampToDate} from "@/components/helper/helper-functions";
+import {timestampToDateString} from "@/components/helper/helper-functions";
 import {Team} from "@/models/team";
 import CalendarIcon from '@/public/icons/calendarIcon.svg'
 import {SongItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-item";
@@ -19,7 +19,7 @@ export default async function WorshipPage({params}: any) {
       <div className="flex-start flex-col w-full px-6 gap-2 max-w-4xl">
         <div className="flex-between w-full">
           <p className="text-4xl font-semibold">{worship.title}</p>
-          <MenuButton title={worship.title}/>
+          <MenuButton title={worship.title} worshipId={worshipId}/>
         </div>
         <div className="flex-start mt-6 gap-2">
           <div className="flex-start gap-2 w-52">
@@ -33,7 +33,7 @@ export default async function WorshipPage({params}: any) {
             <CalendarIcon className="text-gray-500"/>
             <p className="text-gray-500">Worship Date</p>
           </div>
-          <p>{timestampToDate(worship.worship_date)}</p>
+          <p>{timestampToDateString(worship.worship_date)}</p>
         </div>
         <p className="mt-10">
           {worship.description}

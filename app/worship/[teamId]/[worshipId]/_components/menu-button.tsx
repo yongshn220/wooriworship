@@ -3,16 +3,23 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import MenuIcon from "@/public/icons/menuIcon.svg";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {useState} from "react";
+import {useRouter} from "next/navigation";
+import {getPathWorshipEdit} from "@/components/helper/routes";
+import {useRecoilValue} from "recoil";
+import {currentTeamIdAtom} from "@/global-states/teamState";
 
 
 interface Props {
   title: string
+  worshipId: string
 }
-export function MenuButton({title}: Props) {
+export function MenuButton({title, worshipId}: Props) {
+  const teamId = useRecoilValue(currentTeamIdAtom)
   const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
 
   function handleEditWorship() {
-
+    router.push(getPathWorshipEdit(teamId, worshipId))
   }
 
   async function handleDeleteWorship() {
