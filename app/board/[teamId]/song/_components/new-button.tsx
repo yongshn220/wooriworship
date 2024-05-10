@@ -9,7 +9,6 @@ import {SongForm} from "@/app/board/[teamId]/song/_components/song-form";
 import {Mode} from "@/components/constants/enums";
 
 export function NewButton() {
-  const {data: session} = useSession()
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtomById(teamId))
   const [isOpen, setIsOpen] = useState(false)

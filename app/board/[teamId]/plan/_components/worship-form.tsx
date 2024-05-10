@@ -27,6 +27,8 @@ import {SongService, WorshipService} from "@/apis";
 import {Mode} from "@/components/constants/enums";
 import {Worship} from "@/models/worship";
 import {timestampToDate, timestampToDateString} from "@/components/helper/helper-functions";
+import {useRouter} from "next/navigation";
+import {getPathWorship} from "@/components/helper/routes";
 
 export interface WorshipInfo {
   title: string
@@ -59,7 +61,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
   const [date, setDate] = useState<Date>((mode === Mode.EDIT)? timestampToDate(worship?.worship_date) : new Date())
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
-
+  const router = useRouter()
 
   useEffect(() => {
     if (mode === Mode.EDIT) {
@@ -98,13 +100,15 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
     try {
       const worshipInput = getWorshipInput()
 
-      WorshipService.addNewWorship(session?.user.id, teamId, worshipInput).then(() => {
+      WorshipService.addNewWorship(session?.user.id, teamId, worshipInput).then((worshipId: string) => {
         toast({
           title: `New worship has set on ${date}.`,
           description: team?.name,
         })
         setIsOpen(false)
         setIsLoading(false)
+
+        router.push(getPathWorship(teamId, worshipId))
       })
     }
     catch (e) {
