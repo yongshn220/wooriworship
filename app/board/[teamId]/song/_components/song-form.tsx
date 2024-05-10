@@ -243,7 +243,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
         <DialogFooter>
           {
             (mode === Mode.EDIT)
-              ? <Button type="submit" onClick={handleEdit}>{isLoading ? "Editing..." : "Edit"}</Button>
+              ? <Button type="submit" onClick={handleEdit}>{isLoading ? "Saving..." : "Save"}</Button>
               : <Button type="submit" onClick={handleCreate}>{isLoading ? "Creating..." : "Create"}</Button>
           }
         </DialogFooter>
