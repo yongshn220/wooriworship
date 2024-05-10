@@ -3,11 +3,9 @@
 import React, {useEffect} from "react";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
-import {Routes} from "@/components/constants/enums";
 import {useRecoilValue} from "recoil";
-import {firebaseSyncAtom} from "@/global-states/syncState";
-import {getPathBoard, getPathPlan} from "@/components/helper/routes";
-import {UserService} from "@/apis";
+import {FirebaseSyncStatus, firebaseSyncStatusAtom} from "@/global-states/syncState";
+import {getPathBoard} from "@/components/helper/routes";
 
 const SessionType = {
   LOADING: "loading",
@@ -16,18 +14,17 @@ const SessionType = {
 }
 
 export function RootAuthenticate({children}: Readonly<{ children: React.ReactNode }>) {
-  const isFirebaseSynced = useRecoilValue(firebaseSyncAtom)
+  const firebaseSyncStatus = useRecoilValue(firebaseSyncStatusAtom)
   const {status} = useSession()
   const router = useRouter()
 
 
   useEffect(() => {
-    console.log(status, isFirebaseSynced)
-    if (status === SessionType.AUTHENTICATED && isFirebaseSynced) {
-
+    console.log(status, firebaseSyncStatus)
+    if (status === SessionType.AUTHENTICATED && firebaseSyncStatus === FirebaseSyncStatus.SYNCED) {
       router.replace(getPathBoard())
     }
-  }, [status, router, isFirebaseSynced])
+  }, [status, router, firebaseSyncStatus])
 
   return (
     <>

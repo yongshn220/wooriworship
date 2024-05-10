@@ -5,7 +5,7 @@ import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Routes} from "@/components/constants/enums";
 import {useRecoilValue} from "recoil";
-import {firebaseSyncAtom} from "@/global-states/syncState";
+import {FirebaseSyncStatus, firebaseSyncStatusAtom} from "@/global-states/syncState";
 
 const SessionType = {
   LOADING: "loading",
@@ -14,24 +14,24 @@ const SessionType = {
 }
 
 export function BoardAuthenticate({children}: Readonly<{ children: React.ReactNode }>) {
-  const isFirebaseSynced = useRecoilValue(firebaseSyncAtom)
+  const firebaseSyncStatus = useRecoilValue(firebaseSyncStatusAtom)
   const {status} = useSession()
   const router = useRouter()
 
   useEffect(() => {
-    console.log("check", status, isFirebaseSynced)
+    console.log("check", status, firebaseSyncStatus)
     if (status === SessionType.UNAUTHENTICATED) {
       router.replace(Routes.HOME)
     }
-    if (status === SessionType.AUTHENTICATED && !isFirebaseSynced) {
-      console.log("Sync firebase...")
+    if (status === SessionType.AUTHENTICATED && firebaseSyncStatus !== FirebaseSyncStatus.SYNCED) {
+      console.log("Try to sync firebase...")
     }
-  }, [status, router, isFirebaseSynced])
+  }, [status, router, firebaseSyncStatus])
 
   return (
     <div>
       {
-        (status === SessionType.AUTHENTICATED && isFirebaseSynced) && children
+        (status === SessionType.AUTHENTICATED && firebaseSyncStatus === FirebaseSyncStatus.SYNCED) && children
       }
     </div>
   )
