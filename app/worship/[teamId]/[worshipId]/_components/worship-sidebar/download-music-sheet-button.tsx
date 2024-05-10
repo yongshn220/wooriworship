@@ -1,23 +1,50 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
+'use client'
+
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import {DownloadIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Checkbox} from "@/components/ui/checkbox";
+import {saveAs} from 'file-saver';
+import {useRecoilValue} from "recoil";
+import {currentSongListAtom} from "@/app/worship/[teamId]/[worshipId]/_states/states";
+import {useState} from "react";
 
-const songs = [
-  "내 주를 가까이",
-  "나의 소망 되신 주",
-  "오직 예수",
-  "빛 되신 주"
-]
 
 export function DownloadMusicSheetButton() {
+  const songList = useRecoilValue(currentSongListAtom)
+  const [selectedSongIds, setSelectedSongIds] = useState<Array<string>>([])
+
+  function handleDownload() {
+    const downloadSongList = songList.filter((song) => selectedSongIds.includes(song.id))
+
+    downloadSongList.forEach((song) => {
+      song.music_sheet_urls.forEach(url => {
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.onload = (event) => {
+          const blob = xhr.response;
+          saveAs(blob, song.title)
+        };
+        xhr.open('GET', url);
+        xhr.send();
+      })
+    })
+  }
+
+  function handleSelectSong(songId: string) {
+    if (selectedSongIds.includes(songId)) {
+      setSelectedSongIds((prev) => ([...prev.filter((id) => id !== songId)]))
+    }
+    else {
+      setSelectedSongIds((prev) => ([...prev, songId]))
+    }
+  }
+
+  function handleSelectAll() {
+    setSelectedSongIds(songList.map((song) => song.id))
+  }
+
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -33,19 +60,23 @@ export function DownloadMusicSheetButton() {
         </DialogHeader>
         <div className="flex flex-col gap-5 mt-5">
           {
-            songs.map((song, index) => (
-              <div key={index} className="flex items-center space-x-5">
-                <Checkbox id={song + index}/>
-                <label htmlFor={song + index} className="font-medium cursor-pointer">
-                  {song}
+            songList.map((song) => (
+              <div key={song?.id} className="flex items-center space-x-5">
+                <Checkbox id={song?.id} checked={selectedSongIds.includes(song?.id)} onClick={() => handleSelectSong(song?.id)}/>
+                <label htmlFor={song?.id} className="font-medium cursor-pointer">
+                  {song?.title}
                 </label>
               </div>
             ))
           }
         </div>
         <div className="w-full flex-center space-x-4">
-          <Button variant="outline" className="cursor-pointer">Select All</Button>
-          <Button className="cursor-pointer">Download</Button>
+          {
+            (songList.length === selectedSongIds.length)
+              ? <Button variant="outline" className="cursor-pointer" onClick={() => setSelectedSongIds([])}>Unselect All</Button>
+              : <Button variant="outline" className="cursor-pointer" onClick={() => setSelectedSongIds(songList.map((song) => song.id))}>Select All</Button>
+          }
+          <Button className="cursor-pointer" onClick={handleDownload}>Download</Button>
         </div>
       </DialogContent>
     </Dialog>
