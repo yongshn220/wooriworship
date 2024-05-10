@@ -21,7 +21,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Provider>
             <FirebaseAuthProvider>
               <Toaster />
-              <Suspense fallback={<div>loading</div>}>
+              <Suspense fallback={<div></div>}>
                 {children}
               </Suspense>
             </FirebaseAuthProvider>
