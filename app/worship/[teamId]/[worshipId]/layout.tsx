@@ -8,11 +8,12 @@ interface Props {
 
 export default function WorshipLayout({params, children}: Props) {
   const worshipId = params.worshipId
+  const teamId = params.teamId
 
   return (
     <section className="h-full">
       <div className="flex gap-x-3 h-full">
-        <WorshipSidebarWrapper worshipId={worshipId}/>
+        <WorshipSidebarWrapper teamId={teamId} worshipId={worshipId}/>
         <div className="h-full flex-1">
           <Navbar/>
           {children}

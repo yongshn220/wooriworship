@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {Login} from "@/app/_components/login";
 import {useState} from "react";
 import {Signup} from "@/app/_components/signup";
-import {MainLogo} from "@/components/logo/main-logo";
+import {MainLogoRouter} from "@/components/logo/main-logo";
 import {RootAuthenticate} from "@/app/_components/auth/root-authenticate";
 
 export enum Mode {
@@ -19,7 +19,7 @@ export default function Home() {
     <RootAuthenticate>
       <div className="flex-center flex-col w-full">
         <div className="flex-between w-full max-w-7xl p-5 left-0 top-0">
-          <MainLogo/>
+          <MainLogoRouter route="/"/>
           <Button variant="outline" onClick={() => setMode(Mode.SIGNUP)}>Sign Up</Button>
         </div>
         <div className="w-full h-full flex flex-col items-center p-5">

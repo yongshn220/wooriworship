@@ -1,6 +1,6 @@
 "use client"
 import {Button} from "@/components/ui/button";
-import {MainLogo} from "@/components/logo/main-logo";
+import {MainLogoRouter} from "@/components/logo/main-logo";
 import {MdSidebar} from "@/components/sidebar/md-sidebar";
 import {Label} from "@/components/ui/label";
 import {useState} from "react";
