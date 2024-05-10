@@ -206,10 +206,9 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
         </div>
         <DialogFooter>
           {
-            (mode === Mode.CREATE)?
-            <Button type="submit" onClick={handleCreate}>{isLoading? "Creating..." : "Create"}</Button>
-              :
-            <Button type="submit" onClick={handleEdit}>{isLoading? "Editing..." : "Edit"}</Button>
+            (mode === Mode.CREATE)
+              ? <Button type="submit" onClick={handleCreate}>{isLoading? "Creating..." : "Create"}</Button>
+              : <Button type="submit" onClick={handleEdit}>{isLoading? "Saving..." : "Save"}</Button>
           }
         </DialogFooter>
       </DialogContent>

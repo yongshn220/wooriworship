@@ -5,6 +5,8 @@ import {useState} from "react";
 import {Song} from "@/models/song";
 import {WorshipForm} from "@/app/board/[teamId]/plan/_components/worship-form";
 import {Mode} from "@/components/constants/enums";
+import {useSetRecoilState} from "recoil";
+import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
 
 export interface WorshipInfo {
   title: string
@@ -20,12 +22,20 @@ export interface SongInfo {
 
 export function NewButton() {
   const [isOpen, setIsOpen] = useState(false)
+  const setSelectedSongInfoList = useSetRecoilState(selectedSongInfoListAtom)
+
+  function handleClick() {
+    setSelectedSongInfoList([])
+    setIsOpen(true)
+  }
 
   return (
     <>
       <WorshipForm mode={Mode.CREATE} isOpen={isOpen} setIsOpen={setIsOpen} worship={null}/>
       <div
-        className="group aspect-[1/1] border rounded-lg flex-center flex-col overflow-hidden bg-blue-500 hover:bg-blue-600 cursor-pointer">
+        className="group aspect-[1/1] border rounded-lg flex-center flex-col overflow-hidden bg-blue-500 hover:bg-blue-600 cursor-pointer"
+        onClick={handleClick}
+      >
         <Plus className="h-12 w-12 text-white stroke-1"/>
         <p className="text-sm text-white">New board</p>
       </div>
