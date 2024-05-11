@@ -1,23 +1,33 @@
+'use client'
 
 import {SongService} from "@/apis";
-import {redirect} from "next/navigation";
+import {useRouter} from "next/navigation";
 import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-card";
 import {toPlainObject} from "@/components/helper/helper-functions";
+import {useEffect, useState} from "react";
+import {Song} from "@/models/song";
+import {getPathSong} from "@/components/helper/routes";
 
 
-export default async function SongDetailPage({params}: any) {
+export default function SongDetailPage({params}: any) {
   const teamId = params.teamId
   const songId = params.songId
+  const [song, setSong] = useState<Song>(null)
+  const router = useRouter()
 
-  const song = await SongService.getById(songId)
+  useEffect(() => {
+    SongService.getById(songId).then(_song => {
+      setSong(_song as Song)
+    })
+  }, [songId])
 
-  async function onOpenChangeHandler(state: boolean) {
-    "use server"
-
+  function onOpenChangeHandler(state: boolean) {
     if (!state) {
-      redirect(`/board/${teamId}/song`)
+      router.push(getPathSong(teamId))
     }
   }
+
+  if (!song) return <></>
 
   return (
      <SongDetailCard isOpen={true} setIsOpen={onOpenChangeHandler} song={toPlainObject(song)} editable={true} />
