@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import {Carousel, CarouselContent, type CarouselApi, CarouselPrevious, CarouselNext} from "@/components/ui/carousel"
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {SongCarouselItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel-item";
 import {SongHeader} from "@/models/worship";
 
@@ -12,9 +12,9 @@ interface Props {
 }
 
 export function SongCarousel({songHeaderList}: Props) {
-  const [api, setApi] = React.useState<CarouselApi>()
-  const [current, setCurrent] = React.useState(0)
-  const [count, setCount] = React.useState(songHeaderList.length)
+  const [api, setApi] = useState<CarouselApi>()
+  const [current, setCurrent] = useState(0)
+  const [count, setCount] = useState(songHeaderList?.length)
 
   useEffect(() => {
     if (!api) {

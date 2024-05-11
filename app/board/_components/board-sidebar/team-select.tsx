@@ -1,29 +1,29 @@
 'use client'
 
-import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,} from "@/components/ui/select"
+import {Select, SelectContent, SelectGroup, SelectLabel, SelectTrigger, SelectValue,} from "@/components/ui/select"
 import {UserService} from "@/apis";
 import {User} from "@/models/user";
-import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
 import {TeamItem} from "@/app/board/_components/board-sidebar/team-item";
 import {Button} from "@/components/ui/button";
 import {CreateNewTeamDialog} from "@/app/board/_components/create-new-team-dialog";
-import {useRecoilState, useRecoilValue} from "recoil";
+import {useRecoilState} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {useRouter} from "next/navigation";
 import {getPathPlan} from "@/components/helper/routes";
+import {auth} from "@/firebase";
 
 export function TeamSelect() {
+  const authUser = auth.currentUser
   const router = useRouter()
   const [currentTeamId, setCurrentTeamId] = useRecoilState(currentTeamIdAtom)
-  const {data: session} = useSession()
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
-    if (!session) return
+    if (!authUser) return
 
     try {
-      UserService.getById(session.user.id).then((_user) => {
+      UserService.getById(authUser.uid).then((_user) => {
         console.log(_user)
         setUser(_user as User)
       })
@@ -31,11 +31,13 @@ export function TeamSelect() {
     catch(e) {
       console.log(e)
     }
-  }, [session])
+  }, [authUser])
 
   function handleChangeTeam(teamId: string) {
-    setCurrentTeamId(teamId)
-    router.push(getPathPlan(teamId))
+    if (teamId) {
+      setCurrentTeamId(teamId)
+      router.push(getPathPlan(teamId))
+    }
   }
 
 

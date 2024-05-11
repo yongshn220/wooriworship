@@ -12,7 +12,6 @@ import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/app/board/[teamId]/song/_components/multiple-image-uploader";
 import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
-import {useSession} from "next-auth/react";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {Song} from "@/models/song";
@@ -20,6 +19,7 @@ import {SongService, StorageService, TagService}  from "@/apis";
 import {Mode} from "@/components/constants/enums";
 import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
+import {auth} from "@/firebase";
 
 interface Props {
   mode: Mode
@@ -45,7 +45,7 @@ export interface MusicSheet {
 }
 
 export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
-  const {data: session} = useSession()
+  const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtomById(teamId))
   const [input, setInput] = useState<SongInput>({
@@ -72,7 +72,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
   async function handleCreate() {
     setIsLoading(true)
 
-    if (!session?.user.id) {
+    if (!authUser?.uid) {
       console.log("error");
       setIsOpen(false)
       setIsLoading(false)
@@ -86,7 +86,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
         music_sheet_urls: downloadUrls
       }
       const promises = [];
-      promises.push(SongService.addNewSong(session?.user.id, teamId, songInput));
+      promises.push(SongService.addNewSong(authUser?.uid, teamId, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
       Promise.all(promises).then(results => {
         const songId = results[0] as string
@@ -111,7 +111,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
   async function handleEdit() {
     setIsLoading(true)
 
-    if (!session?.user.id || (song == null || song.id == null)) {
+    if (!authUser?.uid|| (song == null || song.id == null)) {
       setIsOpen(false)
       setIsLoading(false)
       return;
@@ -130,7 +130,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       }
 
       const promises = [];
-      promises.push(SongService.updateSong(session?.user.id, song?.id, songInput));
+      promises.push(SongService.updateSong(authUser?.uid, song?.id, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
       promises.push(StorageService.updateMusicSheets(teamId, filesToAdd, urlsToDelete))
       await Promise.all(promises)

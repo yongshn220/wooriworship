@@ -7,6 +7,7 @@ import {useState} from "react";
 import Link from "next/link";
 import {signIn} from "next-auth/react";
 import {Mode} from "@/app/_components/landing-page";
+import {AuthService, UserService} from "@/apis";
 
 export function Login({setMode}: any) {
   const [login, setLogin] = useState({
@@ -17,19 +18,21 @@ export function Login({setMode}: any) {
 
   async function handleLogin(e: any) {
     e.preventDefault();
-    try {
-      const res = await signIn("credentials", {
-        email: login.email,
-        password: login.password,
-        redirect: false
-      })
-      if (res?.ok === false) {
-        setError(true)
-      }
-    }
-    catch (e) {
-      console.log(e)
-    }
+    const res = await AuthService.login(login.email, login.password)
+
+    // try {
+    //   const res = await signIn("credentials", {
+    //     email: login.email,
+    //     password: login.password,
+    //     redirect: false
+    //   })
+    //   if (res?.ok === false) {
+    //     setError(true)
+    //   }
+    // }
+    // catch (e) {
+    //   console.log(e)
+    // }
   }
 
   return (
