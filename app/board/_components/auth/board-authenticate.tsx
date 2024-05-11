@@ -1,39 +1,31 @@
 'use client'
 
-import React, {useEffect} from "react";
-import {useSession} from "next-auth/react";
+import React, {useEffect, useState} from "react";
+import {auth} from "@/firebase";
 import {useRouter} from "next/navigation";
-import {Routes} from "@/components/constants/enums";
-import {useRecoilValue} from "recoil";
-import {FirebaseSyncStatus, firebaseSyncStatusAtom} from "@/global-states/syncState";
-
-const SessionType = {
-  LOADING: "loading",
-  AUTHENTICATED: "authenticated",
-  UNAUTHENTICATED: "unauthenticated"
-}
 
 export function BoardAuthenticate({children}: Readonly<{ children: React.ReactNode }>) {
-  const firebaseSyncStatus = useRecoilValue(firebaseSyncStatusAtom)
-  const {status} = useSession()
+  const [access, setAccess] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
-    console.log("check", status, firebaseSyncStatus)
-    if (status === SessionType.UNAUTHENTICATED) {
-      router.replace(Routes.HOME)
-    }
-    if (status === SessionType.AUTHENTICATED && firebaseSyncStatus !== FirebaseSyncStatus.SYNCED) {
-      console.log("Try to sync firebase...")
-    }
-  }, [status, router, firebaseSyncStatus])
+    auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        console.log("LOGIN SUCCESS", authUser.uid)
+        setAccess(true)
+      }
+      else {
+        router.replace("/")
+      }
+    });
+  }, [router]);
+
 
   return (
     <div>
       {
-        (status === SessionType.AUTHENTICATED && firebaseSyncStatus === FirebaseSyncStatus.SYNCED) && children
+        (access) && children
       }
     </div>
   )
 }
-//////http://localhost:3000/board/ngAraLTxWKZCvsdc1zvO/song

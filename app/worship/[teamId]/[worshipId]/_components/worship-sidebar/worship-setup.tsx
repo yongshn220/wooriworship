@@ -6,27 +6,35 @@ import {useSetRecoilState} from "recoil";
 import {currentSongListAtom, currentWorshipAtom} from "@/app/worship/[teamId]/[worshipId]/_states/states";
 import {useEffect} from "react";
 import {toPlainObject} from "@/components/helper/helper-functions";
+import {SongService, WorshipService} from "@/apis";
 
 
 interface Props {
-  worship: Worship
-  songList: Array<Song>
+  worshipId: string
 }
-export function WorshipSetup({worship, songList}: Props) {
+export function WorshipSetup({worshipId}: Props) {
   const setWorship = useSetRecoilState(currentWorshipAtom)
   const setSongList = useSetRecoilState(currentSongListAtom)
 
   useEffect(() => {
-    let _songList = toPlainObject(songList)
-    for (let song of _songList) {
-      for (let header of worship.songs) {
-        if (song.id === header.id)
-          song.description = header.note
+    async function init() {
+      const worship = await WorshipService.getById(worshipId) as Worship
+      setWorship(worship)
+
+      const songListPromise = worship?.songs?.map(header => SongService.getById(header.id))
+      let songList = toPlainObject(await Promise.all(songListPromise)) as Array<Song>
+      for (let song of songList) {
+        for (let header of worship.songs) {
+          if (song.id === header.id)
+            song.description = header.note
+        }
       }
+      setSongList(songList)
     }
-    setWorship(worship)
-    setSongList(_songList)
-  }, [setWorship, setSongList, worship, songList])
+
+    init().then()
+
+  }, [setSongList, setWorship, worshipId])
 
   return (
     <></>

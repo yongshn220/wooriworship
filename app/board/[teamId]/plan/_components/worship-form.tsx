@@ -18,7 +18,6 @@ import {DatePicker} from "@/app/board/[teamId]/plan/_components/date-picker";
 import {NewSongCard} from "@/app/board/[teamId]/plan/_components/new-song-card";
 import {useRecoilState, useRecoilValue} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
-import {useSession} from "next-auth/react";
 import {useToast} from "@/components/ui/use-toast";
 import {AddSongButton} from "@/app/board/[teamId]/plan/_components/add-song-button";
 import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
@@ -26,9 +25,10 @@ import {Song} from "@/models/song";
 import {SongService, WorshipService} from "@/apis";
 import {Mode} from "@/components/constants/enums";
 import {Worship} from "@/models/worship";
-import {timestampToDate, timestampToDateString} from "@/components/helper/helper-functions";
+import {timestampToDate} from "@/components/helper/helper-functions";
 import {useRouter} from "next/navigation";
 import {getPathWorship} from "@/components/helper/routes";
+import {auth} from "@/firebase";
 
 export interface WorshipInfo {
   title: string
@@ -50,7 +50,7 @@ interface Props {
 }
 
 export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
-  const {data: session} = useSession()
+  const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtomById(teamId))
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
@@ -78,7 +78,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
   }, [mode, setSelectedSongInfoList, worship?.songs])
 
   function isSessionValid() {
-    if (!session?.user.id) {
+    if (!authUser?.uid) {
       console.log("error");
       setIsOpen(false)
       setIsLoading(false)
@@ -100,7 +100,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
     try {
       const worshipInput = getWorshipInput()
 
-      WorshipService.addNewWorship(session?.user.id, teamId, worshipInput).then((worshipId: string) => {
+      WorshipService.addNewWorship(authUser?.uid, teamId, worshipInput).then((worshipId: string) => {
         toast({
           title: `New worship has set on ${date}.`,
           description: team?.name,
@@ -129,7 +129,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
       const worshipInput = getWorshipInput()
 
       // Todo: firestore
-      // WorshipService.editWorship(session?.user.id, teamId, worshipInput).then(() => {
+      // WorshipService.editWorship(authUser?.uid, teamId, worshipInput).then(() => {
       //   toast({
       //     title: `Worship successfully updated.`,
       //     description: team?.name,
