@@ -1,26 +1,33 @@
+"use client"
+
 import {WorshipForm} from "@/app/board/[teamId]/plan/_components/worship-form";
 import {WorshipService} from "@/apis";
-import {redirect} from "next/navigation";
-import {getPathWorship, getPathWorshipEdit} from "@/components/helper/routes";
+import {useRouter} from "next/navigation";
+import {getPathWorship} from "@/components/helper/routes";
 import {Mode} from "@/components/constants/enums";
 import {Worship} from "@/models/worship";
+import {useEffect, useState} from "react";
 
-
-export default async function EditWorshipPage({params}: any) {
+export default function EditWorshipPage({params}: any) {
   const teamId = params.teamId
   const worshipId = params.worshipId
+  const [worship, setWorship] = useState<Worship>(null)
+  const router = useRouter()
 
-  const worship = await WorshipService.getById(worshipId) as Worship
+  useEffect(() => {
+    WorshipService.getById(worshipId).then(_worship => {
+      setWorship(_worship as Worship)
+    })
+  }, [worshipId])
 
-  console.log(worship)
-
-  async function onOpenChangeHandler(state: boolean) {
-    "use server"
-
+  function onOpenChangeHandler(state: boolean) {
     if (!state) {
-      redirect(getPathWorship(teamId, worshipId))
+      router.push(getPathWorship(teamId, worshipId))
     }
   }
+
+  if (!worship) return <></>
+
   return (
     <WorshipForm mode={Mode.EDIT} isOpen={true} setIsOpen={onOpenChangeHandler} worship={worship} />
   )

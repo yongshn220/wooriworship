@@ -1,25 +1,34 @@
+"use client"
+
 import {Mode} from "@/components/constants/enums";
 import {SongForm} from "@/app/board/[teamId]/song/_components/song-form";
 import {Song} from "@/models/song";
 import {SongService} from "@/apis";
-import { redirect } from 'next/navigation'
+import {redirect, useRouter} from 'next/navigation'
 import {toPlainObject} from "@/components/helper/helper-functions";
 import {getPathSongDetail} from "@/components/helper/routes";
+import {useEffect, useState} from "react";
 
 
-export default async  function SongEditPage({params}: any) {
+export default function SongEditPage({params}: any) {
   const teamId = params.teamId
   const songId = params.songId
+  const [song, setSong] = useState<Song>(null)
+  const router = useRouter()
 
-  const song = await SongService.getById(songId) as Song
+  useEffect(() => {
+    SongService.getById(songId).then(_song => {
+      setSong(_song as Song)
+    })
+  }, [songId])
 
-  async function onOpenChangeHandler(state: boolean) {
-    "use server"
-
+  function onOpenChangeHandler(state: boolean) {
     if (!state) {
-      redirect(getPathSongDetail(teamId, songId))
+      router.push(getPathSongDetail(teamId, songId))
     }
   }
+
+  if (!song) return <></>
 
   return (
     <SongForm mode={Mode.EDIT} isOpen={true} setIsOpen={onOpenChangeHandler} song={toPlainObject(song)}/>
