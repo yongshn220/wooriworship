@@ -5,8 +5,8 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
 import Link from "next/link";
-import {Mode} from "@/app/page";
 import {signIn} from "next-auth/react";
+import {Mode} from "@/app/_components/landing-page";
 
 export function Login({setMode}: any) {
   const [login, setLogin] = useState({

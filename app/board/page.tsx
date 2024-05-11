@@ -15,12 +15,12 @@ export default function BoardPage() {
   useEffect(() => {
     if (!session) return
 
-    UserService.getById(session?.user.id).then((_user: any) => {
-      const user = _user as User
-      if (user.teams.length > 0) {
-        router.push(getPathPlan(user.teams[0]))
-      }
-    })
+    // UserService.getById(session?.user.id).then((_user: any) => {
+    //   const user = _user as User
+    //   if (user.teams.length > 0) {
+    //     router.push(getPathPlan(user.teams[0]))
+    //   }
+    // })
   }, [router, session])
 
   return (

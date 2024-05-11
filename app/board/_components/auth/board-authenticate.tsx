@@ -36,3 +36,4 @@ export function BoardAuthenticate({children}: Readonly<{ children: React.ReactNo
     </div>
   )
 }
+//////http://localhost:3000/board/ngAraLTxWKZCvsdc1zvO/song

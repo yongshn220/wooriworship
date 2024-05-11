@@ -26,17 +26,17 @@ export async function WorshipCard({teamId, worship}: Props) {
             <HoverOverlay/>
             {
               songs.map((song, i) => (
-                <p key={i} className="line-clamp-1">{song.title}</p>
+                <p key={i} className="line-clamp-1">{song?.title}</p>
               ))
             }
           </div>
           <p className="p-4 bg-white text-xs line-clamp-1">
-            {worship.title}
+            {worship?.title}
           </p>
         </div>
       </Link>
       <p className="w-full text-center text-sm text-gray-600 mt-1">
-        {timestampToDateString(worship.worship_date)} <span className="text-xs">(Mon)</span>
+        {timestampToDateString(worship?.worship_date)} <span className="text-xs">(Mon)</span>
       </p>
     </div>
   )
