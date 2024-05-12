@@ -13,7 +13,8 @@ class UserService extends BaseService {
             email: email,
             created_time: new Date(),
             last_logged_in_time: new Date(),
-            teams: []
+            teams: [],
+            invite_optin: true
         }
         await this.update(userId, user);
         return {...user, id: userId}
@@ -27,6 +28,10 @@ class UserService extends BaseService {
             console.log("there is no currentUser")
             return null;
         }
+    }
+
+    async updateInviteOptin(userId: string, inviteOptin: Boolean) {
+        this.update(userId, {invite_optin: inviteOptin})
     }
 }
 export default new UserService();

@@ -41,7 +41,7 @@ class WorshipService extends BaseService {
   async updateWorship(userId: string, worshipId: string, worshipInput: any) {
     const worship = {
         title: worshipInput.title,
-        detail: worshipInput.detail,
+        description: worshipInput.description,
         songs: worshipInput.songs,
         updated_by: {
           id: userId,
@@ -50,6 +50,16 @@ class WorshipService extends BaseService {
         worship_date: worshipInput.worship_date
     }
     return await this.update(worshipId, worship);
+  }
+
+  async deleteWorship(worshipId: string) {
+    try{
+        await this.delete(worshipId);
+        return true;
+    } catch (err) {
+        console.log("error occured: "+err);
+        return false;
+    }
   }
 }
 
