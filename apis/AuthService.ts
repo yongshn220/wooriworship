@@ -1,3 +1,4 @@
+
 import { auth, firebaseApp } from "@/firebase";
 import { BaseService, UserService } from './';
 
@@ -29,6 +30,7 @@ class AuthService extends BaseService {
         const user = await auth.signInWithCustomToken(token);
         if (user.user) {
             await UserService.update(user.user.uid, {last_logged_in_time: new Date()});
+            console.log("SUC - loginWithCustomToken")
             return true
         }
         return null;

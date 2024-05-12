@@ -1,3 +1,5 @@
+"use client"
+
 import {BoardSidebar} from "@/app/board/_components/board-sidebar/board-sidebar";
 import {Navbar} from "@/app/board/_components/nav-bar/nav-bar";
 import {TeamSidebar} from "@/app/board/_components/team-sidebar/team-sidebar";
@@ -5,7 +7,7 @@ import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate
 
 
 export default function BoardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  console.log("board layout")
+
   return (
     <section className="h-full">
       <BoardAuthenticate>

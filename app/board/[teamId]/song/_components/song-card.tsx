@@ -4,20 +4,28 @@ import LinkIcon from '@/public/icons/linkIcon.svg'
 import HeartIcon from '@/public/icons/heartIcon.svg'
 import {Badge} from "@/components/ui/badge";
 import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-card";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Song} from "@/models/song";
 import {useRouter} from "next/navigation";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
+import {SongService} from "@/apis";
 
 
 interface Props {
-  song: Song
+  songId: string
 }
-export function SongCard({song}: Props) {
+export function SongCard({songId}: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
+  const [song, setSong] = useState<Song>()
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    SongService.getById(songId).then(_song => {
+      setSong(_song as Song)
+    })
+  }, [songId])
 
   function handleSongCardClick() {
     router.push(`/board/${teamId}/song/${song.id}`)

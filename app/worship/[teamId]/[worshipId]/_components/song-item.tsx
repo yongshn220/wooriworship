@@ -1,18 +1,30 @@
+"use client"
+
 import {SongHeader} from "@/models/worship";
 import {SongService} from "@/apis";
 import {Song} from "@/models/song";
 import LinkIcon from '@/public/icons/linkIcon.svg'
-import {Button} from "@/components/ui/button";
-import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-card";
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
+import {useEffect, useState} from "react";
 
 interface Props {
   songHeader: SongHeader
   index: number
 }
 
-export async function SongItem({songHeader, index}: Props) {
-  const song = await SongService.getById(songHeader.id) as Song
+export function SongItem({songHeader, index}: Props) {
+  const [song, setSong] = useState<Song>(null)
+
+  useEffect(() => {
+    if (songHeader?.id) {
+      SongService.getById(songHeader?.id).then((_song) => {
+        if (_song)
+          setSong(_song as Song)
+      })
+    }
+  }, [songHeader?.id])
+
+  if (!song) return <></>
 
   return (
     <SongDetailCardWrapper song={song}>

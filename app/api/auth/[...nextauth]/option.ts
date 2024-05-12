@@ -1,8 +1,5 @@
 import {NextAuthOptions} from "@/node_modules/next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import {UserService} from "@/apis";
-import {User} from "@/models/user";
-import {auth} from "@/firebase";
 import {FirestoreAdapter} from "@auth/firebase-adapter";
 import {adminAuth, adminDB} from "@/firebase-admin";
 import {Adapter} from "next-auth/adapters";
