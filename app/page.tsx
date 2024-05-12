@@ -4,18 +4,40 @@ import {RoutingPage} from "@/app/_components/routing-page";
 import {useRecoilValue} from "recoil";
 import {FirebaseSyncStatus, firebaseSyncStatusAtom} from "@/global-states/syncState";
 import {LandingPage} from "@/app/_components/landing-page";
+import {useEffect, useState} from "react";
+import {auth} from "@/firebase";
+import {getPathBoard} from "@/components/helper/routes";
+import {useRouter} from "next/navigation";
 
+enum AuthStatus {
+  PROCESSING,
+  VALID,
+  NOT_VALID,
+}
 
 export default function Home() {
-  const firebaseSyncStatus = useRecoilValue(firebaseSyncStatusAtom)
-  return (
-    <RootAuthenticate>
-      {
-        firebaseSyncStatus === FirebaseSyncStatus.NOT_SYNCED
-        ?  <LandingPage/>
-        :  <RoutingPage/>
+  const [authStatus, setAuthStatus] = useState<AuthStatus>(AuthStatus.PROCESSING)
+  const router = useRouter()
+
+  useEffect(() => {
+    auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        router.replace(getPathBoard())
       }
-    </RootAuthenticate>
+      else {
+        setAuthStatus(AuthStatus.NOT_VALID)
+      }
+    });
+  }, [router]);
+
+  return (
+    <>
+      {
+        authStatus === AuthStatus.NOT_VALID
+          ? <LandingPage/>
+          : <RoutingPage/>
+      }
+    </>
   )
 }
 
