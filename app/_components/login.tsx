@@ -5,30 +5,34 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
 import Link from "next/link";
-import {Mode} from "@/app/page";
 import {signIn} from "next-auth/react";
+import {Mode} from "@/app/_components/landing-page";
+import {AuthService, UserService} from "@/apis";
 
 export function Login({setMode}: any) {
   const [login, setLogin] = useState({
     email: "",
     password: "",
   })
+  const [error, setError] = useState(false)
 
   async function handleLogin(e: any) {
     e.preventDefault();
-    try {
-      const res = await signIn("credentials", {
-        email: login.email,
-        password: login.password,
-        redirect: false
-      })
-      if (res?.ok === false) {
-        console.log("login fail")
-      }
-    }
-    catch (e) {
-      console.log(e)
-    }
+    const res = await AuthService.login(login.email, login.password)
+
+    // try {
+    //   const res = await signIn("credentials", {
+    //     email: login.email,
+    //     password: login.password,
+    //     redirect: false
+    //   })
+    //   if (res?.ok === false) {
+    //     setError(true)
+    //   }
+    // }
+    // catch (e) {
+    //   console.log(e)
+    // }
   }
 
   return (
@@ -49,6 +53,10 @@ export function Login({setMode}: any) {
               <Input id="loginPassword" required type="password"
                      onChange={(e) => setLogin((prev) => ({...prev, password: e.target.value}))}/>
             </div>
+            {
+              error &&
+              <p className="text-red-500 text-sm">Wrong email or password.</p>
+            }
             <Button className="w-full" type="submit" >Login</Button>
           </form>
           <div className="flex flex-col mt-4 text-center text-sm gap-2">

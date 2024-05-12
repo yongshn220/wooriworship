@@ -4,20 +4,18 @@ import {Sheet, SheetContent, SheetTrigger} from "@/components/ui/sheet";
 import {Button} from "@/components/ui/button";
 import {MainLogo} from "@/components/logo/main-logo";
 import {useRouter} from "next/navigation";
-import {Routes} from "@/components/constants/enums";
 import { AuthService } from "@/apis"
-import {signOut} from "next-auth/react";
 
 export function ProfileButton() {
 
   const router = useRouter()
 
   async function handleSignOut() {
-    try{
-      await signOut()
+    try {
       await AuthService.logout();
-
-  } catch (err: any) {
+      router.replace("/")
+    }
+    catch (err: any) {
       console.log(err.code);
     }
   }

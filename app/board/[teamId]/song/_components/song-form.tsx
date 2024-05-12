@@ -12,14 +12,14 @@ import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/app/board/[teamId]/song/_components/multiple-image-uploader";
 import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
-import {useSession} from "next-auth/react";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {Song} from "@/models/song";
 import {SongService, StorageService, TagService}  from "@/apis";
 import {Mode} from "@/components/constants/enums";
-import {revalidatePath} from "next/cache";
 import {useRouter} from "next/navigation";
+import {getPathSongDetail} from "@/components/helper/routes";
+import {auth} from "@/firebase";
 
 interface Props {
   mode: Mode
@@ -45,7 +45,7 @@ export interface MusicSheet {
 }
 
 export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
-  const {data: session} = useSession()
+  const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtomById(teamId))
   const [input, setInput] = useState<SongInput>({
@@ -61,6 +61,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
   const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
 
   useEffect(() => {
     const _musicSheets = song?.music_sheet_urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<MusicSheet>
@@ -71,7 +72,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
   async function handleCreate() {
     setIsLoading(true)
 
-    if (!session?.user.id) {
+    if (!authUser?.uid) {
       console.log("error");
       setIsOpen(false)
       setIsLoading(false)
@@ -85,29 +86,32 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
         music_sheet_urls: downloadUrls
       }
       const promises = [];
-      console.log(songInput);
-      promises.push(SongService.addNewSong(session?.user.id, teamId, songInput));
+      promises.push(SongService.addNewSong(authUser?.uid, teamId, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
+      Promise.all(promises).then(results => {
+        const songId = results[0] as string
 
-      promises.push();
-      await Promise.all(promises)
+        toast({
+          title: "New song has been added.",
+          description: team?.name,
+        })
 
-      toast({
-        title: "New song has been added.",
-        description: team?.name,
+        router.push(getPathSongDetail(teamId, songId))
       })
-      setIsOpen(false)
-      setIsLoading(false)
     }
     catch (e) {
       console.log("err", e)
+    }
+    finally {
+      setIsOpen(false)
+      setIsLoading(false)
     }
   }
 
   async function handleEdit() {
     setIsLoading(true)
 
-    if (!session?.user.id || (song == null || song.id == null)) {
+    if (!authUser?.uid|| (song == null || song.id == null)) {
       setIsOpen(false)
       setIsLoading(false)
       return;
@@ -126,7 +130,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       }
 
       const promises = [];
-      promises.push(SongService.updateSong(session?.user.id, song?.id, songInput));
+      promises.push(SongService.updateSong(authUser?.uid, song?.id, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
       await Promise.all(promises)
     }
@@ -242,7 +246,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
         <DialogFooter>
           {
             (mode === Mode.EDIT)
-              ? <Button type="submit" onClick={handleEdit}>{isLoading ? "Editing..." : "Edit"}</Button>
+              ? <Button type="submit" onClick={handleEdit}>{isLoading ? "Saving..." : "Save"}</Button>
               : <Button type="submit" onClick={handleCreate}>{isLoading ? "Creating..." : "Create"}</Button>
           }
         </DialogFooter>

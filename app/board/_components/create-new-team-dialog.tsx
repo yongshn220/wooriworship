@@ -8,22 +8,22 @@ import {TeamIcon} from "@/components/team-icon";
 import {ReactNode, useState} from "react";
 import {useToast} from "@/components/ui/use-toast";
 import { TeamService, UserService } from '@/apis';
-import {useSession} from "next-auth/react";
+import {auth} from "@/firebase";
 
 
 export function CreateNewTeamDialog({children}: {children: ReactNode}) {
-  const {data: session} = useSession()
+  const authUser = auth.currentUser
   const [teamName, setTeamName] = useState("New Team")
   const { toast } = useToast()
 
-  if (!session) return <></>
+  if (!authUser) return <></>
 
 
   async function handleCreateNewTeam() {
-    if (session?.user) {
+    if (authUser) {
       try {
-        const teamId = await TeamService.addNewTeam(session.user.id, teamName);
-        await UserService.addNewTeam(session.user.id, teamId);
+        const teamId = await TeamService.addNewTeam(authUser.uid, teamName);
+        await UserService.addNewTeam(authUser.uid, teamId);
 
         toast({
           title: "New team created!",

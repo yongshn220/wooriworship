@@ -1,5 +1,9 @@
 import {Navbar} from "@/app/board/_components/nav-bar/nav-bar";
-import {WorshipSidebarWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/worship-sidebar-wrapper";
+import {WorshipSetup} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/worship-setup";
+import {MainLogoRouter} from "@/components/logo/main-logo";
+import {getPathPlan} from "@/components/helper/routes";
+import {WorshipSidebar} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/worship-sidebar";
+import {MdSidebar} from "@/components/sidebar/md-sidebar";
 
 interface Props {
   params: any
@@ -8,11 +12,16 @@ interface Props {
 
 export default function WorshipLayout({params, children}: Props) {
   const worshipId = params.worshipId
+  const teamId = params.teamId
 
   return (
     <section className="h-full">
       <div className="flex gap-x-3 h-full">
-        <WorshipSidebarWrapper worshipId={worshipId}/>
+        <WorshipSetup worshipId={worshipId}/>
+        <MdSidebar className="px-5 shadow-lg">
+          <MainLogoRouter route={getPathPlan(teamId)}/>
+          <WorshipSidebar/>
+        </MdSidebar>
         <div className="h-full flex-1">
           <Navbar/>
           {children}

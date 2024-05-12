@@ -1,21 +1,26 @@
+"use client"
+
 import {HoverOverlay} from "@/components/hover-overlay";
 import Link from "next/link";
 import {Worship} from "@/models/worship";
 import {SongService} from "@/apis";
-import {Song} from "@/models/song";
-import {timestampToDate} from "@/components/helper/helper-functions";
+import {timestampToDateString} from "@/components/helper/helper-functions";
 import {getPathWorship} from "@/components/helper/routes";
-
+import {useEffect, useState} from "react";
 
 interface Props {
   teamId: string
   worship: Worship
 }
-export async function WorshipCard({teamId, worship}: Props) {
+export function WorshipCard({teamId, worship}: Props) {
+  const [songList, setSongList] = useState([])
 
-  let songsPromise = worship.songs.map(song => SongService.getById(song.id))
-  const songs = await Promise.all(songsPromise) as Array<Song>
-
+  useEffect(() => {
+    let songsPromise = worship.songs.map(song => SongService.getById(song.id))
+    Promise.all(songsPromise).then(_songList => {
+      setSongList(_songList)
+    })
+  }, [worship.songs])
 
 
   return (
@@ -25,18 +30,18 @@ export async function WorshipCard({teamId, worship}: Props) {
           <div className="relative flex-1 flex-center flex-col text-white text-xs font-semibold gap-2 p-2">
             <HoverOverlay/>
             {
-              songs.map((song, i) => (
-                <p key={i} className="line-clamp-1">{song.title}</p>
+              songList.map((song, i) => (
+                <p key={i} className="line-clamp-1">{song?.title}</p>
               ))
             }
           </div>
           <p className="p-4 bg-white text-xs line-clamp-1">
-            {worship.title}
+            {worship?.title}
           </p>
         </div>
       </Link>
       <p className="w-full text-center text-sm text-gray-600 mt-1">
-        {timestampToDate(worship.worship_date)} <span className="text-xs">(Mon)</span>
+        {timestampToDateString(worship?.worship_date)} <span className="text-xs">(Mon)</span>
       </p>
     </div>
   )

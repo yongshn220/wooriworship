@@ -30,6 +30,7 @@
     "cmdk": "^1.0.0",
     "date-fns": "^3.5.0",
     "embla-carousel-react": "^8.0.0",
+    "file-saver": "^2.0.5",
     "firebase": "^10.8.1",
     "firebase-admin": "^11.4.1",
     "lottie-react": "^2.4.0",
@@ -50,6 +51,7 @@
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
     "@types/bcryptjs": "^2.4.6",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

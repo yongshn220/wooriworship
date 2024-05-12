@@ -1,12 +1,12 @@
 'use client'
 
-import {CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
-import {Mode} from "@/app/page";
 import { AuthService, UserService } from "@/apis"
+import {Mode} from "@/app/_components/landing-page";
 
 export function Signup({setMode}: any) {
     const [signup, setSignup] = useState({
@@ -25,7 +25,7 @@ export function Signup({setMode}: any) {
     if(signup.password != signup.confirmPassword) {
       console.log("password and confirm password not same");
       return;
-    } 
+    }
     if(signup.name.length == 0) {
       console.log("Name is not given")
       return;

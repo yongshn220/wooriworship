@@ -4,7 +4,6 @@ import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-
 import {Song} from "@/models/song";
 import {useState} from "react";
 
-
 interface Props {
   song: Song
   children: React.ReactNode
