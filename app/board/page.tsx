@@ -18,7 +18,7 @@ export default function BoardPage() {
       UserService.getById(authUser.uid).then((_user: any) => {
         const user = _user as User
         if (user.teams.length > 0) {
-          // router.push(getPathPlan(user.teams[0]))
+          router.push(getPathPlan(user.teams[0]))
         }
       })
     }
