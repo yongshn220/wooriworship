@@ -6,6 +6,7 @@ import TagService from './TagService';
 import StorageService from './StorageService';
 import SongService from './SongService';
 import WorshipService from './WorshipService';
+import InvitationService from './InvitationService';
 
 export {
     BaseService,
@@ -15,5 +16,6 @@ export {
     TagService,
     StorageService,
     SongService,
-    WorshipService
+    WorshipService,
+    InvitationService
 }
