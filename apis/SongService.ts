@@ -65,6 +65,7 @@ class SongService extends BaseService {
       key: songInput.key,
       music_sheet_urls: songInput.music_sheet_urls
     }
+    console.log(song)
     return await this.update(songId, song);
   }
 

@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Badge} from "@/components/ui/badge";
-import {EditButton} from "@/app/board/[teamId]/song/_components/edit-button";
 import {Song} from "@/models/song";
 import Image from "next/image"
 import {Button} from "@/components/ui/button";
@@ -17,7 +16,6 @@ import Link from "next/link";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {getPathSongEdit} from "@/components/helper/routes";
-import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {DeleteSongButton} from "@/app/board/[teamId]/song/_components/delete-song-button";
 
 interface Props {

@@ -22,8 +22,8 @@ export default function SongEditPage({params}: any) {
     })
   }, [songId])
 
-  function onOpenChangeHandler(state: boolean) {
-    if (!state) {
+  function onOpenChangeHandler(isOpen: boolean) {
+    if (!isOpen) {
       router.push(getPathSongDetail(teamId, songId))
     }
   }

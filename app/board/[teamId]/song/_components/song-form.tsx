@@ -116,6 +116,10 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     if (!authUser?.uid|| (song == null || song.id == null)) {
       setIsOpen(false)
       setIsLoading(false)
+      toast({
+        title: "Fail to edit song",
+        description: "Something went wrong. Please try again later."
+      })
       return false
     }
     return true
@@ -142,11 +146,12 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       promises.push(SongService.updateSong(authUser?.uid, song?.id, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
       await Promise.all(promises)
+
+      setIsOpen(false)
+      setIsLoading(false)
     }
     catch (e) {
-      console.log("err", e)
-    }
-    finally {
+      console.log(e)
       setIsOpen(false)
       setIsLoading(false)
     }
