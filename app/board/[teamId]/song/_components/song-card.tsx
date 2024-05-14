@@ -10,6 +10,7 @@ import {useRouter} from "next/navigation";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {SongService} from "@/apis";
+import {songAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
 
 
 interface Props {
@@ -17,15 +18,9 @@ interface Props {
 }
 export function SongCard({songId}: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
-  const [song, setSong] = useState<Song>()
+  const song = useRecoilValue(songAtom(songId))
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
-
-  useEffect(() => {
-    SongService.getById(songId).then(_song => {
-      setSong(_song as Song)
-    })
-  }, [songId])
 
   function handleSongCardClick() {
     router.push(`/board/${teamId}/song/${song.id}`)
@@ -33,7 +28,6 @@ export function SongCard({songId}: Props) {
 
   return (
     <div className="h-full">
-      {/*<SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen} song={song} editable={true}/>*/}
       <div className="aspect-[5/4] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC]">
         <div className="relative group h-full flex-center flex-col text-white cursor-pointer" onClick={handleSongCardClick}>
           <HoverOverlay/>

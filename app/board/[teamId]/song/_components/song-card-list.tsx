@@ -1,12 +1,10 @@
 "use client"
 
-import {useRecoilValue, useRecoilValueLoadable} from "recoil";
-import {currentTeamIdAtom} from "@/global-states/teamState";
+import {useRecoilValueLoadable} from "recoil";
 import {SongCard} from "@/app/board/[teamId]/song/_components/song-card";
 import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
 
 export function SongCardList() {
-  const teamId = useRecoilValue(currentTeamIdAtom)
   const songIdsLoadable = useRecoilValueLoadable(currentTeamSongIdsAtom)
 
   switch (songIdsLoadable.state) {
