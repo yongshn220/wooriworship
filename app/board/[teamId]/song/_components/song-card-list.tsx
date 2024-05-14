@@ -1,31 +1,28 @@
 "use client"
 
-import SongService from "@/apis/SongService";
-import {useEffect, useState} from "react";
-import {useRecoilValue} from "recoil";
+import {useRecoilValue, useRecoilValueLoadable} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {SongCard} from "@/app/board/[teamId]/song/_components/song-card";
+import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
 
 export function SongCardList() {
-  const [songIds, setSongIds] = useState([])
   const teamId = useRecoilValue(currentTeamIdAtom)
+  const songIdsLoadable = useRecoilValueLoadable(currentTeamSongIdsAtom)
 
-  useEffect(() => {
-    SongService.getTeamSong(teamId).then((songList => {
-      setSongIds(songList.map((song) => song.id))
-    }))
-
-  }, [teamId]);
-
-  return (
-    <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10">
-      {
-        songIds.map((songId) => (
-          <SongCard key={songId} songId={songId}/>
-        ))
-      }
-    </div>
-  )
+  switch (songIdsLoadable.state) {
+    case 'loading': return <></>;
+    case 'hasValue':
+      return (
+        <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10">
+          {
+            songIdsLoadable.contents.map((songId) => (
+              <SongCard key={songId} songId={songId}/>
+            ))
+          }
+        </div>
+      )
+    case 'hasError': throw songIdsLoadable.contents
+  }
 }
 
 

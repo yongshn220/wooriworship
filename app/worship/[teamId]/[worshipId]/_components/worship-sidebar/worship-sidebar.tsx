@@ -12,7 +12,7 @@ import {DownloadMusicSheetButton} from "@/app/worship/[teamId]/[worshipId]/_comp
 import {getPathPlan, getPathSong} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import {currentSongListAtom} from "@/app/worship/[teamId]/[worshipId]/_states/states";
+import {currentSongListAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 
 
 export function WorshipSidebar() {

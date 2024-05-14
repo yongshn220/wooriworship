@@ -3,7 +3,7 @@
 import {Worship} from "@/models/worship";
 import {Song} from "@/models/song";
 import {useSetRecoilState} from "recoil";
-import {currentSongListAtom, currentWorshipAtom} from "@/app/worship/[teamId]/[worshipId]/_states/states";
+import {currentSongListAtom, currentWorshipAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useEffect} from "react";
 import {toPlainObject} from "@/components/helper/helper-functions";
 import {SongService, WorshipService} from "@/apis";

@@ -3,7 +3,7 @@
 import {Search} from "lucide-react";
 import {Input} from "@/components/ui/input";
 import {useRecoilState} from "recoil";
-import {songSearchInputAtom} from "@/app/board/_states/pageState";
+import {songSearchInputAtom} from "@/app/board/_states/board-states";
 
 export function SearchInput() {
   const [input, setInput] = useRecoilState(songSearchInputAtom)

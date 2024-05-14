@@ -12,7 +12,7 @@ import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/app/board/[teamId]/song/_components/multiple-image-uploader";
 import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
-import {useRecoilValue} from "recoil";
+import {useRecoilValue, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {Song} from "@/models/song";
 import {SongService, StorageService, TagService}  from "@/apis";
@@ -20,6 +20,7 @@ import {Mode} from "@/components/constants/enums";
 import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
 import {auth} from "@/firebase";
+import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
 
 interface Props {
   mode: Mode
@@ -48,6 +49,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtomById(teamId))
+  const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom)
   const [input, setInput] = useState<SongInput>({
     title: (mode === Mode.EDIT)? song?.title?? "" : "",
     author: (mode === Mode.EDIT)? song?.original.author?? "" : "",
@@ -69,35 +71,37 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       setMusicSheets(_musicSheets)
   }, [song?.music_sheet_urls])
 
-  async function handleCreate() {
-    setIsLoading(true)
-
+  function createValidCheck() {
     if (!authUser?.uid) {
       console.log("error");
       setIsOpen(false)
       setIsLoading(false)
-      return;
+      return false
     }
+    return true
+  }
+
+  async function handleCreate() {
+    setIsLoading(true)
+
+    if (!createValidCheck()) return false
 
     try {
       const downloadUrls = await StorageService.uploadMusicSheets(teamId, musicSheets);
-      const songInput = {
-        ...input,
-        music_sheet_urls: downloadUrls
-      }
+      const songInput = {...input, music_sheet_urls: downloadUrls}
       const promises = [];
       promises.push(SongService.addNewSong(authUser?.uid, teamId, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
-      Promise.all(promises).then(results => {
-        const songId = results[0] as string
+      const promiseResults = await Promise.all(promises)
+      const songId = promiseResults[0] as string
 
-        toast({
-          title: `New Song Created!`,
-          description: `${team?.name} - ${songInput.title}`,
-        })
-
-        router.push(getPathSongDetail(teamId, songId))
+      toast({
+        title: `New Song Created!`,
+        description: `${team?.name} - ${songInput.title}`,
       })
+
+      setCurrentTeamSongIds((prev) => ([...prev, songId]))
+      router.push(getPathSongDetail(teamId, songId))
     }
     catch (e) {
       console.log("err", e)
@@ -108,14 +112,19 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     }
   }
 
-  async function handleEdit() {
-    setIsLoading(true)
-
+  function editValidCheck() {
     if (!authUser?.uid|| (song == null || song.id == null)) {
       setIsOpen(false)
       setIsLoading(false)
-      return;
+      return false
     }
+    return true
+  }
+
+  async function handleEdit() {
+    setIsLoading(true)
+
+    if (!editValidCheck()) return false
 
     try {
       const curImageUrls = musicSheets.map(item => item.url)
