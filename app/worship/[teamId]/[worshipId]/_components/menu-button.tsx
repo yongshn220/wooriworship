@@ -4,9 +4,10 @@ import MenuIcon from "@/public/icons/menuIcon.svg";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
-import {getPathWorshipEdit} from "@/components/helper/routes";
+import {getPathPlan, getPathWorshipEdit} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
+import { WorshipService } from "@/apis";
 
 
 interface Props {
@@ -23,7 +24,17 @@ export function MenuButton({title, worshipId}: Props) {
   }
 
   async function handleDeleteWorship() {
-    console.log("delete worship")
+    try {
+      await WorshipService.deleteWorship(worshipId);
+      return true
+    }
+    catch {
+      console.log("error");
+      return false
+    }
+    finally {
+      router.replace(getPathPlan(teamId))
+    }
   }
 
   return (

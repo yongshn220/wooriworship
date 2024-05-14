@@ -3,7 +3,11 @@
 import { SongService } from "@/apis";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {Button} from "@/components/ui/button";
+import { currentTeamIdAtom } from "@/global-states/teamState";
+import { useRouter } from "next/navigation";
 import {useState} from "react";
+import { useRecoilValue } from "recoil";
+import {getPathSong} from "@/components/helper/routes"
 
 interface Props {
   songTitle: string
@@ -11,10 +15,20 @@ interface Props {
 }
 
 export function DeleteSongButton({songTitle, songId}: Props) {
+  const teamId = useRecoilValue(currentTeamIdAtom)
   const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
 
   async function handleDeleteSong() {
-    return await SongService.deleteSong(songId)
+    try {
+      await SongService.deleteSong(songId)
+    }
+    catch (e) {
+      console.log(e)
+    }
+    finally {
+      router.replace(getPathSong(teamId))
+    }
   }
 
   return (
