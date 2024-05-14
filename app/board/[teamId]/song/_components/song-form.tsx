@@ -92,8 +92,8 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
         const songId = results[0] as string
 
         toast({
-          title: "New song has been added.",
-          description: team?.name,
+          title: `New Song Created!`,
+          description: `${team?.name} - ${songInput.title}`,
         })
 
         router.push(getPathSongDetail(teamId, songId))

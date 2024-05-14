@@ -36,3 +36,9 @@ export enum InvitationStatus {
   Reject = 1,
   Accepted = 2
 }
+
+export enum DataFetchStatus {
+  PROCESSING,
+  VALID,
+  INVALID
+}
