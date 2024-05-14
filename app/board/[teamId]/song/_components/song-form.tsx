@@ -132,16 +132,17 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
 
     try {
       const curImageUrls = musicSheets.map(item => item.url)
-      const filesToAdd = musicSheets.filter(url => !!url) as Array<MusicSheet>
+      const filesToAdd = musicSheets.filter(item => !!item.id) as Array<MusicSheet>
       const urlsToDelete = song.music_sheet_urls.filter(url => !curImageUrls.includes(url))
-      const urlsToKeep = song.music_sheet_urls.filter(url => curImageUrls.includes(url))
-
+      let urlsToKeep = song.music_sheet_urls.filter(url => curImageUrls.includes(url))
       const newDownloadUrls = await StorageService.updateMusicSheets(teamId, filesToAdd, urlsToDelete);
+      if (newDownloadUrls.length > 0) {
+        urlsToKeep = urlsToKeep.concat(newDownloadUrls)
+      }
       const songInput = {
         ...input,
-        music_sheet_urls: urlsToKeep.concat(newDownloadUrls)
+        music_sheet_urls: urlsToKeep
       }
-
       const promises = [];
       promises.push(SongService.updateSong(authUser?.uid, song?.id, songInput));
       promises.push(TagService.addNewTags(teamId, songInput.tags));
