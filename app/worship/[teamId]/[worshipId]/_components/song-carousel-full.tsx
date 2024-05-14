@@ -10,7 +10,7 @@ import {
   currentSongListAtom,
   currentWorshipAtom,
   worshipIndexAtom
-} from "@/app/worship/[teamId]/[worshipId]/_states/states";
+} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 
 

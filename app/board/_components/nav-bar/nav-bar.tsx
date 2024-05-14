@@ -6,7 +6,7 @@ import {SearchTags} from "@/app/board/_components/nav-bar/search-tags";
 import {cn} from "@/lib/utils";
 import {Page} from "@/components/constants/enums";
 import {useRecoilValue} from "recoil";
-import {currentPageAtom} from "@/app/board/_states/pageState";
+import {currentPageAtom} from "@/app/board/_states/board-states";
 import {ProfileButton} from "@/app/board/_components/nav-bar/profile-button";
 
 export function Navbar() {

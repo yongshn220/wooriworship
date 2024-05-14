@@ -6,8 +6,9 @@ import {Button} from "@/components/ui/button";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { useRouter } from "next/navigation";
 import {useState} from "react";
-import { useRecoilValue } from "recoil";
+import {useRecoilValue, useSetRecoilState} from "recoil";
 import {getPathSong} from "@/components/helper/routes"
+import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
 
 interface Props {
   songTitle: string
@@ -16,12 +17,14 @@ interface Props {
 
 export function DeleteSongButton({songTitle, songId}: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
+  const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom)
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
 
   async function handleDeleteSong() {
     try {
       await SongService.deleteSong(songId)
+      setCurrentTeamSongIds((prev) => prev.filter(_id => _id !== songId))
     }
     catch (e) {
       console.log(e)

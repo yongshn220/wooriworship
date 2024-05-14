@@ -6,7 +6,7 @@ import {Button} from "@/components/ui/button";
 import {Checkbox} from "@/components/ui/checkbox";
 import {saveAs} from 'file-saver';
 import {useRecoilValue} from "recoil";
-import {currentSongListAtom} from "@/app/worship/[teamId]/[worshipId]/_states/states";
+import {currentSongListAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useState} from "react";
 
 

@@ -7,7 +7,7 @@ import DownIcon from "@/public/icons/downIcon.svg";
 import {useState} from "react";
 import {cn} from "@/lib/utils";
 import {useRecoilState} from "recoil";
-import {worshipMenuAtom} from "@/app/worship/[teamId]/[worshipId]/_states/states";
+import {worshipMenuAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 
 export function WorshipViewMenu() {
   const [isOpen, setIsOpen] = useState(true)

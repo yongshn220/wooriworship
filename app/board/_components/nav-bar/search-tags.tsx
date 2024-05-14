@@ -8,7 +8,7 @@ import {useEffect, useState} from "react";
 import {useRecoilState, useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import tagService from "@/apis/TagService";
-import {searchSelectedTagsAtom} from "@/app/board/_states/pageState";
+import {searchSelectedTagsAtom} from "@/app/board/_states/board-states";
 
 export function SearchTags() {
   const teamId = useRecoilValue(currentTeamIdAtom)
