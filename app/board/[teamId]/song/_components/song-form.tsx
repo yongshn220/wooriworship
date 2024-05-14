@@ -12,7 +12,13 @@ import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/app/board/[teamId]/song/_components/multiple-image-uploader";
 import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
-import {useRecoilValue, useSetRecoilState} from "recoil";
+import {
+  useRecoilRefresher_UNSTABLE,
+  useRecoilState,
+  useRecoilStateLoadable,
+  useRecoilValue, useResetRecoilState,
+  useSetRecoilState
+} from "recoil";
 import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
 import {Song} from "@/models/song";
 import {SongService, StorageService, TagService}  from "@/apis";
@@ -20,13 +26,13 @@ import {Mode} from "@/components/constants/enums";
 import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
 import {auth} from "@/firebase";
-import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
+import {currentTeamSongIdsAtom, songAtom, songUpdaterAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
 
 interface Props {
   mode: Mode
   isOpen: boolean
   setIsOpen: Function
-  song: Song | null
+  songId: string
 }
 export interface SongInput {
   title: string
@@ -45,7 +51,9 @@ export interface MusicSheet {
   isLoading: boolean;
 }
 
-export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
+export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
+  const [song, setSong] = useRecoilState(songAtom(songId))
+  const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtomById(teamId))
@@ -147,6 +155,9 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       promises.push(TagService.addNewTags(teamId, songInput.tags));
       await Promise.all(promises)
 
+      setSongUpdater((prev) => prev+1)
+
+      toast({title: "Song edited successfully."})
       setIsOpen(false)
       setIsLoading(false)
     }

@@ -13,14 +13,7 @@ import {useEffect, useState} from "react";
 export default function SongEditPage({params}: any) {
   const teamId = params.teamId
   const songId = params.songId
-  const [song, setSong] = useState<Song>(null)
   const router = useRouter()
-
-  useEffect(() => {
-    SongService.getById(songId).then(_song => {
-      setSong(_song as Song)
-    })
-  }, [songId])
 
   function onOpenChangeHandler(isOpen: boolean) {
     if (!isOpen) {
@@ -28,9 +21,7 @@ export default function SongEditPage({params}: any) {
     }
   }
 
-  if (!song) return <></>
-
   return (
-    <SongForm mode={Mode.EDIT} isOpen={true} setIsOpen={onOpenChangeHandler} song={toPlainObject(song)}/>
+    <SongForm mode={Mode.EDIT} isOpen={true} setIsOpen={onOpenChangeHandler} songId={songId}/>
   )
 }
