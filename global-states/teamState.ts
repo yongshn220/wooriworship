@@ -1,4 +1,4 @@
-import {atom, atomFamily, selectorFamily} from "recoil";
+import {atom, atomFamily, selector, selectorFamily} from "recoil";
 import {Team} from "@/models/team";
 import TeamService from "@/apis/TeamService";
 
@@ -8,12 +8,13 @@ export const currentTeamIdAtom = atom<string>({
   default: ""
 })
 
-export const teamAtom = atomFamily<Team, string>({
-  key: "currentTeamIdAtom",
-  default: selectorFamily({
+export const teamAtom = atom<Team>({
+  key: "teamAtom",
+  default: selector({
     key: "teamAtom/default",
-    get: (teamId) => async () => {
+    get: async ({get}) => {
       try {
+        const teamId = get(currentTeamIdAtom)
         if (!teamId) return null
 
         const team = await TeamService.getById(teamId) as Team

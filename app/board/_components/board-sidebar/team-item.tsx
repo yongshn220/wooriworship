@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function TeamItem({teamId}: Props) {
-  const team = useRecoilValue(teamAtom(teamId))
+  const team = useRecoilValue(teamAtom)
 
   return (
     <SelectItem value={teamId.toString()}>

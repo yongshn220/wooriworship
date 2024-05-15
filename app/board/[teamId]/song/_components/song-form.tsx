@@ -56,7 +56,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
-  const team = useRecoilValue(teamAtom(teamId))
+  const team = useRecoilValue(teamAtom)
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom)
   const [input, setInput] = useState<SongInput>({
     title: (mode === Mode.EDIT)? song?.title?? "" : "",
