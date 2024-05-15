@@ -9,7 +9,7 @@ import {RoleSelect} from "@/app/board/_components/nav-bar/role-select";
 import {Input} from "@/components/ui/input";
 import {useCallback, useState} from "react";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
-import {teamAtom} from "@/global-states/teamState";
+import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {userUpdaterAtom} from "@/global-states/userState";
 import {useRouter} from "next/navigation";
@@ -23,7 +23,8 @@ const members = [
 
 export function ManageTeamButton() {
   const setUserUpdater = useSetRecoilState(userUpdaterAtom)
-  const team = useRecoilValue(teamAtom)
+  const currentTeamId = useRecoilValue(currentTeamIdAtom)
+  const team = useRecoilValue(teamAtom(currentTeamId))
   const [email, setEmail] = useState("")
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
   const router = useRouter()
