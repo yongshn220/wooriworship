@@ -32,7 +32,7 @@ interface Props {
   mode: Mode
   isOpen: boolean
   setIsOpen: Function
-  songId: string
+  songId?: string
 }
 export interface SongInput {
   title: string
