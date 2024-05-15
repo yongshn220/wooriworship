@@ -9,6 +9,7 @@ export function SongCardList() {
 
   switch (songIdsLoadable.state) {
     case 'loading': return <></>;
+    case 'hasError': throw songIdsLoadable.contents
     case 'hasValue':
       return (
         <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10">
@@ -19,7 +20,6 @@ export function SongCardList() {
           }
         </div>
       )
-    case 'hasError': throw songIdsLoadable.contents
   }
 }
 

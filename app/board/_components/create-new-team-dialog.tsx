@@ -6,15 +6,17 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {TeamIcon} from "@/components/team-icon";
 import {ReactNode, useState} from "react";
-import {useToast} from "@/components/ui/use-toast";
+import {toast, useToast} from "@/components/ui/use-toast";
 import { TeamService, UserService } from '@/apis';
 import {auth} from "@/firebase";
+import {useSetRecoilState} from "recoil";
+import {userUpdaterAtom} from "@/global-states/userState";
 
 
 export function CreateNewTeamDialog({children}: {children: ReactNode}) {
   const authUser = auth.currentUser
+  const setUserUpdater = useSetRecoilState(userUpdaterAtom)
   const [teamName, setTeamName] = useState("New Team")
-  const { toast } = useToast()
 
   if (!authUser) return <></>
 
@@ -24,12 +26,13 @@ export function CreateNewTeamDialog({children}: {children: ReactNode}) {
       try {
         const teamId = await TeamService.addNewTeam(authUser.uid, teamName);
         await UserService.addNewTeam(authUser.uid, teamId);
-
+        setUserUpdater(prev => prev + 1)
         toast({
           title: "New team created!",
           description: `${teamName}`,
         })
-      } catch(err) {
+      }
+      catch(err) {
         console.log(err);
         alert({
           title: "Error on creating New Team from Server"

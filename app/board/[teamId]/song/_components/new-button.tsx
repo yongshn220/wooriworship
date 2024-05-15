@@ -3,13 +3,13 @@
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
 import {useRecoilValue} from "recoil";
-import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
+import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {SongForm} from "@/app/board/[teamId]/song/_components/song-form";
 import {Mode} from "@/components/constants/enums";
 
 export function NewButton() {
   const teamId = useRecoilValue(currentTeamIdAtom)
-  const team = useRecoilValue(teamAtomById(teamId))
+  const team = useRecoilValue(teamAtom(teamId))
   const [isOpen, setIsOpen] = useState(false)
 
   return (
