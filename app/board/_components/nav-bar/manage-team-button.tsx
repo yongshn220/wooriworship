@@ -7,10 +7,13 @@ import {Button} from "@/components/ui/button";
 import Image from 'next/image'
 import {RoleSelect} from "@/app/board/_components/nav-bar/role-select";
 import {Input} from "@/components/ui/input";
-import {useState} from "react";
+import {useCallback, useState} from "react";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {teamAtom} from "@/global-states/teamState";
-import {useRecoilValue} from "recoil";
+import {useRecoilValue, useSetRecoilState} from "recoil";
+import {userUpdaterAtom} from "@/global-states/userState";
+import {useRouter} from "next/navigation";
+import {getPathBoard} from "@/components/helper/routes";
 
 const members = [
   {email: "banaba212@gmail.com", role: "Leader"},
@@ -19,18 +22,25 @@ const members = [
 ]
 
 export function ManageTeamButton() {
+  const setUserUpdater = useSetRecoilState(userUpdaterAtom)
   const team = useRecoilValue(teamAtom)
   const [email, setEmail] = useState("")
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
-
+  const router = useRouter()
 
   function handleAddPeople() {
     // Todo: firebase
   }
 
-  function handleDeleteTeam() {
+  async function handleDeleteTeam() {
     setIsOpenDeleteDialog(true)
     // Todo: firebase
+  }
+
+  function onDeleteTeamCompleteCallback() {
+    setIsOpenDeleteDialog(false)
+    // setUserUpdater(prev => prev + 1)
+    // router.replace(getPathBoard())
   }
 
   return (
@@ -82,8 +92,9 @@ export function ManageTeamButton() {
             isOpen={isOpenDeleteDialog}
             setOpen={setIsOpenDeleteDialog}
             title="Delete Team"
-            description={`Do you really want to delete [${team.name}]? This action cannot be undone.`}
-            onDeleteHanlder={handleDeleteTeam}
+            description={`Do you really want to delete [${team?.name}]? This action cannot be undone.`}
+            onDeleteHandler={handleDeleteTeam}
+            callback={onDeleteTeamCompleteCallback}
           />
           <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-500" onClick={handleDeleteTeam}>Delete Team</Button>
         </DialogFooter>
