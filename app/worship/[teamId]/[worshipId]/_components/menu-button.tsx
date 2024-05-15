@@ -44,7 +44,7 @@ export function MenuButton({title, worshipId}: Props) {
         setOpen={setIsOpen}
         title={`Delete Worship`}
         description={`This will permanently delete [${title}]. This action cannot be undone.`}
-        onDeleteHanlder={handleDeleteWorship}
+        onDeleteHandler={handleDeleteWorship}
       />
       <DropdownMenu>
         <DropdownMenuTrigger>
