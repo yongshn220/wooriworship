@@ -9,7 +9,7 @@ import {Mode} from "@/components/constants/enums";
 
 export function NewButton() {
   const teamId = useRecoilValue(currentTeamIdAtom)
-  const team = useRecoilValue(teamAtom(teamId))
+  const team = useRecoilValue(teamAtom)
   const [isOpen, setIsOpen] = useState(false)
 
   return (

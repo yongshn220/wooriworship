@@ -14,7 +14,7 @@ interface Props {
 
 export function TeamIconHint({teamId}: Props) {
   const router = useRouter()
-  const team = useRecoilValue(teamAtom(teamId))
+  const team = useRecoilValue(teamAtom)
   const [currentTeamId, setCurrentTeamId] = useRecoilState(currentTeamIdAtom)
 
   function handleChangeTeam() {
