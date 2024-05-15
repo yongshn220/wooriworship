@@ -56,7 +56,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
-  const team = useRecoilValue(teamAtom)
+  const team = useRecoilValue(teamAtom(teamId))
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom)
   const [input, setInput] = useState<SongInput>({
     title: (mode === Mode.EDIT)? song?.title?? "" : "",
@@ -214,6 +214,15 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
+            <Label htmlFor="key">Key</Label>
+            <Input
+              id="key"
+              placeholder="key"
+              value={input.key}
+              onChange={(e) => setInput((prev => ({...prev, key: e.target.value})))}
+            />
+          </div>
+          <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="link">Link</Label>
             <Input
               id="link"
@@ -232,7 +241,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               id="bpm"
               type="number"
               placeholder="ex) 120"
-              defaultValue={input.bpm?? ""}
+              defaultValue={input.bpm ?? ""}
               onChange={(e) => setInput((prev => ({...prev, bpm: Number(e.target.value)})))}
             />
           </div>

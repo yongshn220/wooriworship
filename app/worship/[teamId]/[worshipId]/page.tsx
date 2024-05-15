@@ -15,7 +15,7 @@ export default function WorshipPage({params}: any) {
   const teamId = params.teamId
   const worshipId = params.worshipId
   const worship = useRecoilValue(worshipAtom(worshipId))
-  const team = useRecoilValue(teamAtom)
+  const team = useRecoilValue(teamAtom(teamId))
 
   return (
     <div className="w-full flex-center">

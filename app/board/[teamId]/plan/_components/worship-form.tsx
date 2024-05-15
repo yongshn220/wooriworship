@@ -52,7 +52,7 @@ interface Props {
 export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
-  const team = useRecoilValue(teamAtom)
+  const team = useRecoilValue(teamAtom(teamId))
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
   const [basicInfo, setBasicInfo] = useState({
     title: (mode === Mode.EDIT)? worship?.title ?? "" : "",
