@@ -17,7 +17,7 @@ import {useEffect, useState} from "react";
 import {DatePicker} from "@/app/board/[teamId]/plan/_components/date-picker";
 import {NewSongCard} from "@/app/board/[teamId]/plan/_components/new-song-card";
 import {useRecoilState, useRecoilValue} from "recoil";
-import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
+import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {useToast} from "@/components/ui/use-toast";
 import {AddSongButton} from "@/app/board/[teamId]/plan/_components/add-song-button";
 import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
@@ -52,7 +52,7 @@ interface Props {
 export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
-  const team = useRecoilValue(teamAtomById(teamId))
+  const team = useRecoilValue(teamAtom(teamId))
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
   const [basicInfo, setBasicInfo] = useState({
     title: (mode === Mode.EDIT)? worship?.title ?? "" : "",

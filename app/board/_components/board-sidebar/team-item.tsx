@@ -2,14 +2,14 @@
 
 import {SelectItem} from "@/components/ui/select";
 import {useRecoilValue} from "recoil";
-import {teamAtomById} from "@/global-states/teamState";
+import {teamAtom} from "@/global-states/teamState";
 
 interface Props {
   teamId: string
 }
 
 export function TeamItem({teamId}: Props) {
-  const team = useRecoilValue(teamAtomById(teamId))
+  const team = useRecoilValue(teamAtom(teamId))
 
   return (
     <SelectItem value={teamId.toString()}>

@@ -7,31 +7,18 @@ import {useEffect, useState} from "react";
 import {TeamItem} from "@/app/board/_components/board-sidebar/team-item";
 import {Button} from "@/components/ui/button";
 import {CreateNewTeamDialog} from "@/app/board/_components/create-new-team-dialog";
-import {useRecoilState} from "recoil";
+import {useRecoilState, useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {useRouter} from "next/navigation";
 import {getPathPlan} from "@/components/helper/routes";
 import {auth} from "@/firebase";
+import {userAtom} from "@/global-states/userState";
 
 export function TeamSelect() {
   const authUser = auth.currentUser
   const router = useRouter()
   const [currentTeamId, setCurrentTeamId] = useRecoilState(currentTeamIdAtom)
-  const [user, setUser] = useState<User | null>(null)
-
-  useEffect(() => {
-    if (!authUser) return
-
-    try {
-      UserService.getById(authUser.uid).then((_user) => {
-        console.log(_user)
-        setUser(_user as User)
-      })
-    }
-    catch(e) {
-      console.log(e)
-    }
-  }, [authUser])
+  const user = useRecoilValue(userAtom(authUser?.uid))
 
   function handleChangeTeam(teamId: string) {
     if (teamId) {
@@ -39,7 +26,6 @@ export function TeamSelect() {
       router.push(getPathPlan(teamId))
     }
   }
-
 
   return (
     <Select value={currentTeamId.toString()} onValueChange={(teamId) => handleChangeTeam(teamId)}>

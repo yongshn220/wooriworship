@@ -1,13 +1,31 @@
-import {atom, selector} from "recoil";
-import {tempUser} from "@/components/temp-user";
+import {atom, atomFamily, selectorFamily} from "recoil";
+import {UserService} from "@/apis";
 import {User} from "@/models/user";
 
-export const currentUserAtom = atom<User | null>({
-  key: "currentUserAtom",
-  default: null
+
+export const userAtom = atomFamily<User, string>({
+  key: "userAtom",
+  default: selectorFamily({
+    key: "userAtom/default",
+    get: (userId: string) => async ({get}) => {
+      get(userUpdaterAtom)
+      try {
+        if (!userId) return null
+
+        const user = await UserService.getById(userId) as User
+        if (!user) return null
+
+        return user
+      }
+      catch (e) {
+        console.log(e)
+        return null
+      }
+    }
+  })
 })
 
-export const nameAtom = atom({
-  key: "nameAtom",
-  default: "Yongjung"
+export const userUpdaterAtom = atom({
+  key: "userUpdaterAtom",
+  default: 0
 })

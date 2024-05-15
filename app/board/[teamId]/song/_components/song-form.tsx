@@ -19,7 +19,7 @@ import {
   useRecoilValue, useResetRecoilState,
   useSetRecoilState
 } from "recoil";
-import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
+import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {Song} from "@/models/song";
 import {SongService, StorageService, TagService}  from "@/apis";
 import {Mode} from "@/components/constants/enums";
@@ -56,7 +56,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
-  const team = useRecoilValue(teamAtomById(teamId))
+  const team = useRecoilValue(teamAtom(teamId))
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom)
   const [input, setInput] = useState<SongInput>({
     title: (mode === Mode.EDIT)? song?.title?? "" : "",
