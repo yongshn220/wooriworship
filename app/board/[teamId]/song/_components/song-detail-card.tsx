@@ -17,6 +17,7 @@ import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {getPathSongEdit} from "@/components/helper/routes";
 import {DeleteSongButton} from "@/app/board/[teamId]/song/_components/delete-song-button";
+import TextLinkify from "@/components/text-linkify";
 
 interface Props {
   isOpen: boolean
@@ -53,9 +54,11 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
               <Label htmlFor="name" className="text-base font-semibold">
                 Link
               </Label>
-              <p className="text-blue-500 hover:text-blue-600 cursor-pointer">
-                {song?.original.url}
-              </p>
+              <TextLinkify>
+                <p className="text-blue-500 hover:text-blue-600 cursor-pointer">
+                  {song?.original.url}
+                </p>
+              </TextLinkify>
             </div>
             <div className="flex-between items-center">
               <Label htmlFor="name" className="text-base font-semibold">
