@@ -24,3 +24,26 @@ export function timestampToDate(timestamp: Timestamp) {
     return new Date()
   }
 }
+
+export function isMobile() {
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+}
+
+export function OpenYoutubeLink(url: string) {
+  if (url) {
+    // Extract the video ID from the YouTube URL (assuming it is in the standard format)
+    const videoId = url.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/)?.[1];
+
+    if (videoId) {
+      if (isMobile()) {
+        window.location.href = `youtube://www.youtube.com/watch?v=${videoId}`;
+      }
+      else {
+        window.open(url, '_blank');
+      }
+    }
+    else {
+      window.open(url, '_blank');
+    }
+  }
+}

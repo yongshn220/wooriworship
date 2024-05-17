@@ -3,6 +3,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogContentNoCloseButton,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -17,23 +18,36 @@ import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {getPathSongEdit} from "@/components/helper/routes";
 import {DeleteSongButton} from "@/app/board/[teamId]/song/_components/delete-song-button";
-import TextLinkify from "@/components/text-linkify";
+import {isMobile, OpenYoutubeLink} from "@/components/helper/helper-functions";
+import {MenuButton} from "@/app/board/[teamId]/song/_components/menu-button";
 
 interface Props {
   isOpen: boolean
   setIsOpen: Function
   song: Song
-  editable: boolean
+  readOnly: boolean
 }
 
-export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props) {
+export function SongDetailCard({isOpen, setIsOpen, song, readOnly=false}: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
+
+  function handleLinkButtonClick() {
+    if (song?.original?.url) {
+      OpenYoutubeLink(song.original.url)
+    }
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
-      <DialogContent className="sm:max-w-[600px] h-5/6">
+      <DialogContentNoCloseButton className="sm:max-w-[600px] h-5/6">
         <div className="w-full h-full overflow-y-scroll scrollbar-hide">
           <DialogHeader>
+            {
+              !readOnly &&
+              <div className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                <MenuButton songId={song?.id} songTitle={song?.title}/>
+              </div>
+            }
             <DialogTitle className="text-center text-3xl font-bold">{song?.title}</DialogTitle>
             <p className="text-center font-semibold text-gray-500">{song.original.author}</p>
           </DialogHeader>
@@ -54,11 +68,9 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
               <Label htmlFor="name" className="text-base font-semibold">
                 Link
               </Label>
-              <TextLinkify>
-                <p className="text-blue-500 hover:text-blue-600 cursor-pointer">
-                  {song?.original.url}
-                </p>
-              </TextLinkify>
+              <p className="text-blue-500 hover:text-blue-600 cursor-pointer" onClick={handleLinkButtonClick}>
+                {song?.original.url}
+              </p>
             </div>
             <div className="flex-between items-center">
               <Label htmlFor="name" className="text-base font-semibold">
@@ -84,8 +96,8 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
                   <div className="flex-start w-full h-full gap-4 overflow-x-auto">
                     {
                       song.music_sheet_urls.map((url: string, i: number) => (
-                        <div key={i} className="flex flex-col h-full aspect-[3/4] pb-1">
-                          <div className="relative flex-1 bg-gray-200 rounded-md">
+                        <div key={i} className="flex flex-col h-full aspect-[3/4] pb-1 border-2 rounded-lg hover:border-gray-300 cursor-pointer">
+                          <div className="relative flex-1">
                             <Image
                               src={url}
                               fill
@@ -105,18 +117,16 @@ export function SongDetailCard({isOpen, setIsOpen, song, editable=false}: Props)
           <div className="w-full flex-center">
           </div>
           {
-            editable &&
+            readOnly &&
             <DialogFooter className="mt-10">
               <DeleteSongButton songTitle={song?.title} songId={song?.id}/>
               <Link href={getPathSongEdit(teamId, song.id)}>
-                <Button>
-                  Edit
-                </Button>
+                <Button variant="ghost" className="text-black hover:bg-gray-200">Edit</Button>
               </Link>
             </DialogFooter>
           }
         </div>
-      </DialogContent>
+      </DialogContentNoCloseButton>
     </Dialog>
   )
 }

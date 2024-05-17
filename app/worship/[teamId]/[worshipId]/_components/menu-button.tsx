@@ -1,5 +1,11 @@
 "use client"
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import MenuIcon from "@/public/icons/menuIcon.svg";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {useState} from "react";
@@ -8,6 +14,7 @@ import {getPathPlan, getPathWorshipEdit} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import { WorshipService } from "@/apis";
+import {CopyIcon, LinkIcon, SquarePen, Trash2Icon} from "lucide-react";
 
 
 interface Props {
@@ -50,13 +57,25 @@ export function MenuButton({title, worshipId}: Props) {
         <DropdownMenuTrigger>
           <MenuIcon/>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
-           <DropdownMenuItem className="cursor-pointer" onClick={() => handleEditWorship()}>
-             Edit
-           </DropdownMenuItem>
-           <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-500 cursor-pointer" onClick={() => setIsOpen((prev) => !prev)}>
-             Delete
-           </DropdownMenuItem>
+        <DropdownMenuContent className="min-w-[200px] p-2">
+          <DropdownMenuGroup className="space-y-2">
+            <DropdownMenuItem disabled className="cursor-pointer">
+             <LinkIcon className="mr-3 w-5 h-5"/>
+             <p>Copy Link</p>
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled className="cursor-pointer">
+             <CopyIcon className="mr-3 w-5 h-5"/>
+             <p>Duplicate</p>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => handleEditWorship()}>
+              <SquarePen className="mr-3 w-5 h-5"/>
+              <p>Edit</p>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-500 cursor-pointer" onClick={() => setIsOpen((prev) => !prev)}>
+              <Trash2Icon className="mr-3 w-5 h-5"/>
+              <p>Delete</p>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
