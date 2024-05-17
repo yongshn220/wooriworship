@@ -7,10 +7,9 @@ import * as React from "react";
 export function WorshipIndexIndicator() {
   const menu = useRecoilValue(worshipMenuAtom)
   const index = useRecoilValue(worshipIndexAtom)
-  console.log(index)
 
   return (
-    <div className={cn("absolute left-5 gap-4", {"flex-center flex-col": menu.index}, {"hidden": !menu.index})}>
+    <div className={cn("absolute left-5 gap-4", {"flex-center flex-col": menu.showSongNumber}, {"hidden": !menu.showSongNumber})}>
       {
         Array.from(Array(index.total)).map((_, i) => (
           (i !== index.current)

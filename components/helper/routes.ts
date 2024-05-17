@@ -27,3 +27,7 @@ export function getPathWorship(teamId: string, worshipId: string) {
 export function getPathWorshipEdit(teamId: string, worshipId: string) {
   return Routes.BOARD + `/${teamId}` + Routes.PLAN + `/${worshipId}` + Routes.EDIT
 }
+
+export function getPathWorshipStartMode(teamId: string, worshipId: string) {
+  return Routes.WORSHIP + `/${teamId}` + `/${worshipId}` + Routes.WORSHIP_START
+}

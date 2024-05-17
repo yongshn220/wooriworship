@@ -5,7 +5,7 @@ import * as React from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import {Carousel, CarouselContent, CarouselItem, type CarouselApi,} from "@/components/ui/carousel"
 import {useEffect, useState} from "react";
-import {WorshipNote} from "@/app/worship/[teamId]/[worshipId]/_components/worship-note";
+import {WorshipNote} from "@/app/worship/[teamId]/[worshipId]/start-worship/_components/worship-note";
 import {
   currentSongListAtom,
   currentWorshipAtom,
