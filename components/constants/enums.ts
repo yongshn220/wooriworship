@@ -6,6 +6,7 @@ export enum Routes {
   SONG = "/song",
   EDIT = "/edit",
   WORSHIP = "/worship",
+  WORSHIP_START = "/start-worship",
   HOME = "/"
 }
 

@@ -6,8 +6,8 @@ import {Song} from "@/models/song";
 export const worshipMenuAtom = atom({
   key: "worshipMenuAtom",
   default: {
-    note: true,
-    index: true,
+    showSongNote: true,
+    showSongNumber: true,
   }
 })
 
