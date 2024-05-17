@@ -21,7 +21,6 @@ interface Props {
 export function SongCard({songId}: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
   const song = useRecoilValue(songAtom(songId))
-  const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
 
   function handleSongCardClick() {
