@@ -11,6 +11,8 @@ import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {SongService} from "@/apis";
 import {songAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
+import {OpenYoutubeLink} from "@/components/helper/helper-functions";
+import {toast} from "@/components/ui/use-toast";
 
 
 interface Props {
@@ -26,6 +28,16 @@ export function SongCard({songId}: Props) {
     router.push(`/board/${teamId}/song/${song.id}`)
   }
 
+  function handleLinkButtonClick() {
+    if (song?.original?.url) {
+      OpenYoutubeLink(song.original.url)
+    }
+  }
+
+  function handleLikeButtonClick() {
+    toast({title: "Like button will be updated soon."})
+  }
+
   return (
     <div className="h-full">
       <div className="aspect-[5/4] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC]">
@@ -35,10 +47,10 @@ export function SongCard({songId}: Props) {
           <p className="text-sm">{song?.original.author}</p>
         </div>
         <div className="flex-between bg-white p-2">
-          <div className="cursor-pointer hover:bg-gray-100 rounded-full p-2">
+          <div className="cursor-pointer hover:bg-gray-100 rounded-full p-2" onClick={handleLikeButtonClick}>
             <HeartIcon/>
           </div>
-          <div className="cursor-pointer hover:bg-gray-100 rounded-full p-2">
+          <div className="cursor-pointer hover:bg-gray-100 rounded-full p-2" onClick={handleLinkButtonClick}>
             <LinkIcon/>
           </div>
         </div>
