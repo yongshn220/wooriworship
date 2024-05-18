@@ -6,7 +6,7 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {TeamIcon} from "@/components/team-icon";
 import {Button} from "@/components/ui/button";
-import {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {TagMultiSelect} from "@/app/board/[teamId]/song/_components/tag-multi-select";
 import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
@@ -27,6 +27,7 @@ import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
 import {auth} from "@/firebase";
 import {currentTeamSongIdsAtom, songAtom, songUpdaterAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
+import {useKeyboardVisibility} from "@/components/hook/use-keyboard-visibility";
 
 interface Props {
   mode: Mode
@@ -70,6 +71,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   })
   const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [viewportHeight, setViewportHeight] = useState(window.visualViewport.height);
   const { toast } = useToast()
   const router = useRouter()
 
@@ -78,6 +80,16 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     if (_musicSheets)
       setMusicSheets(_musicSheets)
   }, [song?.music_sheet_urls])
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportHeight(window.visualViewport.height);
+    };
+
+    window.visualViewport.addEventListener('resize', handleResize);
+    return () => window.visualViewport.removeEventListener('resize', handleResize);
+  }, [toast]);
+
 
   function createValidCheck() {
     if (!authUser?.uid) {
@@ -174,7 +186,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
-      <DialogContent className="sm:max-w-[600px] h-5/6 overflow-y-scroll scrollbar-hide">
+      <DialogContent className="sm:max-w-[600px] overflow-y-scroll scrollbar-hide top-0 translate-y-0 mt-[50px]" style={{ maxHeight: `${viewportHeight - 100}px` }}>
         <DialogHeader>
           <DialogTitle className="text-2xl">{mode===Mode.EDIT? "Edit Song" : "Add New Song"}</DialogTitle>
           <DialogDescription>
@@ -193,6 +205,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               placeholder="ex) Amazing Grace"
               value={input.title}
               onChange={(e) => setInput((prev => ({...prev, title: e.target.value})))}
+              autoFocus={false}
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
