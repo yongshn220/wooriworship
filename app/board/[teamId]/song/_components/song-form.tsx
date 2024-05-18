@@ -88,7 +88,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
 
     window.visualViewport.addEventListener('resize', handleResize);
     return () => window.visualViewport.removeEventListener('resize', handleResize);
-  }, [toast]);
+  }, []);
 
 
   function createValidCheck() {

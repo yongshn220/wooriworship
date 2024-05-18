@@ -60,6 +60,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
   })
   const [date, setDate] = useState<Date>((mode === Mode.EDIT)? timestampToDate(worship?.worship_date) : new Date())
   const [isLoading, setIsLoading] = useState(false)
+  const [viewportHeight, setViewportHeight] = useState(window.visualViewport.height);
   const { toast } = useToast()
   const router = useRouter()
 
@@ -76,6 +77,15 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
       }
     }
   }, [mode, setSelectedSongInfoList, worship?.songs])
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportHeight(window.visualViewport.height);
+    };
+
+    window.visualViewport.addEventListener('resize', handleResize);
+    return () => window.visualViewport.removeEventListener('resize', handleResize);
+  }, []);
 
   function isSessionValid() {
     if (!authUser?.uid) {
@@ -149,7 +159,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
 
   return (
     <Dialog open={isOpen} onOpenChange={() => setIsOpen()}>
-      <DialogContent className="sm:max-w-[600px] h-5/6 overflow-y-scroll scrollbar-hide">
+      <DialogContent className="sm:max-w-[600px] overflow-y-scroll scrollbar-hide top-0 translate-y-0 mt-[50px]" style={{ maxHeight: `${viewportHeight - 100}px` }}>
         <DialogHeader>
           <DialogTitle className="text-2xl">
             { (mode === Mode.CREATE) ? "Create new worship" : "Edit worship" }
