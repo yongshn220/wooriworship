@@ -14,7 +14,7 @@ export function WorshipIndexIndicator() {
         Array.from(Array(index.total)).map((_, i) => (
           (i !== index.current)
             ? <div key={i} className="w-3 h-3 bg-gray-300 rounded-full"/>
-            : <div key={i} className="flex-center w-6 h-6 bg-gray-500 rounded-lg font-semibold text-white">{i + 1}</div>
+            : <div key={i} className="flex-center w-6 h-6 bg-blue-500 rounded-lg font-semibold text-white">{i + 1}</div>
         ))
       }
     </div>

@@ -22,6 +22,8 @@ export function WorshipSetup({worshipId}: Props) {
       setWorship(worship)
 
       const songListPromise = worship?.songs?.map(header => SongService.getById(header.id))
+      if (!songListPromise) return
+
       let songList = toPlainObject(await Promise.all(songListPromise)) as Array<Song>
       for (let song of songList) {
         for (let header of worship.songs) {
