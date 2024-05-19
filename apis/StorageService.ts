@@ -108,13 +108,17 @@ class StorageService {
 
     async updateMusicSheets(teamId: string, new_sheets: Array<MusicSheet>, delete_sheets: Array<string>) {
         try{
+            await this.deleteMusicSheets(delete_sheets);
+            console.log(new_sheets.length)
+            if(new_sheets.length == 0) {
+                return [];
+            }
             const files = new_sheets.map((ms) => {
                 return ms.file
             })
             const ids = new_sheets.map((ms) => {
                 return ms.id
             })
-            await this.deleteMusicSheets(delete_sheets);
             return await this.uploadFiles(teamId, files, ids);
         } catch (err) {
             return [];
