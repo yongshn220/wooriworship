@@ -209,7 +209,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
             <div className="flex-center w-full flex-col gap-8">
               {
                 selectedSongInfoList.map((songInfo, i) => (
-                  <NewSongCard key={i} index={i+1} songInfo={songInfo}/>
+                  <NewSongCard key={i} songOrder={i + 1} songInfo={songInfo}/>
                 ))
               }
               <AddSongButton/>
