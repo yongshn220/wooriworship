@@ -11,7 +11,7 @@ export function WorshipNote({description}: Props) {
   const menu = useRecoilValue(worshipMenuAtom)
 
   return (
-    <div className={cn("w-full p-2 px-4 text-sm", {"hidden": !menu.showSongNote})}>
+    <div className={cn("w-full p-2 px-4 text-sm whitespace-pre-wrap", {"hidden": !menu.showSongNote})}>
       {description}
     </div>
   )

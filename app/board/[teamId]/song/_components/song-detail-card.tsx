@@ -117,7 +117,7 @@ export function SongDetailCard({isOpen, setIsOpen, song, readOnly=false}: Props)
           <div className="w-full flex-center">
           </div>
           {
-            readOnly &&
+            !readOnly &&
             <DialogFooter className="mt-10">
               <DeleteSongButton songTitle={song?.title} songId={song?.id}/>
               <Link href={getPathSongEdit(teamId, song.id)}>

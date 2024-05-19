@@ -40,10 +40,11 @@ export function SongCard({songId}: Props) {
   return (
     <div className="h-full">
       <div className="aspect-[5/4] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC]">
-        <div className="relative group h-full flex-center flex-col text-white cursor-pointer" onClick={handleSongCardClick}>
+        <div className="relative group h-full flex-center flex-col text-white cursor-pointer"
+             onClick={handleSongCardClick}>
           <HoverOverlay/>
-          <p className="font-semibold text-base">{song?.title}</p>
-          <p className="text-sm">{song?.original.author}</p>
+          <p className="font-semibold text-sm">{song?.title} {song?.key !== ""? `[${song.key}]` : ""}</p>
+          <p className="text-xs">{song?.original.author}</p>
         </div>
         <div className="flex-between bg-white p-2">
           <div className="cursor-pointer hover:bg-gray-100 rounded-full p-2" onClick={handleLikeButtonClick}>
