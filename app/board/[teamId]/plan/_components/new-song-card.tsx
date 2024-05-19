@@ -10,11 +10,11 @@ import Image from "next/image";
 import {toPlainObject} from "@/components/helper/helper-functions";
 
 interface Props {
-  index: number
+  songOrder: number
   songInfo: SongInfo
 }
 
-export function NewSongCard({index, songInfo}: Props) {
+export function NewSongCard({songOrder, songInfo}: Props) {
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
 
   const currentSongInfo = useMemo(() => (selectedSongInfoList.find((_songInfo => _songInfo.song.id === songInfo.song.id))), [selectedSongInfoList, songInfo.song.id])
@@ -37,11 +37,10 @@ export function NewSongCard({index, songInfo}: Props) {
 
   return (
     <div className="w-full">
-      <div className="relative flex-center flex-col w-full h-56 bg-gray-100 border-2 rounded-md p-2 gap-4">
-
+      <div className="relative flex-center flex-col w-full h-72 border shadow-sm rounded-md p-2 gap-4">
         <div className="w-full flex h-28">
           <div className="absolute flex-center -translate-y-1/2 -right-4">
-            <SwapOrderButton index={index}/>
+            <SwapOrderButton songId={songInfo?.song?.id} songOrder={songOrder}/>
           </div>
           {
             (currentSongInfo?.song?.music_sheet_urls?.length > 0) &&
@@ -61,9 +60,9 @@ export function NewSongCard({index, songInfo}: Props) {
           <div className="flex-1 h-full p-2 px-4">
             <div className="flex-between">
               <p className="font-semibold text-lg">{currentSongInfo?.song?.title}</p>
-              <p className="text-sm text-gray-500">bpm {currentSongInfo?.song?.bpm.toString()}</p>
+              <p className="text-sm text-gray-500">bpm {currentSongInfo?.song?.bpm?.toString()}</p>
             </div>
-            <p className="text-sm text-gray-600">{currentSongInfo?.song?.original.author}</p>
+            <p className="text-sm text-gray-600">{currentSongInfo?.song?.original?.author}</p>
           </div>
         </div>
 
