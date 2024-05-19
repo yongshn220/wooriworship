@@ -1,7 +1,7 @@
 "use client"
 
 import {Textarea} from "@/components/ui/textarea";
-import {SongInfo} from "@/app/board/[teamId]/plan/_components/new-button";
+import {SongInfo} from "@/app/board/[teamId]/plan/_components/new-worship-button";
 import {useMemo} from "react";
 import {useRecoilState} from "recoil";
 import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";

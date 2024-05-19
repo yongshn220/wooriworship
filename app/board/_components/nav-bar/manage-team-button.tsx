@@ -14,6 +14,7 @@ import {useRecoilValue, useSetRecoilState} from "recoil";
 import {userUpdaterAtom} from "@/global-states/userState";
 import {useRouter} from "next/navigation";
 import {getPathBoard} from "@/components/helper/routes";
+import {SettingsIcon} from "lucide-react";
 
 const members = [
   {email: "banaba212@gmail.com", role: "Leader"},
@@ -47,7 +48,10 @@ export function ManageTeamButton() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Manage Team</Button>
+        <Button variant="outline" className="w-full">
+          <SettingsIcon className="h-4 w-4 mr-2"/>
+          <p>Manage Team</p>
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[700px] overflow-y-scroll scrollbar-hide">
         <DialogHeader>
