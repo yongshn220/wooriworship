@@ -10,6 +10,7 @@ import UsersIcon from '@/public/icons/usersIcon.svg'
 import {useRecoilValue} from "recoil";
 import {worshipAtom} from "@/app/board/[teamId]/plan/_states/worship-plan-states";
 import {teamAtom} from "@/global-states/teamState";
+import {timestampToDateString} from "@/components/helper/helper-functions";
 
 export default function WorshipPage({params}: any) {
   const teamId = params.teamId
@@ -36,7 +37,7 @@ export default function WorshipPage({params}: any) {
             <CalendarIcon className="text-gray-500"/>
             <p className="text-gray-500">Worship Date</p>
           </div>
-          {/*<p>{timestampToDateString(worship?.worship_date)}</p>*/}
+          <p>{timestampToDateString(worship?.worship_date)}</p>
         </div>
         <p className="mt-10">
           {worship?.description}
