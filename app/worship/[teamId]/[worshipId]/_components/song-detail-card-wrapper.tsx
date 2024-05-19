@@ -13,7 +13,7 @@ export function SongDetailCardWrapper({song, children}: Props) {
 
   return (
     <>
-      <SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen} song={song} editable={false}/>
+      <SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen} song={song} readOnly={true}/>
       <div onClick={() => setIsOpen(prev => !prev)}>
         {children}
       </div>
