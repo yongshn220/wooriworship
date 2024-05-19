@@ -1,10 +1,10 @@
 "use client"
 
 import {useRecoilValueLoadable} from "recoil";
-import {SongCard} from "@/app/board/[teamId]/song/_components/song-card";
+import {SongGridItem} from "@/app/board/[teamId]/song/_components/song-grid-item";
 import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
 
-export function SongCardList() {
+export function SongGridView() {
   const songIdsLoadable = useRecoilValueLoadable(currentTeamSongIdsAtom)
 
   switch (songIdsLoadable.state) {
@@ -15,7 +15,7 @@ export function SongCardList() {
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10">
           {
             songIdsLoadable.contents.map((songId) => (
-              <SongCard key={songId} songId={songId}/>
+              <SongGridItem key={songId} songId={songId}/>
             ))
           }
         </div>
