@@ -11,8 +11,8 @@ export default function BoardLayout({ children }: Readonly<{ children: React.Rea
   return (
     <section className="h-full">
       <BoardAuthenticate>
-        <TeamSidebar/>
-        <div className="flex lg:pl-[60px] gap-x-3 h-full">
+        {/*<TeamSidebar/>*/}
+        <div className="flex gap-x-3 h-full">
           <BoardSidebar/>
           <div className="h-full flex-1">
             <Navbar/>

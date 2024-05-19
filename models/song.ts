@@ -1,3 +1,5 @@
+import {Timestamp} from "@firebase/firestore";
+
 export interface Song {
   id: string
   team_id: string
@@ -14,12 +16,12 @@ export interface Song {
   music_sheet_urls: Array<string>
   created_by: {
     id: string
-    time: Date
+    time: Timestamp
   }
-  last_used_time: Date
+  last_used_time: Timestamp
   updated_by: {
     id: string
-    time: Date
+    time: Timestamp
   }
   key: string
 }

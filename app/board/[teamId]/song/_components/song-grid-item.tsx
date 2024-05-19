@@ -3,13 +3,9 @@ import {HoverOverlay} from "@/components/hover-overlay";
 import LinkIcon from '@/public/icons/linkIcon.svg'
 import HeartIcon from '@/public/icons/heartIcon.svg'
 import {Badge} from "@/components/ui/badge";
-import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-card";
-import {useEffect, useState} from "react";
-import {Song} from "@/models/song";
 import {useRouter} from "next/navigation";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import {SongService} from "@/apis";
 import {songAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
 import {OpenYoutubeLink} from "@/components/helper/helper-functions";
 import {toast} from "@/components/ui/use-toast";
@@ -18,7 +14,7 @@ import {toast} from "@/components/ui/use-toast";
 interface Props {
   songId: string
 }
-export function SongCard({songId}: Props) {
+export function SongGridItem({songId}: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
   const song = useRecoilValue(songAtom(songId))
   const router = useRouter()

@@ -15,6 +15,51 @@ export function timestampToDateString(timestamp: Timestamp) {
   return `${year}-${month}-${day}`
 }
 
+export function timestampToDatePassedFromNow(timestamp: Timestamp) {
+  const jsDate = new Date(timestamp.seconds * 1000); // Convert Firestore timestamp to JavaScript Date
+  const now = new Date();
+
+  const diffInSeconds = Math.floor((now.getTime() - jsDate.getTime()) / 1000);
+
+  const secondsInMinute = 60;
+  const secondsInHour = secondsInMinute * 60;
+  const secondsInDay = secondsInHour * 24;
+  const secondsInWeek = secondsInDay * 7;
+  const secondsInMonth = secondsInDay * 30;
+  const secondsInYear = secondsInDay * 365;
+
+  let result;
+
+  if (diffInSeconds < secondsInMinute) {
+    result = `${diffInSeconds} seconds ago`;
+  }
+  else if (diffInSeconds < secondsInHour) {
+    const minutes = Math.floor(diffInSeconds / secondsInMinute);
+    result = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+  }
+  else if (diffInSeconds < secondsInDay) {
+    const hours = Math.floor(diffInSeconds / secondsInHour);
+    result = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+  }
+  else if (diffInSeconds < secondsInWeek) {
+    const days = Math.floor(diffInSeconds / secondsInDay);
+    result = `${days} day${days !== 1 ? 's' : ''} ago`;
+  }
+  else if (diffInSeconds < secondsInMonth) {
+    const weeks = Math.floor(diffInSeconds / secondsInWeek);
+    result = `${weeks} week${weeks !== 1 ? 's' : ''} ago`;
+  }
+  else if (diffInSeconds < secondsInYear) {
+    const months = Math.floor(diffInSeconds / secondsInMonth);
+    result = `${months} month${months !== 1 ? 's' : ''} ago`;
+  }
+  else {
+    const years = Math.floor(diffInSeconds / secondsInYear);
+    result = `${years} year${years !== 1 ? 's' : ''} ago`;
+  }
+  return result;
+}
+
 export function timestampToDate(timestamp: Timestamp) {
   try {
     return new Date(timestamp.seconds * 1000)
