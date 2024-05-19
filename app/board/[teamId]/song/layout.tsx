@@ -1,4 +1,4 @@
-import {NewButton} from "@/app/board/[teamId]/song/_components/new-button";
+import {NewSongButton} from "@/app/board/[teamId]/song/_components/new-song-button";
 import {PageInit} from "@/components/page/page-init";
 import {Page} from "@/components/constants/enums";
 import {SongGridView} from "@/app/board/[teamId]/song/_components/song-grid-view";
@@ -17,9 +17,7 @@ export default async function SongLayout({params, children}: any) {
           <p className="text-2xl font-semibold">
             Songs
           </p>
-          <NewButton/>
         </div>
-        {/*<SongGridView/>*/}
         <SongListView/>
       </div>
     </>

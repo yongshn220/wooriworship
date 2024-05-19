@@ -22,7 +22,7 @@ export default function EditWorshipPage({params}: any) {
 
   function onOpenChangeHandler(state: boolean) {
     if (!state) {
-      router.push(getPathWorship(teamId, worshipId))
+      router.replace(getPathWorship(teamId, worshipId))
     }
   }
 
