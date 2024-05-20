@@ -1,11 +1,10 @@
 "use client"
 
 import {SongHeader} from "@/models/worship";
-import {SongService} from "@/apis";
-import {Song} from "@/models/song";
 import LinkIcon from '@/public/icons/linkIcon.svg'
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
-import {useEffect, useState} from "react";
+import {useRecoilValue} from "recoil";
+import {songAtom} from "@/global-states/song-state";
 
 interface Props {
   songHeader: SongHeader
@@ -13,16 +12,7 @@ interface Props {
 }
 
 export function SongItem({songHeader, index}: Props) {
-  const [song, setSong] = useState<Song>(null)
-
-  useEffect(() => {
-    if (songHeader?.id) {
-      SongService.getById(songHeader?.id).then((_song) => {
-        if (_song)
-          setSong(_song as Song)
-      })
-    }
-  }, [songHeader?.id])
+  const song = useRecoilValue(songAtom(songHeader?.id))
 
   if (!song) return <></>
 

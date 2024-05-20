@@ -9,12 +9,16 @@ import {DownloadMusicSheetButton} from "@/app/worship/[teamId]/[worshipId]/_comp
 import {getPathPlan, getPathSong, getPathWorshipStartMode} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import {currentSongListAtom, currentWorshipAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useRouter} from "next/navigation";
+import {worshipAtom, worshipSongListAtom} from "@/global-states/worship-state";
 
-export function WorshipSidebar() {
-  const worship = useRecoilValue(currentWorshipAtom)
-  const songList = useRecoilValue(currentSongListAtom)
+interface Props {
+  worshipId: string
+}
+
+export function WorshipSidebar({worshipId}: Props) {
+  const worship = useRecoilValue(worshipAtom(worshipId))
+  const songList = useRecoilValue(worshipSongListAtom(worshipId))
   const [selectedSongId, setSelectedSongId] = useState(songList[0]?.id?? [])
   const teamId = useRecoilValue(currentTeamIdAtom)
   const router = useRouter()
@@ -47,7 +51,7 @@ export function WorshipSidebar() {
             width={80}
             height={80}
           />
-          <DownloadMusicSheetButton/>
+          <DownloadMusicSheetButton worshipId={worshipId}/>
           <Button className="w-full" onClick={handleStartWorship}>Start Worship</Button>
         </div>
       </div>

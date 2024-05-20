@@ -19,13 +19,3 @@ export const worshipIndexAtom = atom({
     current: 0,
   }
 })
-
-export const currentWorshipAtom = atom<Worship>({
-  key: "currentWorshipAtom",
-  default: null
-})
-
-export const currentSongListAtom = atom<Array<Song>>({
-  key: "currentSongListAtom",
-  default: []
-})

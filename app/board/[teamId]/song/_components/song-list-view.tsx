@@ -27,10 +27,10 @@ export function SongListView() {
           <div className="flex-center flex-col mx-2 box-border">
             {
               songIdsLoadable.contents.map((songId) => (
-                <>
-                  <SongListItem key={songId} songId={songId}/>
+                <div key={songId} className="w-full">
+                  <SongListItem songId={songId}/>
                   <Separator/>
-                </>
+                </div>
               ))
             }
           </div>

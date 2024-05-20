@@ -15,10 +15,13 @@ export function Navbar() {
   return (
     <div className="flex-between p-5 gap-4">
       <div className="flex-1">
-        <div className={cn("hidden w-full max-w-xl gap-4", {"flex-center": currentPage === Page.SONG})}>
-          <SearchInput/>
-          <SearchTags/>
-        </div>
+        {
+          (currentPage === Page.SONG) &&
+          <div className={cn("flex-center w-full max-w-xl gap-4")}>
+            <SearchInput/>
+            <SearchTags/>
+          </div>
+        }
       </div>
       <div className=" flex-end gap-4">
         <NewWorshipButton/>

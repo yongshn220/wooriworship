@@ -22,7 +22,7 @@ export default function WorshipLivePage({params}: any) {
   return (
     <Dialog open={true} onOpenChange={handleOpenChange}>
       <DialogContentNoCloseButton className="flex-center w-full max-w-8xl h-full p-0">
-        <SongCarouselFull/>
+        <SongCarouselFull worshipId={worshipId}/>
         <WorshipLiveMenu teamId={teamId} worshipId={worshipId}/>
         <WorshipIndexIndicator/>
       </DialogContentNoCloseButton>

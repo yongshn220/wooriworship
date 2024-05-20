@@ -26,8 +26,8 @@ import {Mode} from "@/components/constants/enums";
 import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
 import {auth} from "@/firebase";
-import {currentTeamSongIdsAtom, songAtom, songUpdaterAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
-import {useKeyboardVisibility} from "@/components/hook/use-keyboard-visibility";
+import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
+import {songAtom, songUpdaterAtom} from "@/global-states/song-state";
 
 interface Props {
   mode: Mode

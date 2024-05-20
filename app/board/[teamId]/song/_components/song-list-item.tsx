@@ -1,10 +1,9 @@
-import LinkIcon from "@/public/icons/linkIcon.svg";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import {songAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
+import {songAtom} from "@/global-states/song-state";
 import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
-import {timestampToDatePassedFromNow, timestampToDateString} from "@/components/helper/helper-functions";
+import {timestampToDatePassedFromNow} from "@/components/helper/helper-functions";
 import {Badge} from "@/components/ui/badge";
 
 interface Props {
