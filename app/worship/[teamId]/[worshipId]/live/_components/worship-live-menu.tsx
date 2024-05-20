@@ -9,8 +9,6 @@ import {Label} from "@/components/ui/label";
 import {Separator} from "@/components/ui/separator";
 import {useRouter} from "next/navigation";
 import {getPathWorship} from "@/components/helper/routes";
-import {currentTeamIdAtom} from "@/global-states/teamState";
-import {worshipAtom} from "@/app/board/[teamId]/plan/_states/worship-plan-states";
 
 interface Props {
   teamId: string,

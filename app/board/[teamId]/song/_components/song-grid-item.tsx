@@ -6,7 +6,7 @@ import {Badge} from "@/components/ui/badge";
 import {useRouter} from "next/navigation";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import {songAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
+import {songAtom} from "@/global-states/song-state";
 import {OpenYoutubeLink} from "@/components/helper/helper-functions";
 import {toast} from "@/components/ui/use-toast";
 

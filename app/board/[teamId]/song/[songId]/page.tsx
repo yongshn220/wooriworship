@@ -48,6 +48,6 @@ export default function SongDetailPage({params}: any) {
   }
 
   return (
-     <SongDetailCard isOpen={true} setIsOpen={onOpenChangeHandler} song={toPlainObject(songWrapper.song)} editable={true} />
+     <SongDetailCard isOpen={true} setIsOpen={onOpenChangeHandler} song={toPlainObject(songWrapper.song)} readOnly={false} />
   )
 }

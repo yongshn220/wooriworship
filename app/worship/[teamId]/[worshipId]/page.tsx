@@ -8,9 +8,9 @@ import {Separator} from "@/components/ui/separator";
 import {MenuButton} from "@/app/worship/[teamId]/[worshipId]/_components/menu-button";
 import UsersIcon from '@/public/icons/usersIcon.svg'
 import {useRecoilValue} from "recoil";
-import {worshipAtom} from "@/app/board/[teamId]/plan/_states/worship-plan-states";
 import {teamAtom} from "@/global-states/teamState";
 import {timestampToDateString} from "@/components/helper/helper-functions";
+import {worshipAtom} from "@/global-states/worship-state";
 
 export default function WorshipPage({params}: any) {
   const teamId = params.teamId

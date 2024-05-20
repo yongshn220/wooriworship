@@ -17,10 +17,9 @@ export default function WorshipLayout({params, children}: Props) {
   return (
     <section className="h-full">
       <div className="flex gap-x-3 h-full">
-        <WorshipSetup worshipId={worshipId}/>
         <MdSidebar>
           <MainLogoRouter route={getPathPlan(teamId)}/>
-          <WorshipSidebar/>
+          <WorshipSidebar worshipId={worshipId}/>
         </MdSidebar>
         <div className="h-full flex-1">
           <Navbar/>

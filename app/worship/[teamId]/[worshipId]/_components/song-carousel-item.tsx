@@ -6,18 +6,14 @@ import {Song} from "@/models/song";
 import {SongService} from "@/apis";
 import {SongHeader} from "@/models/worship";
 import Image from 'next/image'
+import {songAtom} from "@/global-states/song-state";
+import {useRecoilValue} from "recoil";
 
 interface Props {
   songHeader: SongHeader
 }
 export function SongCarouselItem({songHeader}: Props) {
-  const [song, setSong] = useState<Song>()
-
-  useEffect(() => {
-    SongService.getById(songHeader.id).then((_song) => {
-      setSong(_song as Song)
-    })
-  }, [songHeader.id])
+  const song = useRecoilValue(songAtom(songHeader.id))
 
   if (!song) return <></>
 

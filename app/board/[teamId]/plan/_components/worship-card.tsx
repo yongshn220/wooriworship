@@ -7,9 +7,9 @@ import {SongService} from "@/apis";
 import {timestampToDateString} from "@/components/helper/helper-functions";
 import {getPathWorship} from "@/components/helper/routes";
 import {useEffect, useState} from "react";
-import {worshipAtom, worshipSongListAtom} from "@/app/board/[teamId]/plan/_states/worship-plan-states";
 import {useRecoilValue, useRecoilValueLoadable} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
+import {worshipAtom, worshipSongListAtom} from "@/global-states/worship-state";
 
 interface Props {
   worshipId: string

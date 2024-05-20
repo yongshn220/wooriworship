@@ -6,17 +6,16 @@ import { Card, CardContent } from "@/components/ui/card"
 import {Carousel, CarouselContent, CarouselItem, type CarouselApi,} from "@/components/ui/carousel"
 import {useEffect, useState} from "react";
 import {WorshipNote} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-note";
-import {
-  currentSongListAtom,
-  currentWorshipAtom,
-  worshipIndexAtom
-} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
+import {worshipIndexAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useRecoilValue, useSetRecoilState} from "recoil";
+import {worshipSongListAtom} from "@/global-states/worship-state";
 
+interface Props {
+  worshipId: string
+}
 
-export function SongCarouselFull() {
-  const songList = useRecoilValue(currentSongListAtom)
-  const worship = useRecoilValue(currentWorshipAtom)
+export function SongCarouselFull({worshipId}: Props) {
+  const songList = useRecoilValue(worshipSongListAtom(worshipId))
   const [api, setApi] = useState<CarouselApi>()
   const setIndex = useSetRecoilState(worshipIndexAtom)
 
