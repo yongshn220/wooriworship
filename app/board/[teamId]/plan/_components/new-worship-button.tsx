@@ -34,7 +34,7 @@ export function NewWorshipButton() {
     <>
       <WorshipForm mode={Mode.CREATE} isOpen={isOpen} setIsOpen={setIsOpen} worship={null}/>
       <Button className="bg-purple-500 hover:bg-purple-400" onClick={handleClick}>
-        Add Worship
+        + Add Worship
       </Button>
     </>
   )

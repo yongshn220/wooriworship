@@ -12,7 +12,7 @@ export function NewSongButton() {
     <div>
       <SongForm mode={Mode.CREATE} isOpen={isOpen} setIsOpen={setIsOpen}/>
       <Button className="bg-blue-500 hover:bg-blue-400" onClick={() => setIsOpen(prev => !prev)}>
-        Add Song
+        + Add Song
       </Button>
     </div>
   )
