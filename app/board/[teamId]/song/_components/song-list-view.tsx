@@ -18,9 +18,9 @@ export function SongListView() {
             <div className="flex text-sm text-gray-500 px-6">
               <p className="flex-[0.5]">Title</p>
               <p className="flex-[0.2] text-center">Key</p>
-              <p className="flex-[0.4] text-end">Version</p>
+              <p className="hidden lg:flex justify-end lg:flex-[0.4]">Version</p>
               <p className="flex-[0.7] text-end">Tag</p>
-              <p className="flex-[0.3] text-end">Last used date</p>
+              <p className="flex-[0.5] text-end">Last used date</p>
             </div>
             <Separator/>
           </div>

@@ -22,14 +22,14 @@ export function SongListItem({songId}: Props) {
   return (
     <div className="flex w-full px-4 rounded-lg cursor-pointer py-2 my-2 hover:bg-gray-100" onClick={handleSongCardClick}>
       <div className="flex-[0.5] flex flex-col">
-        <p className="font-semibold">{song?.title}</p>
+        <p className="font-semibold text-sm">{song?.title}</p>
         <p className="text-sm text-gray-500">{song?.original.author}</p>
       </div>
       <div className="flex-[0.2] flex-center">
         <div>{song?.key === ""? "" : `${song?.key}`}</div>
       </div>
-      <div className="flex-[0.4] flex-end items-center text-gray-500 text-sm">
-        <div>{song?.version}</div>
+      <div className="hidden lg:flex-[0.4] flex-end items-center text-gray-500 text-sm">
+        <div className="hidden lg:flex">{song?.version}</div>
       </div>
       <div className="flex-[0.7] flex-end items-center w-full text-left text-sm gap-2">
         {
@@ -38,7 +38,7 @@ export function SongListItem({songId}: Props) {
           ))
         }
       </div>
-      <div className="flex-[0.3] flex-end items-center text-gray-500 text-sm">
+      <div className="flex-[0.5] flex-end items-center text-gray-500 text-sm">
         <div>{timestampToDatePassedFromNow(song?.last_used_time)}</div>
       </div>
     </div>
