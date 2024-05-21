@@ -19,7 +19,7 @@ import {
 } from "recoil";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {SongService, StorageService, TagService}  from "@/apis";
-import {Mode} from "@/components/constants/enums";
+import {FormMode} from "@/components/constants/enums";
 import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
 import {auth} from "@/firebase";
@@ -57,14 +57,14 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   const team = useRecoilValue(teamAtom(teamId))
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom)
   const [input, setInput] = useState<SongInput>({
-    title: (mode === Mode.EDIT)? song?.title?? "" : "",
-    author: (mode === Mode.EDIT)? song?.original.author?? "" : "",
-    version: (mode === Mode.EDIT)? song?.version?? "" : "",
-    key: (mode === Mode.EDIT)? song?.key?? "":"",
-    link: (mode === Mode.EDIT)? song?.original.url?? "" : "",
-    tags: (mode === Mode.EDIT)? song?.tags?? [] : [],
-    bpm: (mode === Mode.EDIT)? song?.bpm?? null : null,
-    description: (mode === Mode.EDIT)? song?.description?? "" : ""
+    title: (mode === FormMode.EDIT)? song?.title?? "" : "",
+    author: (mode === FormMode.EDIT)? song?.original.author?? "" : "",
+    version: (mode === FormMode.EDIT)? song?.version?? "" : "",
+    key: (mode === FormMode.EDIT)? song?.key?? "":"",
+    link: (mode === FormMode.EDIT)? song?.original.url?? "" : "",
+    tags: (mode === FormMode.EDIT)? song?.tags?? [] : [],
+    bpm: (mode === FormMode.EDIT)? song?.bpm?? null : null,
+    description: (mode === FormMode.EDIT)? song?.description?? "" : ""
   })
   const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -186,9 +186,9 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
       <DialogContent className="sm:max-w-[600px] overflow-y-scroll scrollbar-hide top-0 translate-y-0 mt-[50px]" style={{ maxHeight: `${viewportHeight - 100}px` }}>
         <DialogHeader>
-          <DialogTitle className="text-2xl">{mode===Mode.EDIT? "Edit Song" : "Add New Song"}</DialogTitle>
+          <DialogTitle className="text-2xl">{mode===FormMode.EDIT? "Edit Song" : "Add New Song"}</DialogTitle>
           <DialogDescription>
-            {mode===Mode.EDIT? "Edit song" : "Create and add new song in the song board"}
+            {mode===FormMode.EDIT? "Edit song" : "Create and add new song in the song board"}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
@@ -290,7 +290,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
         </div>
         <DialogFooter>
           {
-            (mode === Mode.EDIT)
+            (mode === FormMode.EDIT)
               ? <Button type="submit" onClick={handleEdit}>{isLoading ? "Saving..." : "Save"}</Button>
               : <Button type="submit" onClick={handleCreate}>{isLoading ? "Creating..." : "Create"}</Button>
           }

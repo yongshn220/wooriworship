@@ -4,7 +4,7 @@ import {WorshipForm} from "@/app/board/[teamId]/plan/_components/worship-form";
 import {WorshipService} from "@/apis";
 import {useRouter} from "next/navigation";
 import {getPathWorship} from "@/components/helper/routes";
-import {Mode} from "@/components/constants/enums";
+import {FormMode} from "@/components/constants/enums";
 import {Worship} from "@/models/worship";
 import {useEffect, useState} from "react";
 
@@ -29,6 +29,6 @@ export default function EditWorshipPage({params}: any) {
   if (!worship) return <></>
 
   return (
-    <WorshipForm mode={Mode.EDIT} isOpen={true} setIsOpen={onOpenChangeHandler} worship={worship} />
+    <WorshipForm mode={FormMode.EDIT} isOpen={true} setIsOpen={onOpenChangeHandler} worship={worship} />
   )
 }

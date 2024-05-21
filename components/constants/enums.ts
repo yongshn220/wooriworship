@@ -27,7 +27,7 @@ export enum UserRole {
   Member = 1
 }
 
-export enum Mode {
+export enum FormMode {
   EDIT,
   CREATE
 }
