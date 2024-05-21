@@ -5,9 +5,8 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
 import Link from "next/link";
-import {signIn} from "next-auth/react";
 import {Mode} from "@/app/_components/landing-page";
-import {AuthService, UserService} from "@/apis";
+import {AuthService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
 
 export function Login({setMode}: any) {

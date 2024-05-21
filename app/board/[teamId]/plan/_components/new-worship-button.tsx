@@ -1,6 +1,5 @@
 'use client'
 
-import {Plus} from "lucide-react";
 import {useState} from "react";
 import {Song} from "@/models/song";
 import {WorshipForm} from "@/app/board/[teamId]/plan/_components/worship-form";
