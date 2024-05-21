@@ -2,11 +2,8 @@
 
 import {HoverOverlay} from "@/components/hover-overlay";
 import Link from "next/link";
-import {Worship} from "@/models/worship";
-import {SongService} from "@/apis";
 import {timestampToDateString} from "@/components/helper/helper-functions";
 import {getPathWorship} from "@/components/helper/routes";
-import {useEffect, useState} from "react";
 import {useRecoilValue, useRecoilValueLoadable} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {worshipAtom, worshipSongListAtom} from "@/global-states/worship-state";
