@@ -28,13 +28,13 @@ export default function Home() {
   }, [router]);
 
   return (
-    <>
+    <div>
       {
         authStatus === AuthStatus.NOT_VALID
           ? <LandingPage/>
           : <RoutingPage/>
       }
-    </>
+    </div>
   )
 }
 
