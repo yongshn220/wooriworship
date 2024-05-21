@@ -5,6 +5,8 @@ export function toPlainObject(obj: any) {
 }
 
 export function timestampToDateString(timestamp: Timestamp) {
+  if (!timestamp) return "Undefined"
+
   const jsDate = new Date(timestamp.seconds * 1000); // Explicitly type firestoreTimestamp.seconds as a number
 
   // Format the JavaScript Date into a string in 'yyyy-mm-dd' format
