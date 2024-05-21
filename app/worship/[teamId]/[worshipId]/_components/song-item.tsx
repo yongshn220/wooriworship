@@ -30,9 +30,6 @@ export function SongItem({songHeader, index}: Props) {
         </div>
         <div className="flex-center gap-4">
           <div>{song?.key === ""? "" : `${song?.key} Key`}</div>
-          <div className="cursor-pointer hover:bg-white/[0.2] rounded-full p-2">
-            <LinkIcon/>
-          </div>
         </div>
       </div>
     </SongDetailCardWrapper>
