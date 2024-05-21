@@ -2,12 +2,8 @@
 
 import {Mode} from "@/components/constants/enums";
 import {SongForm} from "@/app/board/[teamId]/song/_components/song-form";
-import {Song} from "@/models/song";
-import {SongService} from "@/apis";
-import {redirect, useRouter} from 'next/navigation'
-import {toPlainObject} from "@/components/helper/helper-functions";
+import {useRouter} from 'next/navigation'
 import {getPathSongDetail} from "@/components/helper/routes";
-import {useEffect, useState} from "react";
 
 
 export default function SongEditPage({params}: any) {

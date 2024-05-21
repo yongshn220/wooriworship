@@ -24,7 +24,7 @@ class InvitationService extends BaseService {
             invite_date: new Date(),
             invitation_status: InvitationStatus.Pending,
             receiver_email: receiverEmail,
-            response_date: null,
+            response_date: null as any,
             sender_id: senderId,
             team_id: teamId
         }
