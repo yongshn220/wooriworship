@@ -7,6 +7,7 @@ export default class BaseService {
     }
 
     async getById(id: string) {
+        console.log("getbyid: ", this.collectionName)
         try {
             const ref = firestore.collection(this.collectionName).doc(id);
             const res = await ref.get();
@@ -44,6 +45,7 @@ export default class BaseService {
     }
 
     async getByFilters(filters: Array<any> | null) {
+        console.log("getByFilters: ", this.collectionName)
         const result: Array<any> = [];
         let ref: any = firestore.collection(this.collectionName);
         if(filters) {

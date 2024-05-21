@@ -6,7 +6,7 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
 import { AuthService, UserService } from "@/apis"
-import {Mode} from "@/app/_components/landing-page";
+import {LandingMode} from "@/app/_components/landing-page";
 
 export function Signup({setMode}: any) {
     const [signup, setSignup] = useState({
@@ -82,7 +82,7 @@ export function Signup({setMode}: any) {
             <Button className="w-full" onClick={handleSignup}>Sign Up</Button>
             <div className="flex-center mt-4 text-center text-sm gap-2">
               <p>Already have an account?</p>
-              <div className="underline cursor-pointer" onClick={() => {setMode(Mode.LOGIN)}}>
+              <div className="underline cursor-pointer" onClick={() => {setMode(LandingMode.LOGIN)}}>
                 Sign In
               </div>
             </div>

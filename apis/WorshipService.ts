@@ -1,5 +1,5 @@
 import {BaseService} from ".";
-import {WorshipInfo} from "@/app/board/[teamId]/plan/_components/new-button";
+import {WorshipInfo} from "@/app/board/[teamId]/plan/_components/new-worship-button";
 import {Timestamp} from "@firebase/firestore";
 
 class WorshipService extends BaseService {

@@ -6,27 +6,27 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {TeamIcon} from "@/components/team-icon";
 import {Button} from "@/components/ui/button";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {TagMultiSelect} from "@/app/board/[teamId]/song/_components/tag-multi-select";
 import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/app/board/[teamId]/song/_components/multiple-image-uploader";
 import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {currentTeamIdAtom, teamAtomById} from "@/global-states/teamState";
-import {Song} from "@/models/song";
+import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {SongService, StorageService, TagService}  from "@/apis";
-import {Mode} from "@/components/constants/enums";
+import {FormMode} from "@/components/constants/enums";
 import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
 import {auth} from "@/firebase";
 import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
+import {songAtom, songUpdaterAtom} from "@/global-states/song-state";
 
 interface Props {
-  mode: Mode
+  mode: FormMode
   isOpen: boolean
   setIsOpen: Function
-  song: Song | null
+  songId?: string
 }
 export interface SongInput {
   title: string
@@ -45,23 +45,26 @@ export interface MusicSheet {
   isLoading: boolean;
 }
 
-export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
+export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
+  const song = useRecoilValue(songAtom(songId))
+  const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
-  const team = useRecoilValue(teamAtomById(teamId))
+  const team = useRecoilValue(teamAtom(teamId))
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom)
   const [input, setInput] = useState<SongInput>({
-    title: (mode === Mode.EDIT)? song?.title?? "" : "",
-    author: (mode === Mode.EDIT)? song?.original.author?? "" : "",
-    version: (mode === Mode.EDIT)? song?.version?? "" : "",
-    key: (mode === Mode.EDIT)? song?.key?? "":"",
-    link: (mode === Mode.EDIT)? song?.original.url?? "" : "",
-    tags: (mode === Mode.EDIT)? song?.tags?? [] : [],
-    bpm: (mode === Mode.EDIT)? song?.bpm?? null : null,
-    description: (mode === Mode.EDIT)? song?.description?? "" : ""
+    title: (mode === FormMode.EDIT)? song?.title?? "" : "",
+    author: (mode === FormMode.EDIT)? song?.original.author?? "" : "",
+    version: (mode === FormMode.EDIT)? song?.version?? "" : "",
+    key: (mode === FormMode.EDIT)? song?.key?? "":"",
+    link: (mode === FormMode.EDIT)? song?.original.url?? "" : "",
+    tags: (mode === FormMode.EDIT)? song?.tags?? [] : [],
+    bpm: (mode === FormMode.EDIT)? song?.bpm?? null : null,
+    description: (mode === FormMode.EDIT)? song?.description?? "" : ""
   })
   const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [viewportHeight, setViewportHeight] = useState(window.visualViewport.height);
   const { toast } = useToast()
   const router = useRouter()
 
@@ -70,6 +73,16 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
     if (_musicSheets)
       setMusicSheets(_musicSheets)
   }, [song?.music_sheet_urls])
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportHeight(window.visualViewport.height);
+    };
+
+    window.visualViewport.addEventListener('resize', handleResize);
+    return () => window.visualViewport.removeEventListener('resize', handleResize);
+  }, []);
+
 
   function createValidCheck() {
     if (!authUser?.uid) {
@@ -148,6 +161,9 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
       promises.push(TagService.addNewTags(teamId, songInput.tags));
       await Promise.all(promises)
 
+      setSongUpdater((prev) => prev+1)
+
+      toast({title: "Song edited successfully."})
       setIsOpen(false)
       setIsLoading(false)
     }
@@ -164,11 +180,11 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
-      <DialogContent className="sm:max-w-[600px] h-5/6 overflow-y-scroll scrollbar-hide">
+      <DialogContent className="sm:max-w-[600px] overflow-y-scroll scrollbar-hide top-0 translate-y-0 mt-[50px]" style={{ maxHeight: `${viewportHeight - 100}px` }}>
         <DialogHeader>
-          <DialogTitle className="text-2xl">{mode===Mode.EDIT? "Edit Song" : "Add New Song"}</DialogTitle>
+          <DialogTitle className="text-2xl">{mode===FormMode.EDIT? "Edit Song" : "Add New Song"}</DialogTitle>
           <DialogDescription>
-            {mode===Mode.EDIT? "Edit song" : "Create and add new song in the song board"}
+            {mode===FormMode.EDIT? "Edit song" : "Create and add new song in the song board"}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
@@ -183,6 +199,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
               placeholder="ex) Amazing Grace"
               value={input.title}
               onChange={(e) => setInput((prev => ({...prev, title: e.target.value})))}
+              autoFocus={false}
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
@@ -204,6 +221,15 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
+            <Label htmlFor="key">Key</Label>
+            <Input
+              id="key"
+              placeholder="key"
+              value={input.key}
+              onChange={(e) => setInput((prev => ({...prev, key: e.target.value})))}
+            />
+          </div>
+          <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="link">Link</Label>
             <Input
               id="link"
@@ -222,7 +248,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
               id="bpm"
               type="number"
               placeholder="ex) 120"
-              defaultValue={input.bpm?? ""}
+              defaultValue={input.bpm ?? ""}
               onChange={(e) => setInput((prev => ({...prev, bpm: Number(e.target.value)})))}
             />
           </div>
@@ -260,7 +286,7 @@ export function SongForm({mode, isOpen, setIsOpen, song}: Props) {
         </div>
         <DialogFooter>
           {
-            (mode === Mode.EDIT)
+            (mode === FormMode.EDIT)
               ? <Button type="submit" onClick={handleEdit}>{isLoading ? "Saving..." : "Save"}</Button>
               : <Button type="submit" onClick={handleCreate}>{isLoading ? "Creating..." : "Create"}</Button>
           }

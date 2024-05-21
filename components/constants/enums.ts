@@ -6,6 +6,7 @@ export enum Routes {
   SONG = "/song",
   EDIT = "/edit",
   WORSHIP = "/worship",
+  WORSHIP_LIVE = "/live",
   HOME = "/"
 }
 
@@ -26,7 +27,7 @@ export enum UserRole {
   Member = 1
 }
 
-export enum Mode {
+export enum FormMode {
   EDIT,
   CREATE
 }

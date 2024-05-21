@@ -1,6 +1,7 @@
 
 import { auth, firebaseApp } from "@/firebase";
 import { BaseService, UserService } from './';
+import {User} from "@/models/user";
 
 class AuthService extends BaseService {
     constructor() {
@@ -9,8 +10,8 @@ class AuthService extends BaseService {
 
     async login(email: string, password: string) {
         const user = await auth.signInWithEmailAndPassword(email, password);
-        if(user.user) {
-            const serverUserInfo = await UserService.getById(user.user.uid);
+        if (user.user) {
+            const serverUserInfo = await UserService.getById(user.user.uid) as User;
             await UserService.update(user.user.uid, {last_logged_in_time: new Date()});
             return serverUserInfo;
         }

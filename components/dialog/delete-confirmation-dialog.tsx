@@ -10,18 +10,22 @@ interface Props {
   setOpen: any
   title: string
   description: string
-  onDeleteHanlder: Function
+  onDeleteHandler: Function
+  callback?: Function
 }
-export function DeleteConfirmationDialog({isOpen, setOpen, title, description, onDeleteHanlder}: Props) {
+export function DeleteConfirmationDialog({isOpen, setOpen, title, description, onDeleteHandler, callback}: Props) {
   const [isDeleting, setIsDeleting] = useState(false)
 
   function handleSubmit(e: any) {
     setIsDeleting(true)
     e.preventDefault()
 
-    onDeleteHanlder().then(() => {
+    onDeleteHandler().then(() => {
       setOpen(false)
       setIsDeleting(false)
+      if (callback) {
+        callback()
+      }
     })
   }
   return (

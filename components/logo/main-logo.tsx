@@ -5,7 +5,7 @@ import Image from "next/image";
 export function MainLogoRouter({route}: {route: string}) {
   return (
     <Link href={route}>
-      <div className="flex items-center gap-x-1">
+      <div className="flex items-center gap-x-1 p-1 rounded-lg hover:bg-gray-100">
         <Image
           src={"/image/logo.png"}
           alt="Logo"

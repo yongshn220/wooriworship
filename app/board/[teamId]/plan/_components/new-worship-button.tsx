@@ -1,12 +1,12 @@
 'use client'
 
-import {Plus} from "lucide-react";
 import {useState} from "react";
 import {Song} from "@/models/song";
 import {WorshipForm} from "@/app/board/[teamId]/plan/_components/worship-form";
-import {Mode} from "@/components/constants/enums";
+import {FormMode} from "@/components/constants/enums";
 import {useSetRecoilState} from "recoil";
 import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {Button} from "@/components/ui/button";
 
 export interface WorshipInfo {
   title: string
@@ -20,7 +20,7 @@ export interface SongInfo {
   song: Song
 }
 
-export function NewButton() {
+export function NewWorshipButton() {
   const [isOpen, setIsOpen] = useState(false)
   const setSelectedSongInfoList = useSetRecoilState(selectedSongInfoListAtom)
 
@@ -31,14 +31,10 @@ export function NewButton() {
 
   return (
     <>
-      <WorshipForm mode={Mode.CREATE} isOpen={isOpen} setIsOpen={setIsOpen} worship={null}/>
-      <div
-        className="group aspect-[1/1] border rounded-lg flex-center flex-col overflow-hidden bg-blue-500 hover:bg-blue-600 cursor-pointer"
-        onClick={handleClick}
-      >
-        <Plus className="h-12 w-12 text-white stroke-1"/>
-        <p className="text-sm text-white">New board</p>
-      </div>
+      <WorshipForm mode={FormMode.CREATE} isOpen={isOpen} setIsOpen={setIsOpen} worship={null}/>
+      <Button className="bg-purple-500 hover:bg-purple-400" onClick={handleClick}>
+        + Add Worship
+      </Button>
     </>
   )
 }

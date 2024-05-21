@@ -5,14 +5,20 @@ import {Button} from "@/components/ui/button";
 import {MainLogo} from "@/components/logo/main-logo";
 import {useRouter} from "next/navigation";
 import { AuthService } from "@/apis"
+import {toast} from "@/components/ui/use-toast";
+import {useRecoilValue} from "recoil";
+import {userAtom} from "@/global-states/userState";
+import {auth} from "@/firebase";
 
 export function ProfileButton() {
-
+  const authUser = auth.currentUser
+  const user = useRecoilValue(userAtom(authUser?.uid))
   const router = useRouter()
 
   async function handleSignOut() {
     try {
       await AuthService.logout();
+      toast({title: `Goodbye, ${user.name} :)`})
       router.replace("/")
     }
     catch (err: any) {

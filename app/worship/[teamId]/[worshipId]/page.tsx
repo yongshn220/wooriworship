@@ -1,34 +1,22 @@
 "use client"
 
 import {SongCarousel} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel";
-import {TeamService, WorshipService} from "@/apis";
-import {SongHeader, Worship} from "@/models/worship";
-import {timestampToDateString} from "@/components/helper/helper-functions";
-import {Team} from "@/models/team";
+import {SongHeader} from "@/models/worship";
 import CalendarIcon from '@/public/icons/calendarIcon.svg'
 import {SongItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-item";
 import {Separator} from "@/components/ui/separator";
 import {MenuButton} from "@/app/worship/[teamId]/[worshipId]/_components/menu-button";
 import UsersIcon from '@/public/icons/usersIcon.svg'
-import {useEffect, useState} from "react";
+import {useRecoilValue} from "recoil";
+import {teamAtom} from "@/global-states/teamState";
+import {timestampToDateString} from "@/components/helper/helper-functions";
+import {worshipAtom} from "@/global-states/worship-state";
 
 export default function WorshipPage({params}: any) {
   const teamId = params.teamId
   const worshipId = params.worshipId
-  const [worship, setWorship] = useState<Worship>(null)
-  const [team, setTeam] = useState<Team>(null)
-
-  useEffect(() => {
-    WorshipService.getById(worshipId).then((_worship) => {
-      setWorship(_worship as Worship)
-    })
-  }, [worshipId])
-
-  useEffect(() => {
-    TeamService.getById(teamId).then((_team) => {
-      setTeam(_team as Team)
-    })
-  }, [teamId])
+  const worship = useRecoilValue(worshipAtom(worshipId))
+  const team = useRecoilValue(teamAtom(teamId))
 
   return (
     <div className="w-full flex-center">
@@ -49,7 +37,7 @@ export default function WorshipPage({params}: any) {
             <CalendarIcon className="text-gray-500"/>
             <p className="text-gray-500">Worship Date</p>
           </div>
-          {/*<p>{timestampToDateString(worship?.worship_date)}</p>*/}
+          <p>{timestampToDateString(worship?.worship_date)}</p>
         </div>
         <p className="mt-10">
           {worship?.description}

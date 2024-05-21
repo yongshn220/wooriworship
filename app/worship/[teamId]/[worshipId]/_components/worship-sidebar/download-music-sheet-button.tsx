@@ -6,12 +6,15 @@ import {Button} from "@/components/ui/button";
 import {Checkbox} from "@/components/ui/checkbox";
 import {saveAs} from 'file-saver';
 import {useRecoilValue} from "recoil";
-import {currentSongListAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useState} from "react";
+import {worshipSongListAtom} from "@/global-states/worship-state";
 
+interface Props {
+  worshipId: string
+}
 
-export function DownloadMusicSheetButton() {
-  const songList = useRecoilValue(currentSongListAtom)
+export function DownloadMusicSheetButton({worshipId}: Props) {
+  const songList = useRecoilValue(worshipSongListAtom(worshipId))
   const [selectedSongIds, setSelectedSongIds] = useState<Array<string>>([])
 
   function handleDownload() {
@@ -39,11 +42,6 @@ export function DownloadMusicSheetButton() {
       setSelectedSongIds((prev) => ([...prev, songId]))
     }
   }
-
-  function handleSelectAll() {
-    setSelectedSongIds(songList.map((song) => song.id))
-  }
-
 
   return (
     <Dialog>
