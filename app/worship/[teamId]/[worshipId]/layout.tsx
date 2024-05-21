@@ -1,5 +1,4 @@
 import {Navbar} from "@/app/board/_components/nav-bar/nav-bar";
-import {WorshipSetup} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/worship-setup";
 import {MainLogoRouter} from "@/components/logo/main-logo";
 import {getPathPlan} from "@/components/helper/routes";
 import {WorshipSidebar} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/worship-sidebar";
