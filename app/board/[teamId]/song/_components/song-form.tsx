@@ -12,11 +12,7 @@ import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/app/board/[teamId]/song/_components/multiple-image-uploader";
 import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
-import {
-  useRecoilState,
-  useRecoilValue,
-  useSetRecoilState
-} from "recoil";
+import {useRecoilValue, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {SongService, StorageService, TagService}  from "@/apis";
 import {FormMode} from "@/components/constants/enums";
@@ -27,7 +23,7 @@ import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-boa
 import {songAtom, songUpdaterAtom} from "@/global-states/song-state";
 
 interface Props {
-  mode: Mode
+  mode: FormMode
   isOpen: boolean
   setIsOpen: Function
   songId?: string
@@ -50,7 +46,7 @@ export interface MusicSheet {
 }
 
 export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
-  const [song, setSong] = useRecoilState(songAtom(songId))
+  const song = useRecoilValue(songAtom(songId))
   const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
