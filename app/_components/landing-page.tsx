@@ -5,19 +5,19 @@ import {Login} from "@/app/_components/login";
 import {Signup} from "@/app/_components/signup";
 import {useState} from "react";
 
-export enum Mode {
+export enum LandingMode {
   LOGIN,
   SIGNUP
 }
 
 export function LandingPage() {
-  const [mode, setMode] = useState(Mode.LOGIN)
+  const [mode, setMode] = useState(LandingMode.LOGIN)
 
   return (
     <div className="flex-center flex-col w-full">
       <div className="flex-between w-full max-w-7xl p-5 left-0 top-0">
         <MainLogoRouter route="/"/>
-        <Button variant="outline" onClick={() => setMode(Mode.SIGNUP)}>Sign Up</Button>
+        <Button variant="outline" onClick={() => setMode(LandingMode.SIGNUP)}>Sign Up</Button>
       </div>
       <div className="w-full h-full flex flex-col items-center p-5">
         <p className="mt-0 text-4xl md:text-5xl xl:text-6xl xl:mt-10 text-left font-bold text-white blue_gradient">
@@ -35,7 +35,7 @@ export function LandingPage() {
             className="mt-8"
           />
           {
-            (mode === Mode.LOGIN) ? <Login setMode={setMode}/> : <Signup setMode={setMode}/>
+            (mode === LandingMode.LOGIN) ? <Login setMode={setMode}/> : <Signup setMode={setMode}/>
           }
         </div>
       </div>
