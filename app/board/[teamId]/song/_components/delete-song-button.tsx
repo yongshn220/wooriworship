@@ -9,6 +9,7 @@ import {useState} from "react";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {getPathSong} from "@/components/helper/routes"
 import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
+import {toast} from "@/components/ui/use-toast";
 
 interface Props {
   songTitle: string
@@ -23,11 +24,16 @@ export function DeleteSongButton({songTitle, songId}: Props) {
 
   async function handleDeleteSong() {
     try {
-      await SongService.deleteSong(songId)
+      if (await SongService.deleteSong(songId) === false) {
+        toast({title: "Fail to delete song", description: "Something went wrong. Please try again later."})
+      }
+
       setCurrentTeamSongIds((prev) => prev.filter(_id => _id !== songId))
+      toast({title: "Song deleted successfully", description: ""})
     }
     catch (e) {
       console.log(e)
+      toast({title: "Fail to delete song", description: "Something went wrong. Please try again later."})
     }
     finally {
       router.replace(getPathSong(teamId))
@@ -36,7 +42,7 @@ export function DeleteSongButton({songTitle, songId}: Props) {
 
   return (
     <>
-      <DeleteConfirmationDialog isOpen={isOpen} setOpen={setIsOpen} title="Delete Song" description={`Do you really want to delete [${songTitle}]? This action can't be undone.`} onDeleteHanlder={handleDeleteSong}/>
+      <DeleteConfirmationDialog isOpen={isOpen} setOpen={setIsOpen} title="Delete Song" description={`Do you really want to delete [${songTitle}]? This action can't be undone.`} onDeleteHandler={handleDeleteSong}/>
       <Button variant="ghost" className="text-red-500 hover:text-red-500 hover:bg-red-50" onClick={() => setIsOpen((prev) => !prev)}>
         Delete
       </Button>

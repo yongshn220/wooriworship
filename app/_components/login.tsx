@@ -5,9 +5,9 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
 import Link from "next/link";
-import {signIn} from "next-auth/react";
-import {Mode} from "@/app/_components/landing-page";
-import {AuthService, UserService} from "@/apis";
+import {LandingMode} from "@/app/_components/landing-page";
+import {AuthService} from "@/apis";
+import {toast} from "@/components/ui/use-toast";
 
 export function Login({setMode}: any) {
   const [login, setLogin] = useState({
@@ -18,21 +18,22 @@ export function Login({setMode}: any) {
 
   async function handleLogin(e: any) {
     e.preventDefault();
-    const res = await AuthService.login(login.email, login.password)
-
-    // try {
-    //   const res = await signIn("credentials", {
-    //     email: login.email,
-    //     password: login.password,
-    //     redirect: false
-    //   })
-    //   if (res?.ok === false) {
-    //     setError(true)
-    //   }
-    // }
-    // catch (e) {
-    //   console.log(e)
-    // }
+    AuthService.login(login.email, login.password).then((user) => {
+      toast({title: `Hello, ${user.name} :)`})
+    }, (err) => {
+      switch (err.code) {
+        case 'auth/invalid-credential':
+            toast({title: "Wrong email or password."})
+            setError(true)
+            break;
+        case 'auth/user-not-found':
+            toast({title: "User not found. Please contact to admin."})
+            break;
+        default:
+            toast({title: "Something went wrong. Please contact to admin."})
+            break;
+      }
+    })
   }
 
   return (
@@ -63,7 +64,7 @@ export function Login({setMode}: any) {
             <Link className="underline" href="#">
               Forgot your password?
             </Link>
-            <div className="underline cursor-pointer" onClick={() => {setMode(Mode.SIGNUP)}} >
+            <div className="underline cursor-pointer" onClick={() => {setMode(LandingMode.SIGNUP)}} >
               Create account
             </div>
           </div>

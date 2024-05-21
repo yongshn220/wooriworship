@@ -8,15 +8,21 @@ export const currentTeamIdAtom = atom<string>({
   default: ""
 })
 
-export const teamAtomById = atomFamily<Team | null, string>({
-  key: "currentTeamIdAtom",
+export const teamAtom = atomFamily<Team, string>({
+  key: "teamAtom",
   default: selectorFamily({
-    key: "teamAtomById/Default",
-    get: (id) => async () => {
-      if (id) {
-        return await TeamService.getById(id) as Team
+    key: "teamAtom/default",
+    get: (teamId) => async () => {
+      try {
+        if (!teamId) return null
+
+        const team = await TeamService.getById(teamId) as Team
+        if (!team) return null
+
+        return team
       }
-      else {
+      catch (e) {
+        console.log(e)
         return null
       }
     }

@@ -1,6 +1,7 @@
 import {atom, atomFamily, selector, selectorFamily} from "recoil";
 import {SongService} from "@/apis";
 import {currentTeamIdAtom} from "@/global-states/teamState";
+import {Song} from "@/models/song";
 
 
 export const currentTeamSongIdsAtom = atom<Array<string>>({
@@ -24,4 +25,3 @@ export const currentTeamSongIdsAtom = atom<Array<string>>({
     }
   })
 })
-

@@ -1,16 +1,20 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
+"use client"
+
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import {TeamIcon} from "@/components/team-icon";
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import Image from 'next/image'
 import {RoleSelect} from "@/app/board/_components/nav-bar/role-select";
 import {Input} from "@/components/ui/input";
+import {useCallback, useState} from "react";
+import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
+import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
+import {useRecoilValue, useSetRecoilState} from "recoil";
+import {userUpdaterAtom} from "@/global-states/userState";
+import {useRouter} from "next/navigation";
+import {getPathBoard} from "@/components/helper/routes";
+import {SettingsIcon} from "lucide-react";
 
 const members = [
   {email: "banaba212@gmail.com", role: "Leader"},
@@ -19,18 +23,43 @@ const members = [
 ]
 
 export function ManageTeamButton() {
+  const setUserUpdater = useSetRecoilState(userUpdaterAtom)
+  const currentTeamId = useRecoilValue(currentTeamIdAtom)
+  const team = useRecoilValue(teamAtom(currentTeamId))
+  const [email, setEmail] = useState("")
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
+  const router = useRouter()
+
+  function handleAddPeople() {
+    // Todo: firebase
+  }
+
+  async function handleDeleteTeam() {
+    setIsOpenDeleteDialog(true)
+    // Todo: firebase
+  }
+
+  function onDeleteTeamCompleteCallback() {
+    setIsOpenDeleteDialog(false)
+    // setUserUpdater(prev => prev + 1)
+    // router.replace(getPathBoard())
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Manage Team</Button>
+        <Button variant="outline" className="w-full">
+          <SettingsIcon className="h-4 w-4 mr-2"/>
+          <p>Manage Team</p>
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[700px] overflow-y-scroll scrollbar-hide">
         <DialogHeader>
           <DialogTitle className="text-2xl">Manage Team</DialogTitle>
         </DialogHeader>
         <div className="flex-center gap-2">
-          <TeamIcon name="GVC Friday"/>
-          <p className="font-bold text-sm">GVC Friday</p>
+          <TeamIcon name={team?.name}/>
+          <p className="font-bold text-sm">{team?.name}</p>
         </div>
         <div className="w-full flex-start flex-col items-center gap-1.5">
           <Label htmlFor="name" className="text-xl sm:text-base">
@@ -59,12 +88,21 @@ export function ManageTeamButton() {
           </div>
           <div className="w-full flex gap-4 mt-4">
             <Image alt="mail icon" src="/icons/mailIcon.svg" width={25} height={25}/>
-            <Input placeholder="Email"/>
-            <Button>Add People</Button>
+            <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+            <Button onClick={handleAddPeople}>Add People</Button>
           </div>
         </div>
-        <div className="w-full flex-center">
-        </div>
+        <DialogFooter className="mt-10">
+          <DeleteConfirmationDialog
+            isOpen={isOpenDeleteDialog}
+            setOpen={setIsOpenDeleteDialog}
+            title="Delete Team"
+            description={`Do you really want to delete [${team?.name}]? This action cannot be undone.`}
+            onDeleteHandler={handleDeleteTeam}
+            callback={onDeleteTeamCompleteCallback}
+          />
+          <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-500" onClick={handleDeleteTeam}>Delete Team</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

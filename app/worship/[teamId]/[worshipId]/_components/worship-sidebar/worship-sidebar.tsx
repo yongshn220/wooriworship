@@ -1,24 +1,31 @@
 "use client"
 import {Button} from "@/components/ui/button";
-import {MainLogoRouter} from "@/components/logo/main-logo";
-import {MdSidebar} from "@/components/sidebar/md-sidebar";
 import {Label} from "@/components/ui/label";
 import {useState} from "react";
 import Link from "next/link";
 import {LayoutDashboard, LibraryBig} from "lucide-react";
 import Image from "next/image";
-import {StartWorshipButton} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/start-worship-button";
 import {DownloadMusicSheetButton} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/download-music-sheet-button";
-import {getPathPlan, getPathSong} from "@/components/helper/routes";
+import {getPathPlan, getPathSong, getPathWorshipStartMode} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import {currentSongListAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
+import {useRouter} from "next/navigation";
+import {worshipAtom, worshipSongListAtom} from "@/global-states/worship-state";
 
+interface Props {
+  worshipId: string
+}
 
-export function WorshipSidebar() {
-  const songList = useRecoilValue(currentSongListAtom)
+export function WorshipSidebar({worshipId}: Props) {
+  const worship = useRecoilValue(worshipAtom(worshipId))
+  const songList = useRecoilValue(worshipSongListAtom(worshipId))
   const [selectedSongId, setSelectedSongId] = useState(songList[0]?.id?? [])
-  const currentTeamId = useRecoilValue(currentTeamIdAtom)
+  const teamId = useRecoilValue(currentTeamIdAtom)
+  const router = useRouter()
+
+  function handleStartWorship() {
+    router.push(getPathWorshipStartMode(teamId, worship?.id))
+  }
 
   return (
     <div className="flex-between flex-col h-full">
@@ -33,7 +40,7 @@ export function WorshipSidebar() {
               className="w-full justify-start px-2 text-xs lg:text-sm overflow-hidden"
               onClick={() => setSelectedSongId(song.id)}
             >
-              {`${i+1}. ${song.title}`}
+              {`${song.title}`}
             </Button>
           ))
         }
@@ -44,19 +51,19 @@ export function WorshipSidebar() {
             width={80}
             height={80}
           />
-          <DownloadMusicSheetButton/>
-          <StartWorshipButton/>
+          <DownloadMusicSheetButton worshipId={worshipId}/>
+          <Button className="w-full" onClick={handleStartWorship}>Start Worship</Button>
         </div>
       </div>
       <div className="mb-5">
         <Button variant="ghost" asChild size="lg" className="font-normal w-full justify-start px-2">
-          <Link href={getPathPlan(currentTeamId)}>
+          <Link href={getPathPlan(teamId)}>
             <LayoutDashboard className="h-4 w-4 mr-2"/>
             Worship Plan
           </Link>
         </Button>
         <Button variant="ghost" asChild size="lg" className="font-normal w-full justify-start px-2">
-          <Link href={getPathSong(currentTeamId)}>
+          <Link href={getPathSong(teamId)}>
             <LibraryBig className="h-4 w-4 mr-2"/>
             Song Board
           </Link>

@@ -1,8 +1,5 @@
 'use client'
-import {RootAuthenticate} from "@/app/_components/auth/root-authenticate";
 import {RoutingPage} from "@/app/_components/routing-page";
-import {useRecoilValue} from "recoil";
-import {FirebaseSyncStatus, firebaseSyncStatusAtom} from "@/global-states/syncState";
 import {LandingPage} from "@/app/_components/landing-page";
 import {useEffect, useState} from "react";
 import {auth} from "@/firebase";
@@ -31,13 +28,13 @@ export default function Home() {
   }, [router]);
 
   return (
-    <>
+    <div>
       {
         authStatus === AuthStatus.NOT_VALID
           ? <LandingPage/>
           : <RoutingPage/>
       }
-    </>
+    </div>
   )
 }
 
