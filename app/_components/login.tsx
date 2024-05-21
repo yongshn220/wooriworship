@@ -5,7 +5,7 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
 import Link from "next/link";
-import {Mode} from "@/app/_components/landing-page";
+import {LandingMode} from "@/app/_components/landing-page";
 import {AuthService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
 
@@ -64,7 +64,7 @@ export function Login({setMode}: any) {
             <Link className="underline" href="#">
               Forgot your password?
             </Link>
-            <div className="underline cursor-pointer" onClick={() => {setMode(Mode.SIGNUP)}} >
+            <div className="underline cursor-pointer" onClick={() => {setMode(LandingMode.SIGNUP)}} >
               Create account
             </div>
           </div>
