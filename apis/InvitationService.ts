@@ -4,7 +4,7 @@ import EmailService from "./EmailService";
 
 class InvitationService extends BaseService {
     constructor() {
-        super("worships");
+        super("invitations");
     }
 
     async createInvitation(senderId: string, senderEmail:string, teamId: string, teamName: string, receiverEmail: string) {
