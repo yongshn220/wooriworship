@@ -23,7 +23,7 @@ import {AddSongButton} from "@/app/board/[teamId]/plan/_components/add-song-butt
 import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {Song} from "@/models/song";
 import {SongService, WorshipService} from "@/apis";
-import {Mode} from "@/components/constants/enums";
+import {FormMode} from "@/components/constants/enums";
 import {Worship} from "@/models/worship";
 import {timestampToDate} from "@/components/helper/helper-functions";
 import {useRouter} from "next/navigation";
@@ -55,17 +55,17 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
   const team = useRecoilValue(teamAtom(teamId))
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
   const [basicInfo, setBasicInfo] = useState({
-    title: (mode === Mode.EDIT)? worship?.title ?? "" : "",
-    description: (mode === Mode.EDIT)? worship?.description ?? "" : "",
+    title: (mode === FormMode.EDIT)? worship?.title ?? "" : "",
+    description: (mode === FormMode.EDIT)? worship?.description ?? "" : "",
   })
-  const [date, setDate] = useState<Date>((mode === Mode.EDIT)? timestampToDate(worship?.worship_date) : new Date())
+  const [date, setDate] = useState<Date>((mode === FormMode.EDIT)? timestampToDate(worship?.worship_date) : new Date())
   const [isLoading, setIsLoading] = useState(false)
   const [viewportHeight, setViewportHeight] = useState(window.visualViewport.height);
   const { toast } = useToast()
   const router = useRouter()
 
   useEffect(() => {
-    if (mode === Mode.EDIT) {
+    if (mode === FormMode.EDIT) {
       const songPromises = worship?.songs?.map(async (songInfo) => {
         const song = await SongService.getById(songInfo.id);
         return { song, note: songInfo.note };
@@ -162,10 +162,10 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
       <DialogContent className="sm:max-w-[600px] overflow-y-scroll scrollbar-hide top-0 translate-y-0 mt-[50px]" style={{ maxHeight: `${viewportHeight - 100}px` }}>
         <DialogHeader>
           <DialogTitle className="text-2xl">
-            { (mode === Mode.CREATE) ? "Create new worship" : "Edit worship" }
+            { (mode === FormMode.CREATE) ? "Create new worship" : "Edit worship" }
           </DialogTitle>
           <DialogDescription>
-            { (mode === Mode.CREATE)? "Create worship and share with your team." : "Edit worship"}
+            { (mode === FormMode.CREATE)? "Create worship and share with your team." : "Edit worship"}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
@@ -220,7 +220,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
         </div>
         <DialogFooter>
           {
-            (mode === Mode.CREATE)
+            (mode === FormMode.CREATE)
               ? <Button type="submit" onClick={handleCreate}>{isLoading? "Creating..." : "Create"}</Button>
               : <Button type="submit" onClick={handleEdit}>{isLoading? "Saving..." : "Save"}</Button>
           }

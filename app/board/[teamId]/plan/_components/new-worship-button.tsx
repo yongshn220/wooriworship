@@ -3,7 +3,7 @@
 import {useState} from "react";
 import {Song} from "@/models/song";
 import {WorshipForm} from "@/app/board/[teamId]/plan/_components/worship-form";
-import {Mode} from "@/components/constants/enums";
+import {FormMode} from "@/components/constants/enums";
 import {useSetRecoilState} from "recoil";
 import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {Button} from "@/components/ui/button";
@@ -31,7 +31,7 @@ export function NewWorshipButton() {
 
   return (
     <>
-      <WorshipForm mode={Mode.CREATE} isOpen={isOpen} setIsOpen={setIsOpen} worship={null}/>
+      <WorshipForm mode={FormMode.CREATE} isOpen={isOpen} setIsOpen={setIsOpen} worship={null}/>
       <Button className="bg-purple-500 hover:bg-purple-400" onClick={handleClick}>
         + Add Worship
       </Button>

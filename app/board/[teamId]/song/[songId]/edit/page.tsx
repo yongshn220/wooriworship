@@ -1,6 +1,6 @@
 "use client"
 
-import {Mode} from "@/components/constants/enums";
+import {FormMode} from "@/components/constants/enums";
 import {SongForm} from "@/app/board/[teamId]/song/_components/song-form";
 import {useRouter} from 'next/navigation'
 import {getPathSongDetail} from "@/components/helper/routes";
@@ -18,6 +18,6 @@ export default function SongEditPage({params}: any) {
   }
 
   return (
-    <SongForm mode={Mode.EDIT} isOpen={true} setIsOpen={onOpenChangeHandler} songId={songId}/>
+    <SongForm mode={FormMode.EDIT} isOpen={true} setIsOpen={onOpenChangeHandler} songId={songId}/>
   )
 }
