@@ -12,11 +12,13 @@ import {teamAtom} from "@/global-states/teamState";
 import {timestampToDateString} from "@/components/helper/helper-functions";
 import {worshipAtom} from "@/global-states/worship-state";
 
+
 export default function WorshipPage({params}: any) {
   const teamId = params.teamId
   const worshipId = params.worshipId
   const worship = useRecoilValue(worshipAtom(worshipId))
   const team = useRecoilValue(teamAtom(teamId))
+
 
   return (
     <div className="w-full flex-center">

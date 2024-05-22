@@ -18,8 +18,8 @@ class WorshipService extends BaseService {
     return worships
   }
 
-  //Todo: [Naming changed] Worship.detail -> Worship.description. (please update it for rest of the codes)
   async addNewWorship(userId: string, teamId: string, worshipInput: WorshipInfo) {
+    console.log(userId, teamId, worshipInput)
     const newWorship = {
       team_id: teamId,
       title: worshipInput.title,
@@ -38,16 +38,16 @@ class WorshipService extends BaseService {
     return await this.create(newWorship);
   }
 
-  async updateWorship(userId: string, worshipId: string, worshipInput: any) {
+  async updateWorship(userId: string, worshipId: string, worshipInput: WorshipInfo) {
     const worship = {
         title: worshipInput.title,
         description: worshipInput.description,
-        songs: worshipInput.songs,
+        songs: worshipInput.songInfoList.map((songInfo) => ({id: songInfo.song.id, note: songInfo.note})),
         updated_by: {
           id: userId,
           time: new Date()
         },
-        worship_date: worshipInput.worship_date
+        worship_date: Timestamp.fromDate(worshipInput.date)
     }
     return await this.update(worshipId, worship);
   }

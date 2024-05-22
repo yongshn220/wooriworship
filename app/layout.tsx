@@ -19,7 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <main className="relative h-full">
           <Provider>
             <Toaster />
-            <Suspense fallback={<div></div>}>
+            <Suspense fallback={<div>loading</div>}>
               {children}
             </Suspense>
           </Provider>

@@ -1,7 +1,7 @@
 "use client"
 import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
-import {useState} from "react";
+import {Suspense, useEffect, useState} from "react";
 import Link from "next/link";
 import {LayoutDashboard, LibraryBig} from "lucide-react";
 import Image from "next/image";
@@ -11,39 +11,27 @@ import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {useRouter} from "next/navigation";
 import {worshipAtom, worshipSongListAtom} from "@/global-states/worship-state";
+import {WorshipSongList} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/worship-song-list";
 
 interface Props {
+  teamId: string
   worshipId: string
 }
 
-export function WorshipSidebar({worshipId}: Props) {
-  const worship = useRecoilValue(worshipAtom(worshipId))
-  const songList = useRecoilValue(worshipSongListAtom(worshipId))
-  const [selectedSongId, setSelectedSongId] = useState(songList[0]?.id?? [])
-  const teamId = useRecoilValue(currentTeamIdAtom)
+export function WorshipSidebar({teamId, worshipId}: Props) {
   const router = useRouter()
 
   function handleStartWorship() {
-    router.push(getPathWorshipStartMode(teamId, worship?.id))
+    router.push(getPathWorshipStartMode(teamId, worshipId))
   }
 
   return (
     <div className="flex-between flex-col h-full">
       <div className="space-y-2 w-full ">
         <Label className="font-semibold">Songs</Label>
-        {
-          songList.map((song, i) => (
-            <Button
-              key={song.id}
-              variant={(selectedSongId === song.id)? "secondary" : "ghost"}
-              size="lg"
-              className="w-full justify-start px-2 text-xs lg:text-sm overflow-hidden"
-              onClick={() => setSelectedSongId(song.id)}
-            >
-              {`${song.title}`}
-            </Button>
-          ))
-        }
+        <Suspense fallback={<div>loading..</div>}>
+          <WorshipSongList worshipId={worshipId}/>
+        </Suspense>
         <div className="w-full flex-start flex-col gap-4 pt-5">
           <Image
             alt="compose music image"

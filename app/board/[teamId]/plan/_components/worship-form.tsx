@@ -53,7 +53,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
   })
   const [date, setDate] = useState<Date>((mode === FormMode.EDIT)? timestampToDate(worship?.worship_date) : new Date())
   const [isLoading, setIsLoading] = useState(false)
-  const [viewportHeight, setViewportHeight] = useState(window.visualViewport.height);
+  const [viewportHeight, setViewportHeight] = useState(0);
   const { toast } = useToast()
   const router = useRouter()
 
@@ -72,12 +72,14 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
   }, [mode, setSelectedSongInfoList, worship?.songs])
 
   useEffect(() => {
+    setViewportHeight(window?.visualViewport.height);
+
     const handleResize = () => {
-      setViewportHeight(window.visualViewport.height);
+      setViewportHeight(window?.visualViewport.height);
     };
 
-    window.visualViewport.addEventListener('resize', handleResize);
-    return () => window.visualViewport.removeEventListener('resize', handleResize);
+    window?.visualViewport.addEventListener('resize', handleResize);
+    return () => window?.visualViewport.removeEventListener('resize', handleResize);
   }, []);
 
   function isSessionValid() {
@@ -132,14 +134,14 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
       const worshipInput = getWorshipInput()
 
       // Todo: firestore
-      // WorshipService.editWorship(authUser?.uid, teamId, worshipInput).then(() => {
-      //   toast({
-      //     title: `Worship successfully updated.`,
-      //     description: team?.name,
-      //   })
-      //   setIsOpen(false)
-      //   setIsLoading(false)
-      // })
+      WorshipService.updateWorship(authUser?.uid, teamId, worshipInput).then(() => {
+        toast({
+          title: `Worship successfully updated.`,
+          description: team?.name,
+        })
+        setIsOpen(false)
+        setIsLoading(false)
+      })
     }
     catch (e) {
       console.log("err", e)
