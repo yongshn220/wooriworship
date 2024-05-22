@@ -64,7 +64,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   })
   const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [viewportHeight, setViewportHeight] = useState(window.visualViewport.height);
+  const [viewportHeight, setViewportHeight] = useState( 0);
   const { toast } = useToast()
   const router = useRouter()
 
@@ -75,12 +75,14 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   }, [song?.music_sheet_urls])
 
   useEffect(() => {
+    setViewportHeight(window.visualViewport.height);
+
     const handleResize = () => {
-      setViewportHeight(window.visualViewport.height);
+      setViewportHeight(window?.visualViewport?.height);
     };
 
-    window.visualViewport.addEventListener('resize', handleResize);
-    return () => window.visualViewport.removeEventListener('resize', handleResize);
+    window?.visualViewport?.addEventListener('resize', handleResize);
+    return () => window?.visualViewport?.removeEventListener('resize', handleResize);
   }, []);
 
 
