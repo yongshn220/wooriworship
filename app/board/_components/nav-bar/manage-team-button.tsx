@@ -15,6 +15,7 @@ import {userUpdaterAtom} from "@/global-states/userState";
 import {useRouter} from "next/navigation";
 import {getPathBoard} from "@/components/helper/routes";
 import {SettingsIcon} from "lucide-react";
+import { InvitationService } from "@/apis";
 
 const members = [
   {email: "banaba212@gmail.com", role: "Leader"},
@@ -30,8 +31,13 @@ export function ManageTeamButton() {
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
   const router = useRouter()
 
-  function handleAddPeople() {
-    // Todo: firebase
+  async function handleAddPeople() {
+    const senderId = "nvu1LW6DElOGWDjLs0KVCZQ6Rll2"
+      const senderEmail = "hvandhl88@gmail.com"
+      const teamName = "TestTeam123"
+      const receiverEmail = "yongshn220@gmail.com"
+      await InvitationService.createInvitation(senderId, senderEmail, currentTeamId, teamName, receiverEmail);
+      console.log("email sent!!!");
   }
 
   async function handleDeleteTeam() {

@@ -4,9 +4,10 @@ import {useState} from "react";
 import {Song} from "@/models/song";
 import {WorshipForm} from "@/app/board/[teamId]/plan/_components/worship-form";
 import {FormMode} from "@/components/constants/enums";
-import {useSetRecoilState} from "recoil";
+import {useRecoilValue, useSetRecoilState} from "recoil";
 import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {Button} from "@/components/ui/button";
+import {currentTeamIdAtom} from "@/global-states/teamState";
 
 export interface WorshipInfo {
   title: string
@@ -22,6 +23,7 @@ export interface SongInfo {
 
 export function NewWorshipButton() {
   const [isOpen, setIsOpen] = useState(false)
+  const teamId = useRecoilValue(currentTeamIdAtom)
   const setSelectedSongInfoList = useSetRecoilState(selectedSongInfoListAtom)
 
   function handleClick() {
@@ -32,7 +34,7 @@ export function NewWorshipButton() {
   return (
     <>
       <WorshipForm mode={FormMode.CREATE} isOpen={isOpen} setIsOpen={setIsOpen} worship={null}/>
-      <Button className="bg-purple-500 hover:bg-purple-400" onClick={handleClick}>
+      <Button disabled={!teamId} className="bg-purple-500 hover:bg-purple-400" onClick={handleClick}>
         + Add Worship
       </Button>
     </>

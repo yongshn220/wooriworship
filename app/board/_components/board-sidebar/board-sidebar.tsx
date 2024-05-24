@@ -8,7 +8,7 @@ import {MainLogoRouter} from "@/components/logo/main-logo";
 import {MdSidebar} from "@/components/sidebar/md-sidebar";
 import {useRecoilValue} from "recoil";
 import {currentPageAtom} from "@/app/board/_states/board-states";
-import {getPathPlan, getPathSong} from "@/components/helper/routes";
+import {getPathPlan, getPathSong, getPathWorship} from "@/components/helper/routes";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {ManageTeamButton} from "@/app/board/_components/nav-bar/manage-team-button";
 
@@ -19,18 +19,18 @@ export function BoardSidebar() {
 
   return (
     <MdSidebar>
-      <MainLogoRouter route={getPathPlan(currentTeamId)}/>
+      <MainLogoRouter route={""}/>
       <div className="flex-between flex-col w-full h-full">
         <div className="space-y-2 ">
           <TeamSelect/>
-          <Button variant={(currentPage === Page.PLAN)? "secondary" : "ghost"} asChild size="lg" className="font-normal w-full justify-start px-2">
-            <Link href={getPathPlan(currentTeamId)}>
+          <Button disabled={!currentTeamId} variant={(currentPage === Page.PLAN)? "secondary" : "ghost"} size="lg" className="font-normal w-full justify-start px-2">
+            <Link href={getPathPlan(currentTeamId)} className="flex">
               <LayoutDashboard className="h-4 w-4 mr-2"/>
               Worship Plan
             </Link>
           </Button>
-          <Button variant={(currentPage === Page.SONG)? "secondary" : "ghost"} asChild size="lg" className="font-normal w-full justify-start px-2">
-            <Link href={getPathSong(currentTeamId)}>
+          <Button disabled={!currentTeamId} variant={(currentPage === Page.SONG)? "secondary" : "ghost"} size="lg" className="font-normal w-full justify-start px-2">
+            <Link href={getPathSong(currentTeamId)} className="flex">
               <LibraryBig className="h-4 w-4 mr-2"/>
               Song Board
             </Link>
