@@ -1,20 +1,16 @@
 "use client"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import MenuIcon from "@/public/icons/menuIcon.svg";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
 import {getPathPlan, getPathWorshipEdit} from "@/components/helper/routes";
-import {useRecoilValue} from "recoil";
+import {useRecoilValue, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import { WorshipService } from "@/apis";
 import {CopyIcon, LinkIcon, SquarePen, Trash2Icon} from "lucide-react";
+import {currentTeamWorshipIdsAtom, worshipIdsUpdaterAtom} from "@/global-states/worship-state";
+import {toast} from "@/components/ui/use-toast";
 
 
 interface Props {
@@ -23,6 +19,8 @@ interface Props {
 }
 export function MenuButton({title, worshipId}: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
+  const setCurrentWorshipIds = useSetRecoilState(currentTeamWorshipIdsAtom)
+
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
 
@@ -32,7 +30,15 @@ export function MenuButton({title, worshipId}: Props) {
 
   async function handleDeleteWorship() {
     try {
-      await WorshipService.deleteWorship(worshipId);
+      WorshipService.deleteWorship(worshipId).then(isSuccess => {
+        if (isSuccess) {
+          setCurrentWorshipIds(prev => prev.filter(_id => _id !== worshipId))
+          toast({title: `[${title}] is deleted successfully.`})
+        }
+        else {
+          toast({title: "Something went wrong. Please try again later."})
+        }
+      })
       return true
     }
     catch {

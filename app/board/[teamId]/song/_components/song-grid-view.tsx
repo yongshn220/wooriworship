@@ -2,7 +2,7 @@
 
 import {useRecoilValueLoadable} from "recoil";
 import {SongGridItem} from "@/app/board/[teamId]/song/_components/song-grid-item";
-import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
+import {currentTeamSongIdsAtom} from "@/global-states/song-state";
 
 export function SongGridView() {
   const songIdsLoadable = useRecoilValueLoadable(currentTeamSongIdsAtom)

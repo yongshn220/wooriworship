@@ -18,6 +18,7 @@ export default function SongEditPage({params}: any) {
   }
 
   return (
-    <SongForm mode={FormMode.EDIT} isOpen={true} setIsOpen={onOpenChangeHandler} songId={songId}/>
+    <div>test</div>
+    // <SongForm mode={FormMode.EDIT} isOpen={true} setIsOpen={onOpenChangeHandler} songId={songId}/>
   )
 }

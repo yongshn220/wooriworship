@@ -19,7 +19,7 @@ import {FormMode} from "@/components/constants/enums";
 import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
 import {auth} from "@/firebase";
-import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
+import {currentTeamSongIdsAtom} from "@/global-states/song-state";
 import {songAtom, songUpdaterAtom} from "@/global-states/song-state";
 
 interface Props {

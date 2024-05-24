@@ -4,6 +4,7 @@ import "./globals.css";
 import {Provider} from "@/components/provider/provider";
 import {Suspense} from "react";
 import {Toaster} from "@/components/ui/toaster";
+import {ErrorPage} from "@/app/_components/error-page";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,9 +20,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <main className="relative h-full">
           <Provider>
             <Toaster />
-            <Suspense fallback={<div>loading</div>}>
-              {children}
-            </Suspense>
+            {children}
           </Provider>
         </main>
       </body>

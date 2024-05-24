@@ -1,8 +1,9 @@
 import {WorshipCard} from "@/app/board/[teamId]/plan/_components/worship-card";
-import {toPlainObject} from "@/components/helper/helper-functions";
 import {NewWorshipButton} from "@/app/board/[teamId]/plan/_components/new-worship-button";
 import {useRecoilValueLoadable} from "recoil";
-import {currentTeamWorshipIdsAtom} from "@/app/board/[teamId]/plan/_states/worship-plan-states";
+import Image from "next/image";
+import * as React from "react";
+import {currentTeamWorshipIdsAtom} from "@/global-states/worship-state";
 
 
 export function WorshipCardList() {
@@ -13,11 +14,28 @@ export function WorshipCardList() {
     case 'hasError': throw worshipIdsLoadable.contents
     case 'hasValue':
       return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10">
+        <div className="w-full h-full">
           {
-            worshipIdsLoadable.contents.map((worshipId: string) => (
-              <WorshipCard key={worshipId} worshipId={worshipId}/>
-            ))
+            (worshipIdsLoadable.contents?.length > 0) ?
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10 mt-10">
+              {
+                worshipIdsLoadable.contents.map((worshipId: string) => (
+                  <WorshipCard key={worshipId} worshipId={worshipId}/>
+                ))
+              }
+            </div>
+              :
+            <div className="w-full h-full flex-center flex-col gap-3">
+              <Image
+                alt="compose music image"
+                src="/illustration/offRoadIllustration.svg"
+                width={300}
+                height={300}
+              />
+              <p className="text-3xl font-semibold">Worship Plan is empty</p>
+              <p className="text-gray-500">Click &ldquo;Add Worship&rdquo; button to get started</p>
+              <NewWorshipButton/>
+            </div>
           }
         </div>
       )

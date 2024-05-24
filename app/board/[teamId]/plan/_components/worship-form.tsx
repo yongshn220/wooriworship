@@ -9,7 +9,7 @@ import {Textarea} from "@/components/ui/textarea";
 import {useEffect, useState} from "react";
 import {DatePicker} from "@/app/board/[teamId]/plan/_components/date-picker";
 import {NewSongCard} from "@/app/board/[teamId]/plan/_components/new-song-card";
-import {useRecoilState, useRecoilValue} from "recoil";
+import {useRecoilState, useRecoilValue, useResetRecoilState, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {useToast} from "@/components/ui/use-toast";
 import {AddSongButton} from "@/app/board/[teamId]/plan/_components/add-song-button";
@@ -22,6 +22,7 @@ import {timestampToDate} from "@/components/helper/helper-functions";
 import {useRouter} from "next/navigation";
 import {getPathWorship} from "@/components/helper/routes";
 import {auth} from "@/firebase";
+import {worshipAtom, worshipIdsUpdaterAtom, worshipUpdaterAtom} from "@/global-states/worship-state";
 
 export interface WorshipInfo {
   title: string
@@ -44,6 +45,7 @@ interface Props {
 
 export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
   const authUser = auth.currentUser
+  const setWorshipIdsUpdater = useSetRecoilState(worshipIdsUpdaterAtom)
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtom(teamId))
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
@@ -113,6 +115,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
         setIsOpen(false)
         setIsLoading(false)
 
+        setWorshipIdsUpdater(prev => prev + 1)
         router.push(getPathWorship(teamId, worshipId))
       })
     }
@@ -133,7 +136,6 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
     try {
       const worshipInput = getWorshipInput()
 
-      // Todo: firestore
       WorshipService.updateWorship(authUser?.uid, teamId, worshipInput).then(() => {
         toast({
           title: `Worship successfully updated.`,
@@ -141,6 +143,9 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
         })
         setIsOpen(false)
         setIsLoading(false)
+
+        setWorshipIdsUpdater(prev => prev + 1)
+        router.push(getPathWorship(teamId, worship?.id))
       })
     }
     catch (e) {

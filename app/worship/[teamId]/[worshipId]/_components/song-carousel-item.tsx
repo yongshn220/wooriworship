@@ -38,7 +38,7 @@ export function SongCarouselItem({songHeader}: Props) {
                 <div className="w-full h-full flex-center flex-col">
                   <Image
                     alt="compose music image"
-                    src="/noImage.svg"
+                    src="/illustration/noImage.svg"
                     width={300}
                     height={300}
                   />

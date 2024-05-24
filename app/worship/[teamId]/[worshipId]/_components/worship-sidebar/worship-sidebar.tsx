@@ -35,7 +35,7 @@ export function WorshipSidebar({teamId, worshipId}: Props) {
         <div className="w-full flex-start flex-col gap-4 pt-5">
           <Image
             alt="compose music image"
-            src="/composeMusic.svg"
+            src="/illustration/composeMusic.svg"
             width={80}
             height={80}
           />

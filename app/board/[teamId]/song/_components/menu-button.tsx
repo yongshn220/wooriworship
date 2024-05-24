@@ -7,16 +7,16 @@ import {useRouter} from "next/navigation";
 import {getPathSong, getPathSongEdit} from "@/components/helper/routes";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import {SongService, WorshipService} from "@/apis";
+import {SongService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
-import {currentTeamSongIdsAtom} from "@/app/board/[teamId]/song/_states/song-board-states";
 import {CopyIcon, SquarePen, Trash2Icon, LinkIcon, DownloadIcon} from "lucide-react";
-
+import {currentTeamSongIdsAtom} from "@/global-states/song-state";
 
 interface Props {
   songTitle: string
   songId: string
 }
+
 export function MenuButton({songTitle, songId}: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom)
@@ -29,12 +29,15 @@ export function MenuButton({songTitle, songId}: Props) {
 
   async function handleDeleteSong() {
     try {
-      if (await SongService.deleteSong(songId) === false) {
-        toast({title: "Fail to delete song", description: "Something went wrong. Please try again later."})
-      }
-
-      setCurrentTeamSongIds((prev) => prev.filter(_id => _id !== songId))
-      toast({title: "Song deleted successfully", description: ""})
+      SongService.deleteSong(songId).then((isSuccess) => {
+        if (isSuccess) {
+          setCurrentTeamSongIds((prev) => prev.filter(_id => _id !== songId))
+          toast({title: "Song deleted successfully", description: ""})
+        }
+        else {
+          toast({title: "Fail to delete song", description: "Something went wrong. Please try again later."})
+        }
+      })
     }
     catch (e) {
       console.log(e)
