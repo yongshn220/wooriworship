@@ -135,18 +135,12 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
 
     try {
       const worshipInput = getWorshipInput()
-      if(worship?.id) {
-        await WorshipService.updateWorship(authUser?.uid, worship.id, worshipInput);
-        toast({
-          title: `Worship successfully updated.`,
-          description: team?.name,
-        })
-      } else {
-        toast({
-          title: `There is an error with current Worship`,
-          description: team?.name,
-        })
-      }
+
+      if (!worship?.id) toast({title: `There is an error with current Worship`, description: team?.name})
+
+      await WorshipService.updateWorship(authUser?.uid, worship?.id, worshipInput);
+      toast({title: `Worship successfully updated.`, description: team?.name})
+
       setIsOpen(false)
       setIsLoading(false)
 
@@ -155,6 +149,10 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
     }
     catch (e) {
       console.log("err", e)
+      toast({
+        title: `Something went wrong. Please try again later.`,
+        description: team?.name,
+      })
     }
     finally {
       setIsOpen(false)
