@@ -53,7 +53,10 @@ export function ProfileButton() {
           <Button variant="ghost" className="w-full flex-start gap-2" onClick={() => setIsInvitationDialogOpen(true)}>
             <MailIcon className="w-[20px] h-[20px]"/>
             <p>Invitations</p>
-            <div className="rounded-full bg-red-500 w-5 h-5 text-white">{invitations?.length?? 0}</div>
+            {
+              invitations?.length > 0 &&
+              <div className="rounded-full bg-red-500 w-5 h-5 text-white">{invitations?.length}</div>
+            }
           </Button>
           <Button variant="ghost" className="w-full flex-start gap-2">
             <SettingsIcon className="w-[20px] h-[20px]"/>
