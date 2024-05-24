@@ -28,7 +28,7 @@ export function TeamSelect() {
   }
 
   return (
-    <Select value={currentTeamId.toString()} onValueChange={(teamId) => handleChangeTeam(teamId)}>
+    <Select value={currentTeamId?.toString()} onValueChange={(teamId) => handleChangeTeam(teamId)}>
       <SelectTrigger className="w-full mb-4">
         <SelectValue placeholder="Select a Team" />
       </SelectTrigger>
