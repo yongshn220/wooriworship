@@ -9,10 +9,10 @@ export default function PlanPage({params}: any) {
   const teamId = params.teamId
 
   return (
-    <div>
+    <div className="w-full h-full flex flex-col">
       <PageInit teamId={teamId} page={Page.PLAN}/>
-      <div className="flex-between mb-4">
-        <p className="text-2xl font-semibold pb-4">
+      <div className="flex-between">
+        <p className="text-2xl font-semibold">
           Worship Plan
         </p>
       </div>

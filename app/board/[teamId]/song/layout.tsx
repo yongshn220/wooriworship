@@ -10,7 +10,7 @@ export default async function SongLayout({params, children}: any) {
       {children}
       <PageInit teamId={teamId} page={Page.SONG}/>
       <div className="w-full h-full flex flex-col items-center">
-        <div className="flex-between w-full m-4">
+        <div className="flex-between w-full">
           <p className="text-2xl font-semibold">
             Songs
           </p>

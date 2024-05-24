@@ -29,7 +29,7 @@ export function LandingPage() {
         <div className="w-full max-w-3xl flex-start flex-col sm:flex-row mt-10 gap-20">
           <Image
             alt="compose music image"
-            src="/composeMusic.svg"
+            src="/illustration/composeMusic.svg"
             width={300}
             height={300}
             className="mt-8"

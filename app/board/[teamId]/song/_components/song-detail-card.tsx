@@ -1,24 +1,11 @@
 'use client'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogContentNoCloseButton,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import {Dialog, DialogContentNoCloseButton, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Badge} from "@/components/ui/badge";
 import {Song} from "@/models/song";
 import Image from "next/image"
-import {Button} from "@/components/ui/button";
-import Link from "next/link";
-import {useRecoilValue} from "recoil";
-import {currentTeamIdAtom} from "@/global-states/teamState";
-import {getPathSongEdit} from "@/components/helper/routes";
-import {DeleteSongButton} from "@/app/board/[teamId]/song/_components/delete-song-button";
-import {isMobile, OpenYoutubeLink, timestampToDatePassedFromNow} from "@/components/helper/helper-functions";
+import {OpenYoutubeLink, timestampToDatePassedFromNow} from "@/components/helper/helper-functions";
 import {MenuButton} from "@/app/board/[teamId]/song/_components/menu-button";
 
 interface Props {
@@ -29,7 +16,6 @@ interface Props {
 }
 
 export function SongDetailCard({isOpen, setIsOpen, song, readOnly=false}: Props) {
-  const teamId = useRecoilValue(currentTeamIdAtom)
 
   function handleLinkButtonClick() {
     if (song?.original?.url) {
@@ -123,15 +109,6 @@ export function SongDetailCard({isOpen, setIsOpen, song, readOnly=false}: Props)
           </div>
           <div className="w-full flex-center">
           </div>
-          {
-            !readOnly &&
-            <DialogFooter className="mt-10">
-              <DeleteSongButton songTitle={song?.title} songId={song?.id}/>
-              <Link href={getPathSongEdit(teamId, song.id)}>
-                <Button variant="ghost" className="text-black hover:bg-gray-200">Edit</Button>
-              </Link>
-            </DialogFooter>
-          }
         </div>
       </DialogContentNoCloseButton>
     </Dialog>
