@@ -128,25 +128,30 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
     }
   }
 
-  function handleEdit() {
+  async function handleEdit() {
     setIsLoading(true)
 
     if (!isSessionValid()) return false
 
     try {
       const worshipInput = getWorshipInput()
-
-      WorshipService.updateWorship(authUser?.uid, teamId, worshipInput).then(() => {
+      if(worship?.id) {
+        await WorshipService.updateWorship(authUser?.uid, worship.id, worshipInput);
         toast({
           title: `Worship successfully updated.`,
           description: team?.name,
         })
-        setIsOpen(false)
-        setIsLoading(false)
+      } else {
+        toast({
+          title: `There is an error with current Worship`,
+          description: team?.name,
+        })
+      }
+      setIsOpen(false)
+      setIsLoading(false)
 
-        setWorshipIdsUpdater(prev => prev + 1)
-        router.push(getPathWorship(teamId, worship?.id))
-      })
+      setWorshipIdsUpdater(prev => prev + 1)
+      router.push(getPathWorship(teamId, worship?.id))
     }
     catch (e) {
       console.log("err", e)
