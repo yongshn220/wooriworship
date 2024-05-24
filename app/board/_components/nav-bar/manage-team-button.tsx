@@ -54,7 +54,7 @@ export function ManageTeamButton() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full">
+        <Button disabled={!currentTeamId} variant="outline" className="w-full">
           <SettingsIcon className="h-4 w-4 mr-2"/>
           <p>Manage Team</p>
         </Button>

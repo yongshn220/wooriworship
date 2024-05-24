@@ -6,17 +6,20 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {TeamIcon} from "@/components/team-icon";
 import {ReactNode, useState} from "react";
-import {toast, useToast} from "@/components/ui/use-toast";
+import {toast} from "@/components/ui/use-toast";
 import { TeamService, UserService } from '@/apis';
 import {auth} from "@/firebase";
 import {useSetRecoilState} from "recoil";
 import {userUpdaterAtom} from "@/global-states/userState";
+import {useRouter} from "next/navigation";
+import {getPathPlan} from "@/components/helper/routes";
 
 
 export function CreateNewTeamDialog({children}: {children: ReactNode}) {
   const authUser = auth.currentUser
   const setUserUpdater = useSetRecoilState(userUpdaterAtom)
   const [teamName, setTeamName] = useState("New Team")
+  const router = useRouter()
 
   if (!authUser) return <></>
 
@@ -25,12 +28,19 @@ export function CreateNewTeamDialog({children}: {children: ReactNode}) {
     if (authUser) {
       try {
         const teamId = await TeamService.addNewTeam(authUser.uid, teamName);
-        await UserService.addNewTeam(authUser.uid, teamId);
-        setUserUpdater(prev => prev + 1)
-        toast({
-          title: "New team created!",
-          description: `${teamName}`,
-        })
+        UserService.addNewTeam(authUser.uid, teamId).then(teamId => {
+          if (!teamId) {
+            toast({title: "Oops, fail to create team. Please try again later.",})
+          }
+          else {
+            setUserUpdater(prev => prev + 1)
+            toast({
+              title: "Congrats! New team has created.",
+              description: `${teamName}`,
+            })
+            router.push(getPathPlan(teamId))
+          }
+        });
       }
       catch(err) {
         console.log(err);

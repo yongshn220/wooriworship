@@ -5,7 +5,7 @@ import TeamService from "@/apis/TeamService";
 
 export const currentTeamIdAtom = atom<string>({
   key: "currentTeamIdAtom",
-  default: ""
+  default: null
 })
 
 export const teamAtom = atomFamily<Team, string>({

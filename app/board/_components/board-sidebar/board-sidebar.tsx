@@ -11,11 +11,13 @@ import {currentPageAtom} from "@/app/board/_states/board-states";
 import {getPathPlan, getPathSong, getPathWorship} from "@/components/helper/routes";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {ManageTeamButton} from "@/app/board/_components/nav-bar/manage-team-button";
+import {useRouter} from "next/navigation";
 
 
 export function BoardSidebar() {
   const currentPage = useRecoilValue(currentPageAtom)
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
+  const router = useRouter()
 
   return (
     <MdSidebar>
@@ -23,17 +25,13 @@ export function BoardSidebar() {
       <div className="flex-between flex-col w-full h-full">
         <div className="space-y-2 ">
           <TeamSelect/>
-          <Button disabled={!currentTeamId} variant={(currentPage === Page.PLAN)? "secondary" : "ghost"} size="lg" className="font-normal w-full justify-start px-2">
-            <Link href={getPathPlan(currentTeamId)} className="flex">
-              <LayoutDashboard className="h-4 w-4 mr-2"/>
-              Worship Plan
-            </Link>
+          <Button disabled={!currentTeamId} variant={(currentPage === Page.PLAN)? "secondary" : "ghost"} size="lg" className="font-normal w-full justify-start px-2" onClick={() => router.push(getPathPlan(currentTeamId))}>
+            <LayoutDashboard className="h-4 w-4 mr-2"/>
+            Worship Plan
           </Button>
-          <Button disabled={!currentTeamId} variant={(currentPage === Page.SONG)? "secondary" : "ghost"} size="lg" className="font-normal w-full justify-start px-2">
-            <Link href={getPathSong(currentTeamId)} className="flex">
-              <LibraryBig className="h-4 w-4 mr-2"/>
-              Song Board
-            </Link>
+          <Button disabled={!currentTeamId} variant={(currentPage === Page.SONG)? "secondary" : "ghost"} size="lg" className="font-normal w-full justify-start px-2" onClick={() => router.push(getPathSong(currentTeamId))}>
+            <LibraryBig className="h-4 w-4 mr-2"/>
+            Song Board
           </Button>
         </div>
         <div className="w-full mb-4">
