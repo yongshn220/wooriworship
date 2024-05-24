@@ -49,7 +49,6 @@ class WorshipService extends BaseService {
         },
         worship_date: Timestamp.fromDate(worshipInput.date)
     }
-    console.log(worship)
     return await this.update(worshipId, worship);
   }
 
