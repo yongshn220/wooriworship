@@ -60,6 +60,22 @@ class InvitationService extends BaseService {
         return invitations
     }
 
+    async getTeamSentInvitations(userId: string, teamId: string) {
+        const invitations = await this.getByFilters([
+            {
+                a: 'sender_id',
+                b: '==',
+                c: userId
+            },
+            {
+                a: 'team_id',
+                b: '==',
+                c: teamId
+            }
+        ])
+        return invitations
+    }
+
     async updateInvitation(invitationId: string, invitation_status: InvitationStatus) {
         return await this.update(invitationId, {
             invitation_status: invitation_status,

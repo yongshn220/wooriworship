@@ -5,39 +5,44 @@ import {TeamIcon} from "@/components/team-icon";
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import Image from 'next/image'
-import {RoleSelect} from "@/app/board/_components/nav-bar/role-select";
 import {Input} from "@/components/ui/input";
-import {useCallback, useState} from "react";
+import {useState} from "react";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {userUpdaterAtom} from "@/global-states/userState";
 import {useRouter} from "next/navigation";
-import {getPathBoard} from "@/components/helper/routes";
 import {SettingsIcon} from "lucide-react";
 import { InvitationService } from "@/apis";
-
-const members = [
-  {email: "banaba212@gmail.com", role: "Leader"},
-  {email: "baaba212@gmail.com", role: "Member"},
-  {email: "banaba2ddf12@gmail.com", role: "Member"},
-]
+import {auth} from "@/firebase";
+import {PendingMember} from "@/app/board/_components/nav-bar/pending-member";
+import {Separator} from "@/components/ui/separator";
+import {InvitedMember} from "@/app/board/_components/nav-bar/invited-member";
+import {toast} from "@/components/ui/use-toast";
+import {sentInvitationsAtom, sentInvitationsUpdaterAtom} from "@/global-states/invitation-state";
 
 export function ManageTeamButton() {
+  const authUser = auth.currentUser
   const setUserUpdater = useSetRecoilState(userUpdaterAtom)
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtom(currentTeamId))
-  const [email, setEmail] = useState("")
+  const sentInvitations = useRecoilValue(sentInvitationsAtom({userId: authUser?.uid, teamId:team?.id}))
+  const setSentInvitationsUpdater = useSetRecoilState(sentInvitationsUpdaterAtom)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
+  const [receiverEmail, setReceiverEmail] = useState("")
   const router = useRouter()
 
+
   async function handleAddPeople() {
-    const senderId = "nvu1LW6DElOGWDjLs0KVCZQ6Rll2"
-      const senderEmail = "hvandhl88@gmail.com"
-      const teamName = "TestTeam123"
-      const receiverEmail = "yongshn220@gmail.com"
-      await InvitationService.createInvitation(senderId, senderEmail, currentTeamId, teamName, receiverEmail);
-      console.log("email sent!!!");
+    InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, receiverEmail).then(invitationId => {
+      if (!invitationId) {
+        toast({title: "Can't send invitation", description: "The following user set up a restriction on team invitation or email."})
+      }
+      else {
+        toast({title: "Successfully sent the invitation.", description: `Invitation email has sent to ${receiverEmail}`})
+        setSentInvitationsUpdater(prev => prev + 1)
+      }
+    });
   }
 
   async function handleDeleteTeam() {
@@ -69,45 +74,51 @@ export function ManageTeamButton() {
         </div>
         <div className="w-full flex-start flex-col items-center gap-1.5">
           <Label htmlFor="name" className="text-xl sm:text-base">
-            Members
+            Invited Members ({team?.users.length})
           </Label>
           <div className="w-full divide-y divide-gray-300">
             {
-              members.map((member) => (
-                <div key={member.email} className="w-full flex-start flex-col sm:flex-row sm:items-center gap-4 py-4">
-                  <div className="flex-1 flex-between gap-2">
-                    <div className="flex gap-2">
-                      <Image alt="mail icon" src="/icons/userIcon.svg" width={20} height={20}/>
-                      <p className="flex-1">
-                        {member.email}
-                      </p>
-                    </div>
-                    <p className="text-sm text-right mr-12 text-gray-500">pending</p>
-                  </div>
-                  <div className="w-full sm:w-[160px]">
-                    <RoleSelect/>
-                  </div>
-                  <p className="w-full sm:w-auto text-sm text-gray-500 text-right cursor-pointer">remove</p>
-                </div>
+              team?.users?.map((userId) => (
+                <InvitedMember key={userId} userId={userId}/>
+              ))
+            }
+          </div>
+          <Label htmlFor="name" className="text-xl sm:text-base mt-4">
+            Pending Members ({sentInvitations?.length})
+          </Label>
+          {
+            sentInvitations?.length === 0 &&
+            <div className="w-full flex-center text-sm text-gray-500">No invitations</div>
+          }
+          <div className="w-full divide-y divide-gray-300">
+            {
+              sentInvitations?.map((invitation) => (
+                <PendingMember key={invitation?.id} invitation={invitation}/>
               ))
             }
           </div>
           <div className="w-full flex gap-4 mt-4">
             <Image alt="mail icon" src="/icons/mailIcon.svg" width={25} height={25}/>
-            <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+            <Input placeholder="Email" value={receiverEmail} onChange={(e) => setReceiverEmail(e.target.value)}/>
             <Button onClick={handleAddPeople}>Add People</Button>
           </div>
         </div>
-        <DialogFooter className="mt-10">
-          <DeleteConfirmationDialog
-            isOpen={isOpenDeleteDialog}
-            setOpen={setIsOpenDeleteDialog}
-            title="Delete Team"
-            description={`Do you really want to delete [${team?.name}]? This action cannot be undone.`}
-            onDeleteHandler={handleDeleteTeam}
-            callback={onDeleteTeamCompleteCallback}
-          />
-          <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-500" onClick={handleDeleteTeam}>Delete Team</Button>
+        <DialogFooter className="w-full mt-10">
+          <div className="w-full flex flex-col">
+            <DeleteConfirmationDialog
+              isOpen={isOpenDeleteDialog}
+              setOpen={setIsOpenDeleteDialog}
+              title="Delete Team"
+              description={`Do you really want to delete [${team?.name}]? This action cannot be undone.`}
+              onDeleteHandler={handleDeleteTeam}
+              callback={onDeleteTeamCompleteCallback}
+            />
+            <Separator className="my-4"/>
+            <div className="w-full flex-end">
+              <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-500" onClick={handleDeleteTeam}>Delete Team</Button>
+              <Button variant="outline" className="" onClick={handleDeleteTeam}>Leave Team</Button>
+            </div>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
