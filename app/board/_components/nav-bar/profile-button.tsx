@@ -58,7 +58,7 @@ export function ProfileButton() {
               <div className="rounded-full bg-red-500 w-5 h-5 text-white">{invitations?.length}</div>
             }
           </Button>
-          <Button variant="ghost" className="w-full flex-start gap-2">
+          <Button disabled={true} variant="ghost" className="w-full flex-start gap-2">
             <SettingsIcon className="w-[20px] h-[20px]"/>
             <p>Account Setting</p>
           </Button>
