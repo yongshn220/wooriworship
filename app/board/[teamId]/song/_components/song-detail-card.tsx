@@ -16,7 +16,6 @@ interface Props {
 }
 
 export function SongDetailCard({isOpen, setIsOpen, song, readOnly=false}: Props) {
-
   function handleLinkButtonClick() {
     if (song?.original?.url) {
       OpenYoutubeLink(song.original.url)
