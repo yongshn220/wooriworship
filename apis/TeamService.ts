@@ -1,5 +1,6 @@
 import { BaseService } from ".";
 import { Team } from "@/models/team";
+import {arrayUnion} from "@firebase/firestore";
 
 class TeamService extends BaseService {
     constructor() {
@@ -15,6 +16,16 @@ class TeamService extends BaseService {
             users: [userId]
         }
         return await this.create(team);
+    }
+
+    async addNewMember(userId: string, teamId: string) {
+        if (userId && teamId) {
+            await this.update(teamId, {users: arrayUnion(userId)});
+            return teamId;
+        } else {
+            console.log("there is an error.")
+            return null;
+        }
     }
 }
 export default new TeamService();

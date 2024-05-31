@@ -8,6 +8,9 @@ import {teamAtom} from "@/global-states/teamState";
 import {useRecoilValue} from "recoil";
 import {timestampToDateString} from "@/components/helper/helper-functions";
 import {toast} from "@/components/ui/use-toast";
+import { InvitationService, TeamService, UserService } from "@/apis";
+import { InvitationStatus } from "@/components/constants/enums";
+import { auth } from "@/firebase";
 
 
 interface Props {
@@ -16,11 +19,30 @@ interface Props {
 
 export function InvitationCard({invitation}: Props) {
   const team = useRecoilValue(teamAtom(invitation?.team_id))
+  const user = auth.currentUser
 
   async function handleAccept() {
+    try {
+      invitation.invitation_status = InvitationStatus.Accepted;
+      const promises = [InvitationService.updateInvitation(invitation.id, InvitationStatus.Accepted),
+        UserService.addNewTeam(user.uid, team.id),
+        TeamService.addNewMember(user.uid, team.id)
+      ];
+      await Promise.all(promises);
+      //handle after success
+    } catch (err) {
+      console.log("error: "+err);
+    }
   }
 
   async function handleDecline() {
+    try {
+      await InvitationService.updateInvitation(invitation.id, InvitationStatus.Reject);
+      invitation.invitation_status = InvitationStatus.Reject
+      //handle after success
+    } catch (err) {
+      console.log("error: "+err);
+    }
   }
 
   return (
