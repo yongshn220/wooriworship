@@ -10,8 +10,6 @@ import {useState} from "react";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {userUpdaterAtom} from "@/global-states/userState";
-import {useRouter} from "next/navigation";
 import {SettingsIcon} from "lucide-react";
 import { InvitationService } from "@/apis";
 import {auth} from "@/firebase";
@@ -23,14 +21,12 @@ import {sentInvitationsAtom, sentInvitationsUpdaterAtom} from "@/global-states/i
 
 export function ManageTeamButton() {
   const authUser = auth.currentUser
-  const setUserUpdater = useSetRecoilState(userUpdaterAtom)
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtom(currentTeamId))
   const sentInvitations = useRecoilValue(sentInvitationsAtom({userId: authUser?.uid, teamId:team?.id}))
   const setSentInvitationsUpdater = useSetRecoilState(sentInvitationsUpdaterAtom)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
   const [receiverEmail, setReceiverEmail] = useState("")
-  const router = useRouter()
 
 
   async function handleAddPeople() {
@@ -52,15 +48,13 @@ export function ManageTeamButton() {
 
   function onDeleteTeamCompleteCallback() {
     setIsOpenDeleteDialog(false)
-    // setUserUpdater(prev => prev + 1)
-    // router.replace(getPathBoard())
   }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button disabled={!currentTeamId} variant="outline" className="w-full">
-          <SettingsIcon className="h-4 w-4 mr-2"/>
+        <Button disabled={!currentTeamId} variant="ghost" className="w-full flex-start gap-2">
+          <SettingsIcon className="w-[20px] h-[20px]"/>
           <p>Manage Team</p>
         </Button>
       </DialogTrigger>

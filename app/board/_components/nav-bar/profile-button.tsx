@@ -6,21 +6,16 @@ import {MainLogo} from "@/components/logo/main-logo";
 import {useRouter} from "next/navigation";
 import { AuthService } from "@/apis"
 import {toast} from "@/components/ui/use-toast";
-import {useRecoilValue, useSetRecoilState} from "recoil";
+import {useRecoilValue} from "recoil";
 import {userAtom} from "@/global-states/userState";
 import {auth} from "@/firebase";
 import {Separator} from "@/components/ui/separator";
-import {MailIcon, SettingsIcon} from "lucide-react";
-import {InvitationDialog} from "@/app/board/_components/nav-bar/invitation-dialog";
-import {Suspense, useState} from "react";
-import {pendingReceivedInvitationsAtom} from "@/global-states/invitation-state";
-import {invitationDialogStateAtom} from "@/global-states/dialog-state";
+import {SettingsIcon} from "lucide-react";
+import {InvitationButton} from "@/app/board/_components/nav-bar/invitation-button";
 
 export function ProfileButton() {
   const authUser = auth.currentUser
   const user = useRecoilValue(userAtom(authUser?.uid))
-  const invitations = useRecoilValue(pendingReceivedInvitationsAtom(authUser?.email))
-  const setInvitationDialogState = useSetRecoilState(invitationDialogStateAtom)
   const router = useRouter()
 
   async function handleSignOut() {
@@ -48,14 +43,7 @@ export function ProfileButton() {
       <SheetContent className="flex-start flex-col pt-10 space-y-2 w-[320px]">
         <MainLogo/>
         <div className="flex-1 flex flex-col w-full gap-1">
-          <Button variant="ghost" className="w-full flex-start gap-2" onClick={() => setInvitationDialogState(true)}>
-            <MailIcon className="w-[20px] h-[20px]"/>
-            <p>Invitations</p>
-            {
-              invitations?.length > 0 &&
-              <div className="rounded-full bg-red-500 w-5 h-5 text-white">{invitations?.length}</div>
-            }
-          </Button>
+          <InvitationButton/>
           <Button disabled={true} variant="ghost" className="w-full flex-start gap-2">
             <SettingsIcon className="w-[20px] h-[20px]"/>
             <p>Account Setting</p>
