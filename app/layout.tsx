@@ -19,7 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
     <head>
       <title>Wooriworship | Worship team collaborator</title>
-      <link rel="icon" href="/public/favicon.png"/>
+      <link rel="icon" href="/favicon.png"/>
     </head>
     <body className={inter.className}>
     <main className="relative h-full">
