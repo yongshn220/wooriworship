@@ -18,7 +18,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
     <head>
-      <title>Wooriworship | Collaborate with team</title>
+      <title>Wooriworship | Worship team collaborator</title>
       <link rel="icon" href="/image/logo.png"/>
     </head>
     <body className={inter.className}>

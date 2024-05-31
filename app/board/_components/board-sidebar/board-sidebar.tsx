@@ -1,5 +1,4 @@
 "use client"
-import Link from 'next/link'
 import {Button} from "@/components/ui/button";
 import {LayoutDashboard, LibraryBig} from 'lucide-react';
 import {Page} from "@/components/constants/enums";
@@ -8,13 +7,15 @@ import {MainLogoRouter} from "@/components/logo/main-logo";
 import {MdSidebar} from "@/components/sidebar/md-sidebar";
 import {useRecoilValue} from "recoil";
 import {currentPageAtom} from "@/app/board/_states/board-states";
-import {getPathPlan, getPathSong, getPathWorship} from "@/components/helper/routes";
+import {getPathPlan, getPathSong} from "@/components/helper/routes";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {ManageTeamButton} from "@/app/board/_components/nav-bar/manage-team-button";
 import {useRouter} from "next/navigation";
-
+import {InvitationButton} from "@/app/board/_components/nav-bar/invitation-button";
+import {auth} from "@/firebase";
 
 export function BoardSidebar() {
+  const authUser = auth.currentUser
   const currentPage = useRecoilValue(currentPageAtom)
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
   const router = useRouter()
@@ -35,6 +36,7 @@ export function BoardSidebar() {
           </Button>
         </div>
         <div className="w-full mb-4">
+          <InvitationButton/>
           <ManageTeamButton/>
         </div>
       </div>
