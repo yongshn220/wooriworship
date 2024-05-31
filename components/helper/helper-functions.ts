@@ -17,6 +17,24 @@ export function timestampToDateString(timestamp: Timestamp) {
   return `${year}-${month}-${day}`
 }
 
+export function timestampToDateStringFormatted(timestamp: Timestamp) {
+  if (!timestamp) return "Undefined"
+
+  const jsDate = new Date(timestamp.seconds * 1000); // Explicitly type firestoreTimestamp.seconds as a number
+
+  // Define month names
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  // Extract year, month, and day from the date
+  const year = jsDate.getFullYear();
+  const monthIndex = jsDate.getMonth();
+  const day = jsDate.getDate();
+
+  // Format the date string
+  return `${monthNames[monthIndex]} ${day}, ${year}`;
+}
+
 export function timestampToDatePassedFromNow(timestamp: Timestamp) {
   const jsDate = new Date(timestamp.seconds * 1000); // Convert Firestore timestamp to JavaScript Date
   const now = new Date();

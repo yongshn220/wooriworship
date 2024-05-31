@@ -37,7 +37,9 @@ export const pendingReceivedInvitationsAtom = atomFamily<Array<Invitation>, stri
   key: "pendingReceivedInvitationsAtom",
   default: selectorFamily({
     key: "pendingReceivedInvitationsAtom/default",
-    get: (receiverEmail: string) => async () => {
+    get: (receiverEmail: string) => async ({get}) => {
+      get(pendingReceivedInvitationsUpdaterAtom)
+
       if (!receiverEmail) return []
 
       try {
@@ -52,6 +54,11 @@ export const pendingReceivedInvitationsAtom = atomFamily<Array<Invitation>, stri
       }
     }
   })
+})
+
+export const pendingReceivedInvitationsUpdaterAtom = atom({
+  key: "pendingReceivedInvitationsUpdaterAtom",
+  default: 0
 })
 
 

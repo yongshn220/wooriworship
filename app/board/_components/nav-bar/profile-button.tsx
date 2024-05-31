@@ -6,7 +6,7 @@ import {MainLogo} from "@/components/logo/main-logo";
 import {useRouter} from "next/navigation";
 import { AuthService } from "@/apis"
 import {toast} from "@/components/ui/use-toast";
-import {useRecoilValue} from "recoil";
+import {useRecoilValue, useSetRecoilState} from "recoil";
 import {userAtom} from "@/global-states/userState";
 import {auth} from "@/firebase";
 import {Separator} from "@/components/ui/separator";
@@ -14,12 +14,13 @@ import {MailIcon, SettingsIcon} from "lucide-react";
 import {InvitationDialog} from "@/app/board/_components/nav-bar/invitation-dialog";
 import {Suspense, useState} from "react";
 import {pendingReceivedInvitationsAtom} from "@/global-states/invitation-state";
+import {invitationDialogStateAtom} from "@/global-states/dialog-state";
 
 export function ProfileButton() {
   const authUser = auth.currentUser
   const user = useRecoilValue(userAtom(authUser?.uid))
   const invitations = useRecoilValue(pendingReceivedInvitationsAtom(authUser?.email))
-  const [isInvitationDialogOpen, setIsInvitationDialogOpen] = useState(false)
+  const setInvitationDialogState = useSetRecoilState(invitationDialogStateAtom)
   const router = useRouter()
 
   async function handleSignOut() {
@@ -47,10 +48,7 @@ export function ProfileButton() {
       <SheetContent className="flex-start flex-col pt-10 space-y-2 w-[320px]">
         <MainLogo/>
         <div className="flex-1 flex flex-col w-full gap-1">
-          <Suspense fallback={<></>}>
-            <InvitationDialog isOpen={isInvitationDialogOpen} setIsOpen={setIsInvitationDialogOpen}/>
-          </Suspense>
-          <Button variant="ghost" className="w-full flex-start gap-2" onClick={() => setIsInvitationDialogOpen(true)}>
+          <Button variant="ghost" className="w-full flex-start gap-2" onClick={() => setInvitationDialogState(true)}>
             <MailIcon className="w-[20px] h-[20px]"/>
             <p>Invitations</p>
             {

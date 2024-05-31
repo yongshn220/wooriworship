@@ -12,7 +12,9 @@ export const teamAtom = atomFamily<Team, string>({
   key: "teamAtom",
   default: selectorFamily({
     key: "teamAtom/default",
-    get: (teamId) => async () => {
+    get: (teamId) => async ({get}) => {
+      get(teamUpdaterAtom)
+
       try {
         if (!teamId) return null
 
@@ -27,4 +29,9 @@ export const teamAtom = atomFamily<Team, string>({
       }
     }
   })
+})
+
+export const teamUpdaterAtom = atom({
+  key: "teamUpdaterAtom",
+  default: 0
 })

@@ -22,7 +22,8 @@ class TeamService extends BaseService {
         if (userId && teamId) {
             await this.update(teamId, {users: arrayUnion(userId)});
             return teamId;
-        } else {
+        }
+        else {
             console.log("there is an error.")
             return null;
         }
