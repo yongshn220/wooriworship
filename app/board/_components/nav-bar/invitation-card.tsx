@@ -23,7 +23,7 @@ export function InvitationCard({invitation}: Props) {
 
   async function handleAccept() {
     try {
-      invitation.invitation_status = InvitationStatus.Accepted;
+      //invitation.invitation_status = InvitationStatus.Accepted;
       const promises = [InvitationService.updateInvitation(invitation.id, InvitationStatus.Accepted),
         UserService.addNewTeam(user.uid, team.id),
         TeamService.addNewMember(user.uid, team.id)
@@ -38,7 +38,7 @@ export function InvitationCard({invitation}: Props) {
   async function handleDecline() {
     try {
       await InvitationService.updateInvitation(invitation.id, InvitationStatus.Reject);
-      invitation.invitation_status = InvitationStatus.Reject
+      //invitation.invitation_status = InvitationStatus.Reject
       //handle after success
     } catch (err) {
       console.log("error: "+err);
