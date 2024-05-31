@@ -4,13 +4,15 @@ import Image from "next/image";
 import {Button} from "@/components/ui/button";
 import * as React from "react";
 import {Invitation} from "@/models/invitation";
-import {teamAtom} from "@/global-states/teamState";
-import {useRecoilValue} from "recoil";
-import {timestampToDateString} from "@/components/helper/helper-functions";
+import {teamAtom, teamUpdaterAtom} from "@/global-states/teamState";
+import {useRecoilValue, useSetRecoilState} from "recoil";
+import {timestampToDateString, timestampToDateStringFormatted} from "@/components/helper/helper-functions";
 import {toast} from "@/components/ui/use-toast";
 import { InvitationService, TeamService, UserService } from "@/apis";
 import { InvitationStatus } from "@/components/constants/enums";
 import { auth } from "@/firebase";
+import {userAtom, userUpdaterAtom} from "@/global-states/userState";
+import {pendingReceivedInvitationsUpdaterAtom} from "@/global-states/invitation-state";
 
 
 interface Props {
@@ -18,30 +20,48 @@ interface Props {
 }
 
 export function InvitationCard({invitation}: Props) {
-  const team = useRecoilValue(teamAtom(invitation?.team_id))
   const user = auth.currentUser
+  const sender = useRecoilValue(userAtom(invitation?.sender_id))
+  const team = useRecoilValue(teamAtom(invitation?.team_id))
+  const setUserUpdater = useSetRecoilState(userUpdaterAtom)
+  const setInvitationsUpdater = useSetRecoilState(pendingReceivedInvitationsUpdaterAtom)
+  const setTeamUpdater = useSetRecoilState(teamUpdaterAtom)
 
   async function handleAccept() {
     try {
-      invitation.invitation_status = InvitationStatus.Accepted;
-      const promises = [InvitationService.updateInvitation(invitation.id, InvitationStatus.Accepted),
+      const promises = [
+        InvitationService.updateInvitation(invitation.id, InvitationStatus.Accepted),
         UserService.addNewTeam(user.uid, team.id),
         TeamService.addNewMember(user.uid, team.id)
       ];
-      await Promise.all(promises);
-      //handle after success
-    } catch (err) {
-      console.log("error: "+err);
+      const [invitationUpdateResult, addNewTeamResult, addNewMemberResult] = await Promise.all(promises);
+
+      if (!addNewTeamResult || !addNewMemberResult) {
+        console.log("err: InvitationCard-handleAccept")
+        toast({title:"Failed to accept the team. Please try later again."})
+      }
+      else {
+        toast({title: `You have successfully joined [${team.name}]`})
+      }
+      setUserUpdater(prev => prev + 1)
+      setInvitationsUpdater(prev => prev + 1)
+      setTeamUpdater(prev => prev + 1)
+    }
+    catch (err) {
+      console.log("err: ", err);
+      toast({title: "Oops, Something went wrong."})
     }
   }
 
   async function handleDecline() {
     try {
-      await InvitationService.updateInvitation(invitation.id, InvitationStatus.Reject);
-      invitation.invitation_status = InvitationStatus.Reject
-      //handle after success
-    } catch (err) {
+      const result = await InvitationService.updateInvitation(invitation.id, InvitationStatus.Reject);
+      toast({title: `You declined invitation from [${team.name}]`})
+      setInvitationsUpdater(prev => prev + 1)
+    }
+    catch (err) {
       console.log("error: "+err);
+      toast({title: "Oops, Something went wrong."})
     }
   }
 
@@ -61,11 +81,14 @@ export function InvitationCard({invitation}: Props) {
         <div className="w-full h-full flex flex-col pl-8">
           <div className="flex-1 flex flex-col gap-2">
             <p className="w-full flex-start text-2xl font-semibold">{team?.name}</p>
-            <p className="w-full flex-start text-sm text-gray-200">{timestampToDateString(invitation?.invite_date)}</p>
+            <p className="w-full flex-start text-sm text-gray-200">From {sender?.email}</p>
           </div>
           <div className="w-full flex-end gap-2">
+            <div className="w-full flex-start">
+              <p className="text-xs text-gray-200 border p-1 rounded-sm">{timestampToDateStringFormatted(invitation?.invite_date)}</p>
+            </div>
             <Button variant="ghost" onClick={handleDecline} className="hover:bg-white/20 hover:text-white">Decline</Button>
-            <Button onClick={handleAccept} className="hover:bg-purple-900">Accept</Button>
+            <Button onClick={handleAccept} className="hover:bg-purple-900">Join Team</Button>
           </div>
         </div>
       </div>

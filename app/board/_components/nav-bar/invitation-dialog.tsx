@@ -1,12 +1,15 @@
 "use client"
 
-import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import * as React from "react";
 import {InvitationCard} from "@/app/board/_components/nav-bar/invitation-card";
 import {auth} from "@/firebase";
 import {Invitation} from "@/models/invitation";
 import {useRecoilValue} from "recoil";
 import {pendingReceivedInvitationsAtom} from "@/global-states/invitation-state";
+import {Suspense} from "react";
+import Image from "next/image";
+import {Separator} from "@/components/ui/separator";
 
 interface Props {
   isOpen: boolean
@@ -20,11 +23,21 @@ export function InvitationDialog({isOpen, setIsOpen}: Props) {
     <Dialog open={isOpen} onOpenChange={(isOpen) => setIsOpen(isOpen)}>
       <DialogContent className="sm:max-w-[700px] flex flex-col h-2/3 overflow-y-scroll scrollbar-hide">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Invitations</DialogTitle>
+          <DialogTitle className="text-2xl">Team Invitations</DialogTitle>
+          <DialogDescription>You received invitations from the following teams. Join now!</DialogDescription>
+          <Separator/>
         </DialogHeader>
         {
+          invitations.length === 0 &&
+          <div className="h-full flex-center flex-col">
+            <p className="text-gray-500">No pending invitations</p>
+          </div>
+        }
+        {
           invitations?.map((invitation: Invitation) => (
-            <InvitationCard key={invitation.id} invitation={invitation}/>
+            <Suspense key={invitation.id} fallback={<></>}>
+              <InvitationCard invitation={invitation}/>
+            </Suspense>
           ))
         }
       </DialogContent>
