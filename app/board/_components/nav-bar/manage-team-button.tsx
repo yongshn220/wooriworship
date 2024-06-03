@@ -13,13 +13,14 @@ import {useRecoilValue, useSetRecoilState} from "recoil";
 import {userUpdaterAtom} from "@/global-states/userState";
 import {useRouter} from "next/navigation";
 import {SettingsIcon} from "lucide-react";
-import { InvitationService } from "@/apis";
+import { InvitationService, TeamService } from "@/apis";
 import {auth} from "@/firebase";
 import {PendingMember} from "@/app/board/_components/nav-bar/pending-member";
 import {Separator} from "@/components/ui/separator";
 import {InvitedMember} from "@/app/board/_components/nav-bar/invited-member";
 import {toast} from "@/components/ui/use-toast";
 import {sentInvitationsAtom, sentInvitationsUpdaterAtom} from "@/global-states/invitation-state";
+import { emailExists } from "@/components/helper/helper-functions";
 
 export function ManageTeamButton() {
   const authUser = auth.currentUser
@@ -34,6 +35,15 @@ export function ManageTeamButton() {
 
 
   async function handleAddPeople() {
+    if (emailExists(sentInvitations.map((x) => x.receiver_email), receiverEmail)) {
+      toast({title: "Invitation Already sent", description:"Invitation already sent to the given email"});
+      return;
+    } else if (receiverEmail == authUser?.email) {
+      toast({title: "Nice Try.", description:"You can't send an invitation to yourself."});
+      return;
+    }
+    //team.users 에 이메일 받아야함.
+    
     InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, receiverEmail).then(invitationId => {
       if (!invitationId) {
         toast({title: "Can't send invitation", description: "The following user set up a restriction on team invitation or email."})
@@ -46,8 +56,20 @@ export function ManageTeamButton() {
   }
 
   async function handleDeleteTeam() {
-    setIsOpenDeleteDialog(true)
     // Todo: firebase
+    await TeamService.deleteTeam(team);
+  }
+
+  function openConfirmation() {
+    setIsOpenDeleteDialog(true)
+  }
+
+  async function handleLeaveTeam() {
+    if (team.leaders.includes(authUser.uid)) {
+      toast({title: "Please don't leave", description: 'You are the leader of this team'})
+      return;
+    }
+    await TeamService.removeMember(authUser.uid, team.id);
   }
 
   function onDeleteTeamCompleteCallback() {
@@ -115,8 +137,8 @@ export function ManageTeamButton() {
             />
             <Separator className="my-4"/>
             <div className="w-full flex-end">
-              <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-500" onClick={handleDeleteTeam}>Delete Team</Button>
-              <Button variant="outline" className="" onClick={handleDeleteTeam}>Leave Team</Button>
+              <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-500" onClick={openConfirmation}>Delete Team</Button>
+              <Button variant="outline" className="" onClick={handleLeaveTeam}>Leave Team</Button>
             </div>
           </div>
         </DialogFooter>

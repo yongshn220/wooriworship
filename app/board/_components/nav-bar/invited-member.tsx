@@ -2,6 +2,7 @@ import Image from "next/image";
 import {RoleSelect} from "@/app/board/_components/nav-bar/role-select";
 import {useRecoilValue} from "recoil";
 import {userAtom} from "@/global-states/userState";
+import { TeamService } from "@/apis";
 
 interface Props {
   userId: string
@@ -9,6 +10,12 @@ interface Props {
 
 export function InvitedMember({userId}: Props) {
   const user = useRecoilValue(userAtom(userId))
+
+  async function handleRemoveMember(userId:string) {
+    //todo: frontend -> bring the current team id
+    const teamId = "";
+    await TeamService.removeMember(userId, teamId);
+  }
 
   return (
     <div className="w-full flex-start flex-col sm:flex-row sm:items-center gap-4 py-4">
@@ -23,7 +30,7 @@ export function InvitedMember({userId}: Props) {
       <div className="w-full sm:w-[160px]">
         <RoleSelect/>
       </div>
-      <p className="w-full sm:w-auto text-sm text-gray-500 text-right cursor-pointer">remove</p>
+      <p className="w-full sm:w-auto text-sm text-gray-500 text-right cursor-pointer" onClick={() => handleRemoveMember(user?.id)}>remove</p>
     </div>
   )
 }
