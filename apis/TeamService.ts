@@ -28,10 +28,12 @@ class TeamService extends BaseService {
         }
     }
 
-    async removeMember(userId: string, teamId: string) {
+    async removeMember(userId: string, teamId: string, singleSide: Boolean) {
         if(userId && teamId) {
             const promises = [];
-            promises.push(UserService.leaveTeam(userId, teamId));
+            if(!singleSide) {
+                promises.push(UserService.leaveTeam(userId, teamId, true));
+            }
             promises.push(this.update(teamId, {users: arrayRemove(userId)}));
             await Promise.all(promises);
             return userId;
@@ -44,7 +46,7 @@ class TeamService extends BaseService {
     async deleteTeam(team:Team) {
         const promises:any = [];
         for(const user of team.users) {
-            promises.push(UserService.leaveTeam(user, team.id));
+            promises.push(UserService.leaveTeam(user, team.id, true));
         }
         promises.push(this.delete(team.id));
         await Promise.all(promises);
