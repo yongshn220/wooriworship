@@ -42,7 +42,13 @@ class TeamService extends BaseService {
     }
 
     async deleteTeam(team:Team) {
-        console.log(team);
+        const promises:any = [];
+        for(const user of team.users) {
+            promises.push(UserService.leaveTeam(user, team.id));
+        }
+        promises.push(this.delete(team.id));
+        await Promise.all(promises);
+        return true;
     }
 }
 export default new TeamService();
