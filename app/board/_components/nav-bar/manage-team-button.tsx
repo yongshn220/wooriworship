@@ -56,8 +56,17 @@ export function ManageTeamButton() {
   }
 
   async function handleDeleteTeam() {
-    // Todo: firebase
-    await TeamService.deleteTeam(team);
+    if (team.leaders.includes(authUser.uid)) {
+      try {
+        await TeamService.deleteTeam(team);
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      toast({title: "You are not the leader.", description: `Only Leader can delete team.`})
+    }
+    // Todo: frontend -> Handle after deletion
+    
   }
 
   function openConfirmation() {
