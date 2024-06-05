@@ -78,7 +78,7 @@ export function ManageTeamButton() {
       toast({title: "Please don't leave", description: 'You are the leader of this team'})
       return;
     }
-    await TeamService.removeMember(authUser.uid, team.id);
+    await TeamService.removeMember(authUser.uid, team.id, false);
   }
 
   function onDeleteTeamCompleteCallback() {

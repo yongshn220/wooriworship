@@ -14,7 +14,7 @@ export function InvitedMember({userId}: Props) {
   async function handleRemoveMember(userId:string) {
     //todo: frontend -> bring the current team id
     const teamId = "";
-    await TeamService.removeMember(userId, teamId);
+    await TeamService.removeMember(userId, teamId, false);
   }
 
   return (
