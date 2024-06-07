@@ -7,6 +7,8 @@ import {Song} from "@/models/song";
 import Image from "next/image"
 import {OpenYoutubeLink, timestampToDatePassedFromNow} from "@/components/helper/helper-functions";
 import {MenuButton} from "@/app/board/[teamId]/song/_components/menu-button";
+import {SongMusicSheetViewer} from "@/app/board/[teamId]/song/_components/song-music-sheet-viewer";
+import {useState} from "react";
 
 interface Props {
   isOpen: boolean
@@ -16,14 +18,21 @@ interface Props {
 }
 
 export function SongDetailCard({isOpen, setIsOpen, song, readOnly=false}: Props) {
+  const [isMusicSheetViewOpen, setMusicSheetViewOpen] = useState(false)
+
   function handleLinkButtonClick() {
     if (song?.original?.url) {
       OpenYoutubeLink(song.original.url)
     }
   }
 
+  function handleMusicSheetClick() {
+    setMusicSheetViewOpen(true)
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
+      <SongMusicSheetViewer isOpen={isMusicSheetViewOpen} setIsOpen={setMusicSheetViewOpen} musicSheetUrls={song?.music_sheet_urls}/>
       <DialogContentNoCloseButton className="sm:max-w-[600px] h-5/6">
         <div className="w-full h-full overflow-y-scroll scrollbar-hide">
           <DialogHeader>
@@ -87,8 +96,7 @@ export function SongDetailCard({isOpen, setIsOpen, song, readOnly=false}: Props)
                   <div className="flex-start w-full h-full gap-4 overflow-x-auto">
                     {
                       song.music_sheet_urls.map((url: string, i: number) => (
-                        <div key={i}
-                             className="flex flex-col h-full aspect-[3/4] pb-1 border-2 rounded-lg hover:border-gray-300 cursor-pointer">
+                        <div key={i} className="flex flex-col h-full aspect-[3/4] pb-1 border-2 rounded-lg hover:border-gray-300 cursor-pointer" onClick={handleMusicSheetClick}>
                           <div className="relative flex-1">
                             <Image
                               src={url}
