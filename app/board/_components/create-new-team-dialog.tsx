@@ -35,7 +35,7 @@ export function CreateNewTeamDialog({children}: {children: ReactNode}) {
           else {
             setUserUpdater(prev => prev + 1)
             toast({
-              title: "Congrats! New team has created.",
+              title: "Congratulation! New team has created.",
               description: `${teamName}`,
             })
             router.push(getPathPlan(teamId))

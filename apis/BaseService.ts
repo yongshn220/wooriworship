@@ -102,7 +102,13 @@ export default class BaseService {
     }
 
     async delete(id: string) {
-        await firestore.collection(this.collectionName).doc(id).delete();
+        try {
+            await firestore.collection(this.collectionName).doc(id).delete();
+            return true
+        }
+        catch (e) {
+            return false
+        }
     }
 }
 

@@ -77,10 +77,15 @@ class InvitationService extends BaseService {
     }
 
     async updateInvitation(invitationId: string, invitation_status: InvitationStatus) {
-        return await this.update(invitationId, {
-            invitation_status: invitation_status,
-            response_date: new Date()
-        })
+        try {
+            await this.update(invitationId, {
+                invitation_status: invitation_status,
+                response_date: new Date()
+            });
+            return true
+        } catch (err) {
+            return false
+        }
     }
 }
 

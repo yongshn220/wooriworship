@@ -55,7 +55,11 @@ export function InvitationCard({invitation}: Props) {
 
   async function handleDecline() {
     try {
-      const result = await InvitationService.updateInvitation(invitation.id, InvitationStatus.Reject);
+      const result = await InvitationService.updateInvitation(invitation.id, InvitationStatus.Rejected);
+      if (!result) {
+        toast({title: `Fail to declined the invitation. Please try later again.`}); return;
+      }
+
       toast({title: `You declined invitation from [${team.name}]`})
       setInvitationsUpdater(prev => prev + 1)
     }

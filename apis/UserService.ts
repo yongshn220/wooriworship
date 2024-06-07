@@ -1,6 +1,7 @@
 import BaseService from "./BaseService"
 import { User } from "@/models/user";
-import {arrayUnion} from "@firebase/firestore";
+import {arrayUnion, arrayRemove} from "@firebase/firestore";
+import { TeamService } from ".";
 
 class UserService extends BaseService {
     constructor() {
@@ -32,6 +33,19 @@ class UserService extends BaseService {
 
     async updateInviteOptin(userId: string, inviteOptin: Boolean) {
         this.update(userId, {invite_optin: inviteOptin})
+    }
+
+    async leaveTeam(userId: string, teamId: string, singleSide: Boolean) {
+        if (userId && teamId){
+            if (!singleSide) {
+                await TeamService.removeMember(userId, teamId, true);
+            }
+            await this.update(userId, {teams: arrayRemove(teamId)});
+            return teamId;
+        } else {
+            console.log("user id or team id is missing");
+            return false;
+        }
     }
 }
 export default new UserService();

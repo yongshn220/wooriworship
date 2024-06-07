@@ -8,16 +8,20 @@ import Image from 'next/image'
 import {Input} from "@/components/ui/input";
 import {useState} from "react";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
-import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
+import {currentTeamIdAtom, teamAtom, teamUpdaterAtom} from "@/global-states/teamState";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {SettingsIcon} from "lucide-react";
-import { InvitationService } from "@/apis";
+import { InvitationService, TeamService } from "@/apis";
 import {auth} from "@/firebase";
 import {PendingMember} from "@/app/board/_components/nav-bar/pending-member";
 import {Separator} from "@/components/ui/separator";
 import {InvitedMember} from "@/app/board/_components/nav-bar/invited-member";
 import {toast} from "@/components/ui/use-toast";
 import {sentInvitationsAtom, sentInvitationsUpdaterAtom} from "@/global-states/invitation-state";
+import { emailExists } from "@/components/helper/helper-functions";
+import {useRouter} from "next/navigation";
+import {userUpdaterAtom} from "@/global-states/userState";
+import {InvitationStatus} from "@/components/constants/enums";
 
 export function ManageTeamButton() {
   const authUser = auth.currentUser
@@ -25,11 +29,26 @@ export function ManageTeamButton() {
   const team = useRecoilValue(teamAtom(currentTeamId))
   const sentInvitations = useRecoilValue(sentInvitationsAtom({userId: authUser?.uid, teamId:team?.id}))
   const setSentInvitationsUpdater = useSetRecoilState(sentInvitationsUpdaterAtom)
+  const setUserUpdater = useSetRecoilState(userUpdaterAtom)
+  const setTeamUpdater = useSetRecoilState(teamUpdaterAtom)
+
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
   const [receiverEmail, setReceiverEmail] = useState("")
-
+  const router = useRouter()
 
   async function handleAddPeople() {
+    if (emailExists(sentInvitations.map((x) => x.receiver_email), receiverEmail)) {
+      toast({title: "Invitation Already sent", description:"Invitation already sent to the given email"});
+      return;
+    }
+
+    if (receiverEmail == authUser?.email) {
+      toast({title: "Nice Try.", description:"You can't send an invitation to yourself."});
+      return;
+    }
+
+    //team.users 에 이메일 받아야함.
+
     InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, receiverEmail).then(invitationId => {
       if (!invitationId) {
         toast({title: "Can't send invitation", description: "The following user set up a restriction on team invitation or email."})
@@ -42,8 +61,38 @@ export function ManageTeamButton() {
   }
 
   async function handleDeleteTeam() {
-    setIsOpenDeleteDialog(true)
-    // Todo: firebase
+    try {
+      // TODO: leader 체크는 나중에 firebase rule 안에서도 검증 필요 (보안상)
+      if (!team.leaders.includes(authUser.uid))  {
+        toast({title: "No Permission", description: `Only Leader can delete team.`}); return;
+      }
+
+      if (await TeamService.deleteTeam(team) === false) {
+        console.log("err | TeamService.deleteTeam")
+        toast({title: "Something went wrong. Please try later again."})
+        return;
+      }
+
+      /* on success */
+      setUserUpdater(prev => prev + 1)
+      setTeamUpdater(prev => prev + 1)
+      toast({title: `Team [${team.name}] deleted successfully.`})
+      router.replace("/")
+
+    }
+    catch (err) {
+      console.log(err);
+      toast({title: "Something went wrong. Please try later again."})
+    }
+  }
+
+
+  async function handleLeaveTeam() {
+    if (team.leaders.includes(authUser.uid)) {
+      toast({title: "Please don't leave", description: 'You are the leader of this team'})
+      return;
+    }
+    await TeamService.removeMember(authUser.uid, team.id, false);
   }
 
   function onDeleteTeamCompleteCallback() {
@@ -73,7 +122,7 @@ export function ManageTeamButton() {
           <div className="w-full divide-y divide-gray-300">
             {
               team?.users?.map((userId) => (
-                <InvitedMember key={userId} userId={userId}/>
+                <InvitedMember key={userId} userId={userId} teamId={currentTeamId}/>
               ))
             }
           </div>
@@ -86,7 +135,7 @@ export function ManageTeamButton() {
           }
           <div className="w-full divide-y divide-gray-300">
             {
-              sentInvitations?.map((invitation) => (
+              sentInvitations.filter((invitation) => invitation.invitation_status !== InvitationStatus.Accepted)?.map((invitation) => (
                 <PendingMember key={invitation?.id} invitation={invitation}/>
               ))
             }
@@ -109,8 +158,8 @@ export function ManageTeamButton() {
             />
             <Separator className="my-4"/>
             <div className="w-full flex-end">
-              <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-500" onClick={handleDeleteTeam}>Delete Team</Button>
-              <Button variant="outline" className="" onClick={handleDeleteTeam}>Leave Team</Button>
+              <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-500" onClick={() => setIsOpenDeleteDialog(true)}>Delete Team</Button>
+              <Button variant="outline" className="" onClick={handleLeaveTeam}>Leave Team</Button>
             </div>
           </div>
         </DialogFooter>

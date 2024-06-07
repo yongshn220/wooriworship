@@ -34,7 +34,7 @@ export enum FormMode {
 
 export enum InvitationStatus {
   Pending = 0,
-  Reject = 1,
+  Rejected = 1,
   Accepted = 2
 }
 

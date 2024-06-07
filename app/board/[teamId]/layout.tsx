@@ -1,17 +1,22 @@
 "use client"
 
-import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate";
+import React from "react";
 import {TeamIdValidation} from "@/app/board/_components/auth/teamid-validation";
 
 
-export default function WorshipInitLayout({params, children}: any) {
+interface Props {
+  params: any,
+  children: any
+}
+
+export default function BoardTeamLayout({params, children}: Props) {
   const teamId = params.teamId
 
   return (
-    <BoardAuthenticate>
+    <div>
       <TeamIdValidation teamId={teamId}>
         {children}
       </TeamIdValidation>
-    </BoardAuthenticate>
+    </div>
   )
 }
