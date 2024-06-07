@@ -112,3 +112,10 @@ export function OpenYoutubeLink(url: string) {
     }
   }
 }
+
+export function emailExists(emails: Array<string>, targetEmail:string) {
+  if (emails.map((x) => x.toLowerCase().trim()).includes(targetEmail.toLowerCase().trim())) {
+    return true;
+  }
+  return false;
+}

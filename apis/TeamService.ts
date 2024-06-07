@@ -1,6 +1,6 @@
-import { BaseService } from ".";
+import { BaseService, UserService } from ".";
 import { Team } from "@/models/team";
-import {arrayUnion} from "@firebase/firestore";
+import {arrayUnion, arrayRemove} from "@firebase/firestore";
 
 class TeamService extends BaseService {
     constructor() {
@@ -26,6 +26,37 @@ class TeamService extends BaseService {
         else {
             console.log("there is an error.")
             return null;
+        }
+    }
+
+    async removeMember(userId: string, teamId: string, singleSide: Boolean) {
+        if(userId && teamId) {
+            const promises = [];
+            if(!singleSide) {
+                promises.push(UserService.leaveTeam(userId, teamId, true));
+            }
+            promises.push(this.update(teamId, {users: arrayRemove(userId)}));
+            await Promise.all(promises);
+            return userId;
+        } else {
+            console.log("user id or team id is missing");
+            return false;
+        }
+    }
+
+    async deleteTeam(team:Team) {
+        const promises = [];
+        try {
+            for(const user of team.users) {
+                promises.push(UserService.leaveTeam(user, team.id, true));
+            }
+            promises.push(this.delete(team.id));
+            await Promise.all(promises);
+            return true;
+        }
+        catch (e) {
+            console.log (e)
+            return false;
         }
     }
 }

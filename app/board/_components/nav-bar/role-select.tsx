@@ -2,10 +2,9 @@ import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigg
 
 const roles = ["Leader", "Member"]
 
-export function RoleSelect() {
-
+export function RoleSelect({role}: any) {
   return (
-    <Select>
+    <Select disabled value={role}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Select a Role" />
       </SelectTrigger>

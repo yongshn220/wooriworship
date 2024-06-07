@@ -9,6 +9,7 @@ import {WorshipNote} from "@/app/worship/[teamId]/[worshipId]/live/_components/w
 import {worshipIndexAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {worshipSongListAtom} from "@/global-states/worship-state";
+import Image from "next/image"
 
 interface Props {
   worshipId: string
@@ -56,10 +57,24 @@ export function SongCarouselFull({worshipId}: Props) {
                         ))
                       }
                     </div>
+                    {/*<div className="relative flex-1 h-full bg-gray-50 overflow-y-scroll lg:mx-10 grid grid-cols-1">*/}
+                    {/*    {*/}
+                    {/*      song.music_sheet_urls.map((url, index) => (*/}
+                    {/*        <div key={index} className="relative flex-center w-full h-full bg-red-500 border">*/}
+                    {/*          <Image*/}
+                    {/*            alt="Music score"*/}
+                    {/*            src={url}*/}
+                    {/*            fill*/}
+                    {/*            className="h-full object-contain"*/}
+                    {/*          />*/}
+                    {/*        </div>*/}
+                    {/*      ))*/}
+                    {/*    }*/}
+                    {/*</div>*/}
                   </CardContent>
                 </Card>
               </CarouselItem>
-          ))}
+            ))}
         </CarouselContent>
       </Carousel>
     </div>
