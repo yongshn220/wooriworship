@@ -10,8 +10,9 @@ import {currentTeamIdAtom} from "@/global-states/teamState";
 import {SongService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
 import {CopyIcon, SquarePen, Trash2Icon, LinkIcon, DownloadIcon} from "lucide-react";
-import {currentTeamSongIdsAtom} from "@/global-states/song-state";
+import {currentTeamSongIdsAtom, songAtom} from "@/global-states/song-state";
 import {Button} from "@/components/ui/button";
+import {downloadByUrl} from "@/components/helper/helper-functions";
 
 interface Props {
   songTitle: string
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export function MenuButton({songTitle, songId}: Props) {
+  const song = useRecoilValue(songAtom(songId))
   const teamId = useRecoilValue(currentTeamIdAtom)
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -49,6 +51,12 @@ export function MenuButton({songTitle, songId}: Props) {
     }
   }
 
+  function handleDownloadSong() {
+    song.music_sheet_urls.forEach(url => {
+      downloadByUrl(url, song?.title)
+    })
+  }
+
   return (
     <>
       <DeleteConfirmationDialog isOpen={isDeleteDialogOpen} setOpen={setDeleteDialogOpen} title="Delete Song" description={`Do you really want to delete [${songTitle}]? This action can't be undone.`} onDeleteHandler={handleDeleteSong}/>
@@ -58,7 +66,7 @@ export function MenuButton({songTitle, songId}: Props) {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="min-w-[200px] p-2 flex-center flex-col">
           <DropdownMenuGroup className="space-y-2 w-full">
-            <Button variant="ghost" disabled className="cursor-pointer w-full flex-start pl-2" onClick={() => handleEditSong()}>
+            <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => handleDownloadSong()}>
                <DownloadIcon className="mr-3 w-5 h-5"/>
                <p>Download Score</p>
              </Button>

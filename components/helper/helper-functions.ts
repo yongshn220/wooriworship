@@ -1,4 +1,5 @@
 import {Timestamp} from "@firebase/firestore";
+import {saveAs} from "file-saver";
 
 export function toPlainObject(obj: any) {
   return JSON.parse(JSON.stringify(obj))
@@ -118,4 +119,18 @@ export function emailExists(emails: Array<string>, targetEmail:string) {
     return true;
   }
   return false;
+}
+
+
+export function downloadByUrl(url:string, title?: string) {
+  title = title?? "wooriworship_download"
+
+  const xhr = new XMLHttpRequest();
+  xhr.responseType = 'blob';
+  xhr.onload = (event) => {
+    const blob = xhr.response;
+    saveAs(blob, title)
+  };
+  xhr.open('GET', url);
+  xhr.send();
 }
