@@ -8,7 +8,7 @@ import {saveAs} from 'file-saver';
 import {useRecoilValue} from "recoil";
 import {useState} from "react";
 import {worshipSongListAtom} from "@/global-states/worship-state";
-import {downloadByUrl} from "@/components/helper/helper-functions";
+import {downloadByUrl, downloadByUrlWithDelay} from "@/components/helper/helper-functions";
 
 interface Props {
   worshipId: string
@@ -23,7 +23,7 @@ export function DownloadMusicSheetButton({worshipId}: Props) {
 
     downloadSongList.forEach((song) => {
       song.music_sheet_urls.forEach(url => {
-        downloadByUrl(url, song?.title)
+        downloadByUrlWithDelay(url, song?.title)
       })
     })
   }

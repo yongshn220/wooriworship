@@ -12,7 +12,7 @@ import {toast} from "@/components/ui/use-toast";
 import {CopyIcon, SquarePen, Trash2Icon, LinkIcon, DownloadIcon} from "lucide-react";
 import {currentTeamSongIdsAtom, songAtom} from "@/global-states/song-state";
 import {Button} from "@/components/ui/button";
-import {downloadByUrl} from "@/components/helper/helper-functions";
+import {downloadByUrl, downloadByUrlWithDelay} from "@/components/helper/helper-functions";
 
 interface Props {
   songTitle: string
@@ -53,7 +53,7 @@ export function MenuButton({songTitle, songId}: Props) {
 
   function handleDownloadSong() {
     song.music_sheet_urls.forEach(url => {
-      downloadByUrl(url, song?.title)
+      downloadByUrlWithDelay(url, song?.title)
     })
   }
 
