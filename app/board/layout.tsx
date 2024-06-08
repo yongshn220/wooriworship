@@ -5,7 +5,7 @@ import {Navbar} from "@/app/board/_components/nav-bar/nav-bar";
 import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate";
 
 
-export default function BoardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function BoardLayout({ children }: any) {
 
   return (
     <section className="h-full">

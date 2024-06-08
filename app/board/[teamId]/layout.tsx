@@ -13,7 +13,7 @@ export default function BoardTeamLayout({params, children}: Props) {
   const teamId = params.teamId
 
   return (
-    <div>
+    <div className="w-full h-full">
       <TeamIdValidation teamId={teamId}>
         {children}
       </TeamIdValidation>
