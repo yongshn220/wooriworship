@@ -161,7 +161,14 @@ export async function downloadMultipleMusicSheets(songs: Array<Song>) {
 
   // Generate the zip file and trigger download
   const blob = await zip.generateAsync({ type: 'blob' });
-  saveAs(blob, 'music_sheets.zip');
+   // Create a temporary anchor element
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'files.zip'; // Suggested filename
+    a.click();
+
+    // Cleanup
+    URL.revokeObjectURL(a.href);
 
   // const xhr = new XMLHttpRequest();
   // xhr.responseType = 'blob';
