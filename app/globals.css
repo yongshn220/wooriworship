@@ -109,3 +109,33 @@ html, body, :root {
 .blue_gradient {
   @apply bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent;
 }
+
+/* Add this custom CSS to your stylesheet */
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  top: -3px; /* offset by border width */
+  left: -3px; /* offset by border width */
+  right: -3px; /* offset by border width */
+  bottom: -3px; /* offset by border width */
+  border-radius: inherit;
+  background: linear-gradient(319deg, #ba2d0b 0%, #fe7f2d 37%, #ffbf46 100%);
+ /* Your gradient colors */
+  z-index: -1; /* Place it behind the main content */
+}
+
+.gradient-border::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background-color: white; /* or your desired background color */
+  z-index: 1; /* Place it above the gradient */
+}

@@ -24,7 +24,7 @@ export function InvitationDialog({isOpen, setIsOpen}: Props) {
       <DialogContent className="sm:max-w-[700px] flex flex-col h-2/3 overflow-y-scroll scrollbar-hide">
         <DialogHeader>
           <DialogTitle className="text-2xl">Team Invitations</DialogTitle>
-          <DialogDescription>You received invitations from the following teams. Join now!</DialogDescription>
+          <DialogDescription>You are invited from the following teams. Join now!</DialogDescription>
           <Separator/>
         </DialogHeader>
         {
