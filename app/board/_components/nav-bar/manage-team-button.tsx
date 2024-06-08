@@ -6,7 +6,7 @@ import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import Image from 'next/image'
 import {Input} from "@/components/ui/input";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {currentTeamIdAtom, teamAtom, teamUpdaterAtom} from "@/global-states/teamState";
 import {useRecoilValue, useSetRecoilState} from "recoil";
@@ -23,6 +23,7 @@ import {useRouter} from "next/navigation";
 import {userUpdaterAtom} from "@/global-states/userState";
 import {InvitationStatus} from "@/components/constants/enums";
 import {lowerCase} from "lower-case";
+import useViewportHeight from "@/components/hook/use-viewport-height";
 
 export function ManageTeamButton() {
   const authUser = auth.currentUser
@@ -34,6 +35,7 @@ export function ManageTeamButton() {
   const setTeamUpdater = useSetRecoilState(teamUpdaterAtom)
   const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
 
+  const viewportHeight = useViewportHeight();
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
   const [receiverEmail, setReceiverEmail] = useState("")
   const router = useRouter()
@@ -120,7 +122,7 @@ export function ManageTeamButton() {
           <p>Manage Team</p>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px] overflow-y-scroll scrollbar-hide">
+      <DialogContent className="sm:max-w-[600px] overflow-y-scroll scrollbar-hide top-0 translate-y-0 mt-[50px]" style={{ maxHeight: `${viewportHeight - 100}px` }}>
         <DialogHeader>
           <DialogTitle className="text-2xl">Manage Team</DialogTitle>
         </DialogHeader>
