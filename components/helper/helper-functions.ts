@@ -1,5 +1,8 @@
 import {Timestamp} from "@firebase/firestore";
+import JSZip from 'jszip';
 import {saveAs} from "file-saver";
+import {Song} from "@/models/song";
+
 
 export function toPlainObject(obj: any) {
   return JSON.parse(JSON.stringify(obj))
@@ -122,20 +125,50 @@ export function emailExists(emails: Array<string>, targetEmail:string) {
 }
 
 
-export function downloadByUrl(url: string, title?: string) {
-  title = title?? "wooriworship_download"
+function extractFileType(imageUrl: string) {
+  let fileName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
 
-  const xhr = new XMLHttpRequest();
-  xhr.responseType = 'blob';
-  xhr.onload = (event) => {
-    const blob = xhr.response;
-    saveAs(blob, title)
-  };
-  xhr.open('GET', url);
-  xhr.send();
+  // Remove extra strings after '?' if they exist
+  const queryIndex = fileName.indexOf('?');
+  if (queryIndex !== -1) {
+    fileName = fileName.substring(0, queryIndex);
+  }
+
+  // Get the file extension from the file name
+  return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+
 }
 
-export async function downloadByUrlWithDelay(url: string, title?: string) {
-  await downloadByUrl(url, title);
-  await new Promise(resolve => setTimeout(resolve, 500)); // 1 second delay
+async function fetchImageAsBlob (url: string) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch image from ${url}`);
+  }
+  return response.blob();
+}
+
+
+export async function downloadMultipleMusicSheets(songs: Array<Song>) {
+  const zip = new JSZip();
+
+  // Add files to the zip
+  for (const song of songs) {
+    for (const url of song.music_sheet_urls) {
+      const blob = await fetchImageAsBlob(url);
+      zip.file(`${song?.title}.${extractFileType(url)}`, blob)
+    }
+  }
+
+  // Generate the zip file and trigger download
+  const blob = await zip.generateAsync({ type: 'blob' });
+  saveAs(blob, 'music_sheets.zip');
+
+  // const xhr = new XMLHttpRequest();
+  // xhr.responseType = 'blob';
+  // xhr.onload = (event) => {
+  //   const blob = xhr.response;
+  //   saveAs(blob, title)
+  // };
+  // xhr.open('GET', url);
+  // xhr.send();
 }
