@@ -22,6 +22,7 @@ import { emailExists } from "@/components/helper/helper-functions";
 import {useRouter} from "next/navigation";
 import {userUpdaterAtom} from "@/global-states/userState";
 import {InvitationStatus} from "@/components/constants/enums";
+import {lowerCase} from "lower-case";
 
 export function ManageTeamButton() {
   const authUser = auth.currentUser
@@ -31,6 +32,7 @@ export function ManageTeamButton() {
   const setSentInvitationsUpdater = useSetRecoilState(sentInvitationsUpdaterAtom)
   const setUserUpdater = useSetRecoilState(userUpdaterAtom)
   const setTeamUpdater = useSetRecoilState(teamUpdaterAtom)
+  const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
 
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
   const [receiverEmail, setReceiverEmail] = useState("")
@@ -49,7 +51,7 @@ export function ManageTeamButton() {
 
     //team.users 에 이메일 받아야함.
 
-    InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, receiverEmail).then(invitationId => {
+    InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, lowerCase(receiverEmail)).then(invitationId => {
       if (!invitationId) {
         toast({title: "Can't send invitation", description: "The following user set up a restriction on team invitation or email."})
       }
@@ -76,6 +78,8 @@ export function ManageTeamButton() {
       /* on success */
       setUserUpdater(prev => prev + 1)
       setTeamUpdater(prev => prev + 1)
+      setCurrentTeamId(null)
+
       toast({title: `Team [${team.name}] deleted successfully.`})
       router.replace("/")
 
@@ -89,10 +93,19 @@ export function ManageTeamButton() {
 
   async function handleLeaveTeam() {
     if (team.leaders.includes(authUser.uid)) {
-      toast({title: "Please don't leave", description: 'You are the leader of this team'})
+      toast({title: "You can't leave the team.", description: 'You are the only leader of this team. Please grant new leader and try again.'})
       return;
     }
-    await TeamService.removeMember(authUser.uid, team.id, false);
+    if (await TeamService.removeMember(authUser.uid, team.id, false) === false) {
+      toast({title: "Something went wrong.", description: "Please contact us."})
+    }
+
+    /* on success */
+    setUserUpdater(prev => prev + 1)
+    setTeamUpdater(prev => prev + 1)
+    setCurrentTeamId(null)
+    toast({title: `You leave the team [${team.name}] successfully.`})
+    router.replace("/")
   }
 
   function onDeleteTeamCompleteCallback() {

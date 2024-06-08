@@ -1,6 +1,7 @@
 import { InvitationStatus } from "@/components/constants/enums";
 import { BaseService } from ".";
 import EmailService from "./EmailService";
+import {lowerCase} from "lower-case";
 
 class InvitationService extends BaseService {
     constructor() {

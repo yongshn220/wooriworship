@@ -12,14 +12,13 @@ import {currentTeamIdAtom} from "@/global-states/teamState";
 import {ManageTeamButton} from "@/app/board/_components/nav-bar/manage-team-button";
 import {useRouter} from "next/navigation";
 import {InvitationButton} from "@/app/board/_components/nav-bar/invitation-button";
-import {auth} from "@/firebase";
 
 export function BoardSidebar() {
-  const authUser = auth.currentUser
   const currentPage = useRecoilValue(currentPageAtom)
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
   const router = useRouter()
 
+  console.log("sidebar", currentTeamId)
   return (
     <MdSidebar>
       <MainLogoRouter route={""}/>

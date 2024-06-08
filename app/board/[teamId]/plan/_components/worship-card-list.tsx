@@ -28,7 +28,7 @@ export function WorshipCardList() {
             <div className="w-full h-full flex-center flex-col gap-3">
               <Image
                 alt="compose music image"
-                src="/illustration/offRoadIllustration.svg"
+                src="/illustration/teamworkIllustration.svg"
                 width={300}
                 height={300}
               />
