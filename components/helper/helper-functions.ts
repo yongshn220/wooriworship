@@ -122,7 +122,7 @@ export function emailExists(emails: Array<string>, targetEmail:string) {
 }
 
 
-export function downloadByUrl(url:string, title?: string) {
+export function downloadByUrl(url: string, title?: string) {
   title = title?? "wooriworship_download"
 
   const xhr = new XMLHttpRequest();
@@ -133,4 +133,9 @@ export function downloadByUrl(url:string, title?: string) {
   };
   xhr.open('GET', url);
   xhr.send();
+}
+
+export async function downloadByUrlWithDelay(url: string, title?: string) {
+  await downloadByUrl(url, title);
+  await new Promise(resolve => setTimeout(resolve, 500)); // 1 second delay
 }
