@@ -21,6 +21,7 @@ import {getPathSongDetail} from "@/components/helper/routes";
 import {auth} from "@/firebase";
 import {currentTeamSongIdsAtom} from "@/global-states/song-state";
 import {songAtom, songUpdaterAtom} from "@/global-states/song-state";
+import useViewportHeight from "@/components/hook/use-viewport-height";
 
 interface Props {
   mode: FormMode
@@ -64,7 +65,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   })
   const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [viewportHeight, setViewportHeight] = useState( 0);
+  const viewportHeight = useViewportHeight();
   const { toast } = useToast()
   const router = useRouter()
 
@@ -73,18 +74,6 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     if (_musicSheets)
       setMusicSheets(_musicSheets)
   }, [song?.music_sheet_urls])
-
-  useEffect(() => {
-    setViewportHeight(window.visualViewport.height);
-
-    const handleResize = () => {
-      setViewportHeight(window?.visualViewport?.height);
-    };
-
-    window?.visualViewport?.addEventListener('resize', handleResize);
-    return () => window?.visualViewport?.removeEventListener('resize', handleResize);
-  }, []);
-
 
   function createValidCheck() {
     if (!authUser?.uid) {
