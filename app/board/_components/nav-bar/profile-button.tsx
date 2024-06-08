@@ -32,13 +32,11 @@ export function ProfileButton() {
   return (
     <Sheet>
       <SheetTrigger>
-        <Image
-          src={"/image/profileIcon.png"}
-          alt="Logo"
-          height={35}
-          width={35}
-          className="cursor-pointer rounded-full"
-        />
+        <div className="gradient-border w-9 h-9 rounded-full flex-center">
+          <div className="bg-orange-400 w-5/6 h-5/6 z-20 rounded-full flex-center text-white">
+            {user?.email[0].toUpperCase()}
+          </div>
+        </div>
       </SheetTrigger>
       <SheetContent className="flex-start flex-col pt-10 space-y-2 w-[320px]">
         <MainLogo/>
