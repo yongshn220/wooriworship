@@ -34,7 +34,7 @@ export function BoardSidebar() {
             Song Board
           </Button>
         </div>
-        <div className="w-full mb-4">
+        <div className="w-full mb-4 space-y-2">
           <InvitationButton/>
           <ManageTeamButton/>
         </div>
