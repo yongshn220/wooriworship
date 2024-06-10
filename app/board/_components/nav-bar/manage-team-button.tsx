@@ -46,13 +46,12 @@ export function ManageTeamButton() {
       return;
     }
 
-    if (receiverEmail == authUser?.email) {
+    if (lowerCase(receiverEmail) == lowerCase(authUser?.email)) {
       toast({title: "Nice Try.", description:"You can't send an invitation to yourself."});
       return;
     }
 
     //team.users 에 이메일 받아야함.
-
     InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, lowerCase(receiverEmail)).then(invitationId => {
       if (!invitationId) {
         toast({title: "Can't send invitation", description: "The following user set up a restriction on team invitation or email."})

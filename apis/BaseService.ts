@@ -62,6 +62,16 @@ export default class BaseService {
         return result;
     }
 
+    async deleteByFilters(filters: Array<any> | null) {
+        const refs = await this.getByFilters(filters);
+        const promises = [];
+        for(const ref of refs) {
+            promises.push(this.delete(ref.id))
+        }
+        await Promise.all(promises);
+        return true;
+    }
+
     async queryByArray(filter: any) {
         if(filter) {
             const promises = [];
