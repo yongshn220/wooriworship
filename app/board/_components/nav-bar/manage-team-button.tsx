@@ -6,7 +6,7 @@ import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import Image from 'next/image'
 import {Input} from "@/components/ui/input";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {currentTeamIdAtom, teamAtom, teamUpdaterAtom} from "@/global-states/teamState";
 import {useRecoilValue, useSetRecoilState} from "recoil";
@@ -39,6 +39,8 @@ export function ManageTeamButton() {
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
   const [receiverEmail, setReceiverEmail] = useState("")
   const router = useRouter()
+
+  const pendingInvitations = useMemo(() => sentInvitations.filter((invitation) => invitation.invitation_status !== InvitationStatus.Accepted), [sentInvitations])
 
   async function handleAddPeople() {
     if (emailExists(sentInvitations.map((x) => x.receiver_email), receiverEmail)) {
@@ -142,15 +144,15 @@ export function ManageTeamButton() {
             }
           </div>
           <Label htmlFor="name" className="text-xl sm:text-base mt-4">
-            Pending Members ({sentInvitations?.length})
+            Pending Members ({pendingInvitations?.length})
           </Label>
           {
-            sentInvitations?.length === 0 &&
+            pendingInvitations?.length === 0 &&
             <div className="w-full flex-center text-sm text-gray-500">No invitations</div>
           }
           <div className="w-full divide-y divide-gray-300">
             {
-              sentInvitations.filter((invitation) => invitation.invitation_status !== InvitationStatus.Accepted)?.map((invitation) => (
+              pendingInvitations?.map((invitation) => (
                 <PendingMember key={invitation?.id} invitation={invitation}/>
               ))
             }
