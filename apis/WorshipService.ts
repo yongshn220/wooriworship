@@ -1,4 +1,4 @@
-import {BaseService} from ".";
+import {BaseService, SongService} from ".";
 import {WorshipInfo} from "@/app/board/[teamId]/plan/_components/new-worship-button";
 import {Timestamp} from "@firebase/firestore";
 
@@ -20,6 +20,12 @@ class WorshipService extends BaseService {
 
   async addNewWorship(userId: string, teamId: string, worshipInput: WorshipInfo) {
     console.log(userId, teamId, worshipInput)
+    const songIds = worshipInput.songInfoList.map((songInfo) => songInfo.song.id);
+    const promises = [];
+    for(const songId of songIds) {
+      promises.push(SongService.useSong(songId));
+    }
+    await Promise.all(promises);
     const newWorship = {
       team_id: teamId,
       title: worshipInput.title,
