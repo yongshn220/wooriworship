@@ -73,7 +73,34 @@ class InvitationService extends BaseService {
                 b: '==',
                 c: teamId
             }
+        ]);
+        return invitations
+    }
+    
+    async deleteTeamReceiverInvitations(teamId: string, receiver_email: string) {
+        await this.deleteByFilters([
+            {
+                a: 'team_id',
+                b: '==',
+                c: teamId
+            },
+            {
+                a: 'receiver_email',
+                b: '==',
+                c: receiver_email
+            }
         ])
+        return true;
+    }
+
+    async getTeamInvitations(teamId: string) {
+        const invitations = await this.getByFilters([
+            {
+                a: 'team_id',
+                b: '==',
+                c: teamId
+            }
+        ]);
         return invitations
     }
 

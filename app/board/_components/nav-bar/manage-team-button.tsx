@@ -55,38 +55,42 @@ export function ManageTeamButton() {
       toast({description: "Invitation is sending now."});
       return setAddPeopleLoading(false)
     }
+
     try {
-      if (emailExists(sentInvitations.map((x) => x.receiver_email), receiverEmail)) {
-        toast({title: "Invitation Already sent", description:"Invitation already sent to the given email"});
-        return setAddPeopleLoading(false)
-      }
-
-      if (receiverEmail == authUser?.email) {
+      if (receiverEmail.toLowerCase() == authUser?.email.toLowerCase()) {
         toast({title: "Nice Try.", description:"You can't send an invitation to yourself."});
-        return setAddPeopleLoading(false)
+        return;
       }
 
-      //team.users 에 이메일 받아야함.
+        InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, receiverEmail.toLowerCase()).then(invitationId => {
+          if (!invitationId) {
+            toast({title: "Can't send invitation", description: "The following user set up a restriction on team invitation or email."})
+            return;
+          }
 
-      InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, receiverEmail.toLowerCase()).then(invitationId => {
-        if (!invitationId) {
-          toast({title: "Can't send invitation", description: "The following user set up a restriction on team invitation or email."})
-          return;
-        }
+          if (receiverEmail.toLowerCase() == authUser?.email.toLowerCase()) {
+            toast({title: "Nice Try.", description: "You can't send an invitation to yourself."});
+            return;
+          }
 
-        toast({title: "Successfully sent the invitation.", description: `Invitation email has sent to ${receiverEmail}`})
-        setSentInvitationsUpdater(prev => prev + 1)
-        setAddPeopleLoading(false)
+          //TODO
+          // if (receiverEmail.toLowerCase() in currenetMemberEmails) {
+          //   fail
+          // }
 
-      }).catch((e) => {
-        if (e.status === StatusCodes.UNPROCESSABLE_ENTITY) {
-          toast({title:"Send fail", description: "Email structure is invalid. Please check the email.", variant: "destructive"})
-        }
-        else {
-          toast({title: "Something went wrong. Please contact us.", variant: "destructive"})
-        }
-        setAddPeopleLoading(false)
-      });
+          toast({title: "Successfully sent the invitation.", description: `Invitation email has sent to ${receiverEmail}`})
+          setSentInvitationsUpdater(prev => prev + 1)
+          setAddPeopleLoading(false)
+
+        }).catch((e) => {
+          if (e.status === StatusCodes.UNPROCESSABLE_ENTITY) {
+            toast({title:"Send fail", description: "Email structure is invalid. Please check the email.", variant: "destructive"})
+          }
+          else {
+            toast({title: "Something went wrong. Please contact us.", variant: "destructive"})
+          }
+          setAddPeopleLoading(false)
+        });
     }
     catch (e) {
       console.log(e, "manage-team-button/handleAddPeople")
@@ -206,8 +210,11 @@ export function ManageTeamButton() {
               callback={() => setLeaveTeamDialogOpen(false)}
             />
             <Separator className="my-4"/>
-            <div className="w-full flex-end">
-              <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-500" onClick={() => setDeleteTeamDialogOpen(true)}>Delete Team</Button>
+            <div className="w-full flex-end gap-2">
+              {
+                team?.leaders.includes(authUser?.uid) &&
+                <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-500" onClick={() => setDeleteTeamDialogOpen(true)}>Delete Team</Button>
+              }
               <Button variant="outline" className="" onClick={() => setLeaveTeamDialogOpen(true)}>Leave Team</Button>
             </div>
           </div>
