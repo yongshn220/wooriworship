@@ -6,7 +6,7 @@ import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import Image from 'next/image'
 import {Input} from "@/components/ui/input";
-import {useEffect, useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {currentTeamIdAtom, teamAtom, teamUpdaterAtom} from "@/global-states/teamState";
 import {useRecoilValue, useSetRecoilState} from "recoil";
@@ -22,9 +22,10 @@ import { emailExists } from "@/components/helper/helper-functions";
 import {useRouter} from "next/navigation";
 import {userUpdaterAtom} from "@/global-states/userState";
 import {InvitationStatus} from "@/components/constants/enums";
-import {lowerCase} from "lower-case";
 import useViewportHeight from "@/components/hook/use-viewport-height";
 import {ConfirmationDialog} from "@/components/dialog/confirmation-dialog";
+import { StatusCodes } from 'http-status-codes';
+
 
 export function ManageTeamButton() {
   const authUser = auth.currentUser
@@ -36,36 +37,61 @@ export function ManageTeamButton() {
   const setTeamUpdater = useSetRecoilState(teamUpdaterAtom)
   const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
 
-  const viewportHeight = useViewportHeight();
+  const [receiverEmail, setReceiverEmail] = useState("")
+  const [isAddPeopleLoading, setAddPeopleLoading] = useState(false)
+
   const [isDeleteTeamDialogOpen, setDeleteTeamDialogOpen] = useState(false)
   const [isLeaveTeamDialogOpen, setLeaveTeamDialogOpen] = useState(false)
-  const [receiverEmail, setReceiverEmail] = useState("")
-  const router = useRouter()
 
+
+  const viewportHeight = useViewportHeight();
+  const router = useRouter()
   const pendingInvitations = useMemo(() => sentInvitations.filter((invitation) => invitation.invitation_status !== InvitationStatus.Accepted), [sentInvitations])
 
-  async function handleAddPeople() {
-    if (emailExists(sentInvitations.map((x) => x.receiver_email), receiverEmail)) {
-      toast({title: "Invitation Already sent", description:"Invitation already sent to the given email"});
-      return;
+  function handleAddPeople() {
+    setAddPeopleLoading(true)
+
+    if (isAddPeopleLoading) {
+      toast({description: "Invitation is sending now."});
+      return setAddPeopleLoading(false)
     }
-
-    if (receiverEmail == authUser?.email) {
-      toast({title: "Nice Try.", description:"You can't send an invitation to yourself."});
-      return;
-    }
-
-    //team.users 에 이메일 받아야함.
-
-    InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, lowerCase(receiverEmail)).then(invitationId => {
-      if (!invitationId) {
-        toast({title: "Can't send invitation", description: "The following user set up a restriction on team invitation or email."})
+    try {
+      if (emailExists(sentInvitations.map((x) => x.receiver_email), receiverEmail)) {
+        toast({title: "Invitation Already sent", description:"Invitation already sent to the given email"});
+        return setAddPeopleLoading(false)
       }
-      else {
+
+      if (receiverEmail == authUser?.email) {
+        toast({title: "Nice Try.", description:"You can't send an invitation to yourself."});
+        return setAddPeopleLoading(false)
+      }
+
+      //team.users 에 이메일 받아야함.
+
+      InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, receiverEmail.toLowerCase()).then(invitationId => {
+        if (!invitationId) {
+          toast({title: "Can't send invitation", description: "The following user set up a restriction on team invitation or email."})
+          return;
+        }
+
         toast({title: "Successfully sent the invitation.", description: `Invitation email has sent to ${receiverEmail}`})
         setSentInvitationsUpdater(prev => prev + 1)
-      }
-    });
+        setAddPeopleLoading(false)
+
+      }).catch((e) => {
+        if (e.status === StatusCodes.UNPROCESSABLE_ENTITY) {
+          toast({title:"Send fail", description: "Email structure is invalid. Please check the email.", variant: "destructive"})
+        }
+        else {
+          toast({title: "Something went wrong. Please contact us.", variant: "destructive"})
+        }
+        setAddPeopleLoading(false)
+      });
+    }
+    catch (e) {
+      console.log(e, "manage-team-button/handleAddPeople")
+      toast({title: "Something went wrong. Please contact us."})
+    }
   }
 
   async function handleDeleteTeam() {
@@ -158,7 +184,7 @@ export function ManageTeamButton() {
           <div className="w-full flex gap-4 mt-4">
             <Image alt="mail icon" src="/icons/mailIcon.svg" width={25} height={25}/>
             <Input placeholder="Email" value={receiverEmail} onChange={(e) => setReceiverEmail(e.target.value)}/>
-            <Button onClick={handleAddPeople}>Add People</Button>
+            <Button disabled={isAddPeopleLoading} onClick={handleAddPeople}>{isAddPeopleLoading? "Adding People..." : "Add People"}</Button>
           </div>
         </div>
         <DialogFooter className="w-full mt-10">
