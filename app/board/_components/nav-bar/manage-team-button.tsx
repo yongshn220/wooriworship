@@ -24,6 +24,7 @@ import {userUpdaterAtom} from "@/global-states/userState";
 import {InvitationStatus} from "@/components/constants/enums";
 import {lowerCase} from "lower-case";
 import useViewportHeight from "@/components/hook/use-viewport-height";
+import {ConfirmationDialog} from "@/components/dialog/confirmation-dialog";
 
 export function ManageTeamButton() {
   const authUser = auth.currentUser
@@ -36,7 +37,8 @@ export function ManageTeamButton() {
   const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
 
   const viewportHeight = useViewportHeight();
-  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
+  const [isDeleteTeamDialogOpen, setDeleteTeamDialogOpen] = useState(false)
+  const [isLeaveTeamDialogOpen, setLeaveTeamDialogOpen] = useState(false)
   const [receiverEmail, setReceiverEmail] = useState("")
   const router = useRouter()
 
@@ -112,10 +114,6 @@ export function ManageTeamButton() {
     router.replace("/")
   }
 
-  function onDeleteTeamCompleteCallback() {
-    setIsOpenDeleteDialog(false)
-  }
-
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -166,17 +164,25 @@ export function ManageTeamButton() {
         <DialogFooter className="w-full mt-10">
           <div className="w-full flex flex-col">
             <DeleteConfirmationDialog
-              isOpen={isOpenDeleteDialog}
-              setOpen={setIsOpenDeleteDialog}
+              isOpen={isDeleteTeamDialogOpen}
+              setOpen={setDeleteTeamDialogOpen}
               title="Delete Team"
               description={`Do you really want to delete [${team?.name}]? This action cannot be undone.`}
               onDeleteHandler={handleDeleteTeam}
-              callback={onDeleteTeamCompleteCallback}
+              callback={() => setDeleteTeamDialogOpen(false)}
+            />
+            <ConfirmationDialog
+              isOpen={isLeaveTeamDialogOpen}
+              setOpen={setLeaveTeamDialogOpen}
+              title="Leave Team"
+              description={`Do you really want to leave team [${team?.name}]? This action cannot be undone.`}
+              onDeleteHandler={handleLeaveTeam}
+              callback={() => setLeaveTeamDialogOpen(false)}
             />
             <Separator className="my-4"/>
             <div className="w-full flex-end">
-              <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-500" onClick={() => setIsOpenDeleteDialog(true)}>Delete Team</Button>
-              <Button variant="outline" className="" onClick={handleLeaveTeam}>Leave Team</Button>
+              <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-500" onClick={() => setDeleteTeamDialogOpen(true)}>Delete Team</Button>
+              <Button variant="outline" className="" onClick={() => setLeaveTeamDialogOpen(true)}>Leave Team</Button>
             </div>
           </div>
         </DialogFooter>
