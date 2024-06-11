@@ -46,6 +46,10 @@ class SongService extends BaseService {
     return await this.create(newSong);
   }
 
+  async useSong(songId: string) {
+    return await this.update(songId, {last_used_time:new Date()});
+  }
+
   async updateSong(userId: string, songId: string, songInput: any) {
     const song: any = {
       title: songInput.title,
@@ -67,7 +71,6 @@ class SongService extends BaseService {
     if (songInput.music_sheet_urls) {
       song.music_sheet_urls = songInput.music_sheet_urls
     }
-    console.log(song)
     return await this.update(songId, song);
   }
 

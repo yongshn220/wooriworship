@@ -7,6 +7,7 @@ import {useState} from "react";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {toast} from "@/components/ui/use-toast";
 import {teamAtom, teamUpdaterAtom} from "@/global-states/teamState";
+import {auth} from "@/firebase";
 
 interface Props {
   userId: string
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function InvitedMember({userId, teamId}: Props) {
+  const authUser = auth.currentUser
   const user = useRecoilValue(userAtom(userId))
   const team = useRecoilValue(teamAtom(teamId))
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
@@ -50,7 +52,10 @@ export function InvitedMember({userId, teamId}: Props) {
       <div className="w-full sm:w-[160px]">
         <RoleSelect role={team?.leaders.includes(user?.id) ? "Leader" : "Member"}/>
       </div>
-      <p className="w-full sm:w-auto text-sm text-gray-500 text-right cursor-pointer" onClick={() => setIsOpenDeleteDialog(true)}>remove</p>
+      {
+        userId !== authUser?.uid && team?.leaders.includes(authUser?.uid) &&
+        <p className="w-full sm:w-auto text-sm text-gray-500 text-right cursor-pointer" onClick={() => setIsOpenDeleteDialog(true)}>remove</p>
+      }
     </div>
   )
 }
