@@ -14,7 +14,10 @@ import {getPathPlan} from "@/components/helper/routes";
 import {auth} from "@/firebase";
 import {userAtom} from "@/global-states/userState";
 
-export function TeamSelect() {
+interface Props {
+  createOption: boolean
+}
+export function TeamSelect({createOption}: Props) {
   const authUser = auth.currentUser
   const router = useRouter()
   const [currentTeamId, setCurrentTeamId] = useRecoilState(currentTeamIdAtom)
@@ -40,11 +43,14 @@ export function TeamSelect() {
               <TeamItem key={teamId} teamId={teamId}/>
             ))
           }
-          <CreateNewTeamDialog>
-            <Button variant="default" className="w-full mt-2">
-              Create Team
-            </Button>
-          </CreateNewTeamDialog>
+          {
+            createOption &&
+            <CreateNewTeamDialog>
+              <Button variant="default" className="w-full mt-2">
+                Create Team
+              </Button>
+            </CreateNewTeamDialog>
+          }
         </SelectGroup>
       </SelectContent>
     </Select>

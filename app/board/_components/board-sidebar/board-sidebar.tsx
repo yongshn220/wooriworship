@@ -12,6 +12,7 @@ import {currentTeamIdAtom} from "@/global-states/teamState";
 import {ManageTeamButton} from "@/app/board/_components/nav-bar/manage-team-button";
 import {useRouter} from "next/navigation";
 import {InvitationButton} from "@/app/board/_components/nav-bar/invitation-button";
+import {ManageTeamDialog} from "@/app/board/_components/nav-bar/manage-team-dialog";
 
 export function BoardSidebar() {
   const currentPage = useRecoilValue(currentPageAtom)
@@ -24,7 +25,7 @@ export function BoardSidebar() {
       <MainLogoRouter route={""}/>
       <div className="flex-between flex-col w-full h-full">
         <div className="space-y-2 ">
-          <TeamSelect/>
+          <TeamSelect createOption={true}/>
           <Button disabled={!currentTeamId} variant={(currentPage === Page.PLAN)? "secondary" : "ghost"} size="lg" className="font-normal w-full justify-start px-2" onClick={() => router.push(getPathPlan(currentTeamId))}>
             <LayoutDashboard className="h-4 w-4 mr-2"/>
             Worship Plan
@@ -36,7 +37,9 @@ export function BoardSidebar() {
         </div>
         <div className="w-full mb-4 space-y-2">
           <InvitationButton/>
-          <ManageTeamButton/>
+          <ManageTeamDialog>
+            <ManageTeamButton/>
+          </ManageTeamDialog>
         </div>
       </div>
     </MdSidebar>
