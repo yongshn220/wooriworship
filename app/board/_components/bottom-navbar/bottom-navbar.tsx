@@ -8,6 +8,7 @@ import {Page} from "@/components/constants/enums";
 import {currentPageAtom} from "@/app/board/_states/board-states";
 import {CreateButton} from "@/app/board/_components/bottom-navbar/create-button";
 import {useState} from "react";
+import {ManageTeamDialog} from "@/app/board/_components/nav-bar/manage-team-dialog";
 
 export function BottomNavbar() {
   const currentPage = useRecoilValue(currentPageAtom)
@@ -28,10 +29,12 @@ export function BottomNavbar() {
         <div className="w-12 h-12 flex-center flex-col text-gray-500 cursor-pointer">
           <CreateButton/>
         </div>
-        <div className="w-12 h-12 flex-center flex-col text-gray-500 cursor-pointer">
-          <UsersIcon/>
-          <p className="text-sm">Team</p>
-        </div>
+        <ManageTeamDialog>
+          <div className="w-12 h-12 flex-center flex-col text-gray-500 cursor-pointer">
+              <UsersIcon/>
+              <p className="text-sm">Team</p>
+          </div>
+        </ManageTeamDialog>
         <div className="w-12 h-12 flex-center flex-col text-gray-500 cursor-pointer">
           <SettingsIcon/>
           <p className="text-sm">Setting</p>
