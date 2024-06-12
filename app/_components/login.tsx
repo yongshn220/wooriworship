@@ -45,12 +45,12 @@ export function Login({setMode}: any) {
         <CardContent className="space-y-4">
           <form className="space-y-4" onSubmit={handleLogin}>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-md">Email</Label>
               <Input id="loginEmail" placeholder="m@example.com" required type="email"
                      onChange={(e) => setLogin((prev) => ({...prev, email: e.target.value}))}/>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-md">Password</Label>
               <Input id="loginPassword" required type="password"
                      onChange={(e) => setLogin((prev) => ({...prev, password: e.target.value}))}/>
             </div>
@@ -58,7 +58,7 @@ export function Login({setMode}: any) {
               error &&
               <p className="text-red-500 text-sm">Wrong email or password.</p>
             }
-            <Button className="w-full" type="submit" >Login</Button>
+            <Button className="w-full text-md" type="submit" >Login</Button>
           </form>
           <div className="flex flex-col mt-4 text-center text-sm gap-2">
             <Link className="underline" href="#">

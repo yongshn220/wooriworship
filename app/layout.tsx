@@ -18,6 +18,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
     <head>
+      <meta name="viewport" content="width=device-width, user-scalable=no"/>
       <title>Wooriworship | Worship team collaborator</title>
       <link rel="icon" href="/favicon.png"/>
     </head>

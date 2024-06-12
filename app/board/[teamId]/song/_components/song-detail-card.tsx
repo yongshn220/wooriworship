@@ -80,9 +80,17 @@ export function SongDetailCard({isOpen, setIsOpen, song, readOnly=false}: Props)
             </div>
             <div className="flex-between items-center">
               <Label htmlFor="name" className="text-base font-semibold">
+                BPM
+              </Label>
+              <p>
+                {song?.bpm}
+              </p>
+            </div>
+            <div className="flex-between items-center">
+              <Label htmlFor="name" className="text-base font-semibold">
                 Last Used Date
               </Label>
-              <p className="text-sm" >{timestampToDatePassedFromNow(song?.last_used_time)}</p>
+              <p className="text-sm">{timestampToDatePassedFromNow(song?.last_used_time)}</p>
             </div>
             <div className="flex-start flex-col items-center gap-1.5 p-4 bg-gray-100 rounded-lg">
               <div className="whitespace-pre-wrap">
@@ -96,7 +104,9 @@ export function SongDetailCard({isOpen, setIsOpen, song, readOnly=false}: Props)
                   <div className="flex-start w-full h-full gap-4 overflow-x-auto">
                     {
                       song.music_sheet_urls.map((url: string, i: number) => (
-                        <div key={i} className="flex flex-col h-full aspect-[3/4] pb-1 border-2 rounded-lg hover:border-gray-300 cursor-pointer" onClick={handleMusicSheetClick}>
+                        <div key={i}
+                             className="flex flex-col h-full aspect-[3/4] pb-1 border-2 rounded-lg hover:border-gray-300 cursor-pointer"
+                             onClick={handleMusicSheetClick}>
                           <div className="relative flex-1">
                             <Image
                               src={url}
