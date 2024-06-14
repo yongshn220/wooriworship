@@ -3,9 +3,9 @@ import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
 import {Suspense, useEffect, useState} from "react";
 import Link from "next/link";
-import {LayoutDashboard, LibraryBig} from "lucide-react";
+import {DownloadIcon, LayoutDashboard, LibraryBig, PlusCircleIcon} from "lucide-react";
 import Image from "next/image";
-import {DownloadMusicSheetButton} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/download-music-sheet-button";
+import {DownloadMusicSheetDialog} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/download-music-sheet-dialog";
 import {getPathPlan, getPathSong, getPathWorshipStartMode} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
@@ -39,7 +39,12 @@ export function WorshipSidebar({teamId, worshipId}: Props) {
             width={80}
             height={80}
           />
-          <DownloadMusicSheetButton worshipId={worshipId}/>
+          <DownloadMusicSheetDialog worshipId={worshipId}>
+            <Button variant="outline" className="w-full gap-2 pl-0">
+              <DownloadIcon size={20}/>
+              <p>Download</p>
+            </Button>
+          </DownloadMusicSheetDialog>
           <Button className="w-full" onClick={handleStartWorship}>Start Worship</Button>
         </div>
       </div>

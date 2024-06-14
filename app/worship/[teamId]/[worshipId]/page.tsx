@@ -22,7 +22,7 @@ export default function WorshipPage({params}: any) {
 
   return (
     <div className="w-full flex-center">
-      <div className="flex-start flex-col w-full px-6 gap-2 max-w-4xl">
+      <div className="flex-start flex-col w-full px-0 sm:px-6 gap-2 max-w-4xl">
         <div className="flex-between w-full">
           <p className="text-4xl font-semibold">{worship?.title}</p>
           <MenuButton title={worship?.title} worshipId={worshipId}/>

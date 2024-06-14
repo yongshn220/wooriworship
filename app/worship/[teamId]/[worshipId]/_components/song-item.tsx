@@ -20,16 +20,16 @@ export function SongItem({songHeader, index}: Props) {
     <SongDetailCardWrapper song={song}>
       <div className="flex-between w-full h-12 p-2 px-4 rounded-lg cursor-pointer hover:bg-gray-100">
         <div className="flex-between gap-4">
-          <div className="flex-center rounded-full aspect-square text-gray-500 ">
+          <div className="hidden sm:flex  rounded-full aspect-square text-gray-500 ">
             {index}.
           </div>
           <div className="flex-center gap-4">
             <p className="font-semibold">{song?.title} {song?.version !== ""? `- ${song.version}` : ""}</p>
-            <p className="text-sm text-gray-500">{song?.original.author}</p>
+            <p className="hidden sm:flex text-sm text-gray-500">{song?.original.author}</p>
           </div>
         </div>
         <div className="flex-center gap-4">
-          <div>{song?.key === ""? "" : `${song?.key} Key`}</div>
+          <div>{song?.key === ""? "" : `${song?.key}`}</div>
         </div>
       </div>
     </SongDetailCardWrapper>
