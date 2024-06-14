@@ -22,9 +22,9 @@ export function SongListView() {
             <div>
               <div className="flex text-sm text-gray-500 px-6 mt-10">
                 <p className="flex-[0.5]">Title</p>
-                <p className="flex-[0.2] text-center">Key</p>
+                <p className="hidden sm:flex flex-[0.2] text-center">Key</p>
                 <p className="hidden lg:flex justify-end lg:flex-[0.4]">Version</p>
-                <p className="flex-[0.7] text-end">Tag</p>
+                <div className="hidden sm:flex justify-end sm:flex-[0.7] text-end">Tag</div>
                 <p className="flex-[0.5] text-end">Last used date</p>
               </div>
               <Separator/>

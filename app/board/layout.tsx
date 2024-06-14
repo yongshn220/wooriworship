@@ -15,7 +15,7 @@ export default function BoardLayout({ children }: any) {
           <BoardSidebar/>
           <div className="h-full flex-1">
             <Navbar/>
-            <div className="pt-4 sm:mt-0 flex-1 h-[calc(100%-80px)] px-6 overflow-y-scroll scrollbar-hide">
+            <div className="pt-4 sm:mt-0 flex-1 h-[calc(100%-80px)] px-2 sm:px-6 overflow-y-scroll scrollbar-hide">
               {children}
             </div>
             <BottomNavbar/>
