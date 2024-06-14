@@ -20,19 +20,19 @@ export function WorshipCard({worshipId}: Props) {
   return (
     <div>
       <Link href={getPathWorship(teamId, worship.id)}>
-        <div className="group aspect-[1/1] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC] cursor-pointer">
-          <div className="relative flex-1 flex-center flex-col text-white text-xs font-semibold gap-2 p-2">
+        <div className="group sm:aspect-[1/1] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC] cursor-pointer">
+          <div className="relative flex-1 flex-center flex-col text-white text-xs font-semibold gap-2 p-2 min-h-[150px]">
             <HoverOverlay/>
             { worshipSongListLoadable.state === 'loading' && <></> }
             { worshipSongListLoadable.state === 'hasError' && <></> }
             {
               worshipSongListLoadable.state === 'hasValue' &&
               worshipSongListLoadable.contents.map((song, i) => (
-                <p key={i} className="line-clamp-1">{song?.title}</p>
+                <p key={i} className="line-clamp-1 text-base sm:text-sm">{song?.title}</p>
               ))
             }
           </div>
-          <p className="p-4 bg-white text-xs line-clamp-1">
+          <p className="p-4 bg-white line-clamp-1">
             {worship?.title}
           </p>
         </div>
