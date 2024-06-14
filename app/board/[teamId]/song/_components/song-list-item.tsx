@@ -21,27 +21,23 @@ export function SongListItem({songId}: Props) {
 
   return (
     <div className="flex w-full px-4 rounded-lg cursor-pointer py-2 my-2 hover:bg-gray-100" onClick={handleSongCardClick}>
-      <div className="flex-[0.5] flex flex-col">
-        <p className="hidden sm:flex font-semibold text-sm">{song?.title}</p>
-        <p className="sm:hidden font-semibold text-md">{song?.title} {song?.key? `[${song.key}]` : ""}</p>
+      <div className="flex-1 flex flex-col">
+        <p className="font-semibold text-md">{song?.title} {song?.key? `[${song.key}]` : ""}</p>
         <p className="text-sm text-gray-500">{song?.original.author}</p>
       </div>
-      <div className="hidden sm:flex flex-[0.2] justify-center">
-        <div>{song?.key === ""? "" : `${song?.key}`}</div>
-      </div>
-      <div className="hidden lg:flex-[0.4] flex-end items-center text-gray-500 text-sm">
+      <div className="hidden lg:flex flex-[0.4] flex-end items-center text-gray-500 text-sm">
         <div className="hidden lg:flex">{song?.version}</div>
       </div>
-      <div className="hidden sm:flex flex-[0.7] justify-end items-center w-full text-left text-sm gap-2">
+      <div className="hidden sm:flex flex-1 justify-end items-center w-full text-left text-sm gap-2">
         {
           song?.tags.map((tag, i) => (
             <Badge key={i} variant="outline">{tag}</Badge>
           ))
         }
       </div>
-      <div className="flex-[0.5] flex-end items-center text-gray-500 text-sm">
-        <div className="sm:hidden">{timestampToDatePassedFromNowMini(song?.last_used_time)}</div>
-        <div className="hidden sm:flex">{timestampToDatePassedFromNow(song?.last_used_time)}</div>
+      <div className="flex flex-1 lg:flex-[0.5] justify-end items-center text-gray-500 text-sm">
+        <div className="lg:hidden">{timestampToDatePassedFromNowMini(song?.last_used_time)}</div>
+        <div className="hidden lg:flex">{timestampToDatePassedFromNow(song?.last_used_time)}</div>
       </div>
     </div>
   )

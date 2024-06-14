@@ -16,7 +16,7 @@ export function Navbar() {
   const currentPage = useRecoilValue(currentPageAtom)
   const [invitationDialogState, setInvitationDialogState] = useRecoilState(invitationDialogStateAtom)
   return (
-    <div className="hidden sm:flex content-between p-5 gap-4">
+    <div className="hidden lg:flex content-between p-5 gap-4">
       <InvitationDialog isOpen={invitationDialogState} setIsOpen={setInvitationDialogState}/>
       <div className="flex-1">
         {
