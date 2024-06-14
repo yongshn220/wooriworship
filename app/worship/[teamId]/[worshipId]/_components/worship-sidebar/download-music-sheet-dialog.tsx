@@ -10,10 +10,11 @@ import {worshipSongListAtom} from "@/global-states/worship-state";
 import {downloadMultipleMusicSheets} from "@/components/helper/helper-functions";
 
 interface Props {
+  children: any
   worshipId: string
 }
 
-export function DownloadMusicSheetButton({worshipId}: Props) {
+export function DownloadMusicSheetDialog({children,  worshipId}: Props) {
   const songList = useRecoilValue(worshipSongListAtom(worshipId))
   const [selectedSongIds, setSelectedSongIds] = useState<Array<string>>([])
 
@@ -21,12 +22,6 @@ export function DownloadMusicSheetButton({worshipId}: Props) {
     const downloadSongList = songList.filter((song) => selectedSongIds.includes(song.id))
 
     downloadMultipleMusicSheets(downloadSongList)
-
-    // downloadSongList.forEach((song) => {
-    //   song.music_sheet_urls.forEach(url => {
-    //     downloadByUrlWithDelay(url, song?.title)
-    //   })
-    // })
   }
 
   function handleSelectSong(songId: string) {
@@ -41,10 +36,9 @@ export function DownloadMusicSheetButton({worshipId}: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full gap-2 pl-0">
-          <DownloadIcon size={20} className=""/>
-          <p>Download</p>
-        </Button>
+        <div className="w-full">
+          {children}
+        </div>
       </DialogTrigger>
       <DialogContent className="w-full flex-start flex-col">
         <DialogHeader>

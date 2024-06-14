@@ -1,4 +1,4 @@
-import {LayoutDashboard, LibraryBig, UsersIcon} from "lucide-react";
+import {DownloadIcon, LayoutDashboard, LibraryBig, UsersIcon} from "lucide-react";
 import {getPathPlan, getPathSong} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
@@ -9,6 +9,9 @@ import {currentPageAtom} from "@/app/board/_states/board-states";
 import {ManageTeamDialog} from "@/app/board/_components/nav-bar/manage-team-dialog";
 import {SettingButton} from "@/app/board/_components/bottom-navbar/setting-button";
 import {StartButton} from "@/app/worship/_components/bottom-navbar/start-button";
+import {
+  DownloadMusicSheetDialog
+} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/download-music-sheet-dialog";
 
 
 interface Props {
@@ -34,12 +37,14 @@ export function BottomNavbar({teamId, worshipId}: Props) {
         <div className="w-12 h-12 flex-center flex-col text-gray-500 cursor-pointer">
           <StartButton teamId={teamId} worshipId={worshipId}/>
         </div>
-        <ManageTeamDialog>
           <div className="w-12 h-12 flex-center flex-col text-gray-500 cursor-pointer">
-            <UsersIcon/>
-            <p className="text-sm">Team</p>
+            <DownloadMusicSheetDialog worshipId={worshipId}>
+              <div className="flex-center flex-col">
+                <DownloadIcon/>
+                <p className="text-sm">Download</p>
+              </div>
+            </DownloadMusicSheetDialog>
           </div>
-        </ManageTeamDialog>
         <div className="w-12 h-12 flex-center flex-col text-gray-500 cursor-pointer">
           <SettingButton/>
         </div>
