@@ -84,6 +84,47 @@ export function timestampToDatePassedFromNow(timestamp: Timestamp) {
   return result;
 }
 
+export function timestampToDatePassedFromNowMini(timestamp: Timestamp) {
+  const jsDate = new Date(timestamp.seconds * 1000); // Convert Firestore timestamp to JavaScript Date
+  const now = new Date();
+
+  const diffInSeconds = Math.floor((now.getTime() - jsDate.getTime()) / 1000);
+
+  const secondsInMinute = 60;
+  const secondsInHour = secondsInMinute * 60;
+  const secondsInDay = secondsInHour * 24;
+  const secondsInWeek = secondsInDay * 7;
+  const secondsInMonth = secondsInDay * 30;
+  const secondsInYear = secondsInDay * 365;
+
+  let result;
+
+  if (diffInSeconds < secondsInMinute) {
+    result = `${diffInSeconds} seconds ago`;
+  }
+  else if (diffInSeconds < secondsInHour) {
+    const minutes = Math.floor(diffInSeconds / secondsInMinute);
+    result = `${minutes}min ago`;
+  }
+  else if (diffInSeconds < secondsInDay) {
+    const hours = Math.floor(diffInSeconds / secondsInHour);
+    result = `${hours}hrs ago`;
+  }
+  else if (diffInSeconds < secondsInWeek) {
+    const days = Math.floor(diffInSeconds / secondsInDay);
+    result = `${days}d ago`;
+  }
+  else if (diffInSeconds < secondsInYear) {
+    const months = Math.floor(diffInSeconds / secondsInMonth);
+    result = `${months}m ago`;
+  }
+  else {
+    const years = Math.floor(diffInSeconds / secondsInYear);
+    result = `${years}y ago`;
+  }
+  return result;
+}
+
 export function timestampToDate(timestamp: Timestamp) {
   try {
     return new Date(timestamp.seconds * 1000)
