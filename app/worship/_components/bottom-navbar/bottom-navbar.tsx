@@ -6,11 +6,16 @@ import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {Page} from "@/components/constants/enums";
 import {currentPageAtom} from "@/app/board/_states/board-states";
-import {CreateButton} from "@/app/board/_components/bottom-navbar/create-button";
 import {ManageTeamDialog} from "@/app/board/_components/nav-bar/manage-team-dialog";
 import {SettingButton} from "@/app/board/_components/bottom-navbar/setting-button";
+import {StartButton} from "@/app/worship/_components/bottom-navbar/start-button";
 
-export function BottomNavbar() {
+
+interface Props {
+  teamId: string
+  worshipId: string
+}
+export function BottomNavbar({teamId, worshipId}: Props) {
   const currentPage = useRecoilValue(currentPageAtom)
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
   const router = useRouter()
@@ -27,7 +32,7 @@ export function BottomNavbar() {
           <p className="text-sm">Song</p>
         </div>
         <div className="w-12 h-12 flex-center flex-col text-gray-500 cursor-pointer">
-          <CreateButton/>
+          <StartButton teamId={teamId} worshipId={worshipId}/>
         </div>
         <ManageTeamDialog>
           <div className="w-12 h-12 flex-center flex-col text-gray-500 cursor-pointer">
