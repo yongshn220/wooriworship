@@ -2,7 +2,7 @@
 
 export default function WorshipLayout({children}: any) {
   return (
-    <div>
+    <div className="w-full h-full">
       {children}
     </div>
   )

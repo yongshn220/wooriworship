@@ -15,7 +15,7 @@ export function SongMusicSheetViewer({isOpen, setIsOpen, musicSheetUrls}: Props)
   return (
     <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
       <DialogContent className="sm:max-w-[600px] h-5/6">
-        <div className="relative flex-center w-full h-full py-10">
+        <div className="relative flex-center w-full h-full">
           <Carousel className="w-full h-full">
             <CarouselContent className="h-full">
               {
@@ -28,7 +28,7 @@ export function SongMusicSheetViewer({isOpen, setIsOpen, musicSheetUrls}: Props)
                             alt="Music score"
                             src={url}
                             fill
-                            sizes="20vw, 20vw, 20vw"
+                            sizes="100vw"
                             className="h-full object-contain rounded-md p-2"
                           />
                         </div>
