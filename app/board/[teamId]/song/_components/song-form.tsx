@@ -85,6 +85,11 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     return true
   }
 
+  function clearContents() {
+    setInput({title: "", author: "", version: "", key: "", link: "", tags: [], bpm: null, description: ""})
+    setMusicSheets([])
+  }
+
   async function handleCreate() {
     setIsLoading(true)
 
@@ -104,13 +109,15 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
         description: `${team?.name} - ${songInput.title}`,
       })
 
-      setCurrentTeamSongIds((prev) => ([...prev, songId]))
+      clearContents()
+      setCurrentTeamSongIds((prev) => ([...prev, songId])) // render new song card
       router.push(getPathSongDetail(teamId, songId))
     }
     catch (e) {
       console.log("err", e)
     }
     finally {
+      clearContents()
       setIsOpen(false)
       setIsLoading(false)
     }
@@ -160,6 +167,9 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     }
     catch (e) {
       console.log(e)
+    }
+    finally {
+      clearContents()
       setIsOpen(false)
       setIsLoading(false)
     }

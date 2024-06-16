@@ -6,8 +6,12 @@ import * as React from "react";
 import {currentTeamWorshipIdsAtom} from "@/global-states/worship-state";
 
 
-export function WorshipCardList() {
-  const worshipIdsLoadable = useRecoilValueLoadable(currentTeamWorshipIdsAtom)
+interface Props {
+  teamId: string
+}
+
+export function WorshipCardList({teamId}: Props) {
+  const worshipIdsLoadable = useRecoilValueLoadable(currentTeamWorshipIdsAtom(teamId))
 
   switch (worshipIdsLoadable.state) {
     case 'loading': return <></>

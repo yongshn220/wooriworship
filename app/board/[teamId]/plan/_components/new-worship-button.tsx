@@ -24,10 +24,8 @@ export interface SongInfo {
 export function NewWorshipButton() {
   const [isOpen, setIsOpen] = useState(false)
   const teamId = useRecoilValue(currentTeamIdAtom)
-  const setSelectedSongInfoList = useSetRecoilState(selectedSongInfoListAtom)
 
   function handleClick() {
-    setSelectedSongInfoList([])
     setIsOpen(true)
   }
 

@@ -16,7 +16,7 @@ export default function PlanPage({params}: any) {
           Worship Plan
         </p>
       </div>
-      <WorshipCardList/>
+      <WorshipCardList teamId={teamId}/>
     </div>
   )
 }
