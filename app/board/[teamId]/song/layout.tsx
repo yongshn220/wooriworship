@@ -15,7 +15,7 @@ export default async function SongLayout({params, children}: any) {
             Songs
           </p>
         </div>
-        <SongListView/>
+        <SongListView teamId={teamId}/>
       </div>
     </>
   )

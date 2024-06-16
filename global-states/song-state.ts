@@ -3,15 +3,14 @@ import {Song} from "@/models/song";
 import {SongService} from "@/apis";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 
-export const currentTeamSongIdsAtom = atom<Array<string>>({
+export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
   key: "currentTeamSongIdsAtom",
-  default: selector({
+  default: selectorFamily({
     key: "currentTeamSongIdsAtom/default",
-    get: async ({get}) => {
-      try {
-        const teamId = get(currentTeamIdAtom)
-        if (!teamId) return []
+    get: (teamId) => async ({get}) => {
+      if (!teamId) return []
 
+      try {
         const songList = await SongService.getTeamSong(teamId)
         if (!songList) return []
 
@@ -24,7 +23,6 @@ export const currentTeamSongIdsAtom = atom<Array<string>>({
     }
   })
 })
-
 
 
 
