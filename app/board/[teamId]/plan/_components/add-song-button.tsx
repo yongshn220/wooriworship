@@ -11,8 +11,11 @@ import {Song} from "@/models/song";
 import {Button} from "@/components/ui/button";
 import {SongSelectCardList} from "@/app/board/[teamId]/plan/_components/song-select-card-list";
 
-export function AddSongButton() {
-  const teamId = useRecoilValue(currentTeamIdAtom)
+interface Props {
+  teamId: string
+}
+
+export function AddSongButton({teamId}: Props) {
   const [songList, setSongList] = useState<Array<Song>>([])
   const [input, setInput] = useState("")
 
@@ -40,7 +43,7 @@ export function AddSongButton() {
               onChange={(e) => setInput(e.target.value)}
             />
           </div>
-          <SongSelectCardList searchInput={input} songList={songList}/>
+          <SongSelectCardList teamId={teamId} searchInput={input} songList={songList}/>
         </div>
         <DialogClose asChild>
           <div className="w-full flex-center">

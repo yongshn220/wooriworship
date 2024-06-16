@@ -11,16 +11,17 @@ import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/st
 import {toPlainObject} from "@/components/helper/helper-functions";
 
 interface Props {
+  teamId: string
   song: Song
   isSelected: boolean
 }
-export function SongSelectCard({song, isSelected}: Props) {
+export function SongSelectCard({teamId, song, isSelected}: Props) {
   const setSelectedSongInfoList = useSetRecoilState(selectedSongInfoListAtom)
   const [isOpen, setIsOpen] = useState(false)
 
   return (
     <div className="h-full">
-      <SongDetailCard isOpen={isOpen} setIsOpen={setIsOpen} song={toPlainObject(song)} readOnly={true}/>
+      <SongDetailCard teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} song={toPlainObject(song)} readOnly={true}/>
       <div className="aspect-[5/4] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC]">
         <div className="relative group h-full flex-center flex-col text-white cursor-pointer" onClick={() => setIsOpen(true)}>
           <HoverOverlay/>
