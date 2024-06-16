@@ -222,7 +222,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
                   <NewSongCard key={i} songOrder={i + 1} songInfo={songInfo}/>
                 ))
               }
-              <AddSongButton/>
+              <AddSongButton teamId={teamId}/>
             </div>
           </div>
         </div>

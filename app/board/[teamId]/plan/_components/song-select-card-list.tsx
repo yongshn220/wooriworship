@@ -6,11 +6,12 @@ import {useMemo} from "react";
 import {useDebounce} from "use-debounce";
 
 interface Props {
+  teamId: string
   searchInput: string
   songList: Array<Song>
 }
 
-export function SongSelectCardList({searchInput, songList}: Props) {
+export function SongSelectCardList({teamId, searchInput, songList}: Props) {
   const selectedSongInfoList = useRecoilValue(selectedSongInfoListAtom)
   const [debounced] = useDebounce(searchInput, 500)
 
@@ -28,6 +29,7 @@ export function SongSelectCardList({searchInput, songList}: Props) {
       {
         preprocessedSongList.map((song: Song) => (
           <SongSelectCard
+            teamId={teamId}
             key={song.id}
             song={JSON.parse(JSON.stringify(song))}
             isSelected={selectedSongIds.includes(song.id)}
