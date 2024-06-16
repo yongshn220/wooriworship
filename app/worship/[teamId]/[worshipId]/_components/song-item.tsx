@@ -7,17 +7,18 @@ import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
 
 interface Props {
+  teamId: string
   songHeader: SongHeader
   index: number
 }
 
-export function SongItem({songHeader, index}: Props) {
+export function SongItem({teamId, songHeader, index}: Props) {
   const song = useRecoilValue(songAtom(songHeader?.id))
 
   if (!song) return <></>
 
   return (
-    <SongDetailCardWrapper song={song}>
+    <SongDetailCardWrapper teamId={teamId} song={song}>
       <div className="flex-between w-full h-12 p-2 px-4 rounded-lg cursor-pointer hover:bg-gray-100">
         <div className="flex-between gap-4">
           <div className="hidden sm:flex  rounded-full aspect-square text-gray-500 ">

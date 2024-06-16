@@ -51,7 +51,7 @@ export default function WorshipPage({params}: any) {
         <div className="flex flex-col w-full gap-4">
           {
             worship?.songs.map((songHeader: SongHeader, index: number) => (
-              <SongItem key={songHeader?.id} songHeader={songHeader} index={index + 1}/>
+              <SongItem teamId={teamId} key={songHeader?.id} songHeader={songHeader} index={index + 1}/>
             ))
           }
         </div>
