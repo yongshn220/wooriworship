@@ -5,16 +5,15 @@ import {Song} from "@/models/song";
 import {songAtom} from "@/global-states/song-state";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 
-export const currentTeamWorshipIdsAtom = atom<Array<string>>({
+export const currentTeamWorshipIdsAtom = atomFamily<Array<string>, string>({
   key: "currentTeamWorshipIdsAtom",
-  default: selector({
+  default: selectorFamily({
     key: "currentTeamWorshipIdsAtom/default",
-    get: async ({get}) => {
+    get: (teamId) => async ({get}) => {
+      if (!teamId) return []
+
       try {
         get(worshipIdsUpdaterAtom)
-
-        const teamId = get(currentTeamIdAtom)
-        if (!teamId) return []
 
         const worshipList = await WorshipService.getTeamWorship(teamId)
         if (!worshipList) return []

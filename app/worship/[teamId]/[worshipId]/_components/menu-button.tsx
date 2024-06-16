@@ -14,12 +14,12 @@ import {toast} from "@/components/ui/use-toast";
 
 
 interface Props {
+  teamId: string
   title: string
   worshipId: string
 }
-export function MenuButton({title, worshipId}: Props) {
-  const teamId = useRecoilValue(currentTeamIdAtom)
-  const setCurrentWorshipIds = useSetRecoilState(currentTeamWorshipIdsAtom)
+export function MenuButton({teamId, title, worshipId}: Props) {
+  const setCurrentWorshipIds = useSetRecoilState(currentTeamWorshipIdsAtom(teamId))
 
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()

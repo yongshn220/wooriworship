@@ -9,7 +9,7 @@ import {Textarea} from "@/components/ui/textarea";
 import {useEffect, useState} from "react";
 import {DatePicker} from "@/app/board/[teamId]/plan/_components/date-picker";
 import {NewSongCard} from "@/app/board/[teamId]/plan/_components/new-song-card";
-import {useRecoilState, useRecoilValue, useResetRecoilState, useSetRecoilState} from "recoil";
+import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {useToast} from "@/components/ui/use-toast";
 import {AddSongButton} from "@/app/board/[teamId]/plan/_components/add-song-button";
@@ -22,7 +22,7 @@ import {timestampToDate} from "@/components/helper/helper-functions";
 import {useRouter} from "next/navigation";
 import {getPathWorship} from "@/components/helper/routes";
 import {auth} from "@/firebase";
-import {worshipAtom, worshipIdsUpdaterAtom, worshipUpdaterAtom} from "@/global-states/worship-state";
+import {worshipIdsUpdaterAtom} from "@/global-states/worship-state";
 
 export interface WorshipInfo {
   title: string
@@ -94,6 +94,13 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
     return true
   }
 
+  function clearContents() {
+    setBasicInfo({title:"", description: ""})
+    setDate(new Date())
+    setIsLoading(false)
+    setSelectedSongInfoList([])
+  }
+
   function getWorshipInput() {
     const worshipInput: WorshipInfo = {...basicInfo, date, songInfoList: selectedSongInfoList,}
     return worshipInput
@@ -114,7 +121,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
         })
         setIsOpen(false)
         setIsLoading(false)
-
+        clearContents()
         setWorshipIdsUpdater(prev => prev + 1)
         router.push(getPathWorship(teamId, worshipId))
       })
@@ -143,7 +150,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
 
       setIsOpen(false)
       setIsLoading(false)
-
+      clearContents()
       setWorshipIdsUpdater(prev => prev + 1)
       router.push(getPathWorship(teamId, worship?.id))
     }
