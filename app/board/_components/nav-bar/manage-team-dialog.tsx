@@ -1,7 +1,6 @@
 "use client"
 
 import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
-import {TeamIcon} from "@/components/team-icon";
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import Image from 'next/image'
@@ -10,7 +9,6 @@ import {useMemo, useState} from "react";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {currentTeamIdAtom, teamAtom, teamUpdaterAtom} from "@/global-states/teamState";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {SettingsIcon} from "lucide-react";
 import { InvitationService, TeamService } from "@/apis";
 import {auth} from "@/firebase";
 import {PendingMember} from "@/app/board/_components/nav-bar/pending-member";
@@ -18,9 +16,8 @@ import {Separator} from "@/components/ui/separator";
 import {InvitedMember} from "@/app/board/_components/nav-bar/invited-member";
 import {toast} from "@/components/ui/use-toast";
 import {sentInvitationsAtom, sentInvitationsUpdaterAtom} from "@/global-states/invitation-state";
-import { emailExists } from "@/components/helper/helper-functions";
 import {useRouter} from "next/navigation";
-import {userUpdaterAtom} from "@/global-states/userState";
+import {usersAtom, userUpdaterAtom} from "@/global-states/userState";
 import {InvitationStatus} from "@/components/constants/enums";
 import useViewportHeight from "@/components/hook/use-viewport-height";
 import {ConfirmationDialog} from "@/components/dialog/confirmation-dialog";
@@ -32,6 +29,7 @@ export function ManageTeamDialog({children}: any) {
   const authUser = auth.currentUser
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtom(currentTeamId))
+  const members = useRecoilValue(usersAtom(team?.users))
   const sentInvitations = useRecoilValue(sentInvitationsAtom({userId: authUser?.uid, teamId:team?.id}))
   const setSentInvitationsUpdater = useSetRecoilState(sentInvitationsUpdaterAtom)
   const setUserUpdater = useSetRecoilState(userUpdaterAtom)
@@ -53,45 +51,44 @@ export function ManageTeamDialog({children}: any) {
     setAddPeopleLoading(true)
 
     if (isAddPeopleLoading) {
-      toast({description: "Invitation is sending now."});
-      return setAddPeopleLoading(false)
+      toast({description: "Invitation is on processing."});
+      return;
     }
 
     try {
       if (receiverEmail.toLowerCase() == authUser?.email.toLowerCase()) {
-        toast({title: "Nice Try.", description:"You can't send an invitation to yourself."});
+        toast({title: "Can't send invitation", description:"You can't send an invitation to yourself."});
+        setAddPeopleLoading(false)
         return;
       }
 
-        InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, receiverEmail.toLowerCase()).then(invitationId => {
-          if (!invitationId) {
-            toast({title: "Can't send invitation", description: "The following user set up a restriction on team invitation or email."})
-            return;
-          }
+      if (members.map(m => m.email.toLowerCase()).includes(receiverEmail.toLowerCase())) {
+        toast({title: "Can't send invitation", description: "The following user is already the team member."})
+        setAddPeopleLoading(false)
+        return;
+      }
 
-          if (receiverEmail.toLowerCase() == authUser?.email.toLowerCase()) {
-            toast({title: "Nice Try.", description: "You can't send an invitation to yourself."});
-            return;
-          }
-
-          //TODO
-          // if (receiverEmail.toLowerCase() in currenetMemberEmails) {
-          //   fail
-          // }
-
-          toast({title: "Successfully sent the invitation.", description: `Invitation email has sent to ${receiverEmail}`})
-          setSentInvitationsUpdater(prev => prev + 1)
+      InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, receiverEmail.toLowerCase()).then(invitationId => {
+        if (!invitationId) {
+          toast({title: "Can't send invitation", description: "The following user set up a restriction on team invitation or email."})
           setAddPeopleLoading(false)
+          return;
+        }
 
-        }).catch((e) => {
-          if (e.status === StatusCodes.UNPROCESSABLE_ENTITY) {
-            toast({title:"Send fail", description: "Email structure is invalid. Please check the email.", variant: "destructive"})
-          }
-          else {
-            toast({title: "Something went wrong. Please contact us.", variant: "destructive"})
-          }
-          setAddPeopleLoading(false)
-        });
+        setReceiverEmail("")
+        toast({title: "Successfully sent the invitation.", description: `Invitation email has sent to ${receiverEmail}`})
+        setSentInvitationsUpdater(prev => prev + 1)
+        setAddPeopleLoading(false)
+
+      }).catch((e) => {
+        if (e.status === StatusCodes.UNPROCESSABLE_ENTITY) {
+          toast({title:"Send fail", description: "Email structure is invalid. Please check the email.", variant: "destructive"})
+        }
+        else {
+          toast({title: "Something went wrong. Please contact us.", variant: "destructive"})
+        }
+        setAddPeopleLoading(false)
+      });
     }
     catch (e) {
       console.log(e, "manage-team-button/handleAddPeople")

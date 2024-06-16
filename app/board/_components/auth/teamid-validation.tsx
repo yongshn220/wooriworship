@@ -2,8 +2,11 @@
 
 import React, {useEffect} from "react";
 import {useRouter} from "next/navigation";
-import {useRecoilValueLoadable, useSetRecoilState} from "recoil";
+import {useRecoilValue, useRecoilValueLoadable, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
+import {auth} from "@/firebase";
+import {userAtom} from "@/global-states/userState";
+import {toast} from "@/components/ui/use-toast";
 
 
 interface Props {
@@ -12,11 +15,13 @@ interface Props {
 }
 
 export function TeamIdValidation({teamId, children}: Props) {
+  const authUser = auth.currentUser
+  const user = useRecoilValue(userAtom(authUser?.uid))
   const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
   const teamLoadable = useRecoilValueLoadable(teamAtom(teamId))
   const router = useRouter()
 
-  // TODO: 유저가 이 팀에 소속 되어있는지 확인 필요함. 없을 경우 redirect
+
 
   useEffect(() => {
     if (!teamId) {
@@ -34,7 +39,12 @@ export function TeamIdValidation({teamId, children}: Props) {
       router.replace("/")
       return;
     }
-  }, [router, teamLoadable]);
+
+    if (teamLoadable.state === 'hasValue' && !user.teams.includes(teamId)) {
+      toast({title: "Unauthorized Member", description: `You have no permission to the team [${teamLoadable.contents.name}].`})
+      router.replace("/")
+    }
+  }, [setCurrentTeamId, teamId, user.teams, router, teamLoadable]);
 
 
   return (
