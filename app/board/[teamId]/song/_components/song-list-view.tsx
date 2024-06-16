@@ -7,9 +7,12 @@ import Image from "next/image";
 import * as React from "react";
 import {NewSongButton} from "@/app/board/[teamId]/song/_components/new-song-button";
 
+interface Props {
+  teamId: string
+}
 
-export function SongListView() {
-  const songIdsLoadable = useRecoilValueLoadable(currentTeamSongIdsAtom)
+export function SongListView({teamId}: Props) {
+  const songIdsLoadable = useRecoilValueLoadable(currentTeamSongIdsAtom(teamId))
 
   switch (songIdsLoadable.state) {
     case 'loading': return <></>;
