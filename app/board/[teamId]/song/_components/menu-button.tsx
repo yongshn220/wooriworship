@@ -15,13 +15,13 @@ import {Button} from "@/components/ui/button";
 import {downloadMultipleMusicSheets} from "@/components/helper/helper-functions";
 
 interface Props {
-  teamId: string
   songTitle: string
   songId: string
 }
 
-export function MenuButton({teamId, songTitle, songId}: Props) {
+export function MenuButton({songTitle, songId}: Props) {
   const song = useRecoilValue(songAtom(songId))
+  const teamId = useRecoilValue(currentTeamIdAtom)
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom(teamId))
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const router = useRouter()

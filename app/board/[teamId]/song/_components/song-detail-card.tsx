@@ -11,14 +11,13 @@ import {SongMusicSheetViewer} from "@/app/board/[teamId]/song/_components/song-m
 import {useState} from "react";
 
 interface Props {
-  teamId: string
   isOpen: boolean
   setIsOpen: Function
   song: Song
   readOnly: boolean
 }
 
-export function SongDetailCard({teamId, isOpen, setIsOpen, song, readOnly=false}: Props) {
+export function SongDetailCard({isOpen, setIsOpen, song, readOnly=false}: Props) {
   const [isMusicSheetViewOpen, setMusicSheetViewOpen] = useState(false)
 
   function handleLinkButtonClick() {
@@ -40,7 +39,7 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, song, readOnly=false}
             {
               !readOnly &&
               <div className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                <MenuButton teamId={teamId} songId={song?.id} songTitle={song?.title}/>
+                <MenuButton songId={song?.id} songTitle={song?.title}/>
               </div>
             }
             <DialogTitle className="text-center text-3xl font-bold">{song?.title}</DialogTitle>
