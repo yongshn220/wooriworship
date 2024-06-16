@@ -13,16 +13,17 @@ import {useSetRecoilState} from "recoil";
 import {userUpdaterAtom} from "@/global-states/userState";
 import {useRouter} from "next/navigation";
 import {getPathPlan} from "@/components/helper/routes";
+import {currentTeamIdAtom} from "@/global-states/teamState";
 
 
 export function CreateNewTeamDialog({children}: {children: ReactNode}) {
   const authUser = auth.currentUser
   const setUserUpdater = useSetRecoilState(userUpdaterAtom)
+  const setTeamId = useSetRecoilState(currentTeamIdAtom)
   const [teamName, setTeamName] = useState("New Team")
   const router = useRouter()
 
   if (!authUser) return <></>
-
 
   async function handleCreateNewTeam() {
     if (authUser) {
@@ -38,6 +39,7 @@ export function CreateNewTeamDialog({children}: {children: ReactNode}) {
               title: "Congratulation! New team has created.",
               description: `${teamName}`,
             })
+            setTeamId(teamId)
             router.push(getPathPlan(teamId))
           }
         });
