@@ -8,15 +8,16 @@ import {useEffect, useState} from "react";
 import {WorshipNote} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-note";
 import {worshipIndexAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {worshipSongListAtom} from "@/global-states/worship-state";
+import {worshipAtom, worshipSongListAtom} from "@/global-states/worship-state";
 import Image from "next/image"
+import {SongCarouselFullItem} from "@/app/worship/[teamId]/[worshipId]/live/_components/song-carousel-full-item";
 
 interface Props {
   worshipId: string
 }
 
 export function SongCarouselFull({worshipId}: Props) {
-  const songList = useRecoilValue(worshipSongListAtom(worshipId))
+  const worship = useRecoilValue(worshipAtom(worshipId))
   const [api, setApi] = useState<CarouselApi>()
   const setIndex = useSetRecoilState(worshipIndexAtom)
 
@@ -39,42 +40,10 @@ export function SongCarouselFull({worshipId}: Props) {
       <Carousel setApi={setApi} className="w-full h-full">
         <CarouselContent className="h-full">
           {
-            songList.map((song, index) => (
-              <CarouselItem key={index} className="h-full">
-                <Card className="h-full">
-                  <CardContent className="flex flex-col w-full h-full divide-y">
-                    <WorshipNote description={song.description}/>
-                    <div className="flex-1 h-full flex flex-col bg-gray-50 overflow-y-scroll lg:mx-10">
-                      {
-                        song.music_sheet_urls.map((url, index) => (
-                          <div key={index} className="flex-center w-full h-full">
-                            <img
-                              alt="Music score"
-                              src={url}
-                              className="h-full object-contain rounded-md"
-                            />
-                          </div>
-                        ))
-                      }
-                    </div>
-                    {/*<div className="relative flex-1 h-full bg-gray-50 overflow-y-scroll lg:mx-10 grid grid-cols-1">*/}
-                    {/*    {*/}
-                    {/*      song.music_sheet_urls.map((url, index) => (*/}
-                    {/*        <div key={index} className="relative flex-center w-full h-full bg-red-500 border">*/}
-                    {/*          <Image*/}
-                    {/*            alt="Music score"*/}
-                    {/*            src={url}*/}
-                    {/*            fill*/}
-                    {/*            className="h-full object-contain"*/}
-                    {/*          />*/}
-                    {/*        </div>*/}
-                    {/*      ))*/}
-                    {/*    }*/}
-                    {/*</div>*/}
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
+            worship?.songs.map((songHeader, index) => (
+              <SongCarouselFullItem key={index} index={index} songHeader={songHeader}/>
+            ))
+          }
         </CarouselContent>
       </Carousel>
     </div>
