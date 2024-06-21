@@ -33,7 +33,7 @@ export function InvitedMember({userId, teamId}: Props) {
   }
 
   return (
-    <div className="w-full flex-start flex-col sm:flex-row sm:items-center gap-4 py-4">
+    <div className="w-full flex-start flex-col sm:flex-row sm:items-center gap-4 my-3 py-1 px-2 bg-gray-100 rounded-lg">
       <DeleteConfirmationDialog
         isOpen={isOpenDeleteDialog}
         setOpen={setIsOpenDeleteDialog}
@@ -52,10 +52,10 @@ export function InvitedMember({userId, teamId}: Props) {
       <div className="w-full sm:w-[160px]">
         <RoleSelect role={team?.leaders.includes(user?.id) ? "Leader" : "Member"}/>
       </div>
-      {
-        userId !== authUser?.uid && team?.leaders.includes(authUser?.uid) &&
-        <p className="w-full sm:w-auto text-sm text-gray-500 text-right cursor-pointer" onClick={() => setIsOpenDeleteDialog(true)}>remove</p>
-      }
+      {/*{*/}
+      {/*  userId !== authUser?.uid && team?.leaders.includes(authUser?.uid) &&*/}
+      {/*  <p className="w-full sm:w-auto text-sm text-black text-right cursor-pointer" onClick={() => setIsOpenDeleteDialog(true)}>remove</p>*/}
+      {/*}*/}
     </div>
   )
 }

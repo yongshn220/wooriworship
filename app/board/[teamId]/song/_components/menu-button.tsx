@@ -72,21 +72,21 @@ export function MenuButton({teamId, songTitle, songId}: Props) {
           <DropdownMenuSeparator/>
           <DropdownMenuGroup className="space-y-2 flex-center flex-col w-full">
             <Button variant="ghost" disabled className="cursor-pointer w-full flex-start pl-2">
-               <LinkIcon className="mr-3 w-5 h-5"/>
-               <p>Copy Link</p>
-             </Button>
+              <LinkIcon className="mr-3 w-5 h-5"/>
+              <p>Copy Link</p>
+            </Button>
             <Button variant="ghost" disabled className="cursor-pointer w-full flex-start pl-2">
-               <CopyIcon className="mr-3 w-5 h-5"/>
-               <p>Duplicate</p>
-             </Button>
-             <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => handleEditSong()}>
-               <SquarePen className="mr-3 w-5 h-5"/>
-               <p>Edit</p>
-             </Button>
-             <Button variant="ghost" className="text-red-600 focus:bg-red-50 focus:text-red-500 cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteDialogOpen((prev) => !prev)}>
-               <Trash2Icon className="mr-3 w-5 h-5"/>
-               <p>Delete</p>
-             </Button>
+              <CopyIcon className="mr-3 w-5 h-5"/>
+              <p>Duplicate</p>
+            </Button>
+            <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => handleEditSong()}>
+              <SquarePen className="mr-3 w-5 h-5"/>
+              <p>Edit</p>
+            </Button>
+            <Button variant="ghost" className="text-red-600 focus:bg-red-50 focus:text-red-500 cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteDialogOpen((prev) => !prev)}>
+              <Trash2Icon className="mr-3 w-5 h-5"/>
+              <p>Delete</p>
+           </Button>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

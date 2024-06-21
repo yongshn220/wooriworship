@@ -1,11 +1,12 @@
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,} from "@/components/ui/select"
+import {Button} from "@/components/ui/button";
 
 const roles = ["Leader", "Member"]
 
 export function RoleSelect({role}: any) {
   return (
-    <Select disabled value={role}>
-      <SelectTrigger className="w-full">
+    <Select value={role}>
+      <SelectTrigger className="flex-end gap-2 w-full border-0 shadow-none " >
         <SelectValue placeholder="Select a Role" />
       </SelectTrigger>
       <SelectContent>
@@ -13,9 +14,10 @@ export function RoleSelect({role}: any) {
           <SelectLabel>Team</SelectLabel>
           {
             roles.map((role) => (
-              <SelectItem key={role} value={role}>{role}</SelectItem>
+              <SelectItem key={role} value={role} className="cursor-pointer hover:bg-gray-50">{role}</SelectItem>
             ))
           }
+          <Button className="w-full">Remove</Button>
         </SelectGroup>
       </SelectContent>
     </Select>
