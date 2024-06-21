@@ -19,3 +19,8 @@ export const worshipIndexAtom = atom({
     current: 0,
   }
 })
+
+export const worshipIndexChangeEventAtom = atom({
+  key: "worshipIndexChangeEventAtom",
+  default: 0
+})

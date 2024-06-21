@@ -17,7 +17,7 @@ export function StartButton({teamId, worshipId}: Props) {
   return (
     <div className="flex-center flex-col" onClick={handleStartWorship}>
       <PlayerPlayIcon/>
-      <p className="text-sm">Play</p>
+      <p className="text-sm">View</p>
     </div>
   )
 }

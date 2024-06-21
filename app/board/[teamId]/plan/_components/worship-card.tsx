@@ -20,7 +20,7 @@ export function WorshipCard({worshipId}: Props) {
   return (
     <div>
       <Link href={getPathWorship(teamId, worship.id)}>
-        <div className="group sm:aspect-[1/1] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC] cursor-pointer">
+        <div className="group md:aspect-[1/1] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC] cursor-pointer">
           <div className="relative flex-1 flex-center flex-col text-white text-xs font-semibold gap-2 p-2 min-h-[150px]">
             <HoverOverlay/>
             { worshipSongListLoadable.state === 'loading' && <></> }
