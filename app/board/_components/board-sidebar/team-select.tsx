@@ -1,9 +1,6 @@
 'use client'
 
 import {Select, SelectContent, SelectGroup, SelectLabel, SelectTrigger, SelectValue,} from "@/components/ui/select"
-import {UserService} from "@/apis";
-import {User} from "@/models/user";
-import {useEffect, useState} from "react";
 import {TeamItem} from "@/app/board/_components/board-sidebar/team-item";
 import {Button} from "@/components/ui/button";
 import {CreateNewTeamDialog} from "@/app/board/_components/create-new-team-dialog";

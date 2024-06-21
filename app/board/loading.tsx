@@ -2,8 +2,11 @@
 
 import {CenterLoadingCircle} from "@/components/animation/center-loading-circle";
 
-export default function WorshipLoading() {
+export default function BoardLoading() {
   return (
-    <CenterLoadingCircle/>
+    <div>
+      Board Loading
+      <CenterLoadingCircle/>
+    </div>
   )
 }
