@@ -1,6 +1,8 @@
 import { v4 as uuid } from 'uuid';
-import {Dispatch, SetStateAction} from "react";
+import {Dispatch, SetStateAction, useState} from "react";
 import {MusicSheet} from "@/app/board/[teamId]/song/_components/song-form";
+import {usePDFJS} from "@/components/hook/use-pdfjs";
+import * as PDFJS from "pdfjs-dist";
 
 interface Props {
   musicSheets: Array<MusicSheet>;
@@ -10,37 +12,64 @@ interface Props {
 }
 
 export default function PdfUploader({musicSheets, setMusicSheets, maxNum, children}: Props) {
-  async function handleFileChange(e: any) {
-    const files = Array.from(e.target.files) as Array<File>
-    const totalImages = musicSheets?.length + files.length
+  const [pdfjs, setPDFjs] = useState<typeof PDFJS>(null)
 
-    try {
-      if (totalImages <= maxNum) {
-        files.forEach((file) => {
-          const reader: any = new FileReader();
-          reader.readAsDataURL(file);
-          const imageId = uuid()
-          setMusicSheets((prev: Array<MusicSheet>) =>([...prev, {id: imageId, file: file, url: "", isLoading: true}]))
+  usePDFJS(async (pdfjs) => {
+    console.log(pdfjs)
+    setPDFjs(pdfjs)
+  })
+  const handleFileChange = async (event: any) => {
+    if (!pdfjs) return;
 
-          reader.onloadend = () => {
-            setMusicSheets((prevImages) => {
-              return prevImages.map(prev => {
-                return (prev.id !== imageId)? prev : {...prev, url: reader.result.toString(), isLoading: false}
-              })
-            })
-          };
-        })
-      }
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (e: any) => {
+        const typedArray = new Uint8Array(e.target.result);
+        const pdf = await pdfjs.getDocument(typedArray).promise;
+        const numPages = pdf.numPages;
+
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+          const imageId = uuid();
+          setMusicSheets((prev: Array<MusicSheet>) => ([...prev, { id: imageId, file: null, url: "", isLoading: true }]));
+          const imageBlob = await renderPageAsImage(pdf, pageNum);
+          const imageFile = new File([imageBlob], `pdf-image-${pageNum}.jpg`, { type: 'image/jpeg' });
+          const imageUrl = URL.createObjectURL(imageFile);
+          setMusicSheets((prevImages) => {
+            return prevImages.map(prev => {
+              return (prev.id !== imageId) ? prev : { ...prev, file:imageFile, url: imageUrl, isLoading: false };
+            });
+          });
+        }
+      };
+      reader.readAsArrayBuffer(file);
     }
-    catch (error) {
-      console.error(error);
-    }
-    finally {
-    }
-  }
+  };
+
+  const renderPageAsImage = async (pdf: PDFJS.PDFDocumentProxy, pageNum: number): Promise<Blob> => {
+    const page = await pdf.getPage(pageNum);
+    const viewport = page.getViewport({ scale: 2 });
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    const renderContext = {
+      canvasContext: context!,
+      viewport: viewport,
+    };
+
+    await page.render(renderContext).promise;
+
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        resolve(blob!);
+      }, 'image/jpeg'); // Use 'image/png' for PNG format
+    });
+  };
 
   return (
-    <div className="h-full">
+    <div className="w-full h-full">
       <input
         type="file"
         id="file-input"

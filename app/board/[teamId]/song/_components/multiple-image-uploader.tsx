@@ -40,7 +40,7 @@ export default function MultipleImageUploader({musicSheets, setMusicSheets, maxN
   }
 
   return (
-    <div className="h-full">
+    <div className="w-full h-full">
       <input
         type="file"
         id="image-input"
