@@ -22,6 +22,7 @@ import {auth} from "@/firebase";
 import {currentTeamSongIdsAtom} from "@/global-states/song-state";
 import {songAtom, songUpdaterAtom} from "@/global-states/song-state";
 import useViewportHeight from "@/components/hook/use-viewport-height";
+import PdfUploader from "@/app/board/[teamId]/song/_components/pdf-uploader";
 
 interface Props {
   mode: FormMode
@@ -264,17 +265,23 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               onChange={(e) => setInput((prev => ({...prev, description: e.target.value})))}
             />
           </div>
-          <div className="flex-start flex-col items-center gap-1.5">
+          <div className="w-full flex-start flex-col items-center gap-1.5">
             <Label>
               Music Sheets
             </Label>
-            <div className="flex-start w-full h-60 aspect-square border-2 p-2 rounded-md shadow-sm">
+            <div className="w-full h-14 py-2 flex-center gap-2">
               <MultipleImageUploader musicSheets={musicSheets} setMusicSheets={setMusicSheets} maxNum={5}>
-                <div className="h-full flex-center flex-col p-6">
-                  <Plus
-                    className="h-[50px] w-[50px] rounded-full p-2 text-white bg-blue-500 hover:bg-blue-400 cursor-pointer"/>
+                <div className="w-full h-full bg-blue-500 rounded-lg flex-center text-white cursor-pointer hover:bg-blue-400">
+                  Upload Image
                 </div>
               </MultipleImageUploader>
+              <PdfUploader musicSheets={musicSheets} setMusicSheets={setMusicSheets} maxNum={5}>
+                <div className="w-full h-full bg-purple-700 rounded-lg flex-center text-white cursor-pointer hover:bg-purple-500">
+                  Upload PDF
+                </div>
+              </PdfUploader>
+            </div>
+            <div className="flex-start w-full h-60 aspect-square border-2 p-2 rounded-md shadow-sm">
               <div className="flex w-full h-full gap-4 overflow-x-auto">
                 {
                   musicSheets?.map((musicSheet, i) => (

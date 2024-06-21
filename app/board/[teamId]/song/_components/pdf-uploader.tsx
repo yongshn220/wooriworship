@@ -9,8 +9,8 @@ interface Props {
   children: any;
 }
 
-export default function MultipleImageUploader({musicSheets, setMusicSheets, maxNum, children}: Props) {
-  async function handleImageChange(e: any) {
+export default function PdfUploader({musicSheets, setMusicSheets, maxNum, children}: Props) {
+  async function handleFileChange(e: any) {
     const files = Array.from(e.target.files) as Array<File>
     const totalImages = musicSheets?.length + files.length
 
@@ -43,14 +43,14 @@ export default function MultipleImageUploader({musicSheets, setMusicSheets, maxN
     <div className="h-full">
       <input
         type="file"
-        id="image-input"
+        id="file-input"
         name="Image"
         style={{display: 'none'}}
-        accept="image/*"
-        onChange={handleImageChange}
+        accept="application/pdf"
+        onChange={handleFileChange}
         multiple
       />
-      <label htmlFor="image-input">
+      <label htmlFor="file-input">
         {children}
       </label>
     </div>
