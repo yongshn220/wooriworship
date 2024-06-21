@@ -43,3 +43,8 @@ export enum DataFetchStatus {
   VALID,
   INVALID
 }
+
+
+export enum ResetType {
+  ALL
+}

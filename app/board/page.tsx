@@ -12,6 +12,7 @@ import {Hint} from "@/components/hint";
 import {Plus} from "lucide-react";
 import {CreateNewTeamDialog} from "@/app/board/_components/create-new-team-dialog";
 import {Button} from "@/components/ui/button";
+import {toast} from "@/components/ui/use-toast";
 
 
 export default function BoardPage() {
@@ -22,6 +23,10 @@ export default function BoardPage() {
   useEffect(() => {
     if (authUser) {
       UserService.getById(authUser.uid).then((_user: any) => {
+        if (!_user) {
+          toast({title: "Something went wrong."})
+          return;
+        }
         const user = _user as User
         if (user.teams.length > 0) {
           router.push(getPathPlan(user.teams[0]))

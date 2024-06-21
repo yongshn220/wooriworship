@@ -1,4 +1,4 @@
-import Image from "next/image";
+"use client"
 
 import {Sheet, SheetContent, SheetTrigger} from "@/components/ui/sheet";
 import {Button} from "@/components/ui/button";
@@ -6,21 +6,24 @@ import {MainLogo} from "@/components/logo/main-logo";
 import {useRouter} from "next/navigation";
 import { AuthService } from "@/apis"
 import {toast} from "@/components/ui/use-toast";
-import {useRecoilValue} from "recoil";
+import {useRecoilValue, useSetRecoilState} from "recoil";
 import {userAtom} from "@/global-states/userState";
 import {auth} from "@/firebase";
 import {Separator} from "@/components/ui/separator";
 import {SettingsIcon} from "lucide-react";
 import {InvitationButton} from "@/app/board/_components/nav-bar/invitation-button";
+import {currentTeamIdAtom} from "@/global-states/teamState";
 
 export function ProfileButton() {
   const authUser = auth.currentUser
   const user = useRecoilValue(userAtom(authUser?.uid))
+  const setCurrentTeam = useSetRecoilState(currentTeamIdAtom)
   const router = useRouter()
 
   async function handleSignOut() {
     try {
       await AuthService.logout();
+      setCurrentTeam(null)
       toast({title: `Goodbye, ${user.name} :)`})
       router.replace("/")
     }

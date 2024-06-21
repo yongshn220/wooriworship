@@ -11,6 +11,7 @@ import {NewSongButton} from "@/app/board/[teamId]/song/_components/new-song-butt
 import {NewWorshipButton} from "@/app/board/[teamId]/plan/_components/new-worship-button";
 import {InvitationDialog} from "@/app/board/_components/nav-bar/invitation-dialog";
 import {invitationDialogStateAtom} from "@/global-states/dialog-state";
+import {Suspense} from "react";
 
 export function Navbar() {
   const currentPage = useRecoilValue(currentPageAtom)
@@ -30,7 +31,9 @@ export function Navbar() {
       <div className=" flex-end gap-4">
         <NewWorshipButton/>
         <NewSongButton/>
-        <ProfileButton/>
+        <Suspense fallback={<div>loading profile </div>}>
+          <ProfileButton/>
+        </Suspense>
       </div>
     </div>
   )

@@ -1,23 +1,28 @@
+"use client"
+
 import {Drawer, DrawerContent, DrawerHeader, DrawerTrigger,} from "@/components/ui/drawer"
-import {PlusCircleIcon, SettingsIcon} from "lucide-react";
+import {SettingsIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {AuthService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
 import {auth} from "@/firebase";
-import {useRecoilValue} from "recoil";
+import {useRecoilValue, useSetRecoilState} from "recoil";
 import {userAtom} from "@/global-states/userState";
 import {useRouter} from "next/navigation";
 import {InvitationButton} from "@/app/board/_components/nav-bar/invitation-button";
 import {Separator} from "@/components/ui/separator";
+import {currentTeamIdAtom} from "@/global-states/teamState";
 
 export function SettingButton() {
   const authUser = auth.currentUser
   const user = useRecoilValue(userAtom(authUser?.uid))
+  const setCurrentTeam = useSetRecoilState(currentTeamIdAtom)
   const router = useRouter()
 
   async function handleSignOut() {
     try {
       await AuthService.logout();
+      setCurrentTeam(null)
       toast({title: `Goodbye, ${user.name} :)`})
       router.replace("/")
     }

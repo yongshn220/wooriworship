@@ -1,12 +1,17 @@
 import {atom, atomFamily, selectorFamily} from "recoil";
 import {Team} from "@/models/team";
 import TeamService from "@/apis/TeamService";
+import {worshipSongListAtom} from "@/global-states/worship-state";
 
 
 export const currentTeamIdAtom = atom<string>({
   key: "currentTeamIdAtom",
   default: null
 })
+
+export const resetCurrentTeamIdState = (set: any) => {
+  set(currentTeamIdAtom, null)
+}
 
 export const teamAtom = atomFamily<Team, string>({
   key: "teamAtom",
