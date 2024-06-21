@@ -38,12 +38,12 @@ export function PendingMember({invitation}: Props) {
           </p>
         </div>
       </div>
-      {
-        invitation.invitation_status === InvitationStatus.Pending &&
-        <div className="w-full sm:w-[160px]">
-          <RoleSelect/>
-        </div>
-      }
+      {/*{*/}
+      {/*  invitation.invitation_status === InvitationStatus.Pending &&*/}
+      {/*  <div className="w-full sm:w-[160px]">*/}
+      {/*    <RoleSelect/>*/}
+      {/*  </div>*/}
+      {/*}*/}
       <p className="w-full sm:w-auto text-sm text-red-500 text-right cursor-pointer" onClick={handleRemoveInvitation}>remove</p>
     </div>
   )
