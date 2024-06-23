@@ -1,9 +1,6 @@
 import {Card, CardContent} from "@/components/ui/card";
 import {CarouselItem} from "@/components/ui/carousel";
 import * as React from "react";
-import {useEffect, useState} from "react";
-import {Song} from "@/models/song";
-import {SongService} from "@/apis";
 import {SongHeader} from "@/models/worship";
 import Image from 'next/image'
 import {songAtom} from "@/global-states/song-state";
