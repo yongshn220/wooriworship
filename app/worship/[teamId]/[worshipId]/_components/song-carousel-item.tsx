@@ -19,9 +19,9 @@ export function SongCarouselItem({songHeader}: Props) {
 
   return (
     <CarouselItem >
+      <div className="w-full py-2 text-md mb-2">{songHeader.note}</div>
       <Card>
         <CardContent className="flex flex-col w-full aspect-[4/5] max-h-[800px] divide-y">
-          <div className="w-full py-2 text-sm">{songHeader.note}</div>
           <div className="relative h-full flex flex-col bg-gray-50 overflow-y-scroll">
             {
               song.music_sheet_urls.length > 0 ?
