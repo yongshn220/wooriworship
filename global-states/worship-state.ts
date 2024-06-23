@@ -21,8 +21,8 @@ export const currentTeamWorshipIdsAtom = atomFamily<Array<string>, string>({
 
         worshipList.sort((a, b) => {
           try {
-            const dateA = a?.worship_date instanceof Timestamp ? a.worship_date : new Timestamp(0, 0);
-            const dateB = b?.worship_date instanceof Timestamp ? b.worship_date : new Timestamp(0, 0);
+            const dateA = a?.worship_date?.toDate().getTime() || 0;
+            const dateB = b?.worship_date?.toDate().getTime() || 0;
             return dateB - dateA;
           } catch (e) {
             return 0;
