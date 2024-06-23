@@ -18,7 +18,14 @@ export const currentTeamWorshipIdsAtom = atomFamily<Array<string>, string>({
         const worshipList = await WorshipService.getTeamWorship(teamId) as Array<Worship>
         if (!worshipList) return []
 
-        worshipList.sort((a, b) => b.worship_date - a.worship_date)
+        worshipList.sort((a, b) => {
+          try {
+            return b?.worship_date - a?.worship_date
+          }
+          catch (e) {
+            return 0
+          }
+        })
 
         return worshipList.map((worship => worship.id))
       }

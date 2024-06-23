@@ -8,6 +8,13 @@ export function toPlainObject(obj: any) {
   return JSON.parse(JSON.stringify(obj))
 }
 
+export function getDayByTimestamp(timestamp) {
+  if (!timestamp) return ""
+
+  const date = new Date(timestamp.seconds * 1000);
+  return date.toLocaleDateString('en-US', { weekday: 'short' }); // 'Mon', 'Tue', etc.
+}
+
 export function timestampToDateString(timestamp: Timestamp) {
   if (!timestamp) return "Undefined"
 
