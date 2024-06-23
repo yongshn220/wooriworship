@@ -2,7 +2,7 @@
 
 import {HoverOverlay} from "@/components/hover-overlay";
 import Link from "next/link";
-import {timestampToDateString} from "@/components/helper/helper-functions";
+import {getDayByTimestamp, timestampToDateString} from "@/components/helper/helper-functions";
 import {getPathWorship} from "@/components/helper/routes";
 import {useRecoilValue, useRecoilValueLoadable} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
@@ -33,12 +33,12 @@ export function WorshipCard({worshipId}: Props) {
             }
           </div>
           <p className="p-4 bg-white line-clamp-1">
-            {worship?.title}
+            {worship?.title !== ""? worship.title : "No title" }
           </p>
         </div>
       </Link>
       <p className="w-full text-center text-sm text-gray-600 mt-1">
-        {timestampToDateString(worship?.worship_date)} <span className="text-xs">(Mon)</span>
+        {timestampToDateString(worship?.worship_date)} <span className="text-xs">({getDayByTimestamp(worship?.worship_date)})</span>
       </p>
     </div>
   )
