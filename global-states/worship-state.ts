@@ -20,7 +20,8 @@ export const currentTeamWorshipIdsAtom = atomFamily<Array<string>, string>({
 
         worshipList.sort((a, b) => {
           try {
-            return b?.worship_date - a?.worship_date
+            const res = b?.worship_date - a?.worship_date
+            return res
           }
           catch (e) {
             return 0
