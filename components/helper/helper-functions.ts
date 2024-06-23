@@ -8,7 +8,7 @@ export function toPlainObject(obj: any) {
   return JSON.parse(JSON.stringify(obj))
 }
 
-export function getDayByTimestamp(timestamp) {
+export function getDayByTimestamp(timestamp: Timestamp) {
   if (!timestamp) return ""
 
   const date = new Date(timestamp.seconds * 1000);
