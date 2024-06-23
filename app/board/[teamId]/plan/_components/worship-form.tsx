@@ -46,6 +46,7 @@ interface Props {
 export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
   const authUser = auth.currentUser
   const setWorshipUpdater = useSetRecoilState(worshipUpdaterAtom)
+  const setWorshipIdsUpdater = useSetRecoilState(worshipIdsUpdaterAtom)
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtom(teamId))
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
@@ -123,6 +124,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
         setIsLoading(false)
         clearContents()
         setWorshipUpdater(prev => prev + 1)
+        setWorshipIdsUpdater(prev => prev + 1)
         router.push(getPathWorship(teamId, worshipId))
       })
     }
@@ -197,7 +199,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="date">
-              Date
+              Worship Date
             </Label>
             <DatePicker date={date} setDate={setDate}/>
           </div>

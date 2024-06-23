@@ -2,11 +2,12 @@
 
 import {HoverOverlay} from "@/components/hover-overlay";
 import Link from "next/link";
-import {getDayByTimestamp, timestampToDateString} from "@/components/helper/helper-functions";
+import {getDayByTimestamp, isTimestampPast, timestampToDateString} from "@/components/helper/helper-functions";
 import {getPathWorship} from "@/components/helper/routes";
 import {useRecoilValue, useRecoilValueLoadable} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {worshipAtom, worshipSongListAtom} from "@/global-states/worship-state";
+import {cn} from "@/lib/utils";
 
 interface Props {
   worshipId: string
@@ -20,7 +21,7 @@ export function WorshipCard({worshipId}: Props) {
   return (
     <div>
       <Link href={getPathWorship(teamId, worship.id)}>
-        <div className="group md:aspect-[1/1] border rounded-lg flex flex-col overflow-hidden bg-[#95ABCC] cursor-pointer">
+        <div className={cn("group md:aspect-[1/1] border rounded-lg flex flex-col overflow-hidden cursor-pointer", {"bg-gray-400": isTimestampPast(worship?.worship_date)}, {"bg-[#95ABCC]" : !isTimestampPast(worship?.worship_date)})}>
           <div className="relative flex-1 flex-center flex-col text-white text-xs font-semibold gap-2 p-2 min-h-[150px]">
             <HoverOverlay/>
             { worshipSongListLoadable.state === 'loading' && <></> }

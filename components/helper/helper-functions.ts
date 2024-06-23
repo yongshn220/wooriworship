@@ -15,6 +15,13 @@ export function getDayByTimestamp(timestamp: Timestamp) {
   return date.toLocaleDateString('en-US', { weekday: 'short' }); // 'Mon', 'Tue', etc.
 }
 
+export function isTimestampPast(timestamp: Timestamp): boolean {
+  const date = new Date(timestamp.seconds * 1000)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0);
+  return date < today;
+}
+
 export function timestampToDateString(timestamp: Timestamp) {
   if (!timestamp) return "Undefined"
 
