@@ -4,6 +4,7 @@ import {WorshipService} from "@/apis";
 import {Song} from "@/models/song";
 import {songAtom} from "@/global-states/song-state";
 import {currentTeamIdAtom} from "@/global-states/teamState";
+import {Timestamp} from "@firebase/firestore";
 
 export const currentTeamWorshipIdsAtom = atomFamily<Array<string>, string>({
   key: "currentTeamWorshipIdsAtom",
@@ -20,13 +21,13 @@ export const currentTeamWorshipIdsAtom = atomFamily<Array<string>, string>({
 
         worshipList.sort((a, b) => {
           try {
-            const res = b?.worship_date - a?.worship_date
-            return res
+            const dateA = a?.worship_date instanceof Timestamp ? a.worship_date : new Timestamp(0, 0);
+            const dateB = b?.worship_date instanceof Timestamp ? b.worship_date : new Timestamp(0, 0);
+            return dateB - dateA;
+          } catch (e) {
+            return 0;
           }
-          catch (e) {
-            return 0
-          }
-        })
+        });
 
         return worshipList.map((worship => worship.id))
       }
