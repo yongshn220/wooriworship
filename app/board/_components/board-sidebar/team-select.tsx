@@ -23,7 +23,7 @@ export function TeamSelect({createOption}: Props) {
   const user = useRecoilValue(userAtom(authUser?.uid))
   const [preferences, setPreferences] = useUserPreferences()
 
-  function updatePreferenceSelectedTeamId(id) {
+  function updatePreferenceSelectedTeamId(id: string) {
     setPreferences(prev => {
       const boardPref = {...prev.board, selectedTeamId: id}
       return {...prev, board: boardPref}
