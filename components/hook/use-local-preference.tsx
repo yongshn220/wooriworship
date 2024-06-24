@@ -25,5 +25,5 @@ export default function useUserPreferences() {
     },
   });
 
-  return [preferences as Preference, setPreferences];
+  return [preferences, setPreferences];
 }
