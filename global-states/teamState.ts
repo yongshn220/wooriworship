@@ -1,7 +1,6 @@
 import {atom, atomFamily, selectorFamily} from "recoil";
 import {Team} from "@/models/team";
 import TeamService from "@/apis/TeamService";
-import {worshipSongListAtom} from "@/global-states/worship-state";
 
 
 export const currentTeamIdAtom = atom<string>({

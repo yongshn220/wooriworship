@@ -4,8 +4,7 @@ import {useState} from "react";
 import {Song} from "@/models/song";
 import {WorshipForm} from "@/app/board/[teamId]/plan/_components/worship-form";
 import {FormMode} from "@/components/constants/enums";
-import {useRecoilValue, useSetRecoilState} from "recoil";
-import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {useRecoilValue} from "recoil";
 import {Button} from "@/components/ui/button";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 

@@ -8,15 +8,15 @@ import {getPathPlan} from "@/components/helper/routes";
 import {auth} from "@/firebase";
 import Image from "next/image";
 import * as React from "react";
-import {Hint} from "@/components/hint";
-import {Plus} from "lucide-react";
 import {CreateNewTeamDialog} from "@/app/board/_components/create-new-team-dialog";
 import {Button} from "@/components/ui/button";
 import {toast} from "@/components/ui/use-toast";
+import useUserPreferences from "@/components/hook/use-local-preference";
 
 
 export default function BoardPage() {
   const authUser = auth.currentUser
+  const [preferences, setPreferences] = useUserPreferences()
   const [isTeamEmpty, setIsTeamEmpty] = useState(false)
   const router = useRouter()
 
@@ -29,14 +29,15 @@ export default function BoardPage() {
         }
         const user = _user as User
         if (user.teams.length > 0) {
-          router.push(getPathPlan(user.teams[0]))
+          const teamId = user.teams.includes(preferences.board.selectedTeamId)? preferences.board.selectedTeamId : user.teams[0]
+          router.push(getPathPlan(teamId))
         }
         else {
           setIsTeamEmpty(true)
         }
       })
     }
-  }, [authUser, router])
+  }, [preferences.board.selectedTeamId, authUser, router])
 
   return (
     <div className="w-full h-full flex-center">

@@ -5,8 +5,6 @@ import {Search} from "lucide-react";
 import {Input} from "@/components/ui/input";
 import {useEffect, useState} from "react";
 import SongService from "@/apis/SongService";
-import {useRecoilValue} from "recoil";
-import {currentTeamIdAtom} from "@/global-states/teamState";
 import {Song} from "@/models/song";
 import {Button} from "@/components/ui/button";
 import {SongSelectCardList} from "@/app/board/[teamId]/plan/_components/song-select-card-list";
