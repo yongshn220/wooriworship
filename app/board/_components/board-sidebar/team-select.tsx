@@ -12,6 +12,7 @@ import {auth} from "@/firebase";
 import {userAtom} from "@/global-states/userState";
 import useLocalStorage from "@/components/hook/use-local-storage";
 import useUserPreferences from "@/components/hook/use-local-preference";
+import {useState} from "react";
 
 interface Props {
   createOption: boolean
