@@ -10,6 +10,8 @@ import {useRouter} from "next/navigation";
 import {getPathPlan} from "@/components/helper/routes";
 import {auth} from "@/firebase";
 import {userAtom} from "@/global-states/userState";
+import useLocalStorage from "@/components/hook/use-local-storage";
+import useUserPreferences from "@/components/hook/use-local-preference";
 
 interface Props {
   createOption: boolean
@@ -19,9 +21,18 @@ export function TeamSelect({createOption}: Props) {
   const router = useRouter()
   const [currentTeamId, setCurrentTeamId] = useRecoilState(currentTeamIdAtom)
   const user = useRecoilValue(userAtom(authUser?.uid))
+  const [preferences, setPreferences] = useUserPreferences()
+
+  function updatePreferenceSelectedTeamId(id) {
+    setPreferences(prev => {
+      const boardPref = {...prev.board, selectedTeamId: id}
+      return {...prev, board: boardPref}
+    });
+  }
 
   function handleChangeTeam(teamId: string) {
     if (teamId) {
+      updatePreferenceSelectedTeamId(teamId)
       setCurrentTeamId(teamId)
       router.push(getPathPlan(teamId))
     }
