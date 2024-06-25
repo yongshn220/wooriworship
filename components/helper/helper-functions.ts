@@ -151,6 +151,8 @@ export function timestampToDate(timestamp: Timestamp) {
 
 export function OpenYoutubeLink(url: string) {
   if (url) {
+    window.open(url, '_blank');
+    return;
     // Extract the video ID from the YouTube URL (assuming it is in the standard format)
     const videoId = url.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/)?.[1];
 
