@@ -155,7 +155,7 @@ export function OpenYoutubeLink(url: string) {
     const videoId = url.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/)?.[1];
 
     if (videoId) {
-      if (isMobile() && !isPWA()) {
+      if (isMobile()) {
         window.location.href = `youtube://www.youtube.com/watch?v=${videoId}`;
       }
       else {
