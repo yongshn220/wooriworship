@@ -1,10 +1,5 @@
-import {
-  Drawer, DrawerClose,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
-import {LayoutDashboard, LibraryBig, PlusCircleIcon, UsersIcon} from "lucide-react";
+import {Drawer, DrawerContent, DrawerHeader, DrawerTrigger,} from "@/components/ui/drawer"
+import {PlusCircleIcon} from "lucide-react";
 import {CreateWorshipButton} from "@/app/board/_components/bottom-navbar/create-worship-button";
 import {CreateSongButton} from "@/app/board/_components/bottom-navbar/create-song-button";
 import {CreateTeamButton} from "@/app/board/_components/bottom-navbar/create-team-button";
@@ -14,8 +9,8 @@ export function CreateButton() {
   return (
     <Drawer>
       <DrawerTrigger className="flex-center flex-col">
-        <PlusCircleIcon/>
-        <p className="text-sm">Create</p>
+        <PlusCircleIcon strokeWidth={3}/>
+        <p className="text-sm prevent-text-select">Create</p>
       </DrawerTrigger>
       <DrawerContent className="w-full min-h-[240px]">
         <DrawerHeader>
