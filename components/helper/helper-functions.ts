@@ -149,17 +149,13 @@ export function timestampToDate(timestamp: Timestamp) {
   }
 }
 
-export function isMobile() {
-  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-}
-
 export function OpenYoutubeLink(url: string) {
   if (url) {
     // Extract the video ID from the YouTube URL (assuming it is in the standard format)
     const videoId = url.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/)?.[1];
 
     if (videoId) {
-      if (isMobile()) {
+      if (isMobile() && !isPWA()) {
         window.location.href = `youtube://www.youtube.com/watch?v=${videoId}`;
       }
       else {
@@ -170,6 +166,16 @@ export function OpenYoutubeLink(url: string) {
       window.open(url, '_blank');
     }
   }
+}
+
+function isMobile() {
+  // Example of a simple mobile detection function
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function isPWA() {
+  // Example of a function to detect if the app is running as a PWA
+  return window.matchMedia('(display-mode: standalone)').matches;
 }
 
 export function emailExists(emails: Array<string>, targetEmail:string) {

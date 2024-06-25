@@ -9,6 +9,8 @@ import {OpenYoutubeLink, timestampToDatePassedFromNow} from "@/components/helper
 import {MenuButton} from "@/app/board/[teamId]/song/_components/menu-button";
 import {SongMusicSheetViewer} from "@/app/board/[teamId]/song/_components/song-music-sheet-viewer";
 import {useState} from "react";
+import {LinkIcon} from "lucide-react";
+import {Button} from "@/components/ui/button";
 
 interface Props {
   teamId: string
@@ -63,9 +65,13 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, song, readOnly=false}
               <Label htmlFor="name" className="text-base font-semibold">
                 Link
               </Label>
-              <p className="text-blue-500 hover:text-blue-600 cursor-pointer" onClick={handleLinkButtonClick}>
-                {song?.original.url}
-              </p>
+              <Button variant="ghost" className="text-blue-500 hover:text-blue-600 cursor-pointer gap-2 p-0" onClick={handleLinkButtonClick}>
+                <LinkIcon className="w-4 h-4"/>
+                <p>Go to the Link</p>
+              </Button>
+              {/*<p className="text-blue-500 hover:text-blue-600 cursor-pointer" onClick={handleLinkButtonClick}>*/}
+              {/*  {song?.original.url}*/}
+              {/*</p>*/}
             </div>
             <div className="flex-between items-center">
               <Label htmlFor="name" className="text-base font-semibold">
