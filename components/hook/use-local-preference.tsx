@@ -14,7 +14,7 @@ interface BoardPreference {
 }
 
 
-export default function useUserPreferences() {
+export default function useUserPreferences(): [Preference,  (value: (((prevState: Preference) => Preference) | Preference)) => void] {
   const [preferences, setPreferences] = useLocalStorage<Preference>('userPreferences', {
     board: {
       selectedTeamId: "",
