@@ -21,6 +21,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <meta name="viewport" content="width=device-width, user-scalable=no"/>
       <title>Wooriworship | Worship team collaborator</title>
       <link rel="icon" href="/favicon.png"/>
+      <link rel="apple-touch-icon" href="/image/fill-logo-192.png" type="image/<generated>" sizes="<generated>"/>
       <link rel="manifest" href="/manifest.json"/>
     </head>
     <body className={inter.className}>
