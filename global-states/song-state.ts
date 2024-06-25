@@ -20,7 +20,7 @@ export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
         const selectedTags = get(searchSelectedTagsAtom)
 
         let filtered = songList.filter((song) => song.title.toLowerCase().includes(searchInput.toLowerCase()))
-        filtered = filtered.filter((song) => song.tags.some(tag => selectedTags.includes(tag) || selectedTags.length === 0))
+        filtered = filtered.filter((song) => song.tags.some((tag: string) => selectedTags.includes(tag) || selectedTags.length === 0))
         return filtered.map((song) => song.id)
       }
       catch (e) {
