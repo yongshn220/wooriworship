@@ -1,11 +1,14 @@
 "use client"
-import {useRecoilValueLoadable} from "recoil";
+import {useRecoilValue, useRecoilValueLoadable} from "recoil";
 import {currentTeamSongIdsAtom} from "@/global-states/song-state";
 import {SongListItem} from "@/app/board/[teamId]/song/_components/song-list-item";
 import {Separator} from "@/components/ui/separator";
 import Image from "next/image";
 import * as React from "react";
 import {NewSongButton} from "@/app/board/[teamId]/song/_components/new-song-button";
+import {searchSelectedTagsAtom, songSearchInputAtom} from "@/app/board/_states/board-states";
+import {useDebounce} from "use-debounce";
+import {useMemo} from "react";
 
 interface Props {
   teamId: string
@@ -34,7 +37,6 @@ export function SongListView({teamId}: Props) {
           {
             (songIdsLoadable.contents?.length > 0) ?
             <div className="flex-center flex-col mx-2 box-border">
-
               {
                 songIdsLoadable.contents.map((songId) => (
                   <div key={songId} className="w-full">

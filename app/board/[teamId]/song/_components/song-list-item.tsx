@@ -25,7 +25,7 @@ export function SongListItem({songId}: Props) {
         <div className="flex gap-2">
           <p className="font-semibold text-md">{song?.title}</p>
           {
-            song?.key !== "" &&
+            song?.key &&
             <div className="flex-center text-sm text-white font-medium bg-gray-400 rounded-sm w-5 h-5">{song.key}</div>
           }
         </div>

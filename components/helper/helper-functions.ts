@@ -99,6 +99,8 @@ export function timestampToDatePassedFromNow(timestamp: Timestamp) {
 }
 
 export function timestampToDatePassedFromNowShorten(timestamp: Timestamp) {
+  if (!timestamp) return ""
+
   const jsDate = new Date(timestamp.seconds * 1000); // Convert Firestore timestamp to JavaScript Date
   const now = new Date();
 
