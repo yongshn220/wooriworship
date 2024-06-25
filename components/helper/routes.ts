@@ -8,6 +8,10 @@ export function getPathPlan(teamId: string) {
   return Routes.BOARD + `/${teamId}` + Routes.PLAN
 }
 
+export function getPathManagePlan(teamId: string) {
+  return Routes.BOARD + `/${teamId}` + Routes.MANAGE_TEAM
+}
+
 export function getPathSong(teamId: string) {
   return Routes.BOARD + `/${teamId}` + Routes.SONG
 }

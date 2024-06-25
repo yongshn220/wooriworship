@@ -1,7 +1,7 @@
 "use client"
 
 import {Drawer, DrawerContent, DrawerHeader, DrawerTrigger,} from "@/components/ui/drawer"
-import {SettingsIcon} from "lucide-react";
+import {MenuIcon, SettingsIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {AuthService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
@@ -34,21 +34,21 @@ export function SettingButton() {
   return (
     <Drawer>
       <DrawerTrigger className="flex-center flex-col">
-        <SettingsIcon/>
-        <p className="text-sm">Setting</p>
+        <MenuIcon strokeWidth={3} className="prevent-text-select"/>
+        <p className="text-sm prevent-text-select">Menu</p>
       </DrawerTrigger>
       <DrawerContent className="w-full min-h-[240px]">
         <DrawerHeader>
-          <p className="font-semibold">Wooriworship</p>
+          <p className="font-semibold prevent-text-select">Wooriworship</p>
         </DrawerHeader>
         <div className="w-full h-full flex-center flex-col gap-4 p-2">
           <InvitationButton/>
           <Button disabled={true} variant="ghost" className="w-full flex-start gap-2">
             <SettingsIcon className="w-[20px] h-[20px]"/>
-            <p>Account Setting</p>
+            <p className="prevent-text-select">Account Setting</p>
           </Button>
           <Separator/>
-          <Button className="w-full" onClick={handleSignOut}>
+          <Button className="w-full prevent-text-select" onClick={handleSignOut}>
             Sign Out
           </Button>
         </div>

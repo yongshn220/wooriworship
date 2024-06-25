@@ -4,6 +4,7 @@ export enum Routes {
   BOARD = "/board",
   PLAN = "/plan",
   SONG = "/song",
+  MANAGE_TEAM = "/manage-team",
   EDIT = "/edit",
   WORSHIP = "/worship",
   WORSHIP_LIVE = "/live",
@@ -14,6 +15,7 @@ export enum Page {
   BOARD,
   PLAN,
   SONG,
+  MANAGE_TEAM,
   WORSHIP,
   HONE,
 }

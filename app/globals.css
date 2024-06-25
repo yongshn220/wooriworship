@@ -17,6 +17,13 @@ input, a {
   box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.01), 0 -5px 4px -1px rgba(0, 0, 0, 0.07);
 }
 
+.prevent-text-select {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* Standard syntax */
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
