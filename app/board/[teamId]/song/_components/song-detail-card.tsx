@@ -69,9 +69,6 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, song, readOnly=false}
                 <LinkIcon className="w-4 h-4"/>
                 <p>Go to the Link</p>
               </Button>
-              {/*<p className="text-blue-500 hover:text-blue-600 cursor-pointer" onClick={handleLinkButtonClick}>*/}
-              {/*  {song?.original.url}*/}
-              {/*</p>*/}
             </div>
             <div className="flex-between items-center">
               <Label htmlFor="name" className="text-base font-semibold">

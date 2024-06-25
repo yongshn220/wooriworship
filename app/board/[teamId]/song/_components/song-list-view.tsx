@@ -23,18 +23,18 @@ export function SongListView({teamId}: Props) {
           {
             (songIdsLoadable.contents?.length > 0) &&
             <div>
-              <div className="flex text-sm text-gray-500 px-6 mt-10">
+              <div className="hidden md:flex text-sm text-gray-600 px-6 mt-10 font-semibold">
                 <p className="flex-1">Title</p>
-                <p className="hidden lg:flex flex-[0.4] justify-end">Version</p>
-                <div className="hidden sm:flex justify-end sm:flex-1 text-end">Tag</div>
-                <p className="flex justify-end flex-1 lg:flex-[0.5]">Last used date</p>
+                <p className="hidden lg:flex flex-[0.4] justify-start border-l border-gray-300 pl-2">Version</p>
+                <div className="hidden sm:flex justify-start sm:flex-1 text-start border-l border-gray-300 pl-2">Tag</div>
+                <p className="flex justify-end lg:flex-[0.5] pl-2">Last used date</p>
               </div>
-              <Separator/>
             </div>
           }
           {
             (songIdsLoadable.contents?.length > 0) ?
             <div className="flex-center flex-col mx-2 box-border">
+
               {
                 songIdsLoadable.contents.map((songId) => (
                   <div key={songId} className="w-full">
