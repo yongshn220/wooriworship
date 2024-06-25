@@ -3,7 +3,7 @@ import {currentTeamIdAtom} from "@/global-states/teamState";
 import {songAtom} from "@/global-states/song-state";
 import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
-import {timestampToDatePassedFromNow, timestampToDatePassedFromNowMini} from "@/components/helper/helper-functions";
+import {timestampToDatePassedFromNow, timestampToDatePassedFromNowShorten} from "@/components/helper/helper-functions";
 import {Badge} from "@/components/ui/badge";
 
 interface Props {
@@ -36,7 +36,7 @@ export function SongListItem({songId}: Props) {
         }
       </div>
       <div className="flex flex-1 lg:flex-[0.5] justify-end items-center text-gray-500 text-sm">
-        <div className="lg:hidden">{timestampToDatePassedFromNowMini(song?.last_used_time)}</div>
+        <div className="lg:hidden">{timestampToDatePassedFromNowShorten(song?.last_used_time)}</div>
         <div className="hidden lg:flex">{timestampToDatePassedFromNow(song?.last_used_time)}</div>
       </div>
     </div>
