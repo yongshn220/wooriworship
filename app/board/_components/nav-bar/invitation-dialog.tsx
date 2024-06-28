@@ -7,9 +7,10 @@ import {auth} from "@/firebase";
 import {Invitation} from "@/models/invitation";
 import {useRecoilValue} from "recoil";
 import {pendingReceivedInvitationsAtom} from "@/global-states/invitation-state";
-import {Suspense} from "react";
+import {Suspense, useEffect, useState} from "react";
 import Image from "next/image";
 import {Separator} from "@/components/ui/separator";
+import {InvitationService} from "@/apis";
 
 interface Props {
   isOpen: boolean
@@ -17,7 +18,20 @@ interface Props {
 }
 export function InvitationDialog({isOpen, setIsOpen}: Props) {
   const authUser = auth.currentUser
-  const invitations = useRecoilValue(pendingReceivedInvitationsAtom(authUser?.email))
+  const [invitations, setInvitations] = useState([])
+
+  useEffect(() => {
+    if (isOpen) {
+      try {
+        InvitationService.getPendingReceivedInvitations(authUser.email).then(invitations => {
+          setInvitations(invitations)
+        })
+      }
+      catch (e) {
+        console.log(e)
+      }
+    }
+  }, [isOpen, authUser.email])
 
   return (
     <Dialog open={isOpen} onOpenChange={(isOpen) => setIsOpen(isOpen)}>

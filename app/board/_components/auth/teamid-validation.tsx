@@ -22,7 +22,6 @@ export function TeamIdValidation({teamId, children}: Props) {
   const router = useRouter()
 
 
-
   useEffect(() => {
     if (!teamId) {
       setCurrentTeamId(null)

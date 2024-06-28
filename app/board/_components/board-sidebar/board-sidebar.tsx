@@ -13,19 +13,22 @@ import {ManageTeamButton} from "@/app/board/_components/nav-bar/manage-team-butt
 import {useRouter} from "next/navigation";
 import {InvitationButton} from "@/app/board/_components/nav-bar/invitation-button";
 import {ManageTeamDialog} from "@/app/board/_components/nav-bar/manage-team-dialog";
+import React, {Suspense, useEffect} from "react";
+import {FallbackText} from "@/components/fallback-text";
 
 export function BoardSidebar() {
   const currentPage = useRecoilValue(currentPageAtom)
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
   const router = useRouter()
 
-  console.log("sidebar", currentTeamId)
   return (
     <MdSidebar>
       <MainLogoRouter route={""}/>
       <div className="flex-between flex-col w-full h-full">
         <div className="space-y-2 ">
-          <TeamSelect createOption={true}/>
+          <Suspense fallback={<FallbackText text="Loading teams..."/>}>
+            <TeamSelect createOption={true}/>
+          </Suspense>
           <Button disabled={!currentTeamId} variant={(currentPage === Page.PLAN)? "secondary" : "ghost"} size="lg" className="font-normal w-full justify-start px-2" onClick={() => router.push(getPathPlan(currentTeamId))}>
             <LayoutDashboard className="h-4 w-4 mr-2"/>
             Worship Plan
@@ -36,10 +39,12 @@ export function BoardSidebar() {
           </Button>
         </div>
         <div className="w-full mb-4 space-y-2">
-          <InvitationButton/>
-          <ManageTeamDialog>
-            <ManageTeamButton/>
-          </ManageTeamDialog>
+          <Suspense fallback={<FallbackText text="Loading..."/>}>
+            <InvitationButton/>
+            <ManageTeamDialog>
+              <ManageTeamButton/>
+            </ManageTeamDialog>
+          </Suspense>
         </div>
       </div>
     </MdSidebar>

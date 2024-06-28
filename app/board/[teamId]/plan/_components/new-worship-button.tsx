@@ -1,6 +1,6 @@
 'use client'
 
-import {useState} from "react";
+import {Suspense, useState} from "react";
 import {Song} from "@/models/song";
 import {WorshipForm} from "@/app/board/[teamId]/plan/_components/worship-form";
 import {FormMode} from "@/components/constants/enums";
@@ -30,7 +30,9 @@ export function NewWorshipButton() {
 
   return (
     <>
-      <WorshipForm mode={FormMode.CREATE} isOpen={isOpen} setIsOpen={setIsOpen} worship={null}/>
+      <Suspense fallback={<div>loading worship form...</div>}>
+        <WorshipForm mode={FormMode.CREATE} isOpen={isOpen} setIsOpen={setIsOpen} worship={null}/>
+      </Suspense>
       <Button disabled={!teamId} className="bg-purple-500 hover:bg-purple-400" onClick={handleClick}>
         + Add Worship
       </Button>

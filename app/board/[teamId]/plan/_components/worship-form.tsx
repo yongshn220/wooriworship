@@ -50,6 +50,7 @@ export function WorshipForm({mode, isOpen, setIsOpen, worship}: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtom(teamId))
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
+
   const [basicInfo, setBasicInfo] = useState({
     title: (mode === FormMode.EDIT)? worship?.title ?? "" : "",
     description: (mode === FormMode.EDIT)? worship?.description ?? "" : "",

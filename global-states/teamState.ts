@@ -18,7 +18,6 @@ export const teamAtom = atomFamily<Team, string>({
     key: "teamAtom/default",
     get: (teamId) => async ({get}) => {
       get(teamUpdaterAtom)
-
       try {
         if (!teamId) return null
 
