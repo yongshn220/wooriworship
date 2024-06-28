@@ -10,7 +10,7 @@ interface Props {
   songHeader: SongHeader
 }
 export function SongCarouselItem({songHeader}: Props) {
-  const song = useRecoilValue(songAtom(songHeader.id))
+  const song = useRecoilValue(songAtom(songHeader?.id))
 
   if (!song) return <></>
 
