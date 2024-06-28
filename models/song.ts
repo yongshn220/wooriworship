@@ -1,6 +1,6 @@
 import {Timestamp} from "@firebase/firestore";
 
-export interface Song {
+export type Song = {
   id: string
   team_id: string
   title: string
