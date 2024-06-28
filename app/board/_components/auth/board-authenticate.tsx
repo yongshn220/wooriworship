@@ -22,7 +22,7 @@ export function BoardAuthenticate({children}: Readonly<{ children: React.ReactNo
 
 
   return (
-    <div className="h-full">
+    <div className="w-full h-full">
       {
         (access) && children
       }
