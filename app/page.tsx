@@ -24,7 +24,7 @@ export default function Home() {
     auth.onAuthStateChanged((authUser) => {
       console.log("ON AUTH STATE CHANGED")
       if (authUser) {
-        UserService.getById(authUser.uid).then((user: User) => {
+        UserService.getById(authUser.uid).then((user) => {
           if (!user) {
             console.log("Something went wrong.")
             return;
