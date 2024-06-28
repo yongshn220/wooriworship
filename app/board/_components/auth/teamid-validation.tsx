@@ -48,7 +48,7 @@ export function TeamIdValidation({teamId, children}: Props) {
 
 
   return (
-    <div className="h-full">
+    <div className="w-full h-full">
       {
         (teamLoadable.state === 'hasValue' && teamLoadable.contents?.id) && children
       }
