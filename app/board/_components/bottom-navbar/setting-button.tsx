@@ -14,16 +14,14 @@ import {Separator} from "@/components/ui/separator";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 
 export function SettingButton() {
-  const authUser = auth.currentUser
-  const user = useRecoilValue(userAtom(authUser?.uid))
-  const setCurrentTeam = useSetRecoilState(currentTeamIdAtom)
+  const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
   const router = useRouter()
 
   async function handleSignOut() {
     try {
       await AuthService.logout();
-      setCurrentTeam(null)
-      toast({title: `Goodbye, ${user.name} :)`})
+      setCurrentTeamId(null)
+      toast({title: `Goodbye :)`})
       router.replace("/")
     }
     catch (err: any) {

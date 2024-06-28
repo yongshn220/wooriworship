@@ -7,7 +7,7 @@ import {BottomNavbar} from "@/app/board/_components/bottom-navbar/bottom-navbar"
 
 
 export default function BoardLayout({ children }: any) {
-
+  console.log("----BoardLayout")
   return (
     <section className="h-full">
       <BoardAuthenticate>

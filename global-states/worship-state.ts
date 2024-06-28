@@ -56,7 +56,6 @@ export const worshipAtom = atomFamily<Worship, string>({
     get: (worshipId) => async ({get}) => {
       get(worshipUpdaterAtom)
       try {
-        console.log("worshipAtom")
         const worship = await WorshipService.getById(worshipId) as Worship
         if (!worship) return null
 

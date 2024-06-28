@@ -12,14 +12,14 @@ import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/app/board/[teamId]/song/_components/multiple-image-uploader";
 import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
-import {useRecoilValue, useSetRecoilState} from "recoil";
+import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {SongService, StorageService, TagService}  from "@/apis";
 import {FormMode} from "@/components/constants/enums";
 import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
 import {auth} from "@/firebase";
-import {currentTeamSongIdsAtom} from "@/global-states/song-state";
+import {currentTeamSongIdsAtom, songSelector, testAtom} from "@/global-states/song-state";
 import {songAtom, songUpdaterAtom} from "@/global-states/song-state";
 import useViewportHeight from "@/components/hook/use-viewport-height";
 import PdfUploader from "@/app/board/[teamId]/song/_components/pdf-uploader";
@@ -48,7 +48,7 @@ export interface MusicSheet {
 }
 
 export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
-  const song = useRecoilValue(songAtom(songId))
+  const song = useRecoilValue(songSelector(songId))
   const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
@@ -69,7 +69,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   const viewportHeight = useViewportHeight();
   const { toast } = useToast()
   const router = useRouter()
-
+  //
   useEffect(() => {
     const _musicSheets = song?.music_sheet_urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<MusicSheet>
     if (_musicSheets)
@@ -191,8 +191,8 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
         </DialogHeader>
         <div className="grid gap-6 py-4">
           <div className="flex-center gap-2">
-            <TeamIcon name={team?.name || "Team"}/>
-            <p className="font-bold text-sm">{team?.name}</p>
+            {/*<TeamIcon name={team?.name || "Team"}/>*/}
+            {/*<p className="font-bold text-sm">{team?.name}</p>*/}
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="name">Title</Label>

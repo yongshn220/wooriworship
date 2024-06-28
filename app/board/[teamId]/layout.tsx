@@ -1,7 +1,9 @@
 "use client"
 
-import React from "react";
+import React, {Suspense} from "react";
 import {TeamIdValidation} from "@/app/board/_components/auth/teamid-validation";
+import {TestComponent} from "@/app/board/test-component";
+import {FallbackText} from "@/components/fallback-text";
 
 
 interface Props {
@@ -11,12 +13,14 @@ interface Props {
 
 export default function BoardTeamLayout({params, children}: Props) {
   const teamId = params.teamId
-
+  console.log("-------BoardTeamLayout")
   return (
     <div className="w-full h-full">
-      <TeamIdValidation teamId={teamId}>
-        {children}
-      </TeamIdValidation>
+      <Suspense fallback={<FallbackText text="Loading..."/>}>
+        <TeamIdValidation teamId={teamId}>
+          {children}
+        </TeamIdValidation>
+      </Suspense>
     </div>
   )
 }

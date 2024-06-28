@@ -11,7 +11,6 @@ export function BoardAuthenticate({children}: Readonly<{ children: React.ReactNo
   useEffect(() => {
     auth.onAuthStateChanged((authUser) => {
       if (authUser) {
-        console.log("LOGIN SUCCESS", authUser.uid)
         setAccess(true)
       }
       else {

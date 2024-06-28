@@ -7,7 +7,6 @@ export default class BaseService {
     }
 
     async getById(id: string) {
-        console.log("getbyid: ", this.collectionName)
         try {
             const ref = firestore.collection(this.collectionName).doc(id);
             const res = await ref.get();
