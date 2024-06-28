@@ -62,7 +62,7 @@ export const songAtom = atomFamily<Song, string>({
   key: "songAtom",
   default: selectorFamily({
     key: "songAtom/default",
-    get: (songId) => async ({get}) => {
+    get: (songId: string) => async ({get}) => {
       get(songUpdaterAtom)
       try {
         const song = await SongService.getById(songId) as Song
