@@ -57,15 +57,16 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
   const router = useRouter()
 
   const clearContents = useCallback(() => {
-    setBasicInfo({title:"", description: ""})
-    setDate(new Date())
+    // setBasicInfo({title:"", description: ""})
+    // setDate(new Date())
     setIsLoading(false)
+    // todo: check if this called first
     setSelectedSongInfoList([])
   }, [setSelectedSongInfoList])
 
 
   useEffect(() => {
-    clearContents()
+    return () => clearContents()
   }, [clearContents]);
 
 
