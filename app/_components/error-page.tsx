@@ -10,7 +10,7 @@ import Link from "next/link";
 
 export function ErrorPage() {
   return (
-    <div className="absolute flex-center flex-col w-full h-full gap-4">
+    <div className="flex-center flex-col w-full h-full gap-4">
       <div className="absolute bottom-10">
         <MainLogo/>
       </div>

@@ -3,7 +3,6 @@
 import {Dialog, DialogContentNoCloseButton, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Badge} from "@/components/ui/badge";
-import {Song} from "@/models/song";
 import Image from "next/image"
 import {OpenYoutubeLink, timestampToDatePassedFromNow} from "@/components/helper/helper-functions";
 import {MenuButton} from "@/app/board/[teamId]/song/_components/menu-button";
@@ -11,16 +10,19 @@ import {SongMusicSheetViewer} from "@/app/board/[teamId]/song/_components/song-m
 import {useState} from "react";
 import {LinkIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
+import {useRecoilValue} from "recoil";
+import {songAtom} from "@/global-states/song-state";
 
 interface Props {
   teamId: string
   isOpen: boolean
   setIsOpen: Function
-  song: Song
+  songId: string
   readOnly: boolean
 }
 
-export function SongDetailCard({teamId, isOpen, setIsOpen, song, readOnly=false}: Props) {
+export function SongDetailCard({teamId, isOpen, setIsOpen, songId, readOnly=false}: Props) {
+  const song = useRecoilValue(songAtom(songId))
   const [isMusicSheetViewOpen, setMusicSheetViewOpen] = useState(false)
 
   function handleLinkButtonClick() {

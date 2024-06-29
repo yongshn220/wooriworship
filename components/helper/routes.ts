@@ -8,7 +8,15 @@ export function getPathPlan(teamId: string) {
   return Routes.BOARD + `/${teamId}` + Routes.PLAN
 }
 
-export function getPathManagePlan(teamId: string) {
+export function getPathCreatePlan(teamId: string) {
+  return Routes.BOARD + `/${teamId}` + Routes.CREATE_PLAN
+}
+
+export function getPathEditPlan(teamId: string, worshipId: string) {
+  return Routes.BOARD + `/${teamId}` + Routes.EDIT_PLAN + `/${worshipId}`
+}
+
+export function getPathManageTeam(teamId: string) {
   return Routes.BOARD + `/${teamId}` + Routes.MANAGE_TEAM
 }
 
@@ -26,10 +34,6 @@ export function getPathSongEdit(teamId: string, songId: string) {
 
 export function getPathWorship(teamId: string, worshipId: string) {
   return Routes.WORSHIP + `/${teamId}` + `/${worshipId}`
-}
-
-export function getPathWorshipEdit(teamId: string, worshipId: string) {
-  return Routes.BOARD + `/${teamId}` + Routes.PLAN + `/${worshipId}` + Routes.EDIT
 }
 
 export function getPathWorshipStartMode(teamId: string, worshipId: string) {

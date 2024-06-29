@@ -1,13 +1,16 @@
 'use client'
 
-import {Dialog, DialogClose, DialogContent, DialogTrigger} from "@/components/ui/dialog";
+import {Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import {Search} from "lucide-react";
 import {Input} from "@/components/ui/input";
-import {useEffect, useState} from "react";
+import {Suspense, useEffect, useState} from "react";
 import SongService from "@/apis/SongService";
 import {Song} from "@/models/song";
 import {Button} from "@/components/ui/button";
-import {SongSelectCardList} from "@/app/board/[teamId]/plan/_components/song-select-card-list";
+import {SelectSongListView} from "@/app/board/[teamId]/create-plan/_components/select-song-list-view";
+import {LoadingCircle} from "@/components/animation/loading-indicator";
+import {useRecoilState} from "recoil";
+import {songSearchInputAtom} from "@/app/board/_states/board-states";
 
 interface Props {
   teamId: string
@@ -15,7 +18,7 @@ interface Props {
 
 export function AddSongButton({teamId}: Props) {
   const [songList, setSongList] = useState<Array<Song>>([])
-  const [input, setInput] = useState("")
+  const [input, setInput] = useRecoilState(songSearchInputAtom)
 
   useEffect(() => {
     SongService.getTeamSong(teamId).then(songList => {
@@ -30,24 +33,33 @@ export function AddSongButton({teamId}: Props) {
           <p className="text-gray-400 group-hover:text-gray-500">click to add song</p>
         </div>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[1000px] h-4/6 overflow-y-scroll scrollbar-hide">
-        <div className="w-full h-full mt-10">
-          <div className="relative">
-            <Search className="absolute top-1/2 left-3 transform -translate-y-1/2 text-muted-foreground h-5 w-5"/>
-            <Input
-              className="w-full pl-11 py-6"
-              placeholder="Search songs"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-            />
+      <DialogContent className="sm:max-w-4xl h-[90%]">
+        <div className="w-full overflow-y-scroll scrollbar-hide">
+          <DialogTitle>
+            Select Song
+          </DialogTitle>
+          <div className="w-full min-h-[80%] mt-10 flex-col">
+            <div className="w-full relative px-2">
+              <Search className="absolute top-1/2 left-5 transform -translate-y-1/2 text-muted-foreground h-5 w-5"/>
+              <Input
+                className="w-full pl-12 py-6"
+                placeholder="Search songs"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+              />
+            </div>
+            <Suspense fallback={<LoadingCircle/>}>
+              <SelectSongListView teamId={teamId}/>
+            </Suspense>
           </div>
-          <SongSelectCardList teamId={teamId} searchInput={input} songList={songList}/>
+          <div className="w-full mt-10">
+            <div className="w-full flex-center">
+              <DialogClose asChild>
+                <Button className="w-[60px]">Done</Button>
+              </DialogClose>
+            </div>
+          </div>
         </div>
-        <DialogClose asChild>
-          <div className="w-full flex-center">
-            <Button className="w-[60px]">Done</Button>
-          </div>
-        </DialogClose>
       </DialogContent>
     </Dialog>
   )

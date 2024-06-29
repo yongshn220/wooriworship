@@ -14,20 +14,7 @@ import {toast} from "@/components/ui/use-toast";
 export default function SongDetailPage({params}: any) {
   const teamId = params.teamId
   const songId = params.songId
-  const [songWrapper, setSongWrapper] = useState<{ song: Song, status: DataFetchStatus }>({
-    song: null,
-    status: DataFetchStatus.PROCESSING
-  })
   const router = useRouter()
-
-  useEffect(() => {
-    SongService.getById(songId).then(_song => {
-      setSongWrapper({
-        song: _song as Song,
-        status: (_song)? DataFetchStatus.VALID : DataFetchStatus.INVALID
-      })
-    })
-  }, [songId])
 
   function onOpenChangeHandler(state: boolean) {
     if (!state) {
@@ -35,19 +22,7 @@ export default function SongDetailPage({params}: any) {
     }
   }
 
-  if (songWrapper.status === DataFetchStatus.PROCESSING) {
-    return <></>
-  }
-  if (songWrapper.status === DataFetchStatus.INVALID) {
-    toast({
-      title: `Invalid song`,
-      description: "Selected song is deleted or not exist."
-    })
-    router.push(getPathSong(teamId))
-    return <></>
-  }
-
   return (
-     <SongDetailCard teamId={teamId} isOpen={true} setIsOpen={onOpenChangeHandler} song={toPlainObject(songWrapper.song)} readOnly={false} />
+     <SongDetailCard teamId={teamId} isOpen={true} setIsOpen={onOpenChangeHandler} songId={songId} readOnly={false} />
   )
 }

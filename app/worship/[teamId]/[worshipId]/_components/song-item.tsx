@@ -18,7 +18,7 @@ export function SongItem({teamId, songHeader, index}: Props) {
   if (!song) return <></>
 
   return (
-    <SongDetailCardWrapper teamId={teamId} song={song}>
+    <SongDetailCardWrapper teamId={teamId} songId={songHeader?.id}>
       <div className="flex-between w-full h-12 p-2 px-4 rounded-lg cursor-pointer hover:bg-gray-100">
         <div className="flex-between gap-4">
           <div className="hidden sm:flex  rounded-full aspect-square text-gray-500 ">

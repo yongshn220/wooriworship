@@ -5,18 +5,27 @@ import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
 import {timestampToDatePassedFromNow, timestampToDatePassedFromNowShorten} from "@/components/helper/helper-functions";
 import {Badge} from "@/components/ui/badge";
+import {Checkbox} from "@/components/ui/checkbox";
 
 interface Props {
   songId: string
+  viewMode: ViewMode
 }
 
-export function SongListItem({songId}: Props) {
+export enum ViewMode {
+  ROUTE,
+  NONE,
+}
+
+export function SongListItem({songId, viewMode=ViewMode.ROUTE}: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
   const song = useRecoilValue(songAtom(songId))
   const router = useRouter()
 
   function handleSongCardClick() {
-    router.push(getPathSongDetail(teamId, song?.id))
+    if (viewMode === ViewMode.ROUTE) {
+      router.push(getPathSongDetail(teamId, song?.id))
+    }
   }
 
   return (
