@@ -6,6 +6,7 @@ export enum Routes {
   SONG = "/song",
   CREATE_PLAN = "/create-plan",
   EDIT_PLAN = "/edit-plan",
+  EDIT = "/edit",
   MANAGE_TEAM = "/manage-team",
   WORSHIP = "/worship",
   WORSHIP_LIVE = "/live",
