@@ -5,16 +5,18 @@ import {SongInfo} from "@/app/board/[teamId]/plan/_components/new-worship-button
 import {useMemo} from "react";
 import {useRecoilState} from "recoil";
 import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
-import {SwapOrderButton} from "@/app/board/[teamId]/plan/_components/swap-order-button";
-import Image from "next/image";
 import {toPlainObject} from "@/components/helper/helper-functions";
+import {SongListItem, ViewMode} from "@/app/board/[teamId]/song/_components/song-list-item";
+import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
+import {SwapOrderButton} from "@/app/board/[teamId]/plan/_components/swap-order-button";
 
 interface Props {
+  teamId: string
   songOrder: number
   songInfo: SongInfo
 }
 
-export function NewSongCard({songOrder, songInfo}: Props) {
+export function NewSongCard({teamId, songOrder, songInfo}: Props) {
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
 
   const currentSongInfo = useMemo(() => (selectedSongInfoList.find((_songInfo => _songInfo.song.id === songInfo.song.id))), [selectedSongInfoList, songInfo.song.id])
@@ -37,39 +39,18 @@ export function NewSongCard({songOrder, songInfo}: Props) {
 
   return (
     <div className="w-full">
-      <div className="relative flex-center flex-col w-full h-72 border shadow-sm rounded-md p-2 gap-4">
-        <div className="w-full flex h-28">
-          <div className="absolute flex-center -translate-y-1/2 -right-4">
-            <SwapOrderButton songId={songInfo?.song?.id} songOrder={songOrder}/>
-          </div>
-          {
-            (currentSongInfo?.song?.music_sheet_urls?.length > 0) &&
-            <div className="h-full flex-center flex-col">
-              <div className="relative h-full w-full rounded-lg">
-                <Image
-                  src={currentSongInfo?.song?.music_sheet_urls[0]}
-                  fill
-                  sizes="20vw, 20vw, 20vw"
-                  className="object-fill p-1 rounded-md"
-                  alt="Music sheet image"
-                />
-              </div>
-              <p className="text-xs text-gray-500">click to view</p>
-            </div>
-          }
-          <div className="flex-1 h-full p-2 px-4">
-            <div className="flex-between">
-              <p className="font-semibold text-lg">{currentSongInfo?.song?.title}</p>
-              <p className="text-sm text-gray-500">bpm {currentSongInfo?.song?.bpm?.toString()}</p>
-            </div>
-            <p className="text-sm text-gray-600">{currentSongInfo?.song?.original?.author}</p>
-          </div>
+      <div className="relative flex flex-col w-full h-64 border shadow-sm rounded-md p-2 gap-4">
+        <SongDetailCardWrapper teamId={teamId} songId={songInfo?.song?.id}>
+          <SongListItem songId={songInfo?.song?.id} viewMode={ViewMode.NONE}/>
+        </SongDetailCardWrapper>
+        <div className="absolute flex-center -translate-y-1/2 -right-4">
+          <SwapOrderButton songId={songInfo?.song?.id} songOrder={songOrder}/>
         </div>
 
         <div className="w-full flex-1">
           <Textarea
             className="h-full bg-white"
-            placeholder="Write a note for the song."
+            placeholder="Write a note for the song. (Update note in the Song Board to set as default)"
             value={currentSongInfo?.note}
             onChange={(e) => handleOnNoteChange(e.target.value)}
           />

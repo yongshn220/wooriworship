@@ -31,7 +31,7 @@ export function SongSelectCardList({teamId, searchInput, songList}: Props) {
           <SongSelectCard
             teamId={teamId}
             key={song.id}
-            song={JSON.parse(JSON.stringify(song))}
+            songId={song.id}
             isSelected={selectedSongIds.includes(song.id)}
           />
         ))

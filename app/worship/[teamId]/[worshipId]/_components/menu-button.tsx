@@ -4,9 +4,8 @@ import MenuIcon from "@/public/icons/menuIcon.svg";
 import {DeleteConfirmationDialog} from "@/components/dialog/delete-confirmation-dialog";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
-import {getPathPlan, getPathWorshipEdit} from "@/components/helper/routes";
-import {useRecoilValue, useSetRecoilState} from "recoil";
-import {currentTeamIdAtom} from "@/global-states/teamState";
+import {getPathEditPlan, getPathPlan} from "@/components/helper/routes";
+import {useSetRecoilState} from "recoil";
 import { WorshipService } from "@/apis";
 import {CopyIcon, LinkIcon, SquarePen, Trash2Icon} from "lucide-react";
 import {currentTeamWorshipIdsAtom, worshipIdsUpdaterAtom} from "@/global-states/worship-state";
@@ -25,7 +24,7 @@ export function MenuButton({teamId, title, worshipId}: Props) {
   const router = useRouter()
 
   function handleEditWorship() {
-    router.push(getPathWorshipEdit(teamId, worshipId))
+    router.push(getPathEditPlan(teamId, worshipId))
   }
 
   async function handleDeleteWorship() {

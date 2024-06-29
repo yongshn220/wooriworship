@@ -1,5 +1,5 @@
 import {HomeIcon, Columns2Icon, UsersIcon} from "lucide-react";
-import {getPathManagePlan, getPathPlan, getPathSong} from "@/components/helper/routes";
+import {getPathManageTeam, getPathPlan, getPathSong} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {useRouter} from "next/navigation";
@@ -28,7 +28,7 @@ export function BottomNavbar() {
         <div className="w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer">
           <CreateButton/>
         </div>
-        <div className={cn("w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer", {"text-black" : (currentPage === Page.MANAGE_TEAM)})} onClick={() => router.push(getPathManagePlan(currentTeamId))}>
+        <div className={cn("w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer", {"text-black" : (currentPage === Page.MANAGE_TEAM)})} onClick={() => router.push(getPathManageTeam(currentTeamId))}>
           <UsersIcon strokeWidth={3}/>
           <p className="text-sm prevent-text-select">Team</p>
         </div>

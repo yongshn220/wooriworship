@@ -7,6 +7,8 @@ import {FormMode} from "@/components/constants/enums";
 import {useRecoilValue} from "recoil";
 import {Button} from "@/components/ui/button";
 import {currentTeamIdAtom} from "@/global-states/teamState";
+import {useRouter} from "next/navigation";
+import {getPathCreatePlan, getPathPlan} from "@/components/helper/routes";
 
 export interface WorshipInfo {
   title: string
@@ -23,9 +25,11 @@ export interface SongInfo {
 export function NewWorshipButton() {
   const [isOpen, setIsOpen] = useState(false)
   const teamId = useRecoilValue(currentTeamIdAtom)
+  const router = useRouter()
 
   function handleClick() {
-    setIsOpen(true)
+    // setIsOpen(true)
+    router.push(getPathCreatePlan(teamId))
   }
 
   return (

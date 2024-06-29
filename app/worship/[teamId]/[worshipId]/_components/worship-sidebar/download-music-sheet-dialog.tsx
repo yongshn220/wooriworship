@@ -6,7 +6,7 @@ import {Button} from "@/components/ui/button";
 import {Checkbox} from "@/components/ui/checkbox";
 import {useRecoilValue} from "recoil";
 import {useState} from "react";
-import {worshipSongListAtom} from "@/global-states/worship-state";
+import {worshipAtom, worshipSongListAtom} from "@/global-states/worship-state";
 import {downloadMultipleMusicSheets} from "@/components/helper/helper-functions";
 
 interface Props {

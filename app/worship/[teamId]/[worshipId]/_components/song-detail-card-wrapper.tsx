@@ -6,16 +6,16 @@ import {useState} from "react";
 
 interface Props {
   teamId: string
-  song: Song
+  songId: string
   children: React.ReactNode
 }
-export function SongDetailCardWrapper({teamId, song, children}: Props) {
+export function SongDetailCardWrapper({teamId, songId, children}: Props) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
     <>
-      <SongDetailCard teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} song={song} readOnly={true}/>
-      <div onClick={() => setIsOpen(prev => !prev)}>
+      <SongDetailCard teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={songId} readOnly={true}/>
+      <div onClick={() => setIsOpen(prev => !prev)} className="w-full">
         {children}
       </div>
     </>
