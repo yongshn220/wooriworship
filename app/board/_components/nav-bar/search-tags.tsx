@@ -49,13 +49,13 @@ export function SearchTags() {
       <PopoverContent className="mt-4 w-[400px] space-y-8">
         <div className="w-full">
           <p className="font-semibold">Tags</p>
-          <p className="text-sm text-gray-500">Select tags you like to search the songs</p>
+          <p className="text-sm text-gray-500">Select tags to filter the songs</p>
           <div className="relative w-full space-x-2 space-y-2 mt-2">
             {
               teamTags.map((tag, i) => (
                 <Badge
                   key={i}
-                  className={cn("bg-[#AA95CC] hover:bg-[#9780BE] cursor-pointer", {"bg-[#7357A1] hover:bg-[#7357A1]": isTagSelected(tag)})}
+                  className={cn("bg-[#BEB3CF] hover:bg-[#9780BE] cursor-pointer", {"bg-[#7357A1] hover:bg-[#7357A1]": isTagSelected(tag)})}
                   onClick={() => handleTagSelect(tag)}
                 >
                   {tag}
@@ -67,7 +67,7 @@ export function SearchTags() {
         <Separator/>
         <div>
           <p className="font-semibold">Sort</p>
-          <p className="text-sm text-gray-500">Sort the songs</p>
+          <p className="text-sm text-gray-500">Select option to sort the list</p>
           <div className="w-full mt-4">
             <div className="flex-between">
               <p className="text-sm font-semibold text-gray-500">Title</p>
