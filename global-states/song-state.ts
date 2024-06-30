@@ -1,9 +1,12 @@
-import {atom, atomFamily, selector, selectorFamily} from "recoil";
+import {atom, atomFamily, selectorFamily} from "recoil";
 import {Song} from "@/models/song";
 import {SongService} from "@/apis";
-import {currentTeamIdAtom} from "@/global-states/teamState";
-import {useMemo} from "react";
-import {searchSelectedTagsAtom, songSearchInputAtom} from "@/app/board/_states/board-states";
+import {
+  searchSelectedTagsAtom,
+  songBoardSelectedSortOptionAtom,
+  songSearchInputAtom
+} from "@/app/board/_states/board-states";
+import {SongBoardSortOption} from "@/components/constants/enums";
 
 export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
   key: "currentTeamSongIdsAtom",
@@ -13,15 +16,33 @@ export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
       if (!teamId) return []
 
       try {
-        const songList = await SongService.getTeamSong(teamId)
+        const songList = await SongService.getTeamSong(teamId) as Song[]
         if (!songList) return []
 
         const searchInput = get(songSearchInputAtom)
         const selectedTags = get(searchSelectedTagsAtom)
 
-        let filtered = songList.filter((song) => song.title.toLowerCase().includes(searchInput.toLowerCase()))
-        filtered = filtered.filter((song) => song.tags.some((tag: string) => selectedTags.includes(tag) || selectedTags.length === 0))
-        return filtered.map((song) => song.id)
+        // Search Filter
+        let modified = songList.filter((song) => song.title.toLowerCase().includes(searchInput.toLowerCase()))
+        // Tag Filter
+        modified = modified.filter((song) => song.tags.some((tag: string) => selectedTags.includes(tag) || selectedTags.length === 0))
+        // Sort
+        switch (get(songBoardSelectedSortOptionAtom)) {
+          case SongBoardSortOption.TITLE_ASCENDING:
+            modified = modified.sort((a, b) => a.title.localeCompare(b.title));
+            break;
+          case SongBoardSortOption.TITLE_DESCENDING:
+            modified = modified.sort((a, b) => b.title.localeCompare(a.title));
+            break;
+          case SongBoardSortOption.LAST_USED_DATE_ASCENDING:
+            modified = modified.sort((a, b) => a.last_used_time - b.last_used_time);
+            break;
+          case SongBoardSortOption.LAST_USED_DATE_DESCENDING:
+            modified = modified.sort((a, b) => b.last_used_time - a.last_used_time);
+            break;
+        }
+
+        return modified.map((song) => song.id)
       }
       catch (e) {
         console.log(e)
@@ -30,6 +51,7 @@ export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
     }
   })
 })
+
 
 export const testAtom = atomFamily<string, string>({
   key: "testAtom",

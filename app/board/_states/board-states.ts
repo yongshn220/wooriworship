@@ -1,5 +1,5 @@
 import {atom} from "recoil";
-import {Page, Routes} from "@/components/constants/enums";
+import {Page, SongBoardSortOption} from "@/components/constants/enums";
 
 
 export const currentPageAtom = atom({
@@ -15,4 +15,9 @@ export const songSearchInputAtom = atom({
 export const searchSelectedTagsAtom = atom<Array<string>>({
   key: "searchSelectedTagsAtom",
   default: []
+})
+
+export const songBoardSelectedSortOptionAtom = atom<SongBoardSortOption>({
+  key: "songBoardSelectedSortOptionAtom",
+  default: SongBoardSortOption.TITLE_ASCENDING,
 })

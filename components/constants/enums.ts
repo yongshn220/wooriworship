@@ -24,9 +24,6 @@ export enum Page {
   HONE,
 }
 
-export enum Param {
-  TEAM_ID = "teamId"
-}
 
 export enum UserRole {
   Leader = 0,
@@ -44,13 +41,10 @@ export enum InvitationStatus {
   Accepted = 2
 }
 
-export enum DataFetchStatus {
-  PROCESSING,
-  VALID,
-  INVALID
-}
-
-
-export enum ResetType {
-  ALL
+export enum SongBoardSortOption {
+  NONE,
+  TITLE_ASCENDING,
+  TITLE_DESCENDING,
+  LAST_USED_DATE_ASCENDING,
+  LAST_USED_DATE_DESCENDING,
 }
