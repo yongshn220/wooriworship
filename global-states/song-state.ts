@@ -35,10 +35,10 @@ export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
             modified = modified.sort((a, b) => b.title.localeCompare(a.title));
             break;
           case SongBoardSortOption.LAST_USED_DATE_ASCENDING:
-            modified = modified.sort((a, b) => (a.last_used_time ?? 0) - (b.last_used_time ?? 0));
+            modified = modified.sort((a, b) => Number(a.last_used_time || 0) - Number(b.last_used_time || 0))
             break;
           case SongBoardSortOption.LAST_USED_DATE_DESCENDING:
-            modified = modified.sort((a, b) => (b.last_used_time ?? 0) - (a.last_used_time ?? 0));
+            modified = modified.sort((a, b) => Number(b.last_used_time || 0) - Number(a.last_used_time || 0))
             break;
         }
 
