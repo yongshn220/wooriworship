@@ -3,7 +3,7 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react'
 import {LoadingCircle} from "@/components/animation/loading-indicator";
 
-export function PullToRefresh({ children }) {
+export function PullToRefresh({ children }: any) {
   const [startY, setStartY] = useState(0)
   const [pulling, setPulling] = useState(false)
   const [loading, setLoading] = useState(false)
