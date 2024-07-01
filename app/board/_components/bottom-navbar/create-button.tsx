@@ -3,6 +3,8 @@ import {PlusCircleIcon} from "lucide-react";
 import {CreateWorshipButton} from "@/app/board/_components/bottom-navbar/create-worship-button";
 import {CreateSongButton} from "@/app/board/_components/bottom-navbar/create-song-button";
 import {CreateTeamButton} from "@/app/board/_components/bottom-navbar/create-team-button";
+import {DialogTitle} from "@/components/ui/dialog";
+import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
 
 export function CreateButton() {
 
@@ -13,6 +15,11 @@ export function CreateButton() {
         <p className="text-sm prevent-text-select">Create</p>
       </DrawerTrigger>
       <DrawerContent className="w-full min-h-[240px]">
+        <VisuallyHidden>
+          <DialogTitle>
+            Create Menu
+          </DialogTitle>
+        </VisuallyHidden>
         <DrawerHeader>
           <p className="font-semibold">Start creating now</p>
         </DrawerHeader>

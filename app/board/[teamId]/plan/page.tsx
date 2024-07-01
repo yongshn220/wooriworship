@@ -4,6 +4,7 @@ import {PageInit} from "@/components/page/page-init";
 import {Page} from "@/components/constants/enums";
 import {WorshipCardList} from "@/app/board/[teamId]/plan/_components/worship-card-list";
 import {Suspense} from "react";
+import {PullToRefresh} from "@/components/functionality/pull-to-refresh";
 
 export default function PlanPage({params}: any) {
   const teamId = params.teamId
@@ -16,9 +17,9 @@ export default function PlanPage({params}: any) {
           Worship Plan
         </p>
       </div>
-      <Suspense fallback={<></>}>
-        <WorshipCardList teamId={teamId}/>
-      </Suspense>
+        <Suspense fallback={<></>}>
+          <WorshipCardList teamId={teamId}/>
+        </Suspense>
     </div>
   )
 }

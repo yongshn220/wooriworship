@@ -15,7 +15,7 @@ export function BottomNavbar() {
   const router = useRouter()
 
   return (
-    <div className="lg:hidden bottom-0 w-full h-[80px] bg-white shadow shadow-top">
+    <div className="lg:hidden bottom-0 w-full h-[80px] bg-white shadow shadow-top z-50">
       <div className="w-full h-full flex justify-between px-5">
         <div className={cn("w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer", {"text-black" : (currentPage === Page.PLAN)})} onClick={() => router.push(getPathPlan(currentTeamId))}>
           <HomeIcon strokeWidth={3}/>
