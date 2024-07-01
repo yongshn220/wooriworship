@@ -71,9 +71,8 @@ export function InvitationCard({invitation}: Props) {
 
   return (
     <div className="w-full h-full flex-start">
-      <div
-        className="w-full flex h-60 rounded-lg bg-gradient-to-r from-[#A594F9] to-[#6247AA] text-white p-4 shadow-lg shadow-[#A594F9]/80">
-        <div className="relative aspect-square h-full bg-white/20 rounded-sm p-2">
+      <div className="w-full flex h-40 sm:h-60 gap-8 rounded-lg bg-gradient-to-r from-[#A594F9] to-[#6247AA] text-white p-4 shadow-lg shadow-[#A594F9]/80">
+        <div className="hidden sm:block aspect-square h-full bg-white/20 rounded-sm p-2">
           <div className="relative h-full">
             <Image
               alt="compose music image"
@@ -82,7 +81,7 @@ export function InvitationCard({invitation}: Props) {
             />
           </div>
         </div>
-        <div className="w-full h-full flex flex-col pl-8">
+        <div className="w-full h-full flex flex-col">
           <div className="flex-1 flex flex-col gap-2">
             <p className="w-full flex-start text-2xl font-semibold">{team?.name}</p>
             <p className="w-full flex-start text-sm text-gray-200">From {sender?.email}</p>
@@ -92,7 +91,7 @@ export function InvitationCard({invitation}: Props) {
               <p className="text-xs text-gray-200 border p-1 rounded-sm">{timestampToDateStringFormatted(invitation?.invite_date)}</p>
             </div>
             <Button variant="ghost" onClick={handleDecline} className="hover:bg-white/20 hover:text-white">Decline</Button>
-            <Button onClick={handleAccept} className="hover:bg-purple-900">Join Team</Button>
+            <Button onClick={handleAccept} className="hover:bg-purple-900">Join</Button>
           </div>
         </div>
       </div>
