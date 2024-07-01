@@ -12,6 +12,8 @@ import {CreateNewTeamDialog} from "@/app/board/_components/create-new-team-dialo
 import {Button} from "@/components/ui/button";
 import {toast} from "@/components/ui/use-toast";
 import useUserPreferences from "@/components/hook/use-local-preference";
+import {MainLogo} from "@/components/logo/main-logo";
+import {isMobile} from "@/components/helper/helper-functions";
 
 
 export default function BoardPage() {
@@ -44,13 +46,28 @@ export default function BoardPage() {
       {
         isTeamEmpty ?
         <div className="w-full h-full flex-center flex-col gap-4">
-          <Image
-            alt="compose music image"
-            src="/illustration/offRoadIllustration.svg"
-            width={300}
-            height={300}
-          />
-          <p className="text-3xl font-semibold">Welcome to Wooriworship!</p>
+          {
+            isMobile() ?
+            <Image
+              alt="compose music image"
+              src="/illustration/offRoadIllustration.svg"
+              width={250}
+              height={250}
+            />
+              :
+            <Image
+              alt="compose music image"
+              src="/illustration/offRoadIllustration.svg"
+              width={300}
+              height={300}
+            />
+          }
+          {
+            isMobile() ?
+            <p className="text-3xl font-semibold">Welcome!</p>
+              :
+            <p className="text-3xl font-semibold">Welcome to Woori Worship!</p>
+          }
           <p className="text-gray-500">Click &ldquo;Add Team&rdquo; button to get started</p>
           <CreateNewTeamDialog>
             <Button>+ Add Team</Button>
