@@ -4,10 +4,12 @@ import {BoardSidebar} from "@/app/board/_components/board-sidebar/board-sidebar"
 import {Navbar} from "@/app/board/_components/nav-bar/nav-bar";
 import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate";
 import {BottomNavbar} from "@/app/board/_components/bottom-navbar/bottom-navbar";
+import {PullToRefresh} from "@/components/functionality/pull-to-refresh";
 
 
 export default function BoardLayout({ children }: any) {
   console.log("----BoardLayout")
+
   return (
     <section className="h-full">
       <BoardAuthenticate>

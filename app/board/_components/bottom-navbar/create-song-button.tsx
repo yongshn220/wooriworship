@@ -1,16 +1,12 @@
 'use client'
 
-import {Button} from "@/components/ui/button";
 import {useState} from "react";
 import {SongForm} from "@/app/board/[teamId]/song/_components/song-form";
 import {FormMode} from "@/components/constants/enums";
-import {useRecoilValue} from "recoil";
-import {currentTeamIdAtom} from "@/global-states/teamState";
 import {LibraryBig} from "lucide-react";
 
 export function CreateSongButton() {
   const [isOpen, setIsOpen] = useState(false)
-  const teamId = useRecoilValue(currentTeamIdAtom)
 
   return (
     <div>
