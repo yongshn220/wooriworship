@@ -51,12 +51,15 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, songId, readOnly=fals
             <p className="text-center font-semibold text-gray-500">{song.original.author}</p>
           </DialogHeader>
           <div className="grid gap-6 w-full mt-10">
-            <div className="flex-between items-center">
-              <Label htmlFor="name" className="text-base font-semibold">
-                Version
-              </Label>
-              <p>{song?.version}</p>
-            </div>
+            {
+              song?.version &&
+              <div className="flex-between items-center">
+                <Label htmlFor="name" className="text-base font-semibold">
+                  Version
+                </Label>
+                <p>{song?.version}</p>
+              </div>
+            }
             <div className="flex-between items-center">
               <Label htmlFor="name" className="text-base font-semibold">
                 Key
@@ -84,25 +87,31 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, songId, readOnly=fals
                 }
               </div>
             </div>
-            <div className="flex-between items-center">
-              <Label htmlFor="name" className="text-base font-semibold">
-                BPM
-              </Label>
-              <p>
-                {song?.bpm}
-              </p>
-            </div>
+            {
+              song?.bpm &&
+              <div className="flex-between items-center">
+                <Label htmlFor="name" className="text-base font-semibold">
+                  BPM
+                </Label>
+                <p>
+                  {song?.bpm}
+                </p>
+              </div>
+            }
             <div className="flex-between items-center">
               <Label htmlFor="name" className="text-base font-semibold">
                 Last Used Date
               </Label>
               <p className="text-sm">{timestampToDatePassedFromNow(song?.last_used_time)}</p>
             </div>
-            <div className="flex-start flex-col items-center gap-1.5 p-4 bg-gray-100 rounded-lg">
-              <div className="whitespace-pre-wrap">
-                {song.description}
+            {
+              song.description &&
+              <div className="flex-start flex-col items-center gap-1.5 p-4 bg-gray-100 rounded-lg">
+                <div className="whitespace-pre-wrap">
+                  {song.description}
+                </div>
               </div>
-            </div>
+            }
             {
               song.music_sheet_urls.length > 0 &&
               <div className="flex-start flex-col w-full items-center gap-1.5">
