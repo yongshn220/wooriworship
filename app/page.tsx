@@ -30,8 +30,9 @@ export default function Home() {
             return;
           }
 
-          if (user.teams?.length == 0) {
+          if (user.teams?.length === 0) {
             router.replace(getPathBoard())
+            return
           }
 
           const teamId = user.teams.includes(preferences.board.selectedTeamId)? preferences.board.selectedTeamId : user.teams[0]
