@@ -24,14 +24,14 @@ export function PullToRefresh({ children }: any) {
 
   useEffect(() => {
     const content = contentRef.current
-    const touchStart = (e) => {
+    const touchStart = (e: any) => {
       if (contentRef.current.scrollTop === 0) {
         setStartY(e.touches[0].clientY)
         setPulling(true)
       }
     }
 
-    function touchMove(e) {
+    function touchMove(e: any) {
       if (!pulling) return
       const currentY = e.touches[0].clientY
       const pullDistance = currentY - startY
