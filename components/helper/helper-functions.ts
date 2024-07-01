@@ -176,7 +176,7 @@ export function OpenYoutubeLink(url: string) {
   }
 }
 
-function isMobile() {
+export function isMobile() {
   // Example of a simple mobile detection function
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
