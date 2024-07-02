@@ -6,6 +6,9 @@ import {Separator} from "@/components/ui/separator";
 import Image from "next/image";
 import * as React from "react";
 import {NewSongButton} from "@/app/board/[teamId]/song/_components/new-song-button";
+import {useEffect} from "react";
+import {usePathname, useSearchParams} from "next/navigation";
+
 
 interface Props {
   teamId: string
@@ -13,6 +16,7 @@ interface Props {
 
 export function SongListView({teamId}: Props) {
   const songIdsLoadable = useRecoilValueLoadable(currentTeamSongIdsAtom(teamId))
+
 
   switch (songIdsLoadable.state) {
     case 'loading': return <></>;
