@@ -26,5 +26,5 @@ export function ScrollRestoration() {
     };
   }, [pathname, searchParams]);
 
-  return null; // This component doesn't render anything
+  return (<></>); // This component doesn't render anything
 }
