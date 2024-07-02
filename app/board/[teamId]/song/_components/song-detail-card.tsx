@@ -12,6 +12,7 @@ import {LinkIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
+import {SongComment} from "@/app/board/[teamId]/song/_components/song-comment";
 
 interface Props {
   teamId: string
@@ -140,6 +141,7 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, songId, readOnly=fals
             }
           </div>
           <div className="w-full flex-center">
+            <SongComment/>
           </div>
         </div>
       </DialogContentNoCloseButton>
