@@ -1,12 +1,10 @@
 "use client"
 
-import React, {useState} from "react";
+import React from "react";
 import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 
-export function CreateComment({postType, postId}) {
-  const [comment, setComment] = useState({content: "", isSecret: false})
+export function CreateComment() {
 
   async function handleSubmit(e: any) {
     e.preventDefault()
