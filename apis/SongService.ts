@@ -1,4 +1,5 @@
 import {BaseService, StorageService} from ".";
+import SongCommentService from "./SongCommentService";
 
 
 class SongService extends BaseService {
@@ -80,6 +81,12 @@ class SongService extends BaseService {
       if (!song) {
         return true;
       }
+      const promises = [];
+      const comments = await SongCommentService.getSongComments(song.id, song.team_id);
+      for(const comment of comments) {
+        promises.push(SongCommentService.delete(comment.id));
+      }
+      await Promise.all(promises);
       await StorageService.deleteMusicSheets(song.music_sheet_urls ? song.music_sheet_urls : []);
       await this.delete(songId);
       return true;

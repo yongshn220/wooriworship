@@ -82,6 +82,10 @@ class StorageService {
     //     }
     // }
 
+    async uploadNoticeFiles(team_id: string, files: Array<ImageFileContainer>) {
+        return await this.uploadMusicSheets(team_id, files);
+    }
+
     async uploadMusicSheets(team_id: string, musicSheets: Array<ImageFileContainer>) {
         const files = musicSheets.map((ms) => {
             return ms.file
@@ -90,6 +94,10 @@ class StorageService {
             return ms.id
         })
         return await this.uploadFiles(team_id, files as Array<File>, ids)
+    }
+
+    async deleteNoticeFiles(urls: Array<string>) {
+        return await this.deleteMusicSheets(urls);
     }
 
     async deleteMusicSheets(urls: Array<string>) {
@@ -104,6 +112,10 @@ class StorageService {
         } catch (err) {
             return false;
         }
+    }
+
+    async updateNoticeFiles(teamId: string, new_files: Array<ImageFileContainer>, delete_files: Array<string>) {
+        return await this.updateMusicSheets(teamId, new_files, delete_files);
     }
 
     async updateMusicSheets(teamId: string, new_sheets: Array<ImageFileContainer>, delete_sheets: Array<string>) {
