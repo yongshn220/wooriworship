@@ -15,7 +15,7 @@ export function CreateComment() {
 
   async function handleSubmit(e: any) {
     e.preventDefault()
-    // FE-todo: get songId, handle after server call
+    // FE-TODO: get songId, handle after server call
     const songId = "KpX3rvyzwYsJdSkscX7h"
     await SongCommentService.addNewSongComment(authUser.uid, teamId, songId, comment);
   }
