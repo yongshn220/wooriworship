@@ -1,11 +1,9 @@
 "use client"
 
-import {Page} from "@/components/constants/enums";
-import {PageInit} from "@/components/page/page-init";
 import {WorshipPlanPreview} from "@/app/board/[teamId]/_components/worship-plan-preview";
 import {NoticePreview} from "@/app/board/[teamId]/_components/notice-preview";
 
-export default function BoardHomePage({params}) {
+export default function BoardHomePage({params}: any) {
   const teamId = params.teamId
 
   return (
