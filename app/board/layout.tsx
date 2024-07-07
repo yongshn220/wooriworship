@@ -13,11 +13,11 @@ export default function BoardLayout({ children }: any) {
   return (
     <section className="h-full">
       <BoardAuthenticate>
-        <div className="flex gap-x-3 h-full">
+        <div className="flex h-full">
           <BoardSidebar/>
           <div className="h-full flex-1">
             <Navbar/>
-            <div className="pt-4 sm:mt-0 flex-1 h-[calc(100%-80px)] px-2 sm:px-6 overflow-y-scroll scrollbar-hide">
+            <div className="pt-4 sm:mt-0 flex-1 h-[calc(100%-80px)] px-2 sm:px-6 overflow-y-scroll bg-gray-50">
               {children}
             </div>
             <BottomNavbar/>
@@ -27,3 +27,4 @@ export default function BoardLayout({ children }: any) {
     </section>
   )
 }
+///h-[calc(100%-80px)]

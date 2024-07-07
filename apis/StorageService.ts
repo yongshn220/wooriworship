@@ -1,6 +1,6 @@
-import { MusicSheet } from "@/app/board/[teamId]/song/_components/song-form";
 import { storage } from "@/firebase"
 import {deleteObject, ref} from "firebase/storage";
+import {ImageFileContainer} from "@/components/constants/types";
 
 class StorageService {
     constructor() {}
@@ -82,7 +82,7 @@ class StorageService {
     //     }
     // }
 
-    async uploadMusicSheets(team_id: string, musicSheets: Array<MusicSheet>) {
+    async uploadMusicSheets(team_id: string, musicSheets: Array<ImageFileContainer>) {
         const files = musicSheets.map((ms) => {
             return ms.file
         })
@@ -106,7 +106,7 @@ class StorageService {
         }
     }
 
-    async updateMusicSheets(teamId: string, new_sheets: Array<MusicSheet>, delete_sheets: Array<string>) {
+    async updateMusicSheets(teamId: string, new_sheets: Array<ImageFileContainer>, delete_sheets: Array<string>) {
         try{
             await this.deleteMusicSheets(delete_sheets);
             console.log(new_sheets.length)

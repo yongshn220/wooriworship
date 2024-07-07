@@ -67,7 +67,7 @@ export function PullToRefresh({ children }: any) {
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
+    <div className="relative w-full h-full">
       <div
         ref={pullRef}
         className="absolute top-0 left-0 w-full flex items-center justify-center overflow-hidden transition-all duration-300"
@@ -75,7 +75,7 @@ export function PullToRefresh({ children }: any) {
       >
         <LoadingCircle/>
       </div>
-      <div ref={contentRef} className="w-full h-full overflow-auto">
+      <div ref={contentRef} className="w-full h-full">
         {children}
       </div>
     </div>

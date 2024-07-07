@@ -1,17 +1,17 @@
 import { v4 as uuid } from 'uuid';
 import {Dispatch, SetStateAction, useState} from "react";
-import {MusicSheet} from "@/app/board/[teamId]/song/_components/song-form";
 import {usePDFJS} from "@/components/hook/use-pdfjs";
 import * as PDFJS from "pdfjs-dist";
+import {ImageFileContainer} from "@/components/constants/types";
 
 interface Props {
-  musicSheets: Array<MusicSheet>;
-  setMusicSheets: Dispatch<SetStateAction<Array<MusicSheet>>>;
+  imageFileContainers: Array<ImageFileContainer>;
+  setImageFileContainers: Dispatch<SetStateAction<Array<ImageFileContainer>>>;
   maxNum: number;
   children: any;
 }
 
-export default function PdfUploader({musicSheets, setMusicSheets, maxNum, children}: Props) {
+export default function PdfUploader({imageFileContainers, setImageFileContainers, maxNum, children}: Props) {
   const [pdfjs, setPDFjs] = useState<typeof PDFJS>(null)
 
   usePDFJS(async (pdfjs) => {
@@ -31,11 +31,11 @@ export default function PdfUploader({musicSheets, setMusicSheets, maxNum, childr
 
         for (let pageNum = 1; pageNum <= numPages; pageNum++) {
           const imageId = uuid();
-          setMusicSheets((prev: Array<MusicSheet>) => ([...prev, { id: imageId, file: null, url: "", isLoading: true }]));
+          setImageFileContainers((prev: Array<ImageFileContainer>) => ([...prev, { id: imageId, file: null, url: "", isLoading: true }]));
           const imageBlob = await renderPageAsImage(pdf, pageNum);
           const imageFile = new File([imageBlob], `pdf-image-${pageNum}.jpg`, { type: 'image/jpeg' });
           const imageUrl = URL.createObjectURL(imageFile);
-          setMusicSheets((prevImages) => {
+          setImageFileContainers((prevImages) => {
             return prevImages.map(prev => {
               return (prev.id !== imageId) ? prev : { ...prev, file:imageFile, url: imageUrl, isLoading: false };
             });

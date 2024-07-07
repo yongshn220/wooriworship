@@ -1,10 +1,8 @@
 'use client'
 
-import {Plus} from "lucide-react";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
-import {TeamIcon} from "@/components/team-icon";
 import {Button} from "@/components/ui/button";
 import React, {useEffect, useState} from "react";
 import {TagMultiSelect} from "@/app/board/[teamId]/song/_components/tag-multi-select";
@@ -12,17 +10,19 @@ import {Textarea} from "@/components/ui/textarea";
 import {useToast} from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/app/board/[teamId]/song/_components/multiple-image-uploader";
 import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
-import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
+import {useRecoilValue, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {SongService, StorageService, TagService}  from "@/apis";
 import {FormMode} from "@/components/constants/enums";
 import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
 import {auth} from "@/firebase";
-import {currentTeamSongIdsAtom, songSelector, testAtom} from "@/global-states/song-state";
-import {songAtom, songUpdaterAtom} from "@/global-states/song-state";
+import {currentTeamSongIdsAtom, songAtom} from "@/global-states/song-state";
+import {songUpdaterAtom} from "@/global-states/song-state";
 import useViewportHeight from "@/components/hook/use-viewport-height";
 import PdfUploader from "@/app/board/[teamId]/song/_components/pdf-uploader";
+import {ImageFileContainer} from "@/components/constants/types";
+
 
 interface Props {
   mode: FormMode
@@ -40,15 +40,9 @@ export interface SongInput {
   bpm: number | null
   description: string
 }
-export interface MusicSheet {
-  id: string;
-  file: File | null;
-  url: string;
-  isLoading: boolean;
-}
 
 export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
-  const song = useRecoilValue(songSelector(songId))
+  const song = useRecoilValue(songAtom(songId))
   const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
@@ -64,16 +58,16 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     bpm: (mode === FormMode.EDIT)? song?.bpm?? null : null,
     description: (mode === FormMode.EDIT)? song?.description?? "" : ""
   })
-  const [musicSheets, setMusicSheets] = useState<Array<MusicSheet>>([])
+  const [imageFileContainers, setImageFileContainers] = useState<Array<ImageFileContainer>>([])
   const [isLoading, setIsLoading] = useState(false)
   const viewportHeight = useViewportHeight();
   const { toast } = useToast()
   const router = useRouter()
-  //
+
   useEffect(() => {
-    const _musicSheets = song?.music_sheet_urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<MusicSheet>
-    if (_musicSheets)
-      setMusicSheets(_musicSheets)
+    const _imageFileContainers = song?.music_sheet_urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<ImageFileContainer>
+    if (_imageFileContainers)
+      setImageFileContainers(_imageFileContainers)
   }, [song?.music_sheet_urls])
 
   function createValidCheck() {
@@ -88,7 +82,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
 
   function clearContents() {
     setInput({title: "", author: "", version: "", key: "", link: "", tags: [], bpm: null, description: ""})
-    setMusicSheets([])
+    setImageFileContainers([])
   }
 
   async function handleCreate() {
@@ -97,7 +91,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     if (!createValidCheck()) return false
 
     try {
-      const downloadUrls = await StorageService.uploadMusicSheets(teamId, musicSheets);
+      const downloadUrls = await StorageService.uploadMusicSheets(teamId, imageFileContainers);
       const songInput = {...input, music_sheet_urls: downloadUrls}
       const promises = [];
       promises.push(SongService.addNewSong(authUser?.uid, teamId, songInput));
@@ -143,8 +137,8 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     if (!editValidCheck()) return false
 
     try {
-      const curImageUrls = musicSheets.map(item => item.url)
-      const filesToAdd = musicSheets.filter(item => !!item.id) as Array<MusicSheet>
+      const curImageUrls = imageFileContainers.map(item => item.url)
+      const filesToAdd = imageFileContainers.filter(item => !!item.id) as Array<ImageFileContainer>
       const urlsToDelete = song.music_sheet_urls.filter(url => !curImageUrls.includes(url))
       let urlsToKeep = song.music_sheet_urls.filter(url => curImageUrls.includes(url))
       const newDownloadUrls = await StorageService.updateMusicSheets(teamId, filesToAdd, urlsToDelete);
@@ -177,7 +171,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   }
 
   function handleRemoveImage(index: number) {
-    setMusicSheets(item =>item.filter((_, i) => i !== index));
+    setImageFileContainers(item =>item.filter((_, i) => i !== index));
   }
 
   return (
@@ -270,12 +264,12 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               Music Sheets
             </Label>
             <div className="w-full h-14 py-2 flex-center gap-2">
-              <MultipleImageUploader musicSheets={musicSheets} setMusicSheets={setMusicSheets} maxNum={5}>
+              <MultipleImageUploader imageFileContainers={imageFileContainers} setImageFileContainers={setImageFileContainers} maxNum={5}>
                 <div className="w-full h-full bg-blue-500 rounded-lg flex-center text-white cursor-pointer hover:bg-blue-400">
                   Upload Image
                 </div>
               </MultipleImageUploader>
-              <PdfUploader musicSheets={musicSheets} setMusicSheets={setMusicSheets} maxNum={5}>
+              <PdfUploader imageFileContainers={imageFileContainers} setImageFileContainers={setImageFileContainers} maxNum={5}>
                 <div className="w-full h-full bg-purple-700 rounded-lg flex-center text-white cursor-pointer hover:bg-purple-500">
                   Upload PDF
                 </div>
@@ -284,8 +278,8 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
             <div className="flex-start w-full h-60 aspect-square border-2 p-2 rounded-md shadow-sm">
               <div className="flex w-full h-full gap-4 overflow-x-auto">
                 {
-                  musicSheets?.map((musicSheet, i) => (
-                    <MusicSheetCard key={i} musicSheet={musicSheet} index={i} handleRemoveImage={handleRemoveImage}/>
+                  imageFileContainers?.map((imageFileContainer, i) => (
+                    <MusicSheetCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={handleRemoveImage}/>
                   ))
                 }
               </div>

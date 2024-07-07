@@ -77,7 +77,7 @@ export function SearchTags() {
               </div>
             </div>
             <div className="flex-between">
-              <p className="text-sm font-semibold text-gray-500">Last Used</p>
+              <p className="text-sm font-semibold text-gray-500">Used on</p>
               <div className="flex">
                 <Button variant={selectedSortOption === SongBoardSortOption.LAST_USED_DATE_ASCENDING? "secondary" : "ghost"}  className="w-full" onClick={() => setSelectedSortOption(SongBoardSortOption.LAST_USED_DATE_ASCENDING)}>Ascending</Button>
                 <Button variant={selectedSortOption === SongBoardSortOption.LAST_USED_DATE_DESCENDING? "secondary" : "ghost"}  className="w-full" onClick={() => setSelectedSortOption(SongBoardSortOption.LAST_USED_DATE_DESCENDING)}>Descending</Button>

@@ -1,25 +1,25 @@
 import Image from "next/image"
 import {LoadingCircle} from "@/components/animation/loading-indicator";
-import {MusicSheet} from "@/app/board/[teamId]/song/_components/song-form";
 import {Cross2Icon} from "@radix-ui/react-icons";
+import {ImageFileContainer} from "@/components/constants/types";
 
 interface Props {
-  musicSheet: MusicSheet
+  imageFileContainer: ImageFileContainer
   index: number
   handleRemoveImage: Function
 }
 
-export function MusicSheetCard({musicSheet, index, handleRemoveImage}: Props) {
+export function MusicSheetCard({imageFileContainer, index, handleRemoveImage}: Props) {
   return (
     <div className="relative flex flex-col h-full aspect-[3/4]">
       <div className="relative flex-1 flex-start bg-gray-100 rounded-md">
         {
-          musicSheet.isLoading ?
+          imageFileContainer.isLoading ?
           <LoadingCircle/>
           :
           <>
             <Image
-              src={musicSheet.url}
+              src={imageFileContainer.url}
               fill
               sizes="20vw, 20vw, 20vw"
               className="object-contain p-1 rounded-md"

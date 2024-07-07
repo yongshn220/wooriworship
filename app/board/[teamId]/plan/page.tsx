@@ -11,15 +11,9 @@ export default function PlanPage({params}: any) {
   console.log("_---------Plan Page")
   return (
     <div className="w-full h-full flex flex-col">
-      <PageInit teamId={teamId} page={Page.PLAN}/>
-      <div className="flex-between">
-        <p className="text-2xl font-semibold">
-          Worship Plan
-        </p>
-      </div>
-        <Suspense fallback={<></>}>
-          <WorshipCardList teamId={teamId}/>
-        </Suspense>
+      <Suspense fallback={<></>}>
+        <WorshipCardList teamId={teamId}/>
+      </Suspense>
     </div>
   )
 }

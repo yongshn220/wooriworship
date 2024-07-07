@@ -1,18 +1,18 @@
 import { v4 as uuid } from 'uuid';
 import {Dispatch, SetStateAction} from "react";
-import {MusicSheet} from "@/app/board/[teamId]/song/_components/song-form";
+import {ImageFileContainer} from "@/components/constants/types";
 
 interface Props {
-  musicSheets: Array<MusicSheet>;
-  setMusicSheets: Dispatch<SetStateAction<Array<MusicSheet>>>;
+  imageFileContainers: Array<ImageFileContainer>;
+  setImageFileContainers: Dispatch<SetStateAction<Array<ImageFileContainer>>>;
   maxNum: number;
   children: any;
 }
 
-export default function MultipleImageUploader({musicSheets, setMusicSheets, maxNum, children}: Props) {
+export default function MultipleImageUploader({imageFileContainers, setImageFileContainers, maxNum, children}: Props) {
   async function handleImageChange(e: any) {
     const files = Array.from(e.target.files) as Array<File>
-    const totalImages = musicSheets?.length + files.length
+    const totalImages = imageFileContainers?.length + files.length
 
     try {
       if (totalImages <= maxNum) {
@@ -20,10 +20,10 @@ export default function MultipleImageUploader({musicSheets, setMusicSheets, maxN
           const reader: any = new FileReader();
           reader.readAsDataURL(file);
           const imageId = uuid()
-          setMusicSheets((prev: Array<MusicSheet>) =>([...prev, {id: imageId, file: file, url: "", isLoading: true}]))
+          setImageFileContainers((prev: Array<ImageFileContainer>) =>([...prev, {id: imageId, file: file, url: "", isLoading: true}]))
 
           reader.onloadend = () => {
-            setMusicSheets((prevImages) => {
+            setImageFileContainers((prevImages) => {
               return prevImages.map(prev => {
                 return (prev.id !== imageId)? prev : {...prev, url: reader.result.toString(), isLoading: false}
               })

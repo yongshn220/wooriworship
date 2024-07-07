@@ -1,16 +1,13 @@
 "use client"
 import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
-import {Suspense, useEffect, useState} from "react";
+import {Suspense} from "react";
 import Link from "next/link";
-import {DownloadIcon, LayoutDashboard, LibraryBig, PlusCircleIcon} from "lucide-react";
+import {DownloadIcon, CalendarIcon, FileMusicIcon} from "lucide-react";
 import Image from "next/image";
 import {DownloadMusicSheetDialog} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/download-music-sheet-dialog";
 import {getPathPlan, getPathSong, getPathWorshipStartMode} from "@/components/helper/routes";
-import {useRecoilValue} from "recoil";
-import {currentTeamIdAtom} from "@/global-states/teamState";
 import {useRouter} from "next/navigation";
-import {worshipAtom, worshipSongListAtom} from "@/global-states/worship-state";
 import {WorshipSongList} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/worship-song-list";
 
 interface Props {
@@ -51,13 +48,13 @@ export function WorshipSidebar({teamId, worshipId}: Props) {
       <div className="mb-5">
         <Button variant="ghost" asChild size="lg" className="font-normal w-full justify-start px-2">
           <Link href={getPathPlan(teamId)}>
-            <LayoutDashboard className="h-4 w-4 mr-2"/>
+            <CalendarIcon className="h-4 w-4 mr-2"/>
             Worship Plan
           </Link>
         </Button>
         <Button variant="ghost" asChild size="lg" className="font-normal w-full justify-start px-2">
           <Link href={getPathSong(teamId)}>
-            <LibraryBig className="h-4 w-4 mr-2"/>
+            <FileMusicIcon className="h-4 w-4 mr-2"/>
             Song Board
           </Link>
         </Button>
