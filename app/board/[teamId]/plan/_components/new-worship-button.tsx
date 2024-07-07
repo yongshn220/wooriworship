@@ -31,7 +31,7 @@ export function NewWorshipButton() {
   }
 
   return (
-    <Button disabled={!teamId} className="bg-purple-500 hover:bg-purple-400" onClick={handleClick}>
+    <Button disabled={!teamId} className="bg-blue-500 hover:bg-blue-400" onClick={handleClick}>
       + Add Worship
     </Button>
   )

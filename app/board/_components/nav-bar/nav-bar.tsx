@@ -13,14 +13,33 @@ import {InvitationDialog} from "@/app/board/_components/nav-bar/invitation-dialo
 import {invitationDialogStateAtom} from "@/global-states/dialog-state";
 import React, {Suspense} from "react";
 import {FallbackText} from "@/components/fallback-text";
+import {CircleCheckIcon, HomeIcon, CalendarIcon, FileMusicIcon} from "lucide-react";
+import {NewNoticeButton} from "@/app/board/[teamId]/_components/new-notice-button";
 
 export function Navbar() {
   const currentPage = useRecoilValue(currentPageAtom)
   const [invitationDialogState, setInvitationDialogState] = useRecoilState(invitationDialogStateAtom)
+
+  const tabConfig = {
+    [Page.HOME]: { icon: <HomeIcon aria-hidden="true" />, text: "Home" },
+    [Page.NOTICE]: { icon: <CircleCheckIcon aria-hidden="true" />, text: "Notice" },
+    [Page.PLAN]: { icon: <CalendarIcon aria-hidden="true" />, text: "Worship Plan" },
+    [Page.SONG]: { icon: <FileMusicIcon aria-hidden="true" />, text: "Song Board" },
+  };
+
   return (
-    <div className="hidden lg:flex content-between p-5 gap-4">
+    <div className="hidden lg:flex content-between items-center py-4 gap-4 border-b bg-white/95 z-50 px-4">
       <InvitationDialog isOpen={invitationDialogState} setIsOpen={setInvitationDialogState}/>
-      <div className="flex-1">
+      <div className="flex-center h-full">
+        {
+          tabConfig[currentPage] &&
+          <>
+            {tabConfig[currentPage].icon}
+            <p className="ml-2">{tabConfig[currentPage].text}</p>
+          </>
+        }
+      </div>
+      <div className="flex-1 px-4">
         {
           (currentPage === Page.SONG) &&
           <div className={cn("flex-center w-full max-w-xl gap-4")}>
@@ -30,9 +49,19 @@ export function Navbar() {
         }
       </div>
       <div className=" flex-end gap-4">
-        <NewWorshipButton/>
-        <NewSongButton/>
-        <Suspense fallback={<FallbackText text="Loading..."/>}>
+        {
+          (currentPage === Page.NOTICE) &&
+          <NewNoticeButton/>
+        }
+        {
+          (currentPage === Page.SONG) &&
+          <NewSongButton/>
+        }
+        {
+          (currentPage === Page.PLAN) &&
+          <NewWorshipButton/>
+        }
+        <Suspense fallback={<FallbackText text=""/>}>
           <ProfileButton/>
         </Suspense>
       </div>

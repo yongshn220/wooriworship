@@ -31,7 +31,7 @@ export function SongListView({teamId}: Props) {
                 <p className="flex-1">Title</p>
                 <p className="hidden lg:flex flex-[0.4] justify-start border-l border-gray-300 pl-2">Version</p>
                 <div className="hidden sm:flex justify-start sm:flex-1 text-start border-l border-gray-300 pl-2">Tag</div>
-                <p className="flex justify-end lg:flex-[0.5] pl-2">Last used date</p>
+                <p className="flex justify-end lg:flex-[0.5] pl-2">Used on</p>
               </div>
             </div>
           }

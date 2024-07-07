@@ -5,6 +5,8 @@ import {TeamIdValidation} from "@/app/board/_components/auth/teamid-validation";
 import {TestComponent} from "@/app/board/test-component";
 import {FallbackText} from "@/components/fallback-text";
 import {PullToRefresh} from "@/components/functionality/pull-to-refresh";
+import {InitPage} from "@/app/board/[teamId]/_components/init-page";
+import {usePathname} from "next/navigation";
 
 
 interface Props {
@@ -14,13 +16,15 @@ interface Props {
 
 export default function BoardTeamLayout({params, children}: Props) {
   const teamId = params.teamId
-  console.log("-------BoardTeamLayout")
-
+  const pathname = usePathname()
+  console.log(pathname)
   return (
     <div className="w-full h-full">
       <Suspense fallback={<FallbackText text="Loading..."/>}>
         <TeamIdValidation teamId={teamId}>
-          {children}
+          <InitPage pathname={pathname}>
+            {children}
+          </InitPage>
         </TeamIdValidation>
       </Suspense>
     </div>

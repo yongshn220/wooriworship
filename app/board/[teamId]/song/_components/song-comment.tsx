@@ -6,12 +6,12 @@ import {CommentItem} from "@/components/comment/comment-item";
 export function SongComment() {
   return (
     <div className="w-full mt-5 ">
-      <Separator className="my-4"/>
       <p>3 Comments</p>
+      <Separator className="my-4"/>
+      <CommentItem/>
+      <CommentItem/>
+      <CommentItem/>
       <CreateComment/>
-      <CommentItem/>
-      <CommentItem/>
-      <CommentItem/>
     </div>
   )
 }

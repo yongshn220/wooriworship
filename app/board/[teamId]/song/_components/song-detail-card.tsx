@@ -101,7 +101,7 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, songId, readOnly=fals
             }
             <div className="flex-between items-center">
               <Label htmlFor="name" className="text-base font-semibold">
-                Last Used Date
+                Used on
               </Label>
               <p className="text-sm">{timestampToDatePassedFromNow(song?.last_used_time)}</p>
             </div>

@@ -1,14 +1,15 @@
 "use client"
 
-import React from "react";
+import React, {useState} from "react";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
 
 export function CreateComment() {
+  const [comment, setComment] = useState("")
 
   async function handleSubmit(e: any) {
     e.preventDefault()
-
+    // firebase: on send comment.
   }
 
   return (
@@ -17,10 +18,11 @@ export function CreateComment() {
         <Textarea
           className="h-20"
           placeholder="Create a comment"
-          disabled={true}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
         />
         <div className="flex-end">
-          <Button type="submit" disabled={true}>Post</Button>
+          <Button type="submit">Post</Button>
         </div>
       </div>
     </form>

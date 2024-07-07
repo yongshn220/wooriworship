@@ -12,7 +12,6 @@ export default function SongLayout({params, children}: any) {
     <div className="w-full h-full">
       <PullToRefresh>
         {children}
-        <PageInit teamId={teamId} page={Page.SONG}/>
         <div className="w-full h-full flex flex-col items-center">
           <div className="flex-between w-full">
             <p className="text-2xl font-semibold">

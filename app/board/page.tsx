@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {UserService} from "@/apis";
 import {User} from "@/models/user";
 import {useRouter} from "next/navigation";
-import {getPathPlan} from "@/components/helper/routes";
+import {getPathHome, getPathPlan} from "@/components/helper/routes";
 import {auth} from "@/firebase";
 import Image from "next/image";
 import * as React from "react";
@@ -32,7 +32,7 @@ export default function BoardPage() {
         const user = _user as User
         if (user.teams.length > 0) {
           const teamId = user.teams.includes(preferences.board.selectedTeamId)? preferences.board.selectedTeamId : user.teams[0]
-          router.push(getPathPlan(teamId))
+          router.push(getPathHome(teamId))
         }
         else {
           setIsTeamEmpty(true)
