@@ -1,7 +1,7 @@
 'use client'
 
 import {SearchInput} from "@/app/board/_components/nav-bar/search-input";
-import {SearchTags} from "@/app/board/_components/nav-bar/search-tags";
+import {SearchFilterPopover} from "@/app/board/_components/nav-bar/search-filter-popover";
 import {cn} from "@/lib/utils";
 import {Page} from "@/components/constants/enums";
 import {useRecoilState, useRecoilValue} from "recoil";
@@ -13,8 +13,9 @@ import {InvitationDialog} from "@/app/board/_components/nav-bar/invitation-dialo
 import {invitationDialogStateAtom} from "@/global-states/dialog-state";
 import React, {Suspense} from "react";
 import {FallbackText} from "@/components/fallback-text";
-import {CircleCheckIcon, HomeIcon, CalendarIcon, FileMusicIcon} from "lucide-react";
+import {CircleCheckIcon, HomeIcon, CalendarIcon, FileMusicIcon, Settings2Icon} from "lucide-react";
 import {NewNoticeButton} from "@/app/board/[teamId]/_components/new-notice-button";
+import {Button} from "@/components/ui/button";
 
 export function Navbar() {
   const currentPage = useRecoilValue(currentPageAtom)
@@ -44,7 +45,14 @@ export function Navbar() {
           (currentPage === Page.SONG) &&
           <div className={cn("flex-center w-full max-w-xl gap-4")}>
             <SearchInput/>
-            <SearchTags/>
+            <SearchFilterPopover>
+              <>
+                <Button variant="outline" className="gap-2">
+                <Settings2Icon/>
+                  <p>Modify Result</p>
+                </Button>
+              </>
+            </SearchFilterPopover>
           </div>
         }
       </div>

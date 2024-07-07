@@ -13,11 +13,6 @@ export default function SongLayout({params, children}: any) {
       <PullToRefresh>
         {children}
         <div className="w-full h-full flex flex-col items-center">
-          <div className="flex-between w-full">
-            <p className="text-2xl font-semibold">
-              Songs
-            </p>
-          </div>
           <SongListView teamId={teamId}/>
         </div>
       </PullToRefresh>
