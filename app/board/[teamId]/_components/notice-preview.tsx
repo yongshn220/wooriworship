@@ -1,8 +1,16 @@
 import {Separator} from "@/components/ui/separator";
 import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
+import {getPathNotice} from "@/components/helper/routes";
 
 
-export function NoticePreview() {
+interface Props {
+  teamId: string
+}
+
+export function NoticePreview({teamId}: Props) {
+  const router = useRouter()
+
   return (
     <div className="bg-white border p-4 rounded-xl">
       <p className="text-xl font-semibold pb-4">Notice</p>
@@ -25,7 +33,7 @@ export function NoticePreview() {
         <Separator className="mt-2"/>
       </div>
       <div className="w-full flex-center">
-        <Button variant="ghost" className="text-blue-500 hover:text-blue-600 hover:bg-none">View All</Button>
+        <Button variant="ghost" className="text-blue-500 hover:text-blue-600 hover:bg-none" onClick={() => router.push(getPathNotice(teamId))}>View All</Button>
       </div>
     </div>
   )

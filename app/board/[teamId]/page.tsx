@@ -9,7 +9,7 @@ export default function BoardHomePage({params}: any) {
   return (
     <div className="w-full h-full flex-center">
       <div className="flex flex-col w-full h-full gap-6">
-        <NoticePreview/>
+        <NoticePreview teamId={teamId}/>
         <WorshipPlanPreview teamId={teamId}/>
       </div>
     </div>
