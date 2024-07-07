@@ -4,6 +4,8 @@ import {Suspense} from "react";
 import {WorshipCard} from "@/app/board/[teamId]/plan/_components/worship-card";
 import * as React from "react";
 import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
+import {getPathPlan} from "@/components/helper/routes";
 
 
 interface Props {
@@ -11,6 +13,8 @@ interface Props {
 }
 
 export function WorshipPlanPreview({teamId}: Props) {
+  const router = useRouter()
+
   return (
     <div className="bg-white border p-4 rounded-xl">
       <p className="text-xl font-semibold pb-4">Recent Worship Plan</p>
@@ -18,7 +22,7 @@ export function WorshipPlanPreview({teamId}: Props) {
         <RecentWorshipPlanList teamId={teamId}/>
 
         <div className="w-full flex-center">
-          <Button variant="ghost" className="text-blue-500 hover:text-blue-600 hover:bg-none">View All</Button>
+          <Button variant="ghost" className="text-blue-500 hover:text-blue-600 hover:bg-none" onClick={() => router.push(getPathPlan(teamId))}>View All</Button>
         </div>
       </div>
     </div>
