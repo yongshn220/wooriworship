@@ -20,7 +20,7 @@ export function Navbar() {
   const currentPage = useRecoilValue(currentPageAtom)
   const [invitationDialogState, setInvitationDialogState] = useRecoilState(invitationDialogStateAtom)
 
-  const tabConfig = {
+  const tabConfig: any = {
     [Page.HOME]: { icon: <HomeIcon aria-hidden="true" />, text: "Home" },
     [Page.NOTICE]: { icon: <CircleCheckIcon aria-hidden="true" />, text: "Notice" },
     [Page.PLAN]: { icon: <CalendarIcon aria-hidden="true" />, text: "Worship Plan" },
