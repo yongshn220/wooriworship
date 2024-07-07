@@ -13,7 +13,7 @@ import {Settings2Icon} from "lucide-react";
 import {Separator} from "@/components/ui/separator";
 import {SongBoardSortOption} from "@/components/constants/enums";
 
-export function SearchTags() {
+export function SearchFilterPopover({children}: any) {
   const teamId = useRecoilValue(currentTeamIdAtom)
   const [teamTags, setTeamTags] = useState<Array<string>>([])
   const [selectedTags, setSelectedTags] = useRecoilState(searchSelectedTagsAtom)
@@ -41,10 +41,7 @@ export function SearchTags() {
   return (
     <Popover>
       <PopoverTrigger>
-        <Button variant="outline" className="gap-2">
-          <Settings2Icon/>
-          <p>Modify Result</p>
-        </Button>
+        {children}
       </PopoverTrigger>
       <PopoverContent className="mt-4 w-[400px] space-y-8">
         <div className="w-full">

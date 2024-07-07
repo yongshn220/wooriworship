@@ -5,6 +5,7 @@ import {Navbar} from "@/app/board/_components/nav-bar/nav-bar";
 import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate";
 import {BottomNavbar} from "@/app/board/_components/bottom-navbar/bottom-navbar";
 import {PullToRefresh} from "@/components/functionality/pull-to-refresh";
+import {TopNavbarMobile} from "@/app/board/_components/top-navbar-mobile/top-navbar-mobile";
 
 
 export default function BoardLayout({ children }: any) {
@@ -15,9 +16,10 @@ export default function BoardLayout({ children }: any) {
       <BoardAuthenticate>
         <div className="flex h-full">
           <BoardSidebar/>
-          <div className="h-full flex-1">
+          <div className="flex flex-col h-screen flex-1">
             <Navbar/>
-            <div className="pt-4 sm:mt-0 flex-1 h-[calc(100%-80px)] px-2 sm:px-6 overflow-y-scroll bg-gray-50">
+            <TopNavbarMobile/>
+            <div className="flex-1 pt-4 sm:mt-0 px-2 sm:px-6 overflow-y-scroll bg-gray-50">
               {children}
             </div>
             <BottomNavbar/>
