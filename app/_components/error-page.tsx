@@ -7,7 +7,6 @@ import * as React from "react";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
 
-
 export function ErrorPage() {
   return (
     <div className="flex-center flex-col w-full h-full gap-4">

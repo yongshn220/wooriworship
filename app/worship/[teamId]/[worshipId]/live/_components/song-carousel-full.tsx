@@ -1,27 +1,56 @@
 'use client'
 
 import * as React from "react"
-
-import {Carousel, CarouselContent, CarouselItem, type CarouselApi,} from "@/components/ui/carousel"
-import {useEffect, useState} from "react";
-import {worshipIndexAtom, worshipIndexChangeEventAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
+import {useEffect, useMemo, useState} from "react"
+import {Carousel, type CarouselApi, CarouselContent,} from "@/components/ui/carousel"
+import {worshipIndexAtom, worshipIndexChangeEventAtom, worshipMultipleSheetsViewModeAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {worshipAtom} from "@/global-states/worship-state";
-import {SongCarouselFullItem} from "@/app/worship/[teamId]/[worshipId]/live/_components/song-carousel-full-item";
+import {WorshipLiveCarouselItem} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-live-carousel-item";
+import {songsByWorshipIdAtom} from "@/global-states/song-state";
+import {DirectionType} from "@/components/constants/enums";
 
 interface Props {
   worshipId: string
 }
 
+export interface WorshipLiveSheetInfo {
+  note: string
+  urls: string[]
+}
+
 export function SongCarouselFull({worshipId}: Props) {
   const worship = useRecoilValue(worshipAtom(worshipId))
-  const [api, setApi] = useState<CarouselApi>()
+  const songs = useRecoilValue(songsByWorshipIdAtom(worshipId))
   const setIndex = useSetRecoilState(worshipIndexAtom)
   const worshipIndexChangeEvent = useRecoilValue(worshipIndexChangeEventAtom)
+  const multipleSheetsViewMode = useRecoilValue(worshipMultipleSheetsViewModeAtom)
+  const [api, setApi] = useState<CarouselApi>()
+
+  const sheetInfoList = useMemo(() => {
+    const processedSheetInfo: Array<WorshipLiveSheetInfo> = []
+    if (multipleSheetsViewMode === DirectionType.VERTICAL) {
+      songs.forEach((song) => {
+        const header = worship?.songs?.find(header => header.id === song?.id)
+        processedSheetInfo.push({note: header?.note, urls: song?.music_sheet_urls})
+      })
+    }
+    else {
+      songs.forEach((song) => {
+        const header = worship?.songs?.find(header => header.id === song?.id)
+        song?.music_sheet_urls?.forEach((url) => {
+          processedSheetInfo.push({note: header.note, urls: [url]})
+        })
+      })
+    }
+    return processedSheetInfo
+  }, [multipleSheetsViewMode, songs, worship?.songs])
+
 
   useEffect(() => {
     if (api) {
       api.scrollTo(worshipIndexChangeEvent);
+      console.log("API Called")
     }
   }, [api, worshipIndexChangeEvent]);
 
@@ -29,14 +58,14 @@ export function SongCarouselFull({worshipId}: Props) {
     if (!api) return
 
     setIndex({
-      total: api.scrollSnapList().length,
+      total: sheetInfoList.length,
       current: api.selectedScrollSnap()
     })
 
     api.on("select", () => {
       setIndex((prev) => ({...prev, current: api.selectedScrollSnap()}))
     })
-  }, [setIndex, api])
+  }, [sheetInfoList.length, setIndex, api, multipleSheetsViewMode])
 
 
   return (
@@ -44,8 +73,8 @@ export function SongCarouselFull({worshipId}: Props) {
       <Carousel setApi={setApi} className="w-full h-full">
         <CarouselContent className="h-full">
           {
-            worship?.songs.map((songHeader, index) => (
-              <SongCarouselFullItem key={index} index={index} songHeader={songHeader}/>
+            sheetInfoList?.map((sheetInfo, index) => (
+              <WorshipLiveCarouselItem key={index} index={index} sheetInfo={sheetInfo}/>
             ))
           }
         </CarouselContent>

@@ -49,3 +49,8 @@ export enum SongBoardSortOption {
   LAST_USED_DATE_ASCENDING,
   LAST_USED_DATE_DESCENDING,
 }
+
+export enum DirectionType {
+  VERTICAL = "Vertical",
+  HORIZONTAL = "Horizontal"
+}
