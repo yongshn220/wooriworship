@@ -98,15 +98,20 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
       promises.push(TagService.addNewTags(teamId, songInput.tags));
       const promiseResults = await Promise.all(promises)
       const songId = promiseResults[0] as string
-
-      toast({
-        title: `New Song Created!`,
-        description: `${team?.name} - ${songInput.title}`,
-      })
-
-      clearContents()
-      setCurrentTeamSongIds((prev) => ([...prev, songId])) // render new song card
-      router.push(getPathSongDetail(teamId, songId))
+      if (!songId) {
+        toast({
+          description: `Fail to create a song. Please try again.`,
+        })
+      }
+      else {
+        toast({
+          title: `New Song Created!`,
+          description: `${team?.name} - ${songInput.title}`,
+        })
+        setCurrentTeamSongIds((prev) => ([...prev, songId])) // update song board (locally)
+        router.push(getPathSongDetail(teamId, songId))
+        clearContents()
+      }
     }
     catch (e) {
       console.log("err", e)

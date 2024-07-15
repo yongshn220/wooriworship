@@ -124,7 +124,7 @@ export function timestampToDatePassedFromNowShorten(timestamp: Timestamp) {
   }
   else if (diffInSeconds < secondsInDay) {
     const hours = Math.floor(diffInSeconds / secondsInHour);
-    result = `${hours}hrs ago`;
+    result = `${hours}hr ago`;
   }
   else if (diffInSeconds < secondsInWeek) {
     const days = Math.floor(diffInSeconds / secondsInDay);

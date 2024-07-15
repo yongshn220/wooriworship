@@ -1,5 +1,4 @@
 import {Timestamp} from "@firebase/firestore";
-import {SongInfo} from "@/app/board/[teamId]/plan/_components/new-worship-button";
 
 export interface SongHeader {
   id: string
