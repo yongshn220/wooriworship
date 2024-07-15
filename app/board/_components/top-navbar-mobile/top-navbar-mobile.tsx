@@ -22,7 +22,7 @@ export function TopNavbarMobile() {
   }
 
   const tabConfig: any = {
-    [Page.NOTICE]: { text: "Notice (available soon)", createHandler: () => {} },
+    [Page.NOTICE]: { text: "Notice", createHandler: () => {} },
     [Page.PLAN]: { text: "Worship Plan", createHandler: handleCreatePlanClick },
     [Page.SONG]: { text: "Song Board", createHandler: () => {} },
   };

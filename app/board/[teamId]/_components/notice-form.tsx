@@ -10,10 +10,12 @@ import {ImageFileContainer} from "@/components/constants/types";
 import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
 import {Button} from "@/components/ui/button";
 import {auth} from "@/firebase";
-import {useRecoilValue} from "recoil";
+import {useRecoilValue, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import {noticeAtom} from "@/global-states/notice-state";
+import {noticeAtom, noticeIdsAtom} from "@/global-states/notice-state";
 import {NoticeService, StorageService} from "@/apis";
+import {toast} from "@/components/ui/use-toast";
+import {useRouter} from "next/navigation";
 
 
 interface Props {
@@ -31,6 +33,7 @@ export interface NoticeInput {
 export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
+  const setNoticeIds = useSetRecoilState(noticeIdsAtom(teamId))
   const notice = useRecoilValue(noticeAtom(noticeId))
   const [input, setInput] = useState<NoticeInput>({
     title: "",
@@ -38,6 +41,11 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
   })
   const [imageFileContainers, setImageFileContainers] = useState<Array<ImageFileContainer>>([])
   const [isLoading, setIsLoading] = useState(false)
+
+  function clearContents() {
+    setInput({title: "", description: ""})
+    setImageFileContainers([])
+  }
 
   function handleRemoveImage(index: number) {
     setImageFileContainers(item =>item.filter((_, i) => i !== index));
@@ -75,21 +83,34 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
         file_urls: downloadUrls
       }
       console.log(noticeInput)
-      await NoticeService.addNewNotice(authUser.uid, teamId, noticeInput);
-      // FE-TODO: handle post upload
+      const noticeId = await NoticeService.addNewNotice(authUser.uid, teamId, noticeInput);
+      if (!noticeId) {
+        toast({
+          description: "Fail to create notice. Please try again."
+        })
+      }
+      else {
+        toast({
+          title: `New Notice created!`,
+          description: input.title,
+        })
+        setNoticeIds((prev) => ([...prev, noticeId]))
+      }
     }
     catch (e) {
       console.log(e);
     }
     finally {
       setIsLoading(false)
+      clearContents()
+      setIsOpen(false)
     }
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
       <DialogContent className="sm:max-w-[600px] overflow-y-scroll scrollbar-hide">
-        <DialogTitle className="text-2xl">{mode===FormMode.EDIT? "Edit Notice" : "Add New Notice (Available Soon)"}</DialogTitle>
+        <DialogTitle className="text-2xl">{mode===FormMode.EDIT? "Edit Notice" : "Add New Notice"}</DialogTitle>
         <div className="flex flex-col gap-6 py-4">
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="name">Title</Label>

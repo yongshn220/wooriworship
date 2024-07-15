@@ -39,10 +39,6 @@ export const currentTeamWorshipIdsAtom = atomFamily<Array<string>, string>({
   })
 })
 
-export const resetCurrentTeamWorshipIdsState = (set: any) => {
-  set(currentTeamWorshipIdsAtom, [])
-}
-
 export const worshipIdsUpdaterAtom = atom({
   key: "worshipIdsUpdaterAtom",
   default: 0
