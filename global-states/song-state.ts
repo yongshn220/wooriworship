@@ -7,6 +7,8 @@ import {
   songSearchInputAtom
 } from "@/app/board/_states/board-states";
 import {SongBoardSortOption} from "@/components/constants/enums";
+import {worshipAtom} from "@/global-states/worship-state";
+import songService from "@/apis/SongService";
 
 export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
   key: "currentTeamSongIdsAtom",
@@ -78,6 +80,27 @@ export const songAtom = atomFamily<Song, string>({
       catch (e) {
         console.log(e)
         return null
+      }
+    }
+  })
+})
+
+export const songsByWorshipIdAtom = atomFamily<Array<Song>, string>({
+  key: "songsByWorshipIdAtom",
+  default: selectorFamily({
+    key: "songsByWorshipIdAtom/default",
+    get: (worshipId) => async ({get}) => {
+      try {
+        const worship = get(worshipAtom(worshipId))
+        if (!worship) return []
+
+        const songs = await SongService.getByIds(worship.songs.map((songHeader => songHeader.id)))
+        if (!songs) return []
+
+        return songs
+      }
+      catch (e) {
+        return []
       }
     }
   })
