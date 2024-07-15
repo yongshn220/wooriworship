@@ -13,6 +13,7 @@ import {auth} from "@/firebase";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {noticeAtom} from "@/global-states/notice-state";
+import {NoticeService, StorageService} from "@/apis";
 
 
 interface Props {
@@ -43,21 +44,42 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
   }
 
   async function handleEdit() {
-    // TODO: firebase
-    // const curImageUrls = imageFileContainers.map(item => item.url)
-    // const filesToAdd = imageFileContainers.filter(item => !!item.id) as Array<ImageFileContainer>
-    // const urlsToDelete = notice.image_urls.filter(url => !curImageUrls.includes(url))
-    // let urlsToKeep = notice.image_urls.filter(url => curImageUrls.includes(url))
+    try {
+      const curImageUrls = imageFileContainers.map(item => item.url)
+      const filesToAdd = imageFileContainers.filter(item => !!item.id) as Array<ImageFileContainer>
+      const urlsToDelete = notice.file_urls.filter(url => !curImageUrls.includes(url))
+      let urlsToKeep = notice.file_urls.filter(url => curImageUrls.includes(url))
+      const newDownloadUrls = await StorageService.updateNoticeFiles(teamId, filesToAdd, urlsToDelete);
+      if (newDownloadUrls.length > 0) {
+        urlsToKeep = urlsToKeep.concat(newDownloadUrls)
+      }
+      const noticeInput = {
+        title: input.title,
+        body: input.description,
+        file_urls: urlsToKeep
+      }
+      await NoticeService.updateNotice(noticeId, noticeInput)
+      // FE-TODO: handle post edit
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async function handleCreate() {
-    // TODO: firebase
     setIsLoading(true)
     try {
-      console.log(input, imageFileContainers, authUser, teamId)
+      const downloadUrls = await StorageService.uploadNoticeFiles(teamId, imageFileContainers)
+      const noticeInput = {
+        title: input.title,
+        body: input.description,
+        file_urls: downloadUrls
+      }
+      console.log(noticeInput)
+      await NoticeService.addNewNotice(authUser.uid, teamId, noticeInput);
+      // FE-TODO: handle post upload
     }
     catch (e) {
-
+      console.log(e);
     }
     finally {
       setIsLoading(false)

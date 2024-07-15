@@ -1,5 +1,6 @@
 import {atom, atomFamily, selectorFamily} from "recoil";
 import {Notice} from "@/models/notice";
+import NoticeService from "@/apis/NoticeService";
 
 
 export const noticeAtom = atomFamily<Notice, string>({
@@ -7,7 +8,8 @@ export const noticeAtom = atomFamily<Notice, string>({
   default: selectorFamily({
     key: "noticeAtom/default",
     get: (noticeId) => async ({get}) => {
-      return {}
+      const notice = await NoticeService.getById(noticeId) as Notice
+      return notice
       // get(noticeUpdaterAtom)
       // try {
       //   const notice = await NoticeService.getById(noticeId) as Notice
