@@ -2,12 +2,16 @@ import {atom} from "recoil";
 import {DirectionType} from "@/components/constants/enums";
 
 
-export const worshipMenuAtom = atom({
-  key: "worshipMenuAtom",
+export const worshipLiveOptionsAtom = atom({
+  key: "worshipLiveOptionsAtom",
   default: {
     showSongNote: true,
     showSongNumber: true,
   }
+})
+export const worshipMultipleSheetsViewModeAtom = atom<DirectionType>({
+  key: "worshipMultipleSheetsViewModeAtom",
+  default: DirectionType.VERTICAL
 })
 
 export const worshipIndexAtom = atom({
@@ -23,7 +27,3 @@ export const worshipIndexChangeEventAtom = atom({
   default: 0
 })
 
-export const worshipMultipleSheetsViewModeAtom = atom<DirectionType>({
-  key: "worshipMultipleSheetsViewModeAtom",
-  default: DirectionType.VERTICAL
-})

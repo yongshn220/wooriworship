@@ -2,14 +2,14 @@ import {useRecoilValue, useSetRecoilState} from "recoil";
 import {
   worshipIndexAtom,
   worshipIndexChangeEventAtom,
-  worshipMenuAtom
+  worshipLiveOptionsAtom
 } from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {cn} from "@/lib/utils";
 import * as React from "react";
 
 
 export function WorshipIndexIndicator() {
-  const menu = useRecoilValue(worshipMenuAtom)
+  const menu = useRecoilValue(worshipLiveOptionsAtom)
   const index = useRecoilValue(worshipIndexAtom)
   const setWorshipIndexChangeEvent = useSetRecoilState(worshipIndexChangeEventAtom)
 

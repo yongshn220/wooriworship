@@ -20,13 +20,10 @@ export function TeamSelect({createOption}: Props) {
   const router = useRouter()
   const [currentTeamId, setCurrentTeamId] = useRecoilState(currentTeamIdAtom)
   const user = useRecoilValue(userAtom(authUser?.uid))
-  const [preferences, setPreferences] = useUserPreferences()
+  const [_, prefSetter] = useUserPreferences()
 
   function updatePreferenceSelectedTeamId(id: string) {
-    setPreferences(prev => {
-      const boardPref = {...prev.board, selectedTeamId: id}
-      return {...prev, board: boardPref}
-    });
+    prefSetter.boardSelectedTeamId(id)
   }
 
   function handleChangeTeam(teamId: string) {
