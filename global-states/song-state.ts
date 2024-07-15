@@ -27,7 +27,7 @@ export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
         // Search Filter
         let modified = songList.filter((song) => song.title.toLowerCase().includes(searchInput.toLowerCase()))
         // Tag Filter
-        modified = modified.filter((song) => song.tags.some((tag: string) => selectedTags.includes(tag) || selectedTags.length === 0))
+        modified = modified.filter((song) =>  song.tags.length === 0 || song.tags.some((tag: string) => selectedTags.includes(tag) || selectedTags.length === 0))
         // Sort
         switch (get(songBoardSelectedSortOptionAtom)) {
           case SongBoardSortOption.TITLE_ASCENDING:
