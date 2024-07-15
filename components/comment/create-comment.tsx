@@ -3,13 +3,21 @@
 import React, {useState} from "react";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
+import { useRecoilValue } from "recoil";
+import { currentTeamIdAtom } from "@/global-states/teamState";
+import {auth} from "@/firebase";
+import SongCommentService from "@/apis/SongCommentService";
 
 export function CreateComment() {
   const [comment, setComment] = useState("")
+  const teamId = useRecoilValue(currentTeamIdAtom)
+  const authUser = auth.currentUser
 
   async function handleSubmit(e: any) {
     e.preventDefault()
-    // firebase: on send comment.
+    // FE-TODO: get songId, handle after server call
+    const songId = "KpX3rvyzwYsJdSkscX7h"
+    await SongCommentService.addNewSongComment(authUser.uid, teamId, songId, comment);
   }
 
   return (

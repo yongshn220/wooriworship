@@ -1,14 +1,13 @@
 import {Timestamp} from "@firebase/firestore";
 
-export type Notice = {
+export type SongComment = {
     id: string
     team_id: string
     created_by: {
         id: string
         timestamp: Timestamp
     }
-    title: string
-    body: string
+    song_id: string
+    comment: string
     last_updated_time: Timestamp
-    file_urls: Array<string>
 }
