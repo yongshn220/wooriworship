@@ -1,7 +1,7 @@
 'use client'
 
 import {useRecoilState, useRecoilValue} from "recoil";
-import {worshipMenuAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
+import {worshipLiveOptionsAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {MenuIcon, DoorOpenIcon, SquarePenIcon} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Switch} from "@/components/ui/switch";
@@ -15,6 +15,7 @@ import {SelectIcon} from "@radix-ui/react-select";
 import {
   MultipleSheetsViewSelect
 } from "@/app/worship/[teamId]/[worshipId]/live/_components/multiple-sheets-view-select";
+import useUserPreferences from "@/components/hook/use-local-preference";
 
 interface Props {
   teamId: string,
@@ -22,11 +23,22 @@ interface Props {
 }
 
 export function WorshipLiveMenu({teamId, worshipId}: Props) {
-  const [menu, setMenu] = useRecoilState(worshipMenuAtom)
+  const [preference, prefSetter] = useUserPreferences()
+  const [option, setOption] = useRecoilState(worshipLiveOptionsAtom)
   const router = useRouter()
 
   function handleExit() {
     router.replace(getPathWorship(teamId, worshipId))
+  }
+
+  function toggleShowNoteOption() {
+    setOption((prev) => ({...prev, showSongNote: !prev.showSongNote}))
+    prefSetter.worshipLiveShowSongNote(!preference.worshipLive.showSongNote)
+  }
+
+  function toggleShowSongNumberOption() {
+    setOption((prev) => ({...prev, showSongNumber: !prev.showSongNumber}))
+    prefSetter.worshipLiveShowSongNumber(!preference.worshipLive.showSongNumber)
   }
 
   return (
@@ -38,15 +50,13 @@ export function WorshipLiveMenu({teamId, worshipId}: Props) {
           </div>
         </PopoverTrigger>
         <PopoverContent className="mr-4 p-2 space-y-2">
-          <div className="flex-between cursor-pointer hover:bg-gray-100 py-2 px-2 rounded-sm"
-               onClick={() => setMenu((prev) => ({...prev, showSongNote: !prev.showSongNote}))}>
+          <div className="flex-between cursor-pointer hover:bg-gray-100 py-2 px-2 rounded-sm" onClick={() => toggleShowNoteOption()}>
             <Label>Show Song Note</Label>
-            <Switch className="data-[state=checked]:bg-blue-500" checked={menu.showSongNote}/>
+            <Switch className="data-[state=checked]:bg-blue-500" checked={option.showSongNote}/>
           </div>
-          <div className="flex-between cursor-pointer hover:bg-gray-100 py-2 px-2 rounded-sm"
-               onClick={() => setMenu((prev) => ({...prev, showSongNumber: !prev.showSongNumber}))}>
+          <div className="flex-between cursor-pointer hover:bg-gray-100 py-2 px-2 rounded-sm" onClick={() => toggleShowSongNumberOption()}>
             <Label>Show Song Number</Label>
-            <Switch className="data-[state=checked]:bg-blue-500" checked={menu.showSongNumber}/>
+            <Switch className="data-[state=checked]:bg-blue-500" checked={option.showSongNumber}/>
           </div>
           <Separator/>
           <div className="flex-between py-2 px-2 rounded-sm">

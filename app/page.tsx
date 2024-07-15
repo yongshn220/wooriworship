@@ -17,7 +17,7 @@ enum AuthStatus {
 
 export default function Home() {
   const [authStatus, setAuthStatus] = useState<AuthStatus>(AuthStatus.PROCESSING)
-  const [preferences, setPreferences] = useUserPreferences()
+  const [preferences, _] = useUserPreferences()
   const router = useRouter()
 
   useEffect(() => {

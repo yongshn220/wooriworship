@@ -2,13 +2,20 @@ import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVal
 import {DirectionType} from "@/components/constants/enums";
 import {worshipMultipleSheetsViewModeAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useRecoilState} from "recoil";
+import useUserPreferences from "@/components/hook/use-local-preference";
 
 
 export function MultipleSheetsViewSelect() {
+  const [_, prefSetter] = useUserPreferences()
   const [mode, setMode] = useRecoilState(worshipMultipleSheetsViewModeAtom)
 
+  function handleSetMode(mode: DirectionType) {
+    setMode(mode)
+    prefSetter.worshipLiveMultipleSheetsView(mode)
+  }
+
   return (
-    <Select value={mode} onValueChange={(value) => setMode(value as DirectionType)}>
+    <Select value={mode} onValueChange={(value) => handleSetMode(value as DirectionType)}>
       <SelectTrigger className="flex-1 flex-end border-0 shadow-none" >
         <SelectValue placeholder="Mode" />
       </SelectTrigger>

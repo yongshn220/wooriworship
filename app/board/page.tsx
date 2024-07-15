@@ -12,13 +12,12 @@ import {CreateNewTeamDialog} from "@/app/board/_components/create-new-team-dialo
 import {Button} from "@/components/ui/button";
 import {toast} from "@/components/ui/use-toast";
 import useUserPreferences from "@/components/hook/use-local-preference";
-import {MainLogo} from "@/components/logo/main-logo";
 import {isMobile} from "@/components/helper/helper-functions";
 
 
 export default function BoardPage() {
   const authUser = auth.currentUser
-  const [preferences, setPreferences] = useUserPreferences()
+  const [preferences, _] = useUserPreferences()
   const [isTeamEmpty, setIsTeamEmpty] = useState(false)
   const router = useRouter()
 
