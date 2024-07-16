@@ -8,6 +8,7 @@ import {
 import {userAtom} from "@/global-states/userState";
 import {MenuIcon, UserIcon} from "lucide-react";
 import Image from 'next/image'
+import {NoticeDropdownMenu} from "@/app/board/[teamId]/notice/_components/notice-dropdown-menu";
 
 
 interface Props {
@@ -34,9 +35,7 @@ export function NoticeListItem({noticeId}: Props) {
             <div className="ml-4">
             </div>
           </div>
-          <div>
-            <MenuIcon/>
-          </div>
+          <NoticeDropdownMenu/>
         </div>
         <Separator/>
 
