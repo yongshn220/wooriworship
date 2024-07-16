@@ -16,7 +16,7 @@ export function WorshipPlanPreview({teamId}: Props) {
   const router = useRouter()
 
   return (
-    <div className="bg-white border p-4 rounded-xl">
+    <div className="p-4 rounded-xl">
       <p className="text-xl font-semibold pb-4">Recent Worship Plan</p>
       <div className="w-full h-full">
         <RecentWorshipPlanList teamId={teamId}/>

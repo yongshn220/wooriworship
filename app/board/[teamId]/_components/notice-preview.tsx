@@ -16,7 +16,7 @@ export function NoticePreview({teamId}: Props) {
   const noticeIds = useRecoilValue(noticeIdsAtom(teamId))
 
   return (
-    <div className="bg-white border p-4 rounded-xl">
+    <div className="p-4 rounded-xl">
       <p className="text-xl font-semibold pb-4">Recent Notice</p>
       <div className="space-y-2">
         {
