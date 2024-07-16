@@ -9,7 +9,7 @@ export function ManageTeamDialog({children}: any) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div>
+        <div className="w-full">
           {children}
         </div>
       </DialogTrigger>
