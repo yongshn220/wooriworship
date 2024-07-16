@@ -1,7 +1,7 @@
 "use client"
 
 import {Drawer, DrawerContent, DrawerHeader, DrawerTrigger,} from "@/components/ui/drawer"
-import {MenuIcon, SettingsIcon} from "lucide-react";
+import {MenuIcon, SettingsIcon, UsersIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {AuthService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
@@ -12,6 +12,8 @@ import {useRouter} from "next/navigation";
 import {InvitationButton} from "@/app/board/_components/nav-bar/invitation-button";
 import {Separator} from "@/components/ui/separator";
 import {currentTeamIdAtom} from "@/global-states/teamState";
+import ManageTeam from "@/app/board/[teamId]/manage-team/page";
+import {ManageTeamDialog} from "@/app/board/_components/nav-bar/manage-team-dialog";
 
 export function SettingButton() {
   const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
@@ -40,6 +42,12 @@ export function SettingButton() {
           <p className="font-semibold prevent-text-select">Wooriworship</p>
         </DrawerHeader>
         <div className="w-full h-full flex-center flex-col gap-4 p-2">
+          <ManageTeamDialog>
+            <Button variant="ghost" className="w-full flex-start gap-2">
+              <UsersIcon className="w-[20px] h-[20px]"/>
+              <p className="prevent-text-select">Manage Team</p>
+            </Button>
+          </ManageTeamDialog>
           <InvitationButton/>
           <Button disabled={true} variant="ghost" className="w-full flex-start gap-2">
             <SettingsIcon className="w-[20px] h-[20px]"/>
