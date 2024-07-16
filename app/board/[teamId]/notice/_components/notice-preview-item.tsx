@@ -22,7 +22,7 @@ export function NoticePreviewItem({teamId, noticeId}: Props) {
   const router = useRouter()
 
   return (
-    <div className="w-full rounded-lg p-2 cursor-pointer hover:bg-gray-50" onClick={() => router.push(getPathNotice(teamId))}>
+    <div className="bg-white border w-full rounded-lg p-2 cursor-pointer hover:border-blue-300" onClick={() => router.push(getPathNotice(teamId))}>
       <div className="flex items-center gap-2">
         <p className="text-sm pl-2">{timestampToDateStringFormatted(notice?.last_updated_time)}</p>
         <p className="text-sm text-gray-500">{timestampToDatePassedFromNowShorten(notice?.last_updated_time)}</p>
