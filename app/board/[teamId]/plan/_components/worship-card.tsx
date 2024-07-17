@@ -33,7 +33,7 @@ export function WorshipCard({worshipId}: Props) {
             {timestampToDateStringFormatted(worship?.worship_date)} <span
             className="text-xs">({getDayByTimestamp(worship?.worship_date)})</span>
           </p>
-          <div className="font-semibold text-lg">{worship?.title}</div>
+          <div className="font-semibold text-lg">{worship?.title === "" ? "No title" : worship.title}</div>
         </div>
         <div className="h-full flex flex-col justify-start gap-3 py-4">
           {
