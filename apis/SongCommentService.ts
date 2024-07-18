@@ -1,4 +1,6 @@
 import {BaseService} from ".";
+import {SongComment} from "@/models/song_comments";
+import {Timestamp} from "@firebase/firestore";
 
 
 class SongCommentService extends BaseService {
@@ -23,14 +25,14 @@ class SongCommentService extends BaseService {
   }
 
   async addNewSongComment(userId: string, teamId: string, songId: string, comment: any) {
-    const newSongComment = {
+    const newSongComment: SongComment = {
       team_id: teamId,
       song_id: songId,
       created_by: {
         id: userId,
-        time: new Date()
+        timestamp: Timestamp.fromDate(new Date())
       },
-      last_updated_time: new Date(),
+      last_updated_time: Timestamp.fromDate(new Date()),
       comment: comment
     }
     return await this.create(newSongComment);
@@ -38,7 +40,7 @@ class SongCommentService extends BaseService {
 
   async updateSongComment(commentId: string, comment: any) {
     const songComment: any = {
-        last_updated_time: new Date(),
+        last_updated_time: Timestamp.fromDate(new Date()),
         comment: comment
     }
     return await this.update(commentId, songComment);
