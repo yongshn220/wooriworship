@@ -3,11 +3,11 @@
 import React, {useState} from "react";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
-import { useRecoilValue } from "recoil";
-import { currentTeamIdAtom } from "@/global-states/teamState";
 import {auth} from "@/firebase";
 import SongCommentService from "@/apis/SongCommentService";
 import {toast} from "@/components/ui/use-toast";
+import {useSetRecoilState} from "recoil";
+import {songCommentIdsAtom} from "@/global-states/song-comment-state";
 
 interface Props {
   teamId: string
@@ -15,6 +15,7 @@ interface Props {
 }
 
 export function CreateComment({teamId, songId}: Props) {
+  const setSongCommentIds = useSetRecoilState(songCommentIdsAtom({teamId, songId}))
   const [comment, setComment] = useState("")
   const authUser = auth.currentUser
 
@@ -25,6 +26,7 @@ export function CreateComment({teamId, songId}: Props) {
       toast({title: "Fail to create a comment. Please try again."})
       return;
     }
+    setSongCommentIds((prev) => ([...prev, docId]))
     toast({title: "New song created successfully."})
   }
 
