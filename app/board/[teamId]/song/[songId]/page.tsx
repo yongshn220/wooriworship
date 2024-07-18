@@ -3,6 +3,8 @@
 import {useRouter} from "next/navigation";
 import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-card";
 import {getPathSong} from "@/components/helper/routes";
+import {SongDetailDrawer} from "@/app/board/[teamId]/song/_components/song-detail-drawer";
+import {isMobile} from "@/components/helper/helper-functions";
 
 
 export default function SongDetailPage({params}: any) {
@@ -16,7 +18,13 @@ export default function SongDetailPage({params}: any) {
     }
   }
 
+  if (isMobile()) {
+    return (
+      <SongDetailDrawer teamId={teamId} isOpen={true} setIsOpen={onOpenChangeHandler} songId={songId} readOnly={false} />
+    )
+  }
+
   return (
-     <SongDetailCard teamId={teamId} isOpen={true} setIsOpen={onOpenChangeHandler} songId={songId} readOnly={false} />
+    <SongDetailCard teamId={teamId} isOpen={true} setIsOpen={onOpenChangeHandler} songId={songId} readOnly={false} />
   )
 }
