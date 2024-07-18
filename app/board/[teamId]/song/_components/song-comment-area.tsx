@@ -3,6 +3,7 @@ import {Separator} from "@/components/ui/separator";
 import {CommentItem} from "@/components/comment/comment-item";
 import {useRecoilValue} from "recoil";
 import {songCommentIdsAtom} from "@/global-states/song-comment-state";
+import {Suspense} from "react";
 
 
 interface Props {
@@ -18,7 +19,9 @@ export function SongCommentArea({teamId, songId}: Props) {
       <Separator className="my-4"/>
       {
         commentIds.map((commentId, index) => (
-          <CommentItem key={index} commentId={commentId}/>
+          <Suspense key={index} fallback={<></>}>
+            <CommentItem commentId={commentId}/>
+          </Suspense>
         ))
       }
       <CreateComment teamId={teamId} songId={songId} />

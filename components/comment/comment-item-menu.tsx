@@ -13,11 +13,11 @@ export function CommentItemMenu({setIsEditMode}: Props) {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => {setIsEditMode(true)}}>
+          <DropdownMenuItem className="cursor-pointer" onClick={() => {setIsEditMode(true)}}>
             <SquarePen className="mr-3 w-5 h-5"/>
             <p>Edit</p>
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
             <Trash2Icon className="mr-3 w-5 h-5"/>
             <p>Delete</p>
           </DropdownMenuItem>
