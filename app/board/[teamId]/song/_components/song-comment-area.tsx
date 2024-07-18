@@ -15,7 +15,7 @@ export function SongCommentArea({teamId, songId}: Props) {
   const commentIds = useRecoilValue(songCommentIdsAtom({teamId, songId}))
   return (
     <div className="w-full mt-5 ">
-      <p>3 Comments</p>
+      <p>{`${commentIds?.length ?? 0} Comments`}</p>
       <Separator className="my-4"/>
       {
         commentIds.map((commentId, index) => (
