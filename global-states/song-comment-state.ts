@@ -34,8 +34,10 @@ export const songCommentAtom = atomFamily<SongComment, string>({
   key: "songCommentAtom",
   default: selectorFamily({
     key: "songCommentAtom/default",
-    get: (commentId) => async () => {
+    get: (commentId) => async ({get}) => {
       try {
+        get(songCommentUpdater)
+
         if (!commentId) return null
 
         const comment = await SongCommentService.getById(commentId) as SongComment
@@ -49,4 +51,9 @@ export const songCommentAtom = atomFamily<SongComment, string>({
       }
     }
   })
+})
+
+export const songCommentUpdater = atom({
+  key: "songCommentUpdater",
+  default: 0
 })
