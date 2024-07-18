@@ -1,5 +1,5 @@
-import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle} from "@/components/ui/dialog";
-import React, {useState} from "react";
+import {Dialog, DialogContent, DialogFooter, DialogTitle} from "@/components/ui/dialog";
+import React, {useEffect, useState} from "react";
 import {FormMode} from "@/components/constants/enums";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
@@ -12,10 +12,9 @@ import {Button} from "@/components/ui/button";
 import {auth} from "@/firebase";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import {noticeAtom, noticeIdsAtom} from "@/global-states/notice-state";
+import {noticeAtom, noticeIdsAtom, noticeUpdaterAtom} from "@/global-states/notice-state";
 import {NoticeService, StorageService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
-import {useRouter} from "next/navigation";
 
 
 interface Props {
@@ -27,23 +26,32 @@ interface Props {
 
 export interface NoticeInput {
   title: string
-  description: string
+  body: string
 }
 
 export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
   const setNoticeIds = useSetRecoilState(noticeIdsAtom(teamId))
+  const noticeUpdater = useSetRecoilState(noticeUpdaterAtom)
   const notice = useRecoilValue(noticeAtom(noticeId))
   const [input, setInput] = useState<NoticeInput>({
-    title: "",
-    description: "",
+    title: (mode === FormMode.EDIT)? notice?.title?? "" : "",
+    body: (mode === FormMode.EDIT)? notice?.body?? "" : "",
   })
   const [imageFileContainers, setImageFileContainers] = useState<Array<ImageFileContainer>>([])
   const [isLoading, setIsLoading] = useState(false)
 
+  useEffect(() => {
+    if (mode === FormMode.EDIT) {
+      const _imageFileContainers = notice?.file_urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<ImageFileContainer>
+      if (_imageFileContainers)
+        setImageFileContainers(_imageFileContainers)
+    }
+  }, [mode, notice?.file_urls])
+
   function clearContents() {
-    setInput({title: "", description: ""})
+    setInput({title: "", body: ""})
     setImageFileContainers([])
   }
 
@@ -62,14 +70,30 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
         urlsToKeep = urlsToKeep.concat(newDownloadUrls)
       }
       const noticeInput = {
-        title: input.title,
-        body: input.description,
+        title: input?.title,
+        body: input?.body,
         file_urls: urlsToKeep
       }
-      await NoticeService.updateNotice(noticeId, noticeInput)
-      // FE-TODO: handle post edit
-    } catch (e) {
+      if (await NoticeService.updateNotice(noticeId, noticeInput)) {
+        toast({
+          title: `Notice updated successfully!`,
+          description: input.title,
+        })
+        noticeUpdater(prev => prev + 1)
+      }
+      else {
+        toast({
+          description: "Fail to edit notice. Please try again."
+        })
+      }
+    }
+    catch (e) {
       console.log(e);
+    }
+    finally {
+      setIsLoading(false)
+      clearContents()
+      setIsOpen(false)
     }
   }
 
@@ -79,7 +103,7 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
       const downloadUrls = await StorageService.uploadNoticeFiles(teamId, imageFileContainers)
       const noticeInput = {
         title: input.title,
-        body: input.description,
+        body: input.body,
         file_urls: downloadUrls
       }
       console.log(noticeInput)
@@ -129,8 +153,8 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
             <Textarea
               className="h-20 text-base"
               placeholder="Write the description"
-              value={input.description}
-              onChange={(e) => setInput((prev => ({...prev, description: e.target.value})))}
+              value={input.body}
+              onChange={(e) => setInput((prev => ({...prev, body: e.target.value})))}
             />
           </div>
           <div className="w-full h-14 py-2 flex-center gap-2">

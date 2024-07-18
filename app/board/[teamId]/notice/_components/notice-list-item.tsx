@@ -35,7 +35,7 @@ export function NoticeListItem({noticeId}: Props) {
             <div className="ml-4">
             </div>
           </div>
-          <NoticeDropdownMenu/>
+          <NoticeDropdownMenu noticeId={noticeId}/>
         </div>
         <Separator/>
 

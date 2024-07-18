@@ -107,7 +107,14 @@ export default class BaseService {
     }
 
     async update(id: string, data: any) {
-        await firestore.collection(this.collectionName).doc(id).set(data, {merge: true});
+        try {
+            await firestore.collection(this.collectionName).doc(id).set(data, {merge: true});
+            return true
+        }
+        catch (e) {
+            console.log(e)
+            return false
+        }
     }
 
     async delete(id: string) {

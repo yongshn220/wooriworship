@@ -1,18 +1,10 @@
 "use client"
 
-import {HoverOverlay} from "@/components/hover-overlay";
-import Link from "next/link";
-import {
-  getDayByTimestamp,
-  isTimestampPast,
-  timestampToDateString,
-  timestampToDateStringFormatted
-} from "@/components/helper/helper-functions";
+import {getDayByTimestamp, timestampToDateStringFormatted} from "@/components/helper/helper-functions";
 import {getPathWorship} from "@/components/helper/routes";
 import {useRecoilValue, useRecoilValueLoadable} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {worshipAtom, worshipSongListAtom} from "@/global-states/worship-state";
-import {cn} from "@/lib/utils";
 import {useRouter} from "next/navigation";
 
 interface Props {
