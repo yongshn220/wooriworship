@@ -27,6 +27,7 @@ export function CreateComment({teamId, songId}: Props) {
       return;
     }
     setSongCommentIds((prev) => ([...prev, docId]))
+    setComment("")
     toast({title: "New song created successfully."})
   }
 
@@ -34,7 +35,7 @@ export function CreateComment({teamId, songId}: Props) {
     <form onSubmit={handleSubmit}>
       <div className="w-full flex flex-col py-4 px-2 m-0 gap-5 ">
         <Textarea
-          className="h-20"
+          className="h-20 text-base"
           placeholder="Create a comment"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
