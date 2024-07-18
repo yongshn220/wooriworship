@@ -9,7 +9,7 @@ export function CommentItemMenu({setIsEditMode}: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <EllipsisIcon/>
+        <EllipsisIcon className="text-gray-500 w-4 h-4"/>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuGroup>

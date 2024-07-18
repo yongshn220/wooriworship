@@ -7,17 +7,25 @@ import { useRecoilValue } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import {auth} from "@/firebase";
 import SongCommentService from "@/apis/SongCommentService";
+import {toast} from "@/components/ui/use-toast";
 
-export function CreateComment() {
+interface Props {
+  teamId: string
+  songId: string
+}
+
+export function CreateComment({teamId, songId}: Props) {
   const [comment, setComment] = useState("")
-  const teamId = useRecoilValue(currentTeamIdAtom)
   const authUser = auth.currentUser
 
   async function handleSubmit(e: any) {
     e.preventDefault()
-    // FE-TODO: get songId, handle after server call
-    const songId = "KpX3rvyzwYsJdSkscX7h"
-    await SongCommentService.addNewSongComment(authUser.uid, teamId, songId, comment);
+    const docId = await SongCommentService.addNewSongComment(authUser.uid, teamId, songId, comment)
+    if (!docId) {
+      toast({title: "Fail to create a comment. Please try again."})
+      return;
+    }
+    toast({title: "New song created successfully."})
   }
 
   return (
