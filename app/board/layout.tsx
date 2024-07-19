@@ -16,10 +16,10 @@ export default function BoardLayout({ children }: any) {
       <BoardAuthenticate>
         <div className="flex h-full">
           <BoardSidebar/>
-          <div className="flex flex-col h-screen flex-1">
+          <div className="flex flex-col h-screen flex-1 overflow-y-scroll">
             <Navbar/>
             <TopNavbarMobile/>
-            <div className="flex-1 pt-4 sm:mt-0 px-2 sm:px-6 overflow-y-scroll bg-gray-50">
+            <div className="flex-1 pt-4 sm:mt-0 px-2 sm:px-6 bg-gray-50">
               {children}
             </div>
             <BottomNavbar/>

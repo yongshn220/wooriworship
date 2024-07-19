@@ -4,7 +4,7 @@ import {Dialog, DialogContentNoCloseButton, DialogHeader, DialogTitle,} from "@/
 import {Label} from "@/components/ui/label";
 import {Badge} from "@/components/ui/badge";
 import Image from "next/image"
-import {OpenYoutubeLink, timestampToDatePassedFromNow} from "@/components/helper/helper-functions";
+import {OpenYoutubeLink, getTimePassedFromTimestamp} from "@/components/helper/helper-functions";
 import {MenuButton} from "@/app/board/[teamId]/song/_components/menu-button";
 import {SongMusicSheetViewer} from "@/app/board/[teamId]/song/_components/song-music-sheet-viewer";
 import {useState} from "react";
@@ -103,7 +103,7 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, songId, readOnly=fals
               <Label htmlFor="name" className="text-base font-semibold">
                 Used on
               </Label>
-              <p className="text-sm">{timestampToDatePassedFromNow(song?.last_used_time)}</p>
+              <p className="text-sm">{getTimePassedFromTimestamp(song?.last_used_time)}</p>
             </div>
             {
               song.description &&

@@ -29,7 +29,7 @@ export function Navbar() {
   };
 
   return (
-    <div className="hidden lg:flex content-between items-center py-4 gap-4 border-b bg-white/95 z-50 px-4">
+    <div className="hidden lg:flex top-0 sticky content-between items-center py-4 gap-4 border-b bg-white/95 z-40 px-4">
       <InvitationDialog isOpen={invitationDialogState} setIsOpen={setInvitationDialogState}/>
       <div className="flex-center h-full">
         {

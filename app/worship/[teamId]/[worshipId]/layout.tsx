@@ -20,16 +20,16 @@ export default function WorshipLayout({params, children}: Props) {
   const teamId = params.teamId
 
   return (
-    <section className="w-full h-full">
+    <section className="h-full">
       <PageInit teamId={teamId} page={Page.WORSHIP}/>
-      <div className="w-full h-full flex">
+      <div className="h-full flex">
         <MdSidebar>
           <MainLogoRouter route={getPathPlan(teamId)}/>
           <WorshipSidebar teamId={teamId} worshipId={worshipId}/>
         </MdSidebar>
-        <div className="w-full h-full flex-1">
+        <div className="flex flex-col h-screen flex-1 overflow-y-scroll">
           <Navbar/>
-          <div className="pt-4 sm:mt-0 flex-1 h-[calc(100%-160px)] px-6 overflow-y-scroll scrollbar-hide">
+          <div className="pt-4 sm:mt-0 flex-1 px-6 ">
             {children}
           </div>
           <WorshipBottomNavbar teamId={teamId} worshipId={worshipId}/>
