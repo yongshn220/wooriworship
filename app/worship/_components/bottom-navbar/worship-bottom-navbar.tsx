@@ -13,7 +13,7 @@ export function WorshipBottomNavbar({teamId, worshipId}: Props) {
   const router = useRouter()
 
   return (
-    <div className="lg:hidden bottom-0 w-full h-[80px] bg-white border-t-2 z-50">
+    <div className="lg:hidden bottom-0 w-full h-[80px] bg-white border-t-2 z-50 pointer-events: none">
       <div className="w-full h-full flex-center px-4 gap-4">
         <div className="w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer">
           <DownloadMusicSheetDialog worshipId={worshipId}>
