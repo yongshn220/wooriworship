@@ -18,7 +18,7 @@ export function WorshipIndexIndicator() {
   return (
     <div className={cn(
       "absolute gap-y-2",
-      {"flex-center bottom-5 gap-x-2": isMobile()},
+      {"flex-center bottom-5 gap-x-2": menu.showSongNumber && isMobile()},
       {"flex-center flex-col left-5 gap-y-2": menu.showSongNumber && !isMobile()},
       {"hidden": !menu.showSongNumber})}
     >
