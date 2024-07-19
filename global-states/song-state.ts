@@ -94,10 +94,10 @@ export const songsByWorshipIdAtom = atomFamily<Array<Song>, string>({
         const worship = get(worshipAtom(worshipId))
         if (!worship) return []
 
-        const songs = await SongService.getByIds(worship.songs.map((songHeader => songHeader.id)))
-        if (!songs) return []
+        const songPromises = worship.songs.map(songHeader => SongService.getById(songHeader.id))
+        const songs = await Promise.all(songPromises)
 
-        return songs
+        return songs.filter(Boolean)
       }
       catch (e) {
         return []
