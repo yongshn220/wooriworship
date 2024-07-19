@@ -7,7 +7,7 @@ import {useRecoilValue, useSetRecoilState} from "recoil";
 import {songCommentAtom, songCommentUpdater} from "@/global-states/song-comment-state";
 import {userAtom} from "@/global-states/userState";
 import {auth} from "@/firebase";
-import {timestampToDatePassedFromNow, timestampToDatePassedFromNowShorten} from "@/components/helper/helper-functions";
+import {getTimePassedFromTimestamp, getTimePassedFromTimestampShorten} from "@/components/helper/helper-functions";
 import {SongCommentService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
 
@@ -43,7 +43,7 @@ export function CommentItem({commentId}: Props) {
             <p className="text-sm font-semibold">
               {user?.name}
             </p>
-            <p className="text-xs text-gray-500 text-right ml-2">{timestampToDatePassedFromNowShorten(comment?.created_by?.timestamp)}</p>
+            <p className="text-xs text-gray-500 text-right ml-2">{getTimePassedFromTimestampShorten(comment?.created_by?.timestamp)}</p>
           </div>
           {(user?.id === currentUser?.uid) && <CommentItemMenu setIsEditMode={setIsEditMode}/>}
         </div>

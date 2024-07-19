@@ -2,7 +2,7 @@ import {Separator} from "@/components/ui/separator";
 import {useRecoilValue} from "recoil";
 import {noticeAtom} from "@/global-states/notice-state";
 import {
-  timestampToDatePassedFromNowShorten,
+  getTimePassedFromTimestampShorten,
   timestampToDateStringFormatted
 } from "@/components/helper/helper-functions";
 import {userAtom} from "@/global-states/userState";
@@ -23,7 +23,7 @@ export function NoticeListItem({noticeId}: Props) {
     <div className="w-full">
       <div className="flex items-center gap-2">
         <p className="text-sm pl-2">{timestampToDateStringFormatted(notice?.last_updated_time)}</p>
-        <p className="text-sm text-gray-500">{timestampToDatePassedFromNowShorten(notice?.last_updated_time)}</p>
+        <p className="text-sm text-gray-500">{getTimePassedFromTimestampShorten(notice?.last_updated_time)}</p>
       </div>
       <div className="w-full p-4 border rounded-lg bg-white">
         <div className="flex items-center justify-between pb-4">

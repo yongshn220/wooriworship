@@ -2,7 +2,7 @@ import {Separator} from "@/components/ui/separator";
 import {useRecoilValue} from "recoil";
 import {noticeAtom} from "@/global-states/notice-state";
 import {
-  timestampToDatePassedFromNowShorten,
+  getTimePassedFromTimestampShorten,
   timestampToDateStringFormatted
 } from "@/components/helper/helper-functions";
 import {userAtom} from "@/global-states/userState";
@@ -25,7 +25,7 @@ export function NoticePreviewItem({teamId, noticeId}: Props) {
     <div className="bg-white border w-full rounded-lg p-2 cursor-pointer hover:border-blue-300" onClick={() => router.push(getPathNotice(teamId))}>
       <div className="flex items-center gap-2">
         <p className="text-sm pl-2">{timestampToDateStringFormatted(notice?.last_updated_time)}</p>
-        <p className="text-sm text-gray-500">{timestampToDatePassedFromNowShorten(notice?.last_updated_time)}</p>
+        <p className="text-sm text-gray-500">{getTimePassedFromTimestampShorten(notice?.last_updated_time)}</p>
       </div>
       <Separator/>
       <div className="w-full">

@@ -23,7 +23,7 @@ export function WorshipSidebar({teamId, worshipId}: Props) {
   }
 
   return (
-    <div className="flex-between flex-col h-full">
+    <div className="flex-between flex-col w-full h-full">
       <div className="space-y-2 w-full ">
         <Label className="font-semibold">Songs</Label>
         <Suspense fallback={<div>loading..</div>}>

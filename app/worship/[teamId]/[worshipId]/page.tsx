@@ -8,11 +8,16 @@ import {MenuButton} from "@/app/worship/[teamId]/[worshipId]/_components/menu-bu
 import UsersIcon from '@/public/icons/usersIcon.svg'
 import {useRecoilValue} from "recoil";
 import {teamAtom} from "@/global-states/teamState";
-import {timestampToDateString} from "@/components/helper/helper-functions";
+import {
+  getDayPassedFromTimestampShorten,
+  getTimePassedFromTimestampShorten,
+  timestampToDateString
+} from "@/components/helper/helper-functions";
 import {worshipAtom} from "@/global-states/worship-state";
 import {SongListItem, ViewMode} from "@/app/board/[teamId]/song/_components/song-list-item";
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import * as React from "react";
+import {BlocksIcon, MusicIcon} from "lucide-react";
 
 
 export default function WorshipPage({params}: any) {
@@ -26,28 +31,32 @@ export default function WorshipPage({params}: any) {
     <div className="w-full flex-center">
       <div className="flex-start flex-col w-full px-0 sm:px-6 gap-2 max-w-4xl">
         <div className="flex-between w-full">
-          <p className="text-4xl font-semibold">{worship?.title}</p>
+          <p className="text-2xl sm:text-3xl lg:text-4xl font-semibold">{worship?.title}</p>
           <MenuButton teamId={teamId} title={worship?.title} worshipId={worshipId}/>
         </div>
         <div className="flex-start mt-6 gap-2">
-          <div className="flex-start gap-2 w-52">
+          <div className="flex-start gap-2 w-40 sm:w-52">
             <UsersIcon className="text-gray-500"/>
             <p className="text-gray-500">Team</p>
           </div>
           <p>{team?.name}</p>
         </div>
-        <div className="flex-start mt-2 gap-2">
-          <div className="flex-start gap-2 w-52">
+        <div className="flex items-center mt-2 gap-2">
+          <div className="flex-start gap-2 w-40 sm:w-52">
             <CalendarIcon className="text-gray-500"/>
             <p className="text-gray-500">Worship Date</p>
           </div>
           <p>{timestampToDateString(worship?.worship_date)}</p>
+          <p className="text-xs text-gray-500 h-full">{getDayPassedFromTimestampShorten(worship?.worship_date)}</p>
         </div>
         <p className="mt-10">
           {worship?.description}
         </p>
         <div className="w-full flex-start flex-col my-2 mt-10">
-          <p className="font-semibold">Song List</p>
+          <div className="flex items-center gap-2">
+            <MusicIcon className="w-4 h-4"/>
+            <p className="font-semibold">Song List</p>
+          </div>
           <Separator/>
         </div>
         <div className="flex flex-col w-full gap-4">
@@ -60,7 +69,10 @@ export default function WorshipPage({params}: any) {
           }
         </div>
         <div className="w-full flex-start flex-col my-2 mt-10">
-          <p className="font-semibold">Music Sheets</p>
+          <div className="flex items-center gap-2">
+            <BlocksIcon className="w-4 h-4"/>
+            <p className="font-semibold">Music Sheets</p>
+          </div>
           <Separator/>
         </div>
         <div className="w-full flex-center flex-col">
