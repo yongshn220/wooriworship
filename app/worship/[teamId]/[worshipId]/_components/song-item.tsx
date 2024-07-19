@@ -5,6 +5,10 @@ import LinkIcon from '@/public/icons/linkIcon.svg'
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
+import {isMobile} from "@/components/helper/helper-functions";
+import {SongDetailDrawer} from "@/app/board/[teamId]/song/_components/song-detail-drawer";
+import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-card";
+import {Suspense, useState} from "react";
 
 interface Props {
   teamId: string
@@ -14,12 +18,19 @@ interface Props {
 
 export function SongItem({teamId, songHeader, index}: Props) {
   const song = useRecoilValue(songAtom(songHeader?.id))
-
+  const [isOpen, setIsOpen] = useState(false)
   if (!song) return <></>
 
   return (
-    <SongDetailCardWrapper teamId={teamId} songId={songHeader?.id}>
-      <div className="flex-between w-full h-12 p-2 px-4 rounded-lg cursor-pointer hover:bg-gray-100">
+    <>
+      <Suspense fallback={<></>}>
+        {
+          (isMobile())
+          ? <SongDetailDrawer teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={song?.id} readOnly={true}/>
+          : <SongDetailCard teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={song?.id} readOnly={true}/>
+        }
+      </Suspense>
+      <div className="flex-between w-full h-12 p-2 px-4 rounded-lg cursor-pointer hover:bg-gray-100" onClick={() => setIsOpen(true)}>
         <div className="flex-between gap-4">
           <div className="hidden sm:flex  rounded-full aspect-square text-gray-500 ">
             {index}.
@@ -33,6 +44,6 @@ export function SongItem({teamId, songHeader, index}: Props) {
           <div>{song?.key === ""? "" : `${song?.key}`}</div>
         </div>
       </div>
-    </SongDetailCardWrapper>
+    </>
   )
 }

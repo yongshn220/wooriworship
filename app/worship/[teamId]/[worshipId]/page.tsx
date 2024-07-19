@@ -11,6 +11,7 @@ import {useRecoilValue} from "recoil";
 import {teamAtom} from "@/global-states/teamState";
 import {timestampToDateString} from "@/components/helper/helper-functions";
 import {worshipAtom} from "@/global-states/worship-state";
+import {Suspense} from "react";
 
 
 export default function WorshipPage({params}: any) {
@@ -51,7 +52,9 @@ export default function WorshipPage({params}: any) {
         <div className="flex flex-col w-full gap-4">
           {
             worship?.songs.map((songHeader: SongHeader, index: number) => (
-              <SongItem teamId={teamId} key={songHeader?.id} songHeader={songHeader} index={index + 1}/>
+              <Suspense key={songHeader?.id} fallback={<></>}>
+                <SongItem teamId={teamId} songHeader={songHeader} index={index + 1}/>
+              </Suspense>
             ))
           }
         </div>
