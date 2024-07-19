@@ -7,7 +7,8 @@ import {WorshipSidebar} from "@/app/worship/[teamId]/[worshipId]/_components/wor
 import {MdSidebar} from "@/components/sidebar/md-sidebar";
 import {PageInit} from "@/components/page/page-init";
 import {Page} from "@/components/constants/enums";
-import {BottomNavbar} from "@/app/worship/_components/bottom-navbar/bottom-navbar";
+import {BottomNavbar} from "@/app/board/_components/bottom-navbar/bottom-navbar";
+import {WorshipBottomNavbar} from "@/app/worship/_components/bottom-navbar/worship-bottom-navbar";
 
 interface Props {
   params: any
@@ -28,10 +29,11 @@ export default function WorshipLayout({params, children}: Props) {
         </MdSidebar>
         <div className="w-full h-full flex-1">
           <Navbar/>
-          <div className="pt-4 sm:mt-0 flex-1 h-[calc(100%-80px)] px-6 overflow-y-scroll scrollbar-hide">
+          <div className="pt-4 sm:mt-0 flex-1 h-[calc(100%-160px)] px-6 overflow-y-scroll scrollbar-hide">
             {children}
           </div>
-          <BottomNavbar teamId={teamId} worshipId={worshipId}/>
+          <WorshipBottomNavbar teamId={teamId} worshipId={worshipId}/>
+          <BottomNavbar/>
         </div>
       </div>
     </section>
