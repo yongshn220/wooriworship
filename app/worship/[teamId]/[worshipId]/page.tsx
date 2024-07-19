@@ -3,7 +3,6 @@
 import {SongCarousel} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel";
 import {SongHeader} from "@/models/worship";
 import CalendarIcon from '@/public/icons/calendarIcon.svg'
-import {SongItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-item";
 import {Separator} from "@/components/ui/separator";
 import {MenuButton} from "@/app/worship/[teamId]/[worshipId]/_components/menu-button";
 import UsersIcon from '@/public/icons/usersIcon.svg'
@@ -11,7 +10,9 @@ import {useRecoilValue} from "recoil";
 import {teamAtom} from "@/global-states/teamState";
 import {timestampToDateString} from "@/components/helper/helper-functions";
 import {worshipAtom} from "@/global-states/worship-state";
-import {Suspense} from "react";
+import {SongListItem, ViewMode} from "@/app/board/[teamId]/song/_components/song-list-item";
+import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
+import * as React from "react";
 
 
 export default function WorshipPage({params}: any) {
@@ -52,9 +53,9 @@ export default function WorshipPage({params}: any) {
         <div className="flex flex-col w-full gap-4">
           {
             worship?.songs.map((songHeader: SongHeader, index: number) => (
-              <Suspense key={songHeader?.id} fallback={<></>}>
-                <SongItem teamId={teamId} songHeader={songHeader} index={index + 1}/>
-              </Suspense>
+              <SongDetailCardWrapper key={songHeader?.id} teamId={teamId} songId={songHeader?.id}>
+                <SongListItem songId={songHeader?.id} viewMode={ViewMode.NONE}/>
+              </SongDetailCardWrapper>
             ))
           }
         </div>
