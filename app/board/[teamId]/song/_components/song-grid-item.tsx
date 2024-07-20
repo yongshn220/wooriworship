@@ -39,7 +39,7 @@ export function SongGridItem({songId}: Props) {
         <div className="relative group h-full flex-center flex-col text-white cursor-pointer"
              onClick={handleSongCardClick}>
           <HoverOverlay/>
-          <p className="font-semibold text-sm">{song?.title} {song?.key !== ""? `[${song.key}]` : ""}</p>
+          {/*<p className="font-semibold text-sm">{song?.title} {song?.key !== ""? `[${song.key}]` : ""}</p>*/}
           <p className="text-xs">{song?.original.author}</p>
         </div>
         <div className="flex-between bg-white p-2">

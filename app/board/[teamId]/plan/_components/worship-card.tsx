@@ -1,6 +1,10 @@
 "use client"
 
-import {getDayByTimestamp, timestampToDateStringFormatted} from "@/components/helper/helper-functions";
+import {
+  getDayByTimestamp,
+  getDayPassedFromTimestampShorten, isTimestampPast,
+  timestampToDateStringFormatted
+} from "@/components/helper/helper-functions";
 import {getPathWorship} from "@/components/helper/routes";
 import {useRecoilValue, useRecoilValueLoadable} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
@@ -20,11 +24,16 @@ export function WorshipCard({worshipId}: Props) {
   return (
     <div onClick={() => router.push(getPathWorship(teamId, worship.id))}>
       <div className="group md:aspect-[1/1] rounded-lg flex flex-col bg-white overflow-hidden cursor-pointer shadow p-4">
-        <div className="flex-start flex-col pb-2 border-b">
-          <p className="w-full text-sm text-gray-600 mt-1">
-            {timestampToDateStringFormatted(worship?.worship_date)} <span
-            className="text-xs">({getDayByTimestamp(worship?.worship_date)})</span>
-          </p>
+        <div className="flex flex-col pb-2 border-b">
+          <div className="flex-between items-center w-full">
+            <p className="text-sm text-gray-600">{timestampToDateStringFormatted(worship?.worship_date)}
+              <span className="text-xs"> ({getDayByTimestamp(worship?.worship_date)})</span>
+            </p>
+            {
+              isTimestampPast(worship?.worship_date) === false &&
+              <p className="text-xs text-gray-500">{getDayPassedFromTimestampShorten(worship?.worship_date)}</p>
+            }
+          </div>
           <div className="font-semibold text-lg">{worship?.title === "" ? "No title" : worship.title}</div>
         </div>
         <div className="h-full flex flex-col justify-start gap-3 py-4">

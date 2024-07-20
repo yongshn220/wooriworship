@@ -66,7 +66,7 @@ export function SongDetailDrawer({teamId, isOpen, setIsOpen, songId, readOnly=fa
               <Label htmlFor="name" className="text-base font-semibold">
                 Key
               </Label>
-              <p>{song?.key}</p>
+              {/*<p>{song?.key}</p>*/}
             </div>
             <div className="flex-between items-center">
               <Label htmlFor="name" className="text-base font-semibold">
