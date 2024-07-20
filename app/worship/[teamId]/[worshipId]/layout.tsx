@@ -39,3 +39,5 @@ export default function WorshipLayout({params, children}: Props) {
     </section>
   )
 }
+
+
