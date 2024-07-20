@@ -74,30 +74,31 @@ export function getTimePassedFromTimestamp(timestamp: Timestamp) {
     result = `${diffInSeconds} seconds ago`;
   }
   else if (diffInSeconds < secondsInHour) {
-    const minutes = Math.floor(diffInSeconds / secondsInMinute);
-    result = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+    const minutes = Math.abs(Math.floor(diffInSeconds / secondsInMinute));
+    result = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
   }
   else if (diffInSeconds < secondsInDay) {
-    const hours = Math.floor(diffInSeconds / secondsInHour);
-    result = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+    const hours = Math.abs(Math.floor(diffInSeconds / secondsInHour));
+    result = `${hours} hour${hours !== 1 ? 's' : ''}`;
   }
   else if (diffInSeconds < secondsInWeek) {
-    const days = Math.floor(diffInSeconds / secondsInDay);
-    result = `${days} day${days !== 1 ? 's' : ''} ago`;
+    const days = Math.abs(Math.floor(diffInSeconds / secondsInDay));
+    result = `${days} day${days !== 1 ? 's' : ''}`;
   }
   else if (diffInSeconds < secondsInMonth) {
-    const weeks = Math.floor(diffInSeconds / secondsInWeek);
-    result = `${weeks} week${weeks !== 1 ? 's' : ''} ago`;
+    const weeks = Math.abs(Math.floor(diffInSeconds / secondsInWeek));
+    result = `${weeks} week${weeks !== 1 ? 's' : ''}`;
   }
   else if (diffInSeconds < secondsInYear) {
-    const months = Math.floor(diffInSeconds / secondsInMonth);
-    result = `${months} month${months !== 1 ? 's' : ''} ago`;
+    const months = Math.abs(Math.floor(diffInSeconds / secondsInMonth));
+    result = `${months} month${months !== 1 ? 's' : ''}`;
   }
   else {
-    const years = Math.floor(diffInSeconds / secondsInYear);
-    result = `${years} year${years !== 1 ? 's' : ''} ago`;
+    const years = Math.abs(Math.floor(diffInSeconds / secondsInYear));
+    result = `${years} year${years !== 1 ? 's' : ''}`;
   }
-  return result;
+  const suffix = (diffInSeconds < 0)? " left" : " ago"
+  return result + suffix;
 }
 
 export function getTimePassedFromTimestampShorten(timestamp: Timestamp) {
@@ -118,33 +119,35 @@ export function getTimePassedFromTimestampShorten(timestamp: Timestamp) {
   let result;
 
   if (diffInSeconds < secondsInMinute) {
-    result = `${diffInSeconds} sec ago`;
+    result = `${diffInSeconds} sec`;
   }
   else if (diffInSeconds < secondsInHour) {
-    const minutes = Math.floor(diffInSeconds / secondsInMinute);
-    result = `${minutes}min ago`;
+    const minutes = Math.abs(Math.floor(diffInSeconds / secondsInMinute));
+    result = `${minutes}min`;
   }
   else if (diffInSeconds < secondsInDay) {
-    const hours = Math.floor(diffInSeconds / secondsInHour);
-    result = `${hours}hr ago`;
+    const hours = Math.abs(Math.floor(diffInSeconds / secondsInHour));
+    result = `${hours}hr`;
   }
   else if (diffInSeconds < secondsInWeek) {
-    const days = Math.floor(diffInSeconds / secondsInDay);
-    result = `${days}d ago`;
+    const days = Math.abs(Math.floor(diffInSeconds / secondsInDay));
+    result = `${days}d`;
   }
   else if (diffInSeconds < secondsInMonth) {
-    const weeks = Math.floor(diffInSeconds / secondsInWeek);
-    result = `${weeks}w ago`;
+    const weeks = Math.abs(Math.floor(diffInSeconds / secondsInWeek));
+    result = `${weeks}w`;
   }
   else if (diffInSeconds < secondsInYear) {
-    const months = Math.floor(diffInSeconds / secondsInMonth);
-    result = `${months}m ago`;
+    const months = Math.abs(Math.floor(diffInSeconds / secondsInMonth));
+    result = `${months}m`;
   }
   else {
-    const years = Math.floor(diffInSeconds / secondsInYear);
-    result = `${years}y ago`;
+    const years = Math.abs(Math.floor(diffInSeconds / secondsInYear));
+    result = `${years}y`;
   }
-  return result;
+
+  const suffix = (diffInSeconds < 0)? " left" : " ago"
+  return result + suffix;
 }
 
 export function getDayPassedFromTimestampShorten(timestamp: Timestamp) {
@@ -163,24 +166,24 @@ export function getDayPassedFromTimestampShorten(timestamp: Timestamp) {
   const secondsInYear = secondsInDay * 365;
 
   let result;
-
   if (diffInSeconds < secondsInWeek) {
-    const days = Math.floor(diffInSeconds / secondsInDay);
-    result = (days === 0)? "today" : `${days}d ago`;
+    const days = Math.abs(Math.floor(diffInSeconds / secondsInDay));
+    result = (days === 0)? "today" : `${days}d`;
   }
   else if (diffInSeconds < secondsInMonth) {
-    const weeks = Math.floor(diffInSeconds / secondsInWeek);
-    result = `${weeks}w ago`;
+    const weeks = Math.abs(Math.floor(diffInSeconds / secondsInWeek));
+    result = `${weeks}w`;
   }
   else if (diffInSeconds < secondsInYear) {
-    const months = Math.floor(diffInSeconds / secondsInMonth);
-    result = `${months}m ago`;
+    const months = Math.abs(Math.floor(diffInSeconds / secondsInMonth));
+    result = `${months}m`;
   }
   else {
-    const years = Math.floor(diffInSeconds / secondsInYear);
-    result = `${years}y ago`;
+    const years = Math.abs(Math.floor(diffInSeconds / secondsInYear));
+    result = `${years}y`;
   }
-  return result;
+  const suffix = (diffInSeconds < 0)? " left" : " ago"
+  return result + suffix;
 }
 
 export function timestampToDate(timestamp: Timestamp) {

@@ -17,6 +17,7 @@ interface Props {
 export function SongListView({teamId}: Props) {
   const songIdsLoadable = useRecoilValueLoadable(currentTeamSongIdsAtom(teamId))
 
+  console.log(songIdsLoadable.contents)
 
   switch (songIdsLoadable.state) {
     case 'loading': return <></>;

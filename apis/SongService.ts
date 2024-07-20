@@ -4,7 +4,7 @@ import SongCommentService from "./SongCommentService";
 
 class SongService extends BaseService {
   constructor() {
-    super("songs");
+    super("songs.dev");
   }
 
   async getTeamSong(teamId: string) {

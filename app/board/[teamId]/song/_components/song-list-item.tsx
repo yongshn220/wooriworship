@@ -6,6 +6,7 @@ import {getPathSongDetail} from "@/components/helper/routes";
 import {getTimePassedFromTimestamp, getTimePassedFromTimestampShorten} from "@/components/helper/helper-functions";
 import {Badge} from "@/components/ui/badge";
 import {Checkbox} from "@/components/ui/checkbox";
+import {SongKeyBox} from "@/components/song/song-key-box";
 
 interface Props {
   songId: string
@@ -34,8 +35,9 @@ export function SongListItem({songId, viewMode=ViewMode.ROUTE}: Props) {
         <div className="flex gap-2">
           <p className="font-semibold text-md">{song?.title}</p>
           {
-            song?.key &&
-            <div className="flex-center text-sm text-white font-medium bg-gray-400 rounded-sm w-5 h-5">{song.key}</div>
+            song?.music_sheets?.length > 0 && song?.music_sheets?.map((musicSheet, index) => (
+              <SongKeyBox key={index} musicKey={musicSheet?.key}/>
+            ))
           }
         </div>
         <p className="text-sm text-gray-500">{song?.original.author === "" ? "unknown" : song?.original.author}</p>

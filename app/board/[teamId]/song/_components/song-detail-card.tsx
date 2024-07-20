@@ -13,6 +13,7 @@ import {Button} from "@/components/ui/button";
 import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
 import {SongCommentArea} from "@/app/board/[teamId]/song/_components/song-comment-area";
+import {SongKeyBox} from "@/components/song/song-key-box";
 
 interface Props {
   teamId: string
@@ -24,21 +25,15 @@ interface Props {
 
 export function SongDetailCard({teamId, isOpen, setIsOpen, songId, readOnly=false}: Props) {
   const song = useRecoilValue(songAtom(songId))
-  const [isMusicSheetViewOpen, setMusicSheetViewOpen] = useState(false)
 
   function handleLinkButtonClick() {
     if (song?.original?.url) {
-      OpenYoutubeLink(song.original.url)
+      OpenYoutubeLink(song?.original.url)
     }
-  }
-
-  function handleMusicSheetClick() {
-    setMusicSheetViewOpen(true)
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
-      <SongMusicSheetViewer isOpen={isMusicSheetViewOpen} setIsOpen={setMusicSheetViewOpen} musicSheetUrls={song?.music_sheet_urls}/>
       <DialogContentNoCloseButton className="sm:max-w-[600px] h-5/6">
         <div className="w-full h-full overflow-y-scroll scrollbar-hide">
           <DialogHeader>
@@ -49,7 +44,7 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, songId, readOnly=fals
               </div>
             }
             <DialogTitle className="text-center text-3xl font-bold">{song?.title}</DialogTitle>
-            <p className="text-center font-semibold text-gray-500">{song.original.author}</p>
+            <p className="text-center font-semibold text-gray-500">{song?.original.author}</p>
           </DialogHeader>
           <div className="grid gap-6 w-full mt-10">
             {
@@ -65,7 +60,11 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, songId, readOnly=fals
               <Label htmlFor="name" className="text-base font-semibold">
                 Key
               </Label>
-              <p>{song?.key}</p>
+              {
+                song?.music_sheets?.length > 0 && song?.music_sheets?.map((musicSheet, index) => (
+                  <SongKeyBox key={index} musicKey={musicSheet?.key}/>
+                ))
+              }
             </div>
             <div className="flex-between items-center">
               <Label htmlFor="name" className="text-base font-semibold">
@@ -106,39 +105,32 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, songId, readOnly=fals
               <p className="text-sm">{getTimePassedFromTimestamp(song?.last_used_time)}</p>
             </div>
             {
-              song.description &&
+              song?.description &&
               <div className="flex-start flex-col items-center gap-1.5 p-4 bg-gray-100 rounded-lg">
                 <div className="whitespace-pre-wrap">
-                  {song.description}
+                  {song?.description}
                 </div>
               </div>
             }
-            {
-              song.music_sheet_urls.length > 0 &&
-              <div className="flex-start flex-col w-full items-center gap-1.5">
-                <div className="flex-center w-full aspect-[2/1] p-2 rounded-md">
-                  <div className="flex-start w-full h-full gap-4 overflow-x-auto">
-                    {
-                      song.music_sheet_urls.map((url: string, i: number) => (
-                        <div key={i}
-                             className="flex flex-col h-full aspect-[3/4] pb-1 border-2 rounded-lg hover:border-gray-300 cursor-pointer"
-                             onClick={handleMusicSheetClick}>
-                          <div className="relative flex-1">
-                            <Image
-                              src={url}
-                              fill
-                              sizes="20vw, 20vw, 20vw"
-                              className="object-contain p-1 rounded-md"
-                              alt="EventImage"
-                            />
-                          </div>
-                        </div>
-                      ))
-                    }
-                  </div>
-                </div>
+            <div className="flex flex-col gap-4">
+              <Label htmlFor="name" className="text-base font-semibold">
+                Music Sheets
+              </Label>
+              <div className="flex-start">
+                {
+                  song?.music_sheets?.map((musicSheet, index) => (
+                    <Badge key={index} className="cursor-pointer w-10 flex-center">{musicSheet?.key}</Badge>
+                  ))
+                }
               </div>
-            }
+              <div>
+                {
+                  song?.music_sheets?.map((musicSheet, index) => (
+                    <MusicSheet key={index} urls={musicSheet?.urls}/>
+                  ))
+                }
+              </div>
+            </div>
           </div>
           <div className="w-full flex-center">
             <SongCommentArea teamId={teamId} songId={songId}/>
@@ -146,5 +138,45 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, songId, readOnly=fals
         </div>
       </DialogContentNoCloseButton>
     </Dialog>
+  )
+}
+
+function MusicSheet({urls}: {urls: string[]}) {
+  const [isMusicSheetViewOpen, setMusicSheetViewOpen] = useState(false)
+
+  function handleMusicSheetClick() {
+    setMusicSheetViewOpen(true)
+  }
+
+  return (
+    <>
+      <SongMusicSheetViewer isOpen={isMusicSheetViewOpen} setIsOpen={setMusicSheetViewOpen} musicSheetUrls={urls}/>
+      {
+        urls.length > 0 &&
+        <div className="flex-start flex-col w-full items-center gap-1.5">
+          <div className="flex-center w-full aspect-[2/1] p-2 rounded-md">
+            <div className="flex-start w-full h-full gap-4 overflow-x-auto">
+              {
+                urls.map((url: string, i: number) => (
+                  <div key={i}
+                       className="flex flex-col h-full aspect-[3/4] pb-1 border-2 rounded-lg hover:border-gray-300 cursor-pointer"
+                       onClick={handleMusicSheetClick}>
+                    <div className="relative flex-1">
+                      <Image
+                        src={url}
+                        fill
+                        sizes="20vw, 20vw, 20vw"
+                        className="object-contain p-1 rounded-md"
+                        alt="EventImage"
+                      />
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </>
   )
 }

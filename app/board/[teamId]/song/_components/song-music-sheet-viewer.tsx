@@ -19,7 +19,7 @@ export function SongMusicSheetViewer({isOpen, setIsOpen, musicSheetUrls}: Props)
           <Carousel className="w-full h-full">
             <CarouselContent className="h-full">
               {
-                musicSheetUrls.map((url, index) => (
+                musicSheetUrls?.map((url, index) => (
                   <CarouselItem key={index} className="relative h-full">
                     <Card className="h-full">
                       <CardContent className="flex flex-col w-full h-full divide-y">

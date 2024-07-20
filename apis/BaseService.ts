@@ -17,6 +17,7 @@ export default class BaseService {
             }
         }
         catch (e) {
+            console.log(e)
             return null
         }
     }
@@ -38,62 +39,83 @@ export default class BaseService {
             // Assuming there's only one user per email, so we're getting the first document
             const doc = query.docs[0];
             return { id: doc.id, ...doc.data() };
-        } else {
+        }
+        else {
+            console.log("err: getByEamil")
             return null;
         }
     }
 
     async getByFilters(filters: Array<any> | null) {
-        console.log("getByFilters: ", this.collectionName)
-        const result: Array<any> = [];
-        let ref: any = firestore.collection(this.collectionName);
-        if(filters) {
-            for(let i in filters) {
-                ref = ref.where(filters[i].a, filters[i].b, filters[i].c);
+        try {
+            console.log("getByFilters: ", this.collectionName)
+            const result: Array<any> = [];
+            let ref: any = firestore.collection(this.collectionName);
+            if(filters) {
+                for(let i in filters) {
+                    ref = ref.where(filters[i].a, filters[i].b, filters[i].c);
+                }
+                ref = await ref.get();
+            } else {
+                ref = await ref.get();
             }
-            ref = await ref.get();
-        } else {
-            ref = await ref.get();
+            ref.forEach((element: any) => {
+                result.push({id: element.id, ... element.data()});
+            })
+            return result;
         }
-        ref.forEach((element: any) => {
-            result.push({id: element.id, ... element.data()});
-        })
-        return result;
+        catch (e) {
+            console.log(e)
+            return null
+        }
     }
 
     async deleteByFilters(filters: Array<any> | null) {
-        const refs = await this.getByFilters(filters);
-        const promises = [];
-        for(const ref of refs) {
-            promises.push(this.delete(ref.id))
+        try {
+            const refs = await this.getByFilters(filters);
+            const promises = [];
+            for(const ref of refs) {
+                promises.push(this.delete(ref.id))
+            }
+            await Promise.all(promises);
+            return true;
         }
-        await Promise.all(promises);
-        return true;
+        catch (e) {
+            console.log(e)
+            return false;
+        }
     }
 
     async queryByArray(filter: any) {
-        if(filter) {
-            const promises = [];
-            const result:any = [];
-            console.log(filter.c);
-            while (filter.c.length) {
-                const subFilters = filter.c.splice(0, 10);
-                promises.push(
-                    firestore.collection(this.collectionName).where(
-                        filter.a,
-                        filter.b,
-                        subFilters
-                    ).get().then(x => {
-                        x.forEach(element => {
-                            result.push({id: element.id, ... element.data()});
+        try {
+            if(filter) {
+                const promises = [];
+                const result:any = [];
+                console.log(filter.c);
+                while (filter.c.length) {
+                    const subFilters = filter.c.splice(0, 10);
+                    promises.push(
+                        firestore.collection(this.collectionName).where(
+                            filter.a,
+                            filter.b,
+                            subFilters
+                        ).get().then(x => {
+                            x.forEach(element => {
+                                result.push({id: element.id, ... element.data()});
+                            })
                         })
-                    })
-                )
+                    )
+                }
+                await Promise.all(promises);
+                return result;
             }
-            await Promise.all(promises);
-            return result;
+            console.log("queryByArray: filter is not exist.")
+            return null;
         }
-        return null;
+        catch (e) {
+            console.log(e)
+            return null
+        }
     }
 
     async getAll() {
@@ -101,9 +123,15 @@ export default class BaseService {
     }
 
     async create(data: any) {
-        const ref = await firestore.collection(this.collectionName).add(data);
-        const id = ref.id;
-        return id;
+        try {
+            const ref = await firestore.collection(this.collectionName).add(data);
+            const id = ref.id;
+            return id;
+        }
+        catch (e) {
+            console.log(e)
+            return null
+        }
     }
 
     async update(id: string, data: any) {
@@ -123,6 +151,7 @@ export default class BaseService {
             return true
         }
         catch (e) {
+            console.log(e)
             return false
         }
     }
