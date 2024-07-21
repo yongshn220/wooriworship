@@ -1,15 +1,18 @@
 import { v4 as uuid } from 'uuid';
-import {Dispatch, SetStateAction} from "react";
 import {ImageFileContainer} from "@/components/constants/types";
+import {useRef, useState} from "react";
 
 interface Props {
   imageFileContainers: Array<ImageFileContainer>;
-  setImageFileContainers: Dispatch<SetStateAction<Array<ImageFileContainer>>>;
+  updateImageFileContainer: Function;
   maxNum: number;
   children: any;
 }
 
-export default function MultipleImageUploader({imageFileContainers, setImageFileContainers, maxNum, children}: Props) {
+export default function MultipleImageUploader({imageFileContainers, updateImageFileContainer, maxNum, children}: Props) {
+  const [uploaderId, _] = useState(uuid())
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   async function handleImageChange(e: any) {
     const files = Array.from(e.target.files) as Array<File>
     const totalImages = imageFileContainers?.length + files.length
@@ -19,16 +22,12 @@ export default function MultipleImageUploader({imageFileContainers, setImageFile
         files.forEach((file) => {
           const reader: any = new FileReader();
           reader.readAsDataURL(file);
-          const imageId = uuid()
-          setImageFileContainers((prev: Array<ImageFileContainer>) => ([...prev, {id: imageId, file: file, url: "", isLoading: true}]))
+          const uniqueId = uuid()
+          updateImageFileContainer({id: uniqueId, file: file, url: "", isLoading: true})
 
           reader.onloadend = () => {
-            setImageFileContainers((prevImages) => {
-              return prevImages.map(prev => {
-                return (prev.id !== imageId)? prev : {...prev, url: reader.result.toString(), isLoading: false}
-              })
-            })
-          };
+            updateImageFileContainer({id: uniqueId, url: reader.result.toString(), isLoading: false})
+          }
         })
       }
     }
@@ -36,21 +35,26 @@ export default function MultipleImageUploader({imageFileContainers, setImageFile
       console.error(error);
     }
     finally {
+      // Reset the file input to trigger onChange even with the same file.
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   }
 
   return (
     <div>
       <input
+        ref={fileInputRef}
         type="file"
-        id="image-input"
+        id={uploaderId}
         name="Image"
         style={{display: 'none'}}
         accept="image/*"
         onChange={handleImageChange}
         multiple
       />
-      <label htmlFor="image-input">
+      <label htmlFor={uploaderId}>
         {children}
       </label>
     </div>
