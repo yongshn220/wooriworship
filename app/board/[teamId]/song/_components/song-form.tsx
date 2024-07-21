@@ -342,6 +342,12 @@ interface MusicSheetUploadBoxProps {
 }
 
 function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey, handleSetImageFileContainers, handleRemoveImageFileContainer}: MusicSheetUploadBoxProps) {
+  /* Image&PDF uploader must use useState hook functions. */
+  const [tempImageFileContainers, setTempImageFileContainers] = useState<Array<ImageFileContainer>>([])
+
+  useEffect(() => {
+    handleSetImageFileContainers(tempId, tempImageFileContainers)
+  }, [tempId, handleSetImageFileContainers, tempImageFileContainers])
 
   return (
     <div className="w-full border bg-gray-100 rounded-lg p-2 space-y-4">
@@ -357,11 +363,11 @@ function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey
         />
       </div>
       {
-        imageFileContainers?.length > 0 &&
+        tempImageFileContainers?.length > 0 &&
         <div className="flex-start w-full h-60 aspect-square">
           <div className="flex w-full h-full gap-4 overflow-x-auto">
             {
-              imageFileContainers?.map((imageFileContainer, i) => (
+              tempImageFileContainers?.map((imageFileContainer, i) => (
                 <MusicSheetCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index) => handleRemoveImageFileContainer(tempId, index)}/>
               ))
             }
@@ -370,10 +376,10 @@ function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey
       }
       <div className="w-full flex-center">
         <div className="flex gap-4">
-          <MultipleImageUploader imageFileContainers={imageFileContainers} setImageFileContainers={(containers) => handleSetImageFileContainers(tempId, containers)} maxNum={5}>
+          <MultipleImageUploader imageFileContainers={tempImageFileContainers} setImageFileContainers={setTempImageFileContainers} maxNum={5}>
             <div className="w-32 bg-white px-1 py-2 flex-center  rounded-md shadow-sm border text-sm hover:bg-blue-50 cursor-pointer">Upload Image</div>
           </MultipleImageUploader>
-          <PdfUploader imageFileContainers={imageFileContainers} setImageFileContainers={(containers) => handleSetImageFileContainers(tempId, containers)} maxNum={5}>
+          <PdfUploader imageFileContainers={tempImageFileContainers} setImageFileContainers={setTempImageFileContainers} maxNum={5}>
             <div className="w-32 bg-white px-1 py-2 flex-center  rounded-md shadow-sm border text-sm hover:bg-blue-50 cursor-pointer">Upload PDF</div>
           </PdfUploader>
         </div>
