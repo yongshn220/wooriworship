@@ -11,8 +11,8 @@ interface Props {
 
 export function MusicSheetCard({imageFileContainer, index, handleRemoveImage}: Props) {
   return (
-    <div className="relative flex flex-col h-full aspect-[3/4]">
-      <div className="relative flex-1 flex-start bg-gray-100 rounded-md">
+    <div className="relative flex flex-col h-full aspect-[3/4] border rounded-lg bg-white">
+      <div className="relative flex-1 flex-start rounded-md">
         {
           imageFileContainer.isLoading ?
           <LoadingCircle/>
@@ -25,7 +25,7 @@ export function MusicSheetCard({imageFileContainer, index, handleRemoveImage}: P
               className="object-contain p-1 rounded-md"
               alt="Music sheet image"
             />
-            <Cross2Icon className="absolute right-1 top-1 p-0.5 cursor-pointer bg-gray-600 hover:bg-black rounded-full text-white" width={17} height={17} onClick={() => handleRemoveImage(index)}/>
+            <Cross2Icon className="absolute right-1 top-1 cursor-pointer rounded-full hover:text-blue-500" width={20} height={20} onClick={() => handleRemoveImage(index)}/>
           </>
         }
       </div>

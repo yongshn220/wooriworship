@@ -40,7 +40,7 @@ export default function MultipleImageUploader({imageFileContainers, setImageFile
   }
 
   return (
-    <div className="w-full h-full">
+    <div>
       <input
         type="file"
         id="image-input"
