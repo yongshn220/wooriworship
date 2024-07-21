@@ -20,7 +20,7 @@ export default function MultipleImageUploader({imageFileContainers, setImageFile
           const reader: any = new FileReader();
           reader.readAsDataURL(file);
           const imageId = uuid()
-          setImageFileContainers((prev: Array<ImageFileContainer>) =>([...prev, {id: imageId, file: file, url: "", isLoading: true}]))
+          setImageFileContainers((prev: Array<ImageFileContainer>) => ([...prev, {id: imageId, file: file, url: "", isLoading: true}]))
 
           reader.onloadend = () => {
             setImageFileContainers((prevImages) => {
