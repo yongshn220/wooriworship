@@ -59,6 +59,16 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
     setImageFileContainers(item =>item.filter((_, i) => i !== index));
   }
 
+  function updateImageFileContainer(newContainer: ImageFileContainer) {
+    if (imageFileContainers.map((_container) => _container.id).includes(newContainer.id)) {
+      const newContainers = imageFileContainers.map((_container) => (_container.id !== newContainer.id)? _container : newContainer)
+      setImageFileContainers(newContainers)
+    }
+    else {
+      setImageFileContainers([...imageFileContainers, newContainer])
+    }
+  }
+
   async function handleEdit() {
     try {
       const curImageUrls = imageFileContainers.map(item => item.url)
@@ -158,13 +168,13 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
             />
           </div>
           <div className="w-full h-14 py-2 flex-center gap-2">
-            <MultipleImageUploader imageFileContainers={imageFileContainers} setImageFileContainers={setImageFileContainers} maxNum={5}>
+            <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
               <div
                 className="w-full h-full bg-blue-500 rounded-lg flex-center text-white cursor-pointer hover:bg-blue-400">
                 Upload Image
               </div>
             </MultipleImageUploader>
-            <PdfUploader imageFileContainers={imageFileContainers} setImageFileContainers={setImageFileContainers} maxNum={5}>
+            <PdfUploader updateImageFileContainer={updateImageFileContainer}>
               <div
                 className="w-full h-full bg-purple-700 rounded-lg flex-center text-white cursor-pointer hover:bg-purple-500">
                 Upload PDF

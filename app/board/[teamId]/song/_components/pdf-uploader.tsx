@@ -5,13 +5,11 @@ import * as PDFJS from "pdfjs-dist";
 import {ImageFileContainer} from "@/components/constants/types";
 
 interface Props {
-  imageFileContainers: Array<ImageFileContainer>;
-  setImageFileContainers: Dispatch<SetStateAction<Array<ImageFileContainer>>>;
-  maxNum: number;
+  updateImageFileContainer: Function;
   children: any;
 }
 
-export default function PdfUploader({imageFileContainers, setImageFileContainers, maxNum, children}: Props) {
+export default function PdfUploader({updateImageFileContainer, children}: Props) {
   const [pdfjs, setPDFjs] = useState<typeof PDFJS>(null)
 
   usePDFJS(async (pdfjs) => {
@@ -31,20 +29,17 @@ export default function PdfUploader({imageFileContainers, setImageFileContainers
 
         for (let pageNum = 1; pageNum <= numPages; pageNum++) {
           const imageId = uuid();
-          setImageFileContainers((prev: Array<ImageFileContainer>) => ([...prev, { id: imageId, file: null, url: "", isLoading: true }]));
+          const newImageFileContainer: ImageFileContainer = { id: imageId, file: null, url: "", isLoading: true }
+          updateImageFileContainer(newImageFileContainer)
           const imageBlob = await renderPageAsImage(pdf, pageNum);
           const imageFile = new File([imageBlob], `pdf-image-${pageNum}.jpg`, { type: 'image/jpeg' });
           const imageUrl = URL.createObjectURL(imageFile);
-          setImageFileContainers((prevImages) => {
-            return prevImages.map(prev => {
-              return (prev.id !== imageId) ? prev : { ...prev, file:imageFile, url: imageUrl, isLoading: false };
-            });
-          });
+          updateImageFileContainer({...newImageFileContainer, file: imageFile, url: imageUrl, isLoading: false})
         }
-      };
+      }
       reader.readAsArrayBuffer(file);
     }
-  };
+  }
 
   const renderPageAsImage = async (pdf: PDFJS.PDFDocumentProxy, pageNum: number): Promise<Blob> => {
     const page = await pdf.getPage(pageNum);
