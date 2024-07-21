@@ -29,6 +29,8 @@ import useViewportHeight from "@/components/hook/use-viewport-height";
 import PdfUploader from "@/app/board/[teamId]/song/_components/pdf-uploader";
 import {ImageFileContainer} from "@/components/constants/types";
 import {PlusIcon} from "lucide-react";
+import {v4 as uuid} from "uuid";
+import {Cross2Icon} from "@radix-ui/react-icons";
 
 
 interface Props {
@@ -48,8 +50,9 @@ export interface SongInput {
 }
 
 interface MusicSheetInput {
+  tempId: string
   key: string
-  imageFileContainer: ImageFileContainer
+  imageFileContainers: Array<ImageFileContainer>
 }
 
 export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
@@ -68,7 +71,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     bpm: (mode === FormMode.EDIT)? song?.bpm?? null : null,
     description: (mode === FormMode.EDIT)? song?.description?? "" : ""
   })
-  const [musicSheetInput, setMusicSheetInput] = useState<Array<MusicSheetInput>>([])
+  const [musicSheetListInput, setMusicSheetListInput] = useState<Array<MusicSheetInput>>([])
   const [isLoading, setIsLoading] = useState(false)
   const viewportHeight = useViewportHeight();
   const { toast } = useToast()
@@ -76,12 +79,13 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
 
   useEffect(() => {
     if (mode === FormMode.EDIT) {
-      const _musicSheets = song?.music_sheets.map((musicSheet) => ({
+      const _musicSheets = song?.music_sheets.map((musicSheet, index) => ({
+        tempId: uuid(),
         key: musicSheet?.key,
-        imageFileContainer: musicSheet?.urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<ImageFileContainer>
+        imageFileContainers: musicSheet?.urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<ImageFileContainer>
       })) as Array<MusicSheetInput>
 
-      setMusicSheetInput(_musicSheets)
+      setMusicSheetListInput(_musicSheets)
     }
   }, [mode, song?.music_sheets])
 
@@ -97,7 +101,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
 
   function clearContents() {
     setInput({title: "", author: "", version: "", link: "", tags: [], bpm: null, description: ""})
-    setMusicSheetInput([])
+    setMusicSheetListInput([])
   }
 
   async function handleCreate() {
@@ -190,6 +194,31 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     // }
   }
 
+  function handleAddNewMusicSheet() {
+    setMusicSheetListInput((prev) => ([...prev, {
+      tempId: uuid(),
+      key: "",
+      imageFileContainers: []
+    }]))
+  }
+
+  function setKeyToMusicSheet(tempId: string, key: string) {
+    setMusicSheetListInput((prev) => ([...prev.map((musicSheet) => (musicSheet?.tempId === tempId)? {...musicSheet, key: key} : musicSheet)]))
+  }
+  function setImageFileContainersToMusicSheet(tempId: string, imageFileContainers: Array<ImageFileContainer>) {
+    setMusicSheetListInput((prev) => ([
+        ...prev.map((musicSheet) => ((musicSheet?.tempId === tempId)? {...musicSheet, imageFileContainers} : musicSheet))
+      ])
+    )
+  }
+  function removeImageFromMusicSheet(tempId: string, imageFileContainerIndex: number) {
+    setMusicSheetListInput((prev) => ([...prev.map((musicSheet) => {
+      if (musicSheet.tempId !== tempId) return musicSheet
+
+      const newImageFileContainers = musicSheet.imageFileContainers.filter((_, index) => index !== imageFileContainerIndex)
+      return {...musicSheet, imageFileContainers: newImageFileContainers}
+    })]))
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
@@ -233,15 +262,6 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               onChange={(e) => setInput((prev => ({...prev, version: e.target.value})))}
             />
           </div>
-          {/*<div className="flex-start flex-col items-center gap-1.5">*/}
-          {/*  <Label htmlFor="key">Key</Label>*/}
-          {/*  <Input*/}
-          {/*    id="key"*/}
-          {/*    placeholder="key"*/}
-          {/*    value={input.key}*/}
-          {/*    onChange={(e) => setInput((prev => ({...prev, key: e.target.value})))}*/}
-          {/*  />*/}
-          {/*</div>*/}
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="link">Link</Label>
             <Input
@@ -280,9 +300,22 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
             <Label>
               Music Sheets
             </Label>
-            <MusicSheetUploadBox/>
+            <div className="w-full flex flex-col gap-4">
+              {
+                musicSheetListInput?.map((musicSheet) => (
+                  <MusicSheetUploadBox
+                    key={musicSheet.tempId}
+                    setMusicKey={setKeyToMusicSheet}
+                    tempId={musicSheet?.tempId}
+                    imageFileContainers={musicSheet?.imageFileContainers}
+                    handleSetImageFileContainers={setImageFileContainersToMusicSheet}
+                    handleRemoveImageFileContainer={removeImageFromMusicSheet}
+                  />
+                ))
+              }
+            </div>
             <div className="w-full flex-center mt-4">
-              <div className="flex-center w-10 h-10 bg-blue-500 text-white text-4xl rounded-full hover:bg-blue-400 cursor-pointer">
+              <div className="flex-center w-10 h-10 bg-blue-500 text-white text-4xl rounded-full hover:bg-blue-400 cursor-pointer" onClick={() => handleAddNewMusicSheet()}>
                 <PlusIcon/>
               </div>
             </div>
@@ -300,23 +333,26 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   )
 }
 
+interface MusicSheetUploadBoxProps {
+  tempId: string
+  imageFileContainers: Array<ImageFileContainer>
+  setMusicKey: Function
+  handleSetImageFileContainers: Function
+  handleRemoveImageFileContainer: Function
+}
 
-function MusicSheetUploadBox() {
-  const [imageFileContainers, setImageFileContainers] = useState([])
-  const [key, setKey] = useState("")
-  function handleRemoveImage(index: number) {
-    setImageFileContainers((prev) => ([...prev.filter(((_,_index) => _index != index))]))
-  }
+function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey, handleSetImageFileContainers, handleRemoveImageFileContainer}: MusicSheetUploadBoxProps) {
 
   return (
     <div className="w-full border bg-gray-100 rounded-lg p-2 space-y-4">
+      <Cross2Icon className="absolute right-1 top-1 cursor-pointer rounded-full bg-white hover:text-blue-500" width={20} height={20}/>
       <div className="flex items-center gap-4">
         <Label htmlFor="key">Key</Label>
         <Input
           id="key"
           placeholder="ex) Em"
-          defaultValue={key ?? ""}
-          onChange={(e) => setKey(e.target.value)}
+          defaultValue={musicKey ?? ""}
+          onChange={(e) => setMusicKey(tempId, e.target.value)}
           className="bg-white"
         />
       </div>
@@ -326,8 +362,7 @@ function MusicSheetUploadBox() {
           <div className="flex w-full h-full gap-4 overflow-x-auto">
             {
               imageFileContainers?.map((imageFileContainer, i) => (
-                <MusicSheetCard key={i} imageFileContainer={imageFileContainer} index={i}
-                                handleRemoveImage={handleRemoveImage}/>
+                <MusicSheetCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index) => handleRemoveImageFileContainer(tempId, index)}/>
               ))
             }
           </div>
@@ -335,10 +370,10 @@ function MusicSheetUploadBox() {
       }
       <div className="w-full flex-center">
         <div className="flex gap-4">
-          <MultipleImageUploader imageFileContainers={imageFileContainers} setImageFileContainers={setImageFileContainers} maxNum={5}>
+          <MultipleImageUploader imageFileContainers={imageFileContainers} setImageFileContainers={(containers) => handleSetImageFileContainers(tempId, containers)} maxNum={5}>
             <div className="w-32 bg-white px-1 py-2 flex-center  rounded-md shadow-sm border text-sm hover:bg-blue-50 cursor-pointer">Upload Image</div>
           </MultipleImageUploader>
-          <PdfUploader imageFileContainers={imageFileContainers} setImageFileContainers={setImageFileContainers} maxNum={5}>
+          <PdfUploader imageFileContainers={imageFileContainers} setImageFileContainers={(containers) => handleSetImageFileContainers(tempId, containers)} maxNum={5}>
             <div className="w-32 bg-white px-1 py-2 flex-center  rounded-md shadow-sm border text-sm hover:bg-blue-50 cursor-pointer">Upload PDF</div>
           </PdfUploader>
         </div>
