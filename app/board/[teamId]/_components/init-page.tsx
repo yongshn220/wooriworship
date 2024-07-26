@@ -16,13 +16,11 @@ export function InitPage({children, pathname}: Props) {
 
   useEffect(() => {
     const paths = pathname.split('/');
-
     const teamId = paths[2]
     const boardPage = paths[3]
     if (teamId) {
       setCurrentTeamId(teamId)
     }
-
     if (boardPage) {
       setPage(boardPage as Page)
     }
@@ -30,6 +28,8 @@ export function InitPage({children, pathname}: Props) {
       setPage(Page.HOME)
     }
   }, [setCurrentTeamId, setPage, pathname])
+
+
 
   return (
     <>

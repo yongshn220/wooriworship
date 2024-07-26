@@ -7,7 +7,7 @@ import {worshipIndexAtom, worshipIndexChangeEventAtom, worshipMultipleSheetsView
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {worshipAtom} from "@/global-states/worship-state";
 import {WorshipLiveCarouselItem} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-live-carousel-item";
-import {songsByWorshipIdAtom} from "@/global-states/song-state";
+import {songAtom, songsByWorshipIdAtom} from "@/global-states/song-state";
 import {DirectionType} from "@/components/constants/enums";
 
 interface Props {
@@ -22,6 +22,8 @@ export interface WorshipLiveSheetInfo {
 export function SongCarouselFull({worshipId}: Props) {
   const worship = useRecoilValue(worshipAtom(worshipId))
   const songs = useRecoilValue(songsByWorshipIdAtom(worshipId))
+  const beginningSong = useRecoilValue(songAtom(worship?.beginning_song_id))
+  const endingSong = useRecoilValue(songAtom(worship?.ending_song_id))
   const setIndex = useSetRecoilState(worshipIndexAtom)
   const worshipIndexChangeEvent = useRecoilValue(worshipIndexChangeEventAtom)
   const multipleSheetsViewMode = useRecoilValue(worshipMultipleSheetsViewModeAtom)
@@ -29,6 +31,12 @@ export function SongCarouselFull({worshipId}: Props) {
 
   const sheetInfoList = useMemo(() => {
     const processedSheetInfo: Array<WorshipLiveSheetInfo> = []
+    // Handle Beginning song
+    if (beginningSong) {
+      processedSheetInfo.push({note: beginningSong?.description, urls: beginningSong?.music_sheet_urls})
+    }
+
+    // Handle Main songs
     if (multipleSheetsViewMode === DirectionType.VERTICAL) {
       songs.forEach((song) => {
         const header = worship?.songs?.find(header => header.id === song?.id)
@@ -43,8 +51,14 @@ export function SongCarouselFull({worshipId}: Props) {
         })
       })
     }
+
+    // Handle Ending song
+    if (endingSong) {
+      processedSheetInfo.push({note: endingSong?.description, urls: endingSong?.music_sheet_urls})
+    }
+
     return processedSheetInfo
-  }, [multipleSheetsViewMode, songs, worship?.songs])
+  }, [beginningSong, endingSong, multipleSheetsViewMode, songs, worship?.songs])
 
 
   useEffect(() => {
