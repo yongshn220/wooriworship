@@ -48,7 +48,7 @@ class SongService extends BaseService {
     return await this.create(newSong);
   }
 
-  async useSong(songId: string) {
+  async utilizeSong(songId: string) {
     return await this.update(songId, {last_used_time:new Date()});
   }
 

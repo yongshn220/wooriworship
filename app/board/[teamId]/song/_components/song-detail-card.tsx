@@ -53,7 +53,7 @@ export function SongDetailCard({teamId, isOpen, setIsOpen, songId, readOnly=fals
               song?.subtitle &&
               <div className="text-center text-xl font-semibold">({song?.subtitle})</div>
             }
-            <p className="text-center font-semibold text-gray-500">{song.original.author}</p>
+            <p className="text-center font-semibold text-gray-500">{song?.original.author}</p>
           </DialogHeader>
           <div className="grid gap-6 w-full mt-10">
             {

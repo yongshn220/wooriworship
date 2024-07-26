@@ -12,15 +12,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {useRecoilState} from "recoil";
-import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {useRecoilState, useSetRecoilState} from "recoil";
+import {
+  selectedSongInfoListAtom,
+  worshipBeginningSongIdAtom,
+  worshipEndingSongIdAtom
+} from "@/app/board/[teamId]/plan/_components/status";
+import {WorshipSpecialOrderType} from "@/components/constants/enums";
 
 interface Props {
   songId: string
   songOrder: number
 }
+
+
 export function SwapOrderButton({songId, songOrder}: Props) {
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
+  const setWorshipBeginningSongId = useSetRecoilState(worshipBeginningSongIdAtom)
+  const setWorshipEndingSongId = useSetRecoilState(worshipEndingSongIdAtom)
+
+  function handleClick(value) {
+    if (value === WorshipSpecialOrderType.BEGINNING) {
+      handleSetBeginningSong(); return;
+    }
+    if (value === WorshipSpecialOrderType.ENDING) {
+      handleSetEndingSong(); return;
+    }
+
+    handleOrderChange(value)
+  }
 
   function handleOrderChange(newOrderString: string) {
     try {
@@ -35,6 +55,16 @@ export function SwapOrderButton({songId, songOrder}: Props) {
     }
   }
 
+  function handleSetBeginningSong() {
+    setSelectedSongInfoList((prev) => ([...prev.filter(info => info?.song?.id !== songId)]))
+    setWorshipBeginningSongId(songId)
+  }
+
+  function handleSetEndingSong() {
+    setSelectedSongInfoList((prev) => ([...prev.filter(info => info?.song?.id !== songId)]))
+    setWorshipEndingSongId(songId)
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -42,15 +72,17 @@ export function SwapOrderButton({songId, songOrder}: Props) {
           {songOrder}
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="">
-        <DropdownMenuLabel>Change Order</DropdownMenuLabel>
+      <DropdownMenuContent className="flex-center flex-col">
+        <DropdownMenuLabel className="border-b">Change Order</DropdownMenuLabel>
         <DropdownMenuSeparator/>
-        <DropdownMenuRadioGroup value={songOrder.toString()} onValueChange={handleOrderChange}>
+        <DropdownMenuRadioGroup value={songOrder.toString()} onValueChange={handleClick} className="w-full">
+          <DropdownMenuRadioItem className="w-full" value={WorshipSpecialOrderType.BEGINNING}>Beginning</DropdownMenuRadioItem>
           {
             selectedSongInfoList.map((_, i) => (
-              <DropdownMenuRadioItem key={i + 1} value={(i + 1).toString()}>{i + 1}</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem key={i + 1} value={(i + 1).toString()} className="w-full">{i + 1}</DropdownMenuRadioItem>
             ))
           }
+          <DropdownMenuRadioItem className="w-full" value={WorshipSpecialOrderType.ENDING}>Ending</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
