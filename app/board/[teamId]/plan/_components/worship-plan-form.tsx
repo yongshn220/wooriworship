@@ -53,8 +53,8 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
   const setWorshipIdsUpdater = useSetRecoilState(worshipIdsUpdaterAtom)
   const team = useRecoilValue(teamAtom(teamId))
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
-  const worshipBeginningSongId = useRecoilValue(worshipBeginningSongIdAtom)
-  const worshipEndingSongId = useRecoilValue(worshipEndingSongIdAtom)
+  const [beginningSongId, setBeginningSongId] = useRecoilState(worshipBeginningSongIdAtom)
+  const [endingSongId, setEndingSongId] = useRecoilState(worshipEndingSongIdAtom)
 
   const [basicInfo, setBasicInfo] = useState({
     title: (mode === FormMode.EDIT)? worship?.title ?? "" : "",
@@ -66,19 +66,19 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
   const router = useRouter()
 
   const clearContents = useCallback(() => {
-    // setBasicInfo({title:"", description: ""})
-    // setDate(new Date())
     setIsLoading(false)
     // todo: check if this called first
     setSelectedSongInfoList([])
-  }, [setSelectedSongInfoList])
+    setBeginningSongId(null)
+    setEndingSongId(null)
+  }, [setBeginningSongId, setEndingSongId, setSelectedSongInfoList])
 
 
   useEffect(() => {
     return () => clearContents()
   }, [clearContents]);
 
-
+  /* Initialize selected songs */
   useEffect(() => {
     if (mode === FormMode.EDIT) {
       const songPromises = worship?.songs?.map(async (songInfo) => {
@@ -92,6 +92,27 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
       }
     }
   }, [mode, setSelectedSongInfoList, worship?.songs])
+
+  /* Initialize beginning and ending song*/
+  useEffect(() => {
+    if (mode === FormMode.CREATE) {
+      if (team?.option?.worship?.beginning_song_id) {
+        setBeginningSongId(team?.option?.worship?.beginning_song_id)
+      }
+      if (team?.option?.worship?.ending_song_id) {
+        setEndingSongId(team?.option?.worship?.ending_song_id)
+      }
+    }
+
+    if (mode === FormMode.EDIT) {
+      if (worship?.beginning_song_id) {
+        setBeginningSongId(worship?.beginning_song_id)
+      }
+      if (worship?.ending_song_id) {
+        setEndingSongId(worship?.ending_song_id)
+      }
+    }
+  }, [mode, setBeginningSongId, setEndingSongId, worship?.beginning_song_id, worship?.ending_song_id])
 
   function isSessionValid() {
     if (!authUser?.uid) {
@@ -108,8 +129,8 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
       description: basicInfo.description,
       date: date,
       songInfoList: selectedSongInfoList,
-      beginningSongId: worshipBeginningSongId,
-      endingSongId: worshipEndingSongId,
+      beginningSongId: beginningSongId,
+      endingSongId: endingSongId,
     }
     return worshipInput
   }
@@ -223,8 +244,8 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
             </Label>
             <div className="flex-center w-full flex-col gap-8">
               {
-                worshipBeginningSongId &&
-                <StaticSongCard teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songId={worshipBeginningSongId}/>
+                beginningSongId &&
+                <StaticSongCard teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songId={beginningSongId}/>
               }
               {
                 selectedSongInfoList.map((songInfo, i) => (
@@ -232,8 +253,8 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
                 ))
               }
               {
-                worshipEndingSongId &&
-                <StaticSongCard teamId={teamId} specialOrderType={WorshipSpecialOrderType.ENDING} songId={worshipBeginningSongId}/>
+                endingSongId &&
+                <StaticSongCard teamId={teamId} specialOrderType={WorshipSpecialOrderType.ENDING} songId={endingSongId}/>
               }
               <AddSongButton teamId={teamId}/>
             </div>
