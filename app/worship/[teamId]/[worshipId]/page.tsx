@@ -71,7 +71,7 @@ export default function WorshipPage({params}: any) {
           {
             worship?.songs.map((songHeader: SongHeader, index: number) => (
               <SongDetailCardWrapper key={songHeader?.id} teamId={teamId} songId={songHeader?.id}>
-                <SongListPreviewItem songId={songHeader?.id} viewMode={ViewMode.NONE} />
+                <SongListPreviewItem songId={songHeader?.id}/>
               </SongDetailCardWrapper>
             ))
           }
