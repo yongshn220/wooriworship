@@ -1,6 +1,13 @@
 'use client'
 
-import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
@@ -12,13 +19,12 @@ import MultipleImageUploader from "@/app/board/[teamId]/song/_components/multipl
 import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
-import {SongService, StorageService, TagService}  from "@/apis";
+import {SongService, StorageService, TagService} from "@/apis";
 import {FormMode} from "@/components/constants/enums";
 import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
 import {auth} from "@/firebase";
-import {currentTeamSongIdsAtom, songAtom} from "@/global-states/song-state";
-import {songUpdaterAtom} from "@/global-states/song-state";
+import {currentTeamSongIdsAtom, songAtom, songUpdaterAtom} from "@/global-states/song-state";
 import useViewportHeight from "@/components/hook/use-viewport-height";
 import PdfUploader from "@/app/board/[teamId]/song/_components/pdf-uploader";
 import {ImageFileContainer} from "@/components/constants/types";
@@ -32,6 +38,7 @@ interface Props {
 }
 export interface SongInput {
   title: string
+  subtitle: string
   author: string
   version: string
   key: string
@@ -50,6 +57,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom(teamId))
   const [input, setInput] = useState<SongInput>({
     title: (mode === FormMode.EDIT)? song?.title?? "" : "",
+    subtitle: (mode === FormMode.EDIT)? song?.subtitle?? "" : "",
     author: (mode === FormMode.EDIT)? song?.original.author?? "" : "",
     version: (mode === FormMode.EDIT)? song?.version?? "" : "",
     key: (mode === FormMode.EDIT)? song?.key?? "":"",
@@ -81,7 +89,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   }
 
   function clearContents() {
-    setInput({title: "", author: "", version: "", key: "", link: "", tags: [], bpm: null, description: ""})
+    setInput({title: "", subtitle: "", author: "", version: "", key: "", link: "", tags: [], bpm: null, description: ""})
     setImageFileContainers([])
   }
 
@@ -204,6 +212,16 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
+            <Label htmlFor="name">Sub Title</Label>
+            <Input
+              id="subtitle"
+              placeholder="Sub Title..."
+              value={input.subtitle}
+              onChange={(e) => setInput((prev => ({...prev, subtitle: e.target.value})))}
+              autoFocus={false}
+            />
+          </div>
+          <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="author">Author</Label>
             <Input
               id="author"
@@ -269,13 +287,17 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               Music Sheets
             </Label>
             <div className="w-full h-14 py-2 flex-center gap-2">
-              <MultipleImageUploader imageFileContainers={imageFileContainers} setImageFileContainers={setImageFileContainers} maxNum={5}>
-                <div className="w-full h-full bg-blue-500 rounded-lg flex-center text-white cursor-pointer hover:bg-blue-400">
+              <MultipleImageUploader imageFileContainers={imageFileContainers}
+                                     setImageFileContainers={setImageFileContainers} maxNum={5}>
+                <div
+                  className="w-full h-full bg-blue-500 rounded-lg flex-center text-white cursor-pointer hover:bg-blue-400">
                   Upload Image
                 </div>
               </MultipleImageUploader>
-              <PdfUploader imageFileContainers={imageFileContainers} setImageFileContainers={setImageFileContainers} maxNum={5}>
-                <div className="w-full h-full bg-purple-700 rounded-lg flex-center text-white cursor-pointer hover:bg-purple-500">
+              <PdfUploader imageFileContainers={imageFileContainers} setImageFileContainers={setImageFileContainers}
+                           maxNum={5}>
+                <div
+                  className="w-full h-full bg-purple-700 rounded-lg flex-center text-white cursor-pointer hover:bg-purple-500">
                   Upload PDF
                 </div>
               </PdfUploader>
@@ -284,7 +306,8 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               <div className="flex w-full h-full gap-4 overflow-x-auto">
                 {
                   imageFileContainers?.map((imageFileContainer, i) => (
-                    <MusicSheetCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={handleRemoveImage}/>
+                    <MusicSheetCard key={i} imageFileContainer={imageFileContainer} index={i}
+                                    handleRemoveImage={handleRemoveImage}/>
                   ))
                 }
               </div>

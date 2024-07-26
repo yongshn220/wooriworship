@@ -23,6 +23,7 @@ class SongService extends BaseService {
     const newSong = {
       team_id: teamId,
       title: songInput.title,
+      subtitle: songInput.subtitle,
       original: {
         author: songInput.author,
         url: songInput.link
@@ -54,6 +55,7 @@ class SongService extends BaseService {
   async updateSong(userId: string, songId: string, songInput: any) {
     const song: any = {
       title: songInput.title,
+      subtitle: songInput.subtitle,
       original: {
         author: songInput.author,
         url: songInput.link
