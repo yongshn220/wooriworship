@@ -32,7 +32,7 @@ export function SongListItem({songId, viewMode=ViewMode.ROUTE}: Props) {
     <div className="flex w-full px-4 rounded-lg cursor-pointer py-2 my-2 hover:bg-gray-100" onClick={handleSongCardClick}>
       <div className="flex-1 flex flex-col">
         <div className="flex gap-2">
-          <p className="font-semibold text-md">{song?.title}</p>
+          <p className="font-semibold text-md">{song?.title} <span className="text-sm text-gray-500">{song?.subtitle ? `(${song.subtitle})` : ""}</span> </p>
           {
             song?.key &&
             <div className="flex-center text-sm text-white font-medium bg-gray-400 rounded-sm w-5 h-5">{song.key}</div>

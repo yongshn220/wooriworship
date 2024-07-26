@@ -31,12 +31,12 @@ export function WorshipCard({worshipId}: Props) {
           {
             worshipSongListLoadable.state === 'hasValue' &&
             worshipSongListLoadable.contents.map((song, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                  <p className="line-clamp-1 text-base sm:text-sm">{song?.title}</p>
-                </div>
-              ))
-            }
+              <div key={i} className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                <p className="line-clamp-1 text-base sm:text-sm">{song?.title} <span className="text-sm text-gray-500">{song?.subtitle ? `(${song.subtitle})` : ""}</span></p>
+              </div>
+            ))
+          }
         </div>
       </div>
     </div>
