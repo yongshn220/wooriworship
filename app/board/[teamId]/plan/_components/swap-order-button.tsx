@@ -25,13 +25,14 @@ interface Props {
   songOrder: number
 }
 
+type OrderValue = WorshipSpecialOrderType | string
 
 export function SwapOrderButton({songId, songOrder}: Props) {
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
   const setWorshipBeginningSongId = useSetRecoilState(worshipBeginningSongIdAtom)
   const setWorshipEndingSongId = useSetRecoilState(worshipEndingSongIdAtom)
 
-  function handleClick(value) {
+  function handleClick(value: OrderValue) {
     if (value === WorshipSpecialOrderType.BEGINNING) {
       handleSetBeginningSong(); return;
     }
@@ -76,13 +77,13 @@ export function SwapOrderButton({songId, songOrder}: Props) {
         <DropdownMenuLabel className="border-b">Change Order</DropdownMenuLabel>
         <DropdownMenuSeparator/>
         <DropdownMenuRadioGroup value={songOrder.toString()} onValueChange={handleClick} className="w-full">
-          <DropdownMenuRadioItem className="w-full" value={WorshipSpecialOrderType.BEGINNING}>Beginning</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem className="w-full cursor-pointer" value={WorshipSpecialOrderType.BEGINNING}>Beginning</DropdownMenuRadioItem>
           {
             selectedSongInfoList.map((_, i) => (
-              <DropdownMenuRadioItem key={i + 1} value={(i + 1).toString()} className="w-full">{i + 1}</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem key={i + 1} value={(i + 1).toString()} className="w-full cursor-pointer">{i + 1}</DropdownMenuRadioItem>
             ))
           }
-          <DropdownMenuRadioItem className="w-full" value={WorshipSpecialOrderType.ENDING}>Ending</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem className="w-full cursor-pointer" value={WorshipSpecialOrderType.ENDING}>Ending</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
