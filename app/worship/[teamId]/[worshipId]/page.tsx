@@ -18,6 +18,9 @@ import {SongListItem, ViewMode} from "@/app/board/[teamId]/song/_components/song
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import * as React from "react";
 import {BlocksIcon, MusicIcon} from "lucide-react";
+import {StaticSongCard} from "@/app/board/[teamId]/plan/_components/static-song-card";
+import {WorshipSpecialOrderType} from "@/components/constants/enums";
+import {worshipBeginningSongIdAtom, worshipEndingSongIdAtom} from "@/app/board/[teamId]/plan/_components/status";
 
 
 export default function WorshipPage({params}: any) {
@@ -61,11 +64,23 @@ export default function WorshipPage({params}: any) {
         </div>
         <div className="flex flex-col w-full gap-4">
           {
+            worship?.beginning_song_id &&
+            <SongDetailCardWrapper key={worship?.beginning_song_id} teamId={teamId} songId={worship?.beginning_song_id}>
+              <SongListItem songId={worship?.beginning_song_id} viewMode={ViewMode.NONE}/>
+            </SongDetailCardWrapper>
+          }
+          {
             worship?.songs.map((songHeader: SongHeader, index: number) => (
               <SongDetailCardWrapper key={songHeader?.id} teamId={teamId} songId={songHeader?.id}>
                 <SongListItem songId={songHeader?.id} viewMode={ViewMode.NONE}/>
               </SongDetailCardWrapper>
             ))
+          }
+          {
+            worship?.ending_song_id &&
+            <SongDetailCardWrapper key={worship?.ending_song_id} teamId={teamId} songId={worship?.ending_song_id}>
+              <SongListItem songId={worship?.ending_song_id} viewMode={ViewMode.NONE}/>
+            </SongDetailCardWrapper>
           }
         </div>
         <div className="w-full flex-start flex-col my-2 mt-10">
