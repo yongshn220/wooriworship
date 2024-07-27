@@ -35,7 +35,7 @@ export function SongListItem({songId, viewMode=ViewMode.ROUTE}: Props) {
           <p className="font-semibold text-md">{song?.title} <span className="text-sm text-gray-700">{song?.subtitle ? `(${song.subtitle})` : ""}</span> </p>
           {
             song?.key &&
-            <div className="flex-center text-sm text-white font-medium bg-gray-400 rounded-sm w-5 h-5">{song.key}</div>
+            <div className="flex-center text-sm text-white font-medium bg-gray-400 rounded-sm w-5 h-5">{song?.key}</div>
           }
         </div>
         <p className="text-sm text-gray-500">{song?.original.author === "" ? "unknown" : song?.original.author}</p>
