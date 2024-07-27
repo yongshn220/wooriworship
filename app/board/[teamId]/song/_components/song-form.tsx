@@ -41,6 +41,7 @@ interface Props {
 }
 export interface SongInput {
   title: string
+  subtitle: string
   author: string
   version: string
   link: string
@@ -64,6 +65,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom(teamId))
   const [input, setInput] = useState<SongInput>({
     title: (mode === FormMode.EDIT)? song?.title?? "" : "",
+    subtitle: (mode === FormMode.EDIT)? song?.subtitle?? "" : "",
     author: (mode === FormMode.EDIT)? song?.original.author?? "" : "",
     version: (mode === FormMode.EDIT)? song?.version?? "" : "",
     link: (mode === FormMode.EDIT)? song?.original.url?? "" : "",
@@ -100,7 +102,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   }
 
   function clearContents() {
-    setInput({title: "", author: "", version: "", link: "", tags: [], bpm: null, description: ""})
+    setInput({title: "", subtitle: "", author: "", version: "", key: "", link: "", tags: [], bpm: null, description: ""})
     setMusicSheetListInput([])
   }
 
@@ -241,6 +243,16 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               placeholder="ex) Amazing Grace"
               value={input.title}
               onChange={(e) => setInput((prev => ({...prev, title: e.target.value})))}
+              autoFocus={false}
+            />
+          </div>
+          <div className="flex-start flex-col items-center gap-1.5">
+            <Label htmlFor="name">Sub Title</Label>
+            <Input
+              id="subtitle"
+              placeholder="Sub Title..."
+              value={input.subtitle}
+              onChange={(e) => setInput((prev => ({...prev, subtitle: e.target.value})))}
               autoFocus={false}
             />
           </div>

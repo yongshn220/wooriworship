@@ -54,3 +54,9 @@ export enum DirectionType {
   VERTICAL = "Vertical",
   HORIZONTAL = "Horizontal"
 }
+
+/* Worship Plan */
+export enum WorshipSpecialOrderType {
+  BEGINNING="beginning",
+  ENDING="ending",
+}
