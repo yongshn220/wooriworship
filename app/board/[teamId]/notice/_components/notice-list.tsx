@@ -2,7 +2,6 @@ import {NoticeListItem} from "@/app/board/[teamId]/notice/_components/notice-lis
 import {useRecoilValue} from "recoil";
 import {noticeIdsAtom} from "@/global-states/notice-state";
 
-
 interface Props {
   teamId: string
 }
@@ -19,9 +18,7 @@ export function NoticeList({teamId}: Props) {
           ))
         }
       </div>
-      <div className="">
-        <p className="w-full flex-center text-gray-500 text-sm py-4">end of page</p>
-      </div>
+      <p className="w-full flex-center text-gray-500 text-sm py-4">end of page</p>
     </div>
   )
 }

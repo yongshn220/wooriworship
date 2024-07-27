@@ -13,6 +13,8 @@ export interface WorshipInfo {
   description: string
   date: Date
   songInfoList: Array<SongInfo>
+  beginningSongId: string
+  endingSongId: string
 }
 
 export interface SongInfo {

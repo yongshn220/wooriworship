@@ -10,14 +10,14 @@ import {useRecoilValue} from "recoil";
 import {teamAtom} from "@/global-states/teamState";
 import {
   getDayPassedFromTimestampShorten,
-  getTimePassedFromTimestampShorten,
   timestampToDateString
 } from "@/components/helper/helper-functions";
 import {worshipAtom} from "@/global-states/worship-state";
-import {SongListItem, ViewMode} from "@/app/board/[teamId]/song/_components/song-list-item";
+import {ViewMode} from "@/app/board/[teamId]/song/_components/song-list-item";
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import * as React from "react";
 import {BlocksIcon, MusicIcon} from "lucide-react";
+import {SongListPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-preview-item";
 
 
 export default function WorshipPage({params}: any) {
@@ -61,11 +61,27 @@ export default function WorshipPage({params}: any) {
         </div>
         <div className="flex flex-col w-full gap-4">
           {
+            worship?.beginning_song_id &&
+            <div className="flex-center">
+              <SongDetailCardWrapper key={worship?.beginning_song_id} teamId={teamId} songId={worship?.beginning_song_id}>
+                <SongListPreviewItem songId={worship?.beginning_song_id} customTags={["beginning"]}/>
+              </SongDetailCardWrapper>
+            </div>
+          }
+          {
             worship?.songs.map((songHeader: SongHeader, index: number) => (
               <SongDetailCardWrapper key={songHeader?.id} teamId={teamId} songId={songHeader?.id}>
-                <SongListItem songId={songHeader?.id} viewMode={ViewMode.NONE}/>
+                <SongListPreviewItem songId={songHeader?.id}/>
               </SongDetailCardWrapper>
             ))
+          }
+          {
+            worship?.ending_song_id &&
+            <div className="flex-center">
+              <SongDetailCardWrapper key={worship?.ending_song_id} teamId={teamId} songId={worship?.ending_song_id}>
+                <SongListPreviewItem songId={worship?.ending_song_id} customTags={["ending"]}/>
+              </SongDetailCardWrapper>
+            </div>
           }
         </div>
         <div className="w-full flex-start flex-col my-2 mt-10">
@@ -76,7 +92,7 @@ export default function WorshipPage({params}: any) {
           <Separator/>
         </div>
         <div className="w-full flex-center flex-col">
-          <SongCarousel songHeaderList={worship?.songs ?? []}/>
+          <SongCarousel worship={worship}/>
         </div>
       </div>
     </div>

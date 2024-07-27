@@ -4,6 +4,7 @@ export type Song = {
   id: string
   team_id: string
   title: string
+  subtitle: string
   description: string
   tags: Array<string>
   bpm: number

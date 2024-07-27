@@ -23,6 +23,7 @@ class SongService extends BaseService {
     const newSong = {
       team_id: teamId,
       title: songInput.title,
+      subtitle: songInput.subtitle,
       original: {
         author: songInput.author,
         url: songInput.link
@@ -47,13 +48,14 @@ class SongService extends BaseService {
     return await this.create(newSong);
   }
 
-  async useSong(songId: string) {
+  async utilizeSong(songId: string) {
     return await this.update(songId, {last_used_time:new Date()});
   }
 
   async updateSong(userId: string, songId: string, songInput: any) {
     const song: any = {
       title: songInput.title,
+      subtitle: songInput.subtitle,
       original: {
         author: songInput.author,
         url: songInput.link

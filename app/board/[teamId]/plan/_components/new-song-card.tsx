@@ -39,7 +39,7 @@ export function NewSongCard({teamId, songOrder, songInfo}: Props) {
 
   return (
     <div className="w-full">
-      <div className="relative flex flex-col w-full h-64 border shadow-sm rounded-md p-2 gap-4">
+      <div className="relative flex flex-col w-full h-64 border shadow-sm rounded-md p-2 gap-4 bg-white">
         <SongDetailCardWrapper teamId={teamId} songId={songInfo?.song?.id}>
           <SongListItem songId={songInfo?.song?.id} viewMode={ViewMode.NONE}/>
         </SongDetailCardWrapper>
