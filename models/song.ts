@@ -1,7 +1,7 @@
 import {Timestamp} from "@firebase/firestore";
 
 export type Song = {
-  id: string
+  id?: string
   team_id: string
   title: string
   subtitle: string

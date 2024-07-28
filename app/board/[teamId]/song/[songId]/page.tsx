@@ -6,7 +6,6 @@ import {getPathSong} from "@/components/helper/routes";
 import {SongDetailDrawer} from "@/app/board/[teamId]/song/_components/song-detail-drawer";
 import {isMobile} from "@/components/helper/helper-functions";
 
-
 export default function SongDetailPage({params}: any) {
   const teamId = params.teamId
   const songId = params.songId

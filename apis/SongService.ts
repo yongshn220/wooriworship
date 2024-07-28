@@ -1,10 +1,13 @@
 import {BaseService, StorageService} from ".";
 import SongCommentService from "./SongCommentService";
+import {CreateSongInput} from "@/app/board/[teamId]/song/_components/song-form";
+import {Song} from "@/models/song";
+import {getFirebaseTimestampNow} from "@/components/helper/helper-functions";
 
 
 class SongService extends BaseService {
   constructor() {
-    super("songs.dev");
+    super("songs_m");
   }
 
   async getTeamSong(teamId: string) {
@@ -19,33 +22,39 @@ class SongService extends BaseService {
     return songs
   }
 
-  async addNewSong(userId: string, teamId: string, songInput: any) {
-    const newSong = {
-      team_id: teamId,
-      title: songInput.title,
-      subtitle: songInput.subtitle,
-      original: {
-        author: songInput.author,
-        url: songInput.link
-      },
-      version: songInput.version,
-      key: songInput.key,
-      description: songInput.description,
-      lyrics: "",
-      bpm: songInput.bpm,
-      tags: songInput.tags,
-      created_by: {
-        id: userId,
-        time: new Date(),
-      },
-      updated_by: {
-        id: userId,
-        time: new Date()
-      },
-      last_used_time: new Date(),
-      music_sheet_urls: songInput.music_sheet_urls,
+  async addNewSong(userId: string, teamId: string, songInput: CreateSongInput) {
+    try {
+      const music_sheets = songInput?.musicSheetContainers?.map((mContainer) => ({key: mContainer.key, urls: mContainer.imageFileContainers.map(iContainer => iContainer.url)}))
+      const newSong: Song = {
+        team_id: teamId,
+        title: songInput.title,
+        subtitle: songInput.subtitle,
+        original: {
+          author: songInput.author,
+          url: songInput.link
+        },
+        version: songInput.version,
+        description: songInput.description,
+        lyrics: "",
+        bpm: songInput.bpm,
+        tags: songInput.tags,
+        created_by: {
+          id: userId,
+          time: getFirebaseTimestampNow(),
+        },
+        updated_by: {
+          id: userId,
+          time: getFirebaseTimestampNow()
+        },
+        last_used_time: getFirebaseTimestampNow(),
+        music_sheets: music_sheets,
+      }
+      return await this.create(newSong);
     }
-    return await this.create(newSong);
+    catch (e) {
+      console.log("err:addNewSong", e)
+      return null
+    }
   }
 
   async utilizeSong(songId: string) {
