@@ -1,6 +1,6 @@
 import {BaseService, StorageService} from ".";
 import SongCommentService from "./SongCommentService";
-import {CreateSongInput} from "@/app/board/[teamId]/song/_components/song-form";
+import {SongFormParam} from "@/app/board/[teamId]/song/_components/song-form";
 import {Song} from "@/models/song";
 import {getFirebaseTimestampNow} from "@/components/helper/helper-functions";
 
@@ -22,22 +22,22 @@ class SongService extends BaseService {
     return songs
   }
 
-  async addNewSong(userId: string, teamId: string, songInput: CreateSongInput) {
+  async addNewSong(userId: string, teamId: string, songFormParam: SongFormParam) {
     try {
-      const music_sheets = songInput?.musicSheetContainers?.map((mContainer) => ({key: mContainer.key, urls: mContainer.imageFileContainers.map(iContainer => iContainer.url)}))
+      const music_sheets = songFormParam?.musicSheetContainers?.map((mContainer) => ({key: mContainer.key, urls: mContainer.imageFileContainers.map(iContainer => iContainer.url)}))
       const newSong: Song = {
         team_id: teamId,
-        title: songInput.title,
-        subtitle: songInput.subtitle,
+        title: songFormParam.title,
+        subtitle: songFormParam.subtitle,
         original: {
-          author: songInput.author,
-          url: songInput.link
+          author: songFormParam.author,
+          url: songFormParam.link
         },
-        version: songInput.version,
-        description: songInput.description,
+        version: songFormParam.version,
+        description: songFormParam.description,
         lyrics: "",
-        bpm: songInput.bpm,
-        tags: songInput.tags,
+        bpm: songFormParam.bpm,
+        tags: songFormParam.tags,
         created_by: {
           id: userId,
           time: getFirebaseTimestampNow(),
@@ -61,29 +61,32 @@ class SongService extends BaseService {
     return await this.update(songId, {last_used_time:new Date()});
   }
 
-  async updateSong(userId: string, songId: string, songInput: any) {
-    const song: any = {
-      title: songInput.title,
-      subtitle: songInput.subtitle,
-      original: {
-        author: songInput.author,
-        url: songInput.link
-      },
-      version: songInput.version,
-      description: songInput.description,
-      lyrics: "",
-      bpm: songInput.bpm,
-      tags: songInput.tags,
-      updated_by: {
-        id: userId,
-        time: new Date()
-      },
-      key: songInput.key
+  async updateSong(userId: string, songId: string, songFormParam: SongFormParam) {
+    try {
+      const music_sheets = songFormParam?.musicSheetContainers?.map((mContainer) => ({key: mContainer.key, urls: mContainer.imageFileContainers.map(iContainer => iContainer.url)}))
+      const song = {
+        title: songFormParam.title,
+        subtitle: songFormParam.subtitle,
+        original: {
+          author: songFormParam.author,
+          url: songFormParam.link
+        },
+        version: songFormParam.version,
+        description: songFormParam.description,
+        lyrics: "",
+        bpm: songFormParam.bpm,
+        tags: songFormParam.tags,
+        updated_by: {
+          id: userId,
+          time: getFirebaseTimestampNow()
+        },
+        music_sheets: music_sheets
+      }
+      return await this.update(songId, song);
     }
-    if (songInput.music_sheet_urls) {
-      song.music_sheet_urls = songInput.music_sheet_urls
+    catch (e) {
+      console.log(e)
     }
-    return await this.update(songId, song);
   }
 
   async deleteSong(songId: string) {

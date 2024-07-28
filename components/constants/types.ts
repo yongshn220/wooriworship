@@ -5,6 +5,7 @@ export interface ImageFileContainer {
   file: File
   url: string
   isLoading: boolean
+  isUploadedInDatabase: boolean
 }
 
 export interface MusicSheetContainer {

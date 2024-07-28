@@ -104,19 +104,22 @@ class StorageService {
 
   async uploadMusicSheetContainer(team_id: string, musicSheetContainer: MusicSheetContainer) {
     if (!musicSheetContainer || musicSheetContainer.imageFileContainers.length === 0) return null
-    
+
     try {
       const newMusicSheetContainer = {...musicSheetContainer}
       for (const imageFileContainer of newMusicSheetContainer.imageFileContainers) {
         if (!imageFileContainer.file) {
           console.log("uploadMusicSheetContainer: file not exists."); continue
         }
-        
+        if (imageFileContainer.isUploadedInDatabase === true) {
+          console.log("uploadMusicSheetContainer: file already exists in database."); continue
+        }
+
         const downloadUrl = await this.uploadFile(team_id, imageFileContainer.file, imageFileContainer.id)
         if (!downloadUrl) {
           console.log ("uploadMusicSheetContainer: fail to get download url."); continue
         }
-        
+        imageFileContainer.isUploadedInDatabase = true
         imageFileContainer.url = downloadUrl
       }
       return newMusicSheetContainer
@@ -138,10 +141,10 @@ class StorageService {
   }
 
   async deleteNoticeFiles(urls: Array<string>) {
-    return await this.deleteMusicSheets(urls);
+    return await this.deleteFileByUrls(urls);
   }
 
-  async deleteMusicSheets(urls: Array<string>) {
+  async deleteFileByUrls(urls: Array<string>) {
     const promises = [];
     try {
       for (let url of urls) {
@@ -161,7 +164,7 @@ class StorageService {
 
   async updateMusicSheets(teamId: string, new_sheets: Array<ImageFileContainer>, delete_sheets: Array<string>) {
     try {
-      await this.deleteMusicSheets(delete_sheets);
+      await this.deleteFileByUrls(delete_sheets);
       console.log(new_sheets.length)
       if (new_sheets.length === 0) {
         return [];
@@ -173,7 +176,8 @@ class StorageService {
         return ms.id
       })
       return await this.uploadFiles(teamId, files, ids);
-    } catch (err) {
+    }
+    catch (err) {
       return [];
     }
   }

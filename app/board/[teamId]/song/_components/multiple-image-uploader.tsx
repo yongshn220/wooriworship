@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import {ImageFileContainer} from "@/components/constants/types";
 import {useRef, useState} from "react";
+import {update} from "@firebase/database";
 
 interface Props {
   imageFileContainers: Array<ImageFileContainer>;
@@ -23,10 +24,11 @@ export default function MultipleImageUploader({imageFileContainers, updateImageF
           const reader: any = new FileReader();
           reader.readAsDataURL(file);
           const uniqueId = uuid()
-          updateImageFileContainer({id: uniqueId, file: file, url: "", isLoading: true})
+          let newImageFileContainer: ImageFileContainer = {id: uniqueId, file: file, url: "", isLoading: true, isUploadedInDatabase: false}
+          updateImageFileContainer(newImageFileContainer)
 
           reader.onloadend = () => {
-            updateImageFileContainer({id: uniqueId, file: file, url: reader.result.toString(), isLoading: false})
+            updateImageFileContainer({...newImageFileContainer, url: reader.result.toString(), isLoading: false})
           }
         })
       }

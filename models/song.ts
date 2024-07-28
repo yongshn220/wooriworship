@@ -1,5 +1,10 @@
 import {Timestamp} from "@firebase/firestore";
 
+export type SongMusicSheet = {
+  key: string
+  urls: Array<string>
+}
+
 export type Song = {
   id?: string
   team_id: string
@@ -9,12 +14,7 @@ export type Song = {
   tags: Array<string>
   bpm: number
   version: string
-  music_sheets: [
-    {
-      key: string,
-      urls: Array<string>
-    }
-  ],
+  music_sheets: [SongMusicSheet],
   lyrics: string
   created_by: {
     id: string
