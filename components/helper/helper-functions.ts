@@ -3,6 +3,9 @@ import JSZip from 'jszip';
 import {saveAs} from "file-saver";
 import {Song} from "@/models/song";
 
+export function getFirebaseTimestampNow() {
+  return Timestamp.fromDate(new Date())
+}
 
 export function toPlainObject(obj: any) {
   return JSON.parse(JSON.stringify(obj))
@@ -71,7 +74,7 @@ export function getTimePassedFromTimestamp(timestamp: Timestamp) {
   let result;
 
   if (diffInSeconds < secondsInMinute) {
-    result = `${diffInSeconds} seconds ago`;
+    result = `${diffInSeconds} seconds`;
   }
   else if (diffInSeconds < secondsInHour) {
     const minutes = Math.abs(Math.floor(diffInSeconds / secondsInMinute));

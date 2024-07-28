@@ -26,7 +26,7 @@ export default function MultipleImageUploader({imageFileContainers, updateImageF
           updateImageFileContainer({id: uniqueId, file: file, url: "", isLoading: true})
 
           reader.onloadend = () => {
-            updateImageFileContainer({id: uniqueId, url: reader.result.toString(), isLoading: false})
+            updateImageFileContainer({id: uniqueId, file: file, url: reader.result.toString(), isLoading: false})
           }
         })
       }

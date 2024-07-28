@@ -6,3 +6,9 @@ export interface ImageFileContainer {
   url: string
   isLoading: boolean
 }
+
+export interface MusicSheetContainer {
+  tempId: string
+  key: string
+  imageFileContainers: Array<ImageFileContainer>
+}

@@ -27,7 +27,7 @@ import {auth} from "@/firebase";
 import {currentTeamSongIdsAtom, songAtom, songUpdaterAtom} from "@/global-states/song-state";
 import useViewportHeight from "@/components/hook/use-viewport-height";
 import PdfUploader from "@/app/board/[teamId]/song/_components/pdf-uploader";
-import {ImageFileContainer} from "@/components/constants/types";
+import {ImageFileContainer, MusicSheetContainer} from "@/components/constants/types";
 import {PlusIcon} from "lucide-react";
 import {v4 as uuid} from "uuid";
 import {Cross2Icon} from "@radix-ui/react-icons";
@@ -50,11 +50,10 @@ export interface SongInput {
   description: string
 }
 
-interface MusicSheetInput {
-  tempId: string
-  key: string
-  imageFileContainers: Array<ImageFileContainer>
+export interface CreateSongInput extends SongInput {
+  musicSheetContainers: MusicSheetContainer[]
 }
+
 
 export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   const song = useRecoilValue(songAtom(songId))
@@ -73,7 +72,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     bpm: (mode === FormMode.EDIT)? song?.bpm?? null : null,
     description: (mode === FormMode.EDIT)? song?.description?? "" : ""
   })
-  const [musicSheetListInput, setMusicSheetListInput] = useState<Array<MusicSheetInput>>([])
+  const [musicSheetContainers, setMusicSheetContainers] = useState<Array<MusicSheetContainer>>([])
   const [isLoading, setIsLoading] = useState(false)
   const viewportHeight = useViewportHeight();
   const { toast } = useToast()
@@ -85,9 +84,9 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
         tempId: uuid(),
         key: musicSheet?.key,
         imageFileContainers: musicSheet?.urls.map((url) => ({id: "", file: null, url: url, isLoading:false})) as Array<ImageFileContainer>
-      })) as Array<MusicSheetInput>
+      })) as Array<MusicSheetContainer>
 
-      setMusicSheetListInput(_musicSheets)
+      setMusicSheetContainers(_musicSheets)
     }
   }, [mode, song?.music_sheets])
 
@@ -103,45 +102,58 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
 
   function clearContents() {
     setInput({title: "", subtitle: "", author: "", version: "", key: "", link: "", tags: [], bpm: null, description: ""})
-    setMusicSheetListInput([])
+    setMusicSheetContainers([])
   }
 
   async function handleCreate() {
-    // setIsLoading(true)
-    //
-    // if (!createValidCheck()) return false
-    //
-    // try {
-    //   const downloadUrls = await StorageService.uploadMusicSheets(teamId, imageFileContainers);
-    //   const songInput = {...input, music_sheet_urls: downloadUrls}
-    //   const promises = [];
-    //   promises.push(SongService.addNewSong(authUser?.uid, teamId, songInput));
-    //   promises.push(TagService.addNewTags(teamId, songInput.tags));
-    //   const promiseResults = await Promise.all(promises)
-    //   const songId = promiseResults[0] as string
-    //   if (!songId) {
-    //     toast({
-    //       description: `Fail to create a song. Please try again.`,
-    //     })
-    //   }
-    //   else {
-    //     toast({
-    //       title: `New Song Created!`,
-    //       description: `${team?.name} - ${songInput.title}`,
-    //     })
-    //     setCurrentTeamSongIds((prev) => ([...prev, songId])) // update song board (locally)
-    //     router.push(getPathSongDetail(teamId, songId))
-    //     clearContents()
-    //   }
-    // }
-    // catch (e) {
-    //   console.log("err", e)
-    // }
-    // finally {
-    //   clearContents()
-    //   setIsOpen(false)
-    //   setIsLoading(false)
-    // }
+    setIsLoading(true)
+
+    if (!createValidCheck()) return false
+
+    try {
+      const uploadedMusicSheetContainers = []
+      for (const container of musicSheetContainers) {
+        const newContainer = await StorageService.uploadMusicSheetContainer(teamId, container)
+        if (!newContainer) {
+          console.log("Song:handleCreate: fail to upload music sheet container."); continue
+        }
+        uploadedMusicSheetContainers.push(newContainer)
+      }
+      const createSongInput: CreateSongInput = {...input, musicSheetContainers: uploadedMusicSheetContainers}
+
+      const newSongId = await SongService.addNewSong(authUser?.uid, teamId, createSongInput)
+      if (!newSongId) {
+        console.log("err:song-form:handleCreate. Fail to create a song")
+        toast({
+          description: `Fail to create a song. Please try again.`,
+        })
+        return
+      }
+
+      const result = await TagService.addNewTags(teamId, createSongInput.tags)
+      if (!result) {
+        console.log("err:song-form:handleCreate. Fail to create tags")
+      }
+
+      toast({
+        title: `New Song Created!`,
+        description: `${team?.name} - ${createSongInput.title}`,
+      })
+      setCurrentTeamSongIds((prev) => ([newSongId, ...prev])) // update song board (locally)
+      router.push(getPathSongDetail(teamId, newSongId))
+      clearContents()
+    }
+    catch (e) {
+      console.log("err", e)
+      toast({
+        description: `Fail to create a song. Please try again.`,
+      })
+    }
+    finally {
+      clearContents()
+      setIsOpen(false)
+      setIsLoading(false)
+    }
   }
 
   function editValidCheck() {
@@ -197,7 +209,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   }
 
   function handleAddNewMusicSheet() {
-    setMusicSheetListInput((prev) => ([...prev, {
+    setMusicSheetContainers((prev) => ([...prev, {
       tempId: uuid(),
       key: "",
       imageFileContainers: []
@@ -205,16 +217,16 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   }
 
   function setKeyToMusicSheet(tempId: string, key: string) {
-    setMusicSheetListInput((prev) => ([...prev.map((musicSheet) => (musicSheet?.tempId === tempId)? {...musicSheet, key: key} : musicSheet)]))
+    setMusicSheetContainers((prev) => ([...prev.map((musicSheet) => (musicSheet?.tempId === tempId)? {...musicSheet, key: key} : musicSheet)]))
   }
   function setImageFileContainersToMusicSheet(tempId: string, imageFileContainers: Array<ImageFileContainer>) {
-    setMusicSheetListInput((prev) => ([
+    setMusicSheetContainers((prev) => ([
         ...prev.map((musicSheet) => ((musicSheet?.tempId === tempId)? {...musicSheet, imageFileContainers} : musicSheet))
       ])
     )
   }
   function removeImageFromMusicSheet(tempId: string, imageFileContainerIndex: number) {
-    setMusicSheetListInput((prev) => ([...prev.map((musicSheet) => {
+    setMusicSheetContainers((prev) => ([...prev.map((musicSheet) => {
       if (musicSheet.tempId !== tempId) return musicSheet
 
       const newImageFileContainers = musicSheet.imageFileContainers.filter((_, index) => index !== imageFileContainerIndex)
@@ -314,7 +326,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
             </Label>
             <div className="w-full flex flex-col gap-4">
               {
-                musicSheetListInput?.map((musicSheet) => (
+                musicSheetContainers?.map((musicSheet) => (
                   <MusicSheetUploadBox
                     key={musicSheet.tempId}
                     setMusicKey={setKeyToMusicSheet}
