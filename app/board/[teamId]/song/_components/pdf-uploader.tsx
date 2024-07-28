@@ -29,7 +29,7 @@ export default function PdfUploader({updateImageFileContainer, children}: Props)
 
         for (let pageNum = 1; pageNum <= numPages; pageNum++) {
           const imageId = uuid();
-          const newImageFileContainer: ImageFileContainer = { id: imageId, file: null, url: "", isLoading: true }
+          const newImageFileContainer: ImageFileContainer = { id: imageId, file: null, url: "", isLoading: true, isUploadedInDatabase: false }
           updateImageFileContainer(newImageFileContainer)
           const imageBlob = await renderPageAsImage(pdf, pageNum);
           const imageFile = new File([imageBlob], `pdf-image-${pageNum}.jpg`, { type: 'image/jpeg' });
