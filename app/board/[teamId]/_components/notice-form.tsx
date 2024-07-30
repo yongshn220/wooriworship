@@ -185,7 +185,7 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
             <div className="flex w-full h-full gap-4 overflow-x-auto">
               {
                 imageFileContainers?.map((imageFileContainer, i) => (
-                  <MusicSheetCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={handleRemoveImage}/>
+                  <MusicSheetCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImage(index)}/>
                 ))
               }
             </div>
