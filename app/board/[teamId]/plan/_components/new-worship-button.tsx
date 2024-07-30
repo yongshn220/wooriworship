@@ -1,26 +1,11 @@
 'use client'
 
 import {useState} from "react";
-import {Song} from "@/models/song";
 import {useRecoilValue} from "recoil";
 import {Button} from "@/components/ui/button";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {useRouter} from "next/navigation";
 import {getPathCreatePlan} from "@/components/helper/routes";
-
-export interface WorshipInfo {
-  title: string
-  description: string
-  date: Date
-  songInfoList: Array<SongInfo>
-  beginningSongId: string
-  endingSongId: string
-}
-
-export interface SongInfo {
-  note: string
-  song: Song
-}
 
 export function NewWorshipButton() {
   const [isOpen, setIsOpen] = useState(false)

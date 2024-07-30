@@ -7,7 +7,7 @@
 // import {useState} from "react";
 // import {Song} from "@/models/song";
 // import {useSetRecoilState} from "recoil";
-// import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
+// import {selectedWorshipSongWrapperListAtom} from "@/app/board/[teamId]/plan/_components/status";
 // import {toPlainObject} from "@/components/helper/helper-functions";
 //
 // interface Props {
@@ -16,7 +16,7 @@
 //   isSelected: boolean
 // }
 // export function SongSelectCard({teamId, song, isSelected}: Props) {
-//   const setSelectedSongInfoList = useSetRecoilState(selectedSongInfoListAtom)
+//   const setSelectedSongInfoList = useSetRecoilState(selectedWorshipSongWrapperListAtom)
 //   const [isOpen, setIsOpen] = useState(false)
 //
 //   return (

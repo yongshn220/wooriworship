@@ -3,7 +3,7 @@ import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import {worshipIdsUpdaterAtom, worshipUpdaterAtom} from "@/global-states/worship-state";
 import {teamAtom} from "@/global-states/teamState";
 import {
-  selectedSongInfoListAtom,
+  selectedWorshipSongWrapperListAtom,
   worshipBeginningSongIdAtom,
   worshipEndingSongIdAtom
 } from "@/app/board/[teamId]/plan/_components/status";
@@ -25,21 +25,14 @@ import {Button} from "@/components/ui/button";
 import {Song} from "@/models/song";
 import {Worship} from "@/models/worship";
 import {StaticSongCard} from "@/app/board/[teamId]/plan/_components/static-song-card";
+import {WorshipPlan, WorshipSongWrapper} from "@/components/constants/types";
+import {WorshipSongPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/worship-song-preview-item";
+import {
+  SelectSongDetailCardWrapper
+} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
 
 
-export interface WorshipInfo {
-  title: string
-  description: string
-  date: Date
-  songInfoList: Array<SongInfo>
-  beginningSongId: string
-  endingSongId: string
-}
-
-export interface SongInfo {
-  note: string
-  song: Song
-}
+export type WorshipInput = WorshipPlan
 
 interface Props {
   mode: FormMode
@@ -52,7 +45,7 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
   const setWorshipUpdater = useSetRecoilState(worshipUpdaterAtom)
   const setWorshipIdsUpdater = useSetRecoilState(worshipIdsUpdaterAtom)
   const team = useRecoilValue(teamAtom(teamId))
-  const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
+  const [selectedWorshipSongWrapperList, setSelectedWorshipSongWrapperList] = useRecoilState(selectedWorshipSongWrapperListAtom)
   const [beginningSongId, setBeginningSongId] = useRecoilState(worshipBeginningSongIdAtom)
   const [endingSongId, setEndingSongId] = useRecoilState(worshipEndingSongIdAtom)
 
@@ -68,10 +61,10 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
   const clearContents = useCallback(() => {
     setIsLoading(false)
     // todo: check if this called first
-    setSelectedSongInfoList([])
+    setSelectedWorshipSongWrapperList([])
     setBeginningSongId(null)
     setEndingSongId(null)
-  }, [setBeginningSongId, setEndingSongId, setSelectedSongInfoList])
+  }, [setBeginningSongId, setEndingSongId, setSelectedWorshipSongWrapperList])
 
 
   useEffect(() => {
@@ -87,11 +80,11 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
       });
       if (songPromises) {
         Promise.all(songPromises).then((_songInfoList) => {
-          setSelectedSongInfoList(_songInfoList as Array<SongInfo>);
+          setSelectedWorshipSongWrapperList(_songInfoList as Array<WorshipSongWrapper>);
         });
       }
     }
-  }, [mode, setSelectedSongInfoList, worship?.songs])
+  }, [mode, setSelectedWorshipSongWrapperList, worship?.songs])
 
   /* Initialize beginning and ending song*/
   useEffect(() => {
@@ -112,7 +105,7 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
         setEndingSongId(worship?.ending_song_id)
       }
     }
-  }, [mode, setBeginningSongId, setEndingSongId, worship?.beginning_song_id, worship?.ending_song_id])
+  }, [mode, setBeginningSongId, setEndingSongId, team?.option?.worship?.beginning_song_id, team?.option?.worship?.ending_song_id, worship?.beginning_song_id, worship?.ending_song_id])
 
   function isSessionValid() {
     if (!authUser?.uid) {
@@ -124,11 +117,11 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
   }
 
   function getWorshipInput() {
-    const worshipInput: WorshipInfo = {
+    const worshipInput: WorshipInput = {
       title: basicInfo.title,
       description: basicInfo.description,
       date: date,
-      songInfoList: selectedSongInfoList,
+      worshipSongWrappers: selectedWorshipSongWrapperList,
       beginningSongId: beginningSongId,
       endingSongId: endingSongId,
     }
@@ -248,8 +241,8 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
                 <StaticSongCard teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songId={beginningSongId}/>
               }
               {
-                selectedSongInfoList.map((songInfo, i) => (
-                  <NewSongCard key={i} teamId={teamId} songOrder={i + 1} songInfo={songInfo}/>
+                selectedWorshipSongWrapperList.map((songWrapper, i) => (
+                  <NewSongCard key={i} teamId={teamId} songOrder={i + 1} songWrapper={songWrapper}/>
                 ))
               }
               {

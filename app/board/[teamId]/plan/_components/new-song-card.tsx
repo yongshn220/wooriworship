@@ -1,50 +1,74 @@
 "use client"
 
 import {Textarea} from "@/components/ui/textarea";
-import {SongInfo} from "@/app/board/[teamId]/plan/_components/new-worship-button";
 import {useMemo} from "react";
 import {useRecoilState} from "recoil";
-import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {selectedWorshipSongWrapperListAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {toPlainObject} from "@/components/helper/helper-functions";
 import {SongListItem, ViewMode} from "@/app/board/[teamId]/song/_components/song-list-item";
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import {SwapOrderButton} from "@/app/board/[teamId]/plan/_components/swap-order-button";
+import {WorshipSongWrapper} from "@/components/constants/types";
+import {
+  SelectSongDetailCardWrapper
+} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
+import {WorshipSongPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/worship-song-preview-item";
 
 interface Props {
   teamId: string
   songOrder: number
-  songInfo: SongInfo
+  songWrapper: WorshipSongWrapper
 }
 
-export function NewSongCard({teamId, songOrder, songInfo}: Props) {
-  const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
+export function NewSongCard({teamId, songOrder, songWrapper}: Props) {
+  const [selectedSongWrapperList, setSelectedSongWrapperList] = useRecoilState(selectedWorshipSongWrapperListAtom)
 
-  const currentSongInfo = useMemo(() => (selectedSongInfoList.find((_songInfo => _songInfo.song.id === songInfo.song.id))), [selectedSongInfoList, songInfo.song.id])
+  const currentSongInfo = useMemo(() => (selectedSongWrapperList.find((_songWrapper => _songWrapper.song.id === songWrapper.song.id))), [selectedSongWrapperList, songWrapper.song.id])
 
   if (!currentSongInfo.song) return <></>
 
   function handleRemoveSong() {
-    setSelectedSongInfoList(selectedSongInfoList.filter((_songInfo) => _songInfo.song.id != currentSongInfo.song.id))
+    setSelectedSongWrapperList(selectedSongWrapperList.filter((_songWrapper) => _songWrapper.song.id != currentSongInfo.song.id))
   }
 
   function handleOnNoteChange(input: string) {
-    const newSongInfoList = toPlainObject(selectedSongInfoList)
-    newSongInfoList.forEach((_songInfo: SongInfo) => {
-      if (_songInfo.song.id === songInfo.song.id) {
-        _songInfo.note = input
+    const newSongInfoList = toPlainObject(selectedSongWrapperList)
+    newSongInfoList.forEach((_songWrapper: WorshipSongWrapper) => {
+      if (_songWrapper.song.id === songWrapper.song.id) {
+        _songWrapper.note = input
       }
     })
-    setSelectedSongInfoList(newSongInfoList)
+    setSelectedSongWrapperList(newSongInfoList)
+  }
+
+  function setWorshipSongSelectedKeys(selectedKeys: Array<string>) {
+    const targetSongWrapper = selectedSongWrapperList.find((wrapper => wrapper?.song?.id === songWrapper?.song?.id))
+    if (!targetSongWrapper) {
+      console.log("err: setWorshipSongSelectedKeys, there is no such song id.")
+    }
+
+    setSelectedSongWrapperList((prev) => ([
+      ...prev.filter(wrapper => wrapper?.song?.id !== songWrapper?.song?.id),
+      {...targetSongWrapper, selectedKeys: selectedKeys}
+    ]))
   }
 
   return (
     <div className="w-full">
       <div className="relative flex flex-col w-full h-64 border shadow-sm rounded-md p-2 gap-4 bg-white">
-        <SongDetailCardWrapper teamId={teamId} songId={songInfo?.song?.id}>
-          <SongListItem songId={songInfo?.song?.id} viewMode={ViewMode.NONE}/>
-        </SongDetailCardWrapper>
+        <SelectSongDetailCardWrapper
+          teamId={teamId}
+          songId={songWrapper?.song?.id}
+          selectedKeys={songWrapper?.selectedKeys}
+          setSelectedKeys={(selectedKeys: string[]) => setWorshipSongSelectedKeys(selectedKeys)}
+        >
+          <WorshipSongPreviewItem songId={songWrapper?.song?.id} selectedKeys={songWrapper?.selectedKeys} customTags={[]}/>
+        </SelectSongDetailCardWrapper>
+        {/*<SongDetailCardWrapper teamId={teamId} songId={songWrapper?.song?.id}>*/}
+        {/*  <SongListItem songId={songWrapper?.song?.id} viewMode={ViewMode.NONE}/>*/}
+        {/*</SongDetailCardWrapper>*/}
         <div className="absolute flex-center -translate-y-1/2 -right-4">
-          <SwapOrderButton songId={songInfo?.song?.id} songOrder={songOrder}/>
+          <SwapOrderButton songId={songWrapper?.song?.id} songOrder={songOrder}/>
         </div>
 
         <div className="w-full flex-1">
