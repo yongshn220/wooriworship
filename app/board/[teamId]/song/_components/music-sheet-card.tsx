@@ -6,7 +6,7 @@ import {ImageFileContainer} from "@/components/constants/types";
 interface Props {
   imageFileContainer: ImageFileContainer
   index: number
-  handleRemoveImage: (index: number) => {}
+  handleRemoveImage: (index: number) => void
 }
 
 export function MusicSheetCard({imageFileContainer, index, handleRemoveImage}: Props) {
