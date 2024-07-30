@@ -2,7 +2,7 @@ import {BaseService, StorageService} from ".";
 import SongCommentService from "./SongCommentService";
 import {SongFormParam} from "@/app/board/[teamId]/song/_components/song-form";
 import {Song} from "@/models/song";
-import {getFirebaseTimestampNow} from "@/components/helper/helper-functions";
+import {getAllUrlsFromSongMusicSheets, getFirebaseTimestampNow} from "@/components/helper/helper-functions";
 
 
 class SongService extends BaseService {
@@ -91,17 +91,18 @@ class SongService extends BaseService {
 
   async deleteSong(songId: string) {
     try {
-      const song:any = await this.getById(songId);
+      const song: Song = await this.getById(songId) as Song;
       if (!song) {
         return true;
       }
       const promises = [];
       const comments = await SongCommentService.getSongComments(song.id, song.team_id);
-      for(const comment of comments) {
+      for (const comment of comments) {
         promises.push(SongCommentService.delete(comment.id));
       }
+      const songUrls = getAllUrlsFromSongMusicSheets(song?.music_sheets)
+      promises.push(StorageService.deleteFileByUrls(songUrls?? []))
       await Promise.all(promises);
-      await StorageService.deleteMusicSheets(song.music_sheet_urls ? song.music_sheet_urls : []);
       await this.delete(songId);
       return true;
     } catch (err) {

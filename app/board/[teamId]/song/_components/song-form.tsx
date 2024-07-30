@@ -32,6 +32,7 @@ import {PlusIcon} from "lucide-react";
 import {v4 as uuid} from "uuid";
 import {Cross2Icon} from "@radix-ui/react-icons";
 import {SongMusicSheet} from "@/models/song";
+import {getAllUrlsFromMusicSheetContainers, getAllUrlsFromSongMusicSheets} from "@/components/helper/helper-functions";
 
 
 interface Props {
@@ -210,34 +211,6 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
       newMusicSheetContainers.push(newMContainer)
     }
     return newMusicSheetContainers
-  }
-
-  function getAllUrlsFromMusicSheetContainers(mContainers: MusicSheetContainer[]) {
-    if (!mContainers) {
-      console.log("getAllUrlsFromMusicSheetContainers: mContainer is not exists."); return []
-    }
-
-    const urls = []
-    mContainers?.forEach(mContainer => {
-      mContainer?.imageFileContainers?.forEach(iContainer => {
-        urls.push(iContainer?.url)
-      })
-    })
-    return urls
-  }
-
-  function getAllUrlsFromSongMusicSheets(musicSheets: SongMusicSheet[]) {
-    if (!musicSheets) {
-      console.log("getAllUrlsFromSongMusicSheets: musicSheets are not exists."); return []
-    }
-
-    const urls = []
-    musicSheets?.forEach(musicSheet => {
-      musicSheet?.urls?.forEach(url => {
-        urls.push(url)
-      })
-    })
-    return urls
   }
 
   function getNotExistUrlsFromMusicSheets(prevMusicSheets: SongMusicSheet[], newMusicSheetContainers: MusicSheetContainer[]) {
