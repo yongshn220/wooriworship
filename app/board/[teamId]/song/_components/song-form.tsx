@@ -409,7 +409,7 @@ function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey
           <div className="flex w-full h-full gap-4 overflow-x-auto">
             {
               imageFileContainers?.map((imageFileContainer, i) => (
-                <MusicSheetCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index) => handleRemoveImageFileContainer(tempId, index)}/>
+                <MusicSheetCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImageFileContainer(tempId, index)}/>
               ))
             }
           </div>
