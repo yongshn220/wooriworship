@@ -1,7 +1,7 @@
 import {BaseService, SongService} from ".";
-import {WorshipInfo} from "@/app/board/[teamId]/plan/_components/new-worship-button";
 import {Timestamp} from "@firebase/firestore";
 import {Worship} from "@/models/worship";
+import {WorshipPlan} from "@/components/constants/types";
 
 class WorshipService extends BaseService {
   constructor() {
@@ -19,8 +19,8 @@ class WorshipService extends BaseService {
     return worships
   }
 
-  async addNewWorship(userId: string, teamId: string, worshipInput: WorshipInfo) {
-    const songIds = worshipInput?.songInfoList.map((songInfo) => songInfo.song.id);
+  async addNewWorship(userId: string, teamId: string, worshipInput: WorshipPlan) {
+    const songIds = worshipInput?.worshipSongWrappers.map((songInfo) => songInfo.song.id);
     const promises = [];
     for (const songId of songIds) {
       promises.push(SongService.utilizeSong(songId));
@@ -30,7 +30,7 @@ class WorshipService extends BaseService {
       team_id: teamId,
       title: worshipInput?.title,
       description: worshipInput?.description,
-      songs: worshipInput?.songInfoList.map((songInfo) => ({id: songInfo.song.id, note: songInfo.note})),
+      songs: worshipInput?.worshipSongWrappers.map((wrapper) => ({id: wrapper.song.id, note: wrapper.note, selected_keys: wrapper.selectedKeys})),
       beginning_song_id: worshipInput?.beginningSongId,
       ending_song_id: worshipInput?.endingSongId,
       created_by: {
@@ -46,11 +46,11 @@ class WorshipService extends BaseService {
     return await this.create(newWorship);
   }
 
-  async updateWorship(userId: string, worshipId: string, worshipInput: WorshipInfo) {
+  async updateWorship(userId: string, worshipId: string, worshipInput: WorshipPlan) {
     const worship = {
       title: worshipInput?.title,
       description: worshipInput?.description,
-      songs: worshipInput?.songInfoList.map((songInfo) => ({id: songInfo.song.id, note: songInfo.note})),
+      songs: worshipInput?.worshipSongWrappers.map((songInfo) => ({id: songInfo.song.id, note: songInfo.note})),
       beginning_song_id: worshipInput?.beginningSongId,
       ending_song_id: worshipInput?.endingSongId,
       updated_by: {

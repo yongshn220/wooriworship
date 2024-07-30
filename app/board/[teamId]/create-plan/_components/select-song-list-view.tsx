@@ -7,8 +7,11 @@ import Image from "next/image";
 import * as React from "react";
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import {Checkbox} from "@/components/ui/checkbox";
-import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
-import {useMemo} from "react";
+import {selectedWorshipSongWrapperListAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {useMemo, useState} from "react";
+import {
+  SelectSongDetailCardWrapper
+} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
 
 interface Props {
   teamId: string
@@ -70,27 +73,13 @@ interface ItemProps {
 }
 
 function SelectSongListItem({teamId, songId}: ItemProps) {
-  const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
-  const song = useRecoilValue(songAtom(songId))
-
-  const isSongSelected = useMemo(() => selectedSongInfoList.map(info => info?.song?.id).includes(songId), [selectedSongInfoList, songId])
-
-  function handleSongSelectChange(state: any) {
-    console.log(state)
-    if (state === true) {
-      setSelectedSongInfoList(prev => ([...prev, {song, note: song?.description}]))
-    }
-    else if (state === false) {
-      setSelectedSongInfoList(prev => (prev.filter(songInfo => songInfo?.song?.id != song.id)))
-    }
-  }
-
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([])
+  
   return (
     <div className="w-full flex-center">
-      <Checkbox id="select" className="mr-4" checked={isSongSelected} onCheckedChange={(state) => handleSongSelectChange(state)}/>
-      <SongDetailCardWrapper teamId={teamId} songId={songId}>
+      <SelectSongDetailCardWrapper teamId={teamId} songId={songId} selectedKeys={selectedKeys} setSelectedKeys={setSelectedKeys}>
         <SongListItem songId={songId} viewMode={ViewMode.NONE}/>
-      </SongDetailCardWrapper>
+      </SelectSongDetailCardWrapper>
     </div>
   )
 }

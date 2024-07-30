@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {useRecoilState, useSetRecoilState} from "recoil";
 import {
-  selectedSongInfoListAtom,
+  selectedWorshipSongWrapperListAtom,
   worshipBeginningSongIdAtom,
   worshipEndingSongIdAtom
 } from "@/app/board/[teamId]/plan/_components/status";
@@ -28,7 +28,7 @@ interface Props {
 type OrderValue = WorshipSpecialOrderType | string
 
 export function SwapOrderButton({songId, songOrder}: Props) {
-  const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
+  const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedWorshipSongWrapperListAtom)
   const setWorshipBeginningSongId = useSetRecoilState(worshipBeginningSongIdAtom)
   const setWorshipEndingSongId = useSetRecoilState(worshipEndingSongIdAtom)
 

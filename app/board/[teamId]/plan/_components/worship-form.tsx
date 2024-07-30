@@ -13,7 +13,7 @@
 // import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 // import {useToast} from "@/components/ui/use-toast";
 // import {AddSongButton} from "@/app/board/[teamId]/plan/_components/add-song-button";
-// import {selectedSongInfoListAtom} from "@/app/board/[teamId]/plan/_components/status";
+// import {selectedWorshipSongWrapperListAtom} from "@/app/board/[teamId]/plan/_components/status";
 // import {Song} from "@/models/song";
 // import {SongService, WorshipService} from "@/apis";
 // import {FormMode} from "@/components/constants/enums";
@@ -49,7 +49,7 @@
 //   const setWorshipIdsUpdater = useSetRecoilState(worshipIdsUpdaterAtom)
 //   const teamId = useRecoilValue(currentTeamIdAtom)
 //   const team = useRecoilValue(teamAtom(teamId))
-//   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedSongInfoListAtom)
+//   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedWorshipSongWrapperListAtom)
 //
 //   const [basicInfo, setBasicInfo] = useState({
 //     title: (mode === FormMode.EDIT)? worship?.title ?? "" : "",

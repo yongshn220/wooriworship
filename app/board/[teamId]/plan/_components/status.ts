@@ -1,9 +1,9 @@
 import {atom} from "recoil";
-import {SongInfo} from "@/app/board/[teamId]/plan/_components/new-worship-button";
+import {WorshipSongWrapper} from "@/components/constants/types";
 
 
-export const selectedSongInfoListAtom = atom<Array<SongInfo>>({
-  key: "selectedSongInfoListAtom",
+export const selectedWorshipSongWrapperListAtom = atom<Array<WorshipSongWrapper>>({
+  key: "selectedWorshipSongWrapperListAtom",
   default: [],
 })
 

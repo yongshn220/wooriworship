@@ -3,6 +3,7 @@ import {Timestamp} from "@firebase/firestore";
 export interface SongHeader {
   id: string
   note: string
+  selected_keys: Array<string>
 }
 
 export interface Worship {
