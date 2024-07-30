@@ -14,7 +14,7 @@ export type Song = {
   tags: Array<string>
   bpm: number
   version: string
-  music_sheets: [SongMusicSheet],
+  music_sheets: Array<SongMusicSheet>,
   lyrics: string
   created_by: {
     id: string

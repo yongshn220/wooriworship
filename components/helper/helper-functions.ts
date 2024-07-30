@@ -1,7 +1,8 @@
 import {Timestamp} from "@firebase/firestore";
 import JSZip from 'jszip';
 import {saveAs} from "file-saver";
-import {Song} from "@/models/song";
+import {Song, SongMusicSheet} from "@/models/song";
+import {MusicSheetContainer} from "@/components/constants/types";
 
 export function getFirebaseTimestampNow() {
   return Timestamp.fromDate(new Date())
@@ -276,3 +277,31 @@ export async function downloadMultipleMusicSheets(songs: Array<Song>) {
   const blob = await zip.generateAsync({ type: 'blob' });
   saveAs(blob, 'music_sheets.zip');
 }
+
+export function getAllUrlsFromMusicSheetContainers(mContainers: MusicSheetContainer[]) {
+    if (!mContainers) {
+      console.log("getAllUrlsFromMusicSheetContainers: mContainer is not exists."); return []
+    }
+
+    const urls = []
+    mContainers?.forEach(mContainer => {
+      mContainer?.imageFileContainers?.forEach(iContainer => {
+        urls.push(iContainer?.url)
+      })
+    })
+    return urls
+  }
+
+export function getAllUrlsFromSongMusicSheets(musicSheets: SongMusicSheet[]) {
+    if (!musicSheets) {
+      console.log("getAllUrlsFromSongMusicSheets: musicSheets are not exists."); return []
+    }
+
+    const urls = []
+    musicSheets?.forEach(musicSheet => {
+      musicSheet?.urls?.forEach(url => {
+        urls.push(url)
+      })
+    })
+    return urls
+  }
