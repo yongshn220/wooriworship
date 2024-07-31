@@ -2,35 +2,23 @@
 
 import * as React from "react"
 
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import {DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger,} from "@/components/ui/dropdown-menu"
 import {useRecoilState, useSetRecoilState} from "recoil";
-import {
-  selectedWorshipSongWrapperListAtom,
-  worshipBeginningSongIdAtom,
-  worshipEndingSongIdAtom
-} from "@/app/board/[teamId]/plan/_components/status";
+import {selectedWorshipSongWrapperListAtom, worshipBeginningSongWrapperAtom, worshipEndingSongWrapperAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {WorshipSpecialOrderType} from "@/components/constants/enums";
+import {WorshipSongWrapper} from "@/components/constants/types";
 
 interface Props {
-  songId: string
+  songWrapper: WorshipSongWrapper
   songOrder: number
 }
 
 type OrderValue = WorshipSpecialOrderType | string
 
-export function SwapOrderButton({songId, songOrder}: Props) {
+export function SwapOrderButton({songWrapper, songOrder}: Props) {
   const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedWorshipSongWrapperListAtom)
-  const setWorshipBeginningSongId = useSetRecoilState(worshipBeginningSongIdAtom)
-  const setWorshipEndingSongId = useSetRecoilState(worshipEndingSongIdAtom)
+  const setBeginningSongWrapper = useSetRecoilState(worshipBeginningSongWrapperAtom)
+  const setEndingSongWrapper = useSetRecoilState(worshipEndingSongWrapperAtom)
 
   function handleClick(value: OrderValue) {
     if (value === WorshipSpecialOrderType.BEGINNING) {
@@ -57,13 +45,19 @@ export function SwapOrderButton({songId, songOrder}: Props) {
   }
 
   function handleSetBeginningSong() {
-    setSelectedSongInfoList((prev) => ([...prev.filter(info => info?.song?.id !== songId)]))
-    setWorshipBeginningSongId(songId)
+    setSelectedSongInfoList((prev) => ([...prev.filter(info => info?.song?.id !== songWrapper?.song?.id)]))
+    setBeginningSongWrapper({
+      id: songWrapper?.song?.id,
+      key: songWrapper?.selectedKeys[0]
+    })
   }
 
   function handleSetEndingSong() {
-    setSelectedSongInfoList((prev) => ([...prev.filter(info => info?.song?.id !== songId)]))
-    setWorshipEndingSongId(songId)
+    setSelectedSongInfoList((prev) => ([...prev.filter(info => info?.song?.id !== songWrapper?.song?.id)]))
+    setEndingSongWrapper({
+      id: songWrapper?.song?.id,
+      key: songWrapper?.selectedKeys[0]
+    })
   }
 
   return (

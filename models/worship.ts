@@ -13,8 +13,14 @@ export interface Worship {
   worship_date: Timestamp
   description: string
   songs: Array<SongHeader>
-  beginning_song_id: string
-  ending_song_id: string
+  beginning_song: {
+    id: string,
+    key: string
+  },
+  ending_song: {
+    id: string,
+    key: string
+  },
   created_by: {
     id: string
     time: Timestamp

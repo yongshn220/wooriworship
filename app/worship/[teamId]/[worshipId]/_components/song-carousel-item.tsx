@@ -21,8 +21,8 @@ export function SongCarouselItem({songHeader}: Props) {
         <CardContent className="flex flex-col w-full aspect-[4/5] max-h-[800px] divide-y">
           <div className="relative h-full flex flex-col bg-gray-50 overflow-y-scroll">
             {
-              song.music_sheet_urls.length > 0 ?
-                song?.music_sheet_urls.map((url, index) => (
+              song.music_sheets.length > 0 ?
+                song?.music_sheets.map((musicSheet, index) => (
                   <div key={index} className="flex-center w-full h-full">
                     <img
                       alt="Music score"
