@@ -1,7 +1,10 @@
 "use client"
 
 import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
-import {worshipBeginningSongIdAtom, worshipEndingSongIdAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {
+  worshipBeginningSongWrapperAtom,
+  worshipEndingSongWrapperAtom
+} from "@/app/board/[teamId]/plan/_components/status";
 import {SongListItem, ViewMode} from "@/app/board/[teamId]/song/_components/song-list-item";
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import {WorshipSpecialOrderType} from "@/components/constants/enums";
@@ -12,41 +15,46 @@ import {TeamOption} from "@/models/team";
 import {TeamService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
 import {songAtom} from "@/global-states/song-state";
+import {
+  SelectSongDetailCardWrapper
+} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
+import {SongListPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-preview-item";
+import {WorshipSongPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/worship-song-preview-item";
 
 interface Props {
   teamId: string
   specialOrderType: WorshipSpecialOrderType
-  songId: string
+  songWrapper: { id: string, key: string }
 }
 
 type CheckState = boolean | "indeterminate"
 
-export function StaticSongCard({teamId, specialOrderType, songId}: Props) {
-  const song = useRecoilValue(songAtom(songId))
+export function StaticSongCard({teamId, specialOrderType, songWrapper}: Props) {
+  const song = useRecoilValue(songAtom(songWrapper?.id))
   const [team, setTeam] = useRecoilState(teamAtom(teamId))
-  const setWorshipBeginningSongId = useSetRecoilState(worshipBeginningSongIdAtom)
-  const setWorshipEndingSongId = useSetRecoilState(worshipEndingSongIdAtom)
+  const setWorshipBeginningSongWrapper = useSetRecoilState(worshipBeginningSongWrapperAtom)
+  const setWorshipEndingSongWrapper = useSetRecoilState(worshipEndingSongWrapperAtom)
   const [checked, setChecked] = useState<CheckState>(false)
 
   useEffect(() => {
     if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
-      if (team?.option?.worship?.beginning_song_id && team?.option?.worship?.beginning_song_id === songId) {
+      if (team?.option?.worship?.beginning_song?.id && team?.option?.worship?.beginning_song?.id === songWrapper?.id) {
         setChecked(true)
       }
     }
     else {
-      if (team?.option?.worship?.ending_song_id && team?.option?.worship?.ending_song_id === songId) {
+      if (team?.option?.worship?.ending_song?.id && team?.option?.worship?.ending_song?.id === songWrapper?.id) {
         setChecked(true)
       }
     }
-  }, [songId, specialOrderType, team?.option?.worship?.beginning_song_id, team?.option?.worship])
+  }, [songWrapper.id, specialOrderType, team?.option?.worship])
 
   function handleRemoveSong() {
     if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
-      setWorshipBeginningSongId(null); return
+      setWorshipBeginningSongWrapper(null); return
     }
     if (specialOrderType === WorshipSpecialOrderType.ENDING) {
-      setWorshipEndingSongId(null); return
+      setWorshipEndingSongWrapper(null); return
     }
   }
 
@@ -61,23 +69,23 @@ export function StaticSongCard({teamId, specialOrderType, songId}: Props) {
     try {
       const teamOption: TeamOption = {...team?.option}
 
-      teamOption.worship = {
-        beginning_song_id: (specialOrderType === WorshipSpecialOrderType.BEGINNING)? (state)? songId : null : teamOption.worship.beginning_song_id,
-        ending_song_id: (specialOrderType === WorshipSpecialOrderType.ENDING)? (state)? songId : null : teamOption.worship.ending_song_id
+      if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
+        teamOption.worship.beginning_song = (state)? {id: songWrapper?.id, key: songWrapper?.key} : {id: null, key: null}
+      }
+      else {
+        teamOption.worship.ending_song = (state)? {id: songWrapper?.id, key: songWrapper?.key} : {id: null, key: null}
       }
 
       setTeam((prev) => ({...prev, option: teamOption}))
       if (await TeamService.updateTeamOption(teamId, teamOption) === false) {
-        /* Handle Error*/
+        /* On Error */
         console.log("err:setStaticSongAsDefaultOption")
         toast({
           title: "Fail to set default Beginning/Ending song. Please try again"
         })
       }
 
-
-
-      /* Successfully updated*/
+      /* On Success */
       if (state) {
         toast({
           title: `Default ${(specialOrderType === WorshipSpecialOrderType.BEGINNING) ? "Beginning" : "Ending"} song updated`,
@@ -98,15 +106,30 @@ export function StaticSongCard({teamId, specialOrderType, songId}: Props) {
     }
   }
 
+  function setSelectedKey(newKey: string) {
+    if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
+      setWorshipBeginningSongWrapper((prev) => ({id: prev.id, key: newKey}))
+    }
+    else {
+      setWorshipEndingSongWrapper((prev) => ({id: prev.id, key: newKey}))
+    }
+  }
+
   return (
     <div className="w-full">
       <div className="relative flex flex-col w-full border shadow-sm rounded-md p-2 gap-4 bg-white">
         <div className="flex-center border-b text-sm px-4 py-1 text-gray-500">
           {specialOrderType === WorshipSpecialOrderType.BEGINNING ? "Beginning Song" : "Ending Song"}
         </div>
-        <SongDetailCardWrapper teamId={teamId} songId={songId}>
-          <SongListItem songId={songId} viewMode={ViewMode.NONE}/>
-        </SongDetailCardWrapper>
+        <SelectSongDetailCardWrapper
+          teamId={teamId}
+          songId={songWrapper?.id}
+          selectedKeys={songWrapper?.key ? [songWrapper?.key] : []}
+          setSelectedKeys={(selectedKeys: string[]) => setSelectedKey(selectedKeys[0])}
+          isStatic={true}
+        >
+          <WorshipSongPreviewItem songId={songWrapper?.id} selectedKeys={[songWrapper?.key]}/>
+        </SelectSongDetailCardWrapper>
       </div>
       <div className="flex-between px-2 pt-1">
         <div className="flex items-center space-x-2">

@@ -64,11 +64,8 @@ export function NewSongCard({teamId, songOrder, songWrapper}: Props) {
         >
           <WorshipSongPreviewItem songId={songWrapper?.song?.id} selectedKeys={songWrapper?.selectedKeys} customTags={[]}/>
         </SelectSongDetailCardWrapper>
-        {/*<SongDetailCardWrapper teamId={teamId} songId={songWrapper?.song?.id}>*/}
-        {/*  <SongListItem songId={songWrapper?.song?.id} viewMode={ViewMode.NONE}/>*/}
-        {/*</SongDetailCardWrapper>*/}
         <div className="absolute flex-center -translate-y-1/2 -right-4">
-          <SwapOrderButton songId={songWrapper?.song?.id} songOrder={songOrder}/>
+          <SwapOrderButton songWrapper={songWrapper} songOrder={songOrder}/>
         </div>
 
         <div className="w-full flex-1">

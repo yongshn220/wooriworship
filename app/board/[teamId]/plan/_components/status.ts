@@ -7,12 +7,18 @@ export const selectedWorshipSongWrapperListAtom = atom<Array<WorshipSongWrapper>
   default: [],
 })
 
-export const worshipBeginningSongIdAtom = atom<string>({
-  key: "worshipBeginningSongIdAtom",
-  default: null
+export const worshipBeginningSongWrapperAtom = atom<{id: string, key: string}>({
+  key: "worshipBeginningSongWrapperAtom",
+  default: {
+    id: "",
+    key: "",
+  }
 })
 
-export const worshipEndingSongIdAtom = atom<string>({
-  key: "worshipEndingSongIdAtom",
-  default: null
+export const worshipEndingSongWrapperAtom = atom<{id: string, key: string}>({
+  key: "worshipEndingSongWrapperAtom",
+  default: {
+    id: "",
+    key: "",
+  }
 })

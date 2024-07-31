@@ -1,7 +1,7 @@
 // import {useRecoilValue, useSetRecoilState} from "recoil";
 // import {teamAtom} from "@/global-states/teamState";
 // import {useEffect} from "react";
-// import {worshipBeginningSongIdAtom, worshipEndingSongIdAtom} from "@/app/board/[teamId]/plan/_components/status";
+// import {worshipBeginningSongWrapperAtom, worshipEndingSongWrapperAtom} from "@/app/board/[teamId]/plan/_components/status";
 //
 //
 // interface Props {
@@ -10,8 +10,8 @@
 // }
 // export function TeamOptionInitializer({teamId, children}: Props) {
 //   const team = useRecoilValue(teamAtom(teamId))
-//   const setWorshipBeginningSongId = useSetRecoilState(worshipBeginningSongIdAtom)
-//   const setWorshipEndingSongId = useSetRecoilState(worshipEndingSongIdAtom)
+//   const setWorshipBeginningSongId = useSetRecoilState(worshipBeginningSongWrapperAtom)
+//   const setWorshipEndingSongId = useSetRecoilState(worshipEndingSongWrapperAtom)
 //
 //   useEffect(() => {
 //     if (team?.option?.worship?.beginning_song_id) {

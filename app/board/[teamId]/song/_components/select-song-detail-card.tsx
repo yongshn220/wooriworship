@@ -1,23 +1,16 @@
 'use client'
 
 import {Dialog, DialogContentNoCloseButton, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
-import {Label} from "@/components/ui/label";
-import {Badge} from "@/components/ui/badge";
-import Image from "next/image"
-import {OpenYoutubeLink, getTimePassedFromTimestamp} from "@/components/helper/helper-functions";
 import {MenuButton} from "@/app/board/[teamId]/song/_components/menu-button";
-import {SongMusicSheetViewer} from "@/app/board/[teamId]/song/_components/song-music-sheet-viewer";
-import React, {useMemo, useState} from "react";
-import {LinkIcon} from "lucide-react";
+import React from "react";
 import {Button} from "@/components/ui/button";
 import {useRecoilState, useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
 import {SongCommentArea} from "@/app/board/[teamId]/song/_components/song-comment-area";
-import {SongKeyBox} from "@/components/song/song-key-box";
-import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
 import {SongDetailContent} from "@/app/board/[teamId]/song/_components/song-detail-content";
 import {cn} from "@/lib/utils";
-import {selectedWorshipSongWrapperListAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {selectedWorshipSongWrapperListAtom, worshipBeginningSongWrapperAtom, worshipEndingSongWrapperAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {toast} from "@/components/ui/use-toast";
 
 interface Props {
   teamId: string
@@ -25,28 +18,40 @@ interface Props {
   setIsOpen: Function
   songId: string
   selectedKeys: Array<string>
-  setSelectedKeys: React.Dispatch<React.SetStateAction<Array<string>>>
+  setSelectedKeys: (selectedKeys: string[]) => void
   readOnly: boolean
+  isStatic: boolean // true if the song is beginning or ending song. Otherwise, false.
 }
 
-export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selectedKeys, setSelectedKeys, readOnly=false}: Props) {
+export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selectedKeys, setSelectedKeys, readOnly=false, isStatic=false}: Props) {
   const song = useRecoilValue(songAtom(songId))
   const [selectedSongWrapperList, setSelectedSongWrapperList] = useRecoilState(selectedWorshipSongWrapperListAtom)
+  const beginningSongWrapper = useRecoilState(worshipBeginningSongWrapperAtom)
+  const endingSongWrapper = useRecoilState(worshipEndingSongWrapperAtom)
 
   function handleSelectSong() {
+    if (isStatic) return
+
     setSelectedSongWrapperList(prev => ([...prev, {song, note: song?.description, selectedKeys: selectedKeys}]))
   }
 
   function handleUnselectSong() {
+    if (isStatic) return
     setSelectedSongWrapperList(prev => (prev.filter(songWrapper => songWrapper?.song?.id !== song.id)))
   }
 
   function handleKeyClick(key: string) {
-    if (isKeySelected(key)) {
-      setSelectedKeys((prev) => ([...prev.filter((_key) => _key !== key)]))
+    if (isStatic) {
+      setSelectedKeys([key])
     }
     else {
-      setSelectedKeys((prev) => ([...prev, key]))
+      if (isKeySelected(key)) {
+        setSelectedKeys([...selectedKeys.filter((_key) => _key !== key)])
+      }
+      else {
+        console.log(key)
+        setSelectedKeys([...selectedKeys, key])
+      }
     }
   }
 
@@ -85,13 +90,17 @@ export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selecte
               </div>
             </div>
             <div className="w-full flex-center flex-col gap-2">
-              <p className="text-black">selected: {selectedKeys.join(", ")}</p>
               {
-                isSongAdded()
-                ? <Button className="w-full bg-blue-500 hover:bg-blue-500 hover:border-2 hover:text-white" variant="outline" onClick={() => handleUnselectSong()}>Click to Remove Song</Button>
-                : <Button className="w-full" onClick={() => handleSelectSong()}>Click to Add Song</Button>
+                isStatic === false &&
+                <>
+                  <p className="text-black">selected: {selectedKeys.join(", ")}</p>
+                  {
+                    isSongAdded()
+                    ? <Button className="w-full bg-blue-500 hover:bg-blue-500 hover:border-2 hover:text-white" variant="outline" onClick={() => handleUnselectSong()}>Click to Remove Song</Button>
+                    : <Button className="w-full" onClick={() => handleSelectSong()}>Click to Add Song</Button>
+                  }
+                </>
               }
-
             </div>
           </div>
           <div className="w-full p-6 bg-white rounded-lg">

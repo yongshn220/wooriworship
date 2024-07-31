@@ -12,7 +12,13 @@ export interface Team {
 
 export interface TeamOption {
   worship: {
-    beginning_song_id: string
-    ending_song_id: string
+    beginning_song: {
+      id: string
+      key: string
+    }
+    ending_song: {
+      id: string
+      key: string
+    }
   }
 }

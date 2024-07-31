@@ -20,8 +20,14 @@ export interface WorshipPlan {
   description: string
   date: Date
   worshipSongWrappers: Array<WorshipSongWrapper>
-  beginningSongId: string
-  endingSongId: string
+  beginningSong: {
+    id: string,
+    key: string
+  }
+  endingSong: {
+    id: string,
+    key: string,
+  }
 }
 
 export interface WorshipSongWrapper {
@@ -29,5 +35,4 @@ export interface WorshipSongWrapper {
   song: Song
   selectedKeys: Array<string>
 }
-
 
