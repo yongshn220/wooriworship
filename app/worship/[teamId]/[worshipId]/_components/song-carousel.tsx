@@ -7,16 +7,11 @@ import {useEffect, useMemo, useState} from "react";
 import {SongCarouselItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel-item";
 import {SongHeader, Worship} from "@/models/worship";
 import {useRecoilValue} from "recoil";
-import {songAtom} from "@/global-states/song-state";
+import {songAtom, songsByWorshipIdAtom} from "@/global-states/song-state";
+import {MusicSheetUrlWrapper} from "@/components/constants/types";
 
 interface Props {
   worship: Worship
-}
-
-
-interface MusicSheetUrlWrapper {
-  note: string
-  urls: string[]
 }
 
 export function SongCarousel({worship}: Props) {
@@ -25,6 +20,7 @@ export function SongCarousel({worship}: Props) {
   const [count, setCount] = useState(worship?.songs?.length ?? 0)
   const beginningSong = useRecoilValue(songAtom(worship?.beginning_song?.id))
   const endingSong = useRecoilValue(songAtom(worship?.ending_song?.id))
+  const mainSongs = useRecoilValue(songsByWorshipIdAtom(worship?.id))
 
   useEffect(() => {
     if (!api) {
@@ -37,18 +33,22 @@ export function SongCarousel({worship}: Props) {
     })
   }, [api])
 
-  const songHeaderList = useMemo(() => {
-    const results = []
+  const musicSheetUrlWrapperList = useMemo(() => {
+    const results: MusicSheetUrlWrapper[] = []
     if (beginningSong) {
       const musicSheet = beginningSong?.music_sheets.find(ms => ms.key === worship?.beginning_song.key)
       const beginningSongHeader: MusicSheetUrlWrapper = {note: beginningSong?.description, urls: musicSheet?.urls}
       results.push(beginningSongHeader)
     }
 
-    worship?.songs.forEach(songHeader => {
-      results.push(songHeader)
+    mainSongs?.map(song => {
+      const s = useRecoilValue(songAtom(song.id))
+      const header = worship?.songs?.find(header => header.id === song?.id)
+      results.push({
+        note: header?.note,
+        urls: song?.music_sheets.
+      })
     })
-
     if (endingSong) {
       const musicSheet = endingSong?.music_sheets.find(ms => ms.key === worship?.ending_song.key)
       const endingSongHeader: MusicSheetUrlWrapper = {note: endingSong?.description, urls: musicSheet?.urls}
@@ -63,8 +63,8 @@ export function SongCarousel({worship}: Props) {
       <Carousel setApi={setApi} className="w-full h-full">
         <CarouselContent>
           {
-            songHeaderList.map((header, index) => (
-              <SongCarouselItem key={index} songHeader={header}/>
+            musicSheetUrlWrapperList.map((header, index) => (
+              <SongCarouselItem key={index} musicSheetHeader={header}/>
           ))}
         </CarouselContent>
         <CarouselPrevious />

@@ -31,8 +31,8 @@ class WorshipService extends BaseService {
       title: worshipInput?.title,
       description: worshipInput?.description,
       songs: worshipInput?.worshipSongWrappers.map((wrapper) => ({id: wrapper.song.id, note: wrapper.note, selected_keys: wrapper.selectedKeys})),
-      beginning_song_id: worshipInput?.beginningSongId,
-      ending_song_id: worshipInput?.endingSongId,
+      beginning_song: worshipInput.beginningSong,
+      ending_song: worshipInput.endingSong,
       created_by: {
         id: userId,
         time: Timestamp.fromDate(new Date()),
@@ -51,8 +51,8 @@ class WorshipService extends BaseService {
       title: worshipInput?.title,
       description: worshipInput?.description,
       songs: worshipInput?.worshipSongWrappers.map((songInfo) => ({id: songInfo.song.id, note: songInfo.note})),
-      beginning_song_id: worshipInput?.beginningSongId,
-      ending_song_id: worshipInput?.endingSongId,
+      beginning_song: worshipInput.beginningSong,
+      ending_song: worshipInput.endingSong,
       updated_by: {
         id: userId,
         time: new Date()
