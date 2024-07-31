@@ -1,12 +1,7 @@
 "use client"
 
 import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
-import {
-  worshipBeginningSongWrapperAtom,
-  worshipEndingSongWrapperAtom
-} from "@/app/board/[teamId]/plan/_components/status";
-import {SongListItem, ViewMode} from "@/app/board/[teamId]/song/_components/song-list-item";
-import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
+import {worshipBeginningSongWrapperAtom, worshipEndingSongWrapperAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {WorshipSpecialOrderType} from "@/components/constants/enums";
 import {Checkbox} from "@/components/ui/checkbox";
 import {useEffect, useState} from "react";
@@ -15,10 +10,7 @@ import {TeamOption} from "@/models/team";
 import {TeamService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
 import {songAtom} from "@/global-states/song-state";
-import {
-  SelectSongDetailCardWrapper
-} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
-import {SongListPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-preview-item";
+import {SelectSongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
 import {WorshipSongPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/worship-song-preview-item";
 
 interface Props {
@@ -34,20 +26,27 @@ export function StaticSongCard({teamId, specialOrderType, songWrapper}: Props) {
   const [team, setTeam] = useRecoilState(teamAtom(teamId))
   const setWorshipBeginningSongWrapper = useSetRecoilState(worshipBeginningSongWrapperAtom)
   const setWorshipEndingSongWrapper = useSetRecoilState(worshipEndingSongWrapperAtom)
-  const [checked, setChecked] = useState<CheckState>(false)
+  const [isDefaultChecked, setDefaultChecked] = useState<CheckState>(false)
 
   useEffect(() => {
+    const option = team?.option?.worship
     if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
-      if (team?.option?.worship?.beginning_song?.id && team?.option?.worship?.beginning_song?.id === songWrapper?.id) {
-        setChecked(true)
+      if (option?.beginning_song?.id && option?.beginning_song?.id === songWrapper?.id && option?.beginning_song?.key === songWrapper?.key) {
+        setDefaultChecked(true)
+      }
+      else {
+        setDefaultChecked(false)
       }
     }
     else {
-      if (team?.option?.worship?.ending_song?.id && team?.option?.worship?.ending_song?.id === songWrapper?.id) {
-        setChecked(true)
+      if (option?.ending_song?.id && option?.ending_song?.id === songWrapper?.id && option?.ending_song?.key === songWrapper?.key) {
+        setDefaultChecked(true)
+      }
+      else {
+        setDefaultChecked(false)
       }
     }
-  }, [songWrapper.id, specialOrderType, team?.option?.worship])
+  }, [songWrapper.id, specialOrderType, team?.option?.worship, songWrapper?.key])
 
   function handleRemoveSong() {
     if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
@@ -61,13 +60,16 @@ export function StaticSongCard({teamId, specialOrderType, songWrapper}: Props) {
   function handleCheckStateChange(state: CheckState) {
     if (state === "indeterminate") state = false
 
-    setChecked(state)
-    setStaticSongAsDefaultOption(state as boolean).then()
+    setStaticSongAsDefaultOption(state as boolean).then((isSuccess) => {
+      if (isSuccess) {
+        setDefaultChecked(state)
+      }
+    })
   }
 
   async function setStaticSongAsDefaultOption(state: boolean) {
     try {
-      const teamOption: TeamOption = {...team?.option}
+      let teamOption: TeamOption = JSON.parse(JSON.stringify(team?.option))
 
       if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
         teamOption.worship.beginning_song = (state)? {id: songWrapper?.id, key: songWrapper?.key} : {id: null, key: null}
@@ -76,16 +78,17 @@ export function StaticSongCard({teamId, specialOrderType, songWrapper}: Props) {
         teamOption.worship.ending_song = (state)? {id: songWrapper?.id, key: songWrapper?.key} : {id: null, key: null}
       }
 
-      setTeam((prev) => ({...prev, option: teamOption}))
       if (await TeamService.updateTeamOption(teamId, teamOption) === false) {
         /* On Error */
         console.log("err:setStaticSongAsDefaultOption")
         toast({
           title: "Fail to set default Beginning/Ending song. Please try again"
         })
+        return false
       }
 
       /* On Success */
+      setTeam((prev) => ({...prev, option: teamOption}))
       if (state) {
         toast({
           title: `Default ${(specialOrderType === WorshipSpecialOrderType.BEGINNING) ? "Beginning" : "Ending"} song updated`,
@@ -97,12 +100,14 @@ export function StaticSongCard({teamId, specialOrderType, songWrapper}: Props) {
           title: `Default ${(specialOrderType === WorshipSpecialOrderType.BEGINNING) ? "Beginning" : "Ending"} song canceled`,
         })
       }
+      return true
     }
     catch (e) {
       console.log("err:setStaticSongAsDefaultOption", e)
       toast({
         title: "Fail to set default Beginning/Ending song. Please try again"
       })
+      return false
     }
   }
 
@@ -133,19 +138,17 @@ export function StaticSongCard({teamId, specialOrderType, songWrapper}: Props) {
       </div>
       <div className="flex-between px-2 pt-1">
         <div className="flex items-center space-x-2">
-          <Checkbox id={`checkedBox_${specialOrderType}`} checked={checked} onCheckedChange={(state) => handleCheckStateChange(state)}/>
+          <Checkbox id={`checkedBox_${specialOrderType}`} checked={isDefaultChecked} onCheckedChange={(state) => handleCheckStateChange(state)}/>
           <label
             htmlFor={`checkedBox_${specialOrderType}`}
-            className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-500"
+            className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-500 cursor-pointer"
           >
             Set as default for future plan
           </label>
         </div>
 
         <div className="flex-end text-smnpx shadcn-ui@latest add dropdown-menu">
-          <div className="text-gray-500 hover:text-gray-700 cursor-pointer text-sm"
-               onClick={() => handleRemoveSong()}>remove
-          </div>
+          <div className="text-gray-500 hover:text-gray-700 cursor-pointer text-sm" onClick={() => handleRemoveSong()}>remove</div>
         </div>
       </div>
     </div>
