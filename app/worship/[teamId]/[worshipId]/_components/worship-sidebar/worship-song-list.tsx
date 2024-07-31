@@ -15,14 +15,13 @@ export function WorshipSongList({worshipId}: Props) {
   return (
     <div>
       {
-        worship.songs.map((songHeader, i) => (
+        worship?.songs.map((songHeader, i) => (
           <WorshipSongItem key={i} songHeader={songHeader}/>
         ))
       }
     </div>
   )
 }
-
 
 function WorshipSongItem({songHeader}: {songHeader: SongHeader}) {
   const song = useRecoilValue(songAtom(songHeader?.id))

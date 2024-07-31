@@ -7,9 +7,9 @@ import {songAtom} from "@/global-states/song-state";
 import {useRecoilValue} from "recoil";
 
 interface Props {
-  songHeader: SongHeader
+  musicSheetHeader: SongHeader
 }
-export function SongCarouselItem({songHeader}: Props) {
+export function SongCarouselItem({musicSheetHeader}: Props) {
   const song = useRecoilValue(songAtom(songHeader?.id))
 
   if (!song) return <></>

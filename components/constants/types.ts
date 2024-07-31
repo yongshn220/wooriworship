@@ -36,3 +36,7 @@ export interface WorshipSongWrapper {
   selectedKeys: Array<string>
 }
 
+export interface MusicSheetUrlWrapper {
+  note: string
+  urls: string[]
+}
