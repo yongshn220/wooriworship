@@ -116,7 +116,8 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
         })
       }
     }
-  }, [mode, setBeginningSongWrapper, setEndingSongWrapper, team?.option?.worship, worship?.beginning_song?.id, worship?.beginning_song?.key, worship?.ending_song?.id, worship?.ending_song?.key])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, setBeginningSongWrapper, setEndingSongWrapper])
 
   function isSessionValid() {
     if (!authUser?.uid) {
