@@ -34,27 +34,28 @@ export function SongCarousel({worship}: Props) {
   }, [api])
 
   const musicSheetUrlWrapperList = useMemo(() => {
-    const results: MusicSheetUrlWrapper[] = []
-    if (beginningSong) {
-      const musicSheet = beginningSong?.music_sheets.find(ms => ms.key === worship?.beginning_song.key)
-      const beginningSongHeader: MusicSheetUrlWrapper = {note: beginningSong?.description, urls: musicSheet?.urls}
-      results.push(beginningSongHeader)
-    }
-
-    mainSongs?.map(song => {
-      const s = useRecoilValue(songAtom(song.id))
-      const header = worship?.songs?.find(header => header.id === song?.id)
-      results.push({
-        note: header?.note,
-        urls: song?.music_sheets.
-      })
-    })
-    if (endingSong) {
-      const musicSheet = endingSong?.music_sheets.find(ms => ms.key === worship?.ending_song.key)
-      const endingSongHeader: MusicSheetUrlWrapper = {note: endingSong?.description, urls: musicSheet?.urls}
-      results.push(endingSongHeader)
-    }
-    return results
+    return []
+    // const results: MusicSheetUrlWrapper[] = []
+    // if (beginningSong) {
+    //   const musicSheet = beginningSong?.music_sheets.find(ms => ms.key === worship?.beginning_song.key)
+    //   const beginningSongHeader: MusicSheetUrlWrapper = {note: beginningSong?.description, urls: musicSheet?.urls}
+    //   results.push(beginningSongHeader)
+    // }
+    //
+    // mainSongs?.map(song => {
+    //   const s = useRecoilValue(songAtom(song.id))
+    //   const header = worship?.songs?.find(header => header.id === song?.id)
+    //   results.push({
+    //     note: header?.note,
+    //     urls: song?.music_sheets.
+    //   })
+    // })
+    // if (endingSong) {
+    //   const musicSheet = endingSong?.music_sheets.find(ms => ms.key === worship?.ending_song.key)
+    //   const endingSongHeader: MusicSheetUrlWrapper = {note: endingSong?.description, urls: musicSheet?.urls}
+    //   results.push(endingSongHeader)
+    // }
+    // return results
   }, [beginningSong, endingSong, worship?.beginning_song.key, worship?.ending_song.key, worship?.songs])
 
 
