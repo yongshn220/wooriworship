@@ -53,6 +53,28 @@ class MusicSheetService extends BaseService {
     }
   }
 
+  async updateMusicSheet(userId, songId, musicSheetContainer: MusicSheetContainer) {
+    try {
+      if (!musicSheetContainer?.id) {
+        return await this.addNewMusicSheet(userId, songId, musicSheetContainer)
+      }
+
+      const data = {
+        key: musicSheetContainer?.key,
+        urls: musicSheetContainer?.imageFileContainers?.map((iContainer => iContainer.url)),
+        updated_by: {
+          id: userId,
+          timestamp: getFirebaseTimestampNow()
+        }
+      }
+      return await this.update(musicSheetContainer?.id, data)
+    }
+    catch (e) {
+      console.log(e)
+      return null
+    }
+  }
+
   async addNewMusicSheets(userId: string, songId: string, musicSheetContainers: MusicSheetContainer[]) {
     try {
       const promises = []

@@ -9,12 +9,51 @@ export const musicSheetIdsAtom = atomFamily<Array<string>, string>({
     key: "musicSheetIdsAtom/default",
     get: (songId: string) => async ({get}) => {
       if (!songId) return []
-
       try {
+        get(musicSheetIdsUpdaterAtom)
+
         const musicSheetList = await MusicSheetService.getByFilters([{a: 'song_id', b: '==', c: songId}]) as Array<MusicSheet>
         if (!musicSheetList) return []
 
         return musicSheetList?.map(sheet => sheet.id)
+      }
+      catch (e) {
+        console.log(e)
+        return []
+      }
+    }
+  })
+})
+
+export const musicSheetIdsUpdaterAtom = atom({
+  key: "musicSheetIdsUpdaterAtom",
+  default: 0
+})
+
+export const musicSheetsBySongIdAtom = atomFamily<Array<MusicSheet>, string>({
+  key: "musicSheetsAtom",
+  default: selectorFamily({
+    key: "musicSheetsAtom/default",
+    get: (songId: string) => async ({get}) => {
+      try {
+        if (!songId) return []
+
+        const musicSheetIds =  get(musicSheetIdsAtom(songId))
+        if (!musicSheetIds) {
+          console.log("err:musicSheetsBySongIdAtom. musicSheetIds not exists"); return []
+        }
+
+        const musicSheetListPromise = musicSheetIds?.map(id => get(musicSheetAtom(id)))
+        if (!musicSheetListPromise) {
+          console.log("err:musicSheetsBySongIdAtom. musicSheetListPromise not exists"); return []
+        }
+
+        const songMusicSheetList = await Promise.all(musicSheetListPromise)
+        if (!songMusicSheetList) {
+          console.log("err:musicSheetsBySongIdAtom. songMusicSheetList not exists"); return []
+        }
+
+        return songMusicSheetList
       }
       catch (e) {
         console.log(e)

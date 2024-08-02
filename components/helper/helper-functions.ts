@@ -1,8 +1,9 @@
 import {Timestamp} from "@firebase/firestore";
 import JSZip from 'jszip';
 import {saveAs} from "file-saver";
-import {Song, SongMusicSheet} from "@/models/song";
+import {Song} from "@/models/song";
 import {MusicSheetContainer} from "@/components/constants/types";
+import {MusicSheet} from "@/models/music_sheet";
 
 export function getFirebaseTimestampNow() {
   return Timestamp.fromDate(new Date())
@@ -292,7 +293,7 @@ export function getAllUrlsFromMusicSheetContainers(mContainers: MusicSheetContai
     return urls
   }
 
-export function getAllUrlsFromSongMusicSheets(musicSheets: SongMusicSheet[]) {
+export function getAllUrlsFromSongMusicSheets(musicSheets: MusicSheet[]) {
     if (!musicSheets) {
       console.log("getAllUrlsFromSongMusicSheets: musicSheets are not exists."); return []
     }
