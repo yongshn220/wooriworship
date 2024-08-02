@@ -56,7 +56,7 @@ export function SongCarousel({worship}: Props) {
     //   results.push(endingSongHeader)
     // }
     // return results
-  }, [beginningSong, endingSong, worship?.beginning_song.key, worship?.ending_song.key, worship?.songs])
+  }, [beginningSong, endingSong, worship?.beginning_song?.key, worship?.ending_song?.key, worship?.songs])
 
 
   return (
