@@ -7,6 +7,7 @@ import {getTimePassedFromTimestamp, getTimePassedFromTimestampShorten} from "@/c
 import {Badge} from "@/components/ui/badge";
 import {Checkbox} from "@/components/ui/checkbox";
 import {SongKeyBox} from "@/components/song/song-key-box";
+import {musicSheetIdsAtom} from "@/global-states/music-sheet-state";
 
 interface Props {
   songId: string
@@ -21,6 +22,7 @@ export enum ViewMode {
 export function SongListItem({songId, viewMode=ViewMode.ROUTE}: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
   const song = useRecoilValue(songAtom(songId))
+  const musicSheetIds = useRecoilValue(musicSheetIdsAtom(song?.id))
   const router = useRouter()
 
   function handleSongCardClick() {
@@ -35,8 +37,8 @@ export function SongListItem({songId, viewMode=ViewMode.ROUTE}: Props) {
         <div className="flex gap-2">
           <p className="font-semibold text-md">{song?.title} <span className="text-sm text-gray-700">{song?.subtitle ? `(${song.subtitle})` : ""}</span> </p>
           {
-            song?.music_sheets?.length > 0 && song?.music_sheets?.map((musicSheet, index) => (
-              <SongKeyBox key={index} musicKey={musicSheet?.key}/>
+            musicSheetIds?.map((musicSheetId, index) => (
+              <SongKeyBox key={index} musicSheetId={musicSheetId}/>
             ))
           }
         </div>
