@@ -11,6 +11,7 @@ import {SongDetailContent} from "@/app/board/[teamId]/song/_components/song-deta
 import {cn} from "@/lib/utils";
 import {selectedWorshipSongWrapperListAtom, worshipBeginningSongWrapperAtom, worshipEndingSongWrapperAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {toast} from "@/components/ui/use-toast";
+import {musicSheetAtom, musicSheetIdsAtom, musicSheetsBySongIdAtom} from "@/global-states/music-sheet-state";
 
 interface Props {
   teamId: string
@@ -25,6 +26,7 @@ interface Props {
 
 export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selectedKeys, setSelectedKeys, readOnly=false, isStatic=false}: Props) {
   const song = useRecoilValue(songAtom(songId))
+  const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songId))
   const [selectedSongWrapperList, setSelectedSongWrapperList] = useRecoilState(selectedWorshipSongWrapperListAtom)
   const beginningSongWrapper = useRecoilState(worshipBeginningSongWrapperAtom)
   const endingSongWrapper = useRecoilState(worshipEndingSongWrapperAtom)
@@ -72,7 +74,7 @@ export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selecte
               <p className="text-3xl font-semibold">Select Keys</p>
               <div className="flex-center gap-2">
                 {
-                  song?.music_sheets.map((sheet, index) => (
+                  musicSheets?.map((sheet, index) => (
                     <div
                       key={index}
                       className={

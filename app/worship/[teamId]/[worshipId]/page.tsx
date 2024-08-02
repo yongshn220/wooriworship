@@ -61,10 +61,10 @@ export default function WorshipPage({params}: any) {
         </div>
         <div className="flex flex-col w-full gap-4">
           {
-            worship?.beginning_song_id &&
+            worship?.beginning_song?.id &&
             <div className="flex-center">
-              <SongDetailCardWrapper key={worship?.beginning_song_id} teamId={teamId} songId={worship?.beginning_song_id}>
-                <SongListPreviewItem songId={worship?.beginning_song_id} customTags={["beginning"]}/>
+              <SongDetailCardWrapper key={worship?.beginning_song?.id} teamId={teamId} songId={worship?.beginning_song?.id}>
+                <SongListPreviewItem songId={worship?.beginning_song?.id} customTags={["beginning"]}/>
               </SongDetailCardWrapper>
             </div>
           }
@@ -76,10 +76,10 @@ export default function WorshipPage({params}: any) {
             ))
           }
           {
-            worship?.ending_song_id &&
+            worship?.ending_song?.id &&
             <div className="flex-center">
-              <SongDetailCardWrapper key={worship?.ending_song_id} teamId={teamId} songId={worship?.ending_song_id}>
-                <SongListPreviewItem songId={worship?.ending_song_id} customTags={["ending"]}/>
+              <SongDetailCardWrapper key={worship?.ending_song?.id} teamId={teamId} songId={worship?.ending_song?.id}>
+                <SongListPreviewItem songId={worship?.ending_song?.id} customTags={["ending"]}/>
               </SongDetailCardWrapper>
             </div>
           }

@@ -1,11 +1,7 @@
 import {useRecoilValue} from "recoil";
-import {currentTeamIdAtom} from "@/global-states/teamState";
 import {songAtom} from "@/global-states/song-state";
-import {useRouter} from "next/navigation";
-import {getPathSongDetail} from "@/components/helper/routes";
-import {getTimePassedFromTimestamp, getTimePassedFromTimestampShorten} from "@/components/helper/helper-functions";
-import {Badge} from "@/components/ui/badge";
-import {Checkbox} from "@/components/ui/checkbox";
+import {musicSheetIdsAtom} from "@/global-states/music-sheet-state";
+import {SongKeyBox} from "@/components/song/song-key-box";
 
 interface Props {
   songId: string
@@ -15,6 +11,7 @@ interface Props {
 
 export function SongListPreviewItem({songId, customTags=[]}: Props) {
   const song = useRecoilValue(songAtom(songId))
+  const musicSheetIds = useRecoilValue(musicSheetIdsAtom(songId))
 
   return (
     <div className="flex w-full px-4 rounded-lg cursor-pointer py-2 my-2 hover:bg-gray-100">
@@ -27,11 +24,11 @@ export function SongListPreviewItem({songId, customTags=[]}: Props) {
                 {song?.subtitle ? ` (${song.subtitle})` : ""}
               </span>
             </p>
-            {song?.key && (
-              <div className="flex-center text-sm text-white font-medium bg-gray-400 rounded-sm w-5 h-5">
-                {song.key}
-              </div>
-            )}
+            {
+              musicSheetIds?.map(((musicSheetId, index) => (
+                <SongKeyBox key={index} musicSheetId={musicSheetId}/>
+              )))
+            }
           </div>
           <div className="flex flex-shrink-0 items-center gap-2">
             {song?.version && (
