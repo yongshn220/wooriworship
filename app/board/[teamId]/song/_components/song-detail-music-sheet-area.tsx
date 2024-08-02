@@ -1,9 +1,15 @@
 import React, {useState} from "react";
 import {SongMusicSheetViewer} from "@/app/board/[teamId]/song/_components/song-music-sheet-viewer";
 import Image from "next/image";
+import {useRecoilValue} from "recoil";
+import {musicSheetAtom} from "@/global-states/music-sheet-state";
 
 
-export function SongDetailMusicSheetArea({urls}: {urls: string[]}) {
+interface Props {
+  musicSheetId: string
+}
+export function SongDetailMusicSheetArea({musicSheetId}: Props) {
+  const musicSheet = useRecoilValue(musicSheetAtom(musicSheetId))
   const [isMusicSheetViewOpen, setMusicSheetViewOpen] = useState(false)
 
   function handleMusicSheetClick() {
@@ -12,13 +18,13 @@ export function SongDetailMusicSheetArea({urls}: {urls: string[]}) {
 
   return (
     <>
-      <SongMusicSheetViewer isOpen={isMusicSheetViewOpen} setIsOpen={setMusicSheetViewOpen} musicSheetUrls={urls}/>
+      <SongMusicSheetViewer isOpen={isMusicSheetViewOpen} setIsOpen={setMusicSheetViewOpen} musicSheetUrls={musicSheet?.urls}/>
       {
-        urls.length > 0 &&
+        musicSheet?.urls?.length > 0 &&
         <div className="flex-center w-full h-60 aspect-square">
           <div className="flex-center w-full h-full gap-4 overflow-x-auto pb-2">
             {
-              urls.map((url: string, i: number) => (
+              musicSheet?.urls?.map((url: string, i: number) => (
                 <div key={i} className="relative flex flex-col h-full aspect-[3/4] border rounded bg-white" onClick={handleMusicSheetClick}>
                   <div className="relative flex-1 flex-start rounded-md">
                     <Image

@@ -4,10 +4,11 @@ import {Button} from "@/components/ui/button";
 import {LinkIcon} from "lucide-react";
 import {Badge} from "@/components/ui/badge";
 import {getTimePassedFromTimestamp, OpenYoutubeLink} from "@/components/helper/helper-functions";
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
 import {SongDetailMusicSheetArea} from "@/app/board/[teamId]/song/_components/song-detail-music-sheet-area";
+import {musicSheetAtom, musicSheetIdsAtom} from "@/global-states/music-sheet-state";
 
 
 interface Props {
@@ -15,14 +16,14 @@ interface Props {
 }
 
 export function SongDetailContent({songId}: Props) {
-  const [selectedKeyIndex, setSelectedKeyIndex] = useState(0)
   const song = useRecoilValue(songAtom(songId))
+  const musicSheetIds = useRecoilValue(musicSheetIdsAtom(song?.id))
+  const [selectedMusicSheetId, setSelectedMusicSheetId] = useState<string>(null)
 
-  const selectedMusicSheet = useMemo(() => {
-    if (selectedKeyIndex < 0 || selectedKeyIndex > song?.music_sheets.length - 1) return null
+  useEffect(() => {
+    setSelectedMusicSheetId(musicSheetIds? musicSheetIds[0] : null)
+  }, [musicSheetIds])
 
-    return song?.music_sheets[selectedKeyIndex]
-  }, [song?.music_sheets, selectedKeyIndex])
 
   function handleLinkButtonClick() {
     if (song?.original?.url) {
@@ -47,8 +48,8 @@ export function SongDetailContent({songId}: Props) {
         </Label>
         <div className="flex gap-2">
           {
-            song?.music_sheets?.length > 0 && song?.music_sheets?.map((musicSheet, index) => (
-              <SongKeyBox key={index} musicKey={musicSheet?.key}/>
+            musicSheetIds?.map((musicSheetId, index) => (
+              <SongKeyBox key={index} musicSheetId={musicSheetId}/>
             ))
           }
         </div>
@@ -109,27 +110,38 @@ export function SongDetailContent({songId}: Props) {
             <p className="text-white">Select Key</p>
             <div className="flex-center gap-2">
               {
-                song?.music_sheets?.map((musicSheet, index) => (
-                  <Badge
-                    key={index}
-                    variant={(selectedKeyIndex === index) ? "default" : "outline"}
-                    className="cursor-pointer w-8 h-8 flex-center text-white"
-                    onClick={() => setSelectedKeyIndex(index)}
-                  >
-                    {musicSheet?.key}
-                  </Badge>
+                musicSheetIds.map((musicSheetId, index) => (
+                  <MusicSheetKey key={index} musicSheetId={musicSheetId} selectedMusicSheetId={selectedMusicSheetId} setSelectedMusicSheetId={setSelectedMusicSheetId}/>
                 ))
               }
             </div>
           </div>
           <div className="flex-center">
-            {
-              selectedMusicSheet &&
-              <SongDetailMusicSheetArea urls={selectedMusicSheet?.urls}/>
-            }
+            <SongDetailMusicSheetArea musicSheetId={selectedMusicSheetId} />
           </div>
         </div>
       </div>
     </div>
+  )
+}
+
+
+interface MusicSheetKeyProps {
+  musicSheetId: string
+  selectedMusicSheetId: string
+  setSelectedMusicSheetId: React.Dispatch<React.SetStateAction<string>>
+}
+
+function MusicSheetKey({musicSheetId, selectedMusicSheetId, setSelectedMusicSheetId}: MusicSheetKeyProps) {
+  const musicSheet = useRecoilValue(musicSheetAtom(musicSheetId))
+
+  return (
+    <Badge
+      variant={(selectedMusicSheetId === musicSheetId) ? "default" : "outline"}
+      className="cursor-pointer w-8 h-8 flex-center text-white"
+      onClick={() => setSelectedMusicSheetId(musicSheetId)}
+    >
+      {musicSheet?.key}
+    </Badge>
   )
 }

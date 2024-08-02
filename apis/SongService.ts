@@ -1,8 +1,9 @@
 import {BaseService, StorageService} from ".";
 import SongCommentService from "./SongCommentService";
-import {SongFormParam} from "@/app/board/[teamId]/song/_components/song-form";
+import {SongInput} from "@/app/board/[teamId]/song/_components/song-form";
 import {Song} from "@/models/song";
-import {getAllUrlsFromSongMusicSheets, getFirebaseTimestampNow} from "@/components/helper/helper-functions";
+import {getFirebaseTimestampNow} from "@/components/helper/helper-functions";
+import MusicSheetService from "@/apis/MusicSheetService";
 
 
 class SongService extends BaseService {
@@ -22,22 +23,21 @@ class SongService extends BaseService {
     return songs
   }
 
-  async addNewSong(userId: string, teamId: string, songFormParam: SongFormParam) {
+  async addNewSong(userId: string, teamId: string, songInput: SongInput) {
     try {
-      const music_sheets = songFormParam?.musicSheetContainers?.map((mContainer) => ({key: mContainer.key, urls: mContainer.imageFileContainers.map(iContainer => iContainer.url)}))
       const newSong: Song = {
         team_id: teamId,
-        title: songFormParam.title,
-        subtitle: songFormParam.subtitle,
+        title: songInput.title,
+        subtitle: songInput.subtitle,
         original: {
-          author: songFormParam.author,
-          url: songFormParam.link
+          author: songInput.author,
+          url: songInput.link
         },
-        version: songFormParam.version,
-        description: songFormParam.description,
+        version: songInput.version,
+        description: songInput.description,
         lyrics: "",
-        bpm: songFormParam.bpm,
-        tags: songFormParam.tags,
+        bpm: songInput.bpm,
+        tags: songInput.tags,
         created_by: {
           id: userId,
           time: getFirebaseTimestampNow(),
@@ -47,7 +47,6 @@ class SongService extends BaseService {
           time: getFirebaseTimestampNow()
         },
         last_used_time: getFirebaseTimestampNow(),
-        music_sheets: music_sheets,
       }
       return await this.create(newSong);
     }
@@ -62,31 +61,31 @@ class SongService extends BaseService {
   }
 
   async updateSong(userId: string, songId: string, songFormParam: SongFormParam) {
-    try {
-      const music_sheets = songFormParam?.musicSheetContainers?.map((mContainer) => ({key: mContainer.key, urls: mContainer.imageFileContainers.map(iContainer => iContainer.url)}))
-      const song = {
-        title: songFormParam.title,
-        subtitle: songFormParam.subtitle,
-        original: {
-          author: songFormParam.author,
-          url: songFormParam.link
-        },
-        version: songFormParam.version,
-        description: songFormParam.description,
-        lyrics: "",
-        bpm: songFormParam.bpm,
-        tags: songFormParam.tags,
-        updated_by: {
-          id: userId,
-          time: getFirebaseTimestampNow()
-        },
-        music_sheets: music_sheets
-      }
-      return await this.update(songId, song);
-    }
-    catch (e) {
-      console.log(e)
-    }
+    // try {
+    //   const music_sheets = songFormParam?.musicSheetContainers?.map((mContainer) => ({key: mContainer.key, urls: mContainer.imageFileContainers.map(iContainer => iContainer.url)}))
+    //   const song = {
+    //     title: songFormParam.title,
+    //     subtitle: songFormParam.subtitle,
+    //     original: {
+    //       author: songFormParam.author,
+    //       url: songFormParam.link
+    //     },
+    //     version: songFormParam.version,
+    //     description: songFormParam.description,
+    //     lyrics: "",
+    //     bpm: songFormParam.bpm,
+    //     tags: songFormParam.tags,
+    //     updated_by: {
+    //       id: userId,
+    //       time: getFirebaseTimestampNow()
+    //     },
+    //     music_sheets: music_sheets
+    //   }
+    //   return await this.update(songId, song);
+    // }
+    // catch (e) {
+    //   console.log(e)
+    // }
   }
 
   async deleteSong(songId: string) {
@@ -98,10 +97,16 @@ class SongService extends BaseService {
       const promises = [];
       const comments = await SongCommentService.getSongComments(song.id, song.team_id);
       for (const comment of comments) {
-        promises.push(SongCommentService.delete(comment.id));
+        promises.push(SongCommentService.delete(comment?.id));
       }
-      const songUrls = getAllUrlsFromSongMusicSheets(song?.music_sheets)
-      promises.push(StorageService.deleteFileByUrls(songUrls?? []))
+
+      const musicSheets = await MusicSheetService.getSongMusicSheets(song.id)
+      for (const musicSheet of musicSheets) {
+        promises.push(MusicSheetService.delete(musicSheet?.id))
+      }
+
+      const musicSheetUrls = musicSheets?.map(ms => ms.url)
+      promises.push(StorageService.deleteFileByUrls(musicSheetUrls?? []))
       await Promise.all(promises);
       await this.delete(songId);
       return true;

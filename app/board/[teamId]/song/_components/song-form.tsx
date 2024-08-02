@@ -1,13 +1,6 @@
 'use client'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
@@ -31,8 +24,8 @@ import {ImageFileContainer, MusicSheetContainer} from "@/components/constants/ty
 import {PlusIcon} from "lucide-react";
 import {v4 as uuid} from "uuid";
 import {Cross2Icon} from "@radix-ui/react-icons";
-import {SongMusicSheet} from "@/models/song";
-import {getAllUrlsFromMusicSheetContainers, getAllUrlsFromSongMusicSheets} from "@/components/helper/helper-functions";
+import MusicSheetService from "@/apis/MusicSheetService";
+import {musicSheetIdsAtom} from "@/global-states/music-sheet-state";
 
 
 interface Props {
@@ -52,19 +45,13 @@ export interface SongInput {
   description: string
 }
 
-export interface SongFormParam extends SongInput {
-  musicSheetContainers: MusicSheetContainer[]
-}
-
-
 export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   const song = useRecoilValue(songAtom(songId))
-  const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtom(teamId))
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom(teamId))
-  const [input, setInput] = useState<SongInput>({
+  const [songInput, setSongInput] = useState<SongInput>({
     title: (mode === FormMode.EDIT)? song?.title?? "" : "",
     subtitle: (mode === FormMode.EDIT)? song?.subtitle?? "" : "",
     author: (mode === FormMode.EDIT)? song?.original.author?? "" : "",
@@ -82,21 +69,21 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
 
   useEffect(() => {
     if (mode === FormMode.EDIT) {
-      const _musicSheetContainers: MusicSheetContainer[] = []
-      song?.music_sheets.forEach((musicSheet) => {
-        const mContainer: MusicSheetContainer = {
-          tempId: uuid(),
-          key: musicSheet?.key,
-          imageFileContainers: musicSheet?.urls?.map(url => {
-            const iContainer: ImageFileContainer = {id: "", file: null, url: url, isLoading: false, isUploadedInDatabase: true}
-            return iContainer
-          })
-        }
-        _musicSheetContainers.push(mContainer)
-      })
-      setMusicSheetContainers(_musicSheetContainers)
+      // const _musicSheetContainers: MusicSheetContainer[] = []
+      // song?.music_sheets.forEach((musicSheet) => {
+      //   const mContainer: MusicSheetContainer = {
+      //     tempId: uuid(),
+      //     key: musicSheet?.key,
+      //     imageFileContainers: musicSheet?.urls?.map(url => {
+      //       const iContainer: ImageFileContainer = {id: "", file: null, url: url, isLoading: false, isUploadedInDatabase: true}
+      //       return iContainer
+      //     })
+      //   }
+      //   _musicSheetContainers.push(mContainer)
+      // })
+      // setMusicSheetContainers(_musicSheetContainers)
     }
-  }, [mode, song?.music_sheets])
+  }, [mode])
 
   function createValidCheck() {
     if (!authUser?.uid) {
@@ -110,7 +97,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
 
   function clearContents() {
     const songInput: SongInput = {title: "", subtitle: "", author: "", version: "", link: "", tags: [], bpm: null, description: ""}
-    setInput(songInput)
+    setSongInput(songInput)
     setMusicSheetContainers([])
   }
 
@@ -119,25 +106,27 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     if (!createValidCheck()) return false
 
     try {
-      const uploadedMusicSheetContainers = await uploadMusicSheetContainers(musicSheetContainers)
-      const SongFormParam: SongFormParam = {...input, musicSheetContainers: uploadedMusicSheetContainers}
-
-      const newSongId = await SongService.addNewSong(authUser?.uid, teamId, SongFormParam)
+      const newSongId = await SongService.addNewSong(authUser?.uid, teamId, songInput)
       if (!newSongId) {
         console.log("err:song-form:handleCreate. Fail to create a song")
         toast({description: `Fail to create a song. Please try again.`})
         return
       }
 
-      const result = await TagService.addNewTags(teamId, SongFormParam.tags)
-      if (!result) {
+      const uploadedMusicSheetContainers = await uploadMusicSheetContainers(musicSheetContainers)
+      if (await MusicSheetService.addNewMusicSheets(authUser?.uid, newSongId, uploadedMusicSheetContainers) === false) {
+        console.log("err:song-form:handleCreate. Fail to create music sheets."); return
+      }
+
+      if (await TagService.addNewTags(teamId, songInput.tags) === false) {
         console.log("err:song-form:handleCreate. Fail to create tags")
       }
 
       toast({
         title: `New Song Created!`,
-        description: `${team?.name} - ${SongFormParam.title}`,
+        description: `${team?.name} - ${songInput.title}`,
       })
+
       setCurrentTeamSongIds((prev) => ([newSongId, ...prev])) // update song board (locally)
       router.push(getPathSongDetail(teamId, newSongId))
       clearContents()
@@ -169,36 +158,36 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   }
 
   async function handleEdit() {
-    setIsLoading(true)
-    if (!editValidCheck()) return false
-
-    try {
-      const newMusicSheetContainers = await uploadMusicSheetContainers(musicSheetContainers)
-      const urlsToDelete = getNotExistUrlsFromMusicSheets(song?.music_sheets, newMusicSheetContainers)
-      if (await StorageService.deleteFileByUrls(urlsToDelete) === false) {
-        console.log("handleEdit: Fail to delete urls")
-      }
-
-      const songFormParam: SongFormParam = {...input, musicSheetContainers: newMusicSheetContainers}
-      const promises = [];
-      promises.push(SongService.updateSong(authUser?.uid, song?.id, songFormParam));
-      promises.push(TagService.addNewTags(teamId, songFormParam.tags));
-      await Promise.all(promises)
-
-      setSongUpdater((prev) => prev + 1)
-
-      toast({title: "Song edited successfully."})
-      setIsOpen(false)
-      setIsLoading(false)
-    }
-    catch (e) {
-      console.log(e)
-    }
-    finally {
-      clearContents()
-      setIsOpen(false)
-      setIsLoading(false)
-    }
+    // setIsLoading(true)
+    // if (!editValidCheck()) return false
+    //
+    // try {
+    //   const newMusicSheetContainers = await uploadMusicSheetContainers(musicSheetContainers)
+    //   const urlsToDelete = getNotExistUrlsFromMusicSheets(song?.music_sheets, newMusicSheetContainers)
+    //   if (await StorageService.deleteFileByUrls(urlsToDelete) === false) {
+    //     console.log("handleEdit: Fail to delete urls")
+    //   }
+    //
+    //   const songFormParam: SongFormParam = {...input, musicSheetContainers: newMusicSheetContainers}
+    //   const promises = [];
+    //   promises.push(SongService.updateSong(authUser?.uid, song?.id, songFormParam));
+    //   promises.push(TagService.addNewTags(teamId, songFormParam.tags));
+    //   await Promise.all(promises)
+    //
+    //   setSongUpdater((prev) => prev + 1)
+    //
+    //   toast({title: "Song edited successfully."})
+    //   setIsOpen(false)
+    //   setIsLoading(false)
+    // }
+    // catch (e) {
+    //   console.log(e)
+    // }
+    // finally {
+    //   clearContents()
+    //   setIsOpen(false)
+    //   setIsLoading(false)
+    // }
   }
 
   async function uploadMusicSheetContainers(_musicSheetContainers: MusicSheetContainer[]) {
@@ -213,11 +202,11 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     return newMusicSheetContainers
   }
 
-  function getNotExistUrlsFromMusicSheets(prevMusicSheets: SongMusicSheet[], newMusicSheetContainers: MusicSheetContainer[]) {
-    const prevUrls = getAllUrlsFromSongMusicSheets(prevMusicSheets)
-    const newUrls = getAllUrlsFromMusicSheetContainers(newMusicSheetContainers)
-    return prevUrls.filter((pUrl) => !newUrls.includes(pUrl))
-  }
+  // function getNotExistUrlsFromMusicSheets(prevMusicSheets: SongMusicSheet[], newMusicSheetContainers: MusicSheetContainer[]) {
+  //   const prevUrls = getAllUrlsFromSongMusicSheets(prevMusicSheets)
+  //   const newUrls = getAllUrlsFromMusicSheetContainers(newMusicSheetContainers)
+  //   return prevUrls.filter((pUrl) => !newUrls.includes(pUrl))
+  // }
 
   function handleAddNewMusicSheet() {
     setMusicSheetContainers((prev) => ([...prev, {
@@ -255,17 +244,13 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
-          <div className="flex-center gap-2">
-            {/*<TeamIcon name={team?.name || "Team"}/>*/}
-            {/*<p className="font-bold text-sm">{team?.name}</p>*/}
-          </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="name">Title</Label>
             <Input
               id="title"
               placeholder="ex) Amazing Grace"
-              value={input.title}
-              onChange={(e) => setInput((prev => ({...prev, title: e.target.value})))}
+              value={songInput.title}
+              onChange={(e) => setSongInput((prev => ({...prev, title: e.target.value})))}
               autoFocus={false}
             />
           </div>
@@ -274,8 +259,8 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
             <Input
               id="subtitle"
               placeholder="Sub Title..."
-              value={input.subtitle}
-              onChange={(e) => setInput((prev => ({...prev, subtitle: e.target.value})))}
+              value={songInput.subtitle}
+              onChange={(e) => setSongInput((prev => ({...prev, subtitle: e.target.value})))}
               autoFocus={false}
             />
           </div>
@@ -284,8 +269,8 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
             <Input
               id="author"
               placeholder="ex) Isaiah6tyone"
-              value={input.author}
-              onChange={(e) => setInput((prev => ({...prev, author: e.target.value})))}
+              value={songInput.author}
+              onChange={(e) => setSongInput((prev => ({...prev, author: e.target.value})))}
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
@@ -293,8 +278,8 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
             <Input
               id="version"
               placeholder="version"
-              value={input.version}
-              onChange={(e) => setInput((prev => ({...prev, version: e.target.value})))}
+              value={songInput.version}
+              onChange={(e) => setSongInput((prev => ({...prev, version: e.target.value})))}
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
@@ -302,13 +287,13 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
             <Input
               id="link"
               placeholder="https://youtube..."
-              value={input.link}
-              onChange={(e) => setInput((prev => ({...prev, link: e.target.value})))}
+              value={songInput.link}
+              onChange={(e) => setSongInput((prev => ({...prev, link: e.target.value})))}
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="tags">Tags</Label>
-            <TagMultiSelect input={input} setInput={setInput}/>
+            <TagMultiSelect input={songInput} setInput={setSongInput}/>
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="bpm">BPM</Label>
@@ -316,8 +301,8 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               id="bpm"
               type="number"
               placeholder="ex) 120"
-              defaultValue={input.bpm ?? ""}
-              onChange={(e) => setInput((prev => ({...prev, bpm: Number(e.target.value)})))}
+              defaultValue={songInput.bpm ?? ""}
+              onChange={(e) => setSongInput((prev => ({...prev, bpm: Number(e.target.value)})))}
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
@@ -327,8 +312,8 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
             <Textarea
               className="h-20"
               placeholder="Write the description"
-              value={input.description}
-              onChange={(e) => setInput((prev => ({...prev, description: e.target.value})))}
+              value={songInput.description}
+              onChange={(e) => setSongInput((prev => ({...prev, description: e.target.value})))}
             />
           </div>
           <div className="w-full flex-start flex-col items-center gap-1.5">
