@@ -25,7 +25,14 @@ import {PlusIcon} from "lucide-react";
 import {v4 as uuid} from "uuid";
 import {Cross2Icon} from "@radix-ui/react-icons";
 import MusicSheetService from "@/apis/MusicSheetService";
-import {musicSheetIdsAtom} from "@/global-states/music-sheet-state";
+import {
+  musicSheetIdsAtom,
+  musicSheetIdsUpdaterAtom,
+  musicSheetsBySongIdAtom,
+  musicSheetUpdaterAtom
+} from "@/global-states/music-sheet-state";
+import {MusicSheet} from "@/models/music_sheet";
+import {getAllUrlsFromMusicSheetContainers, getAllUrlsFromSongMusicSheets} from "@/components/helper/helper-functions";
 
 
 interface Props {
@@ -47,6 +54,10 @@ export interface SongInput {
 
 export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   const song = useRecoilValue(songAtom(songId))
+  const songUpdater = useSetRecoilState(songUpdaterAtom)
+  const musicSheetIdsUpdater = useSetRecoilState(musicSheetIdsUpdaterAtom)
+  const musicSheetUpdater = useSetRecoilState(musicSheetUpdaterAtom) // todo: need to make it more efficient
+  const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songId))
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtom(teamId))
@@ -69,21 +80,22 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
 
   useEffect(() => {
     if (mode === FormMode.EDIT) {
-      // const _musicSheetContainers: MusicSheetContainer[] = []
-      // song?.music_sheets.forEach((musicSheet) => {
-      //   const mContainer: MusicSheetContainer = {
-      //     tempId: uuid(),
-      //     key: musicSheet?.key,
-      //     imageFileContainers: musicSheet?.urls?.map(url => {
-      //       const iContainer: ImageFileContainer = {id: "", file: null, url: url, isLoading: false, isUploadedInDatabase: true}
-      //       return iContainer
-      //     })
-      //   }
-      //   _musicSheetContainers.push(mContainer)
-      // })
-      // setMusicSheetContainers(_musicSheetContainers)
+      const _musicSheetContainers: MusicSheetContainer[] = []
+      musicSheets?.forEach((musicSheet) => {
+        const mContainer: MusicSheetContainer = {
+          id: musicSheet?.id,
+          tempId: uuid(),
+          key: musicSheet?.key,
+          imageFileContainers: musicSheet?.urls?.map(url => {
+            const iContainer: ImageFileContainer = {id: "", file: null, url: url, isLoading: false, isUploadedInDatabase: true}
+            return iContainer
+          })
+        }
+        _musicSheetContainers.push(mContainer)
+      })
+      setMusicSheetContainers(_musicSheetContainers)
     }
-  }, [mode])
+  }, [mode, musicSheets])
 
   function createValidCheck() {
     if (!authUser?.uid) {
@@ -158,36 +170,49 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   }
 
   async function handleEdit() {
-    // setIsLoading(true)
-    // if (!editValidCheck()) return false
-    //
-    // try {
-    //   const newMusicSheetContainers = await uploadMusicSheetContainers(musicSheetContainers)
-    //   const urlsToDelete = getNotExistUrlsFromMusicSheets(song?.music_sheets, newMusicSheetContainers)
-    //   if (await StorageService.deleteFileByUrls(urlsToDelete) === false) {
-    //     console.log("handleEdit: Fail to delete urls")
-    //   }
-    //
-    //   const songFormParam: SongFormParam = {...input, musicSheetContainers: newMusicSheetContainers}
-    //   const promises = [];
-    //   promises.push(SongService.updateSong(authUser?.uid, song?.id, songFormParam));
-    //   promises.push(TagService.addNewTags(teamId, songFormParam.tags));
-    //   await Promise.all(promises)
-    //
-    //   setSongUpdater((prev) => prev + 1)
-    //
-    //   toast({title: "Song edited successfully."})
-    //   setIsOpen(false)
-    //   setIsLoading(false)
-    // }
-    // catch (e) {
-    //   console.log(e)
-    // }
-    // finally {
-    //   clearContents()
-    //   setIsOpen(false)
-    //   setIsLoading(false)
-    // }
+    setIsLoading(true)
+    if (!editValidCheck()) return false
+
+    try {
+      const promises = [];
+
+      // Delete music sheet images if removed.
+      const newMusicSheetContainers = await uploadMusicSheetContainers(musicSheetContainers)
+      const urlsToDelete = getRemovedMusicSheetUrls(musicSheets, newMusicSheetContainers)
+      promises.push(StorageService.deleteFileByUrls(urlsToDelete))
+
+      // Delete music sheet document if removed.
+      const musicSheetIdsToDelete = getRemovedMusicSheetIds(musicSheets, newMusicSheetContainers)
+      musicSheetIdsToDelete.forEach(id => {
+        promises.push(MusicSheetService.delete(id))
+      })
+
+      // Update music sheet
+      newMusicSheetContainers.forEach(mContainer => {
+        promises.push(MusicSheetService.updateMusicSheet(authUser?.uid, song?.id, mContainer))
+      })
+      // Update Song and tags
+      promises.push(SongService.updateSong(authUser?.uid, song?.id, songInput));
+      promises.push(TagService.addNewTags(teamId, songInput?.tags));
+
+      await Promise.all(promises)
+
+      musicSheetIdsUpdater(prev => prev + 1)
+      musicSheetUpdater(prev => prev + 1)
+      songUpdater(prev => prev + 1)
+
+      toast({title: "Song edited successfully."})
+      setIsOpen(false)
+      setIsLoading(false)
+    }
+    catch (e) {
+      console.log(e)
+    }
+    finally {
+      clearContents()
+      setIsOpen(false)
+      setIsLoading(false)
+    }
   }
 
   async function uploadMusicSheetContainers(_musicSheetContainers: MusicSheetContainer[]) {
@@ -202,11 +227,17 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     return newMusicSheetContainers
   }
 
-  // function getNotExistUrlsFromMusicSheets(prevMusicSheets: SongMusicSheet[], newMusicSheetContainers: MusicSheetContainer[]) {
-  //   const prevUrls = getAllUrlsFromSongMusicSheets(prevMusicSheets)
-  //   const newUrls = getAllUrlsFromMusicSheetContainers(newMusicSheetContainers)
-  //   return prevUrls.filter((pUrl) => !newUrls.includes(pUrl))
-  // }
+  function getRemovedMusicSheetUrls(prevMusicSheets: MusicSheet[], newMusicSheetContainers: MusicSheetContainer[]) {
+    const prevUrls = getAllUrlsFromSongMusicSheets(prevMusicSheets)
+    const newUrls = getAllUrlsFromMusicSheetContainers(newMusicSheetContainers)
+    return prevUrls.filter((pUrl) => !newUrls.includes(pUrl))
+  }
+
+  function getRemovedMusicSheetIds(prevMusicSheets: MusicSheet[], newMusicSheetContainers: MusicSheetContainer[]) {
+    const prevIds = prevMusicSheets?.map(ms => ms?.id)
+    const newIds = newMusicSheetContainers?.map(mContainer => mContainer?.id)
+    return prevIds.filter(pId => !newIds.includes(pId))
+  }
 
   function handleAddNewMusicSheet() {
     setMusicSheetContainers((prev) => ([...prev, {
@@ -232,6 +263,10 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
       const newImageFileContainers = musicSheet.imageFileContainers.filter((_, index) => index !== imageFileContainerIndex)
       return {...musicSheet, imageFileContainers: newImageFileContainers}
     })]))
+  }
+
+  function removeMusicSheetContainer(tempId: string) {
+    setMusicSheetContainers((prev) => ([...prev.filter(mContainer => mContainer.tempId !== tempId) ]))
   }
 
   return (
@@ -331,6 +366,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
                     imageFileContainers={musicSheet?.imageFileContainers}
                     handleSetImageFileContainers={setImageFileContainersToMusicSheet}
                     handleRemoveImageFileContainer={removeImageFromMusicSheet}
+                    handleRemoveMusicSheetContainer={removeMusicSheetContainer}
                   />
                 ))
               }
@@ -361,9 +397,10 @@ interface MusicSheetUploadBoxProps {
   imageFileContainers: Array<ImageFileContainer>
   handleSetImageFileContainers: Function
   handleRemoveImageFileContainer: Function
+  handleRemoveMusicSheetContainer: Function
 }
 
-function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey, handleSetImageFileContainers, handleRemoveImageFileContainer}: MusicSheetUploadBoxProps) {
+function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey, handleSetImageFileContainers, handleRemoveImageFileContainer, handleRemoveMusicSheetContainer}: MusicSheetUploadBoxProps) {
   function updateImageFileContainer(newContainer: ImageFileContainer) {
    console.log(tempId)
     if (imageFileContainers.map((_container) => _container.id).includes(newContainer.id)) {
@@ -376,8 +413,8 @@ function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey
   }
 
   return (
-    <div className="w-full border bg-gray-100 rounded-lg p-2 space-y-4">
-      <Cross2Icon className="absolute right-1 top-1 cursor-pointer rounded-full bg-white hover:text-blue-500" width={20} height={20}/>
+    <div className="relative w-full border bg-gray-100 rounded-lg p-2 space-y-4">
+      <Cross2Icon className="absolute right-1 top-1 cursor-pointer rounded-full hover:text-blue-500" width={20} height={20} onClick={() => handleRemoveMusicSheetContainer(tempId)}/>
       <div className="flex items-center gap-4">
         <Label htmlFor="key">Key</Label>
         <Input
@@ -385,7 +422,7 @@ function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey
           placeholder="ex) Em"
           value={musicKey ?? ""}
           onChange={(e) => setMusicKey(tempId, e.target.value)}
-          className="bg-white"
+          className="bg-white max-w-sm"
         />
       </div>
       {

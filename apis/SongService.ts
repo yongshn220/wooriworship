@@ -60,32 +60,30 @@ class SongService extends BaseService {
     return await this.update(songId, {last_used_time:new Date()});
   }
 
-  async updateSong(userId: string, songId: string, songFormParam: SongFormParam) {
-    // try {
-    //   const music_sheets = songFormParam?.musicSheetContainers?.map((mContainer) => ({key: mContainer.key, urls: mContainer.imageFileContainers.map(iContainer => iContainer.url)}))
-    //   const song = {
-    //     title: songFormParam.title,
-    //     subtitle: songFormParam.subtitle,
-    //     original: {
-    //       author: songFormParam.author,
-    //       url: songFormParam.link
-    //     },
-    //     version: songFormParam.version,
-    //     description: songFormParam.description,
-    //     lyrics: "",
-    //     bpm: songFormParam.bpm,
-    //     tags: songFormParam.tags,
-    //     updated_by: {
-    //       id: userId,
-    //       time: getFirebaseTimestampNow()
-    //     },
-    //     music_sheets: music_sheets
-    //   }
-    //   return await this.update(songId, song);
-    // }
-    // catch (e) {
-    //   console.log(e)
-    // }
+  async updateSong(userId: string, songId: string, songInput: SongInput) {
+    try {
+      const song = {
+        title: songInput.title,
+        subtitle: songInput.subtitle,
+        original: {
+          author: songInput.author,
+          url: songInput.link
+        },
+        version: songInput.version,
+        description: songInput.description,
+        lyrics: "",
+        bpm: songInput.bpm,
+        tags: songInput.tags,
+        updated_by: {
+          id: userId,
+          time: getFirebaseTimestampNow()
+        },
+      }
+      return await this.update(songId, song);
+    }
+    catch (e) {
+      console.log(e)
+    }
   }
 
   async deleteSong(songId: string) {
