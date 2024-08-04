@@ -1,24 +1,26 @@
 import {atom} from "recoil";
-import {WorshipSongWrapper} from "@/components/constants/types";
+import {WorshipSongHeader} from "@/models/worship";
 
-
-export const selectedWorshipSongWrapperListAtom = atom<Array<WorshipSongWrapper>>({
-  key: "selectedWorshipSongWrapperListAtom",
+export const selectedWorshipSongHeaderListAtom = atom<Array<WorshipSongHeader>>({
+  key: "selectedWorshipSongHeaderListAtom",
   default: [],
 })
 
-export const worshipBeginningSongWrapperAtom = atom<{id: string, key: string}>({
-  key: "worshipBeginningSongWrapperAtom",
+
+export const worshipBeginningSongHeaderAtom = atom<WorshipSongHeader>({
+  key: "worshipBeginningSongHeaderAtom",
   default: {
     id: "",
-    key: "",
+    note: "",
+    selected_music_sheet_ids: []
   }
 })
 
-export const worshipEndingSongWrapperAtom = atom<{id: string, key: string}>({
-  key: "worshipEndingSongWrapperAtom",
+export const worshipEndingSongHeaderAtom = atom<WorshipSongHeader>({
+  key: "worshipEndingSongHeaderAtom",
   default: {
     id: "",
-    key: "",
+    note: "",
+    selected_music_sheet_ids: []
   }
 })

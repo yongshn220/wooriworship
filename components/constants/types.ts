@@ -1,4 +1,4 @@
-import {Song} from "@/models/song";
+import {WorshipSongHeader} from "@/models/worship";
 
 
 export interface ImageFileContainer {
@@ -16,26 +16,15 @@ export interface MusicSheetContainer {
   imageFileContainers: Array<ImageFileContainer>
 }
 
-export interface WorshipPlan {
+export interface WorshipInput {
   title: string
   description: string
   date: Date
-  worshipSongWrappers: Array<WorshipSongWrapper>
-  beginningSong: {
-    id: string,
-    key: string
-  }
-  endingSong: {
-    id: string,
-    key: string,
-  }
+  worshipSongHeaders: Array<WorshipSongHeader>
+  beginningSong: WorshipSongHeader
+  endingSong: WorshipSongHeader
 }
 
-export interface WorshipSongWrapper {
-  note: string
-  song: Song
-  selectedKeys: Array<string>
-}
 
 export interface MusicSheetUrlWrapper {
   note: string

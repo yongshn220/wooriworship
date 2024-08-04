@@ -4,21 +4,21 @@ import * as React from "react"
 
 import {DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger,} from "@/components/ui/dropdown-menu"
 import {useRecoilState, useSetRecoilState} from "recoil";
-import {selectedWorshipSongWrapperListAtom, worshipBeginningSongWrapperAtom, worshipEndingSongWrapperAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {selectedWorshipSongHeaderListAtom, worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {WorshipSpecialOrderType} from "@/components/constants/enums";
-import {WorshipSongWrapper} from "@/components/constants/types";
+import {WorshipSongHeader} from "@/models/worship";
 
 interface Props {
-  songWrapper: WorshipSongWrapper
+  songHeader: WorshipSongHeader
   songOrder: number
 }
 
 type OrderValue = WorshipSpecialOrderType | string
 
-export function SwapOrderButton({songWrapper, songOrder}: Props) {
-  const [selectedSongInfoList, setSelectedSongInfoList] = useRecoilState(selectedWorshipSongWrapperListAtom)
-  const setBeginningSongWrapper = useSetRecoilState(worshipBeginningSongWrapperAtom)
-  const setEndingSongWrapper = useSetRecoilState(worshipEndingSongWrapperAtom)
+export function SwapOrderButton({songHeader, songOrder}: Props) {
+  const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
+  const setBeginningSongHeader = useSetRecoilState(worshipBeginningSongHeaderAtom)
+  const setEndingSongHeader = useSetRecoilState(worshipEndingSongHeaderAtom)
 
   function handleClick(value: OrderValue) {
     if (value === WorshipSpecialOrderType.BEGINNING) {
@@ -34,10 +34,10 @@ export function SwapOrderButton({songWrapper, songOrder}: Props) {
   function handleOrderChange(newOrderString: string) {
     try {
       const newOrder = Number(newOrderString)
-      const _selectedSongInfoList = [...selectedSongInfoList]
-      const removed = _selectedSongInfoList.splice((songOrder - 1), 1)[0];
-      _selectedSongInfoList.splice((newOrder - 1), 0, removed);
-      setSelectedSongInfoList(_selectedSongInfoList)
+      const _selectedSongHeaderList = [...selectedSongHeaderList]
+      const removed = _selectedSongHeaderList.splice((songOrder - 1), 1)[0];
+      _selectedSongHeaderList.splice((newOrder - 1), 0, removed);
+      setSelectedSongHeaderList(_selectedSongHeaderList)
     }
     catch (e) {
       console.log(e, "handleOrderChange")
@@ -45,18 +45,20 @@ export function SwapOrderButton({songWrapper, songOrder}: Props) {
   }
 
   function handleSetBeginningSong() {
-    setSelectedSongInfoList((prev) => ([...prev.filter(info => info?.song?.id !== songWrapper?.song?.id)]))
-    setBeginningSongWrapper({
-      id: songWrapper?.song?.id,
-      key: songWrapper?.selectedKeys[0]
+    setSelectedSongHeaderList((prev) => ([...prev.filter(header => header?.id !== songHeader?.id)]))
+    setBeginningSongHeader({
+      id: songHeader?.id,
+      note: songHeader?.note,
+      selected_music_sheet_ids: songHeader?.selected_music_sheet_ids
     })
   }
 
   function handleSetEndingSong() {
-    setSelectedSongInfoList((prev) => ([...prev.filter(info => info?.song?.id !== songWrapper?.song?.id)]))
-    setEndingSongWrapper({
-      id: songWrapper?.song?.id,
-      key: songWrapper?.selectedKeys[0]
+    setSelectedSongHeaderList((prev) => ([...prev.filter(header => header?.id !== songHeader?.id)]))
+    setEndingSongHeader({
+      id: songHeader?.id,
+      note: songHeader?.note,
+      selected_music_sheet_ids: songHeader?.selected_music_sheet_ids
     })
   }
 
@@ -73,7 +75,7 @@ export function SwapOrderButton({songWrapper, songOrder}: Props) {
         <DropdownMenuRadioGroup value={songOrder.toString()} onValueChange={handleClick} className="w-full">
           <DropdownMenuRadioItem className="w-full cursor-pointer" value={WorshipSpecialOrderType.BEGINNING}>Beginning</DropdownMenuRadioItem>
           {
-            selectedSongInfoList.map((_, i) => (
+            selectedSongHeaderList.map((_, i) => (
               <DropdownMenuRadioItem key={i + 1} value={(i + 1).toString()} className="w-full cursor-pointer">{i + 1}</DropdownMenuRadioItem>
             ))
           }

@@ -1,4 +1,5 @@
 import {Timestamp} from "@firebase/firestore";
+import {WorshipSongHeader} from "@/models/worship";
 
 export interface Team {
   id?: string
@@ -12,13 +13,7 @@ export interface Team {
 
 export interface TeamOption {
   worship: {
-    beginning_song: {
-      id: string
-      key: string
-    }
-    ending_song: {
-      id: string
-      key: string
-    }
+    beginning_song: WorshipSongHeader
+    ending_song: WorshipSongHeader
   }
 }

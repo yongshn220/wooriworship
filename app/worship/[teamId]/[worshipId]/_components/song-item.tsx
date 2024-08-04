@@ -1,6 +1,6 @@
 "use client"
 
-import {SongHeader} from "@/models/worship";
+import {WorshipSongHeader} from "@/models/worship";
 import LinkIcon from '@/public/icons/linkIcon.svg'
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import {useRecoilValue} from "recoil";
@@ -12,7 +12,7 @@ import {Suspense, useState} from "react";
 
 interface Props {
   teamId: string
-  songHeader: SongHeader
+  songHeader: WorshipSongHeader
   index: number
 }
 

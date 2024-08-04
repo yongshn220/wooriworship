@@ -1,7 +1,7 @@
 import {Button} from "@/components/ui/button";
 import {useRecoilValue} from "recoil";
 import {worshipAtom} from "@/global-states/worship-state";
-import {SongHeader} from "@/models/worship";
+import {WorshipSongHeader} from "@/models/worship";
 import {songAtom} from "@/global-states/song-state";
 
 
@@ -23,7 +23,7 @@ export function WorshipSongList({worshipId}: Props) {
   )
 }
 
-function WorshipSongItem({songHeader}: {songHeader: SongHeader}) {
+function WorshipSongItem({songHeader}: {songHeader: WorshipSongHeader}) {
   const song = useRecoilValue(songAtom(songHeader?.id))
 
   return (

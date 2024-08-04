@@ -1,7 +1,7 @@
 "use client"
 
 import {SongCarousel} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel";
-import {SongHeader} from "@/models/worship";
+import {WorshipSongHeader} from "@/models/worship";
 import CalendarIcon from '@/public/icons/calendarIcon.svg'
 import {Separator} from "@/components/ui/separator";
 import {MenuButton} from "@/app/worship/[teamId]/[worshipId]/_components/menu-button";
@@ -69,7 +69,7 @@ export default function WorshipPage({params}: any) {
             </div>
           }
           {
-            worship?.songs.map((songHeader: SongHeader, index: number) => (
+            worship?.songs.map((songHeader: WorshipSongHeader, index: number) => (
               <SongDetailCardWrapper key={songHeader?.id} teamId={teamId} songId={songHeader?.id}>
                 <SongListPreviewItem songId={songHeader?.id}/>
               </SongDetailCardWrapper>

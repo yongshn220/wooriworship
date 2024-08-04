@@ -1,13 +1,13 @@
 import {Card, CardContent} from "@/components/ui/card";
 import {CarouselItem} from "@/components/ui/carousel";
 import * as React from "react";
-import {SongHeader} from "@/models/worship";
+import {WorshipSongHeader} from "@/models/worship";
 import Image from 'next/image'
 import {songAtom} from "@/global-states/song-state";
 import {useRecoilValue} from "recoil";
 
 interface Props {
-  musicSheetHeader: SongHeader
+  musicSheetHeader: WorshipSongHeader
 }
 export function SongCarouselItem({musicSheetHeader}: Props) {
   const song = useRecoilValue(songAtom(songHeader?.id))

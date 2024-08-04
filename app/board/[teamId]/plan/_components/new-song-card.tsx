@@ -1,56 +1,51 @@
 "use client"
 
 import {Textarea} from "@/components/ui/textarea";
-import {useMemo} from "react";
 import {useRecoilState} from "recoil";
-import {selectedWorshipSongWrapperListAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {toPlainObject} from "@/components/helper/helper-functions";
-import {SongListItem, ViewMode} from "@/app/board/[teamId]/song/_components/song-list-item";
-import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import {SwapOrderButton} from "@/app/board/[teamId]/plan/_components/swap-order-button";
-import {WorshipSongWrapper} from "@/components/constants/types";
-import {
-  SelectSongDetailCardWrapper
-} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
+import {SelectSongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
 import {WorshipSongPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/worship-song-preview-item";
+import {WorshipSongHeader} from "@/models/worship";
 
 interface Props {
   teamId: string
   songOrder: number
-  songWrapper: WorshipSongWrapper
+  songHeader: WorshipSongHeader
 }
 
-export function NewSongCard({teamId, songOrder, songWrapper}: Props) {
-  const [selectedSongWrapperList, setSelectedSongWrapperList] = useRecoilState(selectedWorshipSongWrapperListAtom)
-
-  const currentSongInfo = useMemo(() => (selectedSongWrapperList.find((_songWrapper => _songWrapper.song.id === songWrapper.song.id))), [selectedSongWrapperList, songWrapper.song.id])
-
-  if (!currentSongInfo.song) return <></>
+export function NewSongCard({teamId, songOrder, songHeader}: Props) {
+  const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
 
   function handleRemoveSong() {
-    setSelectedSongWrapperList(selectedSongWrapperList.filter((_songWrapper) => _songWrapper.song.id != currentSongInfo.song.id))
+    setSelectedSongHeaderList(selectedSongHeaderList.filter((_header) => _header.id !== songHeader?.id))
   }
 
   function handleOnNoteChange(input: string) {
-    const newSongInfoList = toPlainObject(selectedSongWrapperList)
-    newSongInfoList.forEach((_songWrapper: WorshipSongWrapper) => {
-      if (_songWrapper.song.id === songWrapper.song.id) {
-        _songWrapper.note = input
+    const newSongInfoList = toPlainObject(selectedSongHeaderList)
+    newSongInfoList.forEach((_songHeader: WorshipSongHeader) => {
+      if (_songHeader?.id === songHeader?.id) {
+        _songHeader.note = input
       }
     })
-    setSelectedSongWrapperList(newSongInfoList)
+    setSelectedSongHeaderList(newSongInfoList)
   }
 
-  function setWorshipSongSelectedKeys(selectedKeys: Array<string>) {
-    const targetSongWrapper = selectedSongWrapperList.find((wrapper => wrapper?.song?.id === songWrapper?.song?.id))
+  function setMusicSheetIds(musicSheetIds: Array<string>) {
+    const targetSongWrapper = selectedSongHeaderList.find((header => header?.id === songHeader?.id))
     if (!targetSongWrapper) {
-      console.log("err: setWorshipSongSelectedKeys, there is no such song id.")
+      console.log("err: setMusicSheetIds, there is no such song id.")
     }
 
-    setSelectedSongWrapperList((prev) => ([
-      ...prev.filter(wrapper => wrapper?.song?.id !== songWrapper?.song?.id),
-      {...targetSongWrapper, selectedKeys: selectedKeys}
+    setSelectedSongHeaderList((prev) => ([
+      ...prev.filter(header => header?.id !== songHeader?.id),
+      {...targetSongWrapper, selected_music_sheet_ids: musicSheetIds}
     ]))
+  }
+
+  function handleSelectSong() {
+
   }
 
   return (
@@ -58,21 +53,22 @@ export function NewSongCard({teamId, songOrder, songWrapper}: Props) {
       <div className="relative flex flex-col w-full h-64 border shadow-sm rounded-md p-2 gap-4 bg-white">
         <SelectSongDetailCardWrapper
           teamId={teamId}
-          songId={songWrapper?.song?.id}
-          selectedKeys={songWrapper?.selectedKeys}
-          setSelectedKeys={(selectedKeys: string[]) => setWorshipSongSelectedKeys(selectedKeys)}
+          songId={songHeader?.id}
+          selectedMusicSheetIds={songHeader?.selected_music_sheet_ids}
+          setMusicSheetIds={(selectedKeys: string[]) => setMusicSheetIds(selectedKeys)}
+          onSelectHandler={handleSelectSong}
         >
-          <WorshipSongPreviewItem songId={songWrapper?.song?.id} selectedKeys={songWrapper?.selectedKeys} customTags={[]}/>
+          <WorshipSongPreviewItem songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids} customTags={[]}/>
         </SelectSongDetailCardWrapper>
         <div className="absolute flex-center -translate-y-1/2 -right-4">
-          <SwapOrderButton songWrapper={songWrapper} songOrder={songOrder}/>
+          <SwapOrderButton songHeader={songHeader} songOrder={songOrder}/>
         </div>
 
         <div className="w-full flex-1">
           <Textarea
             className="h-full bg-white"
             placeholder="Write a note for the song. (Update note in the Song Board to set as default)"
-            value={currentSongInfo?.note}
+            value={songHeader?.note}
             onChange={(e) => handleOnNoteChange(e.target.value)}
           />
         </div>
