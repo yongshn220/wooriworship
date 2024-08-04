@@ -9,9 +9,8 @@ import {songAtom} from "@/global-states/song-state";
 import {SongCommentArea} from "@/app/board/[teamId]/song/_components/song-comment-area";
 import {SongDetailContent} from "@/app/board/[teamId]/song/_components/song-detail-content";
 import {cn} from "@/lib/utils";
-import {selectedWorshipSongHeaderListAtom, worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom} from "@/app/board/[teamId]/plan/_components/status";
-import {toast} from "@/components/ui/use-toast";
-import {musicSheetAtom, musicSheetIdsAtom, musicSheetsBySongIdAtom} from "@/global-states/music-sheet-state";
+import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {musicSheetAtom, musicSheetsBySongIdAtom} from "@/global-states/music-sheet-state";
 
 interface Props {
   teamId: string
@@ -29,12 +28,9 @@ export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selecte
   const song = useRecoilValue(songAtom(songId))
   const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songId))
   const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
-  const beginningSongWrapper = useRecoilState(worshipBeginningSongHeaderAtom)
-  const endingSongWrapper = useRecoilState(worshipEndingSongHeaderAtom)
 
   function handleSelectSong() {
     if (isStatic) return
-
     onSelectHandler()
   }
 
@@ -43,27 +39,21 @@ export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selecte
     onSelectHandler()
   }
 
-  function handleKeyClick(key: string) {
-    if (isStatic) {
-      setMusicSheetIds([key])
+  function handleSelectMusicSheetKey(id: string) {
+    if (isMusicSheetSelected(id)) {
+      setMusicSheetIds([...selectedMusicSheetIds?.filter((_id) => _id !== id)])
     }
     else {
-      if (isKeySelected(key)) {
-        setMusicSheetIds([...selectedKeys.filter((_key) => _key !== key)])
-      }
-      else {
-        console.log(key)
-        setMusicSheetIds([...selectedKeys, key])
-      }
+      setMusicSheetIds([...selectedMusicSheetIds, id])
     }
   }
 
-  function isKeySelected(key: string) {
-    return selectedKeys.includes(key)
+  function isMusicSheetSelected(id: string) {
+    return selectedMusicSheetIds?.includes(id)
   }
 
   function isSongAdded() {
-    return selectedSongHeaderList.map((songWrapper => songWrapper?.song?.id)).includes(songId)
+    return selectedSongHeaderList.map((songHeader => songHeader?.id)).includes(songId)
   }
 
   return (
@@ -81,10 +71,10 @@ export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selecte
                       className={
                         cn(
                           "flex-center w-16 h-16 border-2 border-white text-white rounded-lg cursor-pointer",
-                          {"bg-white text-black": isKeySelected(sheet?.key)},
+                          {"bg-white text-black": isMusicSheetSelected(sheet?.id)},
                         )
                       }
-                      onClick={() => handleKeyClick(sheet?.key)}
+                      onClick={() => handleSelectMusicSheetKey(sheet?.id)}
                     >
                       {sheet?.key}
                     </div>
@@ -96,7 +86,16 @@ export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selecte
               {
                 isStatic === false &&
                 <>
-                  <p className="text-black">selected: {selectedKeys.join(", ")}</p>
+                  <div className="flex text-black">
+                    <p className="pr-2">selected: </p>
+                    <div className="flex gap-2">
+                      {
+                        selectedMusicSheetIds?.map((id, index) => (
+                          <MusicSheetKeyString key={index} musicSheetId={id}/>
+                        ))
+                      }
+                    </div>
+                  </div>
                   {
                     isSongAdded()
                     ? <Button className="w-full bg-blue-500 hover:bg-blue-500 hover:border-2 hover:text-white" variant="outline" onClick={() => handleUnselectSong()}>Click to Remove Song</Button>
@@ -132,3 +131,14 @@ export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selecte
   )
 }
 
+
+interface MusicSheetKeysToStringProps {
+  musicSheetId: string
+}
+function MusicSheetKeyString({musicSheetId}: MusicSheetKeysToStringProps) {
+  const musicSheet = useRecoilValue(musicSheetAtom(musicSheetId))
+
+  return (
+    <p>{musicSheet?.key}</p>
+  )
+}

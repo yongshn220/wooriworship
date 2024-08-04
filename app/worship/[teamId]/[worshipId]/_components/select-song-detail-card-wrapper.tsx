@@ -11,7 +11,7 @@ interface Props {
   songId: string
   selectedMusicSheetIds: Array<string>
   setMusicSheetIds: (musicSheetIds: string[]) => void
-  isStatic?: boolean
+  isStatic: boolean
   onSelectHandler?: () => void
 }
 export function SelectSongDetailCardWrapper({children, teamId, songId, selectedMusicSheetIds, setMusicSheetIds, isStatic, onSelectHandler}: Props) {
@@ -30,7 +30,7 @@ export function SelectSongDetailCardWrapper({children, teamId, songId, selectedM
             selectedMusicSheetIds={selectedMusicSheetIds}
             setMusicSheetIds={setMusicSheetIds}
             isStatic={isStatic}
-            onSelectHandler={onSelectHandler}
+            onSelectHandler={() => onSelectHandler()}
           />
       }
       <div onClick={() => setIsOpen(prev => !prev)} className="w-full">

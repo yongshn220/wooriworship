@@ -17,14 +17,7 @@ interface Props {
 }
 
 export function AddSongButton({teamId}: Props) {
-  const [songList, setSongList] = useState<Array<Song>>([])
   const [input, setInput] = useRecoilState(songSearchInputAtom)
-
-  useEffect(() => {
-    SongService.getTeamSong(teamId).then(songList => {
-      setSongList(songList as Array<Song>)
-    })
-  }, [teamId])
 
   return (
     <Dialog>

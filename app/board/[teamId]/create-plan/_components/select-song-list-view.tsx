@@ -5,13 +5,9 @@ import {SongListItem, ViewMode} from "@/app/board/[teamId]/song/_components/song
 import {Separator} from "@/components/ui/separator";
 import Image from "next/image";
 import * as React from "react";
-import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
-import {Checkbox} from "@/components/ui/checkbox";
 import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/plan/_components/status";
-import {useMemo, useState} from "react";
-import {
-  SelectSongDetailCardWrapper
-} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
+import {useState} from "react";
+import {SelectSongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
 
 interface Props {
   teamId: string
@@ -58,8 +54,6 @@ export function SelectSongListView({teamId}: Props) {
                 height={200}
               />
               <p className="text-xl font-semibold">No matching songs!</p>
-              {/*<p className="text-gray-500">Click &ldquo;Add Song&rdquo; button to create one!</p>*/}
-              {/*<NewSongButton/>*/}
             </div>
           }
         </div>
@@ -73,11 +67,28 @@ interface ItemProps {
 }
 
 function SelectSongListItem({teamId, songId}: ItemProps) {
-  const [selectedKeys, setSelectedKeys] = useState<string[]>([])
-  
+  const song = useRecoilValue(songAtom(songId))
+  const [selectedMusicSheetIds, setSelectedMusicSheetIds] = useState<Array<string>>([])
+  const [selectedWorshipSongHeaderList, setSelectedWorshipSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
+
+  function handleSelectSong() {
+    setSelectedWorshipSongHeaderList((prev) => ([...prev, {
+      id: song?.id,
+      note: song?.description,
+      selected_music_sheet_ids: selectedMusicSheetIds
+    }]))
+  }
+
   return (
     <div className="w-full flex-center">
-      <SelectSongDetailCardWrapper teamId={teamId} songId={songId} selectedKeys={selectedKeys} setSelectedKeys={setSelectedKeys}>
+      <SelectSongDetailCardWrapper
+        teamId={teamId}
+        songId={songId}
+        selectedMusicSheetIds={selectedMusicSheetIds}
+        setMusicSheetIds={(musicSheetIds) => setSelectedMusicSheetIds(musicSheetIds)}
+        isStatic={false}
+        onSelectHandler={() => handleSelectSong()}
+      >
         <SongListItem songId={songId} viewMode={ViewMode.NONE}/>
       </SelectSongDetailCardWrapper>
     </div>
