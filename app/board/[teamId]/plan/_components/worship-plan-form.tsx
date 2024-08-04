@@ -8,7 +8,7 @@ import {FormMode, WorshipSpecialOrderType} from "@/components/constants/enums";
 import {timestampToDate} from "@/components/helper/helper-functions";
 import {useToast} from "@/components/ui/use-toast";
 import {useRouter} from "next/navigation";
-import {SongService, WorshipService} from "@/apis";
+import {WorshipService} from "@/apis";
 import {getPathWorship} from "@/components/helper/routes";
 import {TeamIcon} from "@/components/team-icon";
 import {Label} from "@/components/ui/label";
@@ -234,7 +234,7 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
             <div className="flex-center w-full flex-col gap-8">
               {
                 beginningSongHeader?.id &&
-                <StaticSongCard teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songWrapper={beginningSongHeader}/>
+                <StaticSongCard teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songHeader={beginningSongHeader}/>
               }
               {
                 selectedWorshipSongHeaderList.map((songHeader, i) => (
@@ -243,7 +243,7 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
               }
               {
                 endingSongHeader?.id &&
-                <StaticSongCard teamId={teamId} specialOrderType={WorshipSpecialOrderType.ENDING} songWrapper={endingSongHeader}/>
+                <StaticSongCard teamId={teamId} specialOrderType={WorshipSpecialOrderType.ENDING} songHeader={endingSongHeader}/>
               }
               <AddSongButton teamId={teamId}/>
             </div>
