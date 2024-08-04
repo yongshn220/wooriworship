@@ -1,9 +1,9 @@
 import {Timestamp} from "@firebase/firestore";
 
-export interface SongHeader {
+export interface WorshipSongHeader {
   id: string
   note: string
-  selected_keys: Array<string>
+  selected_music_sheet_ids: Array<string>
 }
 
 export interface Worship {
@@ -12,15 +12,9 @@ export interface Worship {
   title: string
   worship_date: Timestamp
   description: string
-  songs: Array<SongHeader>
-  beginning_song: {
-    id: string,
-    key: string
-  },
-  ending_song: {
-    id: string,
-    key: string
-  },
+  songs: Array<WorshipSongHeader>
+  beginning_song: WorshipSongHeader
+  ending_song: WorshipSongHeader
   created_by: {
     id: string
     time: Timestamp

@@ -9,7 +9,7 @@ import {songAtom} from "@/global-states/song-state";
 import {SongCommentArea} from "@/app/board/[teamId]/song/_components/song-comment-area";
 import {SongDetailContent} from "@/app/board/[teamId]/song/_components/song-detail-content";
 import {cn} from "@/lib/utils";
-import {selectedWorshipSongWrapperListAtom, worshipBeginningSongWrapperAtom, worshipEndingSongWrapperAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {selectedWorshipSongHeaderListAtom, worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {toast} from "@/components/ui/use-toast";
 import {musicSheetAtom, musicSheetIdsAtom, musicSheetsBySongIdAtom} from "@/global-states/music-sheet-state";
 
@@ -18,41 +18,42 @@ interface Props {
   isOpen: boolean
   setIsOpen: Function
   songId: string
-  selectedKeys: Array<string>
-  setSelectedKeys: (selectedKeys: string[]) => void
+  selectedMusicSheetIds: Array<string>
+  setMusicSheetIds: (musicSheetIds: string[]) => void
   readOnly: boolean
   isStatic: boolean // true if the song is beginning or ending song. Otherwise, false.
+  onSelectHandler: () => void
 }
 
-export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selectedKeys, setSelectedKeys, readOnly=false, isStatic=false}: Props) {
+export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selectedMusicSheetIds, setMusicSheetIds, readOnly=false, isStatic=false, onSelectHandler}: Props) {
   const song = useRecoilValue(songAtom(songId))
   const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songId))
-  const [selectedSongWrapperList, setSelectedSongWrapperList] = useRecoilState(selectedWorshipSongWrapperListAtom)
-  const beginningSongWrapper = useRecoilState(worshipBeginningSongWrapperAtom)
-  const endingSongWrapper = useRecoilState(worshipEndingSongWrapperAtom)
+  const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
+  const beginningSongWrapper = useRecoilState(worshipBeginningSongHeaderAtom)
+  const endingSongWrapper = useRecoilState(worshipEndingSongHeaderAtom)
 
   function handleSelectSong() {
     if (isStatic) return
 
-    setSelectedSongWrapperList(prev => ([...prev, {song, note: song?.description, selectedKeys: selectedKeys}]))
+    onSelectHandler()
   }
 
   function handleUnselectSong() {
     if (isStatic) return
-    setSelectedSongWrapperList(prev => (prev.filter(songWrapper => songWrapper?.song?.id !== song.id)))
+    onSelectHandler()
   }
 
   function handleKeyClick(key: string) {
     if (isStatic) {
-      setSelectedKeys([key])
+      setMusicSheetIds([key])
     }
     else {
       if (isKeySelected(key)) {
-        setSelectedKeys([...selectedKeys.filter((_key) => _key !== key)])
+        setMusicSheetIds([...selectedKeys.filter((_key) => _key !== key)])
       }
       else {
         console.log(key)
-        setSelectedKeys([...selectedKeys, key])
+        setMusicSheetIds([...selectedKeys, key])
       }
     }
   }
@@ -62,7 +63,7 @@ export function SelectSongDetailCard({teamId, isOpen, setIsOpen, songId, selecte
   }
 
   function isSongAdded() {
-    return selectedSongWrapperList.map((songWrapper => songWrapper?.song?.id)).includes(songId)
+    return selectedSongHeaderList.map((songWrapper => songWrapper?.song?.id)).includes(songId)
   }
 
   return (

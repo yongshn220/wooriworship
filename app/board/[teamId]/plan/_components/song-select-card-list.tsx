@@ -1,7 +1,7 @@
 // import {Song} from "@/models/song";
 // import {SongSelectCard} from "@/app/board/[teamId]/plan/_components/song-select-card";
 // import {useRecoilValue} from "recoil";
-// import {selectedWorshipSongWrapperListAtom} from "@/app/board/[teamId]/plan/_components/status";
+// import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/plan/_components/status";
 // import {useMemo} from "react";
 // import {useDebounce} from "use-debounce";
 //
@@ -12,7 +12,7 @@
 // }
 //
 // export function SongSelectCardList({teamId, searchInput, songList}: Props) {
-//   const selectedSongInfoList = useRecoilValue(selectedWorshipSongWrapperListAtom)
+//   const selectedSongInfoList = useRecoilValue(selectedWorshipSongHeaderListAtom)
 //   const [debounced] = useDebounce(searchInput, 500)
 //
 //   const preprocessedSongList = useMemo(() => {

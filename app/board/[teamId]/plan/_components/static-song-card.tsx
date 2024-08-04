@@ -1,7 +1,7 @@
 "use client"
 
 import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
-import {worshipBeginningSongWrapperAtom, worshipEndingSongWrapperAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {WorshipSpecialOrderType} from "@/components/constants/enums";
 import {Checkbox} from "@/components/ui/checkbox";
 import {useEffect, useState} from "react";
@@ -12,48 +12,55 @@ import {toast} from "@/components/ui/use-toast";
 import {songAtom} from "@/global-states/song-state";
 import {SelectSongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
 import {WorshipSongPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/worship-song-preview-item";
+import {WorshipSongHeader} from "@/models/worship";
 
 interface Props {
   teamId: string
   specialOrderType: WorshipSpecialOrderType
-  songWrapper: { id: string, key: string }
+  songHeader: WorshipSongHeader
 }
 
 type CheckState = boolean | "indeterminate"
 
-export function StaticSongCard({teamId, specialOrderType, songWrapper}: Props) {
-  const song = useRecoilValue(songAtom(songWrapper?.id))
+export function StaticSongCard({teamId, specialOrderType, songHeader}: Props) {
+  const song = useRecoilValue(songAtom(songHeader?.id))
   const [team, setTeam] = useRecoilState(teamAtom(teamId))
-  const setWorshipBeginningSongWrapper = useSetRecoilState(worshipBeginningSongWrapperAtom)
-  const setWorshipEndingSongWrapper = useSetRecoilState(worshipEndingSongWrapperAtom)
+  const setWorshipBeginningSongHeader = useSetRecoilState(worshipBeginningSongHeaderAtom)
+  const setWorshipEndingSongHeader = useSetRecoilState(worshipEndingSongHeaderAtom)
   const [isDefaultChecked, setDefaultChecked] = useState<CheckState>(false)
 
   useEffect(() => {
     const option = team?.option?.worship
     if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
-      if (option?.beginning_song?.id && option?.beginning_song?.id === songWrapper?.id && option?.beginning_song?.key === songWrapper?.key) {
-        setDefaultChecked(true)
-      }
-      else {
-        setDefaultChecked(false)
+      if (option?.beginning_song?.id && option?.beginning_song?.id === songHeader?.id) {
+        let checked = true
+        for (const optionId of option.beginning_song?.selected_music_sheet_ids) {
+          if (songHeader?.selected_music_sheet_ids.includes(optionId) === false) {
+            checked = false; break
+          }
+        }
+        setDefaultChecked(checked)
       }
     }
     else {
-      if (option?.ending_song?.id && option?.ending_song?.id === songWrapper?.id && option?.ending_song?.key === songWrapper?.key) {
-        setDefaultChecked(true)
-      }
-      else {
-        setDefaultChecked(false)
+      if (option?.ending_song?.id && option?.ending_song?.id === songHeader?.id) {
+        let checked = true
+        for (const optionId of option.ending_song?.selected_music_sheet_ids) {
+          if (songHeader?.selected_music_sheet_ids.includes(optionId) === false) {
+            checked = false; break
+          }
+        }
+        setDefaultChecked(checked)
       }
     }
-  }, [songWrapper.id, specialOrderType, team?.option?.worship, songWrapper?.key])
+  }, [songHeader?.id, songHeader?.selected_music_sheet_ids, specialOrderType, team?.option?.worship])
 
   function handleRemoveSong() {
     if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
-      setWorshipBeginningSongWrapper(null); return
+      setWorshipBeginningSongHeader(null); return
     }
     if (specialOrderType === WorshipSpecialOrderType.ENDING) {
-      setWorshipEndingSongWrapper(null); return
+      setWorshipEndingSongHeader(null); return
     }
   }
 
@@ -72,10 +79,14 @@ export function StaticSongCard({teamId, specialOrderType, songWrapper}: Props) {
       let teamOption: TeamOption = JSON.parse(JSON.stringify(team?.option))
 
       if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
-        teamOption.worship.beginning_song = (state)? {id: songWrapper?.id, key: songWrapper?.key} : {id: null, key: null}
+        teamOption.worship.beginning_song = (state)
+          ? {id: songHeader?.id, note: songHeader?.note, selected_music_sheet_ids: songHeader?.selected_music_sheet_ids}
+          : {id: null, note: "", selected_music_sheet_ids: []}
       }
       else {
-        teamOption.worship.ending_song = (state)? {id: songWrapper?.id, key: songWrapper?.key} : {id: null, key: null}
+        teamOption.worship.ending_song = (state)
+          ? {id: songHeader?.id, note: songHeader?.note, selected_music_sheet_ids: songHeader?.selected_music_sheet_ids}
+          : {id: null, note: "", selected_music_sheet_ids: []}
       }
 
       if (await TeamService.updateTeamOption(teamId, teamOption) === false) {
@@ -111,12 +122,12 @@ export function StaticSongCard({teamId, specialOrderType, songWrapper}: Props) {
     }
   }
 
-  function setSelectedKey(newKey: string) {
+  function setMusicSheetIds(ids: Array<string>) {
     if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
-      setWorshipBeginningSongWrapper((prev) => ({id: prev.id, key: newKey}))
+      setWorshipBeginningSongHeader((prev) => ({...prev, selected_music_sheet_ids: ids}))
     }
     else {
-      setWorshipEndingSongWrapper((prev) => ({id: prev.id, key: newKey}))
+      setWorshipEndingSongHeader((prev) => ({...prev, selected_music_sheet_ids: ids}))
     }
   }
 
@@ -128,12 +139,12 @@ export function StaticSongCard({teamId, specialOrderType, songWrapper}: Props) {
         </div>
         <SelectSongDetailCardWrapper
           teamId={teamId}
-          songId={songWrapper?.id}
-          selectedKeys={songWrapper?.key ? [songWrapper?.key] : []}
-          setSelectedKeys={(selectedKeys: string[]) => setSelectedKey(selectedKeys[0])}
+          songId={songHeader?.id}
+          selectedMusicSheetIds={songHeader?.selected_music_sheet_ids}
+          setMusicSheetIds={(musicSheetIds) => setMusicSheetIds(musicSheetIds)}
           isStatic={true}
         >
-          <WorshipSongPreviewItem songId={songWrapper?.id} selectedKeys={[songWrapper?.key]}/>
+          <WorshipSongPreviewItem songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids}/>
         </SelectSongDetailCardWrapper>
       </div>
       <div className="flex-between px-2 pt-1">

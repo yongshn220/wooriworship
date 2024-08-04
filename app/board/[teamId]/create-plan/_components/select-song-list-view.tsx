@@ -7,7 +7,7 @@ import Image from "next/image";
 import * as React from "react";
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import {Checkbox} from "@/components/ui/checkbox";
-import {selectedWorshipSongWrapperListAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {useMemo, useState} from "react";
 import {
   SelectSongDetailCardWrapper

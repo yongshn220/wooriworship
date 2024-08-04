@@ -5,7 +5,7 @@ import * as React from "react"
 import {Carousel, CarouselContent, type CarouselApi, CarouselPrevious, CarouselNext} from "@/components/ui/carousel"
 import {useEffect, useMemo, useState} from "react";
 import {SongCarouselItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel-item";
-import {SongHeader, Worship} from "@/models/worship";
+import {WorshipSongHeader, Worship} from "@/models/worship";
 import {useRecoilValue} from "recoil";
 import {songAtom, songsByWorshipIdAtom} from "@/global-states/song-state";
 import {MusicSheetUrlWrapper} from "@/components/constants/types";

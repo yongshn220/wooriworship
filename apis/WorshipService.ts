@@ -1,11 +1,11 @@
 import {BaseService, SongService} from ".";
 import {Timestamp} from "@firebase/firestore";
 import {Worship} from "@/models/worship";
-import {WorshipPlan} from "@/components/constants/types";
+import {WorshipInput} from "@/components/constants/types";
 
 class WorshipService extends BaseService {
   constructor() {
-    super("worships");
+    super("worships_m");
   }
 
   async getTeamWorship(teamId: string) {
@@ -19,8 +19,8 @@ class WorshipService extends BaseService {
     return worships
   }
 
-  async addNewWorship(userId: string, teamId: string, worshipInput: WorshipPlan) {
-    const songIds = worshipInput?.worshipSongWrappers.map((songInfo) => songInfo.song.id);
+  async addNewWorship(userId: string, teamId: string, worshipInput: WorshipInput) {
+    const songIds = worshipInput?.worshipSongHeaders.map((header) => header?.id);
     const promises = [];
     for (const songId of songIds) {
       promises.push(SongService.utilizeSong(songId));
@@ -30,7 +30,7 @@ class WorshipService extends BaseService {
       team_id: teamId,
       title: worshipInput?.title,
       description: worshipInput?.description,
-      songs: worshipInput?.worshipSongWrappers.map((wrapper) => ({id: wrapper.song.id, note: wrapper.note, selected_keys: wrapper.selectedKeys})),
+      songs: worshipInput?.worshipSongHeaders,
       beginning_song: worshipInput.beginningSong,
       ending_song: worshipInput.endingSong,
       created_by: {
@@ -46,11 +46,11 @@ class WorshipService extends BaseService {
     return await this.create(newWorship);
   }
 
-  async updateWorship(userId: string, worshipId: string, worshipInput: WorshipPlan) {
+  async updateWorship(userId: string, worshipId: string, worshipInput: WorshipInput) {
     const worship = {
       title: worshipInput?.title,
       description: worshipInput?.description,
-      songs: worshipInput?.worshipSongWrappers.map((songInfo) => ({id: songInfo.song.id, note: songInfo.note})),
+      songs: worshipInput?.worshipSongHeaders,
       beginning_song: worshipInput.beginningSong,
       ending_song: worshipInput.endingSong,
       updated_by: {

@@ -1,13 +1,14 @@
 import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
+import {SongKeyBox} from "@/components/song/song-key-box";
 
 interface Props {
   songId: string
-  selectedKeys: Array<string>
+  selectedMusicSheetIds: Array<string>
   customTags?: string[]
 }
 
-export function WorshipSongPreviewItem({songId, selectedKeys, customTags=[]}: Props) {
+export function WorshipSongPreviewItem({songId, selectedMusicSheetIds, customTags=[]}: Props) {
   const song = useRecoilValue(songAtom(songId))
 
   return (
@@ -22,10 +23,8 @@ export function WorshipSongPreviewItem({songId, selectedKeys, customTags=[]}: Pr
               </span>
             </p>
             {
-              selectedKeys.map((songKey, index) => (
-                <div key={index} className="flex-center text-sm text-white font-medium bg-gray-400 rounded-sm w-5 h-5">
-                  {songKey}
-                </div>
+              selectedMusicSheetIds?.map((id, index) => (
+                <SongKeyBox key={index} musicSheetId={id}/>
               ))
             }
           </div>
