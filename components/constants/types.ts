@@ -24,9 +24,3 @@ export interface WorshipInput {
   beginningSong: WorshipSongHeader
   endingSong: WorshipSongHeader
 }
-
-
-export interface MusicSheetUrlWrapper {
-  note: string
-  urls: string[]
-}
