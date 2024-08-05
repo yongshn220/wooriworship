@@ -83,13 +83,19 @@ export const worshipSongListAtom = atomFamily<Array<Song>, string>({
       get(worshipSongUpdaterAtom)
       try {
         const worship = get(worshipAtom(worshipId))
-        if (!worship) return []
+        if (!worship) {
+          console.log("Worship is not exists."); return []
+        }
 
         const songListPromise = worship.songs?.map(song => get(songAtom(song.id)))
-        if (!songListPromise) return []
+        if (!songListPromise) {
+          console.log("Fail while loading song list promises."); return []
+        }
 
         const songList = await Promise.all(songListPromise)
-        if (!songList) return []
+        if (!songList) {
+          console.log(("Fail while loading song lists.")); return []
+        }
 
         return songList
       }

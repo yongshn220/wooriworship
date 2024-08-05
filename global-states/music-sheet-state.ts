@@ -63,6 +63,36 @@ export const musicSheetsBySongIdAtom = atomFamily<Array<MusicSheet>, string>({
   })
 })
 
+export const musicSheetsByIdsAtom = atomFamily<Array<MusicSheet>, Array<string>>({
+  key: "musicSheetsByIdsAtom",
+  default: selectorFamily({
+    key: "musicSheetsByIdsAtom/default",
+    get: (musicSheetIds) => async ({get}) => {
+      try {
+        if (!musicSheetIds) {
+          console.log("No music sheet ids exist."); return []
+        }
+
+        const promises = musicSheetIds.map(id => get(musicSheetAtom(id)))
+        if (!promises) {
+          console.log("Fail while loading music sheet promises."); return []
+        }
+
+        const musicSheetList = await Promise.all(promises)
+        if (!musicSheetList) {
+          console.log("Fail while loading music sheet list."); return []
+        }
+
+        return musicSheetList
+      }
+      catch (e) {
+        console.log(e)
+        return []
+      }
+    }
+  })
+})
+
 
 export const musicSheetAtom = atomFamily<MusicSheet, string>({
   key: "musicSheetAtom",

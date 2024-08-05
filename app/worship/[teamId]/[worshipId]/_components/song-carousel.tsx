@@ -4,11 +4,16 @@ import * as React from "react"
 
 import {Carousel, CarouselContent, type CarouselApi, CarouselPrevious, CarouselNext} from "@/components/ui/carousel"
 import {useEffect, useMemo, useState} from "react";
-import {SongCarouselItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel-item";
+import {
+  SongCarouselItem,
+  SongCarouselItemWrapper
+} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel-item";
 import {WorshipSongHeader, Worship} from "@/models/worship";
 import {useRecoilValue} from "recoil";
 import {songAtom, songsByWorshipIdAtom} from "@/global-states/song-state";
 import {MusicSheetUrlWrapper} from "@/components/constants/types";
+import {musicSheetsByIdsAtom} from "@/global-states/music-sheet-state";
+import {MusicSheet} from "@/models/music_sheet";
 
 interface Props {
   worship: Worship
@@ -21,6 +26,8 @@ export function SongCarousel({worship}: Props) {
   const beginningSong = useRecoilValue(songAtom(worship?.beginning_song?.id))
   const endingSong = useRecoilValue(songAtom(worship?.ending_song?.id))
   const mainSongs = useRecoilValue(songsByWorshipIdAtom(worship?.id))
+  // const beginningSongSelectedMusicSheets = useRecoilValue(musicSheetsByIdsAtom(worship?.beginning_song?.selected_music_sheet_ids))
+  // const endingSongSelectedMusicSheets = useRecoilValue(musicSheetsByIdsAtom(worship?.ending_song?.selected_music_sheet_ids))
 
   useEffect(() => {
     if (!api) {
@@ -33,30 +40,19 @@ export function SongCarousel({worship}: Props) {
     })
   }, [api])
 
-  const musicSheetUrlWrapperList = useMemo(() => {
-    return []
-    // const results: MusicSheetUrlWrapper[] = []
-    // if (beginningSong) {
-    //   const musicSheet = beginningSong?.music_sheets.find(ms => ms.key === worship?.beginning_song.key)
-    //   const beginningSongHeader: MusicSheetUrlWrapper = {note: beginningSong?.description, urls: musicSheet?.urls}
-    //   results.push(beginningSongHeader)
-    // }
-    //
-    // mainSongs?.map(song => {
-    //   const s = useRecoilValue(songAtom(song.id))
-    //   const header = worship?.songs?.find(header => header.id === song?.id)
-    //   results.push({
-    //     note: header?.note,
-    //     urls: song?.music_sheets.
-    //   })
-    // })
-    // if (endingSong) {
-    //   const musicSheet = endingSong?.music_sheets.find(ms => ms.key === worship?.ending_song.key)
-    //   const endingSongHeader: MusicSheetUrlWrapper = {note: endingSong?.description, urls: musicSheet?.urls}
-    //   results.push(endingSongHeader)
-    // }
-    // return results
-  }, [beginningSong, endingSong, worship?.beginning_song?.key, worship?.ending_song?.key, worship?.songs])
+  const aggregatedSongHeaders = useMemo(() => {
+    const headers: Array<WorshipSongHeader> = []
+    if (beginningSong) {
+      headers.push(worship?.beginning_song)
+    }
+    worship?.songs?.forEach((songHeader) => {
+      headers.push(songHeader)
+    })
+   if (endingSong) {
+      headers.push(worship?.ending_song)
+    }
+    return headers
+  }, [beginningSong, endingSong, worship?.beginning_song, worship?.ending_song, worship?.songs])
 
 
   return (
@@ -64,8 +60,8 @@ export function SongCarousel({worship}: Props) {
       <Carousel setApi={setApi} className="w-full h-full">
         <CarouselContent>
           {
-            musicSheetUrlWrapperList.map((header, index) => (
-              <SongCarouselItem key={index} musicSheetHeader={header}/>
+            aggregatedSongHeaders.map((songHeader, index) => (
+              <SongCarouselItemWrapper key={index} songHeader={songHeader}/>
           ))}
         </CarouselContent>
         <CarouselPrevious />
