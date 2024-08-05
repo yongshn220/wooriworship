@@ -15,13 +15,13 @@ export function SongCarouselItemWrapper({songHeader}: Props) {
   const musicSheets = useRecoilValue(musicSheetsByIdsAtom(songHeader?.selected_music_sheet_ids))
 
   return (
-    <>
+    <React.Fragment>
       {
         musicSheets?.map((musicSheet, index) => (
           <SongCarouselItem key={index} songId={songHeader?.id} note={songHeader?.note} urls={musicSheet?.urls}/>
         ))
       }
-    </>
+    </React.Fragment>
   )
 }
 

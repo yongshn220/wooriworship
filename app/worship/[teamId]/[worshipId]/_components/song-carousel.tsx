@@ -23,11 +23,6 @@ export function SongCarousel({worship}: Props) {
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
   const [count, setCount] = useState(worship?.songs?.length ?? 0)
-  const beginningSong = useRecoilValue(songAtom(worship?.beginning_song?.id))
-  const endingSong = useRecoilValue(songAtom(worship?.ending_song?.id))
-  const mainSongs = useRecoilValue(songsByWorshipIdAtom(worship?.id))
-  // const beginningSongSelectedMusicSheets = useRecoilValue(musicSheetsByIdsAtom(worship?.beginning_song?.selected_music_sheet_ids))
-  // const endingSongSelectedMusicSheets = useRecoilValue(musicSheetsByIdsAtom(worship?.ending_song?.selected_music_sheet_ids))
 
   useEffect(() => {
     if (!api) {
@@ -42,17 +37,17 @@ export function SongCarousel({worship}: Props) {
 
   const aggregatedSongHeaders = useMemo(() => {
     const headers: Array<WorshipSongHeader> = []
-    if (beginningSong) {
+    if (worship?.beginning_song?.id) {
       headers.push(worship?.beginning_song)
     }
     worship?.songs?.forEach((songHeader) => {
       headers.push(songHeader)
     })
-   if (endingSong) {
+    if (worship?.ending_song?.id) {
       headers.push(worship?.ending_song)
     }
     return headers
-  }, [beginningSong, endingSong, worship?.beginning_song, worship?.ending_song, worship?.songs])
+  }, [worship?.beginning_song, worship?.ending_song, worship?.songs])
 
 
   return (
