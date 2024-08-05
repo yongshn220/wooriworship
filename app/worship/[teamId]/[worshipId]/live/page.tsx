@@ -1,6 +1,6 @@
 "use client"
 
-import {SongCarouselFull} from "@/app/worship/[teamId]/[worshipId]/live/_components/song-carousel-full";
+import {WorshipLiveCarousel} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-live-carousel";
 import {WorshipLiveMenu} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-live-menu";
 import {WorshipIndexIndicator} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-index-indicator";
 import {Dialog, DialogContent, DialogContentNoCloseButton} from "@/components/ui/dialog";
@@ -22,7 +22,7 @@ export default function WorshipLivePage({params}: any) {
   return (
     <Dialog open={true} onOpenChange={handleOpenChange}>
       <DialogContentNoCloseButton className="flex-center w-full max-w-8xl h-full p-0">
-        <SongCarouselFull worshipId={worshipId}/>
+        <WorshipLiveCarousel worshipId={worshipId}/>
         <WorshipLiveMenu teamId={teamId} worshipId={worshipId}/>
         <WorshipIndexIndicator/>
       </DialogContentNoCloseButton>
