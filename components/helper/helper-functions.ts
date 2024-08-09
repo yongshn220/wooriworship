@@ -286,7 +286,7 @@ export function getAllUrlsFromMusicSheetContainers(mContainers: MusicSheetContai
       console.log("getAllUrlsFromMusicSheetContainers: mContainer is not exists."); return []
     }
 
-    const urls = []
+    const urls: Array<string> = []
     mContainers?.forEach(mContainer => {
       mContainer?.imageFileContainers?.forEach(iContainer => {
         urls.push(iContainer?.url)
