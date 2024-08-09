@@ -204,7 +204,7 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
             </Label>
             <Input
               id="name"
-              className=""
+              className="bg-white"
               placeholder="Title of worship"
               value={basicInfo.title}
               onChange={(e) => setBasicInfo((prev => ({...prev, title: e.target.value})))}
@@ -221,7 +221,7 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
               Description
             </Label>
             <Textarea
-              className="h-40"
+              className="h-40 bg-white"
               placeholder="Write the description"
               value={basicInfo.description}
               onChange={(e) => setBasicInfo((prev => ({...prev, description: e.target.value})))}

@@ -7,8 +7,14 @@ import {Suspense} from "react";
 import {Button} from "@/components/ui/button";
 import {SelectSongListView} from "@/app/board/[teamId]/create-plan/_components/select-song-list-view";
 import {LoadingCircle} from "@/components/animation/loading-indicator";
-import {useRecoilState} from "recoil";
+import {useRecoilState, useRecoilValue} from "recoil";
 import {songSearchInputAtom} from "@/app/board/_states/board-states";
+import {Badge} from "@/components/ui/badge";
+import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/plan/_components/status";
+import {songAtom} from "@/global-states/song-state";
+import {
+  SelectSongDetailCardWrapper
+} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
 
 interface Props {
   teamId: string
@@ -16,6 +22,7 @@ interface Props {
 
 export function AddSongButton({teamId}: Props) {
   const [input, setInput] = useRecoilState(songSearchInputAtom)
+  const selectedSongHeaderList = useRecoilValue(selectedWorshipSongHeaderListAtom)
 
   return (
     <Dialog>
@@ -24,13 +31,13 @@ export function AddSongButton({teamId}: Props) {
           <p className="text-gray-400 group-hover:text-gray-500">click to add song</p>
         </div>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-4xl h-[90%]">
-        <div className="w-full overflow-y-scroll scrollbar-hide">
+      <DialogContent className="sm:max-w-4xl h-[90%] p-4">
+        <div className="w-full overflow-y-scroll scrollbar-hide p-1">
           <DialogTitle>
             Select Song
           </DialogTitle>
           <div className="w-full min-h-[80%] mt-10 flex-col">
-            <div className="w-full relative px-2">
+            <div className="w-full relative">
               <Search className="absolute top-1/2 left-5 transform -translate-y-1/2 text-muted-foreground h-5 w-5"/>
               <Input
                 className="w-full pl-12 py-6"
@@ -38,6 +45,13 @@ export function AddSongButton({teamId}: Props) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
               />
+            </div>
+            <div className="space-x-2 space-y-2">
+              {
+                selectedSongHeaderList?.map((songHeader, index) => (
+                  <SongBadge key={index} songId={songHeader?.id} />
+                ))
+              }
             </div>
             <Suspense fallback={<LoadingCircle/>}>
               <SelectSongListView teamId={teamId}/>
@@ -53,5 +67,17 @@ export function AddSongButton({teamId}: Props) {
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+interface SongBadgeProps {
+  songId: string
+}
+
+function SongBadge({songId}: SongBadgeProps) {
+  const song = useRecoilValue(songAtom(songId))
+
+  return (
+    <Badge variant="outline">{song?.title}</Badge>
   )
 }
