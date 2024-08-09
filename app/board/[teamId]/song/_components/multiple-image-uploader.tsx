@@ -1,7 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import {ImageFileContainer} from "@/components/constants/types";
 import {useRef, useState} from "react";
-import {update} from "@firebase/database";
 
 interface Props {
   imageFileContainers: Array<ImageFileContainer>;

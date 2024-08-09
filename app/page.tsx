@@ -6,7 +6,6 @@ import {auth} from "@/firebase";
 import {getPathBoard, getPathPlan} from "@/components/helper/routes";
 import {useRouter} from "next/navigation";
 import {UserService} from "@/apis";
-import {User} from "@/models/user";
 import useUserPreferences from "@/components/hook/use-local-preference";
 
 enum AuthStatus {

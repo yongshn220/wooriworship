@@ -1,10 +1,8 @@
-import {atom, atomFamily, selector, selectorFamily} from "recoil";
+import {atom, atomFamily, selectorFamily} from "recoil";
 import {Worship} from "@/models/worship";
 import {WorshipService} from "@/apis";
 import {Song} from "@/models/song";
 import {songAtom} from "@/global-states/song-state";
-import {currentTeamIdAtom} from "@/global-states/teamState";
-import {Timestamp} from "@firebase/firestore";
 
 export const currentTeamWorshipIdsAtom = atomFamily<Array<string>, string>({
   key: "currentTeamWorshipIdsAtom",

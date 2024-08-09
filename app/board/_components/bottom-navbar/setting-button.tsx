@@ -5,14 +5,11 @@ import {MenuIcon, SettingsIcon, UsersIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {AuthService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
-import {auth} from "@/firebase";
-import {useRecoilValue, useSetRecoilState} from "recoil";
-import {userAtom} from "@/global-states/userState";
+import {useSetRecoilState} from "recoil";
 import {useRouter} from "next/navigation";
 import {InvitationButton} from "@/app/board/_components/nav-bar/invitation-button";
 import {Separator} from "@/components/ui/separator";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import ManageTeam from "@/app/board/[teamId]/manage-team/page";
 import {ManageTeamDialog} from "@/app/board/_components/nav-bar/manage-team-dialog";
 
 export function SettingButton() {

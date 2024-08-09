@@ -6,7 +6,6 @@ import {useState} from "react";
 import {useRouter} from "next/navigation";
 import {getPathSong, getPathSongEdit} from "@/components/helper/routes";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {currentTeamIdAtom} from "@/global-states/teamState";
 import {SongService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
 import {CopyIcon, SquarePen, Trash2Icon, LinkIcon, DownloadIcon} from "lucide-react";

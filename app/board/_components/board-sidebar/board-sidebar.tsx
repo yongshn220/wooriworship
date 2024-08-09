@@ -1,6 +1,6 @@
 "use client"
 import {Button} from "@/components/ui/button";
-import {CalendarIcon, CircleCheckIcon, FileMusicIcon, HomeIcon, LayoutDashboard} from 'lucide-react';
+import {CalendarIcon, CircleCheckIcon, FileMusicIcon, HomeIcon} from 'lucide-react';
 import {Page} from "@/components/constants/enums";
 import {TeamSelect} from "@/app/board/_components/board-sidebar/team-select";
 import {MainLogoRouter} from "@/components/logo/main-logo";

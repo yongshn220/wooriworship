@@ -1,7 +1,6 @@
 import { InvitationStatus } from "@/components/constants/enums";
 import { BaseService } from ".";
 import EmailService from "./EmailService";
-import {lowerCase} from "lower-case";
 
 class InvitationService extends BaseService {
     constructor() {
@@ -76,7 +75,7 @@ class InvitationService extends BaseService {
         ]);
         return invitations
     }
-    
+
     async deleteTeamReceiverInvitations(teamId: string, receiver_email: string) {
         await this.deleteByFilters([
             {

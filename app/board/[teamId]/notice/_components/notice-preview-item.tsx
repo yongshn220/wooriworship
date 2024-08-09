@@ -5,8 +5,6 @@ import {
   getTimePassedFromTimestampShorten,
   timestampToDateStringFormatted
 } from "@/components/helper/helper-functions";
-import {userAtom} from "@/global-states/userState";
-import {MenuIcon, UserIcon} from "lucide-react";
 import Image from 'next/image'
 import {useRouter} from "next/navigation";
 import {getPathNotice} from "@/components/helper/routes";

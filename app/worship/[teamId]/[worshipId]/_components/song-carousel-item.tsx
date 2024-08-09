@@ -5,7 +5,7 @@ import {WorshipSongHeader} from "@/models/worship";
 import Image from 'next/image'
 import {songAtom} from "@/global-states/song-state";
 import {useRecoilValue} from "recoil";
-import {musicSheetAtom, musicSheetsByIdsAtom} from "@/global-states/music-sheet-state";
+import {musicSheetsByIdsAtom} from "@/global-states/music-sheet-state";
 
 interface Props {
   songHeader: WorshipSongHeader

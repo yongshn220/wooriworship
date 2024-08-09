@@ -1,5 +1,4 @@
 import Image from "next/image";
-import {RoleSelect} from "@/app/board/_components/nav-bar/role-select";
 import {Invitation} from "@/models/invitation";
 import { InvitationService } from "@/apis";
 import {InvitationStatus} from "@/components/constants/enums";

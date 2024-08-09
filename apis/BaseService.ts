@@ -1,4 +1,4 @@
-import { firestore } from "@/firebase";
+import {firestore} from "@/firebase";
 
 export default class BaseService {
     collectionName: string;
@@ -124,8 +124,7 @@ export default class BaseService {
     async create(data: any) {
         try {
             const ref = await firestore.collection(this.collectionName).add(data);
-            const id = ref.id;
-            return id;
+            return ref.id;
         }
         catch (e) {
             console.log(e)

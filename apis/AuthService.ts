@@ -42,8 +42,8 @@ class AuthService extends BaseService {
     }
 
     async register(email: string, password: string) {
-        if(auth.currentUser) {
-            this.logout();
+        if (auth.currentUser) {
+            await this.logout();
         }
         return await firebaseApp.auth().createUserWithEmailAndPassword(email, password);
     }

@@ -1,12 +1,9 @@
 import {Separator} from "@/components/ui/separator";
 import {useRecoilValue} from "recoil";
 import {noticeAtom} from "@/global-states/notice-state";
-import {
-  getTimePassedFromTimestampShorten,
-  timestampToDateStringFormatted
-} from "@/components/helper/helper-functions";
+import {getTimePassedFromTimestampShorten, timestampToDateStringFormatted} from "@/components/helper/helper-functions";
 import {userAtom} from "@/global-states/userState";
-import {MenuIcon, UserIcon} from "lucide-react";
+import {UserIcon} from "lucide-react";
 import Image from 'next/image'
 import {NoticeDropdownMenu} from "@/app/board/[teamId]/notice/_components/notice-dropdown-menu";
 

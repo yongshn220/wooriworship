@@ -5,10 +5,7 @@ import * as React from "react";
 import {InvitationCard} from "@/app/board/_components/nav-bar/invitation-card";
 import {auth} from "@/firebase";
 import {Invitation} from "@/models/invitation";
-import {useRecoilValue} from "recoil";
-import {pendingReceivedInvitationsAtom} from "@/global-states/invitation-state";
 import {Suspense, useEffect, useState} from "react";
-import Image from "next/image";
 import {Separator} from "@/components/ui/separator";
 import {InvitationService} from "@/apis";
 

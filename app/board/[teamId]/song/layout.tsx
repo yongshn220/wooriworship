@@ -1,7 +1,5 @@
 "use client"
 
-import {PageInit} from "@/components/page/page-init";
-import {Page} from "@/components/constants/enums";
 import {SongListView} from "@/app/board/[teamId]/song/_components/song-list-view";
 import {PullToRefresh} from "@/components/functionality/pull-to-refresh";
 

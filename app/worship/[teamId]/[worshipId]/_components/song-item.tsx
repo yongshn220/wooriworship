@@ -1,8 +1,6 @@
 "use client"
 
 import {WorshipSongHeader} from "@/models/worship";
-import LinkIcon from '@/public/icons/linkIcon.svg'
-import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
 import {isMobile} from "@/components/helper/helper-functions";

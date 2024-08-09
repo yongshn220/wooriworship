@@ -2,7 +2,6 @@
 
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
-import Image from 'next/image'
 import {Input} from "@/components/ui/input";
 import {useMemo, useState} from "react";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";

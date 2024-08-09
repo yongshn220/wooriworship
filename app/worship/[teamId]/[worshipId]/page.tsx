@@ -13,7 +13,6 @@ import {
   timestampToDateString
 } from "@/components/helper/helper-functions";
 import {worshipAtom} from "@/global-states/worship-state";
-import {ViewMode} from "@/app/board/[teamId]/song/_components/song-list-item";
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import * as React from "react";
 import {BlocksIcon, MusicIcon} from "lucide-react";

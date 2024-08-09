@@ -9,7 +9,7 @@ class SongCommentService extends BaseService {
   }
 
   async getSongComments(songId:string, teamId: string) {
-    const songs = await this.getByFilters([
+    const songComments = await this.getByFilters([
     {
         a: 'song_id',
         b: '==',
@@ -21,7 +21,7 @@ class SongCommentService extends BaseService {
         c: teamId
     }
     ]);
-    return songs
+    return songComments
   }
 
   async addNewSongComment(userId: string, teamId: string, songId: string, comment: any) {

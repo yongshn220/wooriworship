@@ -3,9 +3,7 @@
 import {Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import {Search} from "lucide-react";
 import {Input} from "@/components/ui/input";
-import {Suspense, useEffect, useState} from "react";
-import SongService from "@/apis/SongService";
-import {Song} from "@/models/song";
+import {Suspense} from "react";
 import {Button} from "@/components/ui/button";
 import {SelectSongListView} from "@/app/board/[teamId]/create-plan/_components/select-song-list-view";
 import {LoadingCircle} from "@/components/animation/loading-indicator";

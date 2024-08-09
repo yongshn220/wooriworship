@@ -1,6 +1,6 @@
 'use client'
 
-import {useRecoilState, useRecoilValue} from "recoil";
+import {useRecoilState} from "recoil";
 import {worshipLiveOptionsAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {MenuIcon, DoorOpenIcon, SquarePenIcon} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
@@ -10,8 +10,6 @@ import {Separator} from "@/components/ui/separator";
 import {useRouter} from "next/navigation";
 import {getPathWorship} from "@/components/helper/routes";
 import {Button} from "@/components/ui/button";
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {SelectIcon} from "@radix-ui/react-select";
 import {
   MultipleSheetsViewSelect
 } from "@/app/worship/[teamId]/[worshipId]/live/_components/multiple-sheets-view-select";
