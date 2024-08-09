@@ -72,11 +72,20 @@ function SelectSongListItem({teamId, songId}: ItemProps) {
   const [selectedWorshipSongHeaderList, setSelectedWorshipSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
 
   function handleSelectSong() {
-    setSelectedWorshipSongHeaderList((prev) => ([...prev, {
-      id: song?.id,
-      note: song?.description,
-      selected_music_sheet_ids: selectedMusicSheetIds
-    }]))
+    if (isSongSelected()) {
+      setSelectedWorshipSongHeaderList((prev) => ([...prev.filter((_header => _header?.id !== songId))]))
+    }
+    else {
+      setSelectedWorshipSongHeaderList((prev) => ([...prev, {
+        id: song?.id,
+        note: song?.description,
+        selected_music_sheet_ids: selectedMusicSheetIds
+      }]))
+    }
+  }
+
+  function isSongSelected() {
+    return selectedWorshipSongHeaderList?.map(songHeader => songHeader?.id)?.includes(songId)
   }
 
   return (

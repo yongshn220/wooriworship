@@ -48,7 +48,6 @@ export default class BaseService {
 
     async getByFilters(filters: Array<any> | null) {
         try {
-            console.log("getByFilters: ", this.collectionName)
             const result: Array<any> = [];
             let ref: any = firestore.collection(this.collectionName);
             if(filters) {

@@ -21,7 +21,16 @@ export function SelectSongDetailCardWrapper({children, teamId, songId, selectedM
     <>
       {
         (isMobile())
-        ? <SelectSongDetailDrawer teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={songId} readOnly={true} selectedMusicSheetIds={selectedMusicSheetIds} setMusicSheetIds={setMusicSheetIds} isStatic={isStatic}/>
+        ? <SelectSongDetailDrawer
+            teamId={teamId}
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            songId={songId} readOnly={true}
+            selectedMusicSheetIds={selectedMusicSheetIds}
+            setMusicSheetIds={setMusicSheetIds}
+            isStatic={isStatic}
+            onSelectHandler={() => onSelectHandler()}
+          />
         : <SelectSongDetailCard
             teamId={teamId}
             isOpen={isOpen}
