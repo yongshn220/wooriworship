@@ -300,7 +300,7 @@ export function getAllUrlsFromSongMusicSheets(musicSheets: MusicSheet[]) {
       console.log("getAllUrlsFromSongMusicSheets: musicSheets are not exists."); return []
     }
 
-    const urls = []
+    const urls: Array<string> = []
     musicSheets?.forEach(musicSheet => {
       musicSheet?.urls?.forEach(url => {
         urls.push(url)
