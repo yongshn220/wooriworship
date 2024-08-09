@@ -41,7 +41,7 @@ export function NewSongCard({teamId, songOrder, songHeader}: Props) {
     }
 
     setSelectedSongHeaderList((prev) => {
-      const newList = JSON.parse(JSON.stringify(prev))
+      const newList = JSON.parse(JSON.stringify(prev)) as Array<WorshipSongHeader>
       newList.forEach(_header => {
         if (_header?.id === songHeader?.id) {
           _header.selected_music_sheet_ids = musicSheetIds
