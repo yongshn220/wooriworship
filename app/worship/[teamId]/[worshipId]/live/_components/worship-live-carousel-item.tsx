@@ -1,21 +1,23 @@
 import * as React from "react";
-import {Card, CardContent} from "@/components/ui/card";
+import {Card} from "@/components/ui/card";
 import {WorshipNote} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-note";
 import {CarouselItem} from "@/components/ui/carousel";
-import {WorshipLiveSheetInfo} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-live-carousel";
 import {WorshipSongHeader} from "@/models/worship";
 import {useRecoilValue} from "recoil";
 import {musicSheetsByIdsAtom} from "@/global-states/music-sheet-state";
-import {useMemo} from "react";
+import {useEffect, useMemo} from "react";
 import {worshipMultipleSheetsViewModeAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {DirectionType} from "@/components/constants/enums";
 import {MusicSheet} from "@/models/music_sheet";
+import {MusicSheetCounts} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-live-carousel";
 
 
 interface Props {
   songHeader: WorshipSongHeader
+  setMusicSheetCounts: React.Dispatch<React.SetStateAction<Array<MusicSheetCounts>>>
 }
-export function WorshipLiveCarouselItemWrapper({songHeader}: Props) {
+
+export function WorshipLiveCarouselItemWrapper({songHeader, setMusicSheetCounts}: Props) {
   const musicSheets = useRecoilValue(musicSheetsByIdsAtom(songHeader?.selected_music_sheet_ids))
   const multipleSheetsViewMode = useRecoilValue(worshipMultipleSheetsViewModeAtom)
 
@@ -33,6 +35,13 @@ export function WorshipLiveCarouselItemWrapper({songHeader}: Props) {
     return results
 
   }, [multipleSheetsViewMode, musicSheets])
+
+  useEffect(() => {
+    setMusicSheetCounts((prev) => {
+      const newCounts = prev.filter((count) => count.id !== songHeader?.id)
+      return [...newCounts, {id: songHeader?.id, count: modifiedMusicSheets?.length}]
+    })
+  }, [modifiedMusicSheets?.length, setMusicSheetCounts, songHeader?.id])
 
   return (
     <React.Fragment>
