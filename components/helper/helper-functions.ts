@@ -4,6 +4,7 @@ import {saveAs} from "file-saver";
 import {Song} from "@/models/song";
 import {MusicSheetContainer} from "@/components/constants/types";
 import {MusicSheet} from "@/models/music_sheet";
+import MusicSheetService from "@/apis/MusicSheetService";
 
 export function getFirebaseTimestampNow() {
   return Timestamp.fromDate(new Date())
@@ -264,21 +265,31 @@ async function fetchImageAsBlob (url: string) {
 
 
 export async function downloadMultipleMusicSheets(songs: Array<Song>) {
-  // TODO: fix
-  alert("Download is currently unavailable.")
-  // const zip = new JSZip();
-  //
-  // // Add files to the zip
-  // for (const song of songs) {
-  //   for (const url of song.music_sheet_urls) {
-  //     const blob = await fetchImageAsBlob(url);
-  //     zip.file(`${song?.title}.${extractFileType(url)}`, blob)
-  //   }
-  // }
-  //
-  // // Generate the zip file and trigger download
-  // const blob = await zip.generateAsync({ type: 'blob' });
-  // saveAs(blob, 'music_sheets.zip');
+  const zip = new JSZip();
+
+
+  // Add files to the zip
+  for (const song of songs) {
+    const musicSheets = await MusicSheetService.getSongMusicSheets(song?.id)
+    for (const musicSheet of musicSheets) {
+      let index = 1
+      for (const url of musicSheet?.urls) {
+        const blob = await fetchImageAsBlob(url);
+
+        if (musicSheet?.urls?.length > 1) {
+          zip.file(`${song?.title} [${musicSheet?.key}]_${index}.${extractFileType(url)}`, blob)
+        }
+        else {
+          zip.file(`${song?.title} [${musicSheet?.key}].${extractFileType(url)}`, blob)
+        }
+        index += 1
+      }
+    }
+  }
+
+  // Generate the zip file and trigger download
+  const blob = await zip.generateAsync({ type: 'blob' });
+  saveAs(blob, 'music_sheets.zip');
 }
 
 export function getAllUrlsFromMusicSheetContainers(mContainers: MusicSheetContainer[]) {
@@ -296,15 +307,24 @@ export function getAllUrlsFromMusicSheetContainers(mContainers: MusicSheetContai
   }
 
 export function getAllUrlsFromSongMusicSheets(musicSheets: MusicSheet[]) {
-    if (!musicSheets) {
-      console.log("getAllUrlsFromSongMusicSheets: musicSheets are not exists."); return []
-    }
-
-    const urls: Array<string> = []
-    musicSheets?.forEach(musicSheet => {
-      musicSheet?.urls?.forEach(url => {
-        urls.push(url)
-      })
-    })
-    return urls
+  if (!musicSheets) {
+    console.log("getAllUrlsFromSongMusicSheets: musicSheets are not exists."); return []
   }
+
+  const urls: Array<string> = []
+  musicSheets?.forEach(musicSheet => {
+    musicSheet?.urls?.forEach(url => {
+      urls.push(url)
+    })
+  })
+  return urls
+}
+
+export function getSongTitleFromSongsById(songs, songId) {
+  songs?.forEach(song => {
+    if (song.id === songId) {
+      return song?.title
+    }
+  })
+  return "No title"
+}
