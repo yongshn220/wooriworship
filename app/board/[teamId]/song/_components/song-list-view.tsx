@@ -6,8 +6,6 @@ import {Separator} from "@/components/ui/separator";
 import Image from "next/image";
 import * as React from "react";
 import {NewSongButton} from "@/app/board/[teamId]/song/_components/new-song-button";
-import {useEffect} from "react";
-import {usePathname, useSearchParams} from "next/navigation";
 
 
 interface Props {

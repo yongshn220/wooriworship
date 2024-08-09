@@ -9,11 +9,6 @@ import {
   SongCarouselItemWrapper
 } from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel-item";
 import {WorshipSongHeader, Worship} from "@/models/worship";
-import {useRecoilValue} from "recoil";
-import {songAtom, songsByWorshipIdAtom} from "@/global-states/song-state";
-import {MusicSheetUrlWrapper} from "@/components/constants/types";
-import {musicSheetsByIdsAtom} from "@/global-states/music-sheet-state";
-import {MusicSheet} from "@/models/music_sheet";
 
 interface Props {
   worship: Worship
@@ -22,7 +17,7 @@ interface Props {
 export function SongCarousel({worship}: Props) {
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
-  const [count, setCount] = useState(worship?.songs?.length ?? 0)
+  const [count, _] = useState(worship?.songs?.length ?? 0)
 
   useEffect(() => {
     if (!api) {

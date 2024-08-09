@@ -1,7 +1,6 @@
 "use client"
 
 import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-card";
-import {Song} from "@/models/song";
 import {useState} from "react";
 import {SongDetailDrawer} from "@/app/board/[teamId]/song/_components/song-detail-drawer";
 import {isMobile} from "@/components/helper/helper-functions";

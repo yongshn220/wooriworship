@@ -9,7 +9,6 @@ import {currentTeamIdAtom} from "@/global-states/teamState";
 import tagService from "@/apis/TagService";
 import {songBoardSelectedSortOptionAtom, searchSelectedTagsAtom} from "@/app/board/_states/board-states";
 import {Button} from "@/components/ui/button";
-import {Settings2Icon} from "lucide-react";
 import {Separator} from "@/components/ui/separator";
 import {SongBoardSortOption} from "@/components/constants/enums";
 

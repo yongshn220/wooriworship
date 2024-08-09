@@ -1,4 +1,3 @@
-import {Badge} from "@/components/ui/badge";
 import {UserIcon} from "lucide-react";
 import {CommentItemMenu} from "@/components/comment/comment-item-menu";
 import React, {useState} from "react";
@@ -7,7 +6,7 @@ import {useRecoilValue, useSetRecoilState} from "recoil";
 import {songCommentAtom, songCommentUpdater} from "@/global-states/song-comment-state";
 import {userAtom} from "@/global-states/userState";
 import {auth} from "@/firebase";
-import {getTimePassedFromTimestamp, getTimePassedFromTimestampShorten} from "@/components/helper/helper-functions";
+import {getTimePassedFromTimestampShorten} from "@/components/helper/helper-functions";
 import {SongCommentService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
 

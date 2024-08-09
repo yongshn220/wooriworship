@@ -1,8 +1,7 @@
 "use client"
-import {AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,} from "@/components/ui/alert-dialog"
+import {AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle,} from "@/components/ui/alert-dialog"
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
-import {LoadingCircle} from "@/components/animation/loading-indicator";
 
 
 interface Props {

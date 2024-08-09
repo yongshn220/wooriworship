@@ -1,5 +1,4 @@
 import BaseService from "./BaseService"
-import { User } from "@/models/user";
 import {arrayUnion, arrayRemove} from "@firebase/firestore";
 import { TeamService } from ".";
 
@@ -32,7 +31,7 @@ class UserService extends BaseService {
     }
 
     async updateInviteOptin(userId: string, inviteOptin: Boolean) {
-        this.update(userId, {invite_optin: inviteOptin})
+        await this.update(userId, {invite_optin: inviteOptin})
     }
 
     async leaveTeam(userId: string, teamId: string, singleSide: Boolean) {

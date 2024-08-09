@@ -5,7 +5,6 @@ import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/helper/routes";
 import {getTimePassedFromTimestamp, getTimePassedFromTimestampShorten} from "@/components/helper/helper-functions";
 import {Badge} from "@/components/ui/badge";
-import {Checkbox} from "@/components/ui/checkbox";
 import {SongKeyBox} from "@/components/song/song-key-box";
 import {musicSheetIdsAtom} from "@/global-states/music-sheet-state";
 

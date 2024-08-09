@@ -1,20 +1,11 @@
 'use client'
 
 import {Dialog, DialogContentNoCloseButton, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
-import {Label} from "@/components/ui/label";
-import {Badge} from "@/components/ui/badge";
-import Image from "next/image"
-import {OpenYoutubeLink, getTimePassedFromTimestamp} from "@/components/helper/helper-functions";
 import {MenuButton} from "@/app/board/[teamId]/song/_components/menu-button";
-import {SongMusicSheetViewer} from "@/app/board/[teamId]/song/_components/song-music-sheet-viewer";
-import React, {useMemo, useState} from "react";
-import {LinkIcon} from "lucide-react";
-import {Button} from "@/components/ui/button";
+import React from "react";
 import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
 import {SongCommentArea} from "@/app/board/[teamId]/song/_components/song-comment-area";
-import {SongKeyBox} from "@/components/song/song-key-box";
-import {MusicSheetCard} from "@/app/board/[teamId]/song/_components/music-sheet-card";
 import {SongDetailContent} from "@/app/board/[teamId]/song/_components/song-detail-content";
 
 interface Props {

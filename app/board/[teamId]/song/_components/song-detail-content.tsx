@@ -4,7 +4,7 @@ import {Button} from "@/components/ui/button";
 import {LinkIcon} from "lucide-react";
 import {Badge} from "@/components/ui/badge";
 import {getTimePassedFromTimestamp, OpenYoutubeLink} from "@/components/helper/helper-functions";
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
 import {SongDetailMusicSheetArea} from "@/app/board/[teamId]/song/_components/song-detail-music-sheet-area";

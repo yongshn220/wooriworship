@@ -16,8 +16,16 @@ class TeamService extends BaseService {
       users: [userId],
       option: {
         worship: {
-          beginning_song_id: null,
-          ending_song_id: null,
+          beginning_song: {
+            id: null,
+            note: "",
+            selected_music_sheet_ids: []
+          },
+          ending_song: {
+            id: null,
+            note: "",
+            selected_music_sheet_ids: []
+          }
         }
       }
     }

@@ -6,7 +6,7 @@ import * as React from "react";
 import {Invitation} from "@/models/invitation";
 import {teamAtom, teamUpdaterAtom} from "@/global-states/teamState";
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {timestampToDateString, timestampToDateStringFormatted} from "@/components/helper/helper-functions";
+import {timestampToDateStringFormatted} from "@/components/helper/helper-functions";
 import {toast} from "@/components/ui/use-toast";
 import { InvitationService, TeamService, UserService } from "@/apis";
 import { InvitationStatus } from "@/components/constants/enums";

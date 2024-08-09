@@ -8,7 +8,7 @@ import {getPathEditPlan, getPathPlan} from "@/components/helper/routes";
 import {useSetRecoilState} from "recoil";
 import { WorshipService } from "@/apis";
 import {CopyIcon, LinkIcon, SquarePen, Trash2Icon} from "lucide-react";
-import {currentTeamWorshipIdsAtom, worshipIdsUpdaterAtom} from "@/global-states/worship-state";
+import {currentTeamWorshipIdsAtom} from "@/global-states/worship-state";
 import {toast} from "@/components/ui/use-toast";
 
 

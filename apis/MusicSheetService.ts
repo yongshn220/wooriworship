@@ -53,7 +53,7 @@ class MusicSheetService extends BaseService {
     }
   }
 
-  async updateMusicSheet(userId, songId, musicSheetContainer: MusicSheetContainer) {
+  async updateMusicSheet(userId: string, songId: string, musicSheetContainer: MusicSheetContainer) {
     try {
       if (!musicSheetContainer?.id) {
         return await this.addNewMusicSheet(userId, songId, musicSheetContainer)

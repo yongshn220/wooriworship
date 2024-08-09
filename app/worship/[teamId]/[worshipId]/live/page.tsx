@@ -3,7 +3,7 @@
 import {WorshipLiveCarousel} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-live-carousel";
 import {WorshipLiveMenu} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-live-menu";
 import {WorshipIndexIndicator} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-index-indicator";
-import {Dialog, DialogContent, DialogContentNoCloseButton, DialogTitle} from "@/components/ui/dialog";
+import {Dialog, DialogContentNoCloseButton, DialogTitle} from "@/components/ui/dialog";
 import {useRouter} from "next/navigation";
 import {getPathWorship} from "@/components/helper/routes";
 import {VisuallyHidden} from "@radix-ui/react-visually-hidden";

@@ -1,7 +1,6 @@
 "use client"
 
 import {MainLogo} from "@/components/logo/main-logo";
-import {RoutingIndicator} from "@/components/animation/routing-indicator";
 import Image from "next/image";
 import * as React from "react";
 import {Button} from "@/components/ui/button";

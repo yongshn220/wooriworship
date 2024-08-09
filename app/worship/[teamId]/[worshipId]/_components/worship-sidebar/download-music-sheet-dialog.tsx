@@ -1,12 +1,11 @@
 'use client'
 
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
-import {DownloadIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Checkbox} from "@/components/ui/checkbox";
 import {useRecoilValue} from "recoil";
 import {useState} from "react";
-import {worshipAtom, worshipSongListAtom} from "@/global-states/worship-state";
+import {worshipSongListAtom} from "@/global-states/worship-state";
 import {downloadMultipleMusicSheets} from "@/components/helper/helper-functions";
 
 interface Props {
@@ -18,10 +17,10 @@ export function DownloadMusicSheetDialog({children,  worshipId}: Props) {
   const songList = useRecoilValue(worshipSongListAtom(worshipId))
   const [selectedSongIds, setSelectedSongIds] = useState<Array<string>>([])
 
-  function handleDownload() {
+  async function handleDownload() {
     const downloadSongList = songList.filter((song) => selectedSongIds.includes(song.id))
 
-    downloadMultipleMusicSheets(downloadSongList)
+    await downloadMultipleMusicSheets(downloadSongList)
   }
 
   function handleSelectSong(songId: string) {

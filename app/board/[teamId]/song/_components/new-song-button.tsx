@@ -5,7 +5,7 @@ import React, {Suspense, useState} from "react";
 import {SongForm} from "@/app/board/[teamId]/song/_components/song-form";
 import {FormMode} from "@/components/constants/enums";
 import {useRecoilValue} from "recoil";
-import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
+import {currentTeamIdAtom} from "@/global-states/teamState";
 import {FallbackText} from "@/components/fallback-text";
 
 export function NewSongButton() {

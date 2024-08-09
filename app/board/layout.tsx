@@ -4,7 +4,6 @@ import {BoardSidebar} from "@/app/board/_components/board-sidebar/board-sidebar"
 import {Navbar} from "@/app/board/_components/nav-bar/nav-bar";
 import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate";
 import {BottomNavbar} from "@/app/board/_components/bottom-navbar/bottom-navbar";
-import {PullToRefresh} from "@/components/functionality/pull-to-refresh";
 import {TopNavbarMobile} from "@/app/board/_components/top-navbar-mobile/top-navbar-mobile";
 
 

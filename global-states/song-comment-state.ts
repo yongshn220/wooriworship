@@ -6,12 +6,12 @@ export const songCommentIdsAtom = atomFamily<Array<string>, {teamId: string, son
   key: "songCommentIdsAtom",
   default: selectorFamily({
     key: "songCommentIdsAtom/default",
-    get: ({teamId, songId}) => async ({get}) => {
-      if (!teamId || !songId) return []
+    get: (props: {teamId: string, songId: string}) => async ({get}) => {
+      if (!props?.teamId || !props?.songId) return []
       try {
         get(songCommentIdsUpdaterAtom)
 
-        const commentList = await SongCommentService.getSongComments(songId, teamId)
+        const commentList = await SongCommentService.getSongComments(props?.songId, props?.teamId) as Array<SongComment>
         if (!commentList) return []
 
         return commentList.map((comment: SongComment) => comment.id)

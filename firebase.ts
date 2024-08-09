@@ -2,7 +2,6 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import "firebase/compat/storage";
-import {browserSessionPersistence, getAuth, setPersistence} from "@firebase/auth";
 
 
 // https://firebase.google.com/docs/web/setup#available-libraries

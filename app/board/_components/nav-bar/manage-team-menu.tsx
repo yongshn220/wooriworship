@@ -1,6 +1,6 @@
 import {DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import MenuIcon from "@/public/icons/menuIcon.svg";
-import {DoorOpenIcon, LinkIcon, Trash2Icon} from "lucide-react";
+import {DoorOpenIcon, Trash2Icon} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {toast} from "@/components/ui/use-toast";
 import {TeamService} from "@/apis";

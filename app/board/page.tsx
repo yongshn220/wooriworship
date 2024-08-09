@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {UserService} from "@/apis";
 import {User} from "@/models/user";
 import {useRouter} from "next/navigation";
-import {getPathHome, getPathPlan} from "@/components/helper/routes";
+import {getPathHome} from "@/components/helper/routes";
 import {auth} from "@/firebase";
 import Image from "next/image";
 import * as React from "react";

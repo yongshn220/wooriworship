@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import {Dispatch, SetStateAction, useState} from "react";
+import {useState} from "react";
 import {usePDFJS} from "@/components/hook/use-pdfjs";
 import * as PDFJS from "pdfjs-dist";
 import {ImageFileContainer} from "@/components/constants/types";
