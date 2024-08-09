@@ -1,13 +1,14 @@
 "use client"
 
 import {Textarea} from "@/components/ui/textarea";
-import {useRecoilState} from "recoil";
+import {useRecoilState, useRecoilValue} from "recoil";
 import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {toPlainObject} from "@/components/helper/helper-functions";
 import {SwapOrderButton} from "@/app/board/[teamId]/plan/_components/swap-order-button";
 import {SelectSongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
 import {WorshipSongPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/worship-song-preview-item";
 import {WorshipSongHeader} from "@/models/worship";
+import {songAtom} from "@/global-states/song-state";
 
 interface Props {
   teamId: string
@@ -17,6 +18,7 @@ interface Props {
 
 export function NewSongCard({teamId, songOrder, songHeader}: Props) {
   const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
+  const song = useRecoilValue(songAtom(songHeader?.id))
 
   function handleRemoveSong() {
     setSelectedSongHeaderList(selectedSongHeaderList.filter((_header) => _header.id !== songHeader?.id))
@@ -38,14 +40,32 @@ export function NewSongCard({teamId, songOrder, songHeader}: Props) {
       console.log("err: setMusicSheetIds, there is no such song id.")
     }
 
-    setSelectedSongHeaderList((prev) => ([
-      ...prev.filter(header => header?.id !== songHeader?.id),
-      {...targetSongWrapper, selected_music_sheet_ids: musicSheetIds}
-    ]))
+    setSelectedSongHeaderList((prev) => {
+      const newList = JSON.parse(JSON.stringify(prev))
+      newList.forEach(_header => {
+        if (_header?.id === songHeader?.id) {
+          _header.selected_music_sheet_ids = musicSheetIds
+        }
+      })
+      return newList
+    })
   }
 
   function handleSelectSong() {
+    if (isSongHeaderSelected()) {
+      setSelectedSongHeaderList((prev) => ([...prev.filter((_header => _header?.id !== songHeader?.id))]))
+    }
+    else {
+      setSelectedSongHeaderList((prev) => ([...prev, {
+        id: song?.id,
+        note: song?.description,
+        selected_music_sheet_ids: songHeader?.selected_music_sheet_ids
+      }]))
+    }
+  }
 
+  function isSongHeaderSelected() {
+    return selectedSongHeaderList?.map(songHeader => songHeader?.id)?.includes(songHeader?.id)
   }
 
   return (
@@ -57,6 +77,7 @@ export function NewSongCard({teamId, songOrder, songHeader}: Props) {
           selectedMusicSheetIds={songHeader?.selected_music_sheet_ids}
           setMusicSheetIds={(selectedKeys: string[]) => setMusicSheetIds(selectedKeys)}
           onSelectHandler={handleSelectSong}
+          isStatic={false}
         >
           <WorshipSongPreviewItem songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids} customTags={[]}/>
         </SelectSongDetailCardWrapper>

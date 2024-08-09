@@ -102,12 +102,11 @@ export function SongDetailContent({songId}: Props) {
         </div>
       }
       <div className="space-y-1">
-        <Label htmlFor="name" className="text-base font-semibold">
-          Music Sheets
-        </Label>
-        <div className="relative flex flex-col gap-4 bg-gray-500 p-4 rounded-md">
+        <div className="relative flex flex-col gap-4 bg-gray-100 p-4 rounded-md">
+        {/*<Label htmlFor="name" className="text-base font-semibold text-white flex-center">*/}
+        {/*  Music Sheets*/}
+        {/*</Label>*/}
           <div className="flex-center gap-2">
-            <p className="text-white">Select Key</p>
             <div className="flex-center gap-2">
               {
                 musicSheetIds.map((musicSheetId, index) => (
@@ -138,7 +137,7 @@ function MusicSheetKey({musicSheetId, selectedMusicSheetId, setSelectedMusicShee
   return (
     <Badge
       variant={(selectedMusicSheetId === musicSheetId) ? "default" : "outline"}
-      className="cursor-pointer w-8 h-8 flex-center text-white"
+      className="cursor-pointer w-8 h-8 flex-center border-black"
       onClick={() => setSelectedMusicSheetId(musicSheetId)}
     >
       {musicSheet?.key}

@@ -6,10 +6,11 @@ import {SongKeyBox} from "@/components/song/song-key-box";
 interface Props {
   songId: string
   customTags?: string[]
+  selectedMusicSheetIds?: string[]
 }
 
 
-export function SongListPreviewItem({songId, customTags=[]}: Props) {
+export function SongListPreviewItem({songId, customTags=[], selectedMusicSheetIds=null}: Props) {
   const song = useRecoilValue(songAtom(songId))
   const musicSheetIds = useRecoilValue(musicSheetIdsAtom(songId))
 
@@ -25,7 +26,12 @@ export function SongListPreviewItem({songId, customTags=[]}: Props) {
               </span>
             </p>
             {
+              selectedMusicSheetIds === null ?
               musicSheetIds?.map(((musicSheetId, index) => (
+                <SongKeyBox key={index} musicSheetId={musicSheetId}/>
+              )))
+                :
+              selectedMusicSheetIds?.map(((musicSheetId, index) => (
                 <SongKeyBox key={index} musicSheetId={musicSheetId}/>
               )))
             }
