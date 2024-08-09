@@ -12,6 +12,7 @@ import {CopyIcon, SquarePen, Trash2Icon, LinkIcon, DownloadIcon} from "lucide-re
 import {currentTeamSongIdsAtom, songAtom} from "@/global-states/song-state";
 import {Button} from "@/components/ui/button";
 import {downloadMultipleMusicSheets} from "@/components/helper/helper-functions";
+import {musicSheetsBySongIdAtom} from "@/global-states/music-sheet-state";
 
 interface Props {
   teamId: string
