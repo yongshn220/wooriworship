@@ -264,19 +264,21 @@ async function fetchImageAsBlob (url: string) {
 
 
 export async function downloadMultipleMusicSheets(songs: Array<Song>) {
-  const zip = new JSZip();
-
-  // Add files to the zip
-  for (const song of songs) {
-    for (const url of song.music_sheet_urls) {
-      const blob = await fetchImageAsBlob(url);
-      zip.file(`${song?.title}.${extractFileType(url)}`, blob)
-    }
-  }
-
-  // Generate the zip file and trigger download
-  const blob = await zip.generateAsync({ type: 'blob' });
-  saveAs(blob, 'music_sheets.zip');
+  // TODO: fix
+  alert("Download is currently unavailable.")
+  // const zip = new JSZip();
+  //
+  // // Add files to the zip
+  // for (const song of songs) {
+  //   for (const url of song.music_sheet_urls) {
+  //     const blob = await fetchImageAsBlob(url);
+  //     zip.file(`${song?.title}.${extractFileType(url)}`, blob)
+  //   }
+  // }
+  //
+  // // Generate the zip file and trigger download
+  // const blob = await zip.generateAsync({ type: 'blob' });
+  // saveAs(blob, 'music_sheets.zip');
 }
 
 export function getAllUrlsFromMusicSheetContainers(mContainers: MusicSheetContainer[]) {
