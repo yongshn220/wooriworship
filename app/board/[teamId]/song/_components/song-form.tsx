@@ -25,11 +25,7 @@ import {PlusIcon} from "lucide-react";
 import {v4 as uuid} from "uuid";
 import {Cross2Icon} from "@radix-ui/react-icons";
 import MusicSheetService from "@/apis/MusicSheetService";
-import {
-  musicSheetIdsUpdaterAtom,
-  musicSheetsBySongIdAtom,
-  musicSheetUpdaterAtom
-} from "@/global-states/music-sheet-state";
+import {musicSheetIdsUpdaterAtom, musicSheetsBySongIdAtom, musicSheetUpdaterAtom} from "@/global-states/music-sheet-state";
 import {MusicSheet} from "@/models/music_sheet";
 import {getAllUrlsFromMusicSheetContainers, getAllUrlsFromSongMusicSheets} from "@/components/helper/helper-functions";
 
