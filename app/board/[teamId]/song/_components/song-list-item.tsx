@@ -10,28 +10,15 @@ import {musicSheetIdsAtom} from "@/global-states/music-sheet-state";
 
 interface Props {
   songId: string
-  viewMode: ViewMode
 }
 
-export enum ViewMode {
-  ROUTE,
-  NONE,
-}
 
-export function SongListItem({songId, viewMode=ViewMode.ROUTE}: Props) {
-  const teamId = useRecoilValue(currentTeamIdAtom)
+export function SongListItem({songId}: Props) {
   const song = useRecoilValue(songAtom(songId))
   const musicSheetIds = useRecoilValue(musicSheetIdsAtom(song?.id))
-  const router = useRouter()
-
-  function handleSongCardClick() {
-    if (viewMode === ViewMode.ROUTE) {
-      router.push(getPathSongDetail(teamId, song?.id))
-    }
-  }
 
   return (
-    <div className="flex w-full px-4 rounded-lg cursor-pointer py-2 my-2 hover:bg-gray-100" onClick={handleSongCardClick}>
+    <div className="flex w-full px-4 rounded-lg cursor-pointer py-2 my-2 hover:bg-gray-100">
       <div className="flex-1 flex flex-col">
         <div className="flex gap-2">
           <p className="font-semibold text-md">{song?.title} <span className="text-sm text-gray-700">{song?.subtitle ? `(${song.subtitle})` : ""}</span> </p>

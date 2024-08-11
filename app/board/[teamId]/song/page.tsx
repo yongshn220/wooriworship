@@ -1,8 +1,18 @@
 
 // Placeholder page
 
-export default function SongPage() {
+import {SongListView} from "@/app/board/[teamId]/song/_components/song-list-view";
+
+interface Props {
+  params: any
+}
+
+export default function SongPage({params}: Props) {
+  const teamId = params.teamId
+
   return (
-    <></>
+    <div className="w-full h-full flex flex-col items-center">
+      <SongListView teamId={teamId}/>
+    </div>
   )
 }
