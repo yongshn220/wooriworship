@@ -1,7 +1,7 @@
 "use client"
 
 import {SongDetailCard} from "@/app/board/[teamId]/song/_components/song-detail-card";
-import {useState} from "react";
+import {Suspense, useState} from "react";
 import {SongDetailDrawer} from "@/app/board/[teamId]/song/_components/song-detail-drawer";
 import {isMobile} from "@/components/helper/helper-functions";
 
@@ -15,11 +15,13 @@ export function SongDetailCardWrapper({teamId, songId, children}: Props) {
 
   return (
     <>
-      {
-        (isMobile())
-        ? <SongDetailDrawer teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={songId} readOnly={true}/>
-        : <SongDetailCard teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={songId} readOnly={true}/>
-      }
+      <Suspense fallback={<></>}>
+        {
+          (isMobile())
+          ? <SongDetailDrawer teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={songId} readOnly={true}/>
+          : <SongDetailCard teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={songId} readOnly={true}/>
+        }
+      </Suspense>
       <div onClick={() => setIsOpen(prev => !prev)} className="w-full">
         {children}
       </div>
