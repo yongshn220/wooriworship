@@ -5,7 +5,7 @@ import {teamAtom} from "@/global-states/teamState";
 import {selectedWorshipSongHeaderListAtom, worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {useCallback, useEffect, useState} from "react";
 import {FormMode, WorshipSpecialOrderType} from "@/components/constants/enums";
-import {timestampToDate} from "@/components/helper/helper-functions";
+import {isMobile, timestampToDate} from "@/components/helper/helper-functions";
 import {useToast} from "@/components/ui/use-toast";
 import {useRouter} from "next/navigation";
 import {WorshipService} from "@/apis";
@@ -16,11 +16,12 @@ import {Input} from "@/components/ui/input";
 import {DatePicker} from "@/app/board/[teamId]/plan/_components/date-picker";
 import {Textarea} from "@/components/ui/textarea";
 import {NewSongCard} from "@/app/board/[teamId]/plan/_components/new-song-card";
-import {AddSongButton} from "@/app/board/[teamId]/plan/_components/add-song-button";
+import {AddSongButtonDialog} from "@/app/board/[teamId]/plan/_components/add-song-button-dialog";
 import {Button} from "@/components/ui/button";
 import {Worship} from "@/models/worship";
 import {StaticSongCard} from "@/app/board/[teamId]/plan/_components/static-song-card";
 import {WorshipInput} from "@/components/constants/types";
+import {AddSongButtonDrawer} from "@/app/board/[teamId]/plan/_components/add-song-button-drawer";
 
 interface Props {
   mode: FormMode
@@ -245,7 +246,11 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
                 endingSongHeader?.id &&
                 <StaticSongCard teamId={teamId} specialOrderType={WorshipSpecialOrderType.ENDING} songHeader={endingSongHeader}/>
               }
-              <AddSongButton teamId={teamId}/>
+              {
+                isMobile()
+                  ? <AddSongButtonDrawer teamId={teamId}/>
+                  : <AddSongButtonDialog teamId={teamId}/>
+              }
             </div>
           </div>
         </div>
