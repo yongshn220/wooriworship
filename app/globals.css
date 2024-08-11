@@ -154,3 +154,14 @@ input, a {
   background-color: white; /* or your desired background color */
   z-index: 1; /* Place it above the gradient */
 }
+
+.custom-input-focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.custom-input-focus:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
