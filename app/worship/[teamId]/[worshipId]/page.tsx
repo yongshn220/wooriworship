@@ -5,18 +5,15 @@ import {WorshipSongHeader} from "@/models/worship";
 import CalendarIcon from '@/public/icons/calendarIcon.svg'
 import {Separator} from "@/components/ui/separator";
 import {MenuButton} from "@/app/worship/[teamId]/[worshipId]/_components/menu-button";
-import UsersIcon from '@/public/icons/usersIcon.svg'
 import {useRecoilValue} from "recoil";
 import {teamAtom} from "@/global-states/teamState";
-import {
-  getDayPassedFromTimestampShorten,
-  timestampToDateString
-} from "@/components/helper/helper-functions";
+import {getDayPassedFromTimestampShorten, timestampToDateString} from "@/components/helper/helper-functions";
 import {worshipAtom} from "@/global-states/worship-state";
 import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
 import * as React from "react";
-import {BlocksIcon, MusicIcon} from "lucide-react";
+import {BlocksIcon, MusicIcon, UserIcon, UsersIcon} from "lucide-react";
 import {SongListPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-preview-item";
+import {userAtom} from "@/global-states/userState";
 
 
 export default function WorshipPage({params}: any) {
@@ -24,6 +21,7 @@ export default function WorshipPage({params}: any) {
   const worshipId = params.worshipId
   const worship = useRecoilValue(worshipAtom(worshipId))
   const team = useRecoilValue(teamAtom(teamId))
+  const creator = useRecoilValue(userAtom(worship?.created_by?.id))
 
 
   return (
@@ -39,6 +37,13 @@ export default function WorshipPage({params}: any) {
             <p className="text-gray-500">Team</p>
           </div>
           <p>{team?.name}</p>
+        </div>
+        <div className="flex-start mt-2 gap-2">
+          <div className="flex-start gap-2 w-40 sm:w-52">
+            <UserIcon className="text-gray-500"/>
+            <p className="text-gray-500">Created By</p>
+          </div>
+          <p>{creator?.name}</p>
         </div>
         <div className="flex items-center mt-2 gap-2">
           <div className="flex-start gap-2 w-40 sm:w-52">
@@ -70,7 +75,8 @@ export default function WorshipPage({params}: any) {
           {
             worship?.songs.map((songHeader: WorshipSongHeader) => (
               <SongDetailCardWrapper key={songHeader?.id} teamId={teamId} songId={songHeader?.id}>
-                <SongListPreviewItem songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids}/>
+                <SongListPreviewItem songId={songHeader?.id}
+                                     selectedMusicSheetIds={songHeader?.selected_music_sheet_ids}/>
               </SongDetailCardWrapper>
             ))
           }

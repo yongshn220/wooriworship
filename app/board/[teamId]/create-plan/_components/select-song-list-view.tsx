@@ -98,7 +98,7 @@ function SelectSongListItem({teamId, songId}: ItemProps) {
         isStatic={false}
         onSelectHandler={() => handleSelectSong()}
       >
-        <SongListItem songId={songId} viewMode={ViewMode.NONE}/>
+        <SongListItem songId={songId}/>
       </SelectSongDetailCardWrapper>
     </div>
   )
