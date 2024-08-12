@@ -138,7 +138,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
       router.push(getPathSongDetail(teamId, newSongId))
       clearContents()
     }
-    catch (e) {리
+    catch (e) {
       console.log("err", e)
       toast({
         description: `Fail to create a song. Please try again.`,
