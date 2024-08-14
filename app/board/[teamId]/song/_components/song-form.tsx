@@ -251,6 +251,24 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
       ])
     )
   }
+
+  function addImageFileContainerToMusicSheet(tempId: string, imageFileContainer: ImageFileContainer) {
+    setMusicSheetContainers((prev) => {
+      const result = []
+      prev.forEach((_musicSheet) => {
+        if (_musicSheet?.tempId === tempId) {
+          const newMusicSheet = {..._musicSheet}
+          newMusicSheet.imageFileContainers = [...newMusicSheet?.imageFileContainers.filter((iContainer) => iContainer?.id !== imageFileContainer?.id), imageFileContainer]
+          result.push(newMusicSheet)
+        }
+        else {
+          result.push(_musicSheet)
+        }
+      })
+      return result
+    })
+  }
+
   function removeImageFromMusicSheet(tempId: string, imageFileContainerIndex: number) {
     setMusicSheetContainers((prev) => ([...prev.map((musicSheet) => {
       if (musicSheet.tempId !== tempId) return musicSheet
@@ -360,6 +378,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
                     tempId={musicSheet?.tempId}
                     imageFileContainers={musicSheet?.imageFileContainers}
                     handleSetImageFileContainers={setImageFileContainersToMusicSheet}
+                    handleAddImageFileContainer={addImageFileContainerToMusicSheet}
                     handleRemoveImageFileContainer={removeImageFromMusicSheet}
                     handleRemoveMusicSheetContainer={removeMusicSheetContainer}
                   />
@@ -391,20 +410,14 @@ interface MusicSheetUploadBoxProps {
   setMusicKey: Function
   imageFileContainers: Array<ImageFileContainer>
   handleSetImageFileContainers: Function
+  handleAddImageFileContainer: Function
   handleRemoveImageFileContainer: Function
   handleRemoveMusicSheetContainer: Function
 }
 
-function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey, handleSetImageFileContainers, handleRemoveImageFileContainer, handleRemoveMusicSheetContainer}: MusicSheetUploadBoxProps) {
+function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey, handleSetImageFileContainers, handleAddImageFileContainer, handleRemoveImageFileContainer, handleRemoveMusicSheetContainer}: MusicSheetUploadBoxProps) {
   function updateImageFileContainer(newContainer: ImageFileContainer) {
-   console.log(tempId)
-    if (imageFileContainers.map((_container) => _container.id).includes(newContainer.id)) {
-      const newContainers = imageFileContainers.map((_container) => (_container.id !== newContainer.id)? _container : newContainer)
-      handleSetImageFileContainers(tempId, newContainers)
-    }
-    else {
-      handleSetImageFileContainers(tempId, [...imageFileContainers, newContainer])
-    }
+    handleAddImageFileContainer(tempId, newContainer)
   }
 
   return (
@@ -437,7 +450,7 @@ function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey
           <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
             <div className="w-32 bg-white px-1 py-2 flex-center  rounded-md shadow-sm border text-sm hover:bg-blue-50 cursor-pointer">Upload Image</div>
           </MultipleImageUploader>
-          <PdfUploader updateImageFileContainer={updateImageFileContainer}>
+          <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
             <div className="w-32 bg-white px-1 py-2 flex-center  rounded-md shadow-sm border text-sm hover:bg-blue-50 cursor-pointer">Upload PDF</div>
           </PdfUploader>
         </div>

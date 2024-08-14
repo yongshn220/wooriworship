@@ -3,13 +3,17 @@ import {useState} from "react";
 import {usePDFJS} from "@/components/hook/use-pdfjs";
 import * as PDFJS from "pdfjs-dist";
 import {ImageFileContainer} from "@/components/constants/types";
+import {toast} from "@/components/ui/use-toast";
 
 interface Props {
+  imageFileContainers: Array<ImageFileContainer>;
   updateImageFileContainer: Function;
+  maxNum: number;
   children: any;
 }
 
-export default function PdfUploader({updateImageFileContainer, children}: Props) {
+export default function PdfUploader({imageFileContainers, updateImageFileContainer, maxNum, children}: Props) {
+  const [uploaderId, _] = useState(uuid())
   const [pdfjs, setPDFjs] = useState<typeof PDFJS>(null)
 
   usePDFJS(async (pdfjs) => {
@@ -26,15 +30,20 @@ export default function PdfUploader({updateImageFileContainer, children}: Props)
         const typedArray = new Uint8Array(e.target.result);
         const pdf = await pdfjs.getDocument(typedArray).promise;
         const numPages = pdf.numPages;
-
-        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-          const imageId = uuid();
-          const newImageFileContainer: ImageFileContainer = { id: imageId, file: null, url: "", isLoading: true, isUploadedInDatabase: false }
-          updateImageFileContainer(newImageFileContainer)
-          const imageBlob = await renderPageAsImage(pdf, pageNum);
-          const imageFile = new File([imageBlob], `pdf-image-${pageNum}.jpg`, { type: 'image/jpeg' });
-          const imageUrl = URL.createObjectURL(imageFile);
-          updateImageFileContainer({...newImageFileContainer, file: imageFile, url: imageUrl, isLoading: false})
+        const totalImages = imageFileContainers?.length + numPages
+        if (totalImages <= maxNum) {
+          for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+            const imageId = uuid();
+            const newImageFileContainer: ImageFileContainer = { id: imageId, file: null, url: "", isLoading: true, isUploadedInDatabase: false }
+            updateImageFileContainer(newImageFileContainer)
+            const imageBlob = await renderPageAsImage(pdf, pageNum);
+            const imageFile = new File([imageBlob], `pdf-image-${pageNum}.jpg`, { type: 'image/jpeg' });
+            const imageUrl = URL.createObjectURL(imageFile);
+            updateImageFileContainer({...newImageFileContainer, file: imageFile, url: imageUrl, isLoading: false})
+          }
+        }
+        else {
+          toast({description: `Pages exceed the maximum number : ${maxNum}`})
         }
       }
       reader.readAsArrayBuffer(file);
@@ -67,14 +76,14 @@ export default function PdfUploader({updateImageFileContainer, children}: Props)
     <div className="w-full h-full">
       <input
         type="file"
-        id="file-input"
+        id={uploaderId}
         name="Image"
         style={{display: 'none'}}
         accept="application/pdf"
         onChange={handleFileChange}
         multiple
       />
-      <label htmlFor="file-input">
+      <label htmlFor={uploaderId}>
         {children}
       </label>
     </div>
