@@ -41,8 +41,8 @@ export function SongCarouselItem({songId, note, urls}: SongCarouselItemProps) {
         <CardContent className="flex flex-col w-full aspect-[4/5] max-h-[800px] divide-y">
           <div className="relative h-full flex flex-col bg-gray-50 overflow-y-scroll">
             {
-              urls.length > 0 ?
-                urls.map((url, index) => (
+              urls?.length > 0 ?
+                urls?.map((url, index) => (
                   <div key={index} className="flex-center w-full h-full">
                     <img
                       alt="Music score"
