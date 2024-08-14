@@ -5,7 +5,7 @@ import {WorshipInput} from "@/components/constants/types";
 
 class WorshipService extends BaseService {
   constructor() {
-    super("worships_m");
+    super("worships");
   }
 
   async getTeamWorship(teamId: string) {

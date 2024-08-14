@@ -9,7 +9,7 @@ import {MusicSheetContainer} from "@/components/constants/types";
 
 class SongService extends BaseService {
   constructor() {
-    super("songs_m");
+    super("songs");
   }
 
   async getTeamSong(teamId: string) {
