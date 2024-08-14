@@ -254,7 +254,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
 
   function addImageFileContainerToMusicSheet(tempId: string, imageFileContainer: ImageFileContainer) {
     setMusicSheetContainers((prev) => {
-      const result = []
+      const result: Array<MusicSheetContainer> = []
       prev.forEach((_musicSheet) => {
         if (_musicSheet?.tempId === tempId) {
           const newMusicSheet = {..._musicSheet}
