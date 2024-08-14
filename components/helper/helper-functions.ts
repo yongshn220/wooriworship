@@ -320,7 +320,7 @@ export function getAllUrlsFromSongMusicSheets(musicSheets: MusicSheet[]) {
   return urls
 }
 
-export function getSongTitleFromSongsById(songs, songId) {
+export function getSongTitleFromSongsById(songs: Array<Song>, songId: string) {
   songs?.forEach(song => {
     if (song.id === songId) {
       return song?.title
