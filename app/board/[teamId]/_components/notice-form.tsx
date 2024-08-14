@@ -174,7 +174,7 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
                 Upload Image
               </div>
             </MultipleImageUploader>
-            <PdfUploader updateImageFileContainer={updateImageFileContainer}>
+            <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
               <div
                 className="w-full h-full bg-purple-700 rounded-lg flex-center text-white cursor-pointer hover:bg-purple-500">
                 Upload PDF
