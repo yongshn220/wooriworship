@@ -28,7 +28,7 @@ export function SongListItem({songId}: Props) {
             ))
           }
         </div>
-        <p className="text-sm text-gray-500">{song?.original.author === "" ? "unknown" : song?.original.author}</p>
+        <p className="text-sm text-gray-500">{song?.original?.author ?? "unknown"}</p>
       </div>
       <div className="hidden lg:flex lg:flex-[0.4] justify-start items-center text-gray-500 text-sm pl-2">
         <div className="hidden lg:flex">{song?.version}</div>
