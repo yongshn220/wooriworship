@@ -4,6 +4,7 @@ import {SongInput} from "@/app/board/[teamId]/song/_components/song-form";
 import {Song} from "@/models/song";
 import {getAllUrlsFromSongMusicSheets, getFirebaseTimestampNow} from "@/components/helper/helper-functions";
 import MusicSheetService from "@/apis/MusicSheetService";
+import {MusicSheetContainer} from "@/components/constants/types";
 
 
 class SongService extends BaseService {
@@ -23,7 +24,7 @@ class SongService extends BaseService {
     return songs
   }
 
-  async addNewSong(userId: string, teamId: string, songInput: SongInput) {
+  async addNewSong(userId: string, teamId: string, songInput: SongInput, musicSheetContainers: Array<MusicSheetContainer>) {
     try {
       const newSong: Song = {
         team_id: teamId,
@@ -36,6 +37,7 @@ class SongService extends BaseService {
         version: songInput.version,
         description: songInput.description,
         lyrics: "",
+        keys: musicSheetContainers?.map(mContainer => mContainer?.key),
         bpm: songInput.bpm,
         tags: songInput.tags,
         created_by: {
@@ -60,7 +62,7 @@ class SongService extends BaseService {
     return await this.update(songId, {last_used_time:new Date()});
   }
 
-  async updateSong(userId: string, songId: string, songInput: SongInput) {
+  async updateSong(userId: string, songId: string, songInput: SongInput, musicSheetContainers: Array<MusicSheetContainer>) {
     try {
       const song = {
         title: songInput.title,
@@ -72,6 +74,7 @@ class SongService extends BaseService {
         version: songInput.version,
         description: songInput.description,
         lyrics: "",
+        keys: musicSheetContainers?.map(mContainer => mContainer?.key),
         bpm: songInput.bpm,
         tags: songInput.tags,
         updated_by: {

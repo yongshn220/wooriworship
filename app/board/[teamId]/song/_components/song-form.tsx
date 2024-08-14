@@ -113,7 +113,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     if (!createValidCheck()) return false
 
     try {
-      const newSongId = await SongService.addNewSong(authUser?.uid, teamId, songInput)
+      const newSongId = await SongService.addNewSong(authUser?.uid, teamId, songInput, musicSheetContainers)
       if (!newSongId) {
         console.log("err:song-form:handleCreate. Fail to create a song")
         toast({description: `Fail to create a song. Please try again.`})
@@ -187,7 +187,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
         promises.push(MusicSheetService.updateMusicSheet(authUser?.uid, song?.id, mContainer))
       })
       // Update Song and tags
-      promises.push(SongService.updateSong(authUser?.uid, song?.id, songInput));
+      promises.push(SongService.updateSong(authUser?.uid, song?.id, songInput, musicSheetContainers));
       promises.push(TagService.addNewTags(teamId, songInput?.tags));
 
       await Promise.all(promises)

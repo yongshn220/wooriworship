@@ -10,6 +10,7 @@ export type Song = {
   bpm: number
   version: string
   lyrics: string
+  keys: Array<string>
   created_by: {
     id: string
     time: Timestamp
