@@ -58,17 +58,6 @@ export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
   })
 })
 
-
-export const testAtom = atomFamily<string, string>({
-  key: "testAtom",
-  default: selectorFamily({
-    key: "testAtom/default",
-    get: () => async () => {
-      return "test"
-    }
-  })
-})
-
 export const songAtom = atomFamily<Song, string>({
   key: "songAtom",
   default: selectorFamily({
@@ -84,27 +73,6 @@ export const songAtom = atomFamily<Song, string>({
       catch (e) {
         console.log(e)
         return null
-      }
-    }
-  })
-})
-
-export const songsByWorshipIdAtom = atomFamily<Array<Song>, string>({
-  key: "songsByWorshipIdAtom",
-  default: selectorFamily({
-    key: "songsByWorshipIdAtom/default",
-    get: (worshipId) => async ({get}) => {
-      try {
-        const worship = get(worshipAtom(worshipId))
-        if (!worship) return []
-
-        const songPromises = worship.songs.map(songHeader => SongService.getById(songHeader.id))
-        const songs = await Promise.all(songPromises) as Song[]
-
-        return songs.filter(Boolean)
-      }
-      catch (e) {
-        return []
       }
     }
   })
