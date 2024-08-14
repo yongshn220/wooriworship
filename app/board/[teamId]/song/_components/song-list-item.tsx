@@ -7,6 +7,7 @@ import {getTimePassedFromTimestamp, getTimePassedFromTimestampShorten} from "@/c
 import {Badge} from "@/components/ui/badge";
 import {SongKeyBox} from "@/components/song/song-key-box";
 import {musicSheetIdsAtom} from "@/global-states/music-sheet-state";
+import {SongKeyBoxByText} from "@/components/song/song-key-box-by-text";
 
 interface Props {
   songId: string
@@ -15,7 +16,7 @@ interface Props {
 
 export function SongListItem({songId}: Props) {
   const song = useRecoilValue(songAtom(songId))
-  const musicSheetIds = useRecoilValue(musicSheetIdsAtom(song?.id))
+  // const musicSheetIds = useRecoilValue(musicSheetIdsAtom(song?.id))
 
   return (
     <div className="flex w-full px-4 rounded-lg cursor-pointer py-2 my-2 hover:bg-gray-100">
@@ -23,8 +24,8 @@ export function SongListItem({songId}: Props) {
         <div className="flex items-center gap-2">
           <p className="font-semibold text-md">{song?.title} <span className="text-sm text-gray-700">{song?.subtitle ? `(${song.subtitle})` : ""}</span> </p>
           {
-            musicSheetIds?.map((musicSheetId, index) => (
-              <SongKeyBox key={index} musicSheetId={musicSheetId}/>
+            song?.keys?.map((songKey, index) => (
+              <SongKeyBoxByText key={index} songKey={songKey}/>
             ))
           }
         </div>

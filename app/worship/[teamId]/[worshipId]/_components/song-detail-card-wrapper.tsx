@@ -18,8 +18,8 @@ export function SongDetailCardWrapper({teamId, songId, children}: Props) {
       <Suspense fallback={<></>}>
         {
           (isMobile())
-          ? <SongDetailDrawer teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={songId} readOnly={true}/>
-          : <SongDetailCard teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={songId} readOnly={true}/>
+          ? <SongDetailDrawer teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={songId} readOnly={false}/>
+          : <SongDetailCard teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={songId} readOnly={false}/>
         }
       </Suspense>
       <div onClick={() => setIsOpen(prev => !prev)} className="w-full">
