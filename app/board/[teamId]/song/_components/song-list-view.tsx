@@ -1,7 +1,7 @@
 "use client"
 import {useRecoilValueLoadable} from "recoil";
 import {currentTeamSongIdsAtom} from "@/global-states/song-state";
-import {SongListItem, ViewMode} from "@/app/board/[teamId]/song/_components/song-list-item";
+import {SongListItem} from "@/app/board/[teamId]/song/_components/song-list-item";
 import {Separator} from "@/components/ui/separator";
 import Image from "next/image";
 import * as React from "react";
