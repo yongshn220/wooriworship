@@ -16,9 +16,9 @@ export default function MultipleImageUploader({imageFileContainers, updateImageF
   async function handleImageChange(e: any) {
     const files = Array.from(e.target.files) as Array<File>
     const totalImages = imageFileContainers?.length + files.length
-
     try {
       if (totalImages <= maxNum) {
+
         files.forEach((file) => {
           const reader: any = new FileReader();
           reader.readAsDataURL(file);
