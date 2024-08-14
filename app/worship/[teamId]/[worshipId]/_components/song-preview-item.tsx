@@ -52,7 +52,7 @@ export function SongListPreviewItem({songId, customTags=[], selectedMusicSheetId
             ))}
           </div>
         </div>
-        <p className="text-sm text-gray-500">{song?.original.author === "" ? "unknown" : song?.original.author}</p>
+        <p className="text-sm text-gray-500">{song?.original?.author ?? "unknown"}</p>
       </div>
     </div>
   )
