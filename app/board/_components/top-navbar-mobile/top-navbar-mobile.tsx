@@ -6,8 +6,7 @@ import {currentPageAtom} from "@/app/board/_states/board-states";
 import Image from "next/image";
 import {SearchInput} from "@/app/board/_components/nav-bar/search-input";
 import {SearchFilterPopover} from "@/app/board/_components/nav-bar/search-filter-popover";
-import {CreateSongDialog} from "@/components/dialog/create-song-dialog";
-import {getPathCreatePlan} from "@/components/helper/routes";
+import {getPathCreatePlan, getPathCreateSong} from "@/components/helper/routes";
 import {useRouter} from "next/navigation";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {NoticeForm} from "@/app/board/[teamId]/_components/notice-form";
@@ -65,9 +64,7 @@ export function TopNavbarMobile() {
                   <p className="text-xl font-semibold">{tabConfig[currentPage].text}</p>
                 }
                 <div className="flex gap-4">
-                  <CreateSongDialog>
-                    <SquarePenIcon/>
-                  </CreateSongDialog>
+                  <SquarePenIcon onClick={() => router.push(getPathCreateSong(teamId))}/>
                   <SearchFilterPopover>
                     <FilterIcon/>
                   </SearchFilterPopover>

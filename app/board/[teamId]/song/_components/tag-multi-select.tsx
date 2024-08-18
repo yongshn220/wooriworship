@@ -49,7 +49,7 @@ export function TagMultiSelect({input, setInput}: Props) {
           </p>
         }
         onChange={(options) => handleTagChange(options)}
-        className="pl-1"
+        className="pl-1 bg-white"
       />
     </div>
   );
