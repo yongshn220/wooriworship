@@ -32,12 +32,16 @@ export function getPathSong(teamId: string) {
   return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.SONG
 }
 
-export function getPathSongDetail(teamId: string, songId: string) {
-  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.SONG + `/${songId}`
+export function getPathCreateSong(teamId: string) {
+  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.CREATE_SONG
 }
 
 export function getPathSongEdit(teamId: string, songId: string) {
-  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.SONG + `/${songId}` + "/" + Routes.EDIT
+  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.EDIT_SONG + `/${songId}`
+}
+
+export function getPathSongDetail(teamId: string, songId: string) {
+  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.SONG + `/${songId}`
 }
 
 export function getPathWorship(teamId: string, worshipId: string) {

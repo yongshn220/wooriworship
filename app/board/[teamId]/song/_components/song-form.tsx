@@ -1,6 +1,5 @@
 'use client'
 
-import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
@@ -32,8 +31,6 @@ import {getAllUrlsFromMusicSheetContainers, getAllUrlsFromSongMusicSheets} from 
 
 interface Props {
   mode: FormMode
-  isOpen: boolean
-  setIsOpen: Function
   songId?: string
 }
 export interface SongInput {
@@ -47,7 +44,7 @@ export interface SongInput {
   description: string
 }
 
-export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
+export function SongForm({mode, songId}: Props) {
   const song = useRecoilValue(songAtom(songId))
   const songUpdater = useSetRecoilState(songUpdaterAtom)
   const musicSheetIdsUpdater = useSetRecoilState(musicSheetIdsUpdaterAtom)
@@ -95,7 +92,6 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   function createValidCheck() {
     if (!authUser?.uid) {
       console.log("error");
-      setIsOpen(false)
       setIsLoading(false)
       return false
     }
@@ -146,14 +142,12 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
     }
     finally {
       clearContents()
-      setIsOpen(false)
       setIsLoading(false)
     }
   }
 
   function editValidCheck() {
     if (!authUser?.uid|| (song == null || song.id == null)) {
-      setIsOpen(false)
       setIsLoading(false)
       toast({
         title: "Fail to edit song",
@@ -197,15 +191,14 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
       songUpdater(prev => prev + 1)
 
       toast({title: "Song edited successfully."})
-      setIsOpen(false)
       setIsLoading(false)
+      router.push(getPathSongDetail(teamId, songId))
     }
     catch (e) {
       console.log(e)
     }
     finally {
       clearContents()
-      setIsOpen(false)
       setIsLoading(false)
     }
   }
@@ -283,15 +276,15 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
-      <DialogContent className="sm:max-w-[600px] overflow-y-scroll scrollbar-hide top-0 translate-y-0 mt-[50px]" style={{ maxHeight: `${viewportHeight - 100}px` }}>
-        <DialogHeader>
-          <DialogTitle className="text-2xl">{mode===FormMode.EDIT? "Edit Song" : "Add New Song"}</DialogTitle>
-          <DialogDescription>
+    <div className="w-full h-full flex justify-center">
+      <div className="w-full sm:max-w-3xl">
+        <div>
+          <div className="text-2xl font-semibold">{mode===FormMode.EDIT? "Edit Song" : "Add New Song"}</div>
+          <div>
             {mode===FormMode.EDIT? "Edit song" : "Create and add new song in the song board"}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-6 py-4">
+          </div>
+        </div>
+        <div className="grid gap-6 py-10">
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="name">Title</Label>
             <Input
@@ -299,6 +292,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               placeholder="ex) Amazing Grace"
               value={songInput.title}
               onChange={(e) => setSongInput((prev => ({...prev, title: e.target.value})))}
+              className="bg-white"
               autoFocus={false}
             />
           </div>
@@ -309,6 +303,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               placeholder="Sub Title..."
               value={songInput.subtitle}
               onChange={(e) => setSongInput((prev => ({...prev, subtitle: e.target.value})))}
+              className="bg-white"
               autoFocus={false}
             />
           </div>
@@ -319,6 +314,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               placeholder="ex) Isaiah6tyone"
               value={songInput.author}
               onChange={(e) => setSongInput((prev => ({...prev, author: e.target.value})))}
+              className="bg-white"
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
@@ -328,6 +324,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               placeholder="version"
               value={songInput.version}
               onChange={(e) => setSongInput((prev => ({...prev, version: e.target.value})))}
+              className="bg-white"
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
@@ -337,6 +334,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               placeholder="https://youtube..."
               value={songInput.link}
               onChange={(e) => setSongInput((prev => ({...prev, link: e.target.value})))}
+              className="bg-white"
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
@@ -351,6 +349,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               placeholder="ex) 120"
               defaultValue={songInput.bpm ?? ""}
               onChange={(e) => setSongInput((prev => ({...prev, bpm: Number(e.target.value)})))}
+              className="bg-white"
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
@@ -358,7 +357,7 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
               Description
             </Label>
             <Textarea
-              className="h-20"
+              className="h-20 bg-white"
               placeholder="Write the description"
               value={songInput.description}
               onChange={(e) => setSongInput((prev => ({...prev, description: e.target.value})))}
@@ -385,22 +384,24 @@ export function SongForm({mode, isOpen, setIsOpen, songId}: Props) {
                 ))
               }
             </div>
-            <div className="w-full flex-center mt-4">
-              <div className="flex-center w-10 h-10 bg-blue-500 text-white text-4xl rounded-full hover:bg-blue-400 cursor-pointer" onClick={() => handleAddNewMusicSheet()}>
-                <PlusIcon/>
+            <div className="w-full flex-center">
+              <div className="group w-full flex-center h-28 p-2 rounded-lg border-2 border-dashed border-gray-200 hover:border-blue-300 cursor-pointer" onClick={() => handleAddNewMusicSheet()}>
+                <p className="text-gray-400 group-hover:text-gray-500">click to add song</p>
               </div>
             </div>
           </div>
         </div>
-        <DialogFooter>
-          {
-            (mode === FormMode.EDIT)
-              ? <Button type="submit" onClick={handleEdit}>{isLoading ? "Saving..." : "Save"}</Button>
-              : <Button type="submit" onClick={handleCreate}>{isLoading ? "Creating..." : "Create"}</Button>
-          }
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <div className="w-full flex-end mb-20">
+          <div>
+            {
+              (mode === FormMode.EDIT)
+                ? <Button type="submit" onClick={handleEdit}>{isLoading ? "Saving..." : "Save"}</Button>
+                : <Button type="submit" onClick={handleCreate}>{isLoading ? "Creating..." : "Create"}</Button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
