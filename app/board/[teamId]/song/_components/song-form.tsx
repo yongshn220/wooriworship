@@ -31,6 +31,7 @@ import {getAllUrlsFromMusicSheetContainers, getAllUrlsFromSongMusicSheets} from 
 
 interface Props {
   mode: FormMode
+  teamId: string
   songId?: string
 }
 export interface SongInput {
@@ -44,14 +45,13 @@ export interface SongInput {
   description: string
 }
 
-export function SongForm({mode, songId}: Props) {
+export function SongForm({mode, teamId, songId}: Props) {
   const song = useRecoilValue(songAtom(songId))
   const songUpdater = useSetRecoilState(songUpdaterAtom)
   const musicSheetIdsUpdater = useSetRecoilState(musicSheetIdsUpdaterAtom)
   const musicSheetUpdater = useSetRecoilState(musicSheetUpdaterAtom) // todo: need to make it more efficient
   const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songId))
   const authUser = auth.currentUser
-  const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtom(teamId))
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom(teamId))
   const [songInput, setSongInput] = useState<SongInput>({
