@@ -22,6 +22,7 @@ import {Worship} from "@/models/worship";
 import {StaticSongCard} from "@/app/board/[teamId]/plan/_components/static-song-card";
 import {WorshipInput} from "@/components/constants/types";
 import {AddSongButtonDrawer} from "@/app/board/[teamId]/plan/_components/add-song-button-drawer";
+import { format, addDays, nextFriday, nextSunday } from 'date-fns';
 
 interface Props {
   mode: FormMode
@@ -46,6 +47,11 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
+  const todayDate = format(new Date(), 'yyyy-MM-dd');
+  const upcomingFriday = nextFriday(new Date());
+  const upcomingSunday = nextSunday(new Date());
+  const formattedUpcomingFriday = format(upcomingFriday, 'yyyy-MM-dd');
+  const formattedUpcomingSunday = format(upcomingSunday, 'yyyy-MM-dd');
 
   const clearContents = useCallback(() => {
     setIsLoading(false)
@@ -210,6 +216,26 @@ export function WorshipPlanForm({mode, teamId, worship}: Props) {
               value={basicInfo.title}
               onChange={(e) => setBasicInfo((prev => ({...prev, title: e.target.value})))}
             />
+            <div className="space-x-2 space-y-2">
+              <Button variant="outline" onClick={() => setBasicInfo(prev => ({...prev, title: `금요 예배`}))}>
+                {`금요 예배`}
+              </Button>
+              <Button variant="outline" onClick={() => setBasicInfo(prev => ({...prev, title: `주일 예배`}))}>
+                {`주일 예배`}
+              </Button>
+              <Button variant="outline" onClick={() => {
+                setBasicInfo(prev => ({...prev, title: `${formattedUpcomingFriday} 금요 예배`}));
+                setDate(upcomingFriday);
+              }}>
+                {`${formattedUpcomingFriday} 금요 예배`}
+              </Button>
+              <Button variant="outline" onClick={() => {
+                setBasicInfo(prev => ({...prev, title: `${formattedUpcomingSunday} 주일 예배`}));
+                setDate(upcomingSunday);
+              }}>
+                {`${formattedUpcomingSunday} 주일 예배`}
+              </Button>
+            </div>
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="date">
