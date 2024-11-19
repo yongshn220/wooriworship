@@ -54,7 +54,7 @@ export function SelectSongMusicSheetKey({songId, isStatic=false, onSelectHandler
                 key={index}
                 className={
                   cn(
-                    "flex-center w-16 h-16 border-2 border-white text-white rounded-lg cursor-pointer",
+                    "flex-center w-16 h-16 border-2 border-white/30 text-white/70 rounded-lg cursor-pointer",
                     {"bg-white text-black": isMusicSheetSelected(sheet?.id)},
                   )
                 }
@@ -84,7 +84,7 @@ export function SelectSongMusicSheetKey({songId, isStatic=false, onSelectHandler
               isSongAdded()
                 ? <Button className="w-full bg-blue-500 hover:bg-blue-500 hover:border-2 hover:text-white"
                           variant="outline" onClick={() => handleUnselectSong()}>Click to Remove Song</Button>
-                : <Button className="w-full" onClick={() => handleSelectSong()}>Click to Add Song</Button>
+                : <Button className="w-full" onClick={() => handleSelectSong()} disabled={selectedMusicSheetIds.length === 0}>Click to Add Song</Button>
             }
           </>
         }

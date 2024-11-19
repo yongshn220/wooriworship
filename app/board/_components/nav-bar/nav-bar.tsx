@@ -16,6 +16,7 @@ import {FallbackText} from "@/components/fallback-text";
 import {CircleCheckIcon, HomeIcon, CalendarIcon, FileMusicIcon, Settings2Icon} from "lucide-react";
 import {NewNoticeButton} from "@/app/board/[teamId]/_components/new-notice-button";
 import {Button} from "@/components/ui/button";
+import { SearchPlan } from "./search-plan";
 
 export function Navbar() {
   const currentPage = useRecoilValue(currentPageAtom)
@@ -53,6 +54,12 @@ export function Navbar() {
                 </Button>
               </>
             </SearchFilterPopover>
+          </div>
+        }
+        {
+          (currentPage === Page.PLAN) &&
+          <div className={cn("flex-center w-full max-w-xl gap-4")}>
+            <SearchPlan/>
           </div>
         }
       </div>

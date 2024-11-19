@@ -21,3 +21,8 @@ export const songBoardSelectedSortOptionAtom = atom<SongBoardSortOption>({
   key: "songBoardSelectedSortOptionAtom",
   default: SongBoardSortOption.TITLE_ASCENDING,
 })
+
+export const planSearchInputAtom = atom({
+  key: "planSearchInputAtom",
+  default: ""
+})

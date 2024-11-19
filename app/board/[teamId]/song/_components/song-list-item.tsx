@@ -1,12 +1,7 @@
 import {useRecoilValue} from "recoil";
-import {currentTeamIdAtom} from "@/global-states/teamState";
 import {songAtom} from "@/global-states/song-state";
-import {useRouter} from "next/navigation";
-import {getPathSongDetail} from "@/components/helper/routes";
 import {getTimePassedFromTimestamp, getTimePassedFromTimestampShorten} from "@/components/helper/helper-functions";
 import {Badge} from "@/components/ui/badge";
-import {SongKeyBox} from "@/components/song/song-key-box";
-import {musicSheetIdsAtom} from "@/global-states/music-sheet-state";
 import {SongKeyBoxByText} from "@/components/song/song-key-box-by-text";
 
 interface Props {
