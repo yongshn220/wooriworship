@@ -20,9 +20,7 @@ export default function BoardTeamLayout({params, children}: Props) {
     <div className="w-full h-full">
       <Suspense fallback={<FallbackText text="Loading..."/>}>
         <TeamIdValidation teamId={teamId}>
-          <InitPage pathname={pathname}>
-            {children}
-          </InitPage>
+          {children}
         </TeamIdValidation>
       </Suspense>
     </div>

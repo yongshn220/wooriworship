@@ -1,10 +1,10 @@
 'use client'
 
 import {useSetRecoilState} from "recoil";
-import {currentPageAtom} from "@/app/board/_states/board-states";
 import {useEffect} from "react";
 import {Page} from "@/components/constants/enums";
 import {currentTeamIdAtom} from "@/global-states/teamState";
+import { currentPageAtom } from "@/components/states/page-states";
 
 interface Props {
   teamId: string

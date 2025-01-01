@@ -1,11 +1,6 @@
 import {atom} from "recoil";
-import {Page, SongBoardSortOption} from "@/components/constants/enums";
+import {SongBoardSortOption} from "@/components/constants/enums";
 
-
-export const currentPageAtom = atom({
-  key: "currentPageAtom",
-  default: Page.BOARD
-})
 
 export const songSearchInputAtom = atom({
   key: "songSearchInputAtom",

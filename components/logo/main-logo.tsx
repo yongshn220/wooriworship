@@ -35,3 +35,19 @@ export function MainLogo() {
     </div>
   )
 }
+
+
+export function MainLogoSmall() {
+  return (
+    <div className="flex-center gap-1">
+      <Image
+        src={"/image/logo.png"}
+        alt="Logo"
+        height={25}
+        width={25}
+        className="object-contain object-center"
+      />
+      <p className="font-semibold">OORI</p>
+    </div>
+  )
+}

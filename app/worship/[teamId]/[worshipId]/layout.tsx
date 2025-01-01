@@ -7,8 +7,8 @@ import {WorshipSidebar} from "@/app/worship/[teamId]/[worshipId]/_components/wor
 import {MdSidebar} from "@/components/sidebar/md-sidebar";
 import {PageInit} from "@/components/page/page-init";
 import {Page} from "@/components/constants/enums";
-import {BottomNavbar} from "@/app/board/_components/bottom-navbar/bottom-navbar";
 import {WorshipBottomNavbar} from "@/app/worship/_components/bottom-navbar/worship-bottom-navbar";
+import { BoardBottomeNavBar } from "@/app/board/_components/board-navigation/board-bottom-nav-bar";
 
 interface Props {
   params: any
@@ -33,7 +33,7 @@ export default function WorshipLayout({params, children}: Props) {
             {children}
           </div>
           <WorshipBottomNavbar teamId={teamId} worshipId={worshipId}/>
-          <BottomNavbar/>
+          <BoardBottomeNavBar/>
         </div>
       </div>
     </section>
