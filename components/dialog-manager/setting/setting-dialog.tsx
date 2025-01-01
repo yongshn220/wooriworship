@@ -1,18 +1,22 @@
 "use client"
 
-import {Drawer, DrawerContent, DrawerHeader, DrawerTrigger,} from "@/components/ui/drawer"
-import {MenuIcon, SettingsIcon, UsersIcon} from "lucide-react";
+import {Drawer, DrawerContent, DrawerHeader} from "@/components/ui/drawer"
+import {SettingsIcon, UsersIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {AuthService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
 import {useSetRecoilState} from "recoil";
 import {useRouter} from "next/navigation";
-import {InvitationButton} from "@/app/board/[teamId]/_components/dialog-manager/invitation/invitation-button";
+import {InvitationButton} from "@/components/dialog-manager/invitation/invitation-button";
 import {Separator} from "@/components/ui/separator";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {ManageTeamDialog} from "@/app/board/_components/nav-bar/manage-team-dialog";
 
-export function SettingButton() {
+interface Props {
+  isOpen: boolean
+  setIsOpen: Function
+}
+export function SettingDialog({isOpen, setIsOpen}: Props) {
   const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
   const router = useRouter()
 
@@ -29,11 +33,7 @@ export function SettingButton() {
   }
 
   return (
-    <Drawer>
-      <DrawerTrigger className="flex-center flex-col">
-        <MenuIcon strokeWidth={3} className="prevent-text-select"/>
-        <p className="text-sm prevent-text-select">Menu</p>
-      </DrawerTrigger>
+    <Drawer open={isOpen} onOpenChange={(isOpen) => setIsOpen(isOpen)}>
       <DrawerContent className="w-full min-h-[240px]">
         <DrawerHeader>
           <p className="font-semibold prevent-text-select">Wooriworship</p>

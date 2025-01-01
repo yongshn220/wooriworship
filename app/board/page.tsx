@@ -1,6 +1,6 @@
 "use client"
 
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {UserService} from "@/apis";
 import {User} from "@/models/user";
 import {useRouter} from "next/navigation";
@@ -44,7 +44,7 @@ export default function BoardPage() {
         }
       })
     }
-  }, [teamId, preferences.board.selectedTeamId, authUser, router])
+  }, [setTeamId, teamId, preferences.board.selectedTeamId, authUser, router])
 
 
 

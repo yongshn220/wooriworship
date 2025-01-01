@@ -8,19 +8,19 @@ import {useRecoilState, useRecoilValue} from "recoil";
 import {ProfileButton} from "@/app/board/_components/nav-bar/profile-button";
 import {NewSongButton} from "@/app/board/[teamId]/song/_components/new-song-button";
 import {NewWorshipButton} from "@/app/board/[teamId]/plan/_components/new-worship-button";
-import {invitationDialogStateAtom} from "@/global-states/dialog-state";
+import {invitationInboxDialogOpenStateAtom} from "@/global-states/dialog-state";
 import React, {Suspense} from "react";
 import {FallbackText} from "@/components/fallback-text";
 import {CircleCheckIcon, HomeIcon, CalendarIcon, FileMusicIcon, Settings2Icon} from "lucide-react";
 import {NewNoticeButton} from "@/app/board/[teamId]/_components/new-notice-button";
 import {Button} from "@/components/ui/button";
 import { SearchPlan } from "./search-plan";
-import { currentPageAtom } from "@/components/states/page-states";
-import { InvitationInboxDialog } from "../../[teamId]/_components/dialog-manager/invitation/invitation-inbox-dialog";
+import { currentPageAtom } from "@/global-states/page-state";
+import { InvitationInboxDialog } from "@/components/dialog-manager/invitation/invitation-inbox-dialog";
 
 export function Navbar() {
   const currentPage = useRecoilValue(currentPageAtom)
-  const [invitationDialogState, setInvitationDialogState] = useRecoilState(invitationDialogStateAtom)
+  const [invitationDialogState, setInvitationDialogState] = useRecoilState(invitationInboxDialogOpenStateAtom)
 
   const tabConfig: any = {
     [Page.HOME]: { icon: <HomeIcon aria-hidden="true" />, text: "Home" },

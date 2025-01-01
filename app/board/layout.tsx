@@ -4,7 +4,7 @@ import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate
 import { BoardTopNavBar } from "@/app/board/_components/board-navigation/board-top-nav-bar";
 import { BoardBottomeNavBar } from "@/app/board/_components/board-navigation/board-bottom-nav-bar";
 import { BoardInitializer } from "@/app/board/_components/configuration/board-initializer";
-import { DialogManager } from "@/app/board/[teamId]/_components/dialog-manager/dialog-manager";
+import { DialogManager } from "@/components/dialog-manager/dialog-manager";
 import { usePathname } from "next/navigation";
 
 

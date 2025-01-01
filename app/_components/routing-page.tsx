@@ -5,11 +5,11 @@ import {MainLogo} from "@/components/logo/main-logo";
 
 export function RoutingPage() {
   return (
-    <div className="absolute flex-center w-full h-full">
+    <div className="flex-center w-full h-screen bg-white">
+      <RoutingIndicator/>
       <div className="absolute bottom-10">
         <MainLogo/>
       </div>
-      <RoutingIndicator/>
     </div>
   )
 }

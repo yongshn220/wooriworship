@@ -11,7 +11,7 @@ import {userAtom} from "@/global-states/userState";
 import {auth} from "@/firebase";
 import {Separator} from "@/components/ui/separator";
 import {SettingsIcon} from "lucide-react";
-import {InvitationButton} from "@/app/board/[teamId]/_components/dialog-manager/invitation/invitation-button";
+import {InvitationButton} from "@/components/dialog-manager/invitation/invitation-button";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 
 export function ProfileButton() {
