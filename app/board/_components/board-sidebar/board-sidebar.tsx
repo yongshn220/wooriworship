@@ -6,7 +6,6 @@ import {TeamSelect} from "@/app/board/_components/board-sidebar/team-select";
 import {MainLogoRouter} from "@/components/logo/main-logo";
 import {MdSidebar} from "@/components/sidebar/md-sidebar";
 import {useRecoilValue} from "recoil";
-import {currentPageAtom} from "@/app/board/_states/board-states";
 import {getPathHome, getPathNotice, getPathPlan, getPathSong} from "@/components/helper/routes";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {ManageTeamButton} from "@/app/board/_components/nav-bar/manage-team-button";
@@ -15,6 +14,7 @@ import {InvitationButton} from "@/app/board/_components/nav-bar/invitation-butto
 import {ManageTeamDialog} from "@/app/board/_components/nav-bar/manage-team-dialog";
 import React, {Suspense} from "react";
 import {FallbackText} from "@/components/fallback-text";
+import { currentPageAtom } from "@/components/states/page-states";
 
 export function BoardSidebar() {
   const currentPage = useRecoilValue(currentPageAtom)

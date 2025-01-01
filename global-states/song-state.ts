@@ -1,13 +1,9 @@
 import {atom, atomFamily, selectorFamily} from "recoil";
 import {Song} from "@/models/song";
 import {SongService} from "@/apis";
-import {
-  searchSelectedTagsAtom,
-  songBoardSelectedSortOptionAtom,
-  songSearchInputAtom
-} from "@/app/board/_states/board-states";
+import {searchSelectedTagsAtom,songBoardSelectedSortOptionAtom,songSearchInputAtom} from "@/app/board/_states/board-states";
 import {SongBoardSortOption} from "@/components/constants/enums";
-import {worshipAtom} from "@/global-states/worship-state";
+
 
 export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
   key: "currentTeamSongIdsAtom",

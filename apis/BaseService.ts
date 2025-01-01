@@ -13,7 +13,8 @@ export default class BaseService {
       const res = await ref.get();
       if (res.exists) {
         return {id: id, ...res.data()};
-      } else {
+      } 
+      else {
         return null;
       }
     } catch (e) {
@@ -168,7 +169,8 @@ export default class BaseService {
     try {
       await firestore.collection(this.collectionName).doc(id).set(data, {merge: true});
       return true
-    } catch (e) {
+    } 
+    catch (e) {
       console.log(e)
       return false
     }

@@ -42,7 +42,10 @@ export function TeamIdValidation({teamId, children}: Props) {
     if (teamLoadable.state === 'hasValue' && !user.teams.includes(teamId)) {
       toast({title: "Unauthorized Member", description: `You have no permission to the team [${teamLoadable.contents.name}].`})
       router.replace("/")
+      return;
     }
+
+    setCurrentTeamId(teamId)
   }, [setCurrentTeamId, teamId, user.teams, router, teamLoadable]);
 
 

@@ -21,62 +21,38 @@ export default function BoardPage() {
   const [isTeamEmpty, setIsTeamEmpty] = useState(false)
   const router = useRouter()
 
-  useEffect(() => {
-    if (authUser) {
-      UserService.getById(authUser.uid).then((_user: any) => {
-        if (!_user) {
-          toast({title: "Something went wrong."})
-          return;
-        }
-        const user = _user as User
-        if (user.teams.length > 0) {
-          const teamId = user.teams.includes(preferences.board.selectedTeamId)? preferences.board.selectedTeamId : user.teams[0]
-          router.push(getPathHome(teamId))
-        }
-        else {
-          setIsTeamEmpty(true)
-        }
-      })
-    }
-  }, [preferences.board.selectedTeamId, authUser, router])
+  // useEffect(() => {
+  //   if (authUser) {
+  //     UserService.getById(authUser.uid).then((_user: any) => {
+  //       if (!_user) {
+  //         toast({title: "Something went wrong."})
+  //         return;
+  //       }
+  //       const user = _user as User
+  //       if (user.teams.length > 0) {
+  //         const teamId = user.teams.includes(preferences.board.selectedTeamId)? preferences.board.selectedTeamId : user.teams[0]
+  //         router.push(getPathHome(teamId))
+  //       }
+  //       else {
+  //         setIsTeamEmpty(true)
+  //       }
+  //     })
+  //   }
+  // }, [preferences.board.selectedTeamId, authUser, router])
 
   return (
-    <div className="w-full h-full flex-center">
-      {
-        isTeamEmpty ?
-        <div className="w-full h-full flex-center flex-col gap-4">
-          {
-            isMobile() ?
-            <Image
-              alt="compose music image"
-              src="/illustration/offRoadIllustration.svg"
-              width={250}
-              height={250}
-            />
-              :
-            <Image
-              alt="compose music image"
-              src="/illustration/offRoadIllustration.svg"
-              width={300}
-              height={300}
-            />
-          }
-          {
-            isMobile() ?
-            <p className="text-3xl font-semibold">Welcome!</p>
-              :
-            <p className="text-3xl font-semibold">Welcome to Woori Worship!</p>
-          }
-          <p className="text-gray-500">Click &ldquo;Add Team&rdquo; button to get started</p>
-          <CreateNewTeamDialog>
-            <Button>+ Add Team</Button>
-          </CreateNewTeamDialog>
-        </div>
-          :
-        <div>
-          Select your team to start
-        </div>
-      }
+    <div className="w-full h-full flex-center flex-col gap-4">
+      <Image
+        alt="compose music image"
+        src="/illustration/offRoadIllustration.svg"
+        width={250}
+        height={250}
+      />
+      <p className="text-2xl font-semibold">Welcome to Woori Worship!</p>
+      <p className="text-gray-500">Click &ldquo;Add Team&rdquo; button to get started</p>
+      <CreateNewTeamDialog>
+        <Button>+ Add Team</Button>
+      </CreateNewTeamDialog>
     </div>
   )
 }

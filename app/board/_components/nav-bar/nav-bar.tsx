@@ -5,7 +5,6 @@ import {SearchFilterPopover} from "@/app/board/_components/nav-bar/search-filter
 import {cn} from "@/lib/utils";
 import {Page} from "@/components/constants/enums";
 import {useRecoilState, useRecoilValue} from "recoil";
-import {currentPageAtom} from "@/app/board/_states/board-states";
 import {ProfileButton} from "@/app/board/_components/nav-bar/profile-button";
 import {NewSongButton} from "@/app/board/[teamId]/song/_components/new-song-button";
 import {NewWorshipButton} from "@/app/board/[teamId]/plan/_components/new-worship-button";
@@ -17,6 +16,7 @@ import {CircleCheckIcon, HomeIcon, CalendarIcon, FileMusicIcon, Settings2Icon} f
 import {NewNoticeButton} from "@/app/board/[teamId]/_components/new-notice-button";
 import {Button} from "@/components/ui/button";
 import { SearchPlan } from "./search-plan";
+import { currentPageAtom } from "@/components/states/page-states";
 
 export function Navbar() {
   const currentPage = useRecoilValue(currentPageAtom)
