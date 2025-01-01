@@ -17,7 +17,6 @@ interface Props {
 }
 export function TeamSelect({createOption}: Props) {
   const authUser = auth.currentUser
-  const router = useRouter()
   const [currentTeamId, setCurrentTeamId] = useRecoilState(currentTeamIdAtom)
   const user = useRecoilValue(userAtom(authUser?.uid))
   const [_, prefSetter] = useUserPreferences()
@@ -30,7 +29,6 @@ export function TeamSelect({createOption}: Props) {
     if (teamId) {
       updatePreferenceSelectedTeamId(teamId)
       setCurrentTeamId(teamId)
-      router.push(getPathPlan(teamId))
     }
   }
 

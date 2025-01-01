@@ -2,7 +2,7 @@
 
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import * as React from "react";
-import {InvitationCard} from "@/app/board/_components/nav-bar/invitation-card";
+import {InvitationCard} from "@/app/board/[teamId]/_components/dialog-manager/invitation/invitation-card";
 import {auth} from "@/firebase";
 import {Invitation} from "@/models/invitation";
 import {Suspense, useEffect, useState} from "react";
@@ -13,7 +13,7 @@ interface Props {
   isOpen: boolean
   setIsOpen: Function
 }
-export function InvitationDialog({isOpen, setIsOpen}: Props) {
+export function InvitationInboxDialog({isOpen, setIsOpen}: Props) {
   const authUser = auth.currentUser
   const [invitations, setInvitations] = useState([])
 

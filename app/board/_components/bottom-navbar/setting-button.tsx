@@ -7,7 +7,7 @@ import {AuthService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
 import {useSetRecoilState} from "recoil";
 import {useRouter} from "next/navigation";
-import {InvitationButton} from "@/app/board/_components/nav-bar/invitation-button";
+import {InvitationButton} from "@/app/board/[teamId]/_components/dialog-manager/invitation/invitation-button";
 import {Separator} from "@/components/ui/separator";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {ManageTeamDialog} from "@/app/board/_components/nav-bar/manage-team-dialog";
