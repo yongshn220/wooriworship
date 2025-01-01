@@ -8,40 +8,48 @@ import {getPathHome} from "@/components/helper/routes";
 import {auth} from "@/firebase";
 import Image from "next/image";
 import * as React from "react";
-import {CreateNewTeamDialog} from "@/app/board/_components/create-new-team-dialog";
-import {Button} from "@/components/ui/button";
 import {toast} from "@/components/ui/use-toast";
 import useUserPreferences from "@/components/hook/use-local-preference";
-import {isMobile} from "@/components/helper/helper-functions";
+import { TeamSelect } from "./_components/board-sidebar/team-select";
+import { currentTeamIdAtom } from "@/global-states/teamState";
+import { useRecoilState } from "recoil";
 
 
 export default function BoardPage() {
   const authUser = auth.currentUser
+  const [teamId, setTeamId] = useRecoilState(currentTeamIdAtom)
   const [preferences, _] = useUserPreferences()
-  const [isTeamEmpty, setIsTeamEmpty] = useState(false)
   const router = useRouter()
 
-  // useEffect(() => {
-  //   if (authUser) {
-  //     UserService.getById(authUser.uid).then((_user: any) => {
-  //       if (!_user) {
-  //         toast({title: "Something went wrong."})
-  //         return;
-  //       }
-  //       const user = _user as User
-  //       if (user.teams.length > 0) {
-  //         const teamId = user.teams.includes(preferences.board.selectedTeamId)? preferences.board.selectedTeamId : user.teams[0]
-  //         router.push(getPathHome(teamId))
-  //       }
-  //       else {
-  //         setIsTeamEmpty(true)
-  //       }
-  //     })
-  //   }
-  // }, [preferences.board.selectedTeamId, authUser, router])
+  useEffect(() => {
+    if (!authUser) {
+      router.replace("/");
+      return;
+    }
+
+    if (teamId) {
+      router.push(getPathHome(teamId))
+    }
+    else {
+      UserService.getById(authUser.uid).then((_user: any) => {
+        if (!_user) {
+          toast({title: "Something went wrong."})
+          return;
+        }
+        const user = _user as User
+        if (user?.teams?.length > 0) {
+          const newTeamId = user.teams.includes(preferences.board.selectedTeamId)? preferences.board.selectedTeamId : user.teams[0]
+          setTeamId(newTeamId)
+          router.push(getPathHome(newTeamId))
+        }
+      })
+    }
+  }, [teamId, preferences.board.selectedTeamId, authUser, router])
+
+
 
   return (
-    <div className="w-full h-full flex-center flex-col gap-4">
+    <div className="w-full h-full flex-center flex-col gap-4 bg-white">
       <Image
         alt="compose music image"
         src="/illustration/offRoadIllustration.svg"
@@ -49,10 +57,10 @@ export default function BoardPage() {
         height={250}
       />
       <p className="text-2xl font-semibold">Welcome to Woori Worship!</p>
-      <p className="text-gray-500">Click &ldquo;Add Team&rdquo; button to get started</p>
-      <CreateNewTeamDialog>
-        <Button>+ Add Team</Button>
-      </CreateNewTeamDialog>
+      <p className="text-gray-500">Select or add team to get started</p>
+      <div className="w-[300px]">
+        <TeamSelect createOption={true}/>
+      </div>
     </div>
   )
 }

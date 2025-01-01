@@ -8,7 +8,6 @@ import {useRecoilState, useRecoilValue} from "recoil";
 import {ProfileButton} from "@/app/board/_components/nav-bar/profile-button";
 import {NewSongButton} from "@/app/board/[teamId]/song/_components/new-song-button";
 import {NewWorshipButton} from "@/app/board/[teamId]/plan/_components/new-worship-button";
-import {InvitationDialog} from "@/app/board/_components/nav-bar/invitation-dialog";
 import {invitationDialogStateAtom} from "@/global-states/dialog-state";
 import React, {Suspense} from "react";
 import {FallbackText} from "@/components/fallback-text";
@@ -17,6 +16,7 @@ import {NewNoticeButton} from "@/app/board/[teamId]/_components/new-notice-butto
 import {Button} from "@/components/ui/button";
 import { SearchPlan } from "./search-plan";
 import { currentPageAtom } from "@/components/states/page-states";
+import { InvitationInboxDialog } from "../../[teamId]/_components/dialog-manager/invitation/invitation-inbox-dialog";
 
 export function Navbar() {
   const currentPage = useRecoilValue(currentPageAtom)
@@ -31,7 +31,7 @@ export function Navbar() {
 
   return (
     <div className="hidden lg:flex top-0 sticky content-between items-center py-4 gap-4 border-b bg-white/95 z-40 px-4">
-      <InvitationDialog isOpen={invitationDialogState} setIsOpen={setInvitationDialogState}/>
+      <InvitationInboxDialog isOpen={invitationDialogState} setIsOpen={setInvitationDialogState}/>
       <div className="flex-center h-full">
         {
           tabConfig[currentPage] &&
