@@ -10,11 +10,11 @@ import {getPathHome, getPathNotice, getPathPlan, getPathSong} from "@/components
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {ManageTeamButton} from "@/app/board/_components/nav-bar/manage-team-button";
 import {useRouter} from "next/navigation";
-import {InvitationButton} from "@/app/board/[teamId]/_components/dialog-manager/invitation/invitation-button";
+import {InvitationButton} from "@/components/dialog-manager/invitation/invitation-button";
 import {ManageTeamDialog} from "@/app/board/_components/nav-bar/manage-team-dialog";
 import React, {Suspense} from "react";
 import {FallbackText} from "@/components/fallback-text";
-import { currentPageAtom } from "@/components/states/page-states";
+import { currentPageAtom } from "@/global-states/page-state";
 
 export function BoardSidebar() {
   const currentPage = useRecoilValue(currentPageAtom)

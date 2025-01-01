@@ -28,6 +28,10 @@ export function getPathManageTeam(teamId: string) {
   return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.MANAGE_TEAM
 }
 
+export function getPathManage(teamId: string) {
+  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.MANAGE
+}
+
 export function getPathSong(teamId: string) {
   return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.SONG
 }

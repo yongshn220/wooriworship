@@ -14,7 +14,7 @@ enum AuthStatus {
   NOT_VALID,
 }
 
-export default function Home() {
+export default function RoutePage() {
   const [authStatus, setAuthStatus] = useState<AuthStatus>(AuthStatus.PROCESSING)
   const [preferences, _] = useUserPreferences()
   const router = useRouter()
@@ -43,6 +43,8 @@ export default function Home() {
       }
     });
   }, [preferences.board.selectedTeamId, router]);
+
+
 
   return (
     <div>

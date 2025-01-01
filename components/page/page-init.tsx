@@ -4,7 +4,7 @@ import {useSetRecoilState} from "recoil";
 import {useEffect} from "react";
 import {Page} from "@/components/constants/enums";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import { currentPageAtom } from "@/components/states/page-states";
+import { currentPageAtom } from "@/global-states/page-state";
 
 interface Props {
   teamId: string

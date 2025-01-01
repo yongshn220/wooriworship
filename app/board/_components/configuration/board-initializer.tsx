@@ -1,7 +1,7 @@
 import {useEffect} from "react";
 import {useSetRecoilState} from "recoil";
 import {Page} from "@/components/constants/enums";
-import { currentPageAtom } from "@/components/states/page-states";
+import { currentPageAtom } from "@/global-states/page-state";
 
 interface Props {
   children: any
@@ -29,6 +29,9 @@ export function BoardInitializer({children, pathname}: Props) {
     }
     if (/^\/board\/[^\/]+\/song$/.test(pathname)) {
       setPage(Page.SONG)
+    }
+    if (/^\/board\/[^\/]+\/manage$/.test(pathname)) {
+      setPage(Page.MANAGE)
     }
   }, [setPage, pathname])
 

@@ -1,13 +1,12 @@
-import {HomeIcon, FileMusicIcon, CircleCheckIcon, CalendarIcon} from "lucide-react";
-import {getPathHome, getPathNotice, getPathPlan, getPathSong} from "@/components/helper/routes";
+import {HomeIcon, FileMusicIcon, CircleCheckIcon, CalendarIcon, CircleUserRoundIcon} from "lucide-react";
+import {getPathHome, getPathManage, getPathNotice, getPathPlan, getPathSong} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {Page} from "@/components/constants/enums";
-import {SettingButton} from "@/app/board/_components/bottom-navbar/setting-button";
 import { BaseBottomNavBar } from "@/components/navigation/base-bottom-nav-bar";
-import { currentPageAtom } from "@/components/states/page-states";
+import { currentPageAtom } from "@/global-states/page-state";
 
 export function BoardBottomeNavBar() {
   const currentPage = useRecoilValue(currentPageAtom)
@@ -41,8 +40,11 @@ export function BoardBottomeNavBar() {
           <FileMusicIcon strokeWidth={2}/>
           <p className="text-xs prevent-text-select">Song</p>
         </div>
-        <div className="w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer">
-          <SettingButton/>
+        <div
+          className={cn("w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer", {"text-blue-500": (currentPage === Page.MANAGE)})}
+          onClick={() => router.push(getPathManage(currentTeamId))}>
+          <CircleUserRoundIcon strokeWidth={2} className="prevent-text-select"/>
+          <p className="text-sm prevent-text-select">Manage</p>
         </div>
       </div>
     </BaseBottomNavBar>
