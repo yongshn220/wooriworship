@@ -1,8 +1,8 @@
 import React, {useState} from "react";
-import {SongMusicSheetViewer} from "@/app/board/[teamId]/song/_components/song-music-sheet-viewer";
 import Image from "next/image";
 import {useRecoilValue} from "recoil";
 import {musicSheetAtom} from "@/global-states/music-sheet-state";
+import {ImageFullScreenDialog} from "@/components/dialog/dynamic-dialog/image-full-screen/image-full-screen-dialog";
 
 
 interface Props {
@@ -18,7 +18,7 @@ export function SongDetailMusicSheetArea({musicSheetId}: Props) {
 
   return (
     <>
-      <SongMusicSheetViewer isOpen={isMusicSheetViewOpen} setIsOpen={setMusicSheetViewOpen} musicSheetUrls={musicSheet?.urls}/>
+      <ImageFullScreenDialog isOpen={isMusicSheetViewOpen} setIsOpen={setMusicSheetViewOpen} imageUrls={musicSheet?.urls}/>
       {
         musicSheet?.urls?.length > 0 &&
         <div className="flex-center w-full h-60 aspect-square">

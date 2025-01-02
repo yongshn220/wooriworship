@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator"
 import { toast } from "@/components/ui/use-toast"
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState"
 import { AuthService } from "@/apis"
-import { LogOut, MailIcon, Settings, Users, Building2 } from 'lucide-react'
+import { LogOut, MailIcon, Settings, Users } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import { useRecoilValue, useSetRecoilState } from "recoil"
 import { auth } from "@/firebase"

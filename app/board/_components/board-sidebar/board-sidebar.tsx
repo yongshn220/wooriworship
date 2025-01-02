@@ -10,7 +10,7 @@ import {getPathHome, getPathNotice, getPathPlan, getPathSong} from "@/components
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {ManageTeamButton} from "@/app/board/_components/nav-bar/manage-team-button";
 import {useRouter} from "next/navigation";
-import {InvitationButton} from "@/components/dialog-manager/invitation/invitation-button";
+import {InvitationButton} from "@/components/dialog/static-dialog/invitation/invitation-button";
 import {ManageTeamDialog} from "@/app/board/_components/nav-bar/manage-team-dialog";
 import React, {Suspense} from "react";
 import {FallbackText} from "@/components/fallback-text";
