@@ -8,7 +8,7 @@ import {MdSidebar} from "@/components/sidebar/md-sidebar";
 import {PageInit} from "@/components/page/page-init";
 import {Page} from "@/components/constants/enums";
 import {WorshipBottomNavbar} from "@/app/worship/_components/bottom-navbar/worship-bottom-navbar";
-import { BoardBottomeNavBar } from "@/app/board/_components/board-navigation/board-bottom-nav-bar";
+import { BoardBottomNavBar } from "@/app/board/_components/board-navigation/board-bottom-nav-bar";
 
 interface Props {
   params: any
@@ -22,19 +22,13 @@ export default function WorshipLayout({params, children}: Props) {
   return (
     <section className="h-full">
       <PageInit teamId={teamId} page={Page.WORSHIP}/>
-      <div className="h-full flex">
-        <MdSidebar>
-          <MainLogoRouter route={getPathPlan(teamId)}/>
-          <WorshipSidebar teamId={teamId} worshipId={worshipId}/>
-        </MdSidebar>
-        <div className="flex flex-col h-screen flex-1 overflow-y-scroll">
-          <Navbar/>
-          <div className="pt-4 sm:mt-0 flex-1 px-6 ">
-            {children}
-          </div>
-          <WorshipBottomNavbar teamId={teamId} worshipId={worshipId}/>
-          <BoardBottomeNavBar/>
-        </div>
+      <div className="flex flex-col h-screen">
+        <Navbar/>
+        <main className="flex-grow overflow-y-auto p-4">
+          {children}
+        </main>
+        <WorshipBottomNavbar teamId={teamId} worshipId={worshipId}/>
+        <BoardBottomNavBar/>
       </div>
     </section>
   )

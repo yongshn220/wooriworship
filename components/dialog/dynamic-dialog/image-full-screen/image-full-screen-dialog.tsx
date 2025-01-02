@@ -14,7 +14,7 @@ export function ImageFullScreenDialog({isOpen, setIsOpen, imageUrls}: Props) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
-      <DialogContent className="w-full h-full bg-black p-2 m-0">
+      <DialogContent className="w-full h-full max-w-8xl bg-black p-2 m-0 ">
           <Carousel className="w-full h-full bg-gray-50">
             <CarouselContent className="">
               {
