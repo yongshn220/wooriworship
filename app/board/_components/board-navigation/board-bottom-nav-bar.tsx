@@ -44,7 +44,7 @@ export function BoardBottomNavBar() {
           className={cn("w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer", {"text-blue-500": (currentPage === Page.MANAGE)})}
           onClick={() => router.push(getPathManage(currentTeamId))}>
           <CircleUserRoundIcon strokeWidth={2} className="prevent-text-select"/>
-          <p className="text-sm prevent-text-select">Manage</p>
+          <p className="text-xs prevent-text-select">Manage</p>
         </div>
       </div>
     </BaseBottomNavBar>
