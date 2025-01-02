@@ -6,6 +6,8 @@ import {userAtom} from "@/global-states/userState";
 import {UserIcon} from "lucide-react";
 import Image from 'next/image'
 import {NoticeDropdownMenu} from "@/app/board/[teamId]/notice/_components/notice-dropdown-menu";
+import {ImageFullScreenDialog} from "@/components/dialog/dynamic-dialog/image-full-screen/image-full-screen-dialog";
+import React, {useState} from "react";
 
 
 interface Props {
@@ -13,11 +15,16 @@ interface Props {
 }
 
 export function NoticeListItem({noticeId}: Props) {
+  const [fullScreenOn, setFullScreenOn] = useState({
+    state: false,
+    urls: []
+  })
   const notice = useRecoilValue(noticeAtom(noticeId))
   const user = useRecoilValue(userAtom(notice?.created_by.id))
 
   return (
     <div className="w-full">
+      <ImageFullScreenDialog isOpen={fullScreenOn.state} setIsOpen={(state) => setFullScreenOn((prev) => ({...prev, state: state}))} imageUrls={fullScreenOn.urls}/>
       <div className="flex items-center gap-2">
         <p className="text-sm pl-2">{timestampToDateStringFormatted(notice?.last_updated_time)}</p>
         <p className="text-sm text-gray-500">{getTimePassedFromTimestampShorten(notice?.last_updated_time)}</p>
@@ -46,7 +53,7 @@ export function NoticeListItem({noticeId}: Props) {
           <div>
             {
               notice?.file_urls?.map((url, index) => (
-                <div key={index}>
+                <div key={index} className="cursor-pointer" onClick={() => setFullScreenOn({state: true, urls: [url]})}>
                   <Image
                     alt="notice uploaded image"
                     src={url}

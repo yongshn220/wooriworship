@@ -2,7 +2,7 @@
 
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import * as React from "react";
-import {InvitationCard} from "@/components/dialog-manager/invitation/invitation-card";
+import {InvitationCard} from "@/components/dialog/static-dialog/invitation/invitation-card";
 import {auth} from "@/firebase";
 import {Invitation} from "@/models/invitation";
 import {Suspense, useEffect, useState} from "react";

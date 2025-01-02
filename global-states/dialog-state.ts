@@ -6,8 +6,4 @@ export const invitationInboxDialogOpenStateAtom = atom({
   default: false
 })
 
-export const settingDialogOpenStateAtom = atom({
-  key: "settingDialogOpenStateAtom",
-  default: false
-})
 

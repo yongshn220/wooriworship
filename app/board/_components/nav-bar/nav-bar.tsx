@@ -16,7 +16,7 @@ import {NewNoticeButton} from "@/app/board/[teamId]/_components/new-notice-butto
 import {Button} from "@/components/ui/button";
 import { SearchPlan } from "./search-plan";
 import { currentPageAtom } from "@/global-states/page-state";
-import { InvitationInboxDialog } from "@/components/dialog-manager/invitation/invitation-inbox-dialog";
+import { InvitationInboxDialog } from "@/components/dialog/static-dialog/invitation/invitation-inbox-dialog";
 
 export function Navbar() {
   const currentPage = useRecoilValue(currentPageAtom)
