@@ -8,7 +8,7 @@ import {Page} from "@/components/constants/enums";
 import { BaseBottomNavBar } from "@/components/navigation/base-bottom-nav-bar";
 import { currentPageAtom } from "@/global-states/page-state";
 
-export function BoardBottomeNavBar() {
+export function BoardBottomNavBar() {
   const currentPage = useRecoilValue(currentPageAtom)
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
   const router = useRouter()

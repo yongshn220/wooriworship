@@ -2,7 +2,7 @@
 
 import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate";
 import { BoardTopNavBar } from "@/app/board/_components/board-navigation/board-top-nav-bar";
-import { BoardBottomeNavBar } from "@/app/board/_components/board-navigation/board-bottom-nav-bar";
+import { BoardBottomNavBar } from "@/app/board/_components/board-navigation/board-bottom-nav-bar";
 import { BoardInitializer } from "@/app/board/_components/configuration/board-initializer";
 import { DialogManager } from "@/components/dialog/static-dialog/dialog-manager";
 import { usePathname } from "next/navigation";
@@ -19,10 +19,10 @@ export default function BoardLayout({ children }: any) {
         <BoardInitializer pathname={pathname}>
           <div className="flex flex-col h-screen">
             <BoardTopNavBar/>
-            <main className="flex-grow overflow-y-auto bg-gray-100 p-4">
+            <main className="flex-grow overflow-y-auto bg-gray-50 p-4">
               {children}
             </main>
-            <BoardBottomeNavBar/>
+            <BoardBottomNavBar/>
           </div>
         </BoardInitializer>
       </BoardAuthenticate>
