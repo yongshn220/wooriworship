@@ -1,12 +1,12 @@
 "use client"
 
-import {WorshipLiveCarousel} from "@/app/worship/[teamId]/[worshipId]/worship-view/_components/worship-live-carousel";
-import {WorshipLiveMenu} from "@/app/worship/[teamId]/[worshipId]/worship-view/_components/worship-live-menu";
-import {WorshipIndexIndicator} from "@/app/worship/[teamId]/[worshipId]/worship-view/_components/worship-index-indicator";
 import {Dialog, DialogContentNoCloseButton, DialogTitle} from "@/components/ui/dialog";
 import {useRouter} from "next/navigation";
 import {getPathWorship} from "@/components/helper/routes";
 import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
+import {WorshipLiveCarousel} from "@/app/board/[teamId]/worship/[worshipId]/worship-view/_components/worship-live-carousel";
+import {WorshipLiveMenu} from "@/app/board/[teamId]/worship/[worshipId]/worship-view/_components/worship-live-menu";
+import {WorshipIndexIndicator} from "@/app/board/[teamId]/worship/[worshipId]/worship-view/_components/worship-index-indicator";
 
 
 export default function WorshipLivePage({params}: any) {

@@ -1,10 +1,7 @@
 import useUserPreferences from "@/components/hook/use-local-preference";
 import {useEffect} from "react";
 import {useSetRecoilState} from "recoil";
-import {
-  worshipLiveOptionsAtom,
-  worshipMultipleSheetsViewModeAtom
-} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
+import {worshipLiveOptionsAtom, worshipMultipleSheetsViewModeAtom} from "@/app/board/[teamId]/worship/[worshipId]/_states/worship-detail-states";
 
 
 export function WorshipLivePreference() {

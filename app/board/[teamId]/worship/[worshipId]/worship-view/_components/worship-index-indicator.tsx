@@ -1,8 +1,8 @@
 import {useRecoilValue, useSetRecoilState} from "recoil";
-import {worshipIndexAtom, worshipIndexChangeEventAtom, worshipLiveOptionsAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {cn} from "@/lib/utils";
 import * as React from "react";
 import {isMobile} from "@/components/helper/helper-functions";
+import {worshipIndexAtom, worshipIndexChangeEventAtom, worshipLiveOptionsAtom} from "@/app/board/[teamId]/worship/[worshipId]/_states/worship-detail-states";
 
 
 export function WorshipIndexIndicator() {

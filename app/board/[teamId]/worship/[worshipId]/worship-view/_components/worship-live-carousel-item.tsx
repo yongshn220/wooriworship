@@ -1,15 +1,15 @@
 import * as React from "react";
 import {Card} from "@/components/ui/card";
-import {WorshipNote} from "@/app/worship/[teamId]/[worshipId]/worship-view/_components/worship-note";
 import {CarouselItem} from "@/components/ui/carousel";
 import {WorshipSongHeader} from "@/models/worship";
 import {useRecoilValue} from "recoil";
 import {musicSheetsByIdsAtom} from "@/global-states/music-sheet-state";
 import {useEffect, useMemo} from "react";
-import {worshipMultipleSheetsViewModeAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {DirectionType} from "@/components/constants/enums";
 import {MusicSheet} from "@/models/music_sheet";
-import {MusicSheetCounts} from "@/app/worship/[teamId]/[worshipId]/worship-view/_components/worship-live-carousel";
+import {MusicSheetCounts} from "@/app/board/[teamId]/worship/[worshipId]/worship-view/_components/worship-live-carousel";
+import {worshipMultipleSheetsViewModeAtom} from "@/app/board/[teamId]/worship/[worshipId]/_states/worship-detail-states";
+import {WorshipNote} from "@/app/board/[teamId]/worship/[worshipId]/worship-view/_components/worship-note";
 
 
 interface Props {

@@ -7,9 +7,11 @@ import {cn} from "@/lib/utils";
 import {Page} from "@/components/constants/enums";
 import { BaseBottomNavBar } from "@/components/navigation/base-bottom-nav-bar";
 import { currentPageAtom } from "@/global-states/page-state";
-import {DownloadMusicSheetDialog} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/download-music-sheet-dialog";
 import {Button} from "@/components/ui/button";
 import {currentWorshipIdAtom} from "@/global-states/worship-state";
+import {
+  DownloadMusicSheetDialog
+} from "@/app/board/[teamId]/worship/[worshipId]/_components/download-music-sheet-dialog";
 
 export function BoardBottomNavBar() {
   const currentPage = useRecoilValue(currentPageAtom)

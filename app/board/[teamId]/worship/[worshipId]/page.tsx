@@ -1,20 +1,17 @@
 "use client"
 
-import {SongCarousel} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel";
-import {WorshipSongHeader} from "@/models/worship";
-import CalendarIcon from '@/public/icons/calendarIcon.svg'
-import {Separator} from "@/components/ui/separator";
-import {MenuButton} from "@/app/worship/[teamId]/[worshipId]/_components/menu-button";
 import {useRecoilValue} from "recoil";
-import {teamAtom} from "@/global-states/teamState";
-import {getDayPassedFromTimestampShorten, timestampToDateString} from "@/components/helper/helper-functions";
 import {worshipAtom} from "@/global-states/worship-state";
-import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
-import * as React from "react";
-import {BlocksIcon, MusicIcon, UserIcon, UsersIcon} from "lucide-react";
-import {SongListPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/song-preview-item";
+import {teamAtom} from "@/global-states/teamState";
 import {userAtom} from "@/global-states/userState";
-
+import {MenuButton} from "@/app/board/[teamId]/worship/[worshipId]/_components/menu-button";
+import {BlocksIcon, CalendarIcon, MusicIcon, UserIcon, UsersIcon} from "lucide-react";
+import {getDayPassedFromTimestampShorten, timestampToDateString} from "@/components/helper/helper-functions";
+import {Separator} from "@/components/ui/separator";
+import {SongDetailCardWrapper} from "@/app/board/[teamId]/worship/[worshipId]/_components/song-detail-card-wrapper";
+import {SongListPreviewItem} from "@/app/board/[teamId]/worship/[worshipId]/_components/song-preview-item";
+import {WorshipSongHeader} from "@/models/worship";
+import {SongCarousel} from "@/app/board/[teamId]/worship/[worshipId]/_components/song-carousel";
 
 export default function WorshipPage({params}: any) {
   const teamId = params.teamId
