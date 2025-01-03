@@ -3,11 +3,12 @@
 import * as React from "react"
 import {useEffect, useMemo, useState} from "react"
 import {Carousel, type CarouselApi, CarouselContent,} from "@/components/ui/carousel"
-import {worshipIndexAtom, worshipIndexChangeEventAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {worshipAtom} from "@/global-states/worship-state";
-import {WorshipLiveCarouselItemWrapper} from "@/app/worship/[teamId]/[worshipId]/worship-view/_components/worship-live-carousel-item";
 import {WorshipSongHeader} from "@/models/worship";
+import {worshipIndexAtom, worshipIndexChangeEventAtom} from "@/app/board/[teamId]/worship/[worshipId]/_states/worship-detail-states";
+import {WorshipLiveCarouselItemWrapper} from "@/app/board/[teamId]/worship/[worshipId]/worship-view/_components/worship-live-carousel-item";
+
 
 interface Props {
   worshipId: string

@@ -1,7 +1,6 @@
 'use client'
 
 import {useRecoilState} from "recoil";
-import {worshipLiveOptionsAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {MenuIcon, DoorOpenIcon, SquarePenIcon} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Switch} from "@/components/ui/switch";
@@ -10,10 +9,9 @@ import {Separator} from "@/components/ui/separator";
 import {useRouter} from "next/navigation";
 import {getPathWorship} from "@/components/helper/routes";
 import {Button} from "@/components/ui/button";
-import {
-  MultipleSheetsViewSelect
-} from "@/app/worship/[teamId]/[worshipId]/worship-view/_components/multiple-sheets-view-select";
 import useUserPreferences from "@/components/hook/use-local-preference";
+import {worshipLiveOptionsAtom} from "@/app/board/[teamId]/worship/[worshipId]/_states/worship-detail-states";
+import {MultipleSheetsViewSelect} from "@/app/board/[teamId]/worship/[worshipId]/worship-view/_components/multiple-sheets-view-select";
 
 interface Props {
   teamId: string,

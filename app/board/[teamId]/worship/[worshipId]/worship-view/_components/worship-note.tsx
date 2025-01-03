@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useRecoilValue} from "recoil";
-import {worshipLiveOptionsAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {cn} from "@/lib/utils";
+import {worshipLiveOptionsAtom} from "@/app/board/[teamId]/worship/[worshipId]/_states/worship-detail-states";
 
 interface Props {
   description: string

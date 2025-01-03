@@ -1,8 +1,8 @@
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {DirectionType} from "@/components/constants/enums";
-import {worshipMultipleSheetsViewModeAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useRecoilState} from "recoil";
 import useUserPreferences from "@/components/hook/use-local-preference";
+import {worshipMultipleSheetsViewModeAtom} from "@/app/board/[teamId]/worship/[worshipId]/_states/worship-detail-states";
 
 
 export function MultipleSheetsViewSelect() {

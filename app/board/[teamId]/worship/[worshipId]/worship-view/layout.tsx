@@ -1,7 +1,7 @@
 "use client"
 
-import {WorshipLivePreference} from "@/app/worship/[teamId]/[worshipId]/worship-view/_components/worship-live-preference";
 
+import {WorshipLivePreference} from "@/app/board/[teamId]/worship/[worshipId]/worship-view/_components/worship-live-preference";
 
 export default function WorshipLiveLayout({children}: any) {
   return (

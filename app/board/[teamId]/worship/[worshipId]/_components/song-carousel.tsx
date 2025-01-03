@@ -4,11 +4,8 @@ import * as React from "react"
 
 import {Carousel, CarouselContent, type CarouselApi, CarouselPrevious, CarouselNext} from "@/components/ui/carousel"
 import {useEffect, useMemo, useState} from "react";
-import {
-  SongCarouselItem,
-  SongCarouselItemWrapper
-} from "@/app/worship/[teamId]/[worshipId]/_components/song-carousel-item";
 import {WorshipSongHeader, Worship} from "@/models/worship";
+import {SongCarouselItemWrapper} from "@/app/board/[teamId]/worship/[worshipId]/_components/song-carousel-item";
 
 interface Props {
   worship: Worship
