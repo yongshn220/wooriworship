@@ -1,5 +1,5 @@
-import {HomeIcon, FileMusicIcon, CircleCheckIcon, CalendarIcon, CircleUserRoundIcon} from "lucide-react";
-import {getPathHome, getPathManage, getPathNotice, getPathPlan, getPathSong} from "@/components/helper/routes";
+import {HomeIcon, FileMusicIcon, CircleCheckIcon, CalendarIcon, CircleUserRoundIcon, DownloadIcon} from "lucide-react";
+import {getPathHome, getPathManage, getPathNotice, getPathPlan, getPathSong, getPathWorshipView} from "@/components/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {useRouter} from "next/navigation";
@@ -7,8 +7,52 @@ import {cn} from "@/lib/utils";
 import {Page} from "@/components/constants/enums";
 import { BaseBottomNavBar } from "@/components/navigation/base-bottom-nav-bar";
 import { currentPageAtom } from "@/global-states/page-state";
+import {DownloadMusicSheetDialog} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/download-music-sheet-dialog";
+import {Button} from "@/components/ui/button";
+import {currentWorshipIdAtom} from "@/global-states/worship-state";
 
 export function BoardBottomNavBar() {
+  const currentPage = useRecoilValue(currentPageAtom)
+
+  if (currentPage === Page.WORSHIP) {
+    return (
+      <>
+        <WorshipBottomNavBar/>
+        <DefaultBoardBottomNavBar/>
+      </>
+    )
+  }
+  return (
+    <DefaultBoardBottomNavBar/>
+  )
+}
+
+
+export function WorshipBottomNavBar() {
+  const worshipId = useRecoilValue(currentWorshipIdAtom)
+  const teamId = useRecoilValue(currentTeamIdAtom)
+  const router = useRouter()
+
+  return (
+    <BaseBottomNavBar height={80}>
+      <div className="w-full h-full flex-center px-4 gap-4">
+        <div className="w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer">
+          <DownloadMusicSheetDialog worshipId={worshipId}>
+            <div className="flex-center flex-col">
+              <DownloadIcon/>
+              <p className="text-xs">Save</p>
+            </div>
+          </DownloadMusicSheetDialog>
+        </div>
+        <Button className="w-full" onClick={() => router.push(getPathWorshipView(teamId, worshipId))}>
+          Worship View
+        </Button>
+      </div>
+    </BaseBottomNavBar>
+  )
+}
+
+export function DefaultBoardBottomNavBar() {
   const currentPage = useRecoilValue(currentPageAtom)
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
   const router = useRouter()

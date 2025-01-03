@@ -6,7 +6,7 @@ import {Carousel, type CarouselApi, CarouselContent,} from "@/components/ui/caro
 import {worshipIndexAtom, worshipIndexChangeEventAtom} from "@/app/worship/[teamId]/[worshipId]/_states/worship-detail-states";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {worshipAtom} from "@/global-states/worship-state";
-import {WorshipLiveCarouselItemWrapper} from "@/app/worship/[teamId]/[worshipId]/live/_components/worship-live-carousel-item";
+import {WorshipLiveCarouselItemWrapper} from "@/app/worship/[teamId]/[worshipId]/worship-view/_components/worship-live-carousel-item";
 import {WorshipSongHeader} from "@/models/worship";
 
 interface Props {

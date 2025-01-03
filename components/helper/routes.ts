@@ -1,57 +1,57 @@
-import {Routes} from "@/components/constants/enums";
+import {Page} from "@/components/constants/enums";
 
 export function getPathBoard() {
-  return "/" + Routes.BOARD
+  return "/" + Page.BOARD
 }
 
 export function getPathHome(teamId: string) {
-  return "/" + Routes.BOARD + `/${teamId}`
+  return "/" + Page.BOARD + `/${teamId}`
 }
 
 export function getPathNotice(teamId: string) {
-  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.NOTICE
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.NOTICE
 }
 
 export function getPathPlan(teamId: string) {
-  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.PLAN
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.PLAN
 }
 
 export function getPathCreatePlan(teamId: string) {
-  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.CREATE_PLAN
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.CREATE_PLAN
 }
 
 export function getPathEditPlan(teamId: string, worshipId: string) {
-  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.EDIT_PLAN + `/${worshipId}`
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.EDIT_PLAN + `/${worshipId}`
 }
 
 export function getPathManageTeam(teamId: string) {
-  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.MANAGE_TEAM
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.MANAGE_TEAM
 }
 
 export function getPathManage(teamId: string) {
-  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.MANAGE
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.MANAGE
 }
 
 export function getPathSong(teamId: string) {
-  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.SONG
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SONG
 }
 
 export function getPathCreateSong(teamId: string) {
-  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.CREATE_SONG
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.CREATE_SONG
 }
 
 export function getPathSongEdit(teamId: string, songId: string) {
-  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.EDIT_SONG + `/${songId}`
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.EDIT_SONG + `/${songId}`
 }
 
 export function getPathSongDetail(teamId: string, songId: string) {
-  return "/" + Routes.BOARD + `/${teamId}` + "/" + Routes.SONG + `/${songId}`
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SONG + `/${songId}`
 }
 
 export function getPathWorship(teamId: string, worshipId: string) {
-  return "/" + Routes.WORSHIP + `/${teamId}` + `/${worshipId}`
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.WORSHIP + `/${worshipId}`
 }
 
-export function getPathWorshipStartMode(teamId: string, worshipId: string) {
-  return "/" + Routes.WORSHIP + `/${teamId}` + `/${worshipId}` + "/" + Routes.WORSHIP_LIVE
+export function getPathWorshipView(teamId: string, worshipId: string) {
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.WORSHIP + `/${worshipId}` + "/" + Page.WORSHIP_VIEW
 }

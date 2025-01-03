@@ -1,5 +1,5 @@
 import {DownloadIcon} from "lucide-react";
-import {getPathWorshipStartMode} from "@/components/helper/routes";
+import {getPathWorshipView} from "@/components/helper/routes";
 import {useRouter} from "next/navigation";
 import {DownloadMusicSheetDialog} from "@/app/worship/[teamId]/[worshipId]/_components/worship-sidebar/download-music-sheet-dialog";
 import {Button} from "@/components/ui/button";
@@ -24,7 +24,7 @@ export function WorshipBottomNavbar({teamId, worshipId}: Props) {
             </div>
           </DownloadMusicSheetDialog>
         </div>
-        <Button className="w-full" onClick={() => router.push(getPathWorshipStartMode(teamId, worshipId))}>
+        <Button className="w-full" onClick={() => router.push(getPathWorshipView(teamId, worshipId))}>
           Worship View
         </Button>
       </div>
