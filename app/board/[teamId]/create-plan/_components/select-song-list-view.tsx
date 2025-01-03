@@ -7,7 +7,7 @@ import Image from "next/image";
 import * as React from "react";
 import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {useState} from "react";
-import {SelectSongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
+import {SelectSongDetailCardWrapper} from "@/app/board/[teamId]/song/_components/select-song-detail-card-wrapper";
 
 interface Props {
   teamId: string

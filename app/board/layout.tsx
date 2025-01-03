@@ -3,7 +3,6 @@
 import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate";
 import { BoardTopNavBar } from "@/app/board/_components/board-navigation/board-top-nav-bar";
 import { BoardBottomNavBar } from "@/app/board/_components/board-navigation/board-bottom-nav-bar";
-import { BoardInitializer } from "@/app/board/_components/configuration/board-initializer";
 import { DialogManager } from "@/components/dialog/static-dialog/dialog-manager";
 import { usePathname } from "next/navigation";
 import {useSetRecoilState} from "recoil";
@@ -18,13 +17,10 @@ export default function BoardLayout({ children }: any) {
 
 
   useEffect(() => {
-    if (!pathname) {
-      return;
-    }
     if (/^\/board$/.test(pathname)) {
       setPage(Page.BOARD)
     }
-  })
+  }, [pathname, setPage])
 
   console.log("----BoardLayout")
   return (

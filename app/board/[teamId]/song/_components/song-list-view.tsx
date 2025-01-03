@@ -6,7 +6,7 @@ import {Separator} from "@/components/ui/separator";
 import Image from "next/image";
 import * as React from "react";
 import {NewSongButton} from "@/app/board/[teamId]/song/_components/new-song-button";
-import {SongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/song-detail-card-wrapper";
+import {SongDetailCardWrapper} from "@/app/board/[teamId]/song/_components/song-detail-card-wrapper";
 
 
 interface Props {

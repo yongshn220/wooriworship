@@ -8,10 +8,10 @@ import {MenuButton} from "@/app/board/[teamId]/worship/[worshipId]/_components/m
 import {BlocksIcon, CalendarIcon, MusicIcon, UserIcon, UsersIcon} from "lucide-react";
 import {getDayPassedFromTimestampShorten, timestampToDateString} from "@/components/helper/helper-functions";
 import {Separator} from "@/components/ui/separator";
-import {SongDetailCardWrapper} from "@/app/board/[teamId]/worship/[worshipId]/_components/song-detail-card-wrapper";
 import {SongListPreviewItem} from "@/app/board/[teamId]/worship/[worshipId]/_components/song-preview-item";
 import {WorshipSongHeader} from "@/models/worship";
 import {SongCarousel} from "@/app/board/[teamId]/worship/[worshipId]/_components/song-carousel";
+import {SongDetailCardWrapper} from "@/app/board/[teamId]/song/_components/song-detail-card-wrapper";
 
 export default function WorshipPage({params}: any) {
   const teamId = params.teamId

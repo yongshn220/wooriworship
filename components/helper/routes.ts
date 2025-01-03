@@ -24,10 +24,6 @@ export function getPathEditPlan(teamId: string, worshipId: string) {
   return "/" + Page.BOARD + `/${teamId}` + "/" + Page.EDIT_PLAN + `/${worshipId}`
 }
 
-export function getPathManageTeam(teamId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.MANAGE_TEAM
-}
-
 export function getPathManage(teamId: string) {
   return "/" + Page.BOARD + `/${teamId}` + "/" + Page.MANAGE
 }
