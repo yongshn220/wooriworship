@@ -10,9 +10,9 @@ import {TeamOption} from "@/models/team";
 import {TeamService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
 import {songAtom} from "@/global-states/song-state";
-import {SelectSongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
-import {WorshipSongPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/worship-song-preview-item";
 import {WorshipSongHeader} from "@/models/worship";
+import {SelectSongDetailCardWrapper} from "@/app/board/[teamId]/song/_components/select-song-detail-card-wrapper";
+import {SongPreviewItem} from "@/app/board/[teamId]/song/_components/song-preview-item";
 
 interface Props {
   teamId: string
@@ -144,7 +144,7 @@ export function StaticSongCard({teamId, specialOrderType, songHeader}: Props) {
           setMusicSheetIds={(musicSheetIds) => setMusicSheetIds(musicSheetIds)}
           isStatic={true}
         >
-          <WorshipSongPreviewItem songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids}/>
+          <SongPreviewItem songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids}/>
         </SelectSongDetailCardWrapper>
       </div>
       <div className="flex-between px-2 pt-1">

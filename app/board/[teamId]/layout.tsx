@@ -1,9 +1,12 @@
 "use client"
 
-import React, {Suspense} from "react";
+import React, {Suspense, useEffect} from "react";
 import {TeamIdValidation} from "@/app/board/_components/auth/teamid-validation";
 import {FallbackText} from "@/components/fallback-text";
 import {usePathname} from "next/navigation";
+import {useSetRecoilState} from "recoil";
+import {currentPageAtom} from "@/global-states/page-state";
+import {Page} from "@/components/constants/enums";
 
 
 interface Props {
@@ -14,8 +17,14 @@ interface Props {
 export default function BoardTeamLayout({params, children}: Props) {
   const teamId = params.teamId
   const pathname = usePathname()
+  const setPage = useSetRecoilState(currentPageAtom)
 
-  console.log(pathname)
+  useEffect(() => {
+    if (/^\/board\/[^\/]+$/.test(pathname)) {
+      setPage(Page.HOME)
+    }
+  }, [pathname, setPage])
+
   return (
     <div className="w-full h-full">
       <Suspense fallback={<FallbackText text="Loading..."/>}>

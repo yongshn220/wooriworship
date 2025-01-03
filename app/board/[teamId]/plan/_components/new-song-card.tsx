@@ -5,10 +5,10 @@ import {useRecoilState, useRecoilValue} from "recoil";
 import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/plan/_components/status";
 import {toPlainObject} from "@/components/helper/helper-functions";
 import {SwapOrderButton} from "@/app/board/[teamId]/plan/_components/swap-order-button";
-import {SelectSongDetailCardWrapper} from "@/app/worship/[teamId]/[worshipId]/_components/select-song-detail-card-wrapper";
-import {WorshipSongPreviewItem} from "@/app/worship/[teamId]/[worshipId]/_components/worship-song-preview-item";
 import {WorshipSongHeader} from "@/models/worship";
 import {songAtom} from "@/global-states/song-state";
+import {SelectSongDetailCardWrapper} from "@/app/board/[teamId]/song/_components/select-song-detail-card-wrapper";
+import {SongPreviewItem} from "@/app/board/[teamId]/song/_components/song-preview-item";
 
 interface Props {
   teamId: string
@@ -79,7 +79,7 @@ export function NewSongCard({teamId, songOrder, songHeader}: Props) {
           onSelectHandler={handleSelectSong}
           isStatic={false}
         >
-          <WorshipSongPreviewItem songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids} customTags={[]}/>
+          <SongPreviewItem songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids} customTags={[]}/>
         </SelectSongDetailCardWrapper>
         <div className="absolute flex-center -translate-y-1/2 -right-4">
           <SwapOrderButton songHeader={songHeader} songOrder={songOrder}/>
