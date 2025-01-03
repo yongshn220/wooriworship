@@ -14,6 +14,7 @@ interface Props {
 export default function BoardTeamLayout({params, children}: Props) {
   const teamId = params.teamId
   const pathname = usePathname()
+
   console.log(pathname)
   return (
     <div className="w-full h-full">

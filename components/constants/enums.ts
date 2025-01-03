@@ -1,21 +1,5 @@
 
 
-export enum Routes {
-  BOARD = "board",
-  NOTICE = "notice",
-  PLAN = "plan",
-  SONG = "song",
-  CREATE_SONG = "create-song",
-  EDIT_SONG = "edit-song",
-  CREATE_PLAN = "create-plan",
-  EDIT_PLAN = "edit-plan",
-  EDIT = "edit",
-  MANAGE_TEAM = "manage-team",
-  MANAGE = "manage",
-  WORSHIP = "worship",
-  WORSHIP_LIVE = "live",
-}
-
 export enum Page {
   BOARD = "board",
   HOME = "home",
@@ -27,8 +11,8 @@ export enum Page {
   EDIT_SONG = "edit-song",
   CREATE_PLAN = "create-plan",
   EDIT_PLAN = "edit-plan",
-  MANAGE_TEAM = "manage-team",
   WORSHIP = "worship",
+  WORSHIP_VIEW = "worship-view",
 }
 
 

@@ -12,7 +12,7 @@ import {getPathWorship} from "@/components/helper/routes";
 import {Button} from "@/components/ui/button";
 import {
   MultipleSheetsViewSelect
-} from "@/app/worship/[teamId]/[worshipId]/live/_components/multiple-sheets-view-select";
+} from "@/app/worship/[teamId]/[worshipId]/worship-view/_components/multiple-sheets-view-select";
 import useUserPreferences from "@/components/hook/use-local-preference";
 
 interface Props {

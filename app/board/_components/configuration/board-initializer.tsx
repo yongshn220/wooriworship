@@ -27,12 +27,16 @@ export function BoardInitializer({children, pathname}: Props) {
     if (/^\/board\/[^\/]+\/plan$/.test(pathname)) {
       setPage(Page.PLAN)
     }
+    if (/^\/board\/[^\/]+\/worship\/[^\/]+$/.test(pathname)) {
+      setPage(Page.WORSHIP)
+    }
     if (/^\/board\/[^\/]+\/song$/.test(pathname)) {
       setPage(Page.SONG)
     }
     if (/^\/board\/[^\/]+\/manage$/.test(pathname)) {
       setPage(Page.MANAGE)
     }
+
   }, [setPage, pathname])
 
 

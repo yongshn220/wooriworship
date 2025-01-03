@@ -1,5 +1,5 @@
 import {useRouter} from "next/navigation";
-import {getPathWorshipStartMode} from "@/components/helper/routes";
+import {getPathWorshipView} from "@/components/helper/routes";
 import PlayerPlayIcon from '@/public/icons/playerPlayIcon.svg'
 
 interface Props {
@@ -11,7 +11,7 @@ export function StartButton({teamId, worshipId}: Props) {
   const router = useRouter()
 
   function handleStartWorship() {
-    router.push(getPathWorshipStartMode(teamId, worshipId))
+    router.push(getPathWorshipView(teamId, worshipId))
   }
 
   return (

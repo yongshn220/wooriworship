@@ -63,10 +63,6 @@ export const worshipAtom = atomFamily<Worship, string>({
   })
 })
 
-export const resetWorshipState = (set: any) => {
-  set(worshipAtom, null)
-}
-
 export const worshipUpdaterAtom = atom({
   key: "worshipUpdaterAtom",
   default: 0
@@ -105,12 +101,12 @@ export const worshipSongListAtom = atomFamily<Array<Song>, string>({
   })
 })
 
-export const resetWorshipSongListState = (set: any) => {
-  set(worshipSongListAtom, [])
-}
-
 export const worshipSongUpdaterAtom = atom({
   key: "worshipSongUpdaterAtom",
   default: 0
 })
 
+export const currentWorshipIdAtom = atom<string>({
+  key: "currentWorshipIdAtom",
+  default: null
+})
