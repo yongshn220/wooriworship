@@ -1,18 +1,17 @@
 
-
 export enum Page {
   BOARD = "board",
   HOME = "home",
-  NOTICE = "notice",
-  PLAN = "plan",
-  SONG = "song",
-  MANAGE = "manage",
-  CREATE_SONG = "create-song",
-  EDIT_SONG = "edit-song",
-  CREATE_PLAN = "create-plan",
-  EDIT_PLAN = "edit-plan",
+  NOTICE_BOARD = "notice-board",
+  WORSHIP_BOARD = "worship-board",
   WORSHIP = "worship",
   WORSHIP_VIEW = "worship-view",
+  CREATE_WORSHIP = "create-worship",
+  EDIT_WORSHIP = "edit-worship",
+  SONG_BOARD = "song-board",
+  CREATE_SONG = "create-song",
+  EDIT_SONG = "edit-song",
+  MANAGE = "manage",
 }
 
 

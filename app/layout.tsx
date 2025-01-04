@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Wooriworship",
-  description: "A web application designed for church worship teams to create and manage song lists and service schedules. Users can create and share song lists, add personal notes to each song, and access shared service schedules.",
+  description: "A web application designed for church worship teams to create and manage song-board lists and service schedules. Users can create and share song-board lists, add personal notes to each song-board, and access shared service schedules.",
   metadataBase: new URL("https://www.wooriworship.com/"),
 };
 

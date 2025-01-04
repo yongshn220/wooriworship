@@ -28,7 +28,7 @@ export function CreateComment({teamId, songId}: Props) {
     }
     setSongCommentIds((prev) => ([...prev, docId]))
     setComment("")
-    toast({title: "New song created successfully."})
+    toast({title: "New song-board created successfully."})
   }
 
   return (
