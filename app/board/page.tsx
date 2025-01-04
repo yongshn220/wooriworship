@@ -10,7 +10,7 @@ import Image from "next/image";
 import * as React from "react";
 import {toast} from "@/components/ui/use-toast";
 import useUserPreferences from "@/components/hook/use-local-preference";
-import { TeamSelect } from "./_components/board-sidebar/team-select";
+import { TeamSelect } from "../../components/team/team-select";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { useRecoilState } from "recoil";
 

@@ -9,19 +9,19 @@ export function getPathHome(teamId: string) {
 }
 
 export function getPathNotice(teamId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.NOTICE
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.NOTICE_BOARD
 }
 
 export function getPathPlan(teamId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.PLAN
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.WORSHIP_BOARD
 }
 
 export function getPathCreatePlan(teamId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.CREATE_PLAN
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.CREATE_WORSHIP
 }
 
 export function getPathEditPlan(teamId: string, worshipId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.EDIT_PLAN + `/${worshipId}`
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.EDIT_WORSHIP + `/${worshipId}`
 }
 
 export function getPathManage(teamId: string) {
@@ -29,7 +29,7 @@ export function getPathManage(teamId: string) {
 }
 
 export function getPathSong(teamId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SONG
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SONG_BOARD
 }
 
 export function getPathCreateSong(teamId: string) {
@@ -41,7 +41,7 @@ export function getPathSongEdit(teamId: string, songId: string) {
 }
 
 export function getPathSongDetail(teamId: string, songId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SONG + `/${songId}`
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SONG_BOARD + `/${songId}`
 }
 
 export function getPathWorship(teamId: string, worshipId: string) {
