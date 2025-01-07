@@ -38,7 +38,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
   }
 
   return (
-    <div className="flex flex-col w-full h-full p-2 bg-white">
+    <div className="flex flex-col w-full h-full">
       <div className="flex-grow flex flex-col justify-between">
         <div className="flex items-center space-x-4 p-4  rounded-lg mb-4">
           <TeamIcon name={team?.name}></TeamIcon>

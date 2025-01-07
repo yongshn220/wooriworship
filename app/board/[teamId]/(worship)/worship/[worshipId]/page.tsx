@@ -9,7 +9,7 @@ import {getDayPassedFromTimestampShorten, timestampToDateString} from "@/compone
 import {Separator} from "@/components/ui/separator";
 import {WorshipSongHeader} from "@/models/worship";
 import {MenuButton} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_components/menu-button";
-import {SongDetailCardWrapper} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card-wrapper";
+import {SongDetailCardWrapper} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-card-wrapper";
 import {SongListPreviewItem} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_components/song-preview-item";
 import {SongCarousel} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_components/song-carousel";
 

@@ -1,7 +1,7 @@
 
 // Placeholder page
 
-import {SongListView} from "@/app/board/[teamId]/(song)/song-board/_components/song-list-view";
+import {SongList} from "@/app/board/[teamId]/(song)/song-board/_components/song-list";
 
 interface Props {
   params: any
@@ -12,7 +12,7 @@ export default function SongPage({params}: Props) {
 
   return (
     <div className="w-full h-full flex flex-col items-center">
-      <SongListView teamId={teamId}/>
+      <SongList teamId={teamId}/>
     </div>
   )
 }

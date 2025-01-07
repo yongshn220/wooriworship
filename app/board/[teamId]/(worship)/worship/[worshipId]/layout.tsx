@@ -19,7 +19,9 @@ export default function WorshipLayout({params, children}: any) {
 
   return (
     <PullToRefresh>
-      {children}
+      <div className="p-4 bg-white">
+        {children}
+      </div>
     </PullToRefresh>
   )
 }

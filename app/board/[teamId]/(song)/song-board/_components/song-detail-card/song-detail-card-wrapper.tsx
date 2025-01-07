@@ -2,8 +2,8 @@
 
 import {Suspense, useState} from "react";
 import {isMobile} from "@/components/helper/helper-functions";
-import {SongDetailDrawer} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-drawer";
-import {SongDetailCard} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card";
+import {SongDetailDrawer} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-drawer";
+import {SongDetailCard} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-card";
 
 interface Props {
   teamId: string

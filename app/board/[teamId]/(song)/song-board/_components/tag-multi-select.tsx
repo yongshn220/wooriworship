@@ -6,7 +6,7 @@ import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import tagService from "@/apis/TagService";
 import {toast} from "@/components/ui/use-toast";
-import {SongInput} from "@/app/board/[teamId]/(song)/song-board/_components/song-form";
+import {SongInput} from "@/app/board/[teamId]/(song)/song-board/_components/song-form/song-form";
 
 interface Props {
   input: SongInput

@@ -15,7 +15,9 @@ export default function ManageLayout({children}: any) {
 
   return (
     <PullToRefresh>
-      {children}
+      <div className="h-full p-4 bg-white">
+        {children}
+      </div>
     </PullToRefresh>
   )
 }

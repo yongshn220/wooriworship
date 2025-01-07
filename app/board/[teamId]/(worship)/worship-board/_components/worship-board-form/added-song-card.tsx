@@ -6,7 +6,7 @@ import {toPlainObject} from "@/components/helper/helper-functions";
 import {WorshipSongHeader} from "@/models/worship";
 import {songAtom} from "@/global-states/song-state";
 import {SelectSongDetailCardWrapper} from "@/app/board/[teamId]/(song)/song-board/_components/select-song-detail-card-wrapper";
-import {SongPreviewItem} from "@/app/board/[teamId]/(song)/song-board/_components/song-preview-item";
+import {SongPreviewItem} from "@/app/board/[teamId]/(song)/song-board/_components/song-header/song-preview-item";
 import {SwapOrderButton} from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-board-form/swap-order-button";
 import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
 

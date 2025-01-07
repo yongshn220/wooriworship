@@ -1,9 +1,7 @@
 "use client"
 
 import {useState} from "react";
-import {isMobile} from "@/components/helper/helper-functions";
 import {SelectSongDetailDrawer} from "@/app/board/[teamId]/(song)/song-board/_components/select-song-detail-drawer";
-import {SelectSongDetailCard} from "@/app/board/[teamId]/(song)/song-board/_components/select-song-detail-card";
 
 interface Props {
   children: React.ReactNode
@@ -19,29 +17,16 @@ export function SelectSongDetailCardWrapper({children, teamId, songId, selectedM
 
   return (
     <>
-      {
-        (isMobile())
-        ? <SelectSongDetailDrawer
-            teamId={teamId}
-            isOpen={isOpen}
-            setIsOpen={setIsOpen}
-            songId={songId} readOnly={true}
-            selectedMusicSheetIds={selectedMusicSheetIds}
-            setMusicSheetIds={setMusicSheetIds}
-            isStatic={isStatic}
-            onSelectHandler={() => onSelectHandler()}
-          />
-        : <SelectSongDetailCard
-            teamId={teamId}
-            isOpen={isOpen}
-            setIsOpen={setIsOpen}
-            songId={songId} readOnly={true}
-            selectedMusicSheetIds={selectedMusicSheetIds}
-            setMusicSheetIds={setMusicSheetIds}
-            isStatic={isStatic}
-            onSelectHandler={() => onSelectHandler()}
-          />
-      }
+      <SelectSongDetailDrawer
+        teamId={teamId}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        songId={songId} readOnly={true}
+        selectedMusicSheetIds={selectedMusicSheetIds}
+        setMusicSheetIds={setMusicSheetIds}
+        isStatic={isStatic}
+        onSelectHandler={() => onSelectHandler()}
+      />
       <div onClick={() => setIsOpen(prev => !prev)} className="w-full">
         {children}
       </div>

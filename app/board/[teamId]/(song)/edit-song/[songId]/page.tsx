@@ -2,7 +2,7 @@
 
 import {FormMode, Page} from "@/components/constants/enums";
 import {PageInit} from "@/components/page/page-init";
-import {SongForm} from "@/app/board/[teamId]/(song)/song-board/_components/song-form";
+import {SongForm} from "@/app/board/[teamId]/(song)/song-board/_components/song-form/song-form";
 
 
 export default function EditSongPage({params}: any) {

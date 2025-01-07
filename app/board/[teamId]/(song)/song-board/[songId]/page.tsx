@@ -3,8 +3,8 @@
 import {useRouter} from "next/navigation";
 import {getPathSong} from "@/components/helper/routes";
 import {isMobile} from "@/components/helper/helper-functions";
-import {SongDetailDrawer} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-drawer";
-import {SongDetailCard} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card";
+import {SongDetailDrawer} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-drawer";
+import {SongDetailCard} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-card";
 
 export default function SongDetailPage({params}: any) {
   const teamId = params.teamId

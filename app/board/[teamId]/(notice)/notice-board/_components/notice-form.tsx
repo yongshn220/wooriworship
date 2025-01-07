@@ -12,9 +12,9 @@ import {currentTeamIdAtom} from "@/global-states/teamState";
 import {noticeAtom, noticeIdsAtom, noticeUpdaterAtom} from "@/global-states/notice-state";
 import {NoticeService, StorageService} from "@/apis";
 import {toast} from "@/components/ui/use-toast";
-import MultipleImageUploader from "@/app/board/[teamId]/(song)/song-board/_components/multiple-image-uploader";
-import PdfUploader from "@/app/board/[teamId]/(song)/song-board/_components/pdf-uploader";
-import {MusicSheetCard} from "@/app/board/[teamId]/(song)/song-board/_components/music-sheet-card";
+import MultipleImageUploader from "@/components/image/multiple-image-uploader";
+import PdfUploader from "@/components/image/pdf-uploader";
+import {UploadedImageFileCard} from "@/components/image/uploaded-image-file-card";
 
 
 interface Props {
@@ -185,7 +185,7 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
             <div className="flex w-full h-full gap-4 overflow-x-auto">
               {
                 imageFileContainers?.map((imageFileContainer, i) => (
-                  <MusicSheetCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImage(index)}/>
+                  <UploadedImageFileCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImage(index)}/>
                 ))
               }
             </div>

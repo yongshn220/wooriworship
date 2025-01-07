@@ -4,7 +4,7 @@ import {Song} from "@/models/song";
 import {getAllUrlsFromSongMusicSheets, getFirebaseTimestampNow} from "@/components/helper/helper-functions";
 import MusicSheetService from "@/apis/MusicSheetService";
 import {MusicSheetContainer} from "@/components/constants/types";
-import {SongInput} from "@/app/board/[teamId]/(song)/song-board/_components/song-form";
+import {SongInput} from "@/app/board/[teamId]/(song)/song-board/_components/song-form/song-form";
 
 
 class SongService extends BaseService {

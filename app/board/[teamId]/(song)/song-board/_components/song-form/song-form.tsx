@@ -23,9 +23,9 @@ import {musicSheetIdsUpdaterAtom, musicSheetsBySongIdAtom, musicSheetUpdaterAtom
 import {MusicSheet} from "@/models/music_sheet";
 import {getAllUrlsFromMusicSheetContainers, getAllUrlsFromSongMusicSheets} from "@/components/helper/helper-functions";
 import {TagMultiSelect} from "@/app/board/[teamId]/(song)/song-board/_components/tag-multi-select";
-import MultipleImageUploader from "@/app/board/[teamId]/(song)/song-board/_components/multiple-image-uploader";
-import PdfUploader from "@/app/board/[teamId]/(song)/song-board/_components/pdf-uploader";
-import {MusicSheetCard} from "@/app/board/[teamId]/(song)/song-board/_components/music-sheet-card";
+import MultipleImageUploader from "@/components/image/multiple-image-uploader";
+import PdfUploader from "@/components/image/pdf-uploader";
+import {UploadedImageFileCard} from "@/components/image/uploaded-image-file-card";
 
 
 interface Props {
@@ -439,7 +439,7 @@ function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey
           <div className="flex w-full h-full gap-4 overflow-x-auto">
             {
               imageFileContainers?.map((imageFileContainer, i) => (
-                <MusicSheetCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImageFileContainer(tempId, index)}/>
+                <UploadedImageFileCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImageFileContainer(tempId, index)}/>
               ))
             }
           </div>
