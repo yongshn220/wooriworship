@@ -5,9 +5,9 @@ import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
 import {Drawer, DrawerContent, DrawerHeader, DrawerTitle} from "@/components/ui/drawer";
 import {SelectSongMusicSheetKey} from "@/app/board/[teamId]/(song)/song-board/_components/select-song-music-sheet-key";
-import {MenuButton} from "@/app/board/[teamId]/(song)/song-board/_components/menu-button";
-import {SongDetailContent} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-content";
-import {SongCommentArea} from "@/app/board/[teamId]/(song)/song-board/_components/song-comment-area";
+import {MenuButton} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/menu-button";
+import {SongDetailContent} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-content";
+import {SongCommentArea} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-comment-area";
 
 interface Props {
   teamId: string

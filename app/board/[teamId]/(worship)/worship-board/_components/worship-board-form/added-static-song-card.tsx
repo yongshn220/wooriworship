@@ -12,7 +12,7 @@ import {songAtom} from "@/global-states/song-state";
 import {WorshipSongHeader} from "@/models/worship";
 import {worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom} from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
 import {SelectSongDetailCardWrapper} from "@/app/board/[teamId]/(song)/song-board/_components/select-song-detail-card-wrapper";
-import {SongPreviewItem} from "@/app/board/[teamId]/(song)/song-board/_components/song-preview-item";
+import {SongPreviewItem} from "@/app/board/[teamId]/(song)/song-board/_components/song-header/song-preview-item";
 
 interface Props {
   teamId: string

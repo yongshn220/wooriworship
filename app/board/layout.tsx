@@ -29,7 +29,7 @@ export default function BoardLayout({ children }: any) {
         <DialogManager/>
         <div className="flex flex-col h-screen">
           <BoardTopNavBar/>
-          <main className="flex-grow overflow-y-auto bg-gray-50 p-4">
+          <main className="flex-grow overflow-y-auto bg-gray-50">
             {children}
           </main>
           <BoardBottomNavBar/>

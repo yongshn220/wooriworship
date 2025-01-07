@@ -14,11 +14,11 @@ export default function SongLayout({children}: any) {
   }, [setPage]);
 
   return (
-    <div className="w-full h-full">
-      <PullToRefresh>
+    <PullToRefresh>
+      <div className="bg-white">
         {children}
-      </PullToRefresh>
-    </div>
+      </div>
+    </PullToRefresh>
   )
 }
 

@@ -3,9 +3,9 @@
 import {Dialog, DialogContentNoCloseButton, DialogTitle,} from "@/components/ui/dialog";
 import React, {Suspense} from "react";
 import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
-import {SongDetailHeader} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-header";
-import {SongDetailContent} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-content";
-import {SongCommentArea} from "@/app/board/[teamId]/(song)/song-board/_components/song-comment-area";
+import {SongDetailHeader} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-header";
+import {SongDetailContent} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-content";
+import {SongCommentArea} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-comment-area";
 
 interface Props {
   teamId: string

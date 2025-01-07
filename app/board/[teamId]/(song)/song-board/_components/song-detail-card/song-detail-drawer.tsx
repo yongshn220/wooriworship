@@ -2,9 +2,9 @@
 
 import {Drawer, DrawerContent} from "@/components/ui/drawer";
 import {Suspense} from "react";
-import {SongDetailHeader} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-header";
-import {SongDetailContent} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-content";
-import {SongCommentArea} from "@/app/board/[teamId]/(song)/song-board/_components/song-comment-area";
+import {SongDetailHeader} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-header";
+import {SongDetailContent} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-content";
+import {SongCommentArea} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-comment-area";
 
 interface Props {
   teamId: string

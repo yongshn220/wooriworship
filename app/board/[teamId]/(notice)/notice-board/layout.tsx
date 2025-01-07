@@ -15,7 +15,9 @@ export default function NoticeLayout({children}: any) {
 
   return (
     <PullToRefresh>
-      {children}
+      <div className="p-4">
+        {children}
+      </div>
     </PullToRefresh>
   )
 }

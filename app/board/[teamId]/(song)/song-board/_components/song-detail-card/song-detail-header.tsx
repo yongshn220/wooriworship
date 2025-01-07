@@ -1,7 +1,7 @@
 import React from "react";
 import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
-import {MenuButton} from "@/app/board/[teamId]/(song)/song-board/_components/menu-button";
+import {MenuButton} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/menu-button";
 
 interface Props {
   teamId: string

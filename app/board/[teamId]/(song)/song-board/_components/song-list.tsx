@@ -4,16 +4,19 @@ import {currentTeamSongIdsAtom} from "@/global-states/song-state";
 import {Separator} from "@/components/ui/separator";
 import Image from "next/image";
 import * as React from "react";
-import {SongDetailCardWrapper} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card-wrapper";
-import {SongListItem} from "@/app/board/[teamId]/(song)/song-board/_components/song-list-item";
-import {NewSongButton} from "@/app/board/[teamId]/(song)/song-board/_components/new-song-button";
+import {SongDetailCardWrapper} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-card-wrapper";
+import {SongListItem} from "@/app/board/[teamId]/(song)/song-board/_components/song-header/song-list-item";
+import {NewSongButton} from "@/app/board/[teamId]/(song)/song-board/_components/empty-song-board-page/new-song-button";
+import {
+  EmptySongBoardPage
+} from "@/app/board/[teamId]/(song)/song-board/_components/empty-song-board-page/empty-song-board-page";
 
 
 interface Props {
   teamId: string
 }
 
-export function SongListView({teamId}: Props) {
+export function SongList({teamId}: Props) {
   const songIdsLoadable = useRecoilValueLoadable(currentTeamSongIdsAtom(teamId))
 
   switch (songIdsLoadable.state) {
@@ -48,17 +51,7 @@ export function SongListView({teamId}: Props) {
               }
             </div>
               :
-            <div className="w-full h-full flex-center flex-col gap-4">
-              <Image
-                alt="compose music image"
-                src="/illustration/happyMusic.svg"
-                width={300}
-                height={300}
-              />
-              <p className="text-3xl font-semibold">Song Board is empty</p>
-              <p className="text-gray-500">Click &ldquo;Add Song&rdquo; button to get started</p>
-              <NewSongButton/>
-            </div>
+            <EmptySongBoardPage/>
           }
         </div>
       )

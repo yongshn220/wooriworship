@@ -8,7 +8,7 @@ import React, {useEffect, useState} from "react";
 import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
 import {musicSheetAtom, musicSheetIdsAtom} from "@/global-states/music-sheet-state";
-import {SongDetailMusicSheetArea} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-music-sheet-area";
+import {SongDetailMusicSheetArea} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-music-sheet-area";
 
 
 interface Props {

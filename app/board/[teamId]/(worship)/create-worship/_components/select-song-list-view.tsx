@@ -8,7 +8,7 @@ import {useState} from "react";
 import {
   SelectSongDetailCardWrapper
 } from "@/app/board/[teamId]/(song)/song-board/_components/select-song-detail-card-wrapper";
-import {SongListItem} from "@/app/board/[teamId]/(song)/song-board/_components/song-list-item";
+import {SongListItem} from "@/app/board/[teamId]/(song)/song-board/_components/song-header/song-list-item";
 import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
 
 interface Props {

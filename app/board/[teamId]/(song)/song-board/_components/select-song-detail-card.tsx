@@ -5,8 +5,8 @@ import React from "react";
 import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
 import {SelectSongMusicSheetKey} from "@/app/board/[teamId]/(song)/song-board/_components/select-song-music-sheet-key";
-import {SongDetailContent} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-content";
-import {SongCommentArea} from "@/app/board/[teamId]/(song)/song-board/_components/song-comment-area";
+import {SongDetailContent} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-content";
+import {SongCommentArea} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-comment-area";
 
 interface Props {
   teamId: string
