@@ -4,8 +4,8 @@ import {
   getDayByTimestamp,
   getDayPassedFromTimestampShorten, isTimestampPast,
   timestampToDateStringFormatted
-} from "@/components/helper/helper-functions";
-import {getPathWorship} from "@/components/helper/routes";
+} from "@/components/util/helper/helper-functions";
+import {getPathWorship} from "@/components/util/helper/routes";
 import {useRecoilValue, useRecoilValueLoadable} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {worshipAtom, worshipSongListAtom} from "@/global-states/worship-state";

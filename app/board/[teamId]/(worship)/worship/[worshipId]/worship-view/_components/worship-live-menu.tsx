@@ -7,9 +7,9 @@ import {Switch} from "@/components/ui/switch";
 import {Label} from "@/components/ui/label";
 import {Separator} from "@/components/ui/separator";
 import {useRouter} from "next/navigation";
-import {getPathWorship} from "@/components/helper/routes";
+import {getPathWorship} from "@/components/util/helper/routes";
 import {Button} from "@/components/ui/button";
-import useUserPreferences from "@/components/hook/use-local-preference";
+import useUserPreferences from "@/components/util/hook/use-local-preference";
 import {worshipLiveOptionsAtom} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_states/worship-detail-states";
 import {
   MultipleSheetsViewSelect

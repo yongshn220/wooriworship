@@ -4,12 +4,12 @@ import {worshipIdsUpdaterAtom, worshipUpdaterAtom} from "@/global-states/worship
 import {teamAtom} from "@/global-states/teamState";
 import {useCallback, useEffect, useState} from "react";
 import {FormMode, WorshipSpecialOrderType} from "@/components/constants/enums";
-import {timestampToDate} from "@/components/helper/helper-functions";
+import {timestampToDate} from "@/components/util/helper/helper-functions";
 import {useToast} from "@/components/ui/use-toast";
 import {useRouter} from "next/navigation";
 import {WorshipService} from "@/apis";
-import {getPathWorship} from "@/components/helper/routes";
-import {TeamIcon} from "@/components/team-icon";
+import {getPathWorship} from "@/components/util/helper/routes";
+import {TeamIcon} from "@/components/elements/design/team/team-icon";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
@@ -19,9 +19,15 @@ import {WorshipInput} from "@/components/constants/types";
 import { format, nextFriday, nextSunday } from 'date-fns';
 import {selectedWorshipSongHeaderListAtom, worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom} from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
 import {WorshipDatePicker} from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-board-form/worship-date-picker";
-import {AddedStaticSongCard} from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-board-form/added-static-song-card";
-import {AddedSongCard} from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-board-form/added-song-card";
-import {AddSongButtonDrawer} from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-board-form/add-song-button-drawer";
+import {AddedSongHeaderStatic} from "@/components/elements/design/song/song-header/worship-form/added-song-header-static";
+import {AddedSongHeaderDefault} from "@/components/elements/design/song/song-header/worship-form/added-song-header-default";
+import {AddWorshipSongDialog} from "@/components/elements/design/song/song-list/worship-form/add-worship-song-dialog";
+import {
+  AddSongButton
+} from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-board-form/add-song-button";
+import {
+  AddWorshipSongDialogTrigger
+} from "@/components/elements/design/song/song-list/worship-form/add-worship-song-dialog-trigger";
 
 interface Props {
   mode: FormMode
@@ -260,18 +266,20 @@ export function WorshipForm({mode, teamId, worship}: Props) {
             <div className="flex-center w-full flex-col gap-8">
               {
                 beginningSongHeader?.id &&
-                <AddedStaticSongCard teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songHeader={beginningSongHeader}/>
+                <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songHeader={beginningSongHeader}/>
               }
               {
                 selectedWorshipSongHeaderList.map((songHeader, i) => (
-                  <AddedSongCard key={i} teamId={teamId} songOrder={i + 1} songHeader={songHeader}/>
+                  <AddedSongHeaderDefault key={i} teamId={teamId} songOrder={i + 1} songHeader={songHeader}/>
                 ))
               }
               {
                 endingSongHeader?.id &&
-                <AddedStaticSongCard teamId={teamId} specialOrderType={WorshipSpecialOrderType.ENDING} songHeader={endingSongHeader}/>
+                <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.ENDING} songHeader={endingSongHeader}/>
               }
-              <AddSongButtonDrawer teamId={teamId}/>
+              <AddWorshipSongDialogTrigger teamId={teamId}>
+                <AddSongButton/>
+              </AddWorshipSongDialogTrigger>
             </div>
           </div>
         </div>

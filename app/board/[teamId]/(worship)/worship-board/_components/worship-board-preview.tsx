@@ -4,7 +4,7 @@ import {Suspense} from "react";
 import * as React from "react";
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
-import {getPathPlan} from "@/components/helper/routes";
+import {getPathPlan} from "@/components/util/helper/routes";
 import {WorshipCard} from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-card";
 
 

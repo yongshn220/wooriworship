@@ -1,11 +1,11 @@
 import {HomeIcon, FileMusicIcon, CircleCheckIcon, CalendarIcon, CircleUserRoundIcon, DownloadIcon} from "lucide-react";
-import {getPathHome, getPathManage, getPathNotice, getPathPlan, getPathSong, getPathWorshipView} from "@/components/helper/routes";
+import {getPathHome, getPathManage, getPathNotice, getPathPlan, getPathSong, getPathWorshipView} from "@/components/util/helper/routes";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {Page} from "@/components/constants/enums";
-import { BaseBottomNavBar } from "@/components/navigation/base-bottom-nav-bar";
+import { BaseBottomNavBar } from "@/components/elements/util/navigation/base-bottom-nav-bar";
 import { currentPageAtom } from "@/global-states/page-state";
 import {Button} from "@/components/ui/button";
 import {currentWorshipIdAtom} from "@/global-states/worship-state";

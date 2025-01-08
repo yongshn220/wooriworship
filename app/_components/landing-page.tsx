@@ -1,4 +1,4 @@
-import {MainLogoRouter} from "@/components/logo/main-logo";
+import {MainLogoRouter} from "@/components/elements/util/logo/main-logo";
 import {Button} from "@/components/ui/button";
 import Image from "next/image";
 import {Login} from "@/app/_components/login";

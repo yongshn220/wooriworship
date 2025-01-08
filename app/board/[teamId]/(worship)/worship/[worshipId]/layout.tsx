@@ -1,6 +1,6 @@
 "use client"
 
-import {PullToRefresh} from "@/components/functionality/pull-to-refresh";
+import {PullToRefresh} from "@/components/elements/util/page/pull-to-refresh";
 import {useSetRecoilState} from "recoil";
 import {currentPageAtom} from "@/global-states/page-state";
 import {useEffect} from "react";

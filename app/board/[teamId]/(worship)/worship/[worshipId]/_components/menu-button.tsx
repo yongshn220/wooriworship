@@ -1,15 +1,15 @@
 "use client"
 import {DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import MenuIcon from "@/public/icons/menuIcon.svg";
-import {DeleteConfirmationDialog} from "@/components/dialog/user-confirmation/delete-confirmation-dialog";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
-import {getPathEditPlan, getPathPlan} from "@/components/helper/routes";
+import {getPathEditPlan, getPathPlan} from "@/components/util/helper/routes";
 import {useSetRecoilState} from "recoil";
 import { WorshipService } from "@/apis";
 import {CopyIcon, LinkIcon, SquarePen, Trash2Icon} from "lucide-react";
 import {currentTeamWorshipIdsAtom} from "@/global-states/worship-state";
 import {toast} from "@/components/ui/use-toast";
+import {DeleteConfirmationDialog} from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 
 
 interface Props {

@@ -1,7 +1,7 @@
 import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
 import {musicSheetIdsAtom} from "@/global-states/music-sheet-state";
-import {SongKeyBox} from "@/components/song/song-key-box";
+import {SongKeyBox} from "@/components/elements/design/song/song-detail-card/default/parts/song-key-box";
 
 interface Props {
   songId: string

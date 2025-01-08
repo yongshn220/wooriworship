@@ -1,4 +1,4 @@
-import useUserPreferences from "@/components/hook/use-local-preference";
+import useUserPreferences from "@/components/util/hook/use-local-preference";
 import {useEffect} from "react";
 import {useSetRecoilState} from "recoil";
 import {worshipLiveOptionsAtom, worshipMultipleSheetsViewModeAtom} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_states/worship-detail-states";

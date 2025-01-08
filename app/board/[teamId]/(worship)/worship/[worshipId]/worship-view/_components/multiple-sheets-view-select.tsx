@@ -1,7 +1,7 @@
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {DirectionType} from "@/components/constants/enums";
 import {useRecoilState} from "recoil";
-import useUserPreferences from "@/components/hook/use-local-preference";
+import useUserPreferences from "@/components/util/hook/use-local-preference";
 import {worshipMultipleSheetsViewModeAtom} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_states/worship-detail-states";
 
 

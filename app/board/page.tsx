@@ -4,13 +4,13 @@ import {useEffect} from "react";
 import {UserService} from "@/apis";
 import {User} from "@/models/user";
 import {useRouter} from "next/navigation";
-import {getPathHome} from "@/components/helper/routes";
+import {getPathHome} from "@/components/util/helper/routes";
 import {auth} from "@/firebase";
 import Image from "next/image";
 import * as React from "react";
 import {toast} from "@/components/ui/use-toast";
-import useUserPreferences from "@/components/hook/use-local-preference";
-import { TeamSelect } from "../../components/team/team-select";
+import useUserPreferences from "@/components/util/hook/use-local-preference";
+import { TeamSelect } from "@/components/elements/design/team/team-select";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { useRecoilState } from "recoil";
 

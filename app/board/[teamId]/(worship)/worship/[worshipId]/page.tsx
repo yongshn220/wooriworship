@@ -5,11 +5,11 @@ import {worshipAtom} from "@/global-states/worship-state";
 import {teamAtom} from "@/global-states/teamState";
 import {userAtom} from "@/global-states/userState";
 import {BlocksIcon, CalendarIcon, MusicIcon, UserIcon, UsersIcon} from "lucide-react";
-import {getDayPassedFromTimestampShorten, timestampToDateString} from "@/components/helper/helper-functions";
+import {getDayPassedFromTimestampShorten, timestampToDateString} from "@/components/util/helper/helper-functions";
 import {Separator} from "@/components/ui/separator";
 import {WorshipSongHeader} from "@/models/worship";
 import {MenuButton} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_components/menu-button";
-import {SongDetailCardWrapper} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-card-wrapper";
+import {SongDetailDialogTrigger} from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog-trigger";
 import {SongListPreviewItem} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_components/song-preview-item";
 import {SongCarousel} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_components/song-carousel";
 
@@ -64,25 +64,25 @@ export default function WorshipPage({params}: any) {
           {
             worship?.beginning_song?.id &&
             <div className="flex-center">
-              <SongDetailCardWrapper key={worship?.beginning_song?.id} teamId={teamId} songId={worship?.beginning_song?.id}>
+              <SongDetailDialogTrigger key={worship?.beginning_song?.id} teamId={teamId} songId={worship?.beginning_song?.id}>
                 <SongListPreviewItem songId={worship?.beginning_song?.id} customTags={["beginning"]}/>
-              </SongDetailCardWrapper>
+              </SongDetailDialogTrigger>
             </div>
           }
           {
             worship?.songs.map((songHeader: WorshipSongHeader) => (
-              <SongDetailCardWrapper key={songHeader?.id} teamId={teamId} songId={songHeader?.id}>
+              <SongDetailDialogTrigger key={songHeader?.id} teamId={teamId} songId={songHeader?.id}>
                 <SongListPreviewItem songId={songHeader?.id}
                                      selectedMusicSheetIds={songHeader?.selected_music_sheet_ids}/>
-              </SongDetailCardWrapper>
+              </SongDetailDialogTrigger>
             ))
           }
           {
             worship?.ending_song?.id &&
             <div className="flex-center">
-              <SongDetailCardWrapper key={worship?.ending_song?.id} teamId={teamId} songId={worship?.ending_song?.id}>
+              <SongDetailDialogTrigger key={worship?.ending_song?.id} teamId={teamId} songId={worship?.ending_song?.id}>
                 <SongListPreviewItem songId={worship?.ending_song?.id} customTags={["ending"]}/>
-              </SongDetailCardWrapper>
+              </SongDetailDialogTrigger>
             </div>
           }
         </div>

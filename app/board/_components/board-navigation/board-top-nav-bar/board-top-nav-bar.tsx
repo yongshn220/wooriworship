@@ -4,13 +4,13 @@ import React, {Suspense, useState} from "react";
 import {useRecoilValue} from "recoil";
 import {SearchInput} from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
 import {SearchFilterPopover} from "@/app/board/_components/board-navigation/board-top-nav-bar/search-filter-popover";
-import {getPathCreatePlan, getPathCreateSong} from "@/components/helper/routes";
+import {getPathCreatePlan, getPathCreateSong} from "@/components/util/helper/routes";
 import {useRouter} from "next/navigation";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import {NoticeForm} from "@/app/board/[teamId]/(notice)/notice-board/_components/notice-form";
+import {NoticeForm} from "@/components/elements/design/notice/notice-form/notice-form";
 import { SearchPlan } from "./search-plan";
-import { BaseTopNavBar } from "@/components/navigation/base-top-nav-bar";
-import { MainLogoSmall } from "@/components/logo/main-logo";
+import { BaseTopNavBar } from "@/components/elements/util/navigation/base-top-nav-bar";
+import { MainLogoSmall } from "@/components/elements/util/logo/main-logo";
 import { currentPageAtom } from "@/global-states/page-state";
 
 

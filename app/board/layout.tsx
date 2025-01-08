@@ -3,12 +3,12 @@
 import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate";
 import { BoardTopNavBar } from "@/app/board/_components/board-navigation/board-top-nav-bar/board-top-nav-bar";
 import { BoardBottomNavBar } from "@/app/board/_components/board-navigation/board-bottom-nav-bar/board-bottom-nav-bar";
-import { DialogManager } from "@/components/dialog/static-dialog/dialog-manager";
 import { usePathname } from "next/navigation";
 import {useSetRecoilState} from "recoil";
 import {currentPageAtom} from "@/global-states/page-state";
 import {useEffect} from "react";
 import {Page} from "@/components/constants/enums";
+import {DialogManager} from "@/components/elements/dialog/static-dialog/dialog-manager";
 
 
 export default function BoardLayout({ children }: any) {

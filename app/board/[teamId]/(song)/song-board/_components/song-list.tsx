@@ -4,8 +4,8 @@ import {currentTeamSongIdsAtom} from "@/global-states/song-state";
 import {Separator} from "@/components/ui/separator";
 import Image from "next/image";
 import * as React from "react";
-import {SongDetailCardWrapper} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-card-wrapper";
-import {SongListItem} from "@/app/board/[teamId]/(song)/song-board/_components/song-header/song-list-item";
+import {SongDetailDialogTrigger} from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog-trigger";
+import {SongHeaderDefault} from "@/components/elements/design/song/song-header/default/song-header-default";
 import {NewSongButton} from "@/app/board/[teamId]/(song)/song-board/_components/empty-song-board-page/new-song-button";
 import {
   EmptySongBoardPage
@@ -42,9 +42,9 @@ export function SongList({teamId}: Props) {
               {
                 songIdsLoadable.contents.map((songId) => (
                   <div key={songId} className="w-full">
-                    <SongDetailCardWrapper teamId={teamId} songId={songId}>
-                      <SongListItem songId={songId}/>
-                    </SongDetailCardWrapper>
+                    <SongDetailDialogTrigger teamId={teamId} songId={songId}>
+                      <SongHeaderDefault songId={songId}/>
+                    </SongDetailDialogTrigger>
                     <Separator/>
                   </div>
                 ))
