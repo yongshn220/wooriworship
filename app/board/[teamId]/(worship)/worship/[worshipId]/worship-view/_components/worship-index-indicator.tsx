@@ -1,7 +1,7 @@
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import {cn} from "@/lib/utils";
 import * as React from "react";
-import {isMobile} from "@/components/helper/helper-functions";
+import {isMobile} from "@/components/util/helper/helper-functions";
 import {worshipIndexAtom, worshipIndexChangeEventAtom, worshipLiveOptionsAtom} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_states/worship-detail-states";
 
 

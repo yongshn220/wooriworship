@@ -1,7 +1,7 @@
 "use client"
 
 import {FormMode, Page} from "@/components/constants/enums";
-import {PageInit} from "@/components/page/page-init";
+import {PageInit} from "@/components/util/page/page-init";
 import {useRecoilValue} from "recoil";
 import {worshipAtom} from "@/global-states/worship-state";
 import {WorshipForm} from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-board-form/worship-form";

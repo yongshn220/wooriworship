@@ -11,8 +11,8 @@ import { useRecoilValue, useSetRecoilState } from "recoil"
 import { auth } from "@/firebase"
 import { pendingReceivedInvitationsAtom } from "@/global-states/invitation-state"
 import { invitationInboxDialogOpenStateAtom } from "@/global-states/dialog-state"
-import {TeamIcon} from "@/components/team-icon";
-import {ManageTeamDialog} from "@/components/dialog/manage-team/manage-team-dialog";
+import {TeamIcon} from "@/components/elements/design/team/team-icon";
+import {ManageTeamDialog} from "@/components/elements/dialog/manage-team/manage-team-dialog";
 
 export default function ManagePage({ params }: { params: { teamId: string } }) {
   const authUser = auth.currentUser

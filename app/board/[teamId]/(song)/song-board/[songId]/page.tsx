@@ -1,10 +1,8 @@
 'use client'
 
 import {useRouter} from "next/navigation";
-import {getPathSong} from "@/components/helper/routes";
-import {isMobile} from "@/components/helper/helper-functions";
-import {SongDetailDrawer} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-drawer";
-import {SongDetailCard} from "@/app/board/[teamId]/(song)/song-board/_components/song-detail-card/song-detail-card";
+import {getPathSong} from "@/components/util/helper/routes";
+import {SongDetailDialog} from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
 
 export default function SongDetailPage({params}: any) {
   const teamId = params.teamId
@@ -17,13 +15,7 @@ export default function SongDetailPage({params}: any) {
     }
   }
 
-  if (isMobile()) {
-    return (
-      <SongDetailDrawer teamId={teamId} isOpen={true} setIsOpen={onOpenChangeHandler} songId={songId} readOnly={false} />
-    )
-  }
-
-  return (
-    <SongDetailCard teamId={teamId} isOpen={true} setIsOpen={onOpenChangeHandler} songId={songId} readOnly={false} />
+   return (
+    <SongDetailDialog teamId={teamId} isOpen={true} setIsOpen={onOpenChangeHandler} songId={songId} readOnly={false} />
   )
 }

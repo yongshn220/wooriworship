@@ -5,7 +5,7 @@ import React from "react";
 import {useRecoilValue} from "recoil";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {useRouter} from "next/navigation";
-import {getPathCreateSong} from "@/components/helper/routes";
+import {getPathCreateSong} from "@/components/util/helper/routes";
 
 export function NewSongButton() {
   const teamId = useRecoilValue(currentTeamIdAtom)

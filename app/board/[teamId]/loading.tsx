@@ -1,6 +1,6 @@
 "use client"
 
-import {LoadingCircle} from "@/components/animation/loading-indicator";
+import {LoadingCircle} from "@/components/util/animation/loading-indicator";
 
 export default function BoardTeamLoading() {
   return (

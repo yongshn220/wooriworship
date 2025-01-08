@@ -2,7 +2,7 @@
 
 import React, {Suspense, useEffect} from "react";
 import {TeamIdValidation} from "@/app/board/_components/auth/teamid-validation";
-import {FallbackText} from "@/components/fallback-text";
+import {FallbackText} from "@/components/util/text/fallback-text";
 import {usePathname} from "next/navigation";
 import {useSetRecoilState} from "recoil";
 import {currentPageAtom} from "@/global-states/page-state";

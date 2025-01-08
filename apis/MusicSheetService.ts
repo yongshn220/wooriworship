@@ -1,7 +1,7 @@
 import {BaseService} from "@/apis/index";
 import {MusicSheetContainer} from "@/components/constants/types";
 import {MusicSheet} from "@/models/music_sheet";
-import {getFirebaseTimestampNow} from "@/components/helper/helper-functions";
+import {getFirebaseTimestampNow} from "@/components/util/helper/helper-functions";
 
 
 class MusicSheetService extends BaseService {

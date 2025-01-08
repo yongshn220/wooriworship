@@ -5,7 +5,7 @@ import {useRecoilValue} from "recoil";
 import {Button} from "@/components/ui/button";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {useRouter} from "next/navigation";
-import {getPathCreatePlan} from "@/components/helper/routes";
+import {getPathCreatePlan} from "@/components/util/helper/routes";
 
 export function NewWorshipButton() {
   const [isOpen, setIsOpen] = useState(false)

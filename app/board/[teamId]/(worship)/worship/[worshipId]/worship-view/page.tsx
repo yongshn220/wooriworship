@@ -2,7 +2,7 @@
 
 import {Dialog, DialogContentNoCloseButton, DialogTitle} from "@/components/ui/dialog";
 import {useRouter} from "next/navigation";
-import {getPathWorship} from "@/components/helper/routes";
+import {getPathWorship} from "@/components/util/helper/routes";
 import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
 import {
   WorshipLiveCarousel
