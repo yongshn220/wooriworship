@@ -51,7 +51,7 @@ export function NoticeHeaderDefault({noticeId}: Props) {
               <p className="font-semibold">{notice?.title}</p>
             </div>
             <div className="py-4">
-              <div className="py-4 whitespace-pre-line">
+              <div className="py-4 whitespace-pre-line break-all">
                 <Linkify>
                   {notice?.body || ""}
                 </Linkify>
