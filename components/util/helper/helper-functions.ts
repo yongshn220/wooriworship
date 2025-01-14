@@ -157,10 +157,24 @@ export function getTimePassedFromTimestampShorten(timestamp: Timestamp) {
 }
 
 export function getDayPassedFromTimestampShorten(timestamp: Timestamp) {
-  if (!timestamp) return ""
+  if (!timestamp) return "";
 
   const jsDate = new Date(timestamp.seconds * 1000); // Convert Firestore timestamp to JavaScript Date
   const now = new Date();
+
+  // Get local date components for comparison
+  const postDate = new Date(jsDate.getFullYear(), jsDate.getMonth(), jsDate.getDate());
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  if (postDate.getTime() === today.getTime()) {
+    return "Today";
+  }
+
+  if (postDate.getTime() === yesterday.getTime()) {
+    return "1d ago";
+  }
 
   const diffInSeconds = Math.floor((now.getTime() - jsDate.getTime()) / 1000);
 
@@ -174,21 +188,20 @@ export function getDayPassedFromTimestampShorten(timestamp: Timestamp) {
   let result;
   if (diffInSeconds < secondsInWeek) {
     const days = Math.abs(Math.floor(diffInSeconds / secondsInDay));
-    result = (days === 0)? "today" : `${days}d`;
-  }
-  else if (diffInSeconds < secondsInMonth) {
+    result = `${days}d`;
+  } else if (diffInSeconds < secondsInMonth) {
     const weeks = Math.abs(Math.floor(diffInSeconds / secondsInWeek));
     result = `${weeks}w`;
-  }
-  else if (diffInSeconds < secondsInYear) {
+  } else if (diffInSeconds < secondsInYear) {
     const months = Math.abs(Math.floor(diffInSeconds / secondsInMonth));
     result = `${months}m`;
-  }
-  else {
+  } else {
     const years = Math.abs(Math.floor(diffInSeconds / secondsInYear));
     result = `${years}y`;
   }
-  const suffix = (diffInSeconds < 0)? " left" : " ago"
+
+  const suffix = diffInSeconds < 0 ? " left" : " ago";
+
   return result + suffix;
 }
 

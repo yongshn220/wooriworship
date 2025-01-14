@@ -8,6 +8,8 @@ import Image from 'next/image'
 import {NoticeHeaderMenu} from "@/components/elements/design/notice/notice-header/parts/notice-header-menu";
 import React, {useState} from "react";
 import {ImageFullScreenDialog} from "@/components/elements/dialog/image-full-screen/image-full-screen-dialog";
+import ReactLinkify from "react-linkify";
+import {Linkify} from "@/components/elements/util/text/linkify";
 
 
 interface Props {
@@ -48,7 +50,13 @@ export function NoticeHeaderDefault({noticeId}: Props) {
             <div className="flex-between">
               <p className="font-semibold">{notice?.title}</p>
             </div>
-            <p className="py-4">{notice?.body}</p>
+            <div className="py-4">
+              <div className="py-4 whitespace-pre-line">
+                <Linkify>
+                  {notice?.body || ""}
+                </Linkify>
+              </div>
+            </div>
           </div>
           <div>
             {

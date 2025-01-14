@@ -14,18 +14,17 @@ import {useRouter} from "next/navigation";
 import {getPathSongDetail} from "@/components/util/helper/routes";
 import {auth} from "@/firebase";
 import {currentTeamSongIdsAtom, songAtom, songUpdaterAtom} from "@/global-states/song-state";
-import useViewportHeight from "@/components/util/hook/use-viewport-height";
 import {ImageFileContainer, MusicSheetContainer} from "@/components/constants/types";
 import {v4 as uuid} from "uuid";
-import {Cross2Icon} from "@radix-ui/react-icons";
 import MusicSheetService from "@/apis/MusicSheetService";
 import {musicSheetIdsUpdaterAtom, musicSheetsBySongIdAtom, musicSheetUpdaterAtom} from "@/global-states/music-sheet-state";
 import {MusicSheet} from "@/models/music_sheet";
 import {getAllUrlsFromMusicSheetContainers, getAllUrlsFromSongMusicSheets} from "@/components/util/helper/helper-functions";
 import {TagMultiSelect} from "@/app/board/[teamId]/(song)/song-board/_components/tag-multi-select";
-import MultipleImageUploader from "@/components/elements/util/image/multiple-image-uploader";
-import PdfUploader from "@/components/elements/util/image/pdf-uploader";
-import {UploadedImageFileCard} from "@/components/elements/util/image/uploaded-image-file-card";
+import {LinkIcon, PlusIcon, X} from "lucide-react";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {MusicSheetUploaderBox} from "@/components/elements/design/song/song-form/music-sheet-uploader-box";
+import {BaseForm} from "@/components/elements/util/form/base-form";
 
 
 interface Props {
@@ -65,7 +64,6 @@ export function SongForm({mode, teamId, songId}: Props) {
   })
   const [musicSheetContainers, setMusicSheetContainers] = useState<Array<MusicSheetContainer>>([])
   const [isLoading, setIsLoading] = useState(false)
-  const viewportHeight = useViewportHeight();
   const { toast } = useToast()
   const router = useRouter()
 
@@ -275,23 +273,17 @@ export function SongForm({mode, teamId, songId}: Props) {
   }
 
   return (
-    <div className="w-full h-full flex justify-center">
-      <div className="w-full sm:max-w-3xl">
-        <div>
-          <div className="text-2xl font-semibold">{mode===FormMode.EDIT? "Edit Song" : "Add New Song"}</div>
-          <div>
-            {mode===FormMode.EDIT? "Edit song-board" : "Create and add new song-board in the song-board board"}
-          </div>
-        </div>
-        <div className="grid gap-6 py-10">
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="name">Title</Label>
+    <BaseForm title={mode===FormMode.EDIT? "Edit Song" : "Add New Song"} description="Enter the details of your song below">
+      <div className="w-full">
+        <div className="w-full space-y-6">
+          <div className="w-full gap-1.5">
+            <Label className="w-full" htmlFor="name">Title</Label>
             <Input
               id="title"
-              placeholder="ex) Amazing Grace"
+              placeholder="Enter song title"
               value={songInput.title}
               onChange={(e) => setSongInput((prev => ({...prev, title: e.target.value})))}
-              className="bg-white"
+              className="relative w-full bg-white"
               autoFocus={false}
             />
           </div>
@@ -299,7 +291,7 @@ export function SongForm({mode, teamId, songId}: Props) {
             <Label htmlFor="name">Sub Title</Label>
             <Input
               id="subtitle"
-              placeholder="Sub Title..."
+              placeholder="Enter subtitle (optional)"
               value={songInput.subtitle}
               onChange={(e) => setSongInput((prev => ({...prev, subtitle: e.target.value})))}
               className="bg-white"
@@ -310,14 +302,14 @@ export function SongForm({mode, teamId, songId}: Props) {
             <Label htmlFor="author">Author</Label>
             <Input
               id="author"
-              placeholder="ex) Isaiah6tyone"
+              placeholder="Enter author name"
               value={songInput.author}
               onChange={(e) => setSongInput((prev => ({...prev, author: e.target.value})))}
               className="bg-white"
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="version">Version</Label>
+            <Label htmlFor="Enter version">Version</Label>
             <Input
               id="version"
               placeholder="version"
@@ -328,13 +320,16 @@ export function SongForm({mode, teamId, songId}: Props) {
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="link">Link</Label>
-            <Input
-              id="link"
-              placeholder="https://youtube..."
-              value={songInput.link}
-              onChange={(e) => setSongInput((prev => ({...prev, link: e.target.value})))}
-              className="bg-white"
-            />
+            <div className="w-full relative">
+              <Input
+                id="link"
+                placeholder="https://youtube.com/..."
+                value={songInput.link}
+                onChange={(e) => setSongInput((prev => ({...prev, link: e.target.value})))}
+                className="w-full pl-9"
+              />
+              <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+            </div>
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
             <Label htmlFor="tags">Tags</Label>
@@ -352,45 +347,52 @@ export function SongForm({mode, teamId, songId}: Props) {
             />
           </div>
           <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="description">
-              Description
-            </Label>
+            <Label htmlFor="description">Description</Label>
             <Textarea
-              className="h-20 bg-white"
-              placeholder="Write the description"
+              className="h-20 bg-white text-base"
+              placeholder="Enter song description"
               value={songInput.description}
               onChange={(e) => setSongInput((prev => ({...prev, description: e.target.value})))}
             />
           </div>
           <div className="w-full flex-start flex-col items-center gap-1.5">
-            <Label>
-              Music Sheets
-            </Label>
-            <div className="w-full flex flex-col gap-4">
-              {
-                musicSheetContainers?.map((musicSheet, index) => (
-                  <MusicSheetUploadBox
-                    key={index}
-                    musicKey={musicSheet.key}
-                    setMusicKey={setKeyToMusicSheet}
-                    tempId={musicSheet?.tempId}
-                    imageFileContainers={musicSheet?.imageFileContainers}
-                    handleSetImageFileContainers={setImageFileContainersToMusicSheet}
-                    handleAddImageFileContainer={addImageFileContainerToMusicSheet}
-                    handleRemoveImageFileContainer={removeImageFromMusicSheet}
-                    handleRemoveMusicSheetContainer={removeMusicSheetContainer}
-                  />
-                ))
-              }
+            <div className="flex flex-between w-full justify-between">
+              <h2 className="text-lg font-semibold">Music Sheets</h2>
+              <Button type="button" variant="outline" size="sm" onClick={handleAddNewMusicSheet}>
+                <PlusIcon className="h-4 w-4 mr-2"/>
+                Add Sheet
+              </Button>
             </div>
-            <div className="w-full flex-center">
-              <div className="group w-full flex-center h-28 p-2 rounded-lg border-2 border-dashed border-gray-200 hover:border-blue-300 cursor-pointer" onClick={() => handleAddNewMusicSheet()}>
-                <p className="text-gray-400 group-hover:text-gray-500">click to add song</p>
+            <div className="w-full flex flex-col space-y-4 rounded-lg border p-4">
+              <>
+                {
+                  musicSheetContainers?.map((musicSheet, index) => (
+                    <MusicSheetUploaderBox
+                        key={index}
+                        index={index}
+                        musicKey={musicSheet.key}
+                        setMusicKey={setKeyToMusicSheet}
+                        tempId={musicSheet?.tempId}
+                        imageFileContainers={musicSheet?.imageFileContainers}
+                        handleSetImageFileContainers={setImageFileContainersToMusicSheet}
+                        handleAddImageFileContainer={addImageFileContainerToMusicSheet}
+                        handleRemoveImageFileContainer={removeImageFromMusicSheet}
+                        handleRemoveMusicSheetContainer={removeMusicSheetContainer}
+                      />
+                  ))
+                }
+              </>
+              <div className="w-full flex-center">
+                <div
+                  className="group w-full flex-center h-28 p-2 rounded-lg border-2 border-dashed border-gray-200 hover:border-blue-300 cursor-pointer"
+                  onClick={() => handleAddNewMusicSheet()}>
+                  <p className="text-gray-400 group-hover:text-gray-500">click to add sheet</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="w-full flex-end mb-20">
+        <div className="w-full flex-end my-10">
           <div>
             {
               (mode === FormMode.EDIT)
@@ -400,61 +402,6 @@ export function SongForm({mode, teamId, songId}: Props) {
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-interface MusicSheetUploadBoxProps {
-  tempId: string
-  musicKey: string
-  setMusicKey: Function
-  imageFileContainers: Array<ImageFileContainer>
-  handleSetImageFileContainers: Function
-  handleAddImageFileContainer: Function
-  handleRemoveImageFileContainer: Function
-  handleRemoveMusicSheetContainer: Function
-}
-
-function MusicSheetUploadBox({tempId, imageFileContainers, musicKey, setMusicKey, handleSetImageFileContainers, handleAddImageFileContainer, handleRemoveImageFileContainer, handleRemoveMusicSheetContainer}: MusicSheetUploadBoxProps) {
-  function updateImageFileContainer(newContainer: ImageFileContainer) {
-    handleAddImageFileContainer(tempId, newContainer)
-  }
-
-  return (
-    <div className="relative w-full border bg-gray-100 rounded-lg p-2 space-y-4">
-      <Cross2Icon className="absolute right-1 top-1 cursor-pointer rounded-full hover:text-blue-500" width={20} height={20} onClick={() => handleRemoveMusicSheetContainer(tempId)}/>
-      <div className="flex items-center gap-4">
-        <Label htmlFor="key">Key</Label>
-        <Input
-          id="key"
-          placeholder="ex) Em"
-          value={musicKey ?? ""}
-          onChange={(e) => setMusicKey(tempId, e.target.value)}
-          className="bg-white max-w-sm"
-        />
-      </div>
-      {
-        imageFileContainers?.length > 0 &&
-        <div className="flex-start w-full h-60 aspect-square">
-          <div className="flex w-full h-full gap-4 overflow-x-auto">
-            {
-              imageFileContainers?.map((imageFileContainer, i) => (
-                <UploadedImageFileCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImageFileContainer(tempId, index)}/>
-              ))
-            }
-          </div>
-        </div>
-      }
-      <div className="w-full flex-center">
-        <div className="flex gap-4">
-          <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
-            <div className="w-32 bg-white px-1 py-2 flex-center  rounded-md shadow-sm border text-sm hover:bg-blue-50 cursor-pointer">Upload Image</div>
-          </MultipleImageUploader>
-          <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
-            <div className="w-32 bg-white px-1 py-2 flex-center  rounded-md shadow-sm border text-sm hover:bg-blue-50 cursor-pointer">Upload PDF</div>
-          </PdfUploader>
-        </div>
-      </div>
-    </div>
+    </BaseForm>
   )
 }

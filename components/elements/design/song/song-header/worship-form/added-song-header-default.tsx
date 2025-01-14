@@ -88,14 +88,15 @@ export function AddedSongHeaderDefault({teamId, songOrder, songHeader}: Props) {
         <div className="w-full flex-1">
           <Textarea
             className="h-full bg-white"
-            placeholder="Write a note for the song. (Update note in the Song Board to set as default)"
+            placeholder="Write a song note"
             value={songHeader?.note}
             onChange={(e) => handleOnNoteChange(e.target.value)}
           />
         </div>
 
       </div>
-      <div className="flex-end text-smnpx shadcn-ui@latest add dropdown-menu">
+      <div className="flex-between text-sm shadcn-ui@latest add dropdown-menu">
+        <p className="text-xs text-muted-foreground">* Update the note in the Song Board to set as a default.</p>
         <div className="text-gray-500 hover:text-gray-700 cursor-pointer text-sm" onClick={() => handleRemoveSong()}>remove</div>
       </div>
     </div>

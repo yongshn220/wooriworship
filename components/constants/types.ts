@@ -19,6 +19,7 @@ export interface MusicSheetContainer {
 export interface WorshipInput {
   title: string
   description: string
+  link: string
   date: Date
   worshipSongHeaders: Array<WorshipSongHeader>
   beginningSong: WorshipSongHeader

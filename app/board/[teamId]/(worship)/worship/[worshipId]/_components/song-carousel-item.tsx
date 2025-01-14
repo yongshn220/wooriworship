@@ -60,7 +60,7 @@ export function SongCarouselItem({songId, note, urls}: SongCarouselItemProps) {
                     height={300}
                   />
                   <p className="w-full text-center mt-4 text-lg ">
-                    No music sheet for &quot;<span className="font-semibold">{song.title}</span>&quot;
+                    No music sheet for &quot;<span className="font-semibold">{song?.title}</span>&quot;
                   </p>
                 </div>
             }

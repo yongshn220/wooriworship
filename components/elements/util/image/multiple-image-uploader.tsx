@@ -44,7 +44,7 @@ export default function MultipleImageUploader({imageFileContainers, updateImageF
   }
 
   return (
-    <div>
+    <div className="w-full">
       <input
         ref={fileInputRef}
         type="file"

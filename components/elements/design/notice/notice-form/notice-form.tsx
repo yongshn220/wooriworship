@@ -15,6 +15,7 @@ import {toast} from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/components/elements/util/image/multiple-image-uploader";
 import PdfUploader from "@/components/elements/util/image/pdf-uploader";
 import {UploadedImageFileCard} from "@/components/elements/util/image/uploaded-image-file-card";
+import {UploadIcon} from "lucide-react";
 
 
 interface Props {
@@ -167,17 +168,22 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
               onChange={(e) => setInput((prev => ({...prev, body: e.target.value})))}
             />
           </div>
-          <div className="w-full h-14 py-2 flex-center gap-2">
+          <div className="flex w-full py-2 gap-2">
             <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
-              <div
-                className="w-full h-full bg-blue-500 rounded-lg flex-center text-white cursor-pointer hover:bg-blue-400">
-                Upload Image
+              <div className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors">
+                <UploadIcon className="h-6 w-6 text-gray-500" />
+                <span className="mt-2 text-sm text-gray-500">
+                  Upload Image
+                </span>
               </div>
             </MultipleImageUploader>
             <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
               <div
-                className="w-full h-full bg-purple-700 rounded-lg flex-center text-white cursor-pointer hover:bg-purple-500">
-                Upload PDF
+                className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors">
+                <UploadIcon className="h-6 w-6 text-gray-500"/>
+                <span className="mt-2 text-sm text-gray-500">
+                  Upload PDF
+                </span>
               </div>
             </PdfUploader>
           </div>

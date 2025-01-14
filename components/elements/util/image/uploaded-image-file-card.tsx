@@ -11,7 +11,7 @@ interface Props {
 
 export function UploadedImageFileCard({imageFileContainer, index, handleRemoveImage}: Props) {
   return (
-    <div className="relative flex flex-col h-full aspect-[3/4] border rounded-lg bg-white">
+    <div className="flex flex-col h-60 aspect-[3/4] border rounded-lg">
       <div className="relative flex-1 flex-start rounded-md">
         {
           imageFileContainer.isLoading ?
