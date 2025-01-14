@@ -22,7 +22,6 @@ import {MusicSheet} from "@/models/music_sheet";
 import {getAllUrlsFromMusicSheetContainers, getAllUrlsFromSongMusicSheets} from "@/components/util/helper/helper-functions";
 import {TagMultiSelect} from "@/app/board/[teamId]/(song)/song-board/_components/tag-multi-select";
 import {LinkIcon, PlusIcon, X} from "lucide-react";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {MusicSheetUploaderBox} from "@/components/elements/design/song/song-form/music-sheet-uploader-box";
 import {BaseForm} from "@/components/elements/util/form/base-form";
 
@@ -374,7 +373,6 @@ export function SongForm({mode, teamId, songId}: Props) {
                         setMusicKey={setKeyToMusicSheet}
                         tempId={musicSheet?.tempId}
                         imageFileContainers={musicSheet?.imageFileContainers}
-                        handleSetImageFileContainers={setImageFileContainersToMusicSheet}
                         handleAddImageFileContainer={addImageFileContainerToMusicSheet}
                         handleRemoveImageFileContainer={removeImageFromMusicSheet}
                         handleRemoveMusicSheetContainer={removeMusicSheetContainer}
