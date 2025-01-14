@@ -1,10 +1,10 @@
 import {BaseService, StorageService} from ".";
 import SongCommentService from "./SongCommentService";
-import {SongInput} from "@/app/board/[teamId]/song/_components/song-form";
 import {Song} from "@/models/song";
-import {getAllUrlsFromSongMusicSheets, getFirebaseTimestampNow} from "@/components/helper/helper-functions";
+import {getAllUrlsFromSongMusicSheets, getFirebaseTimestampNow} from "@/components/util/helper/helper-functions";
 import MusicSheetService from "@/apis/MusicSheetService";
 import {MusicSheetContainer} from "@/components/constants/types";
+import {SongInput} from "@/components/elements/design/song/song-form/song-form";
 
 
 class SongService extends BaseService {
@@ -14,7 +14,7 @@ class SongService extends BaseService {
 
   async getTeamSong(teamId: string) {
     console.log("SongService.getTeamSong")
-    const songs = await this.getByFilters([
+    const songs: any = await this.getByFilters([
       {
         a: 'team_id',
         b: '==',

@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import {Provider} from "@/components/provider/provider";
+import {Provider} from "@/components/util/provider/provider";
 import {Toaster} from "@/components/ui/toaster";
-import { BaseContainer } from "@/components/provider/base-container";
+import { BaseContainer } from "@/components/util/provider/base-container";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Wooriworship",
-  description: "A web application designed for church worship teams to create and manage song lists and service schedules. Users can create and share song lists, add personal notes to each song, and access shared service schedules.",
+  description: "A web application designed for church worship teams to create and manage song-board lists and service schedules. Users can create and share song-board lists, add personal notes to each song-board, and access shared service schedules.",
   metadataBase: new URL("https://www.wooriworship.com/"),
 };
 

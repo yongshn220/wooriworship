@@ -1,6 +1,6 @@
 "use client"
 
-import {MainLogo} from "@/components/logo/main-logo";
+import {MainLogo} from "@/components/elements/util/logo/main-logo";
 import Image from "next/image";
 import * as React from "react";
 import {Button} from "@/components/ui/button";

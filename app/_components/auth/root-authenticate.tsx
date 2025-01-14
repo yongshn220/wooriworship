@@ -2,7 +2,7 @@
 
 import React, {useEffect} from "react";
 import {useRouter} from "next/navigation";
-import {getPathBoard} from "@/components/helper/routes";
+import {getPathBoard} from "@/components/util/helper/routes";
 import {auth} from "@/firebase";
 
 
