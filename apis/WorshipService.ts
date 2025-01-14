@@ -30,6 +30,7 @@ class WorshipService extends BaseService {
       team_id: teamId,
       title: worshipInput?.title,
       description: worshipInput?.description,
+      link: worshipInput?.link,
       songs: worshipInput?.worshipSongHeaders,
       beginning_song: worshipInput.beginningSong,
       ending_song: worshipInput.endingSong,
@@ -50,6 +51,7 @@ class WorshipService extends BaseService {
     const worship = {
       title: worshipInput?.title,
       description: worshipInput?.description,
+      link: worshipInput?.link,
       songs: worshipInput?.worshipSongHeaders,
       beginning_song: worshipInput.beginningSong,
       ending_song: worshipInput.endingSong,

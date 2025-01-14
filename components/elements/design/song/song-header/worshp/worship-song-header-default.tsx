@@ -2,6 +2,7 @@ import {useRecoilValue} from "recoil";
 import {songAtom} from "@/global-states/song-state";
 import {musicSheetIdsAtom} from "@/global-states/music-sheet-state";
 import {SongKeyBox} from "@/components/elements/design/song/song-detail-card/default/parts/song-key-box";
+import {Badge} from "@/components/ui/badge";
 
 interface Props {
   songId: string
@@ -10,9 +11,18 @@ interface Props {
 }
 
 
-export function SongListPreviewItem({songId, customTags=[], selectedMusicSheetIds=null}: Props) {
+export function WorshipSongHeaderDefault({songId, customTags=[], selectedMusicSheetIds=null}: Props) {
   const song = useRecoilValue(songAtom(songId))
   const musicSheetIds = useRecoilValue(musicSheetIdsAtom(songId))
+
+  if (songId && song === null) {
+    return (
+      <div className="p-2">
+        Deleted Song.
+      </div>
+    )
+  }
+
 
   return (
     <div className="flex w-full px-4 rounded-lg cursor-pointer py-2 my-2 hover:bg-gray-100">
@@ -27,11 +37,11 @@ export function SongListPreviewItem({songId, customTags=[], selectedMusicSheetId
             </p>
             {
               selectedMusicSheetIds === null ?
-              musicSheetIds?.map(((musicSheetId, index) => (
-                <SongKeyBox key={index} musicSheetId={musicSheetId}/>
-              )))
+                musicSheetIds?.map(((musicSheetId, index) => (
+                  <SongKeyBox key={index} musicSheetId={musicSheetId}/>
+                )))
                 :
-              selectedMusicSheetIds?.map(((musicSheetId, index) => (
+                selectedMusicSheetIds?.map(((musicSheetId, index) => (
                 <SongKeyBox key={index} musicSheetId={musicSheetId}/>
               )))
             }
@@ -52,7 +62,7 @@ export function SongListPreviewItem({songId, customTags=[], selectedMusicSheetId
             ))}
           </div>
         </div>
-        <p className="text-sm text-gray-500">{song?.original?.author ?? "unknown"}</p>
+        <p className="text-sm text-gray-500">{song?.original?.author ?? ""}</p>
       </div>
     </div>
   )

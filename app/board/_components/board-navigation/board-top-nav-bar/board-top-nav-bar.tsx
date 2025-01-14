@@ -8,10 +8,10 @@ import {getPathCreatePlan, getPathCreateSong} from "@/components/util/helper/rou
 import {useRouter} from "next/navigation";
 import {currentTeamIdAtom} from "@/global-states/teamState";
 import {NoticeForm} from "@/components/elements/design/notice/notice-form/notice-form";
-import { SearchPlan } from "./search-plan";
-import { BaseTopNavBar } from "@/components/elements/util/navigation/base-top-nav-bar";
-import { MainLogoSmall } from "@/components/elements/util/logo/main-logo";
-import { currentPageAtom } from "@/global-states/page-state";
+import {SearchPlan} from "./search-plan";
+import {BaseTopNavBar} from "@/components/elements/util/navigation/base-top-nav-bar";
+import {MainLogoSmall} from "@/components/elements/util/logo/main-logo";
+import {currentPageAtom} from "@/global-states/page-state";
 
 
 export function BoardTopNavBar() {
@@ -34,7 +34,7 @@ export function BoardTopNavBar() {
     [Page.SONG_BOARD]: { text: "Song Board", createHandler: () => {} },
   };
 
-  if (currentPage === Page.HOME) {
+  if (currentPage === Page.HOME || currentPage === Page.CREATE_SONG || currentPage === Page.EDIT_SONG || currentPage === Page.CREATE_WORSHIP || currentPage === Page.EDIT_WORSHIP || currentPage === Page.WORSHIP) {
     return (
       <BaseTopNavBar height={56}>
         <div className="w-full h-full flex px-4">

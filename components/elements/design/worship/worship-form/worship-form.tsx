@@ -2,32 +2,38 @@ import {auth} from "@/firebase";
 import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import {worshipIdsUpdaterAtom, worshipUpdaterAtom} from "@/global-states/worship-state";
 import {teamAtom} from "@/global-states/teamState";
-import {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {FormMode, WorshipSpecialOrderType} from "@/components/constants/enums";
 import {timestampToDate} from "@/components/util/helper/helper-functions";
 import {useToast} from "@/components/ui/use-toast";
 import {useRouter} from "next/navigation";
 import {WorshipService} from "@/apis";
 import {getPathWorship} from "@/components/util/helper/routes";
-import {TeamIcon} from "@/components/elements/design/team/team-icon";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
 import {Worship} from "@/models/worship";
 import {WorshipInput} from "@/components/constants/types";
-import { format, nextFriday, nextSunday } from 'date-fns';
-import {selectedWorshipSongHeaderListAtom, worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom} from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
-import {WorshipDatePicker} from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-board-form/worship-date-picker";
-import {AddedSongHeaderStatic} from "@/components/elements/design/song/song-header/worship-form/added-song-header-static";
-import {AddedSongHeaderDefault} from "@/components/elements/design/song/song-header/worship-form/added-song-header-default";
-import {AddWorshipSongDialog} from "@/components/elements/design/song/song-list/worship-form/add-worship-song-dialog";
+import {format, nextFriday, nextSunday} from 'date-fns';
 import {
-  AddSongButton
-} from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-board-form/add-song-button";
+  selectedWorshipSongHeaderListAtom,
+  worshipBeginningSongHeaderAtom,
+  worshipEndingSongHeaderAtom
+} from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
+import {WorshipDatePicker} from "@/components/elements/design/worship/worship-form/worship-date-picker";
+import {
+  AddedSongHeaderStatic
+} from "@/components/elements/design/song/song-header/worship-form/added-song-header-static";
+import {
+  AddedSongHeaderDefault
+} from "@/components/elements/design/song/song-header/worship-form/added-song-header-default";
+import {AddSongButton} from "@/components/elements/design/worship/worship-form/add-song-button";
 import {
   AddWorshipSongDialogTrigger
 } from "@/components/elements/design/song/song-list/worship-form/add-worship-song-dialog-trigger";
+import {BaseForm} from "@/components/elements/util/form/base-form";
+import {LinkIcon} from "lucide-react";
 
 interface Props {
   mode: FormMode
@@ -47,6 +53,7 @@ export function WorshipForm({mode, teamId, worship}: Props) {
   const [basicInfo, setBasicInfo] = useState({
     title: (mode === FormMode.EDIT)? worship?.title ?? "" : "",
     description: (mode === FormMode.EDIT)? worship?.description ?? "" : "",
+    link: (mode === FormMode.EDIT)? worship?.link ?? "" : "",
   })
   const [date, setDate] = useState<Date>((mode === FormMode.EDIT)? timestampToDate(worship?.worship_date) : new Date())
   const [isLoading, setIsLoading] = useState(false)
@@ -128,6 +135,7 @@ export function WorshipForm({mode, teamId, worship}: Props) {
     const worshipInput: WorshipInput = {
       title: basicInfo.title,
       description: basicInfo.description,
+      link: basicInfo.link,
       date: date,
       worshipSongHeaders: selectedWorshipSongHeaderList,
       beginningSong: beginningSongHeader,
@@ -195,104 +203,111 @@ export function WorshipForm({mode, teamId, worship}: Props) {
   }
 
   return (
-    <div className="w-full h-full flex justify-center">
-      <div className="w-full sm:max-w-3xl overflow-y-scrol scrollbar-hide">
-        <div className="w-full">
-          <div className="text-2xl font-semibold">
-            { (mode === FormMode.CREATE) ? "Create new worship" : "Edit worship" }
-          </div>
-          <div className="text-gray-500">
-            { (mode === FormMode.CREATE)? "Create worship and share with your team." : "Edit worship"}
+    <BaseForm title={(mode === FormMode.CREATE) ? "Add New Worship" : "Edit Worship"} description="Enter the details of your worship below">
+      <div className="grid gap-6 py-4">
+        <div className="flex-start flex-col items-center gap-1.5">
+          <Label htmlFor="title">
+            Title
+          </Label>
+          <Input
+            id="name"
+            className="bg-white"
+            placeholder="Title of worship"
+            value={basicInfo.title}
+            onChange={(e) => setBasicInfo((prev => ({...prev, title: e.target.value})))}
+          />
+          <div className="space-x-2 space-y-2">
+            <Button variant="outline" onClick={() => {
+              setBasicInfo(prev => ({...prev, title: `금요 예배`}))
+              setDate(upcomingFriday);
+            }}>
+              {`금요 예배`}
+            </Button>
+            <Button variant="outline" onClick={() => {
+              setDate(upcomingSunday);
+              setBasicInfo(prev => ({...prev, title: `주일 예배`}))
+            }}>
+              {`주일 예배`}
+            </Button>
+            <Button variant="outline" onClick={() => {
+              setBasicInfo(prev => ({...prev, title: `${formattedUpcomingFriday} 금요 예배`}));
+              setDate(upcomingFriday);
+            }}>
+              {`${formattedUpcomingFriday} 금요 예배`}
+            </Button>
+            <Button variant="outline" onClick={() => {
+              setBasicInfo(prev => ({...prev, title: `${formattedUpcomingSunday} 주일 예배`}));
+              setDate(upcomingSunday);
+            }}>
+              {`${formattedUpcomingSunday} 주일 예배`}
+            </Button>
           </div>
         </div>
-        <div className="grid gap-6 py-4">
-          <div className="flex-center gap-2">
-            <TeamIcon name="GVC Friday"/>
-            <p className="font-bold text-sm">{team?.name}</p>
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="title">
-              Title
-            </Label>
+        <div className="flex-start flex-col items-center gap-1.5">
+          <Label htmlFor="date">
+            Worship Date
+          </Label>
+          <WorshipDatePicker date={date} setDate={setDate}/>
+        </div>
+        <div className="flex-start flex-col items-center gap-1.5">
+          <Label htmlFor="title">
+            Link
+          </Label>
+          <div className="w-full relative">
             <Input
-              id="name"
-              className="bg-white"
-              placeholder="Title of worship"
-              value={basicInfo.title}
-              onChange={(e) => setBasicInfo((prev => ({...prev, title: e.target.value})))}
+              id="link"
+              placeholder="https://..."
+              value={basicInfo.link}
+              onChange={(e) => setBasicInfo((prev => ({...prev, link: e.target.value})))}
+              className="w-full pl-9"
             />
-            <div className="space-x-2 space-y-2">
-              <Button variant="outline" onClick={() => setBasicInfo(prev => ({...prev, title: `금요 예배`}))}>
-                {`금요 예배`}
-              </Button>
-              <Button variant="outline" onClick={() => setBasicInfo(prev => ({...prev, title: `주일 예배`}))}>
-                {`주일 예배`}
-              </Button>
-              <Button variant="outline" onClick={() => {
-                setBasicInfo(prev => ({...prev, title: `${formattedUpcomingFriday} 금요 예배`}));
-                setDate(upcomingFriday);
-              }}>
-                {`${formattedUpcomingFriday} 금요 예배`}
-              </Button>
-              <Button variant="outline" onClick={() => {
-                setBasicInfo(prev => ({...prev, title: `${formattedUpcomingSunday} 주일 예배`}));
-                setDate(upcomingSunday);
-              }}>
-                {`${formattedUpcomingSunday} 주일 예배`}
-              </Button>
-            </div>
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="date">
-              Worship Date
-            </Label>
-            <WorshipDatePicker date={date} setDate={setDate}/>
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="description">
-              Description
-            </Label>
-            <Textarea
-              className="h-40 bg-white"
-              placeholder="Write the description"
-              value={basicInfo.description}
-              onChange={(e) => setBasicInfo((prev => ({...prev, description: e.target.value})))}
-            />
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="songs">
-              Songs
-            </Label>
-            <div className="flex-center w-full flex-col gap-8">
-              {
-                beginningSongHeader?.id &&
-                <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songHeader={beginningSongHeader}/>
-              }
-              {
-                selectedWorshipSongHeaderList.map((songHeader, i) => (
-                  <AddedSongHeaderDefault key={i} teamId={teamId} songOrder={i + 1} songHeader={songHeader}/>
-                ))
-              }
-              {
-                endingSongHeader?.id &&
-                <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.ENDING} songHeader={endingSongHeader}/>
-              }
-              <AddWorshipSongDialogTrigger teamId={teamId}>
-                <AddSongButton/>
-              </AddWorshipSongDialogTrigger>
-            </div>
+            <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
           </div>
         </div>
-        <div className="w-full flex-end py-10">
-          <div>
+        <div className="flex-start flex-col items-center gap-1.5">
+          <Label htmlFor="description">
+            Description
+          </Label>
+          <Textarea
+            className="h-40 bg-white"
+            placeholder="Write the description"
+            value={basicInfo.description}
+            onChange={(e) => setBasicInfo((prev => ({...prev, description: e.target.value})))}
+          />
+        </div>
+        <div className="flex-start flex-col items-center gap-1.5">
+          <Label htmlFor="songs">
+            Songs
+          </Label>
+          <div className="flex-center w-full flex-col gap-8">
             {
-              (mode === FormMode.CREATE)
-                ? <Button type="submit" onClick={handleCreate}>{isLoading? "Creating..." : "Create"}</Button>
-                : <Button type="submit" onClick={handleEdit}>{isLoading? "Saving..." : "Save"}</Button>
+              beginningSongHeader?.id &&
+              <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songHeader={beginningSongHeader}/>
             }
+            {
+              selectedWorshipSongHeaderList.map((songHeader, i) => (
+                <AddedSongHeaderDefault key={i} teamId={teamId} songOrder={i + 1} songHeader={songHeader}/>
+              ))
+            }
+            {
+              endingSongHeader?.id &&
+              <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.ENDING} songHeader={endingSongHeader}/>
+            }
+            <AddWorshipSongDialogTrigger teamId={teamId}>
+              <AddSongButton/>
+            </AddWorshipSongDialogTrigger>
           </div>
         </div>
       </div>
-    </div>
+      <div className="w-full flex-end py-10">
+        <div>
+          {
+            (mode === FormMode.CREATE)
+              ? <Button type="submit" onClick={handleCreate}>{isLoading? "Creating..." : "Create"}</Button>
+              : <Button type="submit" onClick={handleEdit}>{isLoading? "Saving..." : "Save"}</Button>
+          }
+        </div>
+      </div>
+    </BaseForm>
   )
 }
