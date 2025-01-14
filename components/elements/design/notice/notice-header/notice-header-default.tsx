@@ -26,7 +26,7 @@ export function NoticeHeaderDefault({noticeId}: Props) {
 
   return (
     <div className="w-full">
-      <ImageFullScreenDialog isOpen={fullScreenOn.state} setIsOpen={(state) => setFullScreenOn((prev) => ({...prev, state: state}))} imageUrls={fullScreenOn.urls}/>
+      <ImageFullScreenDialog isOpen={fullScreenOn.state} setIsOpen={(state: boolean) => setFullScreenOn((prev) => ({...prev, state: state}))} imageUrls={fullScreenOn.urls}/>
       <div className="flex items-center gap-2">
         <p className="text-sm pl-2">{timestampToDateStringFormatted(notice?.last_updated_time)}</p>
         <p className="text-sm text-gray-500">{getTimePassedFromTimestampShorten(notice?.last_updated_time)}</p>
