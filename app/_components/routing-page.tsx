@@ -1,6 +1,6 @@
 
-import {RoutingIndicator} from "@/components/animation/routing-indicator";
-import {MainLogo} from "@/components/logo/main-logo";
+import {RoutingIndicator} from "@/components/util/animation/routing-indicator";
+import {MainLogo} from "@/components/elements/util/logo/main-logo";
 
 
 export function RoutingPage() {

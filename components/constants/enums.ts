@@ -1,34 +1,17 @@
 
-
-export enum Routes {
-  BOARD = "board",
-  NOTICE = "notice",
-  PLAN = "plan",
-  SONG = "song",
-  CREATE_SONG = "create-song",
-  EDIT_SONG = "edit-song",
-  CREATE_PLAN = "create-plan",
-  EDIT_PLAN = "edit-plan",
-  EDIT = "edit",
-  MANAGE_TEAM = "manage-team",
-  MANAGE = "manage",
-  WORSHIP = "worship",
-  WORSHIP_LIVE = "live",
-}
-
 export enum Page {
   BOARD = "board",
   HOME = "home",
-  NOTICE = "notice",
-  PLAN = "plan",
-  SONG = "song",
-  MANAGE = "manage",
+  NOTICE_BOARD = "notice-board",
+  WORSHIP_BOARD = "worship-board",
+  WORSHIP = "worship",
+  WORSHIP_VIEW = "worship-view",
+  CREATE_WORSHIP = "create-worship",
+  EDIT_WORSHIP = "edit-worship",
+  SONG_BOARD = "song-board",
   CREATE_SONG = "create-song",
   EDIT_SONG = "edit-song",
-  CREATE_PLAN = "create-plan",
-  EDIT_PLAN = "edit-plan",
-  MANAGE_TEAM = "manage-team",
-  WORSHIP = "worship",
+  MANAGE = "manage",
 }
 
 

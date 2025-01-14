@@ -12,6 +12,7 @@ export interface Worship {
   title: string
   worship_date: Timestamp
   description: string
+  link: string
   songs: Array<WorshipSongHeader>
   beginning_song: WorshipSongHeader
   ending_song: WorshipSongHeader

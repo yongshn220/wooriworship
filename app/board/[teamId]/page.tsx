@@ -1,7 +1,7 @@
 "use client"
 
-import {WorshipPlanPreview} from "@/app/board/[teamId]/_components/worship-plan-preview";
-import {NoticePreview} from "@/app/board/[teamId]/_components/notice-preview";
+import {NoticeBoardPreview} from "@/components/elements/design/notice/notice-board/notice-board-preview";
+import {WorshipBoardPreview} from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-board-preview";
 
 export default function BoardHomePage({params}: any) {
   const teamId = params.teamId
@@ -9,8 +9,8 @@ export default function BoardHomePage({params}: any) {
   return (
     <div className="w-full h-full flex-center">
       <div className="flex flex-col w-full h-full gap-6">
-        <NoticePreview teamId={teamId}/>
-        <WorshipPlanPreview teamId={teamId}/>
+        <NoticeBoardPreview teamId={teamId}/>
+        <WorshipBoardPreview teamId={teamId}/>
       </div>
     </div>
   )

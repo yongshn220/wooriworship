@@ -63,10 +63,6 @@ export const worshipAtom = atomFamily<Worship, string>({
   })
 })
 
-export const resetWorshipState = (set: any) => {
-  set(worshipAtom, null)
-}
-
 export const worshipUpdaterAtom = atom({
   key: "worshipUpdaterAtom",
   default: 0
@@ -87,12 +83,12 @@ export const worshipSongListAtom = atomFamily<Array<Song>, string>({
 
         const songListPromise = worship.songs?.map(song => get(songAtom(song.id)))
         if (!songListPromise) {
-          console.log("Fail while loading song list promises."); return []
+          console.log("Fail while loading song-board list promises."); return []
         }
 
         const songList = await Promise.all(songListPromise)
         if (!songList) {
-          console.log(("Fail while loading song lists.")); return []
+          console.log(("Fail while loading song-board lists.")); return []
         }
 
         return songList
@@ -105,12 +101,12 @@ export const worshipSongListAtom = atomFamily<Array<Song>, string>({
   })
 })
 
-export const resetWorshipSongListState = (set: any) => {
-  set(worshipSongListAtom, [])
-}
-
 export const worshipSongUpdaterAtom = atom({
   key: "worshipSongUpdaterAtom",
   default: 0
 })
 
+export const currentWorshipIdAtom = atom<string>({
+  key: "currentWorshipIdAtom",
+  default: null
+})

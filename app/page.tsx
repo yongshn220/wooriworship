@@ -3,10 +3,10 @@ import {RoutingPage} from "@/app/_components/routing-page";
 import {LandingPage} from "@/app/_components/landing-page";
 import {useEffect, useState} from "react";
 import {auth} from "@/firebase";
-import {getPathBoard, getPathPlan} from "@/components/helper/routes";
+import {getPathBoard, getPathPlan} from "@/components/util/helper/routes";
 import {useRouter} from "next/navigation";
 import {UserService} from "@/apis";
-import useUserPreferences from "@/components/hook/use-local-preference";
+import useUserPreferences from "@/components/util/hook/use-local-preference";
 
 enum AuthStatus {
   PROCESSING,
