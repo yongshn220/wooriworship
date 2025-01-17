@@ -1,13 +1,12 @@
-import {FormMode, Page} from "@/components/constants/enums";
+import {Page} from "@/components/constants/enums";
 import {FilterIcon, SquarePenIcon} from "lucide-react";
-import React, {Suspense, useState} from "react";
+import React from "react";
 import {useRecoilValue} from "recoil";
 import {SearchInput} from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
 import {SearchFilterPopover} from "@/app/board/_components/board-navigation/board-top-nav-bar/search-filter-popover";
-import {getPathCreatePlan, getPathCreateSong} from "@/components/util/helper/routes";
+import {getPathCreateNotice, getPathCreatePlan, getPathCreateSong} from "@/components/util/helper/routes";
 import {useRouter} from "next/navigation";
 import {currentTeamIdAtom} from "@/global-states/teamState";
-import {NoticeForm} from "@/components/elements/design/notice/notice-form/notice-form";
 import {SearchPlan} from "./search-plan";
 import {BaseTopNavBar} from "@/components/elements/util/navigation/base-top-nav-bar";
 import {MainLogoSmall} from "@/components/elements/util/logo/main-logo";
@@ -18,23 +17,14 @@ export function BoardTopNavBar() {
   const currentPage = useRecoilValue(currentPageAtom)
   const teamId = useRecoilValue(currentTeamIdAtom)
   const router = useRouter()
-  const [isCreateNoticeDialogOpen, setCreateNoticeDialogOpen] = useState(false)
-
-  function handleCreatePlanClick() {
-    router.push(getPathCreatePlan(teamId))
-  }
-
-  function handleCreateNoticeClick() {
-    setCreateNoticeDialogOpen(true)
-  }
 
   const tabConfig: any = {
-    [Page.NOTICE_BOARD]: { text: "Notice", createHandler: handleCreateNoticeClick },
-    [Page.WORSHIP_BOARD]: { text: "Worship Plan", createHandler: handleCreatePlanClick },
-    [Page.SONG_BOARD]: { text: "Song Board", createHandler: () => {} },
+    [Page.NOTICE_BOARD]: { text: "Notice"},
+    [Page.WORSHIP_BOARD]: { text: "Worship Plan" },
+    [Page.SONG_BOARD]: { text: "Song Board"},
   };
 
-  if (currentPage === Page.HOME || currentPage === Page.CREATE_SONG || currentPage === Page.EDIT_SONG || currentPage === Page.CREATE_WORSHIP || currentPage === Page.EDIT_WORSHIP || currentPage === Page.WORSHIP) {
+  if ([Page.BOARD, Page.HOME, Page.CREATE_SONG, Page.EDIT_SONG, Page.CREATE_WORSHIP, Page.EDIT_WORSHIP, Page.WORSHIP, Page.CREATE_NOTICE].includes(currentPage)) {
     return (
       <BaseTopNavBar height={56}>
         <div className="w-full h-full flex px-4">
@@ -47,16 +37,13 @@ export function BoardTopNavBar() {
   if (currentPage === Page.NOTICE_BOARD) {
     return (
       <BaseTopNavBar height={80}>
-        <Suspense>
-          <NoticeForm mode={FormMode.CREATE} isOpen={isCreateNoticeDialogOpen} setIsOpen={setCreateNoticeDialogOpen}/>
-        </Suspense>
         <div className="w-full h-full flex flex-col justify-end">
           <div className="flex-between w-full py-2 px-4">
             {
               tabConfig[currentPage] &&
               <p className="text-xl font-semibold">{tabConfig[currentPage].text}</p>
             }
-            <SquarePenIcon className="cursor-pointer" onClick={() => tabConfig[currentPage].createHandler()}/>
+            <SquarePenIcon className="cursor-pointer" onClick={() => router.push(getPathCreateNotice(teamId))}/>
           </div>
         </div>
       </BaseTopNavBar>
@@ -100,7 +87,7 @@ export function BoardTopNavBar() {
                 <p className="text-xl font-semibold">{tabConfig[currentPage].text}</p>
               }
               <div className="flex gap-4">
-              <SquarePenIcon className="cursor-pointer" onClick={() => tabConfig[currentPage].createHandler()}/>
+              <SquarePenIcon className="cursor-pointer" onClick={() => router.push(getPathCreatePlan(teamId))}/>
               </div>
             </div>
             <div className="mt-2">

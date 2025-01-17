@@ -5,7 +5,7 @@ const roles = ["Leader", "Member"]
 
 export function RoleSelect({role}: any) {
   return (
-    <Select value={role}>
+    <Select value={role} disabled={true}>
       <SelectTrigger className="flex-end gap-2 w-full border-0 shadow-none " >
         <SelectValue placeholder="Select a Role" />
       </SelectTrigger>

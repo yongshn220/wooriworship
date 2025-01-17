@@ -9,6 +9,7 @@ import {auth} from "@/firebase";
 import {userAtom} from "@/global-states/userState";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
 import {CreateNewTeamDialog} from "@/components/elements/dialog/create-new-team/create-new-team-dialog";
+import { Plus } from "lucide-react";
 
 interface Props {
   createOption: boolean
@@ -32,12 +33,12 @@ export function TeamSelect({createOption}: Props) {
 
   return (
     <Select value={currentTeamId?.toString()} onValueChange={(teamId) => handleChangeTeam(teamId)}>
-      <SelectTrigger className="w-full mb-4">
+      <SelectTrigger className="w-full">
         <SelectValue placeholder="Select a Team" />
       </SelectTrigger>
       <SelectContent >
         <SelectGroup>
-          <SelectLabel>Team</SelectLabel>
+          <SelectLabel>Teams ({user?.teams.length})</SelectLabel>
           {
             user?.teams?.map((teamId) => (
               <TeamItem key={teamId} teamId={teamId}/>
@@ -46,9 +47,10 @@ export function TeamSelect({createOption}: Props) {
           {
             createOption &&
             <CreateNewTeamDialog>
-              <Button variant="default" className="w-full mt-2">
-                Create Team
-              </Button>
+              <Button className="w-full" variant="outline">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create New Team
+                </Button>
             </CreateNewTeamDialog>
           }
         </SelectGroup>

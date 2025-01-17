@@ -58,7 +58,8 @@ export function AddableSongHeaderList({teamId}: Props) {
                 width={200}
                 height={200}
               />
-              <p className="text-xl font-semibold">No matching songs!</p>
+              <p className="text-xl font-semibold">No available songs!</p>
+              <p className="text-muted-foreground">Please add songs in the song board.</p>
             </div>
           }
         </div>

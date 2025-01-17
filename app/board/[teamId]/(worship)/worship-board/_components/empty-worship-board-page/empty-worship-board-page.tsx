@@ -4,7 +4,7 @@ import * as React from "react";
 
 export function EmptyWorshipBoardPage() {
   return (
-    <div className="w-full h-full flex-center flex-col gap-3">
+    <div className="w-full h-full flex-center flex-col gap-3 pt-10 bg-gray-50">
       <Image
         alt="compose music image"
         src="/illustration/teamworkIllustration.svg"

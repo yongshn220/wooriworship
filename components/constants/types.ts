@@ -3,7 +3,7 @@ import {WorshipSongHeader} from "@/models/worship";
 
 export interface ImageFileContainer {
   id: string
-  file: File
+  file: File | null
   url: string
   isLoading: boolean
   isUploadedInDatabase: boolean

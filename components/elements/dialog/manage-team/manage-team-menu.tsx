@@ -99,10 +99,13 @@ export function ManageTeamMenu() {
             <DoorOpenIcon className="mr-3 w-5 h-5"/>
             <p>Leave Team</p>
           </Button>
-          <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteTeamDialogOpen(true)}>
-            <Trash2Icon className="mr-3 w-5 h-5 text-red-600"/>
-            <p className="text-red-600">Delete Team</p>
-          </Button>
+          {
+            team.leaders.includes(authUser.uid) &&
+            <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteTeamDialogOpen(true)}>
+              <Trash2Icon className="mr-3 w-5 h-5 text-red-600"/>
+              <p className="text-red-600">Delete Team</p>
+            </Button>
+          }
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
