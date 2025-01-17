@@ -3,7 +3,7 @@
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
-import {useMemo, useState} from "react";
+import {Suspense, useMemo, useState} from "react";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {useRecoilValue, useSetRecoilState} from "recoil";
 import { InvitationService } from "@/apis";
@@ -92,7 +92,9 @@ export function ManageTeamContent() {
           </div>
         </div>
         <div className="w-full flex-center py-4">
-          <TeamSelect createOption={true}/>
+          <Suspense fallback={<div></div>}>
+            <TeamSelect createOption={true}/>
+          </Suspense>
         </div>
       </div>
       <div className="w-full flex-start flex-col">

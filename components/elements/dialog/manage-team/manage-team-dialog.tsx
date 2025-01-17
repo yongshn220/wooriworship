@@ -2,6 +2,7 @@
 
 import {ManageTeamContent} from "@/components/elements/dialog/manage-team/manage-team-content";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Suspense } from "react";
 
 
 export function ManageTeamDialog({children}: any) {
@@ -15,7 +16,9 @@ export function ManageTeamDialog({children}: any) {
       </DrawerTrigger>
       <DrawerContent className="h-5/6">
         <div className="w-full h-full overflow-y-scroll scrollbar-hide p-4">
-          <ManageTeamContent/>
+          <Suspense fallback={<div></div>}>
+            <ManageTeamContent/>
+          </Suspense>
         </div>
       </DrawerContent>
     </Drawer>
