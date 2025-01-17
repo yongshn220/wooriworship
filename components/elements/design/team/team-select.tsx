@@ -10,7 +10,6 @@ import {userAtom} from "@/global-states/userState";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
 import {CreateNewTeamDialog} from "@/components/elements/dialog/create-new-team/create-new-team-dialog";
 import { Plus } from "lucide-react";
-import { Suspense } from "react";
 
 interface Props {
   createOption: boolean
@@ -45,7 +44,6 @@ export function TeamSelect({createOption}: Props) {
               <TeamItem key={teamId} teamId={teamId}/>
             ))
           }
-          <Suspense fallback={<></>}>
             {
               createOption &&
               <CreateNewTeamDialog>
@@ -55,7 +53,6 @@ export function TeamSelect({createOption}: Props) {
                   </Button>
               </CreateNewTeamDialog>
             }
-          </Suspense>
         </SelectGroup>
       </SelectContent>
     </Select>
