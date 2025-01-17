@@ -10,6 +10,7 @@ import {userAtom} from "@/global-states/userState";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
 import {CreateNewTeamDialog} from "@/components/elements/dialog/create-new-team/create-new-team-dialog";
 import { Plus } from "lucide-react";
+import { Suspense } from "react";
 
 interface Props {
   createOption: boolean
@@ -44,15 +45,17 @@ export function TeamSelect({createOption}: Props) {
               <TeamItem key={teamId} teamId={teamId}/>
             ))
           }
-          {
-            createOption &&
-            <CreateNewTeamDialog>
-              <Button className="w-full" variant="outline">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create New Team
-                </Button>
-            </CreateNewTeamDialog>
-          }
+          <Suspense fallback={<></>}>
+            {
+              createOption &&
+              <CreateNewTeamDialog>
+                <Button className="w-full" variant="outline">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create New Team
+                  </Button>
+              </CreateNewTeamDialog>
+            }
+          </Suspense>
         </SelectGroup>
       </SelectContent>
     </Select>
