@@ -21,8 +21,8 @@ export function LandingPage() {
         <Button variant="outline" onClick={() => setMode((mode === LandingMode.LOGIN)? LandingMode.SIGNUP : LandingMode.LOGIN)}>{(mode === LandingMode.LOGIN) ? "Sign Up" : "Sign In"}</Button>
       </div>
       <div className="w-full h-full flex flex-col items-center sm:p-5">
-        <p className="hidden sm:flex mt-0 text-2xl sm:text-4xl md:text-5xl xl:text-6xl xl:mt-10 text-left font-bold text-white blue_gradient">
-          Worship Team Assistant
+        <p className="hidden py-1 sm:flex mt-0 text-2xl sm:text-4xl md:text-5xl xl:text-6xl xl:mt-10 text-left font-bold text-white blue_gradient">
+          Worship Team Manager
         </p>
         <p className="hidden sm:flex text-xl mt-4 text-gray-500">
           Create set list, Plan worship, and Share with team

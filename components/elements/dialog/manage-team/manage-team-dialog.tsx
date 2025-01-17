@@ -1,21 +1,23 @@
 "use client"
 
-import {Dialog, DialogContentNoCloseButton, DialogTrigger} from "@/components/ui/dialog";
 import {ManageTeamContent} from "@/components/elements/dialog/manage-team/manage-team-content";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 
 
 export function ManageTeamDialog({children}: any) {
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <Drawer>
+      <DrawerTrigger asChild>
         <div className="w-full">
           {children}
         </div>
-      </DialogTrigger>
-      <DialogContentNoCloseButton className="flex-start flex-col sm:max-w-[600px] h-[90%] overflow-y-scroll scrollbar-hide top-1/2 -translate-y-1/2 " >
-        <ManageTeamContent/>
-      </DialogContentNoCloseButton>
-    </Dialog>
+      </DrawerTrigger>
+      <DrawerContent className="h-5/6">
+        <div className="w-full h-full overflow-y-scroll scrollbar-hide p-4">
+          <ManageTeamContent/>
+        </div>
+      </DrawerContent>
+    </Drawer>
   )
 }

@@ -8,7 +8,6 @@ import Image from 'next/image'
 import {NoticeHeaderMenu} from "@/components/elements/design/notice/notice-header/parts/notice-header-menu";
 import React, {useState} from "react";
 import {ImageFullScreenDialog} from "@/components/elements/dialog/image-full-screen/image-full-screen-dialog";
-import ReactLinkify from "react-linkify";
 import {Linkify} from "@/components/elements/util/text/linkify";
 
 

@@ -15,6 +15,10 @@ import {DownloadMusicSheetDialog} from "@/app/board/[teamId]/(worship)/worship/[
 export function BoardBottomNavBar() {
   const currentPage = useRecoilValue(currentPageAtom)
 
+  if (currentPage === Page.BOARD) {
+    return (<></>)
+  }
+
   if (currentPage === Page.WORSHIP) {
     return (
       <>

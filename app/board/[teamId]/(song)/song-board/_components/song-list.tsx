@@ -2,14 +2,10 @@
 import {useRecoilValueLoadable} from "recoil";
 import {currentTeamSongIdsAtom} from "@/global-states/song-state";
 import {Separator} from "@/components/ui/separator";
-import Image from "next/image";
 import * as React from "react";
 import {SongDetailDialogTrigger} from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog-trigger";
 import {SongHeaderDefault} from "@/components/elements/design/song/song-header/default/song-header-default";
-import {NewSongButton} from "@/app/board/[teamId]/(song)/song-board/_components/empty-song-board-page/new-song-button";
-import {
-  EmptySongBoardPage
-} from "@/app/board/[teamId]/(song)/song-board/_components/empty-song-board-page/empty-song-board-page";
+import {EmptySongBoardPage} from "@/app/board/[teamId]/(song)/song-board/_components/empty-song-board-page/empty-song-board-page";
 
 
 interface Props {

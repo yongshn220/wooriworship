@@ -1,4 +1,3 @@
-import {Dialog, DialogContent, DialogFooter, DialogTitle} from "@/components/ui/dialog";
 import React, {useEffect, useState} from "react";
 import {FormMode} from "@/components/constants/enums";
 import {Label} from "@/components/ui/label";
@@ -16,12 +15,13 @@ import MultipleImageUploader from "@/components/elements/util/image/multiple-ima
 import PdfUploader from "@/components/elements/util/image/pdf-uploader";
 import {UploadedImageFileCard} from "@/components/elements/util/image/uploaded-image-file-card";
 import {UploadIcon} from "lucide-react";
+import { BaseForm } from "@/components/elements/util/form/base-form";
+import { getPathNotice } from "@/components/util/helper/routes";
+import { useRouter } from "next/navigation";
 
 
 interface Props {
   mode: FormMode
-  isOpen: boolean
-  setIsOpen: Function
   noticeId?: string
 }
 
@@ -30,7 +30,7 @@ export interface NoticeInput {
   body: string
 }
 
-export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
+export function NoticeForm({mode, noticeId}: Props) {
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
   const setNoticeIds = useSetRecoilState(noticeIdsAtom(teamId))
@@ -42,6 +42,7 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
   })
   const [imageFileContainers, setImageFileContainers] = useState<Array<ImageFileContainer>>([])
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     if (mode === FormMode.EDIT) {
@@ -85,18 +86,18 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
         body: input?.body,
         file_urls: urlsToKeep
       }
-      if (await NoticeService.updateNotice(noticeId, noticeInput)) {
-        toast({
-          title: `Notice updated successfully!`,
-          description: input.title,
-        })
-        noticeUpdater(prev => prev + 1)
+      if (await NoticeService.updateNotice(noticeId, noticeInput) === false) {
+        toast({description: "Fail to edit notice-board. Please try again."}); return
       }
-      else {
-        toast({
-          description: "Fail to edit notice-board. Please try again."
-        })
-      }
+      
+      toast({
+        title: `Notice updated successfully!`,
+        description: input.title,
+      })
+
+      noticeUpdater(prev => prev + 1)
+      clearContents()
+      router.push(getPathNotice(teamId))
     }
     catch (e) {
       console.log(e);
@@ -104,7 +105,6 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
     finally {
       setIsLoading(false)
       clearContents()
-      setIsOpen(false)
     }
   }
 
@@ -124,13 +124,15 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
           description: "Fail to create notice-board. Please try again."
         })
       }
-      else {
-        toast({
-          title: `New Notice created!`,
-          description: input.title,
-        })
-        setNoticeIds((prev) => ([...prev, noticeId]))
-      }
+
+      toast({
+        title: `New Notice created!`,
+        description: input.title,
+      })
+      setNoticeIds((prev) => ([...prev, noticeId]))
+
+      clearContents()
+      router.push(getPathNotice(teamId))
     }
     catch (e) {
       console.log(e);
@@ -138,73 +140,71 @@ export function NoticeForm({mode, isOpen, setIsOpen, noticeId}: Props) {
     finally {
       setIsLoading(false)
       clearContents()
-      setIsOpen(false)
     }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
-      <DialogContent className="sm:max-w-[600px] overflow-y-scroll scrollbar-hide">
-        <DialogTitle className="text-2xl">{mode===FormMode.EDIT? "Edit Notice" : "Add New Notice"}</DialogTitle>
-        <div className="flex flex-col gap-6 py-4">
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="name">Title</Label>
-            <Input
-              id="title"
-              placeholder="Write the title"
-              value={input.title}
-              onChange={(e) => setInput((prev => ({...prev, title: e.target.value})))}
-              autoFocus={false}
-            />
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="description">
-              Description
-            </Label>
-            <Textarea
-              className="h-20 text-base"
-              placeholder="Write the description"
-              value={input.body}
-              onChange={(e) => setInput((prev => ({...prev, body: e.target.value})))}
-            />
-          </div>
-          <div className="flex w-full py-2 gap-2">
-            <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
-              <div className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors">
-                <UploadIcon className="h-6 w-6 text-gray-500" />
-                <span className="mt-2 text-sm text-gray-500">
-                  Upload Image
-                </span>
-              </div>
-            </MultipleImageUploader>
-            <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
-              <div
-                className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors">
-                <UploadIcon className="h-6 w-6 text-gray-500"/>
-                <span className="mt-2 text-sm text-gray-500">
-                  Upload PDF
-                </span>
-              </div>
-            </PdfUploader>
-          </div>
-          <div className="flex-start w-full h-60 aspect-square border-2 p-2 rounded-md shadow-xs">
-            <div className="flex w-full h-full gap-4 overflow-x-auto">
-              {
-                imageFileContainers?.map((imageFileContainer, i) => (
-                  <UploadedImageFileCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImage(index)}/>
-                ))
-              }
+    <BaseForm title={mode===FormMode.EDIT? "Edit Notice" : "Add New Notice"} description="Enter the details of your notice below">
+      <div className="flex flex-col gap-6 py-4">
+        <div className="flex-start flex-col items-center gap-1.5">
+          <Label htmlFor="name">Title</Label>
+          <Input
+            id="title"
+            placeholder="Write the title"
+            value={input.title}
+            onChange={(e) => setInput((prev => ({...prev, title: e.target.value})))}
+            autoFocus={false}
+          />
+        </div>
+        <div className="flex-start flex-col items-center gap-1.5">
+          <Label htmlFor="description">
+            Description
+          </Label>
+          <Textarea
+            className="h-20 text-base"
+            placeholder="Write the description"
+            value={input.body}
+            onChange={(e) => setInput((prev => ({...prev, body: e.target.value})))}
+          />
+        </div>
+        <div className="flex w-full py-2 gap-2">
+          <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
+            <div className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors">
+              <UploadIcon className="h-6 w-6 text-gray-500" />
+              <span className="mt-2 text-sm text-gray-500">
+                Upload Image
+              </span>
             </div>
+          </MultipleImageUploader>
+          <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
+            <div
+              className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors">
+              <UploadIcon className="h-6 w-6 text-gray-500"/>
+              <span className="mt-2 text-sm text-gray-500">
+                Upload PDF
+              </span>
+            </div>
+          </PdfUploader>
+        </div>
+        <div className="flex-start w-full h-60 aspect-square border-2 p-2 rounded-md shadow-xs">
+          <div className="flex w-full h-full gap-4 overflow-x-auto">
+            {
+              imageFileContainers?.map((imageFileContainer, i) => (
+                <UploadedImageFileCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImage(index)}/>
+              ))
+            }
           </div>
         </div>
-        <DialogFooter>
+      </div>
+      <div className="w-full flex-end my-10">
+        <div>
           {
             (mode === FormMode.EDIT)
               ? <Button type="submit" onClick={handleEdit}>{isLoading ? "Saving..." : "Save"}</Button>
               : <Button type="submit" onClick={handleCreate}>{isLoading ? "Creating..." : "Create"}</Button>
           }
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </BaseForm>
   )
 }

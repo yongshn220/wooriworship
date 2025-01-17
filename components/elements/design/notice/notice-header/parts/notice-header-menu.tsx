@@ -2,21 +2,18 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuTrigge
 import MenuIcon from "@/public/icons/menuIcon.svg";
 import {Button} from "@/components/ui/button";
 import {SquarePen, Trash2Icon} from "lucide-react";
-import {useState} from "react";
-import {NoticeForm} from "@/components/elements/design/notice/notice-form/notice-form";
-import {FormMode} from "@/components/constants/enums";
+import { getPathEditNotice } from "@/components/util/helper/routes";
+import { useRouter } from "next/navigation";
+import { useRecoilValue } from "recoil";
+import { currentTeamIdAtom } from "@/global-states/teamState";
 
 interface Props {
   noticeId: string
 }
 
 export function NoticeHeaderMenu({noticeId}: Props) {
-  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [isEditDialogOpen, setEditDialogOpen] = useState(false)
-
-  function handleEditSong() {
-    setEditDialogOpen(true)
-  }
+  const teamId = useRecoilValue(currentTeamIdAtom)
+  const router = useRouter()
 
   return (
     <DropdownMenu>
@@ -25,12 +22,11 @@ export function NoticeHeaderMenu({noticeId}: Props) {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuGroup>
-          <NoticeForm mode={FormMode.EDIT} noticeId={noticeId} isOpen={isEditDialogOpen} setIsOpen={setEditDialogOpen}/>
-          <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => handleEditSong()}>
+          <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => router.push(getPathEditNotice(teamId, noticeId))}>
             <SquarePen className="mr-3 w-5 h-5"/>
             <p>Edit</p>
           </Button>
-          <Button variant="ghost" className="text-red-600 focus:bg-red-50 focus:text-red-500 cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteDialogOpen((prev) => !prev)}>
+          <Button disabled={true} variant="ghost" className="text-red-600 focus:bg-red-50 focus:text-red-500 cursor-pointer w-full flex-start pl-2" >
             <Trash2Icon className="mr-3 w-5 h-5"/>
             <p>Delete</p>
           </Button>

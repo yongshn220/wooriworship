@@ -59,11 +59,13 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
 
         <Button variant="ghost" className="w-full justify-start text-lg py-8" onClick={() => setInvitationDialogState(true)}>
           <MailIcon className="mr-4 h-6 w-6"/>
+          Invitation Inbox
           {
             invitations?.length > 0 &&
-            <div className="rounded-full bg-red-500 w-5 h-5 text-white">{invitations?.length}</div>
+            <div className="flex items-center justify-center text-xs rounded-full bg-red-500 w-6 h-6 text-white shadow-md ml-2">
+              {invitations?.length}
+            </div>
           }
-          Invitation Inbox
         </Button>
 
         <Separator/>

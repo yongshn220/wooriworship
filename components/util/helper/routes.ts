@@ -12,6 +12,14 @@ export function getPathNotice(teamId: string) {
   return "/" + Page.BOARD + `/${teamId}` + "/" + Page.NOTICE_BOARD
 }
 
+export function getPathCreateNotice(teamId: string) {
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.CREATE_NOTICE
+}
+
+export function getPathEditNotice(teamId: string, noticeId: string) {
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.EDIT_NOTICE + `/${noticeId}`
+}
+
 export function getPathPlan(teamId: string) {
   return "/" + Page.BOARD + `/${teamId}` + "/" + Page.WORSHIP_BOARD
 }

@@ -3,6 +3,8 @@ export enum Page {
   BOARD = "board",
   HOME = "home",
   NOTICE_BOARD = "notice-board",
+  CREATE_NOTICE = "create-notice",
+  EDIT_NOTICE = "edit-notice",
   WORSHIP_BOARD = "worship-board",
   WORSHIP = "worship",
   WORSHIP_VIEW = "worship-view",

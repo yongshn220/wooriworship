@@ -3,6 +3,7 @@
 import React, {useEffect, useState} from "react";
 import {auth} from "@/firebase";
 import {useRouter} from "next/navigation";
+import { toast } from "@/components/ui/use-toast";
 
 export function BoardAuthenticate({children}: Readonly<{ children: React.ReactNode }>) {
   const [access, setAccess] = useState(false)
@@ -14,6 +15,7 @@ export function BoardAuthenticate({children}: Readonly<{ children: React.ReactNo
         setAccess(true)
       }
       else {
+        toast({title: "Please login to access this page."})
         router.replace("/")
       }
     });

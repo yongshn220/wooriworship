@@ -92,7 +92,7 @@ export function ManageTeamContent() {
           </div>
         </div>
         <div className="w-full flex-center py-4">
-          <TeamSelect createOption={false}/>
+          <TeamSelect createOption={true}/>
         </div>
       </div>
       <div className="w-full flex-start flex-col">
