@@ -1,6 +1,4 @@
 
-// Placeholder page
-
 import {SongList} from "@/app/board/[teamId]/(song)/song-board/_components/song-list";
 
 interface Props {

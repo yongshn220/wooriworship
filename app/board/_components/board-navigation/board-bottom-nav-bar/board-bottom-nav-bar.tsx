@@ -65,12 +65,12 @@ export function DefaultBoardBottomNavBar() {
   return (
     <BaseBottomNavBar height={80}>
       <div className="w-full h-full flex justify-between px-5">
-        <div
+        {/* <div
           className={cn("w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer", {"text-blue-500": (currentPage === Page.HOME)})}
           onClick={() => router.push(getPathHome(currentTeamId))}>
           <HomeIcon strokeWidth={2}/>
           <p className="text-xs prevent-text-select">Home</p>
-        </div>
+        </div> */}
         <div
           className={cn("w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer", {"text-blue-500": (currentPage === Page.NOTICE_BOARD)})}
           onClick={() => router.push(getPathNotice(currentTeamId))}>
