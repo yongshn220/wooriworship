@@ -70,7 +70,7 @@ export function WorshipCard({worshipId}: Props) {
 
   return (
     <div onClick={() => router.push(getPathWorship(teamId, worship.id))}>
-      <div className="group md:aspect-[1/1] rounded-lg flex flex-col bg-white overflow-hidden cursor-pointer p-4 border">
+      <div className="h-full group rounded-lg flex flex-col bg-white overflow-hidden cursor-pointer p-4 border">
         <div className="flex flex-col pb-2 border-b">
           <div className="flex-between items-center w-full">
             <p className="text-sm text-gray-600">{timestampToDateStringFormatted(worship?.worship_date)}

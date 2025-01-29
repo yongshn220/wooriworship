@@ -5,6 +5,27 @@ import {searchSelectedTagsAtom,songBoardSelectedSortOptionAtom,songSearchInputAt
 import {SongBoardSortOption} from "@/components/constants/enums";
 
 
+export const songIdsAtom = atomFamily<Array<string>, string>({
+  key: "songIdsAtom",
+  default: selectorFamily({
+    key: "songIdsAtom/default",
+    get: (teamId: string) => async({get}) => {
+      if (!teamId) return []
+
+      try {
+        const songIds = await SongService.getSongIds(teamId)
+        if (!songIds) return []
+
+        return songIds
+      }
+      catch (e) {
+        console.log(e)
+        return []
+      }
+    }
+  })
+})
+
 export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
   key: "currentTeamSongIdsAtom",
   default: selectorFamily({
@@ -13,7 +34,7 @@ export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
       if (!teamId) return []
 
       try {
-        let songList = await SongService.getTeamSong(teamId) as Song[]
+        let songList = await SongService.getSong(teamId) as Song[]
         if (!songList) return []
 
         const searchInput = get(songSearchInputAtom)

@@ -12,16 +12,26 @@ class SongService extends BaseService {
     super("songs");
   }
 
-  async getTeamSong(teamId: string) {
-    console.log("SongService.getTeamSong")
-    const songs: any = await this.getByFilters([
-      {
-        a: 'team_id',
-        b: '==',
-        c: teamId
-      }
-    ]);
+  async getSong(teamId: string) {
+    const songs: any = await this.getByFilters(
+      [{a: 'team_id', b: '==', c: teamId}]
+    );
     return songs
+  }
+
+  async getSongIds(teamId: string) {
+    const songs: any = await this.getDocIds(
+      [{a: 'team_id', b: "==", c: teamId}]
+    )
+    return songs
+  }
+
+  async getSongHeader(teamId: string) {
+    const songHeaders = await this.getByFiltersAndFields(
+      [{a: 'team_id', b: "==", c: teamId}],
+      ["team_id", "title", "subtitle", "keys", "original", "tags", "version", "last_used_time"]
+    )
+    return songHeaders
   }
 
   async addNewSong(userId: string, teamId: string, songInput: SongInput, musicSheetContainers: Array<MusicSheetContainer>) {
