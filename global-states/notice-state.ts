@@ -17,8 +17,8 @@ export const noticeIdsAtom = atomFamily<Array<string>, string>({
 
         noticeList.sort((a, b) => {
           try {
-            const dateA = a?.created_by?.timestamp?.toDate().getTime() || 0
-            const dateB = b?.created_by?.timestamp?.toDate().getTime() || 0
+            const dateA = a?.created_by?.time?.toDate().getTime() || 0
+            const dateB = b?.created_by?.time?.toDate().getTime() || 0
             return dateB - dateA
           }
           catch (e) {
