@@ -42,7 +42,11 @@ export const currentTeamSongIdsAtom = atomFamily<Array<string>, string>({
 
         // Search Filter
         if (searchInput && searchInput !== "") {
-          songList = songList.filter((song) => song?.title?.toLowerCase().includes(searchInput.toLowerCase()))
+          const normalizedSearchInput = searchInput.toLowerCase().replace(/\s+/g, '');
+          songList = songList.filter((song) => 
+            song?.title?.toLowerCase().replace(/\s+/g, '').includes(normalizedSearchInput) ||
+            song?.subtitle?.toLowerCase().replace(/\s+/g, '').includes(normalizedSearchInput)
+          )
         }
         // Tag Filter
         if (selectedTags && selectedTags.length > 0) {
