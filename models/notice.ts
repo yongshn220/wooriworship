@@ -5,7 +5,7 @@ export type Notice = {
     team_id: string
     created_by: {
         id: string
-        timestamp: Timestamp
+        time: Timestamp
     }
     title: string
     body: string

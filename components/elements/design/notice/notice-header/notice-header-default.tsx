@@ -1,9 +1,7 @@
-import {Separator} from "@/components/ui/separator";
 import {useRecoilValue} from "recoil";
 import {noticeAtom} from "@/global-states/notice-state";
 import {getTimePassedFromTimestampShorten, timestampToDateStringFormatted} from "@/components/util/helper/helper-functions";
 import {userAtom} from "@/global-states/userState";
-import {UserIcon} from "lucide-react";
 import Image from 'next/image'
 import {NoticeHeaderMenu} from "@/components/elements/design/notice/notice-header/parts/notice-header-menu";
 import React, {useState} from "react";
@@ -34,8 +32,8 @@ export function NoticeHeaderDefault({noticeId}: Props) {
         <div className="flex flex-col gap-4">
           {/* Time information */}
           <div className="flex items-center gap-2">
-            <p className="text-sm">{timestampToDateStringFormatted(notice?.last_updated_time)}</p>
-            <p className="text-sm text-gray-500">{getTimePassedFromTimestampShorten(notice?.last_updated_time)}</p>
+            <p className="text-sm">{timestampToDateStringFormatted(notice?.created_by?.time)}</p>
+            <p className="text-sm text-gray-500">{getTimePassedFromTimestampShorten(notice?.created_by?.time)}</p>
           </div>
 
           {/* Title and Body */}
