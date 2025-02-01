@@ -26,53 +26,55 @@ export function NoticeHeaderDefault({noticeId}: Props) {
   return (
     <div className="w-full">
       <ImageFullScreenDialog isOpen={fullScreenOn.state} setIsOpen={(state: boolean) => setFullScreenOn((prev: any) => ({...prev, state: state}))} imageUrls={fullScreenOn.urls}/>
-      <div className="flex items-center gap-2">
-        <p className="text-sm pl-2">{timestampToDateStringFormatted(notice?.last_updated_time)}</p>
-        <p className="text-sm text-gray-500">{getTimePassedFromTimestampShorten(notice?.last_updated_time)}</p>
-      </div>
-      <div className="w-full p-4 border rounded-lg bg-white">
-        <div className="flex items-center justify-between pb-4">
-          <div className="flex-center">
-            <div className="flex gap-1">
-              <UserIcon/>
-              <p>{user?.name}</p>
-            </div>
-            <div className="ml-4">
-            </div>
-          </div>
+      <div className="w-full p-4 border rounded-lg bg-white relative">
+        <div className="absolute top-4 right-4">
           <NoticeHeaderMenu noticeId={noticeId}/>
         </div>
-        <Separator/>
+        
+        <div className="flex flex-col gap-4">
+          {/* Time information */}
+          <div className="flex items-center gap-2">
+            <p className="text-sm">{timestampToDateStringFormatted(notice?.last_updated_time)}</p>
+            <p className="text-sm text-gray-500">{getTimePassedFromTimestampShorten(notice?.last_updated_time)}</p>
+          </div>
 
-        <div className="flex flex-col sm:flex-row">
-          <div className="flex-1 p-4">
-            <div className="flex-between">
-              <p className="font-semibold">{notice?.title}</p>
+          {/* Title and Body */}
+          <div>
+            <p className="font-semibold mb-4">{notice?.title}</p>
+            <div className="whitespace-pre-line break-all">
+              <Linkify>
+                {notice?.body || ""}
+              </Linkify>
             </div>
-            <div className="py-4">
-              <div className="py-4 whitespace-pre-line break-all">
-                <Linkify>
-                  {notice?.body || ""}
-                </Linkify>
+          </div>
+
+          {/* Images */}
+          {notice?.file_urls && notice.file_urls.length > 0 && (
+            <div>
+              <div className="flex flex-wrap gap-2">
+                {notice.file_urls.map((url, index) => (
+                  <div 
+                    key={index} 
+                    className="cursor-pointer w-24 h-24 relative"
+                    onClick={() => setFullScreenOn({state: true, urls: [url]})}>
+                    <Image
+                      alt="notice uploaded image"
+                      src={url}
+                      fill
+                      className="object-cover rounded-lg"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-          <div>
-            {
-              notice?.file_urls?.map((url, index) => (
-                <div key={index} className="cursor-pointer" onClick={() => setFullScreenOn({state: true, urls: [url]})}>
-                  <Image
-                    alt="notice uploaded image"
-                    src={url}
-                    width={400}
-                    height={400}
-                  />
-                </div>
-              ))
-            }
+          )}
+
+          {/* Posted by */}
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            {/* <UserIcon className="w-4 h-4"/> */}
+            <span>Posted by {user?.name}</span>
           </div>
         </div>
-
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 "use client"
-import {useRecoilValue, useRecoilValueLoadable} from "recoil";
-import {currentTeamSongIdsAtom, songIdsAtom} from "@/global-states/song-state";
+import {useRecoilValue} from "recoil";
+import {currentTeamSongIdsAtom} from "@/global-states/song-state";
 import {Separator} from "@/components/ui/separator";
 import * as React from "react";
 import {SongDetailDialogTrigger} from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog-trigger";
@@ -13,8 +13,7 @@ interface Props {
 }
 
 export function SongList({teamId}: Props) {
-  // const songIdsLoadable = useRecoilValueLoadable(currentTeamSongIdsAtom(teamId))
-  const songIds = useRecoilValue(songIdsAtom(teamId))
+  const songIds = useRecoilValue(currentTeamSongIdsAtom(teamId))
 
   if (!songIds || songIds?.length <= 0) {
     return (<EmptySongBoardPage/>)
@@ -35,8 +34,7 @@ export function SongList({teamId}: Props) {
             songIds.map((songId) => (
               <div key={songId} className="w-full">
                 <SongDetailDialogTrigger teamId={teamId} songId={songId}>
-                  {/*<SongHeaderDefault songId={songId}/>*/}
-                  123o
+                  <SongHeaderDefault songId={songId}/>
                 </SongDetailDialogTrigger>
                 <Separator/>
               </div>
