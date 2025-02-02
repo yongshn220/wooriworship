@@ -10,7 +10,6 @@ export function WorshipIndexIndicator() {
   const index = useRecoilValue(worshipIndexAtom)
   const setWorshipIndexChangeEvent = useSetRecoilState(worshipIndexChangeEventAtom)
 
-
   return (
     <div className={cn(
       "absolute gap-y-2",

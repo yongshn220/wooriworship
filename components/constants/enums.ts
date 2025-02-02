@@ -43,7 +43,12 @@ export enum SongBoardSortOption {
 
 export enum DirectionType {
   VERTICAL = "Vertical",
-  HORIZONTAL = "Horizontal"
+  HORIZONTAL = "Horizontal",
+}
+
+export enum WorshipViewPageMode {
+  SINGLE_PAGE = "singlePage",
+  DOUBLE_PAGE = "doublePage",
 }
 
 /* Worship Plan */

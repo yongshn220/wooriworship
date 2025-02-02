@@ -1,5 +1,5 @@
 import useLocalStorage from "@/components/util/hook/use-local-storage";
-import {DirectionType} from "@/components/constants/enums";
+import {DirectionType, WorshipViewPageMode} from "@/components/constants/enums";
 
 interface Preference {
   board: BoardPreference
@@ -10,6 +10,7 @@ interface WorshipLivePreference {
   showSongNote: boolean
   showSongNumber: boolean
   multipleSheetsView: DirectionType
+  pageMode: WorshipViewPageMode
 }
 interface BoardPreference {
   selectedTeamId: string
@@ -21,6 +22,7 @@ type PreferenceSetter = {
   worshipLiveShowSongNote: (showSongNote: boolean) => void
   worshipLiveShowSongNumber: (showSongNumber: boolean) => void
   worshipLiveMultipleSheetsView: (viewMode: DirectionType) => void
+  worshipViewPageMode: (pageMode: WorshipViewPageMode) => void
 }
 
 export default function useUserPreferences(): [Preference, PreferenceSetter] {
@@ -31,7 +33,8 @@ export default function useUserPreferences(): [Preference, PreferenceSetter] {
     worshipLive: {
       showSongNote: true,
       showSongNumber: true,
-      multipleSheetsView: DirectionType.VERTICAL
+      multipleSheetsView: DirectionType.VERTICAL,
+      pageMode: WorshipViewPageMode.SINGLE_PAGE,
     },
   });
 
@@ -49,6 +52,9 @@ export default function useUserPreferences(): [Preference, PreferenceSetter] {
       },
       worshipLiveMultipleSheetsView: (viewMode: DirectionType) => {
         setPreferences((prev) => ({...prev, worshipLive: {...prev.worshipLive, multipleSheetsView: viewMode}}));
+      },
+      worshipViewPageMode: (pageMode: WorshipViewPageMode) => {
+        setPreferences((prev) =>({...prev, worshipLive: {...prev.worshipLive, pageMode: pageMode}}));
       }
     }
   )

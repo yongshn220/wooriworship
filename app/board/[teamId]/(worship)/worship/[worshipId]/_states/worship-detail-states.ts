@@ -1,5 +1,5 @@
 import {atom} from "recoil";
-import {DirectionType} from "@/components/constants/enums";
+import {DirectionType, WorshipViewPageMode} from "@/components/constants/enums";
 
 
 export const worshipLiveOptionsAtom = atom({
@@ -12,6 +12,11 @@ export const worshipLiveOptionsAtom = atom({
 export const worshipMultipleSheetsViewModeAtom = atom<DirectionType>({
   key: "worshipMultipleSheetsViewModeAtom",
   default: DirectionType.VERTICAL
+})
+
+export const worshipViewPageModeAtom = atom<WorshipViewPageMode>({
+  key: "worshipViewPageModeAtom",
+  default: WorshipViewPageMode.SINGLE_PAGE
 })
 
 export const worshipIndexAtom = atom({

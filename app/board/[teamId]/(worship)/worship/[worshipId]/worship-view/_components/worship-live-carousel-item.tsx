@@ -4,12 +4,12 @@ import {CarouselItem} from "@/components/ui/carousel";
 import {WorshipSongHeader} from "@/models/worship";
 import {useRecoilValue} from "recoil";
 import {musicSheetsByIdsAtom} from "@/global-states/music-sheet-state";
-import {useEffect, useMemo} from "react";
-import {DirectionType} from "@/components/constants/enums";
-import {MusicSheet} from "@/models/music_sheet";
-import {MusicSheetCounts} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/worship-view/_components/worship-live-carousel";
-import {worshipMultipleSheetsViewModeAtom} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_states/worship-detail-states";
 import {WorshipNote} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/worship-view/_components/worship-note";
+import { cn } from "@/lib/utils";
+import { worshipViewPageModeAtom } from "../../_states/worship-detail-states";
+import { WorshipViewPageMode } from "@/components/constants/enums";
+import { MusicSheetCounts } from "./worship-live-carousel";
+import { useEffect } from "react";
 
 
 interface Props {
@@ -19,34 +19,19 @@ interface Props {
 
 export function WorshipLiveCarouselItemWrapper({songHeader, setMusicSheetCounts}: Props) {
   const musicSheets = useRecoilValue(musicSheetsByIdsAtom(songHeader?.selected_music_sheet_ids))
-  const multipleSheetsViewMode = useRecoilValue(worshipMultipleSheetsViewModeAtom)
-
-  const modifiedMusicSheets = useMemo(() => {
-    if (multipleSheetsViewMode === DirectionType.VERTICAL) {
-      return musicSheets
-    }
-
-    const results: Array<MusicSheet> = []
-    musicSheets.forEach(musicSheet => {
-      musicSheet?.urls.forEach(url => {
-        results.push({...musicSheet, urls: [url]})
-      })
-    })
-    return results
-
-  }, [multipleSheetsViewMode, musicSheets])
-
+  
   useEffect(() => {
     setMusicSheetCounts((prev) => {
       const newCounts = prev.filter((count) => count.id !== songHeader?.id)
-      return [...newCounts, {id: songHeader?.id, count: modifiedMusicSheets?.length}]
+      return [...newCounts, {id: songHeader?.id, count: musicSheets?.length}]
     })
-  }, [modifiedMusicSheets?.length, setMusicSheetCounts, songHeader?.id])
+  }, [musicSheets?.length, setMusicSheetCounts, songHeader?.id])
+
 
   return (
     <React.Fragment>
       {
-        modifiedMusicSheets?.map((musicSheet, index) => (
+        musicSheets?.map((musicSheet, index) => (
           <WorshipLiveCarouselItem key={index} index={index} note={songHeader?.note} urls={musicSheet?.urls} />
         ))
       }
@@ -63,9 +48,10 @@ interface WorshipLiveCarouselItemProps {
 }
 
 export function WorshipLiveCarouselItem({index, note, urls}: WorshipLiveCarouselItemProps) {
-
+  const pageMode = useRecoilValue(worshipViewPageModeAtom)
+  
   return (
-    <CarouselItem key={`${index}-${Math.floor(Math.random() * 1000)}`} className="h-full p-0">
+    <CarouselItem key={`${index}-${Math.floor(Math.random() * 1000)}`} className={cn("h-full p-0", {"basis-1/2": pageMode === WorshipViewPageMode.DOUBLE_PAGE})}>
       <Card className="h-full pl-4">
         <div className="flex-center flex-col w-full h-full divide-y ">
           <WorshipNote description={note}/>

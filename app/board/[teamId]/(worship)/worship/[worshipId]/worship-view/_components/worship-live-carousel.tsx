@@ -63,7 +63,7 @@ export function WorshipLiveCarousel({worshipId}: Props) {
 
   return (
     <div id="song-carousel" className="w-full h-full">
-      <Carousel setApi={setApi} className="w-full h-full">
+      <Carousel opts={{align: "start"}} setApi={setApi} className="w-full h-full">
         <CarouselContent className="h-full">
           {
             aggregatedSongHeaders?.map((songHeader, index) => (

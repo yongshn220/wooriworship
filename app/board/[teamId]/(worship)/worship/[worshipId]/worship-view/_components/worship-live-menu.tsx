@@ -14,6 +14,7 @@ import {worshipLiveOptionsAtom} from "@/app/board/[teamId]/(worship)/worship/[wo
 import {
   MultipleSheetsViewSelect
 } from "@/app/board/[teamId]/(worship)/worship/[worshipId]/worship-view/_components/multiple-sheets-view-select";
+import { WorshipViewPageModeSelect } from "./worship-view-page-mode-select";
 
 
 interface Props {
@@ -58,9 +59,13 @@ export function WorshipLiveMenu({teamId, worshipId}: Props) {
             <Switch className="data-[state=checked]:bg-blue-500" checked={option.showSongNumber}/>
           </div>
           <Separator/>
-          <div className="flex-between py-2 px-2 rounded-sm">
+          {/* <div className="flex-between py-2 px-2 rounded-sm">
             <Label className="w-full">Multiple Sheets View</Label>
             <MultipleSheetsViewSelect/>
+          </div> */}
+          <div className="flex-between py-2 px-2 rounded-sm">
+            <Label className="w-full">Page Mode</Label>
+            <WorshipViewPageModeSelect/>
           </div>
           <Separator/>
           <Button disabled variant="ghost" className="w-full flex justify-start cursor-pointer hover:bg-gray-100 pl-2">
