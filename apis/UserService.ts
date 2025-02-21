@@ -34,6 +34,12 @@ class UserService extends BaseService {
         await this.update(userId, {invite_optin: inviteOptin})
     }
 
+    async subscribePushNotification() {
+
+    }
+
+
+
     async leaveTeam(userId: string, teamId: string, singleSide: Boolean) {
         if (userId && teamId){
             if (!singleSide) {
