@@ -34,6 +34,15 @@ import {
 } from "@/components/elements/design/song/song-list/worship-form/add-worship-song-dialog-trigger";
 import {BaseForm} from "@/components/elements/util/form/base-form";
 import {LinkIcon} from "lucide-react";
+import PushNotificationService from "@/apis/PushNotificationService";
+import {Separator} from "@/components/ui/separator";
+import {Bell, LogOut, Mail, MailIcon, Settings, Users} from 'lucide-react';
+import {currentTeamIdAtom} from "@/global-states/teamState";
+import {invitationInboxDialogOpenStateAtom} from "@/global-states/dialog-state";
+import {TeamIcon} from "@/components/elements/design/team/team-icon";
+import {ManageTeamDialog} from "@/components/elements/dialog/manage-team/manage-team-dialog";
+import {MenuItem} from "@/app/board/[teamId]/(manage)/manage/_components/menu-item";
+import {accountSettingAtom} from "@/global-states/account-setting";
 
 interface Props {
   mode: FormMode
@@ -144,7 +153,7 @@ export function WorshipForm({mode, teamId, worship}: Props) {
     return worshipInput
   }
 
-  function handleCreate() {
+  async function handleCreate() {
     setIsLoading(true)
 
     if (!isSessionValid()) return false
@@ -152,20 +161,33 @@ export function WorshipForm({mode, teamId, worship}: Props) {
     try {
       const worshipInput = getWorshipInput()
 
-      WorshipService.addNewWorship(authUser?.uid, teamId, worshipInput).then((worshipId: string) => {
-        toast({
-          title: `New worship has set on ${date}.`,
-          description: team?.name,
-        })
-        setIsLoading(false)
-        clearContents()
-        setWorshipUpdater(prev => prev + 1)
-        setWorshipIdsUpdater(prev => prev + 1)
-        router.push(getPathWorship(teamId, worshipId))
+      const worshipId = await WorshipService.addNewWorship(authUser?.uid, teamId, worshipInput);
+      
+      // Send notifications to team members
+      await PushNotificationService.notifyTeamNewWorship(
+        teamId,
+        authUser?.uid,
+        worshipInput.date,
+        worshipInput.title
+      );
+
+      toast({
+        title: `New worship has set on ${date}.`,
+        description: team?.name,
       })
+      setIsLoading(false)
+      clearContents()
+      setWorshipUpdater(prev => prev + 1)
+      setWorshipIdsUpdater(prev => prev + 1)
+      router.push(getPathWorship(teamId, worshipId))
     }
     catch (e) {
       console.log("err", e)
+      toast({
+        title: "Failed to create worship",
+        description: "Please try again",
+        variant: "destructive"
+      })
     }
     finally {
       setIsLoading(false)

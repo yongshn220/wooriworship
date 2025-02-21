@@ -2,6 +2,9 @@ import { AccountSetting, PushNotification, Subscription } from '@/models/account
 import { getNewSubscription } from '@/components/util/helper/push-notification';
 import { getFirebaseTimestampNow } from '@/components/util/helper/helper-functions';
 import AccountSettingService from './AccountSettingService';
+import { sendNotificationToMultipleSubscriptions, PushNotificationPayload } from '@/actions/push-notification/push-notification';
+import TeamService from './TeamService';
+import { Team } from '@/models/team';
 
 class PushNotificationService {
   async updateOptState(uid: string, isEnabled: boolean) {
@@ -52,7 +55,7 @@ class PushNotificationService {
 
       const subscription: Subscription = {
         device_id: deviceId,
-        sub: newSub
+        sub: JSON.stringify(newSub)  // Convert subscription to string before storing
       }
 
       const notif: PushNotification = {
@@ -69,6 +72,53 @@ class PushNotificationService {
     } 
     catch (error) {
       console.error("Error refreshing push notification subscription:", error);
+    }
+  }
+
+  async notifyTeamNewWorship(teamId: string, creatorUid: string, worshipDate: Date, worshipTitle: string) {
+    try {
+      // Get team data to get member UIDs
+      const team = await TeamService.getById(teamId) as Team;
+      if (!team) {
+        console.error("Team not found", { teamId });
+        return;
+      }
+
+      // Get all team members' account settings except the creator
+      const memberUids = team.users.filter(uid => uid !== creatorUid);
+      const memberSettings = await Promise.all(
+        memberUids.map(uid => AccountSettingService.getAccountSetting(uid))
+      );
+
+      // Collect all active subscriptions from members who have enabled notifications
+      const activeSubscriptions = memberSettings
+        .filter(setting => setting && setting.push_notification.is_enabled)
+        .flatMap(setting => setting.push_notification.subscriptions)
+        .map(sub => JSON.parse(sub.sub) as PushSubscription);
+
+      if (activeSubscriptions.length === 0) {
+        console.log("No active subscriptions found for team members");
+        return;
+      }
+
+      // Format the date for the notification
+      const formattedDate = worshipDate.toLocaleDateString();
+
+      // Send the notification
+      const payload: PushNotificationPayload = {
+        title: "New Worship Created",
+        body: `${worshipTitle} on ${formattedDate}`,
+        icon: '/icon.png'
+      };
+
+      const result = await sendNotificationToMultipleSubscriptions(activeSubscriptions, payload);
+      console.log("Notification sending result:", result);
+
+      return result;
+    } 
+    catch (error) {
+      console.error("Error sending team notifications:", error);
+      return { success: false, error: "Failed to send notifications" };
     }
   }
 }
