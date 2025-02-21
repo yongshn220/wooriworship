@@ -9,6 +9,7 @@ import {currentPageAtom} from "@/global-states/page-state";
 import {useEffect} from "react";
 import {Page} from "@/components/constants/enums";
 import {DialogManager} from "@/components/elements/dialog/static-dialog/dialog-manager";
+import Initialization from "@/components/util/provider/initialization";
 
 
 export default function BoardLayout({ children }: any) {
@@ -26,6 +27,7 @@ export default function BoardLayout({ children }: any) {
   return (
     <section className="h-full">
       <BoardAuthenticate>
+        <Initialization/>
         <DialogManager/>
         <div className="flex flex-col h-screen">
           <BoardTopNavBar/>

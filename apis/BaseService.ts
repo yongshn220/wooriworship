@@ -201,6 +201,19 @@ export default class BaseService {
     }
   }
 
+  async createWithId(id: string, data: any) {
+    try {
+      const docRef = firestore.collection(this.collectionName).doc(id);
+      await docRef.set(data);
+      return id;
+    } 
+    catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
+
   async update(id: string, data: any) {
     try {
       await firestore.collection(this.collectionName).doc(id).set(data, {merge: true});
