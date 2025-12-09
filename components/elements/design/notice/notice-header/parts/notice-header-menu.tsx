@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { useState } from "react";
-import { noticeUpdaterAtom } from "@/global-states/notice-state";
+import { noticeUpdaterAtom, noticeIdsUpdaterAtom } from "@/global-states/notice-state";
 import { NoticeService } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
 import {
@@ -20,16 +20,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase";
 
 interface Props {
   noticeId: string
+  createdById: string
 }
 
-export function NoticeHeaderMenu({ noticeId }: Props) {
+export function NoticeHeaderMenu({ noticeId, createdById }: Props) {
+  const [user] = useAuthState(auth as any);
   const teamId = useRecoilValue(currentTeamIdAtom)
   const noticeUpdater = useSetRecoilState(noticeUpdaterAtom)
+  const setNoticeIdsUpdater = useSetRecoilState(noticeIdsUpdaterAtom)
   const router = useRouter()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  if (!user || user.uid !== createdById) return null;
 
   const handleDelete = async () => {
     try {
@@ -38,7 +45,7 @@ export function NoticeHeaderMenu({ noticeId }: Props) {
         title: "Notice deleted",
         description: "The notice has been successfully deleted.",
       });
-      noticeUpdater((prev) => prev + 1);
+      setNoticeIdsUpdater((prev) => prev + 1);
     } catch (error) {
       toast({
         variant: "destructive",
