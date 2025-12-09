@@ -23,12 +23,14 @@ import {
   getDayPassedFromTimestampShorten,
   timestampToDateStringFormatted,
 } from "@/components/util/helper/helper-functions";
-import { getPathWorship } from "@/components/util/helper/routes";
+import { getPathSongDetail, getPathWorship } from "@/components/util/helper/routes";
 
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState";
 import { worshipAtom, worshipSongListAtom } from "@/global-states/worship-state";
 import { userAtom } from "@/global-states/userState";
 import { planSearchInputAtom } from "@/app/board/_states/board-states";
+
+import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
 
 interface Props {
   worshipId: string
@@ -55,6 +57,7 @@ function highlightText(text: string, highlight: string) {
 export function WorshipCard({ worshipId }: Props) {
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
 
   // State Selectors
   const teamId = useRecoilValue(currentTeamIdAtom);
@@ -250,7 +253,14 @@ export function WorshipCard({ worshipId }: Props) {
                   {/* Rich Song List */}
                   <div className="bg-gray-50 rounded-xl p-2 sm:p-3 flex flex-col gap-1">
                     {songs.map((song, idx) => (
-                      <div key={idx} className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 rounded-lg hover:bg-white hover:shadow-sm transition-all duration-200">
+                      <div
+                        key={idx}
+                        className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 rounded-lg hover:bg-white hover:shadow-sm transition-all duration-200 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (song?.id) setSelectedSongId(song.id);
+                        }}
+                      >
                         <div className="w-10 sm:w-12 flex justify-center shrink-0">
                           {song?.keys?.[0] ? (
                             <Badge variant="outline" className="font-mono text-sm sm:text-base font-bold border-gray-300 text-gray-700 bg-white px-1.5 sm:px-2.5">
@@ -283,6 +293,17 @@ export function WorshipCard({ worshipId }: Props) {
           </AnimatePresence>
         </CardContent>
       </Card>
+
+      {/* Song Detail Drawer */}
+      {selectedSongId && (
+        <SongDetailDialog
+          teamId={teamId}
+          isOpen={!!selectedSongId}
+          setIsOpen={(open: boolean) => !open && setSelectedSongId(null)}
+          songId={selectedSongId}
+          readOnly={true}
+        />
+      )}
     </motion.div>
   )
 }
