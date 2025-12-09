@@ -223,21 +223,22 @@ export function WorshipCard({ worshipId }: Props) {
 
                 <div className="space-y-3">
                   {/* Actions & List Header */}
-                  <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-2">
-                    <div className="flex items-center gap-2 text-base sm:text-lg font-semibold text-gray-800">
-                      <Music className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
-                      Song List
-                    </div>
-                    <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-                      <Button variant="outline" size="sm" onClick={handleDownload} className="text-gray-600 w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-9">
-                        <Download className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  <div className="flex flex-col gap-3 pt-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-base sm:text-lg font-semibold text-gray-800">
+                        <Music className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
+                        Song List
+                      </div>
+                      <Button variant="ghost" size="sm" onClick={handleDownload} className="text-gray-500 hover:text-gray-900 h-8 text-xs sm:text-sm px-2">
+                        <Download className="mr-1.5 h-3 w-3 sm:h-4 sm:w-4" />
                         Sheets
                       </Button>
-                      <Button size="sm" onClick={handleStartWorship} className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm w-full sm:w-auto text-sm sm:h-9 font-semibold">
-                        <Play className="mr-2 h-3 w-3 sm:h-4 sm:w-4 fill-current" />
-                        Start Worship
-                      </Button>
                     </div>
+
+                    <Button size="sm" onClick={handleStartWorship} className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-10 sm:h-10 text-sm sm:text-base font-semibold">
+                      <Play className="mr-2 h-3 w-3 sm:h-4 sm:w-4 fill-current" />
+                      Start Worship
+                    </Button>
                   </div>
 
                   {/* Rich Song List */}
