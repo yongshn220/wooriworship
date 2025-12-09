@@ -209,39 +209,42 @@ export function WorshipCard({ worshipId }: Props) {
                       <span>12 views</span>
                     </div>
                   </div>
-
-                  {hasLink && (
-                    <a
-                      href={worship.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-blue-600 hover:underline font-medium text-xs sm:text-sm"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                      Reference
-                    </a>
-                  )}
                 </div>
 
                 <div className="space-y-3">
                   {/* Actions & List Header */}
-                  <div className="flex flex-col gap-4 pt-2">
+                  <div className="flex flex-col gap-3 pt-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-base sm:text-lg font-semibold text-gray-800">
                         <Music className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
                         Song List
                       </div>
-                      <Button variant="ghost" size="sm" onClick={handleDownload} className="text-gray-500 hover:text-gray-900 h-8 text-xs sm:text-sm px-2">
-                        <Download className="mr-1.5 h-3 w-3 sm:h-4 sm:w-4" />
-                        Sheets
-                      </Button>
-                    </div>
 
-                    <Button size="sm" onClick={handleStartWorship} className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-10 sm:h-10 text-sm sm:text-base font-semibold">
-                      <Play className="mr-2 h-3 w-3 sm:h-4 sm:w-4 fill-current" />
-                      Start Worship
-                    </Button>
+                      <div className="flex items-center gap-1">
+                        {hasLink && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            asChild
+                            className="text-gray-500 hover:text-blue-600 h-8 text-xs sm:text-sm px-2 cursor-pointer"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <a
+                              href={worship.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <ExternalLink className="mr-1.5 h-3 w-3 sm:h-4 sm:w-4" />
+                              Link
+                            </a>
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="sm" onClick={handleDownload} className="text-gray-500 hover:text-gray-900 h-8 text-xs sm:text-sm px-2">
+                          <Download className="mr-1.5 h-3 w-3 sm:h-4 sm:w-4" />
+                          Download
+                        </Button>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Rich Song List */}
@@ -269,6 +272,11 @@ export function WorshipCard({ worshipId }: Props) {
                       </div>
                     )}
                   </div>
+
+                  <Button size="sm" onClick={handleStartWorship} className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-10 sm:h-10 text-sm sm:text-base font-semibold">
+                    <Play className="mr-2 h-3 w-3 sm:h-4 sm:w-4 fill-current" />
+                    Start Worship
+                  </Button>
                 </div>
               </motion.div>
             )}
