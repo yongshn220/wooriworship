@@ -1,46 +1,41 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import {useRecoilValue} from "recoil";
-import {musicSheetAtom} from "@/global-states/music-sheet-state";
-import {ImageFullScreenDialog} from "@/components/elements/dialog/image-full-screen/image-full-screen-dialog";
+import { useRecoilValue } from "recoil";
+import { musicSheetAtom } from "@/global-states/music-sheet-state";
 
 
 interface Props {
   musicSheetId: string
 }
-export function SongDetailMusicSheetArea({musicSheetId}: Props) {
+export function SongDetailMusicSheetArea({ musicSheetId }: Props) {
   const musicSheet = useRecoilValue(musicSheetAtom(musicSheetId))
-  const [isMusicSheetViewOpen, setMusicSheetViewOpen] = useState(false)
 
-  function handleMusicSheetClick() {
-    setMusicSheetViewOpen(true)
+  if (!musicSheet?.urls || musicSheet.urls.length === 0) {
+    return (
+      <div className="w-full h-64 flex-center text-gray-400">
+        No sheet available
+      </div>
+    )
   }
 
   return (
-    <>
-      <ImageFullScreenDialog isOpen={isMusicSheetViewOpen} setIsOpen={setMusicSheetViewOpen} imageUrls={musicSheet?.urls}/>
+    <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 py-2">
       {
-        musicSheet?.urls?.length > 0 &&
-        <div className="flex-center w-full h-60 aspect-square">
-          <div className="flex-center w-full h-full gap-4 overflow-x-auto pb-2">
-            {
-              musicSheet?.urls?.map((url: string, i: number) => (
-                <div key={i} className="relative flex flex-col h-full aspect-[3/4] border rounded bg-white" onClick={handleMusicSheetClick}>
-                  <div className="relative flex-1 flex-start rounded-md">
-                    <Image
-                      src={url}
-                      fill
-                      sizes="10vw, 10vw, 10vw"
-                      className="object-contain rounded-md"
-                      alt="EventImage"
-                    />
-                  </div>
-                </div>
-              ))
-            }
+        musicSheet.urls.map((url: string, i: number) => (
+          <div key={i} className="relative w-full flex justify-center items-center">
+            {/* 
+              Render image to fit within the viewport height minus header. 
+              object-contain ensures the whole sheet is visible.
+            */}
+            <img
+              src={url}
+              alt={`Sheet ${i + 1}`}
+              className="w-full h-auto max-h-[calc(100vh-80px)] object-contain shadow-sm"
+              loading="lazy"
+            />
           </div>
-        </div>
+        ))
       }
-    </>
+    </div>
   )
 }
