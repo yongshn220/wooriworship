@@ -229,10 +229,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                         {creator.name}
                       </div>
                     )}
-                    <div className="flex items-center gap-1 text-gray-500 text-xs sm:text-sm">
-                      <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-                      <span>12 views</span>
-                    </div>
+
                   </div>
                 </div>
 
