@@ -1,8 +1,9 @@
-import { useRecoilValueLoadable } from "recoil";
-import React, { Suspense, useEffect, useRef, useState } from "react";
-import { currentTeamWorshipIdsAtom } from "@/global-states/worship-state";
+import React, { Suspense, useEffect, useRef } from "react";
+import { currentTeamWorshipIdsAtom, worshipListDisplayedCountAtom } from "@/global-states/worship-state";
 import { WorshipCard } from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-card";
 import { EmptyWorshipBoardPage } from "@/app/board/[teamId]/(worship)/worship-board/_components/empty-worship-board-page/empty-worship-board-page";
+import { useRecoilValueLoadable, useRecoilState } from "recoil";
+import { useSearchParams } from "next/navigation";
 
 
 interface Props {
@@ -13,8 +14,10 @@ export function WorshipCardList({ teamId }: Props) {
   const worshipIdsLoadable = useRecoilValueLoadable(currentTeamWorshipIdsAtom(teamId));
 
   // Infinite Scroll State
-  const [displayedCount, setDisplayedCount] = useState(5);
+  const [displayedCount, setDisplayedCount] = useRecoilState(worshipListDisplayedCountAtom);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const expandedId = searchParams.get("expanded");
 
   const worshipIds = (worshipIdsLoadable.state === 'hasValue') ? worshipIdsLoadable.contents : [];
   const visibleWorshipIds = worshipIds.slice(0, displayedCount);
@@ -39,6 +42,17 @@ export function WorshipCardList({ teamId }: Props) {
       }
     };
   }, [worshipIds]);
+
+  // Auto-expand list to include target if expanded param exists
+  useEffect(() => {
+    if (worshipIdsLoadable.state === 'hasValue' && expandedId && worshipIds.length > 0) {
+      const index = worshipIds.findIndex(id => id === expandedId);
+      if (index >= 0 && index >= displayedCount) {
+        // Load enough to show the target item + a few more
+        setDisplayedCount(prev => Math.max(prev, index + 3));
+      }
+    }
+  }, [worshipIdsLoadable.state, expandedId, worshipIds, setDisplayedCount, displayedCount]);
 
   switch (worshipIdsLoadable.state) {
     case 'loading': return <></>

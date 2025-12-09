@@ -8,7 +8,7 @@ import { timestampToDate } from "@/components/util/helper/helper-functions";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { WorshipService } from "@/apis";
-import { getPathWorship } from "@/components/util/helper/routes";
+import { getPathPlan, getPathWorship } from "@/components/util/helper/routes";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -179,7 +179,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       clearContents()
       setWorshipUpdater(prev => prev + 1)
       setWorshipIdsUpdater(prev => prev + 1)
-      router.push(getPathWorship(teamId, worshipId))
+      router.push(getPathPlan(teamId) + "?expanded=" + worshipId)
     }
     catch (e) {
       console.log("err", e)
@@ -210,7 +210,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       setIsLoading(false)
       clearContents()
       setWorshipUpdater(prev => prev + 1)
-      router.push(getPathWorship(teamId, worship?.id))
+      router.push(getPathPlan(teamId) + "?expanded=" + worship?.id)
     }
     catch (e) {
       console.log("err", e)
