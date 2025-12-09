@@ -4,7 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageFileContainer } from "@/components/constants/types";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { auth } from "@/firebase";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
@@ -144,61 +145,92 @@ export function NoticeForm({ mode, noticeId }: Props) {
   }
 
   return (
-    <BaseForm title={mode === FormMode.EDIT ? "Edit Notice" : "Add New Notice"} description="Enter the details of your notice below">
-      <div className="flex flex-col gap-6 py-4">
-        <div className="flex-start flex-col items-center gap-1.5">
-          <Label htmlFor="name">Title</Label>
+    <BaseForm title="" description="">
+      <div className="flex flex-col w-full max-w-4xl mx-auto min-h-[600px]">
+
+        {/* Header Action Row */}
+        <div className="flex flex-row justify-between items-start mb-8 pb-4 border-b border-gray-100">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {mode === FormMode.EDIT ? "Edit Notice" : "New Notice"}
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">Share updates and news with your team.</p>
+          </div>
+          <div>
+            {
+              (mode === FormMode.EDIT)
+                ? <Button type="submit" onClick={handleEdit} className="min-w-[100px] bg-gray-900 hover:bg-black text-white">{isLoading ? "Saving..." : "Save Changes"}</Button>
+                : <Button type="submit" onClick={handleCreate} className="min-w-[100px] bg-gray-900 hover:bg-black text-white">{isLoading ? "Creating..." : "Publish"}</Button>
+            }
+          </div>
+        </div>
+
+        {/* Title Input */}
+        <div className="mb-6 group">
           <Input
             id="title"
-            placeholder="Write the title"
+            placeholder="Untitled Notice"
             value={input.title}
             onChange={(e) => setInput((prev => ({ ...prev, title: e.target.value })))}
-            autoFocus={false}
+            autoFocus={true}
+            className="text-4xl sm:text-5xl font-extrabold border-none px-0 shadow-none focus-visible:ring-0 placeholder:text-gray-200 text-gray-900 h-auto py-2 bg-transparent transition-all"
           />
         </div>
-        <div className="flex-start flex-col items-center gap-1.5">
-          <Label htmlFor="description">
-            Description
-          </Label>
+
+        {/* Body Input */}
+        <div className="flex-1 mb-8 group">
           <Textarea
-            className="h-20 text-base"
-            placeholder="Write the description"
+            className="min-h-[400px] w-full text-lg resize-none border-none px-0 shadow-none focus-visible:ring-0 leading-loose text-gray-700 placeholder:text-gray-300 bg-transparent p-0"
+            placeholder="Type '/' for commands or start writing..."
             value={input.body}
             onChange={(e) => setInput((prev => ({ ...prev, body: e.target.value })))}
           />
         </div>
-        <div className="flex w-full items-center gap-3 pt-2">
-          <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
-            <Button variant="outline" size="sm" type="button" className="gap-2 text-gray-600 hover:text-gray-900 border-dashed border-gray-300 hover:border-gray-400">
-              <ImageIcon className="h-4 w-4" />
-              <span>Add Image</span>
-            </Button>
-          </MultipleImageUploader>
-          <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5}>
-            <Button variant="outline" size="sm" type="button" className="gap-2 text-gray-600 hover:text-gray-900 border-dashed border-gray-300 hover:border-gray-400">
-              <FileText className="h-4 w-4" />
-              <span>Add PDF</span>
-            </Button>
-          </PdfUploader>
-        </div>
-        <div className="flex-start w-full h-40 border-2 p-2 rounded-md shadow-xs bg-white">
-          <div className="flex w-full h-full gap-4 overflow-x-auto items-center">
-            {
-              imageFileContainers?.map((imageFileContainer, i) => (
-                <UploadedImageFileCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImage(index)} />
-              ))
-            }
+
+        {/* Floating/Fixed Bottom Toolbar for Attachments */}
+        <div className="sticky bottom-4 z-10 w-full bg-white/80 backdrop-blur-md border border-gray-200 shadow-lg rounded-xl p-3 transition-all">
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-bold text-gray-400 px-2 uppercase tracking-tight">Add to post</span>
+
+            <div className="h-4 w-px bg-gray-200 mx-1"></div>
+
+            <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
+              <div className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "gap-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer rounded-lg px-3")}>
+                <ImageIcon className="h-4 w-4" />
+                <span className="font-medium">Image</span>
+              </div>
+            </MultipleImageUploader>
+            <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
+              <div className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "gap-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer rounded-lg px-3")}>
+                <FileText className="h-4 w-4" />
+                <span className="font-medium">PDF</span>
+              </div>
+            </PdfUploader>
+
+            {/* File Count Indicators if any */}
+            {(imageFileContainers.length > 0) && (
+              <div className="ml-auto flex items-center gap-2 text-xs text-blue-600 font-medium bg-blue-50 px-3 py-1.5 rounded-full">
+                <span>{imageFileContainers.length} files attached</span>
+              </div>
+            )}
           </div>
+
+          {/* Expanded File Preview Area inside the toolbar or just above? */}
+          {/* Putting it above avoids layout shifts in sticky. */}
         </div>
-      </div>
-      <div className="w-full flex-end my-10">
-        <div>
-          {
-            (mode === FormMode.EDIT)
-              ? <Button type="submit" onClick={handleEdit}>{isLoading ? "Saving..." : "Save"}</Button>
-              : <Button type="submit" onClick={handleCreate}>{isLoading ? "Creating..." : "Create"}</Button>
-          }
-        </div>
+
+        {imageFileContainers.length > 0 && (
+          <div className="mt-4 mb-20 flex-start w-full h-auto bg-gray-50 border border-gray-100 rounded-lg p-4">
+            <div className="flex w-full gap-4 overflow-x-auto items-center p-1">
+              {
+                imageFileContainers?.map((imageFileContainer, i) => (
+                  <UploadedImageFileCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImage(index)} />
+                ))
+              }
+            </div>
+          </div>
+        )}
+
       </div>
     </BaseForm>
   )
