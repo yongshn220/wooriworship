@@ -9,7 +9,8 @@ import { cn } from "@/lib/utils";
 import { auth } from "@/firebase";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
-import { noticeAtom, noticeIdsAtom, noticeUpdaterAtom } from "@/global-states/notice-state";
+import { noticeAtom, noticeIdsAtom, noticeUpdaterAtom, noticeIdsUpdaterAtom } from "@/global-states/notice-state";
+
 import { NoticeService, StorageService } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/components/elements/util/image/multiple-image-uploader";
@@ -34,7 +35,7 @@ export interface NoticeInput {
 export function NoticeForm({ mode, noticeId }: Props) {
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
-  const setNoticeIds = useSetRecoilState(noticeIdsAtom(teamId))
+  const setNoticeIdsUpdater = useSetRecoilState(noticeIdsUpdaterAtom)
   const noticeUpdater = useSetRecoilState(noticeUpdaterAtom)
   const notice = useRecoilValue(noticeAtom(noticeId))
   const [input, setInput] = useState<NoticeInput>({
@@ -130,7 +131,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
         title: `New Notice created!`,
         description: input.title,
       })
-      setNoticeIds((prev) => ([...prev, noticeId]))
+      setNoticeIdsUpdater((prev) => prev + 1)
 
       clearContents()
       router.push(getPathNotice(teamId))

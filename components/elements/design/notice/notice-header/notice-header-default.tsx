@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { ImageFullScreenDialog } from "@/components/elements/dialog/image-full-screen/image-full-screen-dialog";
 import { Linkify } from "@/components/elements/util/text/linkify";
 import { motion, AnimatePresence } from "framer-motion";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, ChevronUp } from "lucide-react";
 
 
 interface Props {
@@ -38,8 +38,12 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
         <div className="flex justify-between items-start">
           <div className="flex flex-col w-full pr-4">
             {/* Title */}
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug tracking-tight">
+            {/* Title */}
+            <h3 className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug tracking-tight">
               {notice?.title}
+              {isExpanded && (
+                <ChevronUp className="h-6 w-6 text-gray-400 animate-in fade-in zoom-in duration-300" />
+              )}
             </h3>
 
             {/* Meta Info */}
@@ -55,7 +59,7 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
 
           {/* Menu */}
           <div className="shrink-0 -mt-1 -mr-2" onClick={(e) => e.stopPropagation()}>
-            <NoticeHeaderMenu noticeId={noticeId} />
+            <NoticeHeaderMenu noticeId={noticeId} createdById={notice?.created_by.id || ""} />
           </div>
         </div>
 
