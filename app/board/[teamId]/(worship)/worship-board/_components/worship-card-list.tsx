@@ -1,7 +1,6 @@
 import { useRecoilValueLoadable } from "recoil";
-import * as React from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { currentTeamWorshipIdsAtom } from "@/global-states/worship-state";
-import { Suspense } from "react";
 import { WorshipCard } from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-card";
 import { EmptyWorshipBoardPage } from "@/app/board/[teamId]/(worship)/worship-board/_components/empty-worship-board-page/empty-worship-board-page";
 
@@ -11,7 +10,35 @@ interface Props {
 }
 
 export function WorshipCardList({ teamId }: Props) {
-  const worshipIdsLoadable = useRecoilValueLoadable(currentTeamWorshipIdsAtom(teamId))
+  const worshipIdsLoadable = useRecoilValueLoadable(currentTeamWorshipIdsAtom(teamId));
+
+  // Infinite Scroll State
+  const [displayedCount, setDisplayedCount] = useState(5);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  const worshipIds = (worshipIdsLoadable.state === 'hasValue') ? worshipIdsLoadable.contents : [];
+  const visibleWorshipIds = worshipIds.slice(0, displayedCount);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setDisplayedCount((prev) => prev + 20);
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [worshipIds]);
 
   switch (worshipIdsLoadable.state) {
     case 'loading': return <></>
@@ -20,20 +47,45 @@ export function WorshipCardList({ teamId }: Props) {
       return (
         <div className="w-full h-full">
           {
-            (worshipIdsLoadable.contents?.length > 0) ?
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-10 grid-flow-row-dense grid-rows-[auto]">
-                {
-                  worshipIdsLoadable.contents.map((worshipId: string, index: number) => (
-                    <Suspense key={worshipId} fallback={<div></div>}>
-                      <WorshipCard worshipId={worshipId} isFirst={index === 0} />
-                    </Suspense>
-                  ))
-                }
-              </div>
+            (worshipIds.length > 0) ?
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-10 grid-flow-row-dense grid-rows-[auto]">
+                  {
+                    visibleWorshipIds.map((worshipId: string, index: number) => (
+                      <Suspense key={worshipId} fallback={<WorshipCardSkeleton />}>
+                        <WorshipCard worshipId={worshipId} isFirst={index === 0} />
+                      </Suspense>
+                    ))
+                  }
+                </div>
+                {/* Load More Trigger */}
+                {visibleWorshipIds.length < worshipIds.length && (
+                  <div ref={loadMoreRef} className="h-20 w-full flex-center py-4 text-gray-400 text-sm">
+                    Loading more...
+                  </div>
+                )}
+              </>
               :
               <EmptyWorshipBoardPage />
           }
         </div>
       )
   }
+  return <></>;
+  // Fallback if needed, though switch covers cases provided the state is valid. 
+  // Typescript might complain if switch isn't exhaustive? Recoil Loadable state is 'loading' | 'hasValue' | 'hasError'.
+}
+
+function WorshipCardSkeleton() {
+  return (
+    <div className="w-full h-[400px] border rounded-lg p-4 space-y-4 bg-white animate-pulse">
+      <div className="w-2/3 h-6 bg-gray-200 rounded"></div>
+      <div className="w-1/2 h-4 bg-gray-200 rounded"></div>
+      <div className="w-full h-40 bg-gray-100 rounded-md"></div>
+      <div className="space-y-2">
+        <div className="w-full h-4 bg-gray-200 rounded"></div>
+        <div className="w-5/6 h-4 bg-gray-200 rounded"></div>
+      </div>
+    </div>
+  )
 }
