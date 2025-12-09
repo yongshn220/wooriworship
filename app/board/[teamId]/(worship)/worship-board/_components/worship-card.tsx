@@ -191,22 +191,25 @@ export function WorshipCard({ worshipId }: Props) {
                 className="space-y-6"
               >
                 {/* Meta Data Row */}
-                <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm">
-                  {team?.name && (
-                    <Badge variant="secondary" className="bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs sm:text-sm">
-                      {team.name}
-                    </Badge>
-                  )}
-                  {creator?.name && (
-                    <div className="flex items-center gap-1 sm:gap-2 font-medium text-gray-900 px-2 py-1 bg-gray-50 rounded-md text-xs sm:text-sm">
-                      <span className="text-gray-500 font-normal hidden sm:inline">Created by</span>
-                      {creator.name}
+                <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                  <div className="flex items-center gap-2 sm:gap-4">
+                    {team?.name && (
+                      <Badge variant="secondary" className="bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs sm:text-sm">
+                        {team.name}
+                      </Badge>
+                    )}
+                    {creator?.name && (
+                      <div className="flex items-center gap-1 sm:gap-2 font-medium text-gray-900 px-2 py-1 bg-gray-50 rounded-md text-xs sm:text-sm">
+                        <span className="text-gray-500 font-normal hidden sm:inline">Created by</span>
+                        {creator.name}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1 text-gray-500 text-xs sm:text-sm">
+                      <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span>12 views</span>
                     </div>
-                  )}
-                  <div className="flex items-center gap-1 text-gray-500 text-xs sm:text-sm">
-                    <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-                    <span>12 views</span>
                   </div>
+
                   {hasLink && (
                     <a
                       href={worship.link}
@@ -223,7 +226,7 @@ export function WorshipCard({ worshipId }: Props) {
 
                 <div className="space-y-3">
                   {/* Actions & List Header */}
-                  <div className="flex flex-col gap-3 pt-2">
+                  <div className="flex flex-col gap-4 pt-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-base sm:text-lg font-semibold text-gray-800">
                         <Music className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
@@ -245,7 +248,7 @@ export function WorshipCard({ worshipId }: Props) {
                   <div className="bg-gray-50 rounded-xl p-2 sm:p-3 flex flex-col gap-1">
                     {songs.map((song, idx) => (
                       <div key={idx} className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 rounded-lg hover:bg-white hover:shadow-sm transition-all duration-200">
-                        <span className="min-w-[2rem] sm:min-w-[2.5rem] flex justify-center">
+                        <div className="w-10 sm:w-12 flex justify-center shrink-0">
                           {song?.keys?.[0] ? (
                             <Badge variant="outline" className="font-mono text-sm sm:text-base font-bold border-gray-300 text-gray-700 bg-white px-1.5 sm:px-2.5">
                               {song.keys[0]}
@@ -253,7 +256,7 @@ export function WorshipCard({ worshipId }: Props) {
                           ) : (
                             <Badge variant="outline" className="text-gray-400 bg-gray-50 text-xs sm:text-sm">?</Badge>
                           )}
-                        </span>
+                        </div>
 
                         <span className="font-medium text-gray-900 text-base sm:text-lg line-clamp-1">
                           {highlightText(song?.title, searchInput)}
