@@ -1,9 +1,9 @@
-import {Timestamp} from "@firebase/firestore";
+import { Timestamp } from "@firebase/firestore";
 import JSZip from 'jszip';
-import {saveAs} from "file-saver";
-import {Song} from "@/models/song";
-import {MusicSheetContainer} from "@/components/constants/types";
-import {MusicSheet} from "@/models/music_sheet";
+import { saveAs } from "file-saver";
+import { Song } from "@/models/song";
+import { MusicSheetContainer } from "@/components/constants/types";
+import { MusicSheet } from "@/models/music_sheet";
 import MusicSheetService from "@/apis/MusicSheetService";
 
 export function getFirebaseTimestampNow() {
@@ -48,7 +48,7 @@ export function timestampToDateStringFormatted(timestamp: Timestamp) {
 
   // Define month names
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   // Extract year, month, and day from the date
   const year = jsDate.getFullYear();
@@ -103,7 +103,7 @@ export function getTimePassedFromTimestamp(timestamp: Timestamp) {
     const years = Math.abs(Math.floor(diffInSeconds / secondsInYear));
     result = `${years} year${years !== 1 ? 's' : ''}`;
   }
-  const suffix = (diffInSeconds < 0)? " left" : " ago"
+  const suffix = (diffInSeconds < 0) ? " left" : " ago"
   return result + suffix;
 }
 
@@ -129,30 +129,30 @@ export function getTimePassedFromTimestampShorten(timestamp: Timestamp) {
   }
   else if (diffInSeconds < secondsInHour) {
     const minutes = Math.abs(Math.floor(diffInSeconds / secondsInMinute));
-    result = `${minutes}min`;
+    result = `${minutes} min`;
   }
   else if (diffInSeconds < secondsInDay) {
     const hours = Math.abs(Math.floor(diffInSeconds / secondsInHour));
-    result = `${hours}hr`;
+    result = `${hours} hr${hours !== 1 ? 's' : ''}`;
   }
   else if (diffInSeconds < secondsInWeek) {
     const days = Math.abs(Math.floor(diffInSeconds / secondsInDay));
-    result = `${days}d`;
+    result = `${days} day${days !== 1 ? 's' : ''}`;
   }
   else if (diffInSeconds < secondsInMonth) {
     const weeks = Math.abs(Math.floor(diffInSeconds / secondsInWeek));
-    result = `${weeks}w`;
+    result = `${weeks} week${weeks !== 1 ? 's' : ''}`;
   }
   else if (diffInSeconds < secondsInYear) {
     const months = Math.abs(Math.floor(diffInSeconds / secondsInMonth));
-    result = `${months}m`;
+    result = `${months} month${months !== 1 ? 's' : ''}`;
   }
   else {
     const years = Math.abs(Math.floor(diffInSeconds / secondsInYear));
-    result = `${years}y`;
+    result = `${years} year${years !== 1 ? 's' : ''}`;
   }
 
-  const suffix = (diffInSeconds < 0)? " left" : " ago"
+  const suffix = (diffInSeconds < 0) ? " left" : " ago"
   return result + suffix;
 }
 
@@ -209,7 +209,7 @@ export function timestampToDate(timestamp: Timestamp) {
   try {
     return new Date(timestamp.seconds * 1000)
   }
-  catch(e) {
+  catch (e) {
     console.log("Err: timestampToDate")
     return new Date()
   }
@@ -246,7 +246,7 @@ function isPWA() {
   return window.matchMedia('(display-mode: standalone)').matches;
 }
 
-export function emailExists(emails: Array<string>, targetEmail:string) {
+export function emailExists(emails: Array<string>, targetEmail: string) {
   if (emails.map((x) => x.toLowerCase().trim()).includes(targetEmail.toLowerCase().trim())) {
     return true;
   }
@@ -268,7 +268,7 @@ function extractFileType(imageUrl: string) {
 
 }
 
-async function fetchImageAsBlob (url: string) {
+async function fetchImageAsBlob(url: string) {
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Failed to fetch image from ${url}`);
@@ -306,18 +306,18 @@ export async function downloadMultipleMusicSheets(songs: Array<Song>) {
 }
 
 export function getAllUrlsFromMusicSheetContainers(mContainers: MusicSheetContainer[]) {
-    if (!mContainers) {
-      console.log("getAllUrlsFromMusicSheetContainers: mContainer is not exists."); return []
-    }
-
-    const urls: Array<string> = []
-    mContainers?.forEach(mContainer => {
-      mContainer?.imageFileContainers?.forEach(iContainer => {
-        urls.push(iContainer?.url)
-      })
-    })
-    return urls
+  if (!mContainers) {
+    console.log("getAllUrlsFromMusicSheetContainers: mContainer is not exists."); return []
   }
+
+  const urls: Array<string> = []
+  mContainers?.forEach(mContainer => {
+    mContainer?.imageFileContainers?.forEach(iContainer => {
+      urls.push(iContainer?.url)
+    })
+  })
+  return urls
+}
 
 export function getAllUrlsFromSongMusicSheets(musicSheets: MusicSheet[]) {
   if (!musicSheets) {
@@ -346,10 +346,10 @@ export function getSongTitleFromSongsById(songs: Array<Song>, songId: string) {
 export function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
- 
+
   const rawData = window.atob(base64)
   const outputArray = new Uint8Array(rawData.length)
- 
+
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i)
   }
