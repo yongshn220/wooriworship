@@ -1,43 +1,54 @@
-Woori Worship
+# Woori Worship
 
-Phase 1: MFR Part 1(Minimum Functional Requirement).  
-~~1. User can Log in/Log out/Register.~~  
-~~2. User can create Team.~~  
-3. Leader Invites Team to other users.  
-~~4. User can add song~~  
-~~5. User can Update/Delete Song~~  
-~~6. User can create Worship~~  
-7. Others in the team can view the worship  
-8. User can Update/Delete Worship  
+A web application designed for church worship teams to collaboratively manage songs, worship setlists, and team schedules.
 
-Phase 2: MFR Part 2 Advanced Feature  
-1. User can delete Account.  
-2. User can delete Team (If user is leader of the team)  
-3. Add Forget Password  
-4. Leader can assign other leader  
-5. Leader can remove other members  
+## 🚀 Current Status: Phase 1 Complete
+All Minimum Functional Requirements (MFR) for Phase 1 have been implemented.
 
-Phase 3: Quality Of Life Change.  
-1. User can add their custom note to each worship.  
-2. Create MObile App version for andorid/ios  
+### ✅ Completed Features
+- **Authentication**: User Login, Register, Logout (Firebase Auth)
+- **Team Management**: Create Team, Switch Teams
+- **Invitations**: 
+  - Leaders can invite users via email
+  - Users have an "Invitation Inbox" to accept/decline invites
+- **Song Management**: Add, specific details (BPM, Key, etc.), Update, Delete songs
+- **Worship (Setlist) Management**: 
+  - Create Worship plans
+  - **View Worship**: Team members can view shared worship details (Songs, Music Sheets, Descriptions)
+  - **Update/Delete**: Full CRUD support for Worships
 
-Phase 4: AI Recommendation.  
-1. Each song gets a score based on various features  
-2. User gets song recommendation based on the Tag  
-3. User can rate the worship.  
+## 🛠 Tech Stack
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS, PostCSS, Radix UI (shadcn/ui), Framer Motion
+- **State Management**: Recoil
+- **Backend**: Firebase (Firestore, Authentication, Storage)
 
-Phase M: Monetization.  
-1. Only Users who paid can create team (free users can join free)  
-2. User can not add more than N(10) songs per team  
+## 📅 Roadmap
 
+### Phase 2: Advanced Features (Next Steps)
+- [ ] User Account Deletion
+- [ ] Team Deletion (Leader only)
+- [ ] Forget Password flow
+- [ ] Leader Delegation (Assign new leader)
+- [ ] Member Removal (Kick member)
 
+### Phase 3: Quality of Life
+- [ ] Custom notes for each worship per user
+- [ ] Mobile App version (iOS/Android)
 
+### Phase 4: AI & Recommendation
+- [ ] Automated song scoring
+- [ ] Tag-based song recommendations
+- [ ] Worship rating system
 
-Features by Role.
-1. Add song - 누구나
-2. Invite member - Leader
-3. add worship - 누구나
-4. Remove member - Leader
-5. delete Team - Leader
-6. Update Team(Team name change) - Leader
-7. update team member role - Leader
+### Phase M: Monetization
+- [ ] Premium Team creation limits
+- [ ] Song limits for free teams
+
+## 📂 Project Structure
+- `app/board`: Main dashboard and feature routes
+- `apis`: Service layer for Firebase interactions
+- `models`: TypeScript interfaces for domain objects
+- `components`: Reusable UI components
+- `global-states`: Recoil state definitions
