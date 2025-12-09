@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useRecoilValue, useRecoilValueLoadable } from "recoil";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -23,13 +23,12 @@ import {
   getDayPassedFromTimestampShorten,
   timestampToDateStringFormatted,
 } from "@/components/util/helper/helper-functions";
-import { getPathSongDetail, getPathWorship } from "@/components/util/helper/routes";
+import { getPathSongDetail, getPathWorshipView } from "@/components/util/helper/routes";
 
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState";
 import { worshipAtom, worshipSongListAtom } from "@/global-states/worship-state";
 import { userAtom } from "@/global-states/userState";
 import { planSearchInputAtom } from "@/app/board/_states/board-states";
-
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
 
 interface Props {
@@ -56,8 +55,21 @@ function highlightText(text: string, highlight: string) {
 
 export function WorshipCard({ worshipId }: Props) {
   const router = useRouter();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const searchParams = useSearchParams();
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const [isExpanded, setIsExpanded] = useState(() => searchParams.get("expanded") === worshipId);
   const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
+
+  // Auto-scroll to this card if it's the expanded one from URL
+  useEffect(() => {
+    if (searchParams.get("expanded") === worshipId) {
+      // Small delay to ensure layout is ready
+      setTimeout(() => {
+        cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [searchParams, worshipId]);
 
   // State Selectors
   const teamId = useRecoilValue(currentTeamIdAtom);
@@ -95,7 +107,7 @@ export function WorshipCard({ worshipId }: Props) {
 
   const handleStartWorship = (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push(getPathWorship(teamId, worship.id));
+    router.push(getPathWorshipView(teamId, worship.id));
   };
 
   const handleDownload = (e: React.MouseEvent) => {
@@ -110,6 +122,7 @@ export function WorshipCard({ worshipId }: Props) {
 
   return (
     <motion.div
+      ref={cardRef}
       layout
       className="w-full mb-4"
       initial={{ opacity: 0, y: 20 }}
