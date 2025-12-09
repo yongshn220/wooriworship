@@ -126,6 +126,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
   };
 
   const hasLink = !!worship.link;
+  const isPast = worship ? isTimestampPast(worship.worship_date) : false;
 
   return (
     <motion.div
@@ -138,7 +139,8 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
     >
       <Card
         className={cn(
-          "overflow-hidden transition-all duration-300 border bg-white shadow-sm hover:shadow-md cursor-pointer",
+          "overflow-hidden transition-all duration-300 border shadow-sm hover:shadow-md cursor-pointer",
+          (isExpanded || !isPast) ? 'bg-white' : 'bg-gray-50', // Apply background based on isExpanded and isPast
           isExpanded ? "ring-2 ring-blue-500/10" : ""
         )}
         onClick={() => !isExpanded && setIsExpanded(true)}
