@@ -1,18 +1,19 @@
 import { v4 as uuid } from 'uuid';
-import {useState} from "react";
-import {usePDFJS} from "@/components/util/hook/use-pdfjs";
+import { useState } from "react";
+import { usePDFJS } from "@/components/util/hook/use-pdfjs";
 import * as PDFJS from "pdfjs-dist";
-import {ImageFileContainer} from "@/components/constants/types";
-import {toast} from "@/components/ui/use-toast";
+import { ImageFileContainer } from "@/components/constants/types";
+import { toast } from "@/components/ui/use-toast";
 
 interface Props {
   imageFileContainers: Array<ImageFileContainer>;
   updateImageFileContainer: Function;
   maxNum: number;
   children: any;
+  className?: string;
 }
 
-export default function PdfUploader({imageFileContainers, updateImageFileContainer, maxNum, children}: Props) {
+export default function PdfUploader({ imageFileContainers, updateImageFileContainer, maxNum, children, className }: Props) {
   const [uploaderId, _] = useState(uuid())
   const [pdfjs, setPDFjs] = useState<typeof PDFJS>(null)
 
@@ -39,11 +40,11 @@ export default function PdfUploader({imageFileContainers, updateImageFileContain
             const imageBlob = await renderPageAsImage(pdf, pageNum);
             const imageFile = new File([imageBlob], `pdf-image-${pageNum}.jpg`, { type: 'image/jpeg' });
             const imageUrl = URL.createObjectURL(imageFile);
-            updateImageFileContainer({...newImageFileContainer, file: imageFile, url: imageUrl, isLoading: false})
+            updateImageFileContainer({ ...newImageFileContainer, file: imageFile, url: imageUrl, isLoading: false })
           }
         }
         else {
-          toast({description: `Pages exceed the maximum number : ${maxNum}`})
+          toast({ description: `Pages exceed the maximum number : ${maxNum}` })
         }
       }
       reader.readAsArrayBuffer(file);
@@ -73,12 +74,12 @@ export default function PdfUploader({imageFileContainers, updateImageFileContain
   };
 
   return (
-    <div className="w-full h-full">
+    <div className={className ?? "w-full h-full"}>
       <input
         type="file"
         id={uploaderId}
         name="Image"
-        style={{display: 'none'}}
+        style={{ display: 'none' }}
         accept="application/pdf"
         onChange={handleFileChange}
         multiple
