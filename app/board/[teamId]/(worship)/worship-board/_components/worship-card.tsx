@@ -31,6 +31,7 @@ import { worshipAtom, worshipSongListAtom } from "@/global-states/worship-state"
 import { userAtom } from "@/global-states/userState";
 import { planSearchInputAtom } from "@/app/board/_states/board-states";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
+import { WorshipHeaderMenu } from "./worship-header-menu";
 
 interface Props {
   worshipId: string;
@@ -57,6 +58,7 @@ function highlightText(text: string, highlight: string) {
 
 export function WorshipCard({ worshipId, isFirst }: Props) {
   const router = useRouter();
+  const teamId = useRecoilValue(currentTeamIdAtom);
   const searchParams = useSearchParams();
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -80,7 +82,6 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
   }, [searchParams, worshipId]);
 
   // State Selectors
-  const teamId = useRecoilValue(currentTeamIdAtom);
   const team = useRecoilValue(teamAtom(teamId));
   // Safe access to created_by info
   const creatorId = worship?.created_by?.id || "";
@@ -147,7 +148,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
       >
         <CardContent className="p-4 sm:p-6">
           {/* Header Section */}
-          <div className="flex justify-between items-start mb-4">
+          <div className="flex justify-between items-start mb-4 group cursor-pointer" onClick={handleToggleExpand}>
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <span>{timestampToDateStringFormatted(worship.worship_date)}</span>
@@ -155,27 +156,17 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                   {getDayPassedFromTimestampShorten(worship.worship_date)}
                 </span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900">
+              <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight text-gray-900 group-hover:text-blue-600 transition-colors">
                 {highlightText(worship.title || "Untitled Service", searchInput)}
+                {isExpanded && <ChevronUp className="h-6 w-6 text-gray-400 animate-in fade-in zoom-in duration-300" />}
               </h2>
             </div>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleToggleExpand}
-              className="text-gray-500 hover:text-gray-900 -mr-2 sm:mr-0"
-            >
-              {isExpanded ? (
-                <span className="hidden sm:flex items-center gap-1 font-medium">
-                  Collapse <ChevronUp className="h-4 w-4" />
-                </span>
-              ) : (
-                <ChevronDown className="h-5 w-5" />
-              )}
-              {isExpanded && <ChevronUp className="h-4 w-4 sm:hidden" />}
-            </Button>
+            <div onClick={(e) => e.stopPropagation()}>
+              <WorshipHeaderMenu worshipId={worship.id} createdById={worship.created_by.id} teamId={teamId} />
+            </div>
           </div>
+
 
           <AnimatePresence mode="wait">
             {!isExpanded ? (
@@ -232,6 +223,15 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
 
                   </div>
                 </div>
+
+                {/* Description (Context) */}
+                {worship.description && (
+                  <div className="relative pl-4 border-l-2 border-blue-100 py-1 my-2">
+                    <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed">
+                      {worship.description}
+                    </p>
+                  </div>
+                )}
 
                 <div className="space-y-3">
                   {/* Actions & List Header */}
@@ -306,6 +306,8 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                     <Play className="mr-2 h-3 w-3 sm:h-4 sm:w-4 fill-current" />
                     Start Worship
                   </Button>
+
+
                 </div>
               </motion.div>
             )}
