@@ -22,6 +22,7 @@ import { toast } from "@/components/ui/use-toast";
 import {
   getDayPassedFromTimestampShorten,
   timestampToDateStringFormatted,
+  isTimestampPast
 } from "@/components/util/helper/helper-functions";
 import { getPathSongDetail, getPathWorshipView } from "@/components/util/helper/routes";
 
@@ -32,7 +33,8 @@ import { planSearchInputAtom } from "@/app/board/_states/board-states";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
 
 interface Props {
-  worshipId: string
+  worshipId: string;
+  isFirst?: boolean;
 }
 
 // Helper to normalize text for search
@@ -53,12 +55,18 @@ function highlightText(text: string, highlight: string) {
   return text;
 }
 
-export function WorshipCard({ worshipId }: Props) {
+export function WorshipCard({ worshipId, isFirst }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const [isExpanded, setIsExpanded] = useState(() => searchParams.get("expanded") === worshipId);
+  const worship = useRecoilValue(worshipAtom(worshipId));
+
+  const [isExpanded, setIsExpanded] = useState(() => {
+    if (searchParams.get("expanded") === worshipId) return true;
+    if (isFirst && worship && !isTimestampPast(worship.worship_date)) return true;
+    return false;
+  });
   const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
 
   // Auto-scroll to this card if it's the expanded one from URL
@@ -73,7 +81,6 @@ export function WorshipCard({ worshipId }: Props) {
 
   // State Selectors
   const teamId = useRecoilValue(currentTeamIdAtom);
-  const worship = useRecoilValue(worshipAtom(worshipId));
   const team = useRecoilValue(teamAtom(teamId));
   // Safe access to created_by info
   const creatorId = worship?.created_by?.id || "";
