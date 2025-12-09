@@ -32,23 +32,29 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
       <ImageFullScreenDialog isOpen={fullScreenOn.state} setIsOpen={(state: boolean) => setFullScreenOn((prev: any) => ({ ...prev, state: state }))} imageUrls={fullScreenOn.urls} />
 
       <div
-        className="w-full p-4 border rounded-lg bg-white relative transition-all duration-200 hover:shadow-md cursor-pointer hover:bg-gray-50/50"
+        className="w-full bg-white p-5 sm:p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-gray-200 transition-all duration-300 cursor-pointer group relative hover:-translate-y-[1px]"
         onClick={() => setIsExpanded(prev => !prev)}
       >
-        <div className="flex justify-between items-start mb-3">
-          <div className="flex flex-col gap-1 pr-2">
-            <h3 className="font-semibold text-base sm:text-lg leading-tight">{notice?.title}</h3>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span>{user?.name}</span>
-              <span>•</span>
+        <div className="flex justify-between items-start">
+          <div className="flex flex-col w-full pr-4">
+            {/* Title */}
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug tracking-tight">
+              {notice?.title}
+            </h3>
+
+            {/* Meta Info */}
+            <div className="flex items-center flex-wrap gap-3 text-sm text-gray-400 mt-2 font-medium">
+              <span className="text-gray-700 font-semibold">{user?.name}</span>
+              <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
               <span>{timestampToDateStringFormatted(notice?.created_by?.time)}</span>
-              <span className="bg-gray-100 px-1.5 rounded-sm text-gray-400">
+              <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-xs">
                 {getTimePassedFromTimestampShorten(notice?.created_by?.time)}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+          {/* Menu */}
+          <div className="shrink-0 -mt-1 -mr-2" onClick={(e) => e.stopPropagation()}>
             <NoticeHeaderMenu noticeId={noticeId} />
           </div>
         </div>
@@ -60,15 +66,15 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="text-gray-600 text-sm"
+              className="mt-4"
             >
-              <p className="line-clamp-2">
+              <p className="text-gray-500 line-clamp-2 leading-relaxed text-sm sm:text-base">
                 {notice?.body}
               </p>
               {hasFiles && (
-                <div className="flex items-center gap-1 mt-2 text-xs text-gray-400 font-medium">
-                  <ImageIcon className="h-3 w-3" />
-                  <span>{notice.file_urls.length} images attached</span>
+                <div className="inline-flex items-center gap-1.5 mt-3 px-2.5 py-1 bg-gray-50 rounded-full text-xs font-medium text-gray-500 border border-gray-100">
+                  <ImageIcon className="h-3.5 w-3.5" />
+                  <span>{notice.file_urls.length} attachments</span>
                 </div>
               )}
             </motion.div>
@@ -78,10 +84,10 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="space-y-4"
-              onClick={(e) => e.stopPropagation()} // Allow text selection/interaction
+              className="mt-6"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="whitespace-pre-line break-all text-sm sm:text-base text-gray-800 border-t pt-2">
+              <div className="whitespace-pre-line break-all text-base sm:text-lg text-gray-800 leading-8 space-y-4">
                 <Linkify>
                   {notice?.body || ""}
                 </Linkify>
@@ -89,18 +95,18 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
 
               {/* Images */}
               {hasFiles && (
-                <div>
-                  <div className="flex flex-wrap gap-2">
+                <div className="mt-6 pt-6 border-t border-gray-100">
+                  <div className="flex flex-wrap gap-3">
                     {notice.file_urls.map((url, index) => (
                       <div
                         key={index}
-                        className="cursor-pointer w-24 h-24 relative hover:opacity-90 transition-opacity"
+                        className="cursor-pointer w-32 h-32 relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"
                         onClick={() => setFullScreenOn({ state: true, urls: [url] })}>
                         <Image
                           alt="notice uploaded image"
                           src={url}
                           fill
-                          className="object-cover rounded-lg border border-gray-100"
+                          className="object-cover"
                         />
                       </div>
                     ))}
@@ -112,5 +118,6 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
         </AnimatePresence>
       </div>
     </div>
-  )
+  );
 }
+
