@@ -77,7 +77,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
       // Small delay to ensure layout is ready
       setTimeout(() => {
         cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
+      }, 600);
     }
   }, [searchParams, worshipId]);
 

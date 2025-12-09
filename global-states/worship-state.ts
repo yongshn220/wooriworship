@@ -1,14 +1,14 @@
-import {atom, atomFamily, selectorFamily} from "recoil";
-import {Worship} from "@/models/worship";
-import {WorshipService} from "@/apis";
-import {Song} from "@/models/song";
-import {songAtom} from "@/global-states/song-state";
+import { atom, atomFamily, selectorFamily } from "recoil";
+import { Worship } from "@/models/worship";
+import { WorshipService } from "@/apis";
+import { Song } from "@/models/song";
+import { songAtom } from "@/global-states/song-state";
 
 export const currentTeamWorshipIdsAtom = atomFamily<Array<string>, string>({
   key: "currentTeamWorshipIdsAtom",
   default: selectorFamily({
     key: "currentTeamWorshipIdsAtom/default",
-    get: (teamId) => async ({get}) => {
+    get: (teamId) => async ({ get }) => {
       if (!teamId) return []
 
       try {
@@ -47,7 +47,7 @@ export const worshipAtom = atomFamily<Worship, string>({
   key: "worshipAtom",
   default: selectorFamily({
     key: "worshipAtom/default",
-    get: (worshipId) => async ({get}) => {
+    get: (worshipId) => async ({ get }) => {
       get(worshipUpdaterAtom)
       try {
         const worship = await WorshipService.getById(worshipId) as Worship
@@ -73,7 +73,7 @@ export const worshipSongListAtom = atomFamily<Array<Song>, string>({
   key: "worshipSongListAtom",
   default: selectorFamily({
     key: "worshipSongListAtom/default",
-    get: (worshipId: string) => async ({get}) => {
+    get: (worshipId: string) => async ({ get }) => {
       get(worshipSongUpdaterAtom)
       try {
         const worship = get(worshipAtom(worshipId))
@@ -109,4 +109,9 @@ export const worshipSongUpdaterAtom = atom({
 export const currentWorshipIdAtom = atom<string>({
   key: "currentWorshipIdAtom",
   default: null
+})
+
+export const worshipListDisplayedCountAtom = atom({
+  key: "worshipListDisplayedCountAtom",
+  default: 5
 })
