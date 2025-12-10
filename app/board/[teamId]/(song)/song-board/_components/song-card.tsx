@@ -61,7 +61,7 @@ export function SongCard({ teamId, songId, index }: Props) {
                     </div>
 
                     {/* 2. Key / Icon Indicator (Far Right) */}
-                    <div className="w-20 flex justify-center shrink-0">
+                    <div className="w-32 flex justify-center shrink-0">
                         {song.keys && song.keys.length > 0 ? (
                             <div className="flex flex-wrap items-center justify-center gap-1 w-full">
                                 {song.keys.map((key, i) => (

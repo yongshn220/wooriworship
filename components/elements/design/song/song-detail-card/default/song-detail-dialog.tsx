@@ -41,12 +41,13 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
       <DrawerContent className="h-screen rounded-none flex flex-col focus:outline-none mt-0">
 
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between p-3 border-b bg-white z-20 shrink-0 gap-2">
-          {/* Key Selector (Dropdown) */}
-          <div className="shrink-0">
+        <div className="relative flex items-center justify-between p-3 border-b bg-white shrink-0 z-20">
+
+          {/* Key Selector (Left) */}
+          <div className="relative z-10 flex items-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2 min-w-[4.5rem] justify-between px-3">
+                <Button variant="outline" className="flex items-center gap-2 min-w-[4.5rem] justify-between px-3 h-9">
                   <Suspense fallback={<span>...</span>}>
                     {selectedMusicSheetId ? <SelectedKeyTrigger musicSheetId={selectedMusicSheetId} /> : <span>Key</span>}
                   </Suspense>
@@ -67,15 +68,20 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
             </DropdownMenu>
           </div>
 
-          {/* Title (Center) */}
-          <div className="flex-1 px-2 text-center min-w-0">
-            <h3 className="font-bold text-lg leading-tight break-keep line-clamp-2 truncate">
+          {/* Title & Subtitle (Absolute Center) */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] flex flex-col items-center justify-center pointer-events-none">
+            <h3 className="font-bold text-lg leading-tight truncate w-full text-center">
               {song?.title || "Untitled"}
             </h3>
+            {song?.subtitle && (
+              <p className="text-xs text-gray-500 font-medium truncate w-full text-center mt-0.5">
+                {song.subtitle}
+              </p>
+            )}
           </div>
 
           {/* Exit / Menu (Right) */}
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="relative z-10 flex items-center gap-1">
             <SongDetailMenuButton teamId={teamId} songId={songId} songTitle={song?.title} />
             <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
               <X className="h-6 w-6" />

@@ -49,7 +49,7 @@ export function SongList({ teamId }: Props) {
       {/* Header Row for Desktop */}
       <div className="hidden md:flex items-center px-6 py-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
         <div className="flex-1 pl-4">Title</div>
-        <div className="w-20 shrink-0 text-center">Key</div>
+        <div className="w-32 shrink-0 text-center">Key</div>
       </div>
 
       <div className="flex flex-col space-y-2">
