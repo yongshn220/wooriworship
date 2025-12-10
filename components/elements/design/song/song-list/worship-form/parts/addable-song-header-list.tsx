@@ -69,7 +69,7 @@ export function AddableSongHeaderList({ teamId, showSelectedOnly = false }: Prop
   }
 
   return (
-    <div className="w-full h-full pb-20">
+    <div className="w-full pb-20">
       {
         (allSongIds.length > 0) &&
         <div className="w-full pl-5">
