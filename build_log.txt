@@ -1,0 +1,120 @@
+
+> wooriworship@0.1.0 build
+> next build
+
+   ▲ Next.js 14.1.3
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+./app/board/[teamId]/(notice)/notice-board/_components/notice-header-list.tsx
+36:40  Warning: The ref value 'loadMoreRef.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'loadMoreRef.current' to a variable inside the effect, and use that variable in the cleanup function.  react-hooks/exhaustive-deps
+
+./app/board/[teamId]/(song)/song-board/_components/song-list.tsx
+38:40  Warning: The ref value 'loadMoreRef.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'loadMoreRef.current' to a variable inside the effect, and use that variable in the cleanup function.  react-hooks/exhaustive-deps
+
+./app/board/[teamId]/(worship)/worship/[worshipId]/_components/song-carousel-item.tsx
+47:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/board/[teamId]/(worship)/worship/[worshipId]/worship-view/_components/worship-live-carousel-item.tsx
+40:6  Warning: React Hook useEffect has a missing dependency: 'musicSheets?.length'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+74:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/board/[teamId]/(worship)/worship/[worshipId]/worship-view/_components/worship-live-preference.tsx
+21:6  Warning: React Hook useEffect has a missing dependency: 'setPageMode'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/board/[teamId]/(worship)/worship-board/_components/worship-card-list.tsx
+22:9  Warning: The 'worshipIds' conditional could make the dependencies of useEffect Hook (at line 55) change on every render. To fix this, wrap the initialization of 'worshipIds' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+41:40  Warning: The ref value 'loadMoreRef.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'loadMoreRef.current' to a variable inside the effect, and use that variable in the cleanup function.  react-hooks/exhaustive-deps
+44:6  Warning: React Hook useEffect has a missing dependency: 'setDisplayedCount'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/board/[teamId]/(worship)/worship-board/_components/worship-card.tsx
+93:9  Warning: The 'songs' conditional could make the dependencies of useMemo Hook (at line 106) change on every render. To fix this, wrap the initialization of 'songs' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+
+./app/board/page.tsx
+33:6  Warning: React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/not-found.tsx
+13:6  Warning: React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/elements/design/song/song-detail-card/default/parts/song-detail-music-sheet-area.tsx
+49:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+68:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/elements/design/song/song-list/worship-form/parts/addable-song-header-list.tsx
+43:40  Warning: The ref value 'loadMoreRef.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'loadMoreRef.current' to a variable inside the effect, and use that variable in the cleanup function.  react-hooks/exhaustive-deps
+
+./components/ui/multiple-selector.tsx
+262:8  Warning: React Hook useEffect has a missing dependency: 'onSearch'. Either include it or remove the dependency array. If 'onSearch' changes too often, find the parent component that defines it and wrap that definition in useCallback.  react-hooks/exhaustive-deps
+
+./components/util/hook/use-pdfjs.tsx
+19:6  Warning: React Hook useEffect has a missing dependency: 'onLoad'. Either include it or remove the dependency array. If 'onLoad' changes too often, find the parent component that defines it and wrap that definition in useCallback.  react-hooks/exhaustive-deps
+19:15  Warning: React Hook useEffect has a spread element in its dependency array. This means we can't statically verify whether you've passed the correct dependencies.  react-hooks/exhaustive-deps
+
+./components/util/provider/initialization.tsx
+42:6  Warning: React Hook useEffect has an unnecessary dependency: 'auth.currentUser'. Either exclude it or remove the dependency array. Outer scope values like 'auth.currentUser' aren't valid dependencies because mutating them doesn't re-render the component.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/6) ...
+   Generating static pages (1/6) 
+ReferenceError: document is not defined
+    at createTag (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:15552)
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:28444
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:28567
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:31392
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:15217
+    at 9918 (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:15221)
+    at t (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/webpack-runtime.js:1:143)
+    at 37698 (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:6194)
+    at t (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/webpack-runtime.js:1:143)
+    at 41664 (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/54.js:1:1414)
+
+Error occurred prerendering page "/". Read more: https://nextjs.org/docs/messages/prerender-error
+
+ReferenceError: document is not defined
+    at createTag (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:15552)
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:28444
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:28567
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:31392
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:15217
+    at 9918 (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:15221)
+    at t (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/webpack-runtime.js:1:143)
+    at 37698 (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:6194)
+    at t (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/webpack-runtime.js:1:143)
+    at 41664 (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/54.js:1:1414)
+ReferenceError: document is not defined
+    at createTag (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:15552)
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:28444
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:28567
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:31392
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:15217
+    at 9918 (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:15221)
+    at t (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/webpack-runtime.js:1:143)
+    at 37698 (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:6194)
+    at t (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/webpack-runtime.js:1:143)
+    at 41664 (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/54.js:1:1414)
+
+Error occurred prerendering page "/_not-found". Read more: https://nextjs.org/docs/messages/prerender-error
+
+ReferenceError: document is not defined
+    at createTag (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:15552)
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:28444
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:28567
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:31392
+    at /Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:15217
+    at 9918 (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:15221)
+    at t (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/webpack-runtime.js:1:143)
+    at 37698 (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/304.js:1:6194)
+    at t (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/webpack-runtime.js:1:143)
+    at 41664 (/Users/yongjung/Private/Work/Programming/wooriworship/web/wooriworship/.next/server/chunks/54.js:1:1414)
+   Generating static pages (2/6) 
+----BoardLayout
+   Generating static pages (4/6) 
+ ✓ Generating static pages (6/6) 
+
+> Export encountered errors on following paths:
+	/_not-found
+	/page: /

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@auth/firebase-adapter": "^1.5.2",
+    "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.1.2",
     "@radix-ui/react-checkbox": "^1.0.4",
@@ -48,6 +49,7 @@
     "react-day-picker": "^8.10.0",
     "react-dom": "^18",
     "react-firebase-hooks": "^5.1.1",
+    "react-hook-form": "^7.68.0",
     "react-linkify": "^1.0.0-alpha",
     "recoil": "^0.7.7",
     "tailwind-merge": "^2.2.1",
@@ -56,7 +58,8 @@
     "use-debounce": "^10.0.0",
     "uuid": "^9.0.1",
     "vaul": "^0.9.1",
-    "web-push": "^3.6.7"
+    "web-push": "^3.6.7",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
