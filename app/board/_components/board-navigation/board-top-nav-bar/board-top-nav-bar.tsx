@@ -24,11 +24,11 @@ export function BoardTopNavBar() {
     [Page.SONG_BOARD]: { text: "Song Board" },
   };
 
-  if ([Page.CREATE_WORSHIP, Page.EDIT_WORSHIP].includes(currentPage)) {
+  if ([Page.CREATE_WORSHIP, Page.EDIT_WORSHIP, Page.CREATE_SONG, Page.EDIT_SONG].includes(currentPage)) {
     return <></>
   }
 
-  if ([Page.BOARD, Page.HOME, Page.CREATE_SONG, Page.EDIT_SONG, Page.WORSHIP, Page.CREATE_NOTICE].includes(currentPage)) {
+  if ([Page.BOARD, Page.HOME, Page.WORSHIP, Page.CREATE_NOTICE].includes(currentPage)) {
     return (
       <BaseTopNavBar height={56}>
         <div className="w-full h-full flex px-4">
