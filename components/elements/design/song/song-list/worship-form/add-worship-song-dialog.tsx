@@ -1,18 +1,18 @@
 'use client'
 
-import {Search} from "lucide-react";
-import {Input} from "@/components/ui/input";
-import {Suspense} from "react";
-import {Button} from "@/components/ui/button";
-import {AddableSongHeaderList} from "@/components/elements/design/song/song-list/worship-form/parts/addable-song-header-list";
-import {LoadingCircle} from "@/components/util/animation/loading-indicator";
-import {useRecoilState, useRecoilValue} from "recoil";
-import {songSearchInputAtom} from "@/app/board/_states/board-states";
-import {Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle} from "@/components/ui/drawer";
-import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
-import {Separator} from "@/components/ui/separator";
-import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
-import {SongTitleBadge} from "@/components/elements/design/song/song-list/worship-form/parts/song-title-badge";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Suspense } from "react";
+import { Button } from "@/components/ui/button";
+import { AddableSongHeaderList } from "@/components/elements/design/song/song-list/worship-form/parts/addable-song-header-list";
+import { LoadingCircle } from "@/components/util/animation/loading-indicator";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { songSearchInputAtom } from "@/app/board/_states/board-states";
+import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Separator } from "@/components/ui/separator";
+import { selectedWorshipSongHeaderListAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
+import { SongTitleBadge } from "@/components/elements/design/song/song-list/worship-form/parts/song-title-badge";
 
 interface Props {
   teamId: string
@@ -20,7 +20,7 @@ interface Props {
   setIsOpen: Function
 }
 
-export function AddWorshipSongDialog({teamId, isOpen, setIsOpen}: Props) {
+export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
   const [input, setInput] = useRecoilState(songSearchInputAtom)
   const selectedSongHeaderList = useRecoilValue(selectedWorshipSongHeaderListAtom)
 
@@ -37,14 +37,14 @@ export function AddWorshipSongDialog({teamId, isOpen, setIsOpen}: Props) {
           </VisuallyHidden>
           <div className="w-full flex-col">
             <div className="w-full relative">
-              <Search className="absolute top-1/2 left-5 transform -translate-y-1/2 text-muted-foreground h-5 w-5"/>
+              <Search className="absolute top-1/2 left-5 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
               <Input
                 className="w-full pl-12 py-6 border-0 custom-input-focus"
                 placeholder="Search songs"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
               />
-              <Separator/>
+              <Separator />
             </div>
             <div className="space-x-2 space-y-2">
               {
@@ -54,15 +54,15 @@ export function AddWorshipSongDialog({teamId, isOpen, setIsOpen}: Props) {
               }
             </div>
             <div className="overflow-y-scroll">
-              <Suspense fallback={<LoadingCircle/>}>
-                <AddableSongHeaderList teamId={teamId}/>
+              <Suspense fallback={<LoadingCircle />}>
+                <AddableSongHeaderList teamId={teamId} />
               </Suspense>
             </div>
           </div>
-          <div className="w-full mt-10">
+          <div className="absolute bottom-10 left-0 right-0 px-6">
             <div className="w-full flex-center">
               <DrawerClose asChild>
-                <Button className="w-[60px]">Done</Button>
+                <Button className="w-full max-w-sm h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl">Done</Button>
               </DrawerClose>
             </div>
           </div>

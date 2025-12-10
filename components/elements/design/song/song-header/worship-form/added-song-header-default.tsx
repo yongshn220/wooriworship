@@ -1,14 +1,14 @@
-"use client"
-
-import {Textarea} from "@/components/ui/textarea";
-import {useRecoilState, useRecoilValue} from "recoil";
-import {toPlainObject} from "@/components/util/helper/helper-functions";
-import {WorshipSongHeader} from "@/models/worship";
-import {songAtom} from "@/global-states/song-state";
-import {AddableSongDetailDialogTrigger} from "@/components/elements/design/song/song-detail-card/worship-form/addable-song-detail-dialog-trigger";
-import {AddedSongInnerHeader} from "@/components/elements/design/song/song-header/worship-form/parts/added-song-inner-header";
-import {SwapOrderButton} from "@/components/elements/design/song/song-header/worship-form/parts/swap-order-button";
-import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
+import { Textarea } from "@/components/ui/textarea";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { toPlainObject } from "@/components/util/helper/helper-functions";
+import { WorshipSongHeader } from "@/models/worship";
+import { songAtom } from "@/global-states/song-state";
+import { SwapOrderButton } from "@/components/elements/design/song/song-header/worship-form/parts/swap-order-button";
+import { selectedWorshipSongHeaderListAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
+import React from "react";
+import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog"; // Use read-only detail dialog
+import { musicSheetsBySongIdAtom } from "@/global-states/music-sheet-state";
+import { cn } from "@/lib/utils";
 
 interface Props {
   teamId: string
@@ -16,9 +16,16 @@ interface Props {
   songHeader: WorshipSongHeader
 }
 
-export function AddedSongHeaderDefault({teamId, songOrder, songHeader}: Props) {
+export function AddedSongHeaderDefault({ teamId, songOrder, songHeader }: Props) {
   const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
   const song = useRecoilValue(songAtom(songHeader?.id))
+  // Fetch all available keys for this song to render toggle buttons
+  const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songHeader?.id))
+
+  const [isDetailOpen, setIsDetailOpen] = React.useState(false)
+
+  // Current selected keys for this instance
+  const selectedKeys = songHeader?.selected_music_sheet_ids || []
 
   function handleRemoveSong() {
     setSelectedSongHeaderList(selectedSongHeaderList.filter((_header) => _header.id !== songHeader?.id))
@@ -34,70 +41,108 @@ export function AddedSongHeaderDefault({teamId, songOrder, songHeader}: Props) {
     setSelectedSongHeaderList(newSongInfoList)
   }
 
-  function setMusicSheetIds(musicSheetIds: Array<string>) {
-    const targetSongWrapper = selectedSongHeaderList.find((header => header?.id === songHeader?.id))
-    if (!targetSongWrapper) {
-      console.log("err: setMusicSheetIds, there is no such song-board id.")
+  function handleToggleKey(sheetId: string) {
+    let newSelectedKeys = []
+    if (selectedKeys.includes(sheetId)) {
+      // Toggle Off
+      newSelectedKeys = selectedKeys.filter(id => id !== sheetId)
+    } else {
+      // Toggle On
+      newSelectedKeys = [...selectedKeys, sheetId]
     }
 
+    // Auto-remove check
+    if (newSelectedKeys.length === 0) {
+      handleRemoveSong()
+      return
+    }
+
+    // Update State
     setSelectedSongHeaderList((prev) => {
       const newList = JSON.parse(JSON.stringify(prev)) as Array<WorshipSongHeader>
       newList.forEach(_header => {
         if (_header?.id === songHeader?.id) {
-          _header.selected_music_sheet_ids = musicSheetIds
+          _header.selected_music_sheet_ids = newSelectedKeys
         }
       })
       return newList
     })
   }
 
-  function handleSelectSong() {
-    if (isSongHeaderSelected()) {
-      setSelectedSongHeaderList((prev) => ([...prev.filter((_header => _header?.id !== songHeader?.id))]))
-    }
-    else {
-      setSelectedSongHeaderList((prev) => ([...prev, {
-        id: song?.id,
-        note: song?.description,
-        selected_music_sheet_ids: songHeader?.selected_music_sheet_ids
-      }]))
-    }
-  }
-
-  function isSongHeaderSelected() {
-    return selectedSongHeaderList?.map(songHeader => songHeader?.id)?.includes(songHeader?.id)
-  }
-
   return (
     <div className="w-full">
-      <div className="relative flex flex-col w-full h-64 border shadow-sm rounded-md p-2 gap-4 bg-white">
-        <AddableSongDetailDialogTrigger
-          teamId={teamId}
-          songId={songHeader?.id}
-          selectedMusicSheetIds={songHeader?.selected_music_sheet_ids}
-          setMusicSheetIds={(selectedKeys: string[]) => setMusicSheetIds(selectedKeys)}
-          onSelectHandler={handleSelectSong}
-          isStatic={false}
-        >
-          <AddedSongInnerHeader songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids} customTags={[]}/>
-        </AddableSongDetailDialogTrigger>
-        <div className="absolute flex-center -translate-y-1/2 -right-4">
-          <SwapOrderButton songHeader={songHeader} songOrder={songOrder}/>
+      {/* Read-Only Detail Dialog */}
+      <SongDetailDialog
+        teamId={teamId}
+        isOpen={isDetailOpen}
+        setIsOpen={setIsDetailOpen}
+        songId={songHeader?.id}
+        readOnly={true}
+      />
+
+      <div className="relative flex flex-col w-full min-h-[160px] border shadow-sm rounded-2xl p-5 gap-4 bg-white transition-all hover:border-blue-200">
+
+        {/* Title Section: Click to Open Detail */}
+        <div className="cursor-pointer" onClick={() => setIsDetailOpen(true)}>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-bold text-gray-900 leading-tight">
+                {song?.title}
+              </h3>
+              <span className="text-sm text-gray-400 font-normal">
+                {song?.subtitle}
+              </span>
+            </div>
+            <p className="text-xs text-gray-400">{song?.original?.author || "Unknown Artist"}</p>
+          </div>
         </div>
 
-        <div className="w-full flex-1">
+        {/* Inline Key Toggles */}
+        <div className="flex flex-wrap gap-2">
+          {musicSheets?.map((sheet) => {
+            const isSelected = selectedKeys.includes(sheet.id)
+            return (
+              <button
+                key={sheet.id}
+                onClick={(e) => {
+                  e.stopPropagation() // Prevent opening detail dialog
+                  handleToggleKey(sheet.id)
+                }}
+                className={cn(
+                  "h-9 px-3 min-w-[3rem] rounded-lg text-sm font-bold border transition-all active:scale-95",
+                  isSelected
+                    ? "bg-blue-600 border-blue-600 text-white shadow-md hover:bg-blue-700"
+                    : "bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50"
+                )}
+              >
+                {sheet.key}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Swap Handle */}
+        <div className="absolute flex-center -translate-y-1/2 -right-4 top-1/2">
+          <SwapOrderButton songHeader={songHeader} songOrder={songOrder} />
+        </div>
+
+        {/* Note Area */}
+        <div className="w-full flex-1 pt-2 border-t border-gray-50 mt-2">
           <Textarea
-            className="h-full bg-white"
-            placeholder="Write a song note"
+            className="h-full bg-transparent border-none shadow-none focus-visible:ring-0 p-0 text-gray-600 resize-none placeholder:text-gray-300"
+            placeholder="Write a note (e.g. key change, solo part...)"
             value={songHeader?.note}
             onChange={(e) => handleOnNoteChange(e.target.value)}
           />
         </div>
 
       </div>
-      <div className="flex-between text-sm shadcn-ui@latest add dropdown-menu">
-        <p className="text-xs text-muted-foreground">* Update the note in the Song Board to set as a default.</p>
-        <div className="text-gray-500 hover:text-gray-700 cursor-pointer text-sm" onClick={() => handleRemoveSong()}>remove</div>
+
+      {/* Footer Actions */}
+      <div className="flex justify-end pt-2 pr-2">
+        <div className="text-gray-400 hover:text-red-500 cursor-pointer text-xs font-medium transition-colors" onClick={() => handleRemoveSong()}>
+          Remove from list
+        </div>
       </div>
     </div>
   )

@@ -1,13 +1,14 @@
 'use client'
 
 import React from "react";
-import {useRecoilValue} from "recoil";
-import {songAtom} from "@/global-states/song-state";
-import {Drawer, DrawerContent, DrawerHeader, DrawerTitle} from "@/components/ui/drawer";
-import {MusicKeySelector} from "@/components/elements/design/song/song-detail-card/worship-form/parts/music-key-selector";
-import {SongDetailMenuButton} from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-menu-button";
-import {SongDetailContent} from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-content";
-import {SongCommentArea} from "@/components/elements/design/song/song-detail-card/default/parts/song-comment-area";
+import { useRecoilValue } from "recoil";
+import { songAtom } from "@/global-states/song-state";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import { MusicKeySelector } from "@/components/elements/design/song/song-detail-card/worship-form/parts/music-key-selector";
+import { SongDetailMenuButton } from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-menu-button";
+import { SongDetailContent } from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-content";
+import { SongCommentArea } from "@/components/elements/design/song/song-detail-card/default/parts/song-comment-area";
 
 interface Props {
   teamId: string
@@ -21,7 +22,7 @@ interface Props {
   onSelectHandler: () => void
 }
 
-export function AddableSongDetailDialog({teamId, isOpen, setIsOpen, songId, selectedMusicSheetIds, setMusicSheetIds, readOnly=false, isStatic=false, onSelectHandler}: Props) {
+export function AddableSongDetailDialog({ teamId, isOpen, setIsOpen, songId, selectedMusicSheetIds, setMusicSheetIds, readOnly = false, isStatic = false, onSelectHandler }: Props) {
   const song = useRecoilValue(songAtom(songId))
 
   return (
@@ -41,7 +42,7 @@ export function AddableSongDetailDialog({teamId, isOpen, setIsOpen, songId, sele
                 !readOnly &&
                 <div
                   className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                  <SongDetailMenuButton teamId={teamId} songId={song?.id} songTitle={song?.title}/>
+                  <SongDetailMenuButton teamId={teamId} songId={song?.id} songTitle={song?.title} />
                 </div>
               }
               <DrawerTitle className="text-center text-3xl font-bold">{song?.title}</DrawerTitle>
@@ -51,9 +52,16 @@ export function AddableSongDetailDialog({teamId, isOpen, setIsOpen, songId, sele
               }
               <p className="text-center font-semibold text-gray-500">{song?.original.author}</p>
             </DrawerHeader>
-            <SongDetailContent songId={songId}/>
+            <SongDetailContent songId={songId} />
             <div className="w-full flex-center">
-              <SongCommentArea teamId={teamId} songId={songId}/>
+              <SongCommentArea teamId={teamId} songId={songId} />
+            </div>
+            <div className="w-full mt-6">
+              <DrawerClose asChild>
+                <Button className="w-full h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl">
+                  Done
+                </Button>
+              </DrawerClose>
             </div>
           </div>
         </div>
