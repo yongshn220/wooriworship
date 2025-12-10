@@ -299,7 +299,8 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
             >
               <div className="space-y-4 text-center">
                 <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 2</Label>
-                <h2 className="text-2xl font-bold text-gray-900 break-keep">{basicInfo.title}</h2>
+                <h2 className="text-2xl font-bold text-gray-900">When is the Service?</h2>
+                <h3 className="text-xl font-medium text-blue-600 break-keep">{basicInfo.title}</h3>
               </div>
 
               {/* Card */}

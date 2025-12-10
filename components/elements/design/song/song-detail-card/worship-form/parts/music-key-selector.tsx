@@ -1,9 +1,9 @@
-import {cn} from "@/lib/utils";
-import {Button} from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import React from "react";
-import {useRecoilState, useRecoilValue} from "recoil";
-import {musicSheetAtom, musicSheetsBySongIdAtom} from "@/global-states/music-sheet-state";
-import {selectedWorshipSongHeaderListAtom} from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { musicSheetAtom, musicSheetsBySongIdAtom } from "@/global-states/music-sheet-state";
+import { selectedWorshipSongHeaderListAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
 
 interface Props {
   songId: string,
@@ -13,7 +13,7 @@ interface Props {
   setMusicSheetIds: (musicSheetIds: string[]) => void
 }
 
-export function MusicKeySelector({songId, isStatic=false, onSelectHandler, selectedMusicSheetIds, setMusicSheetIds}: Props) {
+export function MusicKeySelector({ songId, isStatic = false, onSelectHandler, selectedMusicSheetIds, setMusicSheetIds }: Props) {
 
   const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songId))
   const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
@@ -54,8 +54,16 @@ export function MusicKeySelector({songId, isStatic=false, onSelectHandler, selec
                 key={index}
                 className={
                   cn(
-                    "flex-center w-16 h-16 border-2 border-white/30 text-white/70 rounded-lg cursor-pointer",
-                    {"bg-white text-black": isMusicSheetSelected(sheet?.id)},
+                    "flex-center w-16 h-16 border-2 rounded-lg cursor-pointer transition-all font-bold text-lg",
+                    // Use robust coloring: White text/border on dark bg, or Gray on light bg?
+                    // Since parent is usually blue, we keep white/transparent for unselected, 
+                    // but we can make it more opaque or use a filled bg for better contrast.
+                    // Actually, if background is white, text-white is bad. 
+                    // Let's use current context: It expects a dark baground (blue-500).
+                    // If proper parent is used, it works. 
+                    // But to be safe, let's just ensure high contrast.
+                    "border-white/40 text-white hover:bg-white/10 hover:border-white/60",
+                    { "bg-white text-blue-600 border-white shadow-lg scale-105": isMusicSheetSelected(sheet?.id) },
                   )
                 }
                 onClick={() => handleSelectMusicSheetKey(sheet?.id)}
@@ -75,7 +83,7 @@ export function MusicKeySelector({songId, isStatic=false, onSelectHandler, selec
               <div className="flex gap-2">
                 {
                   selectedMusicSheetIds?.map((id, index) => (
-                    <MusicSheetKeyString key={index} musicSheetId={id}/>
+                    <MusicSheetKeyString key={index} musicSheetId={id} />
                   ))
                 }
               </div>
@@ -83,7 +91,7 @@ export function MusicKeySelector({songId, isStatic=false, onSelectHandler, selec
             {
               isSongAdded()
                 ? <Button className="w-full bg-blue-500 hover:bg-blue-500 hover:border-2 hover:text-white"
-                          variant="outline" onClick={() => handleUnselectSong()}>Click to Remove Song</Button>
+                  variant="outline" onClick={() => handleUnselectSong()}>Click to Remove Song</Button>
                 : <Button className="w-full" onClick={() => handleSelectSong()} disabled={selectedMusicSheetIds.length === 0}>Click to Add Song</Button>
             }
           </>
@@ -97,7 +105,7 @@ export function MusicKeySelector({songId, isStatic=false, onSelectHandler, selec
 interface MusicSheetKeysToStringProps {
   musicSheetId: string
 }
-function MusicSheetKeyString({musicSheetId}: MusicSheetKeysToStringProps) {
+function MusicSheetKeyString({ musicSheetId }: MusicSheetKeysToStringProps) {
   const musicSheet = useRecoilValue(musicSheetAtom(musicSheetId))
 
   return (
