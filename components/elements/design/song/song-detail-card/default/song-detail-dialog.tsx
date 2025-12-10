@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SongDetailMenuButton } from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-menu-button";
 
 interface Props {
   teamId: string
@@ -73,10 +74,13 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
             </h3>
           </div>
 
-          {/* Exit (Right) */}
-          <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setIsOpen(false)}>
-            <X className="h-6 w-6" />
-          </Button>
+          {/* Exit / Menu (Right) */}
+          <div className="flex items-center gap-1 shrink-0">
+            <SongDetailMenuButton teamId={teamId} songId={songId} songTitle={song?.title} />
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+              <X className="h-6 w-6" />
+            </Button>
+          </div>
         </div>
 
         {/* Scrollable Body */}

@@ -48,21 +48,17 @@ export function SongList({ teamId }: Props) {
     <div className="w-full h-full p-2 sm:p-4 md:p-6 ml-0 sm:ml-4">
       {/* Header Row for Desktop */}
       <div className="hidden md:flex items-center px-6 py-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-        <div className="w-16 shrink-0 text-center">Key</div>
         <div className="flex-1 pl-4">Title</div>
-        <div className="w-1/4">Author</div>
-        <div className="w-1/5 text-right pr-4">Last Used</div>
+        <div className="w-20 shrink-0 text-center">Key</div>
       </div>
 
-      <AnimatePresence mode="wait">
-        <div className="flex flex-col space-y-2">
-          {
-            visibleSongIds.map((songId, index) => (
-              <SongCard key={songId} teamId={teamId} songId={songId} index={index % 20} />
-            ))
-          }
-        </div>
-      </AnimatePresence>
+      <div className="flex flex-col space-y-2">
+        {
+          visibleSongIds.map((songId, index) => (
+            <SongCard key={songId} teamId={teamId} songId={songId} index={index % 20} />
+          ))
+        }
+      </div>
 
       {/* Load More Trigger */}
       {visibleSongIds.length < songIds.length && (
