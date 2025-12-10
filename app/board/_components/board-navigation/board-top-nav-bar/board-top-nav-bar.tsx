@@ -1,6 +1,6 @@
 import { Page } from "@/components/constants/enums";
-import { FilterIcon, SquarePenIcon, SearchIcon, MenuIcon } from "lucide-react";
-import React, { useMemo } from "react";
+import { FilterIcon, SquarePenIcon, SearchIcon, MenuIcon, XIcon, ArrowLeftIcon } from "lucide-react";
+import React, { useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
 import { getPathCreateNotice, getPathCreatePlan, getPathCreateSong } from "@/components/util/helper/routes";
@@ -10,90 +10,67 @@ import { SearchPlan } from "./search-plan";
 import { BaseTopNavBar } from "@/components/elements/util/navigation/base-top-nav-bar";
 import { MainLogoSmall } from "@/components/elements/util/logo/main-logo";
 import { currentPageAtom } from "@/global-states/page-state";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface HeaderConfig {
   title?: string;
   showLogo?: boolean;
   actions?: React.ReactNode;
-  bottomComponent?: React.ReactNode;
-  height: number;
+  searchComponent?: React.ReactNode;
 }
 
 export function BoardTopNavBar() {
   const currentPage = useRecoilValue(currentPageAtom);
   const teamId = useRecoilValue(currentTeamIdAtom);
   const router = useRouter();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Premium 3D Button Component
-  const ActionButton = ({ onClick, icon: Icon, label }: { onClick: () => void, icon: any, label?: string }) => (
+  const ActionButton = ({ onClick, icon: Icon, label, variant = 'default' }: { onClick: () => void, icon: any, label?: string, variant?: 'default' | 'ghost' }) => (
     <motion.button
       onClick={onClick}
       whileHover={{ scale: 1.05, rotateX: 10, rotateY: 10, y: -2 }}
       whileTap={{ scale: 0.95 }}
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="group relative flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"
+      className={`group relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-300 ${variant === 'default' ? 'bg-gradient-to-br from-white to-gray-50 border border-gray-100 shadow-sm hover:shadow-md' : 'hover:bg-gray-100/50'}`}
       style={{ perspective: 1000 }}
     >
-      <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity" />
-      <Icon className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors" />
-      {label && <span className="text-sm font-medium text-gray-600 group-hover:text-blue-600">{label}</span>}
+      {variant === 'default' && <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity" />}
+      <Icon className={`w-5 h-5 transition-colors ${variant === 'default' ? 'text-gray-600 group-hover:text-blue-600' : 'text-gray-500 group-hover:text-gray-800'}`} />
+      {label && <span className={`text-sm font-medium transition-colors ${variant === 'default' ? 'text-gray-600 group-hover:text-blue-600' : 'text-gray-500 group-hover:text-gray-800'}`}>{label}</span>}
     </motion.button>
   );
 
   const config: Partial<Record<Page, HeaderConfig>> = useMemo(() => {
     const defaultConfig: HeaderConfig = {
       title: "",
-      height: 56,
       showLogo: true
     };
 
     return {
       [Page.NOTICE_BOARD]: {
         title: "Notice",
-        height: 80,
         actions: (
           <ActionButton onClick={() => router.push(getPathCreateNotice(teamId))} icon={SquarePenIcon} label="Write" />
         ),
       },
       [Page.SONG_BOARD]: {
         title: "Song Board",
-        height: 130, // Slightly taller for better spacing
         actions: (
           <ActionButton onClick={() => router.push(getPathCreateSong(teamId))} icon={SquarePenIcon} label="New Song" />
         ),
-        bottomComponent: (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="pb-2"
-          >
-            <SearchInput />
-          </motion.div>
-        )
+        searchComponent: <SearchInput />
       },
       [Page.WORSHIP_BOARD]: {
         title: "Worship Plan",
-        height: 130,
         actions: (
           <ActionButton onClick={() => router.push(getPathCreatePlan(teamId))} icon={SquarePenIcon} label="New Plan" />
         ),
-        bottomComponent: (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="pb-2"
-          >
-            <SearchPlan />
-          </motion.div>
-        )
+        searchComponent: <SearchPlan />
       },
       [Page.MANAGE]: {
         title: "Manage",
-        height: 80,
       },
       [Page.BOARD]: defaultConfig,
       [Page.HOME]: defaultConfig,
@@ -112,38 +89,66 @@ export function BoardTopNavBar() {
   if (!currentConfig) return <></>;
 
   return (
-    <BaseTopNavBar height={currentConfig.height} className="bg-white/80 backdrop-blur-xl border-b border-gray-200/60 shadow-lg shadow-gray-200/40 z-50 supports-[backdrop-filter]:bg-white/60 transition-all duration-300">
-      <div className="w-full h-full flex flex-col justify-between max-w-7xl mx-auto">
-        <div className="flex-1 flex items-center justify-between px-6 pt-3">
-          {/* Left Side: Title or Logo */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3"
-          >
-            {currentConfig.showLogo ? (
-              <div className="opacity-90 hover:opacity-100 transition-opacity">
-                <MainLogoSmall />
+    <BaseTopNavBar height={64} className="bg-white/80 backdrop-blur-xl border-b border-gray-200/60 shadow-lg shadow-gray-200/40 z-50 supports-[backdrop-filter]:bg-white/60 transition-all duration-300">
+      <div className="w-full h-full max-w-7xl mx-auto px-4 relative flex items-center">
+        <AnimatePresence mode="wait">
+          {isSearchOpen && currentConfig.searchComponent ? (
+            <motion.div
+              key="search-mode"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="w-full flex items-center gap-2"
+            >
+              <div className="flex-1">
+                {currentConfig.searchComponent}
               </div>
-            ) : (
-              <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 tracking-tight">
-                {currentConfig.title}
-              </h1>
-            )}
-          </motion.div>
+              <motion.button
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setIsSearchOpen(false)}
+                className="p-2 rounded-full hover:bg-gray-100 text-gray-500"
+              >
+                <XIcon className="w-5 h-5" />
+              </motion.button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="title-mode"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="w-full flex items-center justify-between"
+            >
+              {/* Left Side: Title or Logo */}
+              <div className="flex items-center gap-3">
+                {currentConfig.showLogo ? (
+                  <div className="opacity-90 hover:opacity-100 transition-opacity">
+                    <MainLogoSmall />
+                  </div>
+                ) : (
+                  <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 tracking-tight">
+                    {currentConfig.title}
+                  </h1>
+                )}
+              </div>
 
-          {/* Right Side: Actions */}
-          <div className="flex items-center gap-2">
-            {currentConfig.actions}
-          </div>
-        </div>
-
-        {/* Bottom Component (Search/Filter) */}
-        {currentConfig.bottomComponent && (
-          <div className="px-6 pb-3 w-full">
-            {currentConfig.bottomComponent}
-          </div>
-        )}
+              {/* Right Side: Actions */}
+              <div className="flex items-center gap-2">
+                {currentConfig.searchComponent && (
+                  <ActionButton
+                    onClick={() => setIsSearchOpen(true)}
+                    icon={SearchIcon}
+                    variant="ghost"
+                  />
+                )}
+                {currentConfig.actions}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </BaseTopNavBar>
   );
