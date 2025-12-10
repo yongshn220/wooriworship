@@ -46,18 +46,22 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="flex items-center gap-2 min-w-[4.5rem] justify-between px-3">
-                  {selectedMusicSheetId ? <SelectedKeyTrigger musicSheetId={selectedMusicSheetId} /> : <span>Key</span>}
+                  <Suspense fallback={<span>...</span>}>
+                    {selectedMusicSheetId ? <SelectedKeyTrigger musicSheetId={selectedMusicSheetId} /> : <span>Key</span>}
+                  </Suspense>
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 max-h-[50vh] overflow-y-auto">
-                {musicSheetIds?.map((id) => (
-                  <KeyDropdownItem
-                    key={id}
-                    musicSheetId={id}
-                    onSelect={() => setSelectedMusicSheetId(id)}
-                  />
-                ))}
+              <DropdownMenuContent align="start" className="w-56 max-h-[50vh] overflow-y-auto z-[100]">
+                <Suspense fallback={<div className="p-2 text-sm text-gray-400">Loading keys...</div>}>
+                  {musicSheetIds?.map((id) => (
+                    <KeyDropdownItem
+                      key={id}
+                      musicSheetId={id}
+                      onSelect={() => setSelectedMusicSheetId(id)}
+                    />
+                  ))}
+                </Suspense>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -80,7 +84,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
           <Suspense fallback={<div className="h-full flex-center">Loading...</div>}>
 
             {/* Full Screen Sheet Area */}
-            <div className="w-full min-h-[calc(100vh-70px)] flex flex-col">
+            <div className="w-full min-h-[calc(100vh-70px)] flex flex-col pb-12">
               {selectedMusicSheetId && (
                 <SongDetailMusicSheetArea musicSheetId={selectedMusicSheetId} />
               )}
@@ -107,7 +111,10 @@ function SelectedKeyTrigger({ musicSheetId }: { musicSheetId: string }) {
 function KeyDropdownItem({ musicSheetId, onSelect }: { musicSheetId: string, onSelect: () => void }) {
   const musicSheet = useRecoilValue(musicSheetAtom(musicSheetId));
   return (
-    <DropdownMenuItem onClick={onSelect} className="cursor-pointer">
+    <DropdownMenuItem onClick={(e) => {
+      e.stopPropagation();
+      onSelect();
+    }} className="cursor-pointer">
       {musicSheet?.key || "Unknown Key"}
     </DropdownMenuItem>
   );
