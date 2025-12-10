@@ -223,7 +223,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       </div>
 
       {/* 2. Main Content Area */}
-      <div className="w-full max-w-md h-full px-6 pt-24 pb-20 flex flex-col relative perspective-1000">
+      <div className="w-full max-w-xl h-full px-4 sm:px-6 pt-24 pb-20 flex flex-col relative perspective-1000">
         <AnimatePresence initial={false} mode="popLayout" custom={direction}>
 
           {/* Step 1: Title */}
