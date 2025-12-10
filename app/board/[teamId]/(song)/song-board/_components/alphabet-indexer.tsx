@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { songAlphabetMapAtom } from "@/global-states/song-state";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ interface Props {
 export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
     const alphabetMap = useRecoilValue(songAlphabetMapAtom(teamId));
     const containerRef = useRef<HTMLDivElement>(null);
+    const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const [activeDragChar, setActiveDragChar] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -30,16 +31,45 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
         return ['#', ...english, ...korean];
     }, []);
 
+    const clearScrollInterval = () => {
+        if (scrollIntervalRef.current) {
+            clearInterval(scrollIntervalRef.current);
+            scrollIntervalRef.current = null;
+        }
+    };
+
     const handleInteraction = (clientY: number) => {
         if (!containerRef.current) return;
 
-        // Update Bubble Position
-        setBubbleY(clientY);
+        // Bubble Offset: Position bubble 40px ABOVE the finger
+        setBubbleY(clientY - 40);
 
-        // Find the element under the pointer
+        // Auto-Scroll Logic
         const rect = containerRef.current.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
+        const EDGE_THRESHOLD = 40;
+        const SCROLL_SPEED = 5;
 
+        clearScrollInterval(); // Clear existing to prevent stacking
+
+        // Scroll Down
+        if (clientY > rect.bottom - EDGE_THRESHOLD) {
+            scrollIntervalRef.current = setInterval(() => {
+                if (containerRef.current) {
+                    containerRef.current.scrollTop += SCROLL_SPEED;
+                }
+            }, 16);
+        }
+        // Scroll Up
+        else if (clientY < rect.top + EDGE_THRESHOLD) {
+            scrollIntervalRef.current = setInterval(() => {
+                if (containerRef.current) {
+                    containerRef.current.scrollTop -= SCROLL_SPEED;
+                }
+            }, 16);
+        }
+
+        // Find Element Logic
+        const centerX = rect.left + rect.width / 2;
         const element = document.elementFromPoint(centerX, clientY);
         const button = element?.closest('button');
 
@@ -51,7 +81,7 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
                     onScrollRequest(alphabetMap[char]);
 
                     if (navigator.vibrate) {
-                        navigator.vibrate(10); // Crisper haptic
+                        navigator.vibrate(10);
                     }
                 }
             }
@@ -73,8 +103,13 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
         setIsDragging(false);
         setActiveDragChar(null);
         setBubbleY(null);
+        clearScrollInterval();
         e.currentTarget.releasePointerCapture(e.pointerId);
     };
+
+    useEffect(() => {
+        return () => clearScrollInterval();
+    }, [])
 
     return (
         <>
@@ -100,7 +135,7 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
                 {/* Index Bar */}
                 <div
                     ref={containerRef}
-                    className="flex flex-col gap-[2px] py-4 px-2 pr-1 w-10 sm:w-12 items-center max-h-[75vh] 
+                    className="flex flex-col gap-[2px] py-4 px-2 pr-1 w-12 sm:w-16 items-center max-h-[60vh] 
                      overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']"
                     onPointerDown={onPointerDown}
                     onPointerMove={onPointerMove}

@@ -31,7 +31,7 @@ export default function BoardLayout({ children }: any) {
         <DialogManager />
         <div className="flex flex-col h-screen">
           <BoardTopNavBar />
-          <main className="flex-grow overflow-y-auto bg-gray-50">
+          <main className="flex-grow overflow-y-auto bg-gray-50 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
             {children}
           </main>
           <BoardBottomNavBar />
