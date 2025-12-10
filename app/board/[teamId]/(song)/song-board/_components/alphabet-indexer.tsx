@@ -113,25 +113,25 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
 
     return (
         <>
-            <div className="fixed right-0 top-1/2 -translate-y-[50%] z-50 flex flex-col items-center pointer-events-auto touch-none select-none">
-                {/* Floating Bubble Indicator (Follows Finger) */}
-                <AnimatePresence>
-                    {isDragging && activeDragChar && bubbleY !== null && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.5, x: 20 }}
-                            animate={{ opacity: 1, scale: 1, x: -45 }}
-                            exit={{ opacity: 0, scale: 0.5, x: 20 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                            className="fixed right-2 w-14 h-14 bg-gray-900 shadow-2xl rounded-full rounded-br-none flex items-center justify-center z-50 pointer-events-none transform -translate-y-1/2 rotate-45"
-                            style={{ top: bubbleY }}
-                        >
-                            <div className="transform -rotate-45 text-white text-2xl font-bold font-sans">
-                                {activeDragChar}
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+            {/* Floating Bubble Indicator (Follows Finger) - Moved outside to escape transform context */}
+            <AnimatePresence>
+                {isDragging && activeDragChar && bubbleY !== null && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.5, x: 20 }}
+                        animate={{ opacity: 1, scale: 1, x: -45 }}
+                        exit={{ opacity: 0, scale: 0.5, x: 20 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className="fixed right-2 w-14 h-14 bg-gray-900 shadow-2xl rounded-full rounded-br-none flex items-center justify-center z-50 pointer-events-none transform -translate-y-1/2 rotate-45"
+                        style={{ top: bubbleY }}
+                    >
+                        <div className="transform -rotate-45 text-white text-2xl font-bold font-sans">
+                            {activeDragChar}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
+            <div className="fixed right-0 top-1/2 -translate-y-[50%] z-50 flex flex-col items-center pointer-events-auto touch-none select-none">
                 {/* Index Bar */}
                 <div
                     ref={containerRef}
