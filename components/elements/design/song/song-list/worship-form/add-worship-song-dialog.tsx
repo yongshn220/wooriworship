@@ -74,7 +74,7 @@ export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
           </div>
 
           {/* Scrollable Song List */}
-          <div className="flex-1 overflow-y-auto no-scrollbar pb-24">
+          <div className="flex-1 overflow-y-auto no-scrollbar pb-40">
             <Suspense fallback={<LoadingCircle />}>
               <AddableSongHeaderList teamId={teamId} showSelectedOnly={showSelectedOnly} />
             </Suspense>
