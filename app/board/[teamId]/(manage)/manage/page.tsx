@@ -3,17 +3,19 @@
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "@/components/ui/use-toast"
-import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState"
+import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState"
 import { AuthService } from "@/apis"
-import {Bell, LogOut, Mail, MailIcon, Settings, Users} from 'lucide-react'
+import { Bell, LogOut, Mail, MailIcon, Settings, Users } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import { useRecoilValue, useSetRecoilState } from "recoil"
 import { auth } from "@/firebase"
 import { pendingReceivedInvitationsAtom } from "@/global-states/invitation-state"
 import { invitationInboxDialogOpenStateAtom } from "@/global-states/dialog-state"
-import {TeamIcon} from "@/components/elements/design/team/team-icon";
-import {ManageTeamDialog} from "@/components/elements/dialog/manage-team/manage-team-dialog";
-import {MenuItem} from "@/app/board/[teamId]/(manage)/manage/_components/menu-item";
+import { TeamIcon } from "@/components/elements/design/team/team-icon";
+import { ManageTeamDialog } from "@/components/elements/dialog/manage-team/manage-team-dialog";
+import { MenuItem } from "@/app/board/[teamId]/(manage)/manage/_components/menu-item";
+import { MenuGroup } from "@/app/board/[teamId]/(manage)/manage/_components/menu-group";
+import { TeamProfileCard } from "@/app/board/[teamId]/(manage)/manage/_components/team-profile-card";
 import { accountSettingAtom } from "@/global-states/account-setting"
 import PushNotificationService from "@/apis/PushNotificationService"
 
@@ -25,8 +27,11 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
   const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
   const setInvitationDialogState = useSetRecoilState(invitationInboxDialogOpenStateAtom)
 
-  const router = useRouter()
+  // Badge logic
+  const pendingInvitations = useRecoilValue(pendingReceivedInvitationsAtom(authUser?.email || ""))
+  const badgeCount = pendingInvitations?.length || 0
 
+  const router = useRouter()
 
   async function handleSignOut() {
     try {
@@ -43,58 +48,71 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
 
   async function updatePushNotificationOptState(isEnabled: boolean) {
     if (!authUser?.uid) return;
-    
+
     await PushNotificationService.updateOptState(authUser.uid, isEnabled)
   }
 
-
   return (
-    <div className="flex flex-col w-full h-full">
-      <div className="flex-grow flex flex-col justify-between">
-        <div className="flex items-center space-x-4 p-4  rounded-lg mb-4">
-          <TeamIcon name={team?.name}></TeamIcon>
-          <div>
-            <div>
-              <div className="font-medium">Current Team</div>
-              <div className="text-sm text-muted-foreground">{team?.name}</div>
-            </div>
-          </div>
-        </div>
+    <div className="flex flex-col w-full h-full bg-muted/30 -m-4 p-4 overflow-y-auto">
+      <div className="max-w-md mx-auto w-full pb-10">
 
-        <ManageTeamDialog>
-          <MenuItem
-            icon={<Users className="h-5 w-5 text-primary"/>}
-            title="Manage Team"
-            description="Add or remove team members"
-          />
-        </ManageTeamDialog>
-
-        <div onClick={() => setInvitationDialogState(true)}>
-          <MenuItem
-            icon={<Mail className="h-5 w-5 text-primary"/>}
-            title="Invitation Inbox"
-            description="Manage team invitations"
-          />
-        </div>
-
-        <MenuItem
-          icon={<Bell className="h-5 w-5 text-primary"/>}
-          title="Push Notifications"
-          description="Get notified about important updates"
-          toggleId="push-notifications"
-          onToggle={(state: boolean) => updatePushNotificationOptState(state)}
-          toggleState={accountSetting?.push_notification?.is_enabled}
+        {/* Profile Section */}
+        <TeamProfileCard
+          name={team?.name}
         />
 
-        <div className="mt-auto">
-          <Separator className="my-6"/>
-          <div className="flex-center w-full">
-            <Button className="w-full" onClick={handleSignOut}>
-              <LogOut className="mr-4 h-6 w-6"/>
-              Sign Out
-            </Button>
+        {/* Team Management Group */}
+        <MenuGroup title="Team Management">
+          <ManageTeamDialog>
+            <MenuItem
+              icon={<Users className="h-5 w-5" />}
+              title="Manage Team"
+              description="Add or remove team members"
+              showChevron
+            />
+          </ManageTeamDialog>
+
+          <div onClick={() => setInvitationDialogState(true)}>
+            <MenuItem
+              icon={<Mail className="h-5 w-5" />}
+              title="Invitation Inbox"
+              description="Manage team invitations"
+              badge={badgeCount > 0 ? badgeCount : undefined}
+              showChevron
+              onClick={() => setInvitationDialogState(true)}
+            />
           </div>
+        </MenuGroup>
+
+        {/* App Settings Group */}
+        <MenuGroup title="App Settings">
+          <MenuItem
+            icon={<Bell className="h-5 w-5" />}
+            title="Push Notifications"
+            description="Get notified about important updates"
+            toggleId="push-notifications"
+            onToggle={(state: boolean) => updatePushNotificationOptState(state)}
+            toggleState={accountSetting?.push_notification?.is_enabled}
+          />
+        </MenuGroup>
+
+        {/* Account Group */}
+        <MenuGroup title="Account">
+          <MenuItem
+            icon={<LogOut className="h-5 w-5" />}
+            title="Sign Out"
+            onClick={handleSignOut}
+            variant="destructive"
+          />
+        </MenuGroup>
+
+        {/* Footer Info */}
+        <div className="text-center mt-8">
+          <p className="text-xs text-muted-foreground">
+            Version 1.0.0
+          </p>
         </div>
+
       </div>
     </div>
   )
