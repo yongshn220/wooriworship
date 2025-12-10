@@ -388,14 +388,14 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               animate="center"
               exit="exit"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 flex flex-col h-full space-y-6 w-full leading-relaxed"
+              className="flex-1 flex flex-col h-full space-y-3 w-full leading-relaxed" // Reduced space-y-6 to space-y-3
             >
-              <div className="flex items-center justify-between px-2">
+              <div className="flex items-end justify-between px-2 pb-1"> {/* Align bottom, added padding */}
                 <div>
                   <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Final Step</Label>
-                  <h2 className="text-2xl font-bold text-gray-900">Setlist</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 leading-none">Setlist</h2>
                 </div>
-                <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-200">
+                <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-200 mb-1">
                   {selectedWorshipSongHeaderList.length} Songs
                 </span>
               </div>
@@ -418,7 +418,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               </div>
 
               {/* Action */}
-              <div className="flex gap-4 mt-auto pb-[env(safe-area-inset-bottom)]">
+              <div className="flex gap-4 mt-auto pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"> {/* Added extra 1.5rem padding */}
                 <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
                   <ChevronLeft className="w-6 h-6" />
                 </Button>
