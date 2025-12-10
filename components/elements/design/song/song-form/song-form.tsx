@@ -1,30 +1,30 @@
-'use client'
+"use client"
 
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
-import React, {useEffect, useState} from "react";
-import {Textarea} from "@/components/ui/textarea";
-import {useToast} from "@/components/ui/use-toast";
-import {useRecoilValue, useSetRecoilState} from "recoil";
-import {teamAtom} from "@/global-states/teamState";
-import {SongService, StorageService, TagService} from "@/apis";
-import {FormMode} from "@/components/constants/enums";
-import {useRouter} from "next/navigation";
-import {getPathSongDetail} from "@/components/util/helper/routes";
-import {auth} from "@/firebase";
-import {currentTeamSongIdsAtom, songAtom, songUpdaterAtom} from "@/global-states/song-state";
-import {ImageFileContainer, MusicSheetContainer} from "@/components/constants/types";
-import {v4 as uuid} from "uuid";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import React, { useEffect, useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { teamAtom } from "@/global-states/teamState";
+import { SongService, StorageService, TagService } from "@/apis";
+import { FormMode } from "@/components/constants/enums";
+import { useRouter } from "next/navigation";
+import { getPathSongDetail } from "@/components/util/helper/routes";
+import { auth } from "@/firebase";
+import { currentTeamSongIdsAtom, songAtom, songUpdaterAtom } from "@/global-states/song-state";
+import { ImageFileContainer, MusicSheetContainer } from "@/components/constants/types";
+import { v4 as uuid } from "uuid";
 import MusicSheetService from "@/apis/MusicSheetService";
-import {musicSheetIdsUpdaterAtom, musicSheetsBySongIdAtom, musicSheetUpdaterAtom} from "@/global-states/music-sheet-state";
-import {MusicSheet} from "@/models/music_sheet";
-import {getAllUrlsFromMusicSheetContainers, getAllUrlsFromSongMusicSheets} from "@/components/util/helper/helper-functions";
-import {TagMultiSelect} from "@/app/board/[teamId]/(song)/song-board/_components/tag-multi-select";
-import {LinkIcon, PlusIcon, X} from "lucide-react";
-import {MusicSheetUploaderBox} from "@/components/elements/design/song/song-form/music-sheet-uploader-box";
-import {BaseForm} from "@/components/elements/util/form/base-form";
-
+import { musicSheetIdsUpdaterAtom, musicSheetsBySongIdAtom, musicSheetUpdaterAtom } from "@/global-states/music-sheet-state";
+import { MusicSheet } from "@/models/music_sheet";
+import { getAllUrlsFromMusicSheetContainers, getAllUrlsFromSongMusicSheets } from "@/components/util/helper/helper-functions";
+import { TagMultiSelect } from "@/app/board/[teamId]/(song)/song-board/_components/tag-multi-select";
+import { ArrowRight, Check, ChevronLeft, LinkIcon, Music, PlusIcon } from "lucide-react";
+import { MusicSheetUploaderBox } from "@/components/elements/design/song/song-form/music-sheet-uploader-box";
+import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface Props {
   mode: FormMode
@@ -42,25 +42,32 @@ export interface SongInput {
   description: string
 }
 
-export function SongForm({mode, teamId, songId}: Props) {
+export function SongForm({ mode, teamId, songId }: Props) {
   const song = useRecoilValue(songAtom(songId))
   const songUpdater = useSetRecoilState(songUpdaterAtom)
   const musicSheetIdsUpdater = useSetRecoilState(musicSheetIdsUpdaterAtom)
-  const musicSheetUpdater = useSetRecoilState(musicSheetUpdaterAtom) // todo: need to make it more efficient
+  const musicSheetUpdater = useSetRecoilState(musicSheetUpdaterAtom)
   const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songId))
   const authUser = auth.currentUser
   const team = useRecoilValue(teamAtom(teamId))
   const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom(teamId))
+
+  // Form State
+  const [step, setStep] = useState(0); // 0: Identity, 1: Details, 2: Context, 3: Sheets
+  const [direction, setDirection] = useState(0);
+  const totalSteps = 4;
+
   const [songInput, setSongInput] = useState<SongInput>({
-    title: (mode === FormMode.EDIT)? song?.title?? "" : "",
-    subtitle: (mode === FormMode.EDIT)? song?.subtitle?? "" : "",
-    author: (mode === FormMode.EDIT)? song?.original.author?? "" : "",
-    version: (mode === FormMode.EDIT)? song?.version?? "" : "",
-    link: (mode === FormMode.EDIT)? song?.original.url?? "" : "",
-    tags: (mode === FormMode.EDIT)? song?.tags?? [] : [],
-    bpm: (mode === FormMode.EDIT)? song?.bpm?? null : null,
-    description: (mode === FormMode.EDIT)? song?.description?? "" : ""
+    title: (mode === FormMode.EDIT) ? song?.title ?? "" : "",
+    subtitle: (mode === FormMode.EDIT) ? song?.subtitle ?? "" : "",
+    author: (mode === FormMode.EDIT) ? song?.original.author ?? "" : "",
+    version: (mode === FormMode.EDIT) ? song?.version ?? "" : "",
+    link: (mode === FormMode.EDIT) ? song?.original.url ?? "" : "",
+    tags: (mode === FormMode.EDIT) ? song?.tags ?? [] : [],
+    bpm: (mode === FormMode.EDIT) ? song?.bpm ?? null : null,
+    description: (mode === FormMode.EDIT) ? song?.description ?? "" : ""
   })
+
   const [musicSheetContainers, setMusicSheetContainers] = useState<Array<MusicSheetContainer>>([])
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
@@ -75,7 +82,7 @@ export function SongForm({mode, teamId, songId}: Props) {
           tempId: uuid(),
           key: musicSheet?.key,
           imageFileContainers: musicSheet?.urls?.map(url => {
-            const iContainer: ImageFileContainer = {id: "", file: null, url: url, isLoading: false, isUploadedInDatabase: true}
+            const iContainer: ImageFileContainer = { id: "", file: null, url: url, isLoading: false, isUploadedInDatabase: true }
             return iContainer
           })
         }
@@ -95,7 +102,7 @@ export function SongForm({mode, teamId, songId}: Props) {
   }
 
   function clearContents() {
-    const songInput: SongInput = {title: "", subtitle: "", author: "", version: "", link: "", tags: [], bpm: null, description: ""}
+    const songInput: SongInput = { title: "", subtitle: "", author: "", version: "", link: "", tags: [], bpm: null, description: "" }
     setSongInput(songInput)
     setMusicSheetContainers([])
   }
@@ -107,8 +114,7 @@ export function SongForm({mode, teamId, songId}: Props) {
     try {
       const newSongId = await SongService.addNewSong(authUser?.uid, teamId, songInput, musicSheetContainers)
       if (!newSongId) {
-        console.log("err:song-board-form:handleCreate. Fail to create a song-board")
-        toast({description: `Fail to create a song. Please try again.`})
+        toast({ description: `Fail to create a song. Please try again.` })
         return
       }
 
@@ -143,7 +149,7 @@ export function SongForm({mode, teamId, songId}: Props) {
   }
 
   function editValidCheck() {
-    if (!authUser?.uid|| (song == null || song.id == null)) {
+    if (!authUser?.uid || (song == null || song.id == null)) {
       setIsLoading(false)
       toast({
         title: "Fail to edit song-board",
@@ -186,7 +192,7 @@ export function SongForm({mode, teamId, songId}: Props) {
       musicSheetUpdater(prev => prev + 1)
       songUpdater(prev => prev + 1)
 
-      toast({title: "Song edited successfully."})
+      toast({ title: "Song edited successfully." })
       setIsLoading(false)
       router.push(getPathSongDetail(teamId, songId))
     }
@@ -232,12 +238,12 @@ export function SongForm({mode, teamId, songId}: Props) {
   }
 
   function setKeyToMusicSheet(tempId: string, key: string) {
-    setMusicSheetContainers((prev) => ([...prev.map((musicSheet) => (musicSheet?.tempId === tempId)? {...musicSheet, key: key} : musicSheet)]))
+    setMusicSheetContainers((prev) => ([...prev.map((musicSheet) => (musicSheet?.tempId === tempId) ? { ...musicSheet, key: key } : musicSheet)]))
   }
   function setImageFileContainersToMusicSheet(tempId: string, imageFileContainers: Array<ImageFileContainer>) {
     setMusicSheetContainers((prev) => ([
-        ...prev.map((musicSheet) => ((musicSheet?.tempId === tempId)? {...musicSheet, imageFileContainers} : musicSheet))
-      ])
+      ...prev.map((musicSheet) => ((musicSheet?.tempId === tempId) ? { ...musicSheet, imageFileContainers } : musicSheet))
+    ])
     )
   }
 
@@ -246,7 +252,7 @@ export function SongForm({mode, teamId, songId}: Props) {
       const result: Array<MusicSheetContainer> = []
       prev.forEach((_musicSheet) => {
         if (_musicSheet?.tempId === tempId) {
-          const newMusicSheet = {..._musicSheet}
+          const newMusicSheet = { ..._musicSheet }
           newMusicSheet.imageFileContainers = [...newMusicSheet?.imageFileContainers.filter((iContainer) => iContainer?.id !== imageFileContainer?.id), imageFileContainer]
           result.push(newMusicSheet)
         }
@@ -263,110 +269,294 @@ export function SongForm({mode, teamId, songId}: Props) {
       if (musicSheet.tempId !== tempId) return musicSheet
 
       const newImageFileContainers = musicSheet.imageFileContainers.filter((_, index) => index !== imageFileContainerIndex)
-      return {...musicSheet, imageFileContainers: newImageFileContainers}
+      return { ...musicSheet, imageFileContainers: newImageFileContainers }
     })]))
   }
 
   function removeMusicSheetContainer(tempId: string) {
-    setMusicSheetContainers((prev) => ([...prev.filter(mContainer => mContainer.tempId !== tempId) ]))
+    setMusicSheetContainers((prev) => ([...prev.filter(mContainer => mContainer.tempId !== tempId)]))
   }
 
+  // Navigation Logic
+  const goToStep = (targetStep: number) => {
+    setDirection(targetStep > step ? 1 : -1);
+    setStep(targetStep);
+  }
+
+  const nextStep = () => {
+    if (step < totalSteps - 1) goToStep(step + 1);
+  }
+
+  const prevStep = () => {
+    if (step > 0) goToStep(step - 1);
+  }
+
+  // Animation Variants
+  const slideVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? "100%" : "-100%",
+      opacity: 0,
+      scale: 0.95,
+      rotateY: direction > 0 ? 20 : -20,
+      position: 'absolute' as const
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      rotateY: 0,
+      position: 'relative' as const
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? "100%" : "-100%",
+      opacity: 0,
+      scale: 0.95,
+      rotateY: direction < 0 ? 20 : -20,
+      position: 'absolute' as const
+    })
+  };
+
   return (
-    <BaseForm title={mode===FormMode.EDIT? "Edit Song" : "Add New Song"} description="Enter the details of your song below">
-      <div className="w-full">
-        <div className="w-full space-y-6">
-          <div className="w-full gap-1.5">
-            <Label className="w-full" htmlFor="name">Title</Label>
-            <Input
-              id="title"
-              placeholder="Enter song title"
-              value={songInput.title}
-              onChange={(e) => setSongInput((prev => ({...prev, title: e.target.value})))}
-              className="relative w-full bg-white"
-              autoFocus={false}
-            />
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="name">Sub Title</Label>
-            <Input
-              id="subtitle"
-              placeholder="Enter subtitle (optional)"
-              value={songInput.subtitle}
-              onChange={(e) => setSongInput((prev => ({...prev, subtitle: e.target.value})))}
-              className="bg-white"
-              autoFocus={false}
-            />
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="author">Author</Label>
-            <Input
-              id="author"
-              placeholder="Enter author name"
-              value={songInput.author}
-              onChange={(e) => setSongInput((prev => ({...prev, author: e.target.value})))}
-              className="bg-white"
-            />
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="Enter version">Version</Label>
-            <Input
-              id="version"
-              placeholder="version"
-              value={songInput.version}
-              onChange={(e) => setSongInput((prev => ({...prev, version: e.target.value})))}
-              className="bg-white"
-            />
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="link">Link</Label>
-            <div className="w-full relative">
-              <Input
-                id="link"
-                placeholder="https://youtube.com/..."
-                value={songInput.link}
-                onChange={(e) => setSongInput((prev => ({...prev, link: e.target.value})))}
-                className="w-full pl-9"
-              />
-              <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-            </div>
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="tags">Tags</Label>
-            <TagMultiSelect input={songInput} setInput={setSongInput}/>
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="bpm">BPM</Label>
-            <Input
-              id="bpm"
-              type="number"
-              placeholder="ex) 120"
-              defaultValue={songInput.bpm ?? ""}
-              onChange={(e) => setSongInput((prev => ({...prev, bpm: Number(e.target.value)})))}
-              className="bg-white"
-            />
-          </div>
-          <div className="flex-start flex-col items-center gap-1.5">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              className="h-20 bg-white text-base"
-              placeholder="Enter song description"
-              value={songInput.description}
-              onChange={(e) => setSongInput((prev => ({...prev, description: e.target.value})))}
-            />
-          </div>
-          <div className="w-full flex-start flex-col items-center gap-1.5">
-            <div className="flex flex-between w-full justify-between">
-              <h2 className="text-lg font-semibold">Music Sheets</h2>
-              <Button type="button" variant="outline" size="sm" onClick={handleAddNewMusicSheet}>
-                <PlusIcon className="h-4 w-4 mr-2"/>
-                Add Sheet
+    <div className="fixed inset-0 z-[40] bg-gray-50 flex flex-col items-center justify-center overflow-hidden">
+
+      {/* 1. Header Progress */}
+      <div className="fixed top-8 left-0 right-0 z-50 px-6 flex flex-col items-center gap-4">
+        <div className="flex gap-2 p-1 bg-white/50 backdrop-blur-md rounded-full shadow-sm border border-white/20">
+          {["Identity", "Details", "Context", "Sheets"].map((label, idx) => (
+            <button
+              key={idx}
+              onClick={() => goToStep(idx)}
+              className={cn(
+                "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
+                step === idx
+                  ? "bg-black text-white shadow-md scale-105"
+                  : "text-gray-400 hover:text-gray-600 hover:bg-white/50"
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 2. Main Content Area */}
+      <div className="w-full max-w-xl h-full px-4 sm:px-6 pt-24 pb-20 flex flex-col relative perspective-1000">
+        <AnimatePresence initial={false} mode="popLayout" custom={direction}>
+
+          {/* Step 1: Identity */}
+          {step === 0 && (
+            <motion.div
+              key="step0"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="flex-1 flex flex-col justify-center space-y-8 w-full"
+            >
+              <div className="space-y-4 text-center">
+                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 1</Label>
+                <h2 className="text-2xl font-bold text-gray-900">Project Identity</h2>
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 flex flex-col gap-6">
+                <div className="space-y-2">
+                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Title</Label>
+                  <Input
+                    autoFocus
+                    placeholder="Song Title..."
+                    value={songInput.title}
+                    onChange={(e) => setSongInput(prev => ({ ...prev, title: e.target.value }))}
+                    className="text-2xl font-black bg-gray-50 border-gray-100 h-16 rounded-2xl focus-visible:ring-blue-500/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Subtitle</Label>
+                  <Input
+                    placeholder="Subtitle (Optional)"
+                    value={songInput.subtitle}
+                    onChange={(e) => setSongInput(prev => ({ ...prev, subtitle: e.target.value }))}
+                    className="text-lg font-medium bg-gray-50 border-gray-100 h-14 rounded-2xl focus-visible:ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
+              <Button
+                className="h-14 w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl mt-auto transition-transform active:scale-95"
+                onClick={nextStep}
+                disabled={!songInput.title}
+              >
+                Next Step <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-            </div>
-            <div className="w-full flex flex-col space-y-4 rounded-lg border p-4">
-              <>
-                {
-                  musicSheetContainers?.map((musicSheet, index) => (
-                    <MusicSheetUploaderBox
+            </motion.div>
+          )}
+
+          {/* Step 2: Details */}
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="flex-1 flex flex-col justify-center space-y-8 w-full"
+            >
+              <div className="space-y-4 text-center">
+                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 2</Label>
+                <h2 className="text-2xl font-bold text-gray-900">Song Details</h2>
+                <h3 className="text-xl font-medium text-blue-600 break-words">{songInput.title}</h3>
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Author</Label>
+                    <Input
+                      placeholder="Original Author"
+                      value={songInput.author}
+                      onChange={(e) => setSongInput(prev => ({ ...prev, author: e.target.value }))}
+                      className="bg-gray-50 border-gray-100 rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Version</Label>
+                    <Input
+                      placeholder="v1.0"
+                      value={songInput.version}
+                      onChange={(e) => setSongInput(prev => ({ ...prev, version: e.target.value }))}
+                      className="bg-gray-50 border-gray-100 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">BPM</Label>
+                  <Input
+                    type="number"
+                    placeholder="120"
+                    value={songInput.bpm ?? ""}
+                    onChange={(e) => setSongInput(prev => ({ ...prev, bpm: Number(e.target.value) }))}
+                    className="bg-gray-50 border-gray-100 rounded-xl"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Reference Link</Label>
+                  <div className="relative">
+                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="https://youtube.com/..."
+                      value={songInput.link}
+                      onChange={(e) => setSongInput(prev => ({ ...prev, link: e.target.value }))}
+                      className="pl-9 bg-gray-50 border-gray-100 rounded-xl"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-4 mt-auto">
+                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
+                  <ChevronLeft className="w-6 h-6" />
+                </Button>
+                <Button
+                  className="h-14 flex-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl active:scale-95 transition-all"
+                  onClick={nextStep}
+                >
+                  Next Step
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 3: Context */}
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="flex-1 flex flex-col justify-center space-y-8 w-full"
+            >
+              <div className="space-y-4 text-center">
+                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 3</Label>
+                <h2 className="text-2xl font-bold text-gray-900">Context & Tags</h2>
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-5">
+                <div className="space-y-2">
+                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Tags</Label>
+                  <TagMultiSelect input={songInput} setInput={setSongInput} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Description</Label>
+                  <Textarea
+                    placeholder="Add any notes or description about the song..."
+                    value={songInput.description}
+                    onChange={(e) => setSongInput(prev => ({ ...prev, description: e.target.value }))}
+                    className="min-h-[120px] text-base bg-gray-50 border-gray-100 rounded-xl resize-none p-3 focus-visible:ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-4 mt-auto">
+                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
+                  <ChevronLeft className="w-6 h-6" />
+                </Button>
+                <Button
+                  className="h-14 flex-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl active:scale-95 transition-all"
+                  onClick={nextStep}
+                >
+                  Next Step
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 4: Sheets */}
+          {step === 3 && (
+            <motion.div
+              key="step3"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="flex-1 flex flex-col h-full space-y-3 w-full"
+            >
+              <div className="flex items-end justify-between px-2 pb-1">
+                <div>
+                  <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Final Step</Label>
+                  <h2 className="text-2xl font-bold text-gray-900 leading-none">Music Sheets</h2>
+                </div>
+                <Button size="sm" variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={handleAddNewMusicSheet}>
+                  <PlusIcon className="h-4 w-4 mr-1" /> Add Sheet
+                </Button>
+              </div>
+
+              <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col">
+                {musicSheetContainers.length === 0 ? (
+                  <div
+                    className="flex-1 flex flex-col items-center justify-center p-6 text-center text-gray-400 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={handleAddNewMusicSheet}
+                  >
+                    <Music className="w-12 h-12 mb-2 opacity-20" />
+                    <p className="text-sm font-medium">No music sheets yet</p>
+                    <p className="text-xs">Click to add a sheet</p>
+                  </div>
+                ) : (
+                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                    {musicSheetContainers?.map((musicSheet, index) => (
+                      <MusicSheetUploaderBox
                         key={index}
                         index={index}
                         musicKey={musicSheet.key}
@@ -377,29 +567,28 @@ export function SongForm({mode, teamId, songId}: Props) {
                         handleRemoveImageFileContainer={removeImageFromMusicSheet}
                         handleRemoveMusicSheetContainer={removeMusicSheetContainer}
                       />
-                  ))
-                }
-              </>
-              <div className="w-full flex-center">
-                <div
-                  className="group w-full flex-center h-28 p-2 rounded-lg border-2 border-dashed border-gray-200 hover:border-blue-300 cursor-pointer"
-                  onClick={() => handleAddNewMusicSheet()}>
-                  <p className="text-gray-400 group-hover:text-gray-500">click to add sheet</p>
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          </div>
-        </div>
-        <div className="w-full flex-end my-10">
-          <div>
-            {
-              (mode === FormMode.EDIT)
-                ? <Button type="submit" onClick={handleEdit}>{isLoading ? "Saving..." : "Save"}</Button>
-                : <Button type="submit" onClick={handleCreate}>{isLoading ? "Creating..." : "Create"}</Button>
-            }
-          </div>
-        </div>
+
+              <div className="flex gap-4 mt-auto pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
+                  <ChevronLeft className="w-6 h-6" />
+                </Button>
+                <Button
+                  onClick={mode === FormMode.CREATE ? handleCreate : handleEdit}
+                  disabled={isLoading}
+                  className="h-14 flex-1 rounded-full bg-blue-600 text-white text-lg font-bold shadow-xl hover:bg-blue-700 active:scale-95 transition-all"
+                >
+                  {isLoading ? "Saving..." : (mode === FormMode.CREATE ? "Create Song" : "Save Changes")} <Check className="ml-2 w-5 h-5" />
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+        </AnimatePresence>
       </div>
-    </BaseForm>
+    </div>
   )
 }

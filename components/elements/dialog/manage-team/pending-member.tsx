@@ -1,49 +1,57 @@
 import Image from "next/image";
-import {Invitation} from "@/models/invitation";
+import { Invitation } from "@/models/invitation";
 import { InvitationService } from "@/apis";
-import {InvitationStatus} from "@/components/constants/enums";
-import {toast} from "@/components/ui/use-toast";
-import {sentInvitationsUpdaterAtom} from "@/global-states/invitation-state";
-import {useSetRecoilState} from "recoil";
+import { InvitationStatus } from "@/components/constants/enums";
+import { toast } from "@/components/ui/use-toast";
+import { sentInvitationsUpdaterAtom } from "@/global-states/invitation-state";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import { useSetRecoilState } from "recoil";
 
 interface Props {
   invitation: Invitation
 }
 
-export function PendingMember({invitation}: Props) {
+export function PendingMember({ invitation }: Props) {
   const sentInvitationsUpdater = useSetRecoilState(sentInvitationsUpdaterAtom)
 
   async function handleRemoveInvitation() {
     if (await InvitationService.delete(invitation.id) === false) {
-      toast({title: "Something went wrong. Please try again later."})
+      toast({ title: "Something went wrong. Please try again later." })
       return;
     }
 
     /* on success */
     sentInvitationsUpdater(prev => prev + 1)
-    toast({title: "You have successfully remove the invitation"})
+    toast({ title: "You have successfully remove the invitation" })
   }
 
   return (
-    <div className="w-full flex-start flex-col sm:flex-row sm:items-center gap-4 py-4">
-      <div className="flex-1 flex-between gap-2">
-        <div className="flex gap-2">
-          <Image alt="mail icon" src="/icons/userIcon.svg" width={20} height={20}/>
-          <p className="flex-1 text-sm">
+    <div className="flex items-center justify-between p-3 sm:p-4 hover:bg-muted/50 transition-colors">
+      <div className="flex items-center gap-3 overflow-hidden">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center border border-dashed">
+          <Image alt="user" src="/icons/userIcon.svg" width={16} height={16} className="opacity-40 grayscale" />
+        </div>
+        <div className="flex flex-col min-w-0">
+          <p className="text-sm font-medium truncate text-muted-foreground/80">
             {invitation?.receiver_email}
           </p>
-          <p className="text-sm text-right text-gray-500">
-            ({InvitationStatus[invitation.invitation_status as InvitationStatus]})
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/50"></span>
+            Pending Invitation
           </p>
         </div>
       </div>
-      {/*{*/}
-      {/*  invitation.invitation_status === InvitationStatus.Pending &&*/}
-      {/*  <div className="w-full sm:w-[160px]">*/}
-      {/*    <RoleSelect/>*/}
-      {/*  </div>*/}
-      {/*}*/}
-      <p className="w-full sm:w-auto text-sm text-red-500 text-right cursor-pointer" onClick={handleRemoveInvitation}>remove</p>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 text-muted-foreground hover:text-red-600 hover:bg-red-50"
+        onClick={handleRemoveInvitation}
+      >
+        <span className="sr-only">Remove</span>
+        <X className="h-4 w-4" />
+      </Button>
     </div>
   )
 }
