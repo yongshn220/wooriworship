@@ -83,6 +83,13 @@ export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
           {/* Bottom Floating Action Bar */}
           <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent pt-10">
             <div className="flex gap-3 max-w-md mx-auto">
+              {/* Done Button */}
+              <DrawerClose asChild>
+                <Button className="h-14 flex-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl transition-all active:scale-95">
+                  Done
+                </Button>
+              </DrawerClose>
+
               {/* Cart Toggle Button */}
               <Button
                 variant={showSelectedOnly ? "default" : "outline"}
@@ -104,13 +111,6 @@ export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
                   </span>
                 )}
               </Button>
-
-              {/* Done Button */}
-              <DrawerClose asChild>
-                <Button className="h-14 flex-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl transition-all active:scale-95">
-                  Done
-                </Button>
-              </DrawerClose>
             </div>
           </div>
         </div>
