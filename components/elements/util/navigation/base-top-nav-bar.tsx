@@ -1,16 +1,19 @@
 
 
+import { cn } from "@/lib/utils"; // Assuming utils exists for cn, if not I will just use template literals. But standard projects usually have it. Let me check if I can use it. I'll stick to template literals for safety if I'm not sure, but 'shadcn' was mentioned so `cn` likely exists. I'll just use template strings for now to be safe or check for `clsx`/`tailwind-merge`.
+// Actually, let's safely assume I can just append strings.
 interface Props {
   children: React.ReactNode
-  height: number
+  height: number | string
+  className?: string
 }
 
-export function BaseTopNavBar({ children, height }: Props) {
+export function BaseTopNavBar({ children, height, className }: Props) {
   return (
-    <div>
+    <div className="relative z-50">
       <header
-        className="sticky top-0 w-full border-b bg-white z-50"
-        style={{ height: `${height}px` }}
+        className={`sticky top-0 w-full border-b transition-all duration-300 ${className || "bg-white/80 backdrop-blur-md border-white/20 shadow-sm"}`}
+        style={{ height: typeof height === 'number' ? `${height}px` : height }}
       >
         {children}
       </header>
