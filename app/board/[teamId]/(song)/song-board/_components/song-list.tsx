@@ -10,6 +10,10 @@ interface Props {
   teamId: string
 }
 
+import { AlphabetIndexer } from "./alphabet-indexer";
+
+// ... existing imports
+
 export function SongList({ teamId }: Props) {
   const songIds = useRecoilValue(currentTeamSongIdsAtom(teamId))
 
@@ -40,12 +44,29 @@ export function SongList({ teamId }: Props) {
     };
   }, [songIds]);
 
+  const handleScrollRequest = (index: number) => {
+    // 1. Ensure the item is rendered
+    if (index >= displayedCount) {
+      setDisplayedCount(index + 20); // Load enough to show it
+    }
+
+    // 2. Scroll to it (wait for render if needed)
+    setTimeout(() => {
+      const element = document.getElementById(`song-row-${index}`);
+      if (element) {
+        element.scrollIntoView({ behavior: "auto", block: "center" });
+      }
+    }, 50); // Small delay to allow React to commit changes
+  };
+
   if (!songIds || songIds?.length <= 0) {
     return (<EmptySongBoardPage />)
   }
 
   return (
-    <div className="w-full h-full p-2 sm:p-4 md:p-6">
+    <div className="w-full h-full p-2 sm:p-4 md:p-6 relative">
+      <AlphabetIndexer teamId={teamId} onScrollRequest={handleScrollRequest} />
+
       {/* Header Row for Desktop */}
       <div className="hidden md:flex items-center px-6 py-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
         <div className="flex-1 pl-4">Title</div>
@@ -55,9 +76,11 @@ export function SongList({ teamId }: Props) {
       <div className="flex flex-col space-y-2">
         {
           visibleSongIds.map((songId, index) => (
-            <Suspense key={songId} fallback={<SongRowSkeleton />}>
-              <SongCard teamId={teamId} songId={songId} index={index % 20} />
-            </Suspense>
+            <div key={songId} id={`song-row-${index}`}>
+              <Suspense fallback={<SongRowSkeleton />}>
+                <SongCard teamId={teamId} songId={songId} index={index % 20} />
+              </Suspense>
+            </div>
           ))
         }
       </div>

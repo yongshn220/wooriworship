@@ -355,3 +355,41 @@ export function urlBase64ToUint8Array(base64String: string) {
   }
   return outputArray
 }
+
+/**
+ * Extracts the initial character for indexing.
+ * - English: A-Z (Uppercase)
+ * - Hangul: Initial Consonant (ㄱ, ㄴ, ㄷ...)
+ * - Others: #
+ */
+export function getInitialChar(str: string): string {
+  if (!str) return '#';
+
+  const char = str.charAt(0);
+  const code = char.charCodeAt(0);
+
+  // English (A-Z, a-z)
+  if ((code >= 65 && code <= 90) || (code >= 97 && code <= 122)) {
+    return char.toUpperCase();
+  }
+
+  // Korean (Hangul Syllables)
+  // Range: 0xAC00(44032) - 0xD7A3(55203)
+  if (code >= 0xAC00 && code <= 0xD7A3) {
+    const chosungIndex = Math.floor(((code - 0xAC00) / 28) / 21);
+    const CHOSUNG = [
+      'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ',
+      'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
+    ];
+    return CHOSUNG[chosungIndex] || '#';
+  }
+
+  // Korean (Hangul Jamo compatibility)
+  // Range: 0x3131(12593) - 0x314E(12622) for modern consonants
+  // Range: 0x1100(4352) - 0x11FF(4607) for old jamo
+  if ((code >= 0x3131 && code <= 0x314E) || (code >= 0x1100 && code <= 0x11FF)) {
+    return char;
+  }
+
+  return '#';
+}
