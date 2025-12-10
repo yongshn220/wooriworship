@@ -48,6 +48,9 @@ export function InvitedMember({ userId, teamId }: Props) {
         </div>
         <div className="flex flex-col min-w-0">
           <p className="text-sm font-medium truncate">
+            {user?.name || "No Name"}
+          </p>
+          <p className="text-xs text-muted-foreground truncate">
             {user?.email}
           </p>
           {/* Mobile-friendly role display if needed, or just let RoleSelect handle it */}
