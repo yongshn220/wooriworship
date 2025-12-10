@@ -16,9 +16,10 @@ import {
 
 interface Props {
   teamId: string
+  showSelectedOnly?: boolean
 }
 
-export function AddableSongHeaderList({ teamId }: Props) {
+export function AddableSongHeaderList({ teamId, showSelectedOnly = false }: Props) {
   const songIdsLoadable = useRecoilValueLoadable(currentTeamSongIdsAtom(teamId))
   const [displayedCount, setDisplayedCount] = useState(20)
   const loadMoreRef = React.useRef<HTMLDivElement>(null)
@@ -52,18 +53,17 @@ export function AddableSongHeaderList({ teamId }: Props) {
     case 'hasValue':
       let allSongIds = [...(songIdsLoadable.contents || [])]
 
-      // Sort: Selected songs first
-      if (selectedSongHeaderList.length > 0) {
+      // Filter if in Cart Mode
+      if (showSelectedOnly) {
         const selectedIds = new Set(selectedSongHeaderList.map(h => h.id))
-        allSongIds.sort((a, b) => {
-          const aSelected = selectedIds.has(a)
-          const bSelected = selectedIds.has(b)
-          if (aSelected && !bSelected) return -1
-          if (!aSelected && bSelected) return 1
-          return 0
-        })
+        allSongIds = allSongIds.filter(id => selectedIds.has(id))
       }
 
+      // No auto-sorting based on selection (User Request)
+
+      // Pagination
+      // If showing selected only, we might want to show all of them or still paginate?
+      // Given the list likely won't be huge, showing all might be fine, but safe to keep slicing
       const visibleSongIds = allSongIds.slice(0, displayedCount)
 
       return (
