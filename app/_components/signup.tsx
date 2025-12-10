@@ -20,6 +20,9 @@ import { useState } from "react"
 import { toast } from "@/components/ui/use-toast"
 import { motion } from "framer-motion"
 
+import { PasswordInput } from "./auth/password-input"
+import { PasswordStrength } from "./auth/password-strength"
+
 export function Signup({ setMode }: { setMode: (mode: LandingMode) => void }) {
   const [isLoading, setIsLoading] = useState(false)
 
@@ -32,6 +35,9 @@ export function Signup({ setMode }: { setMode: (mode: LandingMode) => void }) {
       confirmPassword: "",
     },
   })
+
+  // Watch password for strength meter
+  const password = form.watch("password");
 
   async function onSubmit(data: SignupFormValues) {
     setIsLoading(true)
@@ -47,9 +53,12 @@ export function Signup({ setMode }: { setMode: (mode: LandingMode) => void }) {
           data.name
         )
 
+        // 3. Send Verification Email
+        await AuthService.sendEmailVerification(userCredential.user);
+
         toast({
           title: "Account created successfully!",
-          description: "Welcome to Worship Team Manager.",
+          description: "Please check your email to verify your account.",
         })
 
         // Mode will likely change via parent state or global auth listener, 
@@ -118,98 +127,101 @@ export function Signup({ setMode }: { setMode: (mode: LandingMode) => void }) {
             </p>
           </motion.div>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <motion.div variants={itemVariants}>
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-slate-700 font-medium">Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="John Doe" className="bg-white/60 border-slate-200 focus:bg-white focus:border-blue-500 transition-all duration-300" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </motion.div>
+          {/* Form wrapper */}
+          <div className="max-h-[70vh] overflow-y-auto px-1 -mx-1">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <motion.div variants={itemVariants}>
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-700 font-medium">Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John Doe" className="bg-white/60 border-slate-200 focus:bg-white focus:border-blue-500 transition-all duration-300" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
 
-              <motion.div variants={itemVariants}>
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-slate-700 font-medium">Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="name@example.com"
-                          className="bg-white/60 border-slate-200 focus:bg-white focus:border-blue-500 transition-all duration-300"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </motion.div>
+                <motion.div variants={itemVariants}>
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-700 font-medium">Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="name@example.com"
+                            className="bg-white/60 border-slate-200 focus:bg-white focus:border-blue-500 transition-all duration-300"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
 
-              <motion.div variants={itemVariants}>
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-slate-700 font-medium">Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          className="bg-white/60 border-slate-200 focus:bg-white focus:border-blue-500 transition-all duration-300"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </motion.div>
+                <motion.div variants={itemVariants}>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-700 font-medium">Password</FormLabel>
+                        <FormControl>
+                          <PasswordInput
+                            placeholder="••••••••"
+                            {...field}
+                          />
+                        </FormControl>
+                        {/* Strength Meter */}
+                        <div className="mt-2">
+                          <PasswordStrength password={password} />
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
 
-              <motion.div variants={itemVariants}>
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-slate-700 font-medium">Confirm Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          className="bg-white/60 border-slate-200 focus:bg-white focus:border-blue-500 transition-all duration-300"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </motion.div>
+                <motion.div variants={itemVariants}>
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-700 font-medium">Confirm Password</FormLabel>
+                        <FormControl>
+                          <PasswordInput
+                            placeholder="••••••••"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
 
-              <motion.div variants={itemVariants} className="pt-2">
-                <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02]"
-                  type="submit"
-                  disabled={isLoading}
-                >
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Sign Up
-                </Button>
-              </motion.div>
-            </form>
-          </Form>
+                <motion.div variants={itemVariants} className="pt-2">
+                  <Button
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02]"
+                    type="submit"
+                    disabled={isLoading}
+                  >
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Sign Up
+                  </Button>
+                </motion.div>
+              </form>
+            </Form>
+          </div>
 
           <motion.div variants={itemVariants} className="flex flex-col items-center gap-4 text-sm pt-2">
             <div className="text-slate-500">

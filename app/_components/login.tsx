@@ -23,6 +23,8 @@ import { LoginFormValues, LoginSchema } from "./auth/auth-schema"
 import { Loader2 } from "lucide-react"
 import { useState } from "react"
 
+import { PasswordInput } from "./auth/password-input"
+
 export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
   const [isLoading, setIsLoading] = useState(false)
 
@@ -123,10 +125,8 @@ export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
                     <FormItem>
                       <FormLabel className="text-slate-700 font-medium">Password</FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           placeholder="••••••••"
-                          className="bg-white/60 border-slate-200 focus:bg-white focus:border-blue-500 transition-all duration-300"
                           {...field}
                         />
                       </FormControl>

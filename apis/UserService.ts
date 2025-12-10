@@ -1,5 +1,5 @@
 import BaseService from "./BaseService"
-import {arrayUnion, arrayRemove} from "@firebase/firestore";
+import { arrayUnion, arrayRemove } from "@firebase/firestore";
 import { TeamService } from ".";
 
 class UserService extends BaseService {
@@ -14,15 +14,16 @@ class UserService extends BaseService {
             created_time: new Date(),
             last_logged_in_time: new Date(),
             teams: [] as Array<string>,
-            invite_optin: true
+            invite_optin: true,
+            email_verified: false
         }
         await this.update(userId, user);
-        return {...user, id: userId}
+        return { ...user, id: userId }
     }
 
     async addNewTeam(userId: string, teamId: string) {
         if (userId) {
-            await this.update(userId, {teams: arrayUnion(teamId)});
+            await this.update(userId, { teams: arrayUnion(teamId) });
             return teamId;
         } else {
             console.log("there is no currentUser")
@@ -31,7 +32,7 @@ class UserService extends BaseService {
     }
 
     async updateInviteOptin(userId: string, inviteOptin: Boolean) {
-        await this.update(userId, {invite_optin: inviteOptin})
+        await this.update(userId, { invite_optin: inviteOptin })
     }
 
     async subscribePushNotification() {
@@ -41,11 +42,11 @@ class UserService extends BaseService {
 
 
     async leaveTeam(userId: string, teamId: string, singleSide: Boolean) {
-        if (userId && teamId){
+        if (userId && teamId) {
             if (!singleSide) {
                 await TeamService.removeMember(userId, teamId, true);
             }
-            await this.update(userId, {teams: arrayRemove(teamId)});
+            await this.update(userId, { teams: arrayRemove(teamId) });
             return teamId;
         } else {
             console.log("user id or team id is missing");
