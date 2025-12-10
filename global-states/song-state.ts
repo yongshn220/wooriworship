@@ -31,6 +31,7 @@ export const songIdsAtom = atomFamily<Array<string>, string>({
 export const currentTeamSortedSongsAtom = selectorFamily<Array<Song>, string>({
   key: "currentTeamSortedSongsAtom",
   get: (teamId) => async ({ get }) => {
+    get(songUpdaterAtom)
     if (!teamId) return []
 
     try {

@@ -13,7 +13,7 @@ import { FormMode } from "@/components/constants/enums";
 import { useRouter } from "next/navigation";
 import { getPathSongDetail } from "@/components/util/helper/routes";
 import { auth } from "@/firebase";
-import { currentTeamSongIdsAtom, songAtom, songUpdaterAtom } from "@/global-states/song-state";
+import { songAtom, songUpdaterAtom } from "@/global-states/song-state";
 import { ImageFileContainer, MusicSheetContainer } from "@/components/constants/types";
 import { v4 as uuid } from "uuid";
 import MusicSheetService from "@/apis/MusicSheetService";
@@ -50,7 +50,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
   const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songId))
   const authUser = auth.currentUser
   const team = useRecoilValue(teamAtom(teamId))
-  const setCurrentTeamSongIds = useSetRecoilState(currentTeamSongIdsAtom(teamId))
+
 
   // Form State
   const [step, setStep] = useState(0); // 0: Identity, 1: Details, 2: Context, 3: Sheets
@@ -132,7 +132,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
         description: `${team?.name} - ${songInput.title}`,
       })
 
-      setCurrentTeamSongIds((prev) => ([newSongId, ...prev])) // update song-board board (locally)
+      songUpdater((prev) => prev + 1) // update song-board board (locally)
       router.push(getPathSongDetail(teamId, newSongId))
       clearContents()
     }
