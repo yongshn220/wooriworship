@@ -44,11 +44,26 @@ export function AddableSongHeaderList({ teamId }: Props) {
     }
   }, [])
 
+  const selectedSongHeaderList = useRecoilValue(selectedWorshipSongHeaderListAtom)
+
   switch (songIdsLoadable.state) {
     case 'loading': return <div className="w-full h-80 flex items-center justify-center text-gray-400">Loading songs...</div>;
     case 'hasError': throw songIdsLoadable.contents
     case 'hasValue':
-      const allSongIds = songIdsLoadable.contents || []
+      let allSongIds = [...(songIdsLoadable.contents || [])]
+
+      // Sort: Selected songs first
+      if (selectedSongHeaderList.length > 0) {
+        const selectedIds = new Set(selectedSongHeaderList.map(h => h.id))
+        allSongIds.sort((a, b) => {
+          const aSelected = selectedIds.has(a)
+          const bSelected = selectedIds.has(b)
+          if (aSelected && !bSelected) return -1
+          if (!aSelected && bSelected) return 1
+          return 0
+        })
+      }
+
       const visibleSongIds = allSongIds.slice(0, displayedCount)
 
       return (

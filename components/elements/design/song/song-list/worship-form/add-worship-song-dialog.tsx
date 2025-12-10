@@ -46,13 +46,7 @@ export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
               />
               <Separator />
             </div>
-            <div className="space-x-2 space-y-2">
-              {
-                selectedSongHeaderList?.map((songHeader, index) => (
-                  <SongTitleBadge key={index} songId={songHeader?.id} />
-                ))
-              }
-            </div>
+
             <div className="overflow-y-scroll">
               <Suspense fallback={<LoadingCircle />}>
                 <AddableSongHeaderList teamId={teamId} />
