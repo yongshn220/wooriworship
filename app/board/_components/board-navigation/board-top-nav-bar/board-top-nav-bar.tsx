@@ -1,16 +1,16 @@
-import {Page} from "@/components/constants/enums";
-import {FilterIcon, SquarePenIcon} from "lucide-react";
+import { Page } from "@/components/constants/enums";
+import { FilterIcon, SquarePenIcon } from "lucide-react";
 import React from "react";
-import {useRecoilValue} from "recoil";
-import {SearchInput} from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
-import {SearchFilterPopover} from "@/app/board/_components/board-navigation/board-top-nav-bar/search-filter-popover";
-import {getPathCreateNotice, getPathCreatePlan, getPathCreateSong} from "@/components/util/helper/routes";
-import {useRouter} from "next/navigation";
-import {currentTeamIdAtom} from "@/global-states/teamState";
-import {SearchPlan} from "./search-plan";
-import {BaseTopNavBar} from "@/components/elements/util/navigation/base-top-nav-bar";
-import {MainLogoSmall} from "@/components/elements/util/logo/main-logo";
-import {currentPageAtom} from "@/global-states/page-state";
+import { useRecoilValue } from "recoil";
+import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
+import { SearchFilterPopover } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-filter-popover";
+import { getPathCreateNotice, getPathCreatePlan, getPathCreateSong } from "@/components/util/helper/routes";
+import { useRouter } from "next/navigation";
+import { currentTeamIdAtom } from "@/global-states/teamState";
+import { SearchPlan } from "./search-plan";
+import { BaseTopNavBar } from "@/components/elements/util/navigation/base-top-nav-bar";
+import { MainLogoSmall } from "@/components/elements/util/logo/main-logo";
+import { currentPageAtom } from "@/global-states/page-state";
 
 
 export function BoardTopNavBar() {
@@ -19,16 +19,20 @@ export function BoardTopNavBar() {
   const router = useRouter()
 
   const tabConfig: any = {
-    [Page.NOTICE_BOARD]: { text: "Notice"},
+    [Page.NOTICE_BOARD]: { text: "Notice" },
     [Page.WORSHIP_BOARD]: { text: "Worship Plan" },
-    [Page.SONG_BOARD]: { text: "Song Board"},
+    [Page.SONG_BOARD]: { text: "Song Board" },
   };
 
-  if ([Page.BOARD, Page.HOME, Page.CREATE_SONG, Page.EDIT_SONG, Page.CREATE_WORSHIP, Page.EDIT_WORSHIP, Page.WORSHIP, Page.CREATE_NOTICE].includes(currentPage)) {
+  if ([Page.CREATE_WORSHIP, Page.EDIT_WORSHIP].includes(currentPage)) {
+    return <></>
+  }
+
+  if ([Page.BOARD, Page.HOME, Page.CREATE_SONG, Page.EDIT_SONG, Page.WORSHIP, Page.CREATE_NOTICE].includes(currentPage)) {
     return (
       <BaseTopNavBar height={56}>
         <div className="w-full h-full flex px-4">
-          <MainLogoSmall/>
+          <MainLogoSmall />
         </div>
       </BaseTopNavBar>
     )
@@ -43,7 +47,7 @@ export function BoardTopNavBar() {
               tabConfig[currentPage] &&
               <p className="text-xl font-semibold">{tabConfig[currentPage].text}</p>
             }
-            <SquarePenIcon className="cursor-pointer" onClick={() => router.push(getPathCreateNotice(teamId))}/>
+            <SquarePenIcon className="cursor-pointer" onClick={() => router.push(getPathCreateNotice(teamId))} />
           </div>
         </div>
       </BaseTopNavBar>
@@ -61,14 +65,14 @@ export function BoardTopNavBar() {
                 <p className="text-xl font-semibold">{tabConfig[currentPage].text}</p>
               }
               <div className="flex gap-4">
-                <SquarePenIcon onClick={() => router.push(getPathCreateSong(teamId))}/>
+                <SquarePenIcon onClick={() => router.push(getPathCreateSong(teamId))} />
                 <SearchFilterPopover>
-                  <FilterIcon/>
+                  <FilterIcon />
                 </SearchFilterPopover>
               </div>
             </div>
             <div className="mt-2">
-              <SearchInput/>
+              <SearchInput />
             </div>
           </div>
         </div>
@@ -87,11 +91,11 @@ export function BoardTopNavBar() {
                 <p className="text-xl font-semibold">{tabConfig[currentPage].text}</p>
               }
               <div className="flex gap-4">
-              <SquarePenIcon className="cursor-pointer" onClick={() => router.push(getPathCreatePlan(teamId))}/>
+                <SquarePenIcon className="cursor-pointer" onClick={() => router.push(getPathCreatePlan(teamId))} />
               </div>
             </div>
             <div className="mt-2">
-              <SearchPlan/>
+              <SearchPlan />
             </div>
           </div>
         </div>

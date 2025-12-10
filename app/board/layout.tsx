@@ -1,14 +1,14 @@
 "use client"
 
-import {BoardAuthenticate} from "@/app/board/_components/auth/board-authenticate";
+import { BoardAuthenticate } from "@/app/board/_components/auth/board-authenticate";
 import { BoardTopNavBar } from "@/app/board/_components/board-navigation/board-top-nav-bar/board-top-nav-bar";
 import { BoardBottomNavBar } from "@/app/board/_components/board-navigation/board-bottom-nav-bar/board-bottom-nav-bar";
 import { usePathname } from "next/navigation";
-import {useSetRecoilState} from "recoil";
-import {currentPageAtom} from "@/global-states/page-state";
-import {useEffect} from "react";
-import {Page} from "@/components/constants/enums";
-import {DialogManager} from "@/components/elements/dialog/static-dialog/dialog-manager";
+import { useSetRecoilState } from "recoil";
+import { currentPageAtom } from "@/global-states/page-state";
+import { useEffect } from "react";
+import { Page } from "@/components/constants/enums";
+import { DialogManager } from "@/components/elements/dialog/static-dialog/dialog-manager";
 import Initialization from "@/components/util/provider/initialization";
 
 
@@ -27,14 +27,14 @@ export default function BoardLayout({ children }: any) {
   return (
     <section className="h-full">
       <BoardAuthenticate>
-        <Initialization/>
-        <DialogManager/>
+        <Initialization />
+        <DialogManager />
         <div className="flex flex-col h-screen">
-          <BoardTopNavBar/>
+          <BoardTopNavBar />
           <main className="flex-grow overflow-y-auto bg-gray-50">
             {children}
           </main>
-          <BoardBottomNavBar/>
+          <BoardBottomNavBar />
         </div>
       </BoardAuthenticate>
     </section>
