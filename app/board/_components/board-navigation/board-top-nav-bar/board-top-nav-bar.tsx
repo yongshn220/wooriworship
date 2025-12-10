@@ -66,9 +66,6 @@ export function BoardTopNavBar() {
               }
               <div className="flex gap-4">
                 <SquarePenIcon onClick={() => router.push(getPathCreateSong(teamId))} />
-                <SearchFilterPopover>
-                  <FilterIcon />
-                </SearchFilterPopover>
               </div>
             </div>
             <div className="mt-2">
