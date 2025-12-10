@@ -1,7 +1,7 @@
 "use client"
 import { useRecoilValue } from "recoil";
 import { currentTeamSongIdsAtom } from "@/global-states/song-state";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, Suspense } from "react";
 import { EmptySongBoardPage } from "@/app/board/[teamId]/(song)/song-board/_components/empty-song-board-page/empty-song-board-page";
 import { SongCard } from "./song-card";
 import { motion, AnimatePresence } from "framer-motion";
@@ -55,7 +55,9 @@ export function SongList({ teamId }: Props) {
       <div className="flex flex-col space-y-2">
         {
           visibleSongIds.map((songId, index) => (
-            <SongCard key={songId} teamId={teamId} songId={songId} index={index % 20} />
+            <Suspense key={songId} fallback={<SongRowSkeleton />}>
+              <SongCard teamId={teamId} songId={songId} index={index % 20} />
+            </Suspense>
           ))
         }
       </div>
@@ -70,6 +72,23 @@ export function SongList({ teamId }: Props) {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+function SongRowSkeleton() {
+  return (
+    <div className="relative rounded-xl bg-white border border-gray-100 shadow-sm p-3 sm:px-6 sm:py-3.5 flex items-center gap-4 h-[72px]">
+      {/* Title Placeholder */}
+      <div className="flex-1 flex flex-col gap-2">
+        <div className="h-4 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+        <div className="h-3 bg-gray-100 rounded w-1/4 animate-pulse"></div>
+      </div>
+      {/* Key Placeholder */}
+      <div className="w-32 flex justify-center gap-1">
+        <div className="h-5 w-6 bg-gray-200 rounded animate-pulse"></div>
+        <div className="h-5 w-6 bg-gray-200 rounded animate-pulse"></div>
+      </div>
     </div>
   )
 }
