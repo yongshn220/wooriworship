@@ -1,7 +1,7 @@
 import { Page } from "@/components/constants/enums";
 import { FilterIcon, SquarePenIcon, SearchIcon, MenuIcon, XIcon, ArrowLeftIcon } from "lucide-react";
 import React, { useMemo, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
 import { getPathCreateNotice, getPathCreatePlan, getPathCreateSong } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ import { BaseTopNavBar } from "@/components/elements/util/navigation/base-top-na
 import { MainLogoSmall } from "@/components/elements/util/logo/main-logo";
 import { currentPageAtom } from "@/global-states/page-state";
 import { motion, AnimatePresence } from "framer-motion";
+import { planSearchInputAtom, songSearchInputAtom } from "@/app/board/_states/board-states";
 
 interface HeaderConfig {
   title?: string;
@@ -24,6 +25,16 @@ export function BoardTopNavBar() {
   const teamId = useRecoilValue(currentTeamIdAtom);
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const setSongSearch = useSetRecoilState(songSearchInputAtom);
+  const setPlanSearch = useSetRecoilState(planSearchInputAtom);
+
+  const handleCloseSearch = () => {
+    setIsSearchOpen(false);
+    // Reset search inputs based on current page or just reset all to be safe/simple
+    if (currentPage === Page.SONG_BOARD) setSongSearch("");
+    if (currentPage === Page.WORSHIP_BOARD) setPlanSearch("");
+  };
 
   // Premium 3D Button Component
   const ActionButton = ({ onClick, icon: Icon, label, variant = 'default' }: { onClick: () => void, icon: any, label?: string, variant?: 'default' | 'ghost' }) => (
@@ -107,7 +118,7 @@ export function BoardTopNavBar() {
               <motion.button
                 whileHover={{ scale: 1.1, rotate: 90 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => setIsSearchOpen(false)}
+                onClick={handleCloseSearch}
                 className="p-2 rounded-full hover:bg-gray-100 text-gray-500"
               >
                 <XIcon className="w-5 h-5" />

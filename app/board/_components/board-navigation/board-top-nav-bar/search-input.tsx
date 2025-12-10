@@ -18,6 +18,7 @@ export function SearchInput() {
         placeholder="Search by title, lyrics, or author..."
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        autoFocus
       />
       <div className="absolute right-1.5 top-1/2 transform -translate-y-1/2">
         <SearchFilterPopover>

@@ -15,6 +15,7 @@ export function SearchPlan() {
         placeholder="Search Plans"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        autoFocus
       />
       <div className="absolute right-1.5 top-1/2 transform -translate-y-1/2">
         {/* Currently just for visual consistency, functionality can be added later if needed */}
