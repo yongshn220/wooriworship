@@ -1,12 +1,13 @@
 "use client"
 
 import * as React from "react"
+import { ArrowUpDown } from "lucide-react";
 
-import {DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger,} from "@/components/ui/dropdown-menu"
-import {useRecoilState, useSetRecoilState} from "recoil";
-import {WorshipSpecialOrderType} from "@/components/constants/enums";
-import {WorshipSongHeader} from "@/models/worship";
-import {selectedWorshipSongHeaderListAtom, worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom} from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { WorshipSpecialOrderType } from "@/components/constants/enums";
+import { WorshipSongHeader } from "@/models/worship";
+import { selectedWorshipSongHeaderListAtom, worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
 
 interface Props {
   songHeader: WorshipSongHeader
@@ -15,7 +16,7 @@ interface Props {
 
 type OrderValue = WorshipSpecialOrderType | string
 
-export function SwapOrderButton({songHeader, songOrder}: Props) {
+export function SwapOrderButton({ songHeader, songOrder }: Props) {
   const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
   const setBeginningSongHeader = useSetRecoilState(worshipBeginningSongHeaderAtom)
   const setEndingSongHeader = useSetRecoilState(worshipEndingSongHeaderAtom)
@@ -65,13 +66,14 @@ export function SwapOrderButton({songHeader, songOrder}: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <div className="flex-center w-10 h-10 bg-blue-300 hover:bg-blue-500 text-white rounded-full font-semibold text-sm border-4 border-white shadow-lg">
-          {songOrder}
+        <div className="flex-center w-10 h-10 bg-white hover:bg-gray-100 text-blue-600 rounded-full font-bold text-sm border border-gray-200 shadow-sm transition-all active:scale-95 group">
+          <span className="group-hover:hidden">{songOrder}</span>
+          <ArrowUpDown className="hidden group-hover:block w-4 h-4" />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="flex-center flex-col">
         <DropdownMenuLabel className="border-b">Change Order</DropdownMenuLabel>
-        <DropdownMenuSeparator/>
+        <DropdownMenuSeparator />
         <DropdownMenuRadioGroup value={songOrder.toString()} onValueChange={handleClick} className="w-full">
           <DropdownMenuRadioItem className="w-full cursor-pointer" value={WorshipSpecialOrderType.BEGINNING}>Beginning</DropdownMenuRadioItem>
           {
