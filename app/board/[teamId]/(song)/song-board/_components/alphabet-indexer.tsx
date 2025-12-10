@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo, useRef, useState, useEffect } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { songAlphabetMapAtom } from "@/global-states/song-state";
 import { cn } from "@/lib/utils";
@@ -14,8 +14,10 @@ interface Props {
 export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
     const alphabetMap = useRecoilValue(songAlphabetMapAtom(teamId));
     const containerRef = useRef<HTMLDivElement>(null);
+
     const [activeDragChar, setActiveDragChar] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [bubbleY, setBubbleY] = useState<number | null>(null);
 
     // Order: # -> English -> Korean
     const chars = useMemo(() => {
@@ -31,9 +33,10 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
     const handleInteraction = (clientY: number) => {
         if (!containerRef.current) return;
 
+        // Update Bubble Position
+        setBubbleY(clientY);
+
         // Find the element under the pointer
-        // We use document.elementFromPoint to find the button
-        // Note: We need the X coordinate of the container to be accurate
         const rect = containerRef.current.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
 
@@ -47,9 +50,8 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
                     setActiveDragChar(char);
                     onScrollRequest(alphabetMap[char]);
 
-                    // Provide haptic feedback if available (mobile)
                     if (navigator.vibrate) {
-                        navigator.vibrate(5);
+                        navigator.vibrate(10); // Crisper haptic
                     }
                 }
             }
@@ -70,42 +72,36 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
     const onPointerUp = (e: React.PointerEvent) => {
         setIsDragging(false);
         setActiveDragChar(null);
+        setBubbleY(null);
         e.currentTarget.releasePointerCapture(e.pointerId);
     };
 
     return (
         <>
-            <div className="fixed right-1 top-1/2 -translate-y-[45%] z-50 flex flex-col items-center gap-0.5 pointer-events-auto touch-none">
-                {/* Large Bubble Indicator */}
+            <div className="fixed right-0 top-1/2 -translate-y-[50%] z-50 flex flex-col items-center pointer-events-auto touch-none select-none">
+                {/* Floating Bubble Indicator (Follows Finger) */}
                 <AnimatePresence>
-                    {isDragging && activeDragChar && (
+                    {isDragging && activeDragChar && bubbleY !== null && (
                         <motion.div
                             initial={{ opacity: 0, scale: 0.5, x: 20 }}
-                            animate={{ opacity: 1, scale: 1, x: -40 }}
-                            exit={{ opacity: 0, scale: 0.5 }}
-                            className="absolute top-1/2 -translate-y-1/2 w-16 h-16 bg-gray-900/90 text-white rounded-full flex items-center justify-center text-3xl font-bold shadow-xl backdrop-blur-md"
-                            style={{
-                                top: containerRef.current
-                                    ? (() => {
-                                        // Calculate position relative to the current active button would be complex without state.
-                                        // Simpler: Keep bubble fixed center or follow Y? 
-                                        // User requested "Pop-out when sliding". 
-                                        // Let's make it follow the Y of the finger?
-                                        // Actually fixed to the side of the bar is fine for now, or just fixed center of screen?
-                                        // Let's just put it to the left of the bar.
-                                        return '50%';
-                                    })()
-                                    : '50%'
-                            }}
+                            animate={{ opacity: 1, scale: 1, x: -45 }}
+                            exit={{ opacity: 0, scale: 0.5, x: 20 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                            className="fixed right-2 w-14 h-14 bg-gray-900 shadow-2xl rounded-full rounded-br-none flex items-center justify-center z-50 pointer-events-none transform -translate-y-1/2 rotate-45"
+                            style={{ top: bubbleY }}
                         >
-                            {activeDragChar}
+                            <div className="transform -rotate-45 text-white text-2xl font-bold font-sans">
+                                {activeDragChar}
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
 
+                {/* Index Bar */}
                 <div
                     ref={containerRef}
-                    className="flex flex-col gap-[1px] bg-white/40 backdrop-blur-md py-2 px-1 rounded-full shadow-lg border border-white/20 max-h-[60vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']"
+                    className="flex flex-col gap-[2px] py-4 px-2 pr-1 w-10 sm:w-12 items-center max-h-[75vh] 
+                     overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']"
                     onPointerDown={onPointerDown}
                     onPointerMove={onPointerMove}
                     onPointerUp={onPointerUp}
@@ -121,16 +117,17 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
                                 data-char={char}
                                 type="button"
                                 className={cn(
-                                    "w-4 h-4 flex items-center justify-center text-[9px] font-bold rounded-full transition-all duration-150 select-none shrink-0",
+                                    "w-4 h-4 flex items-center justify-center text-[10px] font-bold rounded-full transition-all duration-200 shrink-0",
                                     isActive
-                                        ? "text-gray-500 hover:text-blue-600"
-                                        : "text-gray-300/50 cursor-default",
-                                    isHighlighted && "scale-150 text-blue-600 font-extrabold"
+                                        ? "text-blue-500"
+                                        : "text-gray-300",
+                                    isHighlighted
+                                        ? "scale-150 text-gray-900"
+                                        : "opacity-80"
                                 )}
-                                // Prevent click from bubbling if needed, but pointer events handle main logic
                                 onClick={(e) => e.preventDefault()}
                             >
-                                {char}
+                                {char === '#' ? '•' : char}
                             </button>
                         )
                     })}
