@@ -54,5 +54,9 @@ class AuthService extends BaseService {
         }
     }
 
+    async resetPassword(email: string) {
+        await auth.sendPasswordResetEmail(email);
+    }
+
 }
 export default new AuthService();

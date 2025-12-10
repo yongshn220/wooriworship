@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useForm } from "react-hook-form"
@@ -23,6 +22,7 @@ import { LoginFormValues, LoginSchema } from "./auth/auth-schema"
 import { Loader2 } from "lucide-react"
 import { useState } from "react"
 
+import { ForgotPasswordDialog } from "./auth/forgot-password-dialog"
 import { PasswordInput } from "./auth/password-input"
 
 export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
@@ -158,12 +158,14 @@ export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
           </Form>
 
           <motion.div variants={itemVariants} className="flex flex-col items-center gap-4 text-sm pt-2">
-            <Link
-              className="text-slate-500 hover:text-slate-800 transition-colors underline-offset-4 hover:underline"
-              href="#"
-            >
-              Forgot your password?
-            </Link>
+            <ForgotPasswordDialog>
+              <button
+                className="text-slate-500 hover:text-slate-800 transition-colors underline-offset-4 hover:underline"
+                type="button"
+              >
+                Forgot your password?
+              </button>
+            </ForgotPasswordDialog>
             <div className="text-slate-500">
               Don&apos;t have an account?{" "}
               <button
