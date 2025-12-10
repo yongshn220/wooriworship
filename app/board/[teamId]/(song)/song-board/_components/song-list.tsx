@@ -1,12 +1,10 @@
 "use client"
 import { useRecoilValue } from "recoil";
 import { currentTeamSongIdsAtom } from "@/global-states/song-state";
-import { Separator } from "@/components/ui/separator";
-import React, { useEffect, useRef, useState, Suspense } from "react";
-import { SongDetailDialogTrigger } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog-trigger";
-import { SongHeaderDefault } from "@/components/elements/design/song/song-header/default/song-header-default";
+import React, { useEffect, useRef, useState } from "react";
 import { EmptySongBoardPage } from "@/app/board/[teamId]/(song)/song-board/_components/empty-song-board-page/empty-song-board-page";
-
+import { SongCard } from "./song-card";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   teamId: string
@@ -47,44 +45,35 @@ export function SongList({ teamId }: Props) {
   }
 
   return (
-    <div className="w-full h-full">
-      <div>
-        <div className="hidden md:flex text-sm text-gray-600 px-6 mt-10 font-semibold">
-          <p className="flex-1">Title</p>
-          <p className="hidden lg:flex flex-[0.4] justify-start border-l border-gray-300 pl-2">Version</p>
-          <div className="hidden sm:flex justify-start sm:flex-1 text-start border-l border-gray-300 pl-2">Tag</div>
-          <p className="flex justify-end lg:flex-[0.5] pl-2">Used on</p>
-        </div>
+    <div className="w-full h-full p-2 sm:p-4 md:p-6 ml-0 sm:ml-4">
+      {/* Header Row for Desktop */}
+      <div className="hidden md:flex items-center px-6 py-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+        <div className="w-16 shrink-0 text-center">Key</div>
+        <div className="flex-1 pl-4">Title</div>
+        <div className="w-1/4">Author</div>
+        <div className="w-1/5 text-right pr-4">Last Used</div>
       </div>
-      <div className="flex-center flex-col mx-2 box-border">
-        {
-          visibleSongIds.map((songId) => (
-            <div key={songId} className="w-full">
-              <Suspense fallback={<SongRowSkeleton />}>
-                <SongDetailDialogTrigger teamId={teamId} songId={songId}>
-                  <SongHeaderDefault songId={songId} />
-                </SongDetailDialogTrigger>
-              </Suspense>
-              <Separator />
-            </div>
-          ))
-        }
-        {/* Load More Trigger */}
-        {visibleSongIds.length < songIds.length && (
-          <div ref={loadMoreRef} className="h-10 w-full flex-center py-4 text-gray-400 text-sm">
-            Loading more...
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
 
-function SongRowSkeleton() {
-  return (
-    <div className="w-full py-4 px-6 flex items-center justify-between animate-pulse">
-      <div className="flex-1 h-4 bg-gray-200 rounded w-1/3"></div>
-      <div className="hidden md:block w-20 h-4 bg-gray-200 rounded ml-4"></div>
+      <AnimatePresence mode="wait">
+        <div className="flex flex-col space-y-2">
+          {
+            visibleSongIds.map((songId, index) => (
+              <SongCard key={songId} teamId={teamId} songId={songId} index={index % 20} />
+            ))
+          }
+        </div>
+      </AnimatePresence>
+
+      {/* Load More Trigger */}
+      {visibleSongIds.length < songIds.length && (
+        <div ref={loadMoreRef} className="h-24 w-full flex justify-center items-center py-8">
+          <div className="flex gap-2 items-center text-gray-400 text-sm font-medium animate-pulse">
+            <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+            <div className="w-2 h-2 rounded-full bg-blue-400 animation-delay-75"></div>
+            <div className="w-2 h-2 rounded-full bg-blue-400 animation-delay-150"></div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
