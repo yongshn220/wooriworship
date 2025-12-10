@@ -33,7 +33,7 @@ import {
   AddWorshipSongDialogTrigger
 } from "@/components/elements/design/song/song-list/worship-form/add-worship-song-dialog-trigger";
 import { BaseForm } from "@/components/elements/util/form/base-form";
-import { LinkIcon } from "lucide-react";
+import { LinkIcon, CalendarIcon, Music } from "lucide-react";
 import PushNotificationService from "@/apis/PushNotificationService";
 import { Separator } from "@/components/ui/separator";
 import { Bell, LogOut, Mail, MailIcon, Settings, Users } from 'lucide-react';
@@ -226,37 +226,28 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
 
   return (
     <BaseForm title="" description="">
-      <div className="w-full max-w-5xl mx-auto min-h-[800px]">
-        {/* 1. Header Actions */}
-        <div className="flex justify-between items-start mb-10 pb-4 border-b border-gray-100">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {mode === FormMode.CREATE ? "New Service Plan" : "Edit Service Plan"}
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">Organize your worship flow and setlist.</p>
-          </div>
-          <div>
-            <Button
-              onClick={mode === FormMode.CREATE ? handleCreate : handleEdit}
-              disabled={isLoading}
-              className="bg-gray-900 hover:bg-black text-white min-w-[120px] shadow-sm transition-all hover:shadow-md"
-            >
-              {isLoading ? "Saving..." : (mode === FormMode.CREATE ? "Create Plan" : "Save Changes")}
-            </Button>
-          </div>
+      <div className="w-full max-w-4xl mx-auto min-h-[800px] py-8">
+        {/* Floating Save Action */}
+        <div className="fixed bottom-8 right-8 z-50 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <Button
+            onClick={mode === FormMode.CREATE ? handleCreate : handleEdit}
+            disabled={isLoading}
+            className="rounded-full h-14 px-8 bg-black hover:bg-gray-800 text-white shadow-xl hover:shadow-2xl transition-all font-semibold text-lg"
+          >
+            {isLoading ? "Saving..." : (mode === FormMode.CREATE ? "Create Plan" : "Save Changes")}
+          </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* 2. Main Content (Left: Title, Chips, Desc, Songs) */}
-          <div className="lg:col-span-2 space-y-10">
-            {/* Title Section */}
+        <div className="space-y-8">
+          {/* 1. Header Section */}
+          <div className="space-y-6">
             <div className="space-y-4">
               <Input
                 id="title"
-                placeholder="Service Title (e.g. Sunday Worship)"
+                placeholder="Service Title..."
                 value={basicInfo.title}
                 onChange={(e) => setBasicInfo(prev => ({ ...prev, title: e.target.value }))}
-                className="text-4xl sm:text-5xl font-extrabold border-none px-0 shadow-none focus-visible:ring-0 placeholder:text-gray-200 text-gray-900 h-auto py-2 bg-transparent leading-tight"
+                className="text-4xl sm:text-5xl font-extrabold border-none px-0 shadow-none focus-visible:ring-0 placeholder:text-gray-200 text-gray-900 h-auto py-2 bg-transparent leading-tight w-full"
               />
 
               {/* Preset Chips */}
@@ -292,79 +283,77 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               </div>
             </div>
 
-            {/* Description */}
-            <div className="group">
-              <Label className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-2 block">Description</Label>
-              <Textarea
-                className="min-h-[120px] bg-transparent resize-none border-none shadow-none p-0 text-gray-600 text-base leading-relaxed placeholder:text-gray-300 focus-visible:ring-0"
-                placeholder="Add notes, sermon topic, or details..."
-                value={basicInfo.description}
-                onChange={(e) => setBasicInfo(prev => ({ ...prev, description: e.target.value }))}
-              />
-            </div>
-
-            <Separator className="bg-gray-100" />
-
-            {/* Songs / Setlist */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold text-gray-900">Setlist</span>
-                <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs font-medium text-gray-500">{selectedWorshipSongHeaderList.length} songs</span>
+            {/* Meta Row (Date, Link, Team) */}
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm">
+              {/* Date */}
+              <div className="flex items-center gap-2 text-gray-500 bg-gray-50 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors">
+                <CalendarIcon className="w-4 h-4" />
+                <div className="min-w-[100px]">
+                  <WorshipDatePicker date={date} setDate={setDate} />
+                </div>
               </div>
 
-              <div className="space-y-4">
-                {beginningSongHeader?.id && <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songHeader={beginningSongHeader} />}
+              {/* Link */}
+              <div className="flex items-center gap-2 flex-1 min-w-[200px] bg-gray-50 px-3 py-1.5 rounded-md focus-within:ring-1 focus-within:ring-blue-500 focus-within:bg-white transition-all">
+                <LinkIcon className="w-4 h-4 text-gray-400" />
+                <input
+                  placeholder="Add a link (e.g. YouTube, Drive)..."
+                  value={basicInfo.link}
+                  onChange={(e) => setBasicInfo(prev => ({ ...prev, link: e.target.value }))}
+                  className="bg-transparent border-none focus:outline-none w-full text-gray-900 placeholder:text-gray-400"
+                />
+              </div>
 
-                {selectedWorshipSongHeaderList.map((songHeader, i) => (
-                  <AddedSongHeaderDefault key={i} teamId={teamId} songOrder={i + 1} songHeader={songHeader} />
-                ))}
+              {/* Team (Read Only) */}
+              <div className="flex items-center gap-2 text-gray-400 px-2 select-none">
+                <Users className="w-4 h-4" />
+                <span className="font-medium">{team?.name}</span>
+              </div>
+            </div>
+          </div>
 
-                {endingSongHeader?.id && <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.ENDING} songHeader={endingSongHeader} />}
+          <Separator className="bg-gray-100" />
 
+          {/* 2. Description */}
+          <div className="space-y-2">
+            <Label className="text-xs text-gray-400 font-bold uppercase tracking-wider block ml-1">Context</Label>
+            <Textarea
+              className="min-h-[100px] bg-gray-50/50 resize-y border-none shadow-sm rounded-xl p-4 text-gray-600 text-base leading-relaxed placeholder:text-gray-300 focus-visible:ring-1 focus-visible:ring-gray-200"
+              placeholder="Add notes, sermon topic, or details..."
+              value={basicInfo.description}
+              onChange={(e) => setBasicInfo(prev => ({ ...prev, description: e.target.value }))}
+            />
+          </div>
+
+          <Separator className="bg-gray-100" />
+
+          {/* 3. Song List (Setlist) */}
+          <div className="space-y-6 pt-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Music className="w-5 h-5 text-gray-900" />
+                <span className="text-xl font-bold text-gray-900">Setlist</span>
+                <span className="ml-2 px-2.5 py-0.5 rounded-full bg-gray-100 text-xs font-medium text-gray-600 border border-gray-200">{selectedWorshipSongHeaderList.length}</span>
+              </div>
+              {/* Optional: Add button here too? */}
+            </div>
+
+            <div className="space-y-3 pl-0 sm:pl-4 border-l-2 border-gray-100/50">
+              {beginningSongHeader?.id && <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songHeader={beginningSongHeader} />}
+
+              {selectedWorshipSongHeaderList.map((songHeader, i) => (
+                <AddedSongHeaderDefault key={i} teamId={teamId} songOrder={i + 1} songHeader={songHeader} />
+              ))}
+
+              {endingSongHeader?.id && <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.ENDING} songHeader={endingSongHeader} />}
+
+              <div className="pt-2">
                 <AddWorshipSongDialogTrigger teamId={teamId}>
                   <AddSongButton />
                 </AddWorshipSongDialogTrigger>
               </div>
             </div>
           </div>
-
-          {/* 3. Sidebar (Right: Date, Link, Meta) */}
-          <div className="lg:col-span-1">
-            <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100/80 sticky top-10 space-y-6">
-              <div>
-                <Label className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-3 block">Date</Label>
-                <div className="bg-white rounded-md shadow-sm">
-                  <WorshipDatePicker date={date} setDate={setDate} />
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-3 block">Link</Label>
-                <div className="relative">
-                  <LinkIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="link"
-                    placeholder="https://..."
-                    value={basicInfo.link}
-                    onChange={(e) => setBasicInfo((prev => ({ ...prev, link: e.target.value })))}
-                    className="w-full pl-9 bg-white border-gray-200 focus-visible:ring-gray-200"
-                  />
-                </div>
-              </div>
-
-              {/* Team Info */}
-              <div>
-                <Label className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-3 block">Team</Label>
-                <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100 shadow-sm">
-                  <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 border border-gray-100">
-                    <Users className="h-4 w-4" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 truncate">{team?.name}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
     </BaseForm>
