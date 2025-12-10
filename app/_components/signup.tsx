@@ -1,92 +1,187 @@
-'use client'
+"use client"
 
-import {CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
-import {useState} from "react";
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { LandingMode } from "@/app/_components/landing-page"
 import { AuthService, UserService } from "@/apis"
-import {LandingMode} from "@/app/_components/landing-page";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { SignupFormValues, SignupSchema } from "./auth/auth-schema"
+import { Loader2 } from "lucide-react"
+import { useState } from "react"
+import { toast } from "@/components/ui/use-toast"
 
-export function Signup({setMode}: any) {
-    const [signup, setSignup] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+export function Signup({ setMode }: { setMode: (mode: LandingMode) => void }) {
+  const [isLoading, setIsLoading] = useState(false)
+
+  const form = useForm<SignupFormValues>({
+    resolver: zodResolver(SignupSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
   })
 
+  async function onSubmit(data: SignupFormValues) {
+    setIsLoading(true)
+    try {
+      // 1. Register with Firebase Auth
+      const userCredential = await AuthService.register(data.email, data.password)
 
-  async function handleSignup() {
-    console.log(signup.name)
-    console.log(signup.email)
-    console.log(signup.password)
-    console.log(signup.confirmPassword)
-    if(signup.password != signup.confirmPassword) {
-      console.log("password and confirm password not same");
-      return;
-    }
-    if(signup.name.length == 0) {
-      console.log("Name is not given")
-      return;
-    }
-    await AuthService.register(signup.email, signup.password).then(async user => {
-      if(user.user){
-        const sessionUser = await UserService.addNewUser(user.user.uid, signup.email, signup.name);
-        //여기에 userState 를 new user로 넣어야함
-        console.log(sessionUser);
-        alert("New user created");
-      } else {
-        alert("error occured");
+      if (userCredential.user) {
+        // 2. Create user record in DB
+        await UserService.addNewUser(
+          userCredential.user.uid,
+          data.email,
+          data.name
+        )
+
+        toast({
+          title: "Account created successfully!",
+          description: "Welcome to Worship Team Manager.",
+        })
+
+        // Mode will likely change via parent state or global auth listener, 
+        // but explicit feedback is good.
       }
-    }, err => {
-        console.log(err.code);
-        switch (err.code) {
-            case 'auth/invalid-email':
-                alert("email is invalid");
-                break;
-            case 'auth/email-already-in-use':
-                alert("email is already in use");
-                break;
-            default:
-                console.log(err.code);
-                alert("there was error in creating account");
-                break;
-        }
-    });
+    } catch (err: any) {
+      switch (err.code) {
+        case "auth/email-already-in-use":
+          form.setError("email", {
+            message: "Email is already in use.",
+          })
+          break
+        case "auth/invalid-email":
+          form.setError("email", {
+            message: "Invalid email address.",
+          })
+          break
+        case "auth/weak-password":
+          form.setError("password", {
+            message: "Password is too weak.",
+          })
+          break
+        default:
+          toast({
+            title: "Error creating account",
+            description: "Please try again later.",
+            variant: "destructive",
+          })
+          console.error(err) // acceptable for unknown errors, but avoid logging PII
+          break
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <div className="w-full flex-center">
-      <div className="w-full sm:max-w-lg">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-3xl font-bold">Sign Up</CardTitle>
-        </CardHeader>
-          <CardContent className="space-y-4">
-          <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="signupName" required type="name" onChange={(e) => setSignup((prev) => ({...prev, name: e.target.value}))}/>
-              </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="signupEmail" placeholder="m@example.com" required type="email" onChange={(e) => setSignup((prev) => ({...prev, email: e.target.value}))}/>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="signupPassword" required type="password" onChange={(e) => setSignup((prev) => ({...prev, password: e.target.value}))}/>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Confirm Password</Label>
-              <Input id="signupconfirmPassword" required type="password" onChange={(e) => setSignup((prev) => ({...prev, confirmPassword: e.target.value}))}/>
-            </div>
-            <Button className="w-full" onClick={handleSignup}>Sign Up</Button>
-            <div className="flex-center mt-4 text-center text-sm gap-2">
-              <p>Already have an account?</p>
-              <div className="underline cursor-pointer" onClick={() => {setMode(LandingMode.LOGIN)}}>
-                Sign In
-              </div>
-            </div>
-        </CardContent>
+    <div className="w-full h-full flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white/50 backdrop-blur-md border border-white/20 rounded-xl shadow-xl p-6 space-y-6">
+        <div className="space-y-2 text-center">
+          <h1 className="text-3xl font-bold tracking-tighter">Create Account</h1>
+          <p className="text-gray-500 text-sm">
+            Join your team and start planning worship together
+          </p>
+        </div>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John Doe" className="bg-white/50" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="name@example.com"
+                      className="bg-white/50"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="••••••"
+                      className="bg-white/50"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="••••••"
+                      className="bg-white/50"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button className="w-full" type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Sign Up
+            </Button>
+          </form>
+        </Form>
+
+        <div className="flex flex-col items-center gap-4 text-sm">
+          <div className="text-gray-500">
+            Already have an account?{" "}
+            <button
+              className="font-semibold text-primary underline-offset-4 hover:underline"
+              onClick={() => setMode(LandingMode.LOGIN)}
+            >
+              Sign In
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
