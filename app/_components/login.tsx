@@ -10,6 +10,7 @@ import Link from "next/link"
 import { LandingMode } from "@/app/_components/landing-page"
 import { AuthService } from "@/apis"
 import { toast } from "@/components/ui/use-toast"
+import { motion } from "framer-motion"
 import {
   Form,
   FormControl,
@@ -60,84 +61,120 @@ export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
     }
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  }
+
   return (
     <div className="w-full h-full flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white/50 backdrop-blur-md border border-white/20 rounded-xl shadow-xl p-6 space-y-6">
-        <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold tracking-tighter">Welcome Back</h1>
-          <p className="text-gray-500 text-sm">
-            Enter your credentials to access your workspace
-          </p>
-        </div>
+      <div className="w-full max-w-md bg-white/70 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-6"
+        >
+          <motion.div variants={itemVariants} className="space-y-2 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-800">Welcome Back</h1>
+            <p className="text-slate-500 text-sm">
+              Enter your credentials to access your workspace
+            </p>
+          </motion.div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="name@example.com"
-                      className="bg-white/50"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+              <motion.div variants={itemVariants}>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-700 font-medium">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="name@example.com"
+                          className="bg-white/60 border-slate-200 focus:bg-white focus:border-blue-500 transition-all duration-300"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-700 font-medium">Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          className="bg-white/60 border-slate-200 focus:bg-white focus:border-blue-500 transition-all duration-300"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </motion.div>
+
+              {form.formState.errors.root && (
+                <motion.div variants={itemVariants} className="p-3 rounded-lg bg-red-50 text-red-600 border border-red-100">
+                  <p className="text-sm font-medium text-center">
+                    {form.formState.errors.root.message}
+                  </p>
+                </motion.div>
               )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="••••••"
-                      className="bg-white/50"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
-            {form.formState.errors.root && (
-              <p className="text-sm font-medium text-destructive text-center">
-                {form.formState.errors.root.message}
-              </p>
-            )}
+              <motion.div variants={itemVariants}>
+                <Button
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02]"
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Sign In
+                </Button>
+              </motion.div>
+            </form>
+          </Form>
 
-            <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign In
-            </Button>
-          </form>
-        </Form>
-
-        <div className="flex flex-col items-center gap-4 text-sm">
-          <Link
-            className="text-gray-500 hover:text-gray-900 transition-colors underline-offset-4 hover:underline"
-            href="#"
-          >
-            Forgot your password?
-          </Link>
-          <div className="text-gray-500">
-            Don&apos;t have an account?{" "}
-            <button
-              className="font-semibold text-primary underline-offset-4 hover:underline"
-              onClick={() => setMode(LandingMode.SIGNUP)}
+          <motion.div variants={itemVariants} className="flex flex-col items-center gap-4 text-sm pt-2">
+            <Link
+              className="text-slate-500 hover:text-slate-800 transition-colors underline-offset-4 hover:underline"
+              href="#"
             >
-              Sign Up
-            </button>
-          </div>
-        </div>
+              Forgot your password?
+            </Link>
+            <div className="text-slate-500">
+              Don&apos;t have an account?{" "}
+              <button
+                className="font-semibold text-blue-600 hover:text-blue-700 underline-offset-4 hover:underline transition-colors"
+                onClick={() => setMode(LandingMode.SIGNUP)}
+              >
+                Sign Up
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   )

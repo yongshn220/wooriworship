@@ -1,11 +1,11 @@
 'use client'
-import {RoutingPage} from "@/app/_components/routing-page";
-import {LandingPage} from "@/app/_components/landing-page";
-import {useEffect, useState} from "react";
-import {auth} from "@/firebase";
-import {getPathBoard, getPathPlan} from "@/components/util/helper/routes";
-import {useRouter} from "next/navigation";
-import {UserService} from "@/apis";
+import { RoutingPage } from "@/app/_components/routing-page";
+import { LandingPage } from "@/app/_components/landing-page";
+import { useEffect, useState } from "react";
+import { auth } from "@/firebase";
+import { getPathBoard, getPathPlan } from "@/components/util/helper/routes";
+import { useRouter } from "next/navigation";
+import { UserService } from "@/apis";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
 
 
@@ -21,12 +21,10 @@ export default function RoutePage() {
   const router = useRouter()
 
   useEffect(() => {
-    auth.onAuthStateChanged((authUser) => {
-      console.log("ON AUTH STATE CHANGED")
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
         UserService.getById(authUser.uid).then((user: any) => {
           if (!user) {
-            console.log("Something went wrong.")
             return;
           }
 
@@ -35,7 +33,7 @@ export default function RoutePage() {
             return
           }
 
-          const teamId = user.teams.includes(preferences.board.selectedTeamId)? preferences.board.selectedTeamId : user.teams[0]
+          const teamId = user.teams.includes(preferences.board.selectedTeamId) ? preferences.board.selectedTeamId : user.teams[0]
           router.replace(getPathPlan(teamId))
         })
       }
@@ -43,14 +41,15 @@ export default function RoutePage() {
         setAuthStatus(AuthStatus.NOT_VALID)
       }
     });
+    return () => unsubscribe()
   }, [preferences.board.selectedTeamId, router]);
 
   return (
-    <div>
+    <div className="w-full h-full">
       {
         authStatus === AuthStatus.NOT_VALID
-          ? <LandingPage/>
-          : <RoutingPage/>
+          ? <LandingPage />
+          : <RoutingPage />
       }
     </div>
   )
