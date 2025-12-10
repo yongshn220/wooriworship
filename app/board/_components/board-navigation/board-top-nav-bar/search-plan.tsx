@@ -19,8 +19,13 @@ export function SearchPlan() {
       />
       <div className="absolute right-1.5 top-1/2 transform -translate-y-1/2">
         {/* Currently just for visual consistency, functionality can be added later if needed */}
-        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600">
-          <SlidersHorizontal size={14} />
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 px-3 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-900 flex items-center gap-1.5 transition-colors text-xs font-medium"
+        >
+          <span>Filter</span>
+          <SlidersHorizontal size={12} />
         </Button>
       </div>
     </div>
