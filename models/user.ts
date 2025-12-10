@@ -6,6 +6,7 @@ export interface User {
   last_logged_in_time: Date
   teams: Array<string>
   invite_optin: Boolean
+  email_verified: boolean
 }
 
 

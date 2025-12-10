@@ -1,7 +1,7 @@
 
 import { auth, firebaseApp } from "@/firebase";
 import { BaseService, UserService } from './';
-import {User} from "@/models/user";
+import { User } from "@/models/user";
 
 class AuthService extends BaseService {
     constructor() {
@@ -12,7 +12,7 @@ class AuthService extends BaseService {
         const user = await auth.signInWithEmailAndPassword(email, password);
         if (user.user) {
             const serverUserInfo = await UserService.getById(user.user.uid) as User;
-            await UserService.update(user.user.uid, {last_logged_in_time: new Date()});
+            await UserService.update(user.user.uid, { last_logged_in_time: new Date() });
             return serverUserInfo;
         }
         return null;
@@ -21,8 +21,8 @@ class AuthService extends BaseService {
     async loginTemp(email: string, password: string) {
         const user = await auth.signInWithEmailAndPassword(email, password);
         if (user.user) {
-            await UserService.update(user.user.uid, {last_logged_in_time: new Date()});
-            return {uid: user.user.uid}
+            await UserService.update(user.user.uid, { last_logged_in_time: new Date() });
+            return { uid: user.user.uid }
         }
         return null;
     }
@@ -30,7 +30,7 @@ class AuthService extends BaseService {
     async loginWithCustomToken(token: string) {
         const user = await auth.signInWithCustomToken(token);
         if (user.user) {
-            await UserService.update(user.user.uid, {last_logged_in_time: new Date()});
+            await UserService.update(user.user.uid, { last_logged_in_time: new Date() });
             console.log("SUC - loginWithCustomToken")
             return true
         }
@@ -46,6 +46,12 @@ class AuthService extends BaseService {
             await this.logout();
         }
         return await firebaseApp.auth().createUserWithEmailAndPassword(email, password);
+    }
+
+    async sendEmailVerification(user: any) {
+        if (user && !user.emailVerified) {
+            await user.sendEmailVerification();
+        }
     }
 
 }
