@@ -104,7 +104,7 @@ export function AddableSongHeaderDefault({ teamId, songId }: Props) {
                     }])
                   }
                 }}
-                className={`h-8 px-4 rounded-full text-xs font-bold transition-all ${isSelected ? "bg-black text-white shadow-md ring-2 ring-black ring-offset-1" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
+                className={`h-8 px-4 rounded-full text-xs font-bold transition-all ${isSelected ? "bg-blue-600 text-white shadow-md ring-2 ring-blue-600 ring-offset-1" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
               >
                 {isSelected ? "Added" : "Add Song"}
               </button>
@@ -119,7 +119,7 @@ export function AddableSongHeaderDefault({ teamId, songId }: Props) {
                   className={`
                              h-9 min-w-[3rem] px-3 rounded-lg text-sm font-bold transition-all border
                              ${isKeySelected
-                      ? "bg-black border-black text-white shadow-md scale-100 ring-2 ring-black ring-offset-1"
+                      ? "bg-blue-600 border-blue-600 text-white shadow-md scale-100 ring-2 ring-blue-600 ring-offset-1"
                       : "bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"}
                            `}
                 >

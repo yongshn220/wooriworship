@@ -107,21 +107,8 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
                     msOverflowStyle: 'none',
                 }}
             >
-                <div className="relative w-full" style={{ height: (chars.length + VISIBLE_ITEMS * 2) * ITEM_HEIGHT }}>
+                <div className="relative w-full" style={{ height: (chars.length - 1) * ITEM_HEIGHT + 500 }}>
                     {chars.map((char, i) => {
-                        // Calculate relative position to center
-                        // We add padding (VISIBLE_ITEMS * ITEM_HEIGHT) to top/bottom so first/last items can be centered
-                        // The actual item index in the scrollable area needs to account for this padding if we rendered padding divs, 
-                        // but here let's simplify: we'll pad the top/bottom of the container list with huge margins or spacer divs?
-                        // Better: Render items absolutely positioned or just transformed based on scroll?
-                        // Standard scroll approach: List is tall. 
-                        // We need 'padding' visually. Let's add paddingTop/Bottom to container internal div.
-
-                        // Refined Math: 
-                        // The scrollable area height should allow index 0 to be at scrollTop 0? No, scrollTop 0 means index 0 is at top. We want index 0 to be at CENTER.
-                        // So we need clear padding top = containerHeight/2 - itemHeight/2.
-
-                        // Dynamic container height check would be better, but for now we sync with CSS class
                         // Adjusted Physics for better visibility
                         const containerHeight = 500;
 
@@ -182,8 +169,6 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
                             </div>
                         );
                     })}
-                    {/* Spacer at bottom to allow scrolling last item to center */}
-                    <div style={{ height: (chars.length) * ITEM_HEIGHT + 260 }} className="w-px pointer-events-none opacity-0" />
                 </div>
             </div>
         </div>
