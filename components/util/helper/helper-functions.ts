@@ -305,6 +305,50 @@ export async function downloadMultipleMusicSheets(songs: Array<Song>) {
   saveAs(blob, 'music_sheets.zip');
 }
 
+export async function shareMusicSheets(songs: Array<Song>) {
+  if (navigator.canShare && navigator.canShare({ files: [new File([], 'test.png')] })) {
+    const files: File[] = []
+
+    for (const song of songs) {
+      const musicSheets = await MusicSheetService.getSongMusicSheets(song?.id)
+      for (const musicSheet of musicSheets) {
+        let index = 1
+        for (const url of musicSheet?.urls) {
+          const blob = await fetchImageAsBlob(url);
+          const ext = extractFileType(url);
+          // Files must have valid image extensions for sharing
+          const fileName = musicSheet?.urls?.length > 1
+            ? `${song?.title} [${musicSheet?.key}]_${index}.${ext}`
+            : `${song?.title} [${musicSheet?.key}].${ext}`;
+
+          files.push(new File([blob], fileName, { type: blob.type }));
+          index += 1
+        }
+      }
+    }
+
+    if (files.length > 0) {
+      try {
+        await navigator.share({
+          files: files,
+          title: 'Worship Music Sheets',
+          text: 'Here are the music sheets for the worship.',
+        });
+        return;
+      } catch (error) {
+        console.error('Error sharing:', error);
+        // Fallback to download if sharing fails/cancelled and it's not an AbortError
+        if ((error as Error).name !== 'AbortError') {
+          await downloadMultipleMusicSheets(songs);
+        }
+      }
+    }
+  } else {
+    // Fallback for devices that don't support file sharing
+    await downloadMultipleMusicSheets(songs);
+  }
+}
+
 export function getAllUrlsFromMusicSheetContainers(mContainers: MusicSheetContainer[]) {
   if (!mContainers) {
     console.log("getAllUrlsFromMusicSheetContainers: mContainer is not exists."); return []
