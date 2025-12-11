@@ -119,15 +119,10 @@ export default function WorshipLivePage({ params }: any) {
                     </motion.div>
 
                     {/* Indicator - Always rendered */}
-                    <motion.div
-                        variants={indicatorVariants}
-                        initial="visible"
-                        animate={uiVisible ? "visible" : "hidden"}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-0 left-0 w-full h-full pointer-events-none z-30"
-                    >
+                    {/* Indicator - Always rendered, visible based on its own toggle */}
+                    <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-30">
                         <WorshipIndexIndicator />
-                    </motion.div>
+                    </div>
                 </div>
             </DialogContentNoCloseButton>
         </Dialog>
