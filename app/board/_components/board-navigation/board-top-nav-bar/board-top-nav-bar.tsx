@@ -134,7 +134,7 @@ export function BoardTopNavBar() {
               className="w-full flex items-center justify-between"
             >
               {/* Left Side: Title or Logo */}
-              <div className="flex-center flex-col w-full h-full">
+              <div className="flex items-center gap-3">
                 {currentConfig.showLogo ? (
                   <div className="opacity-90 hover:opacity-100 transition-opacity">
                     <MainLogoSmall />
