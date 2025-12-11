@@ -130,7 +130,7 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader }: Props)
         {/* Note Area */}
         <div className="w-full flex-1 mt-2">
           <Textarea
-            className="w-full h-full min-h-[60px] bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 resize-none placeholder:text-gray-400 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-all"
+            className="w-full h-full min-h-[60px] bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-base text-gray-700 resize-none placeholder:text-gray-400 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-all"
             placeholder="Write a note (e.g. key change, solo part...)"
             value={songHeader?.note}
             onChange={(e) => handleOnNoteChange(e.target.value)}

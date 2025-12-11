@@ -44,7 +44,61 @@ export function SongList({ teamId }: Props) {
     };
   }, [songIds]);
 
+  /* ----------------------------------------------------
+     * Scroll Sync Logic (List -> Indexer)
+     * ---------------------------------------------------- */
+  const [activeIndex, setActiveIndex] = useState(0);
+  const isProgrammaticScroll = useRef(false);
+  const programmaticScrollTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const scrollContainer = document.querySelector('main') as HTMLElement; // Based on BoardLayout
+    if (!scrollContainer) return;
+
+    let ticking = false;
+
+    const handleScroll = () => {
+      // If we are scrolling because of a click on the indexer, don't update the active char
+      // This prevents the indexer from "jumping back" while the list is traveling to the target
+      if (isProgrammaticScroll.current) return;
+
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          // Find the first visible item
+          const containerTop = scrollContainer.getBoundingClientRect().top;
+
+          for (let i = 0; i < displayedCount; i++) {
+            const el = document.getElementById(`song-row-${i}`);
+            if (!el) continue;
+
+            const rect = el.getBoundingClientRect();
+            if (rect.bottom > containerTop + 50) {
+              setActiveIndex(i);
+              break;
+            }
+          }
+
+          ticking = false;
+        });
+
+        ticking = true;
+      }
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    return () => scrollContainer.removeEventListener('scroll', handleScroll);
+  }, [displayedCount]);
+
   const handleScrollRequest = (index: number) => {
+    // Set lock
+    isProgrammaticScroll.current = true;
+    if (programmaticScrollTimeout.current) clearTimeout(programmaticScrollTimeout.current);
+
+    // Release lock after enough time for scroll to settle (approx 1s)
+    programmaticScrollTimeout.current = setTimeout(() => {
+      isProgrammaticScroll.current = false;
+    }, 1000);
+
     // 1. Ensure the item is rendered
     if (index >= displayedCount) {
       setDisplayedCount(index + 20); // Load enough to show it
@@ -54,7 +108,7 @@ export function SongList({ teamId }: Props) {
     setTimeout(() => {
       const element = document.getElementById(`song-row-${index}`);
       if (element) {
-        element.scrollIntoView({ behavior: "auto", block: "center" });
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }, 50); // Small delay to allow React to commit changes
   };
@@ -65,7 +119,7 @@ export function SongList({ teamId }: Props) {
 
   return (
     <div className="w-full h-full p-2 sm:p-4 md:p-6 relative">
-      <AlphabetIndexer teamId={teamId} onScrollRequest={handleScrollRequest} />
+      <AlphabetIndexer teamId={teamId} onScrollRequest={handleScrollRequest} activeIndex={activeIndex} />
 
       {/* Header Row for Desktop */}
       <div className="hidden md:flex items-center px-6 py-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">

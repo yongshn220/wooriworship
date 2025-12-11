@@ -337,13 +337,15 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
             >
               <div className="space-y-4 text-center">
                 <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 3</Label>
-                <h2 className="text-2xl font-bold text-gray-900">Add Context</h2>
+                <div className="flex items-baseline justify-center gap-2">
+                  <h2 className="text-2xl font-bold text-gray-900">Add Context</h2>
+                  <span className="text-gray-400 font-normal text-sm lowercase">(optional)</span>
+                </div>
               </div>
 
               {/* Card */}
               <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-4">
                 <Textarea
-                  autoFocus
                   placeholder="Add sermon topic, announcements, or any notes..."
                   value={basicInfo.description}
                   onChange={(e) => setBasicInfo(prev => ({ ...prev, description: e.target.value }))}
