@@ -65,32 +65,34 @@ export function AddableSongHeaderDefault({ teamId, songId }: Props) {
         teamId={teamId}
         readOnly={true}
       />
-      <div className="relative w-full h-[64px] sm:h-[100px] border-b border-gray-100 hover:bg-gray-50 transition-colors group">
-        <div className="flex items-center w-full h-full p-1 sm:p-5 gap-1.5 sm:gap-3">
+      <div className="relative w-full min-h-[80px] h-auto border-b border-gray-100 hover:bg-gray-50 transition-colors group py-4">
+        <div className="flex flex-col w-full h-full px-4 sm:px-6 gap-3">
 
-          {/* Song Info (Left Column) */}
+          {/* Song Info (Top Row) */}
           <div
-            className="flex-1 min-w-0 flex flex-col justify-between h-full py-0.5 sm:py-1 px-1 cursor-pointer"
+            className="w-full flex flex-col justify-center cursor-pointer"
             onClick={() => setIsDetailOpen(true)}
           >
             {/* Title + Subtitle */}
-            <div className="text-[14px] sm:text-lg font-bold text-gray-900 group-hover:text-blue-700 transition-colors truncate leading-tight -tracking-[0.03em]">
-              {song?.title}
+            <div className="flex items-baseline gap-2 w-full">
+              <span className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-blue-700 transition-colors leading-tight -tracking-[0.03em]">
+                {song?.title}
+              </span>
               {song?.subtitle && (
-                <span className="text-[11px] sm:text-sm font-normal text-gray-400 ml-1.5 sm:ml-2 align-baseline">
+                <span className="text-xs sm:text-sm font-normal text-gray-400 truncate">
                   {song?.subtitle}
                 </span>
               )}
             </div>
 
             {/* Author */}
-            <div className="text-[10px] sm:text-xs text-gray-500 truncate mt-auto mb-0.5">
+            <div className="text-[11px] sm:text-xs text-gray-500 truncate mt-0.5">
               {song?.original?.author || "Unknown Artist"}
             </div>
           </div>
 
-          {/* Key Buttons (The Chips) */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Key Buttons (Bottom Row) */}
+          <div className="flex items-center flex-wrap gap-2 w-full">
             {musicSheets?.length === 0 && (
               <button
                 onClick={() => {
@@ -102,9 +104,9 @@ export function AddableSongHeaderDefault({ teamId, songId }: Props) {
                     }])
                   }
                 }}
-                className={`h-9 px-4 rounded-full text-sm font-bold transition-all ${isSelected ? "bg-blue-600 text-white shadow-md" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
+                className={`h-8 px-4 rounded-full text-xs font-bold transition-all ${isSelected ? "bg-black text-white shadow-md ring-2 ring-black ring-offset-1" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
               >
-                {isSelected ? "Added" : "Add"}
+                {isSelected ? "Added" : "Add Song"}
               </button>
             )}
 
@@ -115,10 +117,10 @@ export function AddableSongHeaderDefault({ teamId, songId }: Props) {
                   key={sheet.id}
                   onClick={() => handleToggleKey(sheet.id)}
                   className={`
-                             h-10 min-w-[3rem] px-3 rounded-xl text-sm font-bold transition-all border
+                             h-9 min-w-[3rem] px-3 rounded-lg text-sm font-bold transition-all border
                              ${isKeySelected
-                      ? "bg-blue-600 border-blue-600 text-white shadow-lg scale-105"
-                      : "bg-white border-gray-200 text-gray-600 hover:border-blue-300 hover:bg-blue-50"}
+                      ? "bg-black border-black text-white shadow-md scale-100 ring-2 ring-black ring-offset-1"
+                      : "bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"}
                            `}
                 >
                   {sheet.key}
