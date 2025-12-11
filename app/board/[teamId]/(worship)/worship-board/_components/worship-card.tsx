@@ -31,7 +31,7 @@ import { worshipAtom, worshipSongListAtom } from "@/global-states/worship-state"
 import { userAtom } from "@/global-states/userState";
 import { planSearchInputAtom } from "@/app/board/_states/board-states";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
-import { DownloadMusicSheetDialog } from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_components/download-music-sheet-dialog";
+import { DownloadMusicSheetDialog } from "@/app/board/[teamId]/(worship)/worship-board/_components/download-music-sheet-dialog";
 import { WorshipHeaderMenu } from "./worship-header-menu";
 
 interface Props {
