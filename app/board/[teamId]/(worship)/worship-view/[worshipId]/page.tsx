@@ -8,17 +8,23 @@ import {
     WorshipLiveCarousel
 } from "./_components/worship-live-carousel";
 import {
-    WorshipLiveMenu
-} from "./_components/worship-live-menu";
+    WorshipControlDock
+} from "./_components/worship-control-dock";
 import {
     WorshipIndexIndicator
 } from "./_components/worship-index-indicator";
+import { WorshipNote } from "./_components/worship-note";
 
+
+import { AnimatePresence, motion } from "framer-motion";
+import { useRecoilState } from "recoil";
+import { worshipUIVisibilityAtom } from "./_states/worship-detail-states";
 
 export default function WorshipLivePage({ params }: any) {
     const teamId = params.teamId
     const worshipId = params.worshipId
     const router = useRouter()
+    const [uiVisible, setUiVisible] = useRecoilState(worshipUIVisibilityAtom)
 
     function handleOpenChange(isOpen: boolean) {
         if (!isOpen) {
@@ -26,15 +32,58 @@ export default function WorshipLivePage({ params }: any) {
         }
     }
 
+    function toggleUI() {
+        setUiVisible(!uiVisible)
+    }
+
     return (
         <Dialog open={true} onOpenChange={handleOpenChange}>
-            <DialogContentNoCloseButton className="flex-center w-full max-w-8xl h-full p-0">
+            <DialogContentNoCloseButton className="flex-center w-full max-w-8xl h-full p-0 bg-transparent border-none shadow-none focus:outline-none ring-0 outline-none">
                 <VisuallyHidden>
                     <DialogTitle>Worship Live Page</DialogTitle>
                 </VisuallyHidden>
-                <WorshipLiveCarousel worshipId={worshipId} />
-                <WorshipLiveMenu teamId={teamId} worshipId={worshipId} />
-                <WorshipIndexIndicator />
+
+                <div className="relative w-full h-full bg-white dark:bg-black overflow-hidden" onClick={toggleUI}>
+                    <WorshipLiveCarousel worshipId={worshipId} />
+
+                    <AnimatePresence>
+                        {uiVisible && (
+                            <>
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="pointer-events-none" // Helper wrapper to pass props if needed, or just fragments
+                                >
+                                    <WorshipNote />
+                                </motion.div>
+
+                                <motion.div
+                                    initial={{ y: 100, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    exit={{ y: 100, opacity: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    // Stop propagation on Dock so clicking buttons doesn't toggle UI
+                                    className="absolute bottom-0 w-full flex justify-center z-50 pointer-events-auto"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <WorshipControlDock teamId={teamId} worshipId={worshipId} />
+                                </motion.div>
+
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="pointer-events-none"
+                                >
+                                    <WorshipIndexIndicator />
+                                </motion.div>
+                            </>
+                        )}
+                    </AnimatePresence>
+                </div>
             </DialogContentNoCloseButton>
         </Dialog>
     )

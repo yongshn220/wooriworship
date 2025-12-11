@@ -6,7 +6,7 @@ import { Carousel, type CarouselApi, CarouselContent, } from "@/components/ui/ca
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { worshipAtom } from "@/global-states/worship-state";
 import { WorshipSongHeader } from "@/models/worship";
-import { worshipIndexAtom, worshipIndexChangeEventAtom } from "../_states/worship-detail-states";
+import { worshipIndexAtom, worshipIndexChangeEventAtom, worshipNoteAtom } from "../_states/worship-detail-states";
 import { WorshipLiveCarouselItemWrapper } from "./worship-live-carousel-item";
 
 interface Props {
@@ -15,12 +15,14 @@ interface Props {
 
 export interface MusicSheetCounts {
     id: string,
-    count: number
+    count: number,
+    note?: string
 }
 
 export function WorshipLiveCarousel({ worshipId }: Props) {
     const worship = useRecoilValue(worshipAtom(worshipId))
     const setWorshipIndex = useSetRecoilState(worshipIndexAtom)
+    const setWorshipNote = useSetRecoilState(worshipNoteAtom)
     const worshipIndexChangeEvent = useRecoilValue(worshipIndexChangeEventAtom)
     const [musicSheetCounts, setMusicSheetCounts] = useState<Array<MusicSheetCounts>>([])
     const [api, setApi] = useState<CarouselApi>()
@@ -45,13 +47,35 @@ export function WorshipLiveCarousel({ worshipId }: Props) {
         }
     }, [api, worshipIndexChangeEvent]);
 
+    // Calculate current note based on index
     useEffect(() => {
         if (!api) return
 
-        api.on("select", () => {
-            setWorshipIndex((prev) => ({ ...prev, current: api.selectedScrollSnap() }))
-        })
-    }, [aggregatedSongHeaders.length, setWorshipIndex, api])
+        const handleSelect = () => {
+            const currentIndex = api.selectedScrollSnap()
+            setWorshipIndex((prev) => ({ ...prev, current: currentIndex }))
+
+            let accumulatedCount = 0
+            let foundNote = ""
+
+            for (const item of musicSheetCounts) {
+                if (currentIndex < accumulatedCount + item.count) {
+                    foundNote = item.note || ""
+                    break
+                }
+                accumulatedCount += item.count
+            }
+            setWorshipNote(foundNote)
+        }
+
+        api.on("select", handleSelect)
+        // Initial set
+        handleSelect()
+
+        return () => {
+            api.off("select", handleSelect)
+        }
+    }, [musicSheetCounts, setWorshipIndex, setWorshipNote, api])
 
     useEffect(() => {
         let totalCounts = 0

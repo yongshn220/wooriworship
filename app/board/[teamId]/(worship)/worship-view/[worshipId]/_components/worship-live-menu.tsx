@@ -1,13 +1,13 @@
 'use client'
 
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { MenuIcon, DoorOpenIcon, SquarePenIcon, Trash2Icon } from "lucide-react";
+import { useRecoilState } from "recoil";
+import { MenuIcon, DoorOpenIcon, SquarePenIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
-import { getPathEditPlan, getPathPlan } from "@/components/util/helper/routes";
+import { getPathPlan } from "@/components/util/helper/routes";
 import { Button } from "@/components/ui/button";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
 import { worshipLiveOptionsAtom } from "../_states/worship-detail-states";
@@ -15,11 +15,6 @@ import {
     MultipleSheetsViewSelect
 } from "./multiple-sheets-view-select";
 import { WorshipViewPageModeSelect } from "./worship-view-page-mode-select";
-import { useState } from "react";
-import { currentTeamWorshipIdsAtom, worshipAtom } from "@/global-states/worship-state";
-import { WorshipService } from "@/apis";
-import { toast } from "@/components/ui/use-toast";
-import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 
 
 interface Props {
@@ -31,11 +26,6 @@ export function WorshipLiveMenu({ teamId, worshipId }: Props) {
     const [preference, prefSetter] = useUserPreferences()
     const [option, setOption] = useRecoilState(worshipLiveOptionsAtom)
     const router = useRouter()
-
-    // Migrated from MenuButton
-    const worship = useRecoilValue(worshipAtom(worshipId))
-    const setCurrentWorshipIds = useSetRecoilState(currentTeamWorshipIdsAtom(teamId))
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
     function handleExit() {
         router.replace(getPathPlan(teamId) + `?expanded=${worshipId}`)
@@ -51,46 +41,8 @@ export function WorshipLiveMenu({ teamId, worshipId }: Props) {
         prefSetter.worshipLiveShowSongNumber(!preference.worshipLive.showSongNumber)
     }
 
-    // Admin Actions
-    function handleEditWorship() {
-        router.push(getPathEditPlan(teamId, worshipId))
-    }
-
-    function handleDeleteWorship() {
-        try {
-            if (!worshipId) return Promise.resolve(false)
-
-            WorshipService.deleteWorship(worshipId).then(isSuccess => {
-                if (isSuccess) {
-                    setCurrentWorshipIds(prev => prev.filter(_id => _id !== worshipId))
-                    const title = worship?.title || "Worship"
-                    toast({ title: `[${title}] is deleted successfully.` })
-                }
-                else {
-                    toast({ title: "Something went wrong. Please try again later." })
-                }
-            })
-            return Promise.resolve(true)
-        }
-        catch {
-            console.log("error");
-            return Promise.resolve(false)
-        }
-        finally {
-            // Navigate back to plan list
-            router.replace(getPathPlan(teamId))
-        }
-    }
-
     return (
         <div className="absolute top-2 right-2 bottom-10">
-            <DeleteConfirmationDialog
-                isOpen={isDeleteDialogOpen}
-                setOpen={setIsDeleteDialogOpen}
-                title={`Delete Worship`}
-                description={`This will permanently delete [${worship?.title || "this worship"}]. This action cannot be undone.`}
-                onDeleteHandler={handleDeleteWorship}
-            />
             <Popover>
                 <PopoverTrigger asChild>
                     <div className="p-2 rounded-full hover:bg-black/5 cursor-pointer">
@@ -119,16 +71,6 @@ export function WorshipLiveMenu({ teamId, worshipId }: Props) {
                     <Button disabled variant="ghost" className="w-full flex justify-start cursor-pointer hover:bg-gray-100 pl-2">
                         <SquarePenIcon className="mr-3 w-5 h-5" />
                         <Label>Notating Mode</Label>
-                    </Button>
-                    <Separator />
-                    {/* Admin Actions */}
-                    <Button variant="ghost" className="w-full flex justify-start cursor-pointer hover:bg-gray-100 pl-2" onClick={handleEditWorship}>
-                        <SquarePenIcon className="mr-3 w-5 h-5" />
-                        <Label>Edit Worship</Label>
-                    </Button>
-                    <Button variant="ghost" className="w-full flex justify-start cursor-pointer hover:bg-gray-100 pl-2 text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => setIsDeleteDialogOpen(true)}>
-                        <Trash2Icon className="mr-3 w-5 h-5" />
-                        <Label>Delete Worship</Label>
                     </Button>
                     <Separator />
                     <Button variant="ghost" className="w-full flex justify-start cursor-pointer hover:bg-gray-100 pl-2"
