@@ -23,6 +23,7 @@ export function AlphabetIndexer({ teamId, onScrollRequest, activeIndex }: Props)
     const [selectedChar, setSelectedChar] = useState<string | null>(null);
     const isSyncing = useRef(false);
     const isUserInteracting = useRef(false);
+    const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Order: # -> English -> Korean
     const chars = useMemo(() => {
@@ -102,13 +103,18 @@ export function AlphabetIndexer({ teamId, onScrollRequest, activeIndex }: Props)
         if (char !== selectedChar) {
             setSelectedChar(char);
             if (alphabetMap[char] !== undefined) {
-                onScrollRequest(alphabetMap[char]);
+                // Debounce the actual scroll request
+                if (scrollTimeoutRef.current) {
+                    clearTimeout(scrollTimeoutRef.current);
+                }
+
+                scrollTimeoutRef.current = setTimeout(() => {
+                    onScrollRequest(alphabetMap[char]);
+                }, 300);
+
                 if (navigator.vibrate) navigator.vibrate(5);
             }
         }
-
-        // We need to clear isUserInteracting eventually if we scroll and stop.
-        // handleScrollEnd will be called 100ms after stop.
     };
 
     // User interaction unlocks sync

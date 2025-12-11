@@ -147,7 +147,10 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <span>{timestampToDateStringFormatted(worship.worship_date)}</span>
-                <span className="text-xs px-1.5 py-0.5 bg-gray-100 rounded-full">
+                <span className={cn(
+                  "text-xs px-1.5 py-0.5 rounded-full",
+                  isPast ? "bg-gray-100 text-gray-500" : "bg-blue-100 text-blue-700 font-medium"
+                )}>
                   {getDayPassedFromTimestampShorten(worship.worship_date)}
                 </span>
               </div>
