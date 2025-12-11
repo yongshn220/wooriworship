@@ -1,15 +1,16 @@
-import {HomeIcon, FileMusicIcon, CircleCheckIcon, CalendarIcon, CircleUserRoundIcon, DownloadIcon} from "lucide-react";
-import {getPathHome, getPathManage, getPathNotice, getPathPlan, getPathSong, getPathWorshipView} from "@/components/util/helper/routes";
-import {useRecoilValue} from "recoil";
-import {currentTeamIdAtom} from "@/global-states/teamState";
-import {useRouter} from "next/navigation";
-import {cn} from "@/lib/utils";
-import {Page} from "@/components/constants/enums";
+import { HomeIcon, Music2Icon, BellIcon, CalendarDaysIcon, LayoutGridIcon, DownloadIcon } from "lucide-react";
+import { getPathHome, getPathManage, getPathNotice, getPathPlan, getPathSong, getPathWorshipView } from "@/components/util/helper/routes";
+import { useRecoilValue } from "recoil";
+import { currentTeamIdAtom } from "@/global-states/teamState";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Page } from "@/components/constants/enums";
 import { BaseBottomNavBar } from "@/components/elements/util/navigation/base-bottom-nav-bar";
 import { currentPageAtom } from "@/global-states/page-state";
-import {Button} from "@/components/ui/button";
-import {currentWorshipIdAtom} from "@/global-states/worship-state";
-import {DownloadMusicSheetDialog} from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_components/download-music-sheet-dialog";
+import { Button } from "@/components/ui/button";
+import { currentWorshipIdAtom } from "@/global-states/worship-state";
+import { DownloadMusicSheetDialog } from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_components/download-music-sheet-dialog";
+import { motion } from "framer-motion";
 
 
 export function BoardBottomNavBar() {
@@ -22,13 +23,13 @@ export function BoardBottomNavBar() {
   if (currentPage === Page.WORSHIP) {
     return (
       <>
-        <WorshipBottomNavBar/>
-        <DefaultBoardBottomNavBar/>
+        <WorshipBottomNavBar />
+        <DefaultBoardBottomNavBar />
       </>
     )
   }
   return (
-    <DefaultBoardBottomNavBar/>
+    <DefaultBoardBottomNavBar />
   )
 }
 
@@ -41,15 +42,18 @@ export function WorshipBottomNavBar() {
   return (
     <BaseBottomNavBar height={80}>
       <div className="w-full h-full flex-center px-4 gap-4">
-        <div className="w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer">
+        <motion.div
+          className="w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer"
+          whileTap={{ scale: 0.9 }}
+        >
           <DownloadMusicSheetDialog worshipId={worshipId}>
             <div className="flex-center flex-col">
-              <DownloadIcon/>
-              <p className="text-xs">Save</p>
+              <DownloadIcon />
+              <p className="text-[10px] mt-1 font-medium">Save</p>
             </div>
           </DownloadMusicSheetDialog>
-        </div>
-        <Button className="w-full" onClick={() => router.push(getPathWorshipView(teamId, worshipId))}>
+        </motion.div>
+        <Button className="w-full shadow-lg shadow-blue-500/20" onClick={() => router.push(getPathWorshipView(teamId, worshipId))}>
           Worship View
         </Button>
       </div>
@@ -62,39 +66,72 @@ export function DefaultBoardBottomNavBar() {
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
   const router = useRouter()
 
+  const NAV_ITEMS = [
+    {
+      page: Page.NOTICE_BOARD,
+      icon: BellIcon,
+      label: "Notice",
+      path: getPathNotice(currentTeamId)
+    },
+    {
+      page: Page.WORSHIP_BOARD,
+      icon: CalendarDaysIcon,
+      label: "Plan",
+      path: getPathPlan(currentTeamId)
+    },
+    {
+      page: Page.SONG_BOARD,
+      icon: Music2Icon,
+      label: "Song",
+      path: getPathSong(currentTeamId)
+    },
+    {
+      page: Page.MANAGE,
+      icon: LayoutGridIcon,
+      label: "Manage",
+      path: getPathManage(currentTeamId)
+    },
+  ]
+
   return (
     <BaseBottomNavBar height={80}>
-      <div className="w-full h-full flex justify-between px-5">
-        {/* <div
-          className={cn("w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer", {"text-blue-500": (currentPage === Page.HOME)})}
-          onClick={() => router.push(getPathHome(currentTeamId))}>
-          <HomeIcon strokeWidth={2}/>
-          <p className="text-xs prevent-text-select">Home</p>
-        </div> */}
-        <div
-          className={cn("w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer", {"text-blue-500": (currentPage === Page.NOTICE_BOARD)})}
-          onClick={() => router.push(getPathNotice(currentTeamId))}>
-          <CircleCheckIcon strokeWidth={2}/>
-          <p className="text-xs prevent-text-select">Notice</p>
-        </div>
-        <div
-          className={cn("w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer", {"text-blue-500": (currentPage === Page.WORSHIP_BOARD)})}
-          onClick={() => router.push(getPathPlan(currentTeamId))}>
-          <CalendarIcon strokeWidth={2}/>
-          <p className="text-xs prevent-text-select">Plan</p>
-        </div>
-        <div
-          className={cn("w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer", {"text-blue-500": (currentPage === Page.SONG_BOARD)})}
-          onClick={() => router.push(getPathSong(currentTeamId))}>
-          <FileMusicIcon strokeWidth={2}/>
-          <p className="text-xs prevent-text-select">Song</p>
-        </div>
-        <div
-          className={cn("w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer", {"text-blue-500": (currentPage === Page.MANAGE)})}
-          onClick={() => router.push(getPathManage(currentTeamId))}>
-          <CircleUserRoundIcon strokeWidth={2} className="prevent-text-select"/>
-          <p className="text-xs prevent-text-select">Manage</p>
-        </div>
+      <div className="w-full h-full flex justify-between px-6 pb-2 items-center">
+        {NAV_ITEMS.map((item) => {
+          const isActive = currentPage === item.page;
+          const Icon = item.icon;
+
+          return (
+            <motion.div
+              key={item.label}
+              className={cn(
+                "w-16 h-full flex-col flex-center cursor-pointer transition-colors duration-300",
+                isActive ? "text-blue-600" : "text-gray-400"
+              )}
+              onClick={() => router.push(item.path)}
+              whileTap={{ scale: 0.9 }}
+            >
+              <div className="relative">
+                <Icon
+                  strokeWidth={isActive ? 2.5 : 2}
+                  className={cn("w-6 h-6 transition-all duration-300", isActive && "fill-blue-100")}
+                />
+                {isActive && (
+                  <motion.div
+                    layoutId="active-dot"
+                    className="absolute -top-2 right-0 w-1.5 h-1.5 bg-blue-600 rounded-full"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+              </div>
+              <p className={cn(
+                "text-[10px] mt-1 font-medium prevent-text-select transition-all duration-300",
+                isActive ? "font-bold text-blue-600" : "font-medium"
+              )}>
+                {item.label}
+              </p>
+            </motion.div>
+          )
+        })}
       </div>
     </BaseBottomNavBar>
   )

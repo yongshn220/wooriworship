@@ -1,4 +1,4 @@
-import {Page} from "@/components/constants/enums";
+import { Page } from "@/components/constants/enums";
 
 export function getPathBoard() {
   return "/" + Page.BOARD
@@ -57,5 +57,5 @@ export function getPathWorship(teamId: string, worshipId: string) {
 }
 
 export function getPathWorshipView(teamId: string, worshipId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.WORSHIP + `/${worshipId}` + "/" + Page.WORSHIP_VIEW
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.WORSHIP_VIEW + `/${worshipId}`
 }

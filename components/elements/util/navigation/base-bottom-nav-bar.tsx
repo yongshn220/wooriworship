@@ -8,8 +8,8 @@ interface Props {
 export function BaseBottomNavBar({ children, height }: Props) {
   return (
     <div>
-      <footer 
-        className="sticky bottom-0 bg-white border-t z-50"
+      <footer
+        className="sticky bottom-0 bg-white/80 backdrop-blur-md border-t border-white/20 shadow-sm z-50 transition-all duration-300"
         style={{ height: `${height}px` }}
       >
         {children}
