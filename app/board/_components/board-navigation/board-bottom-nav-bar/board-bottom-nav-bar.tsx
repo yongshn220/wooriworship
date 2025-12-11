@@ -9,7 +9,7 @@ import { BaseBottomNavBar } from "@/components/elements/util/navigation/base-bot
 import { currentPageAtom } from "@/global-states/page-state";
 import { Button } from "@/components/ui/button";
 import { currentWorshipIdAtom } from "@/global-states/worship-state";
-import { DownloadMusicSheetDialog } from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_components/download-music-sheet-dialog";
+import { DownloadMusicSheetDialog } from "@/app/board/[teamId]/(worship)/worship-board/_components/download-music-sheet-dialog";
 import { motion } from "framer-motion";
 
 
