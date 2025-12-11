@@ -42,8 +42,14 @@ export const worshipIdsUpdaterAtom = atom({
   default: 0
 })
 
+// Workaround for Next.js HMR Duplicate Atom Key
+const globalForRecoil = global as unknown as { recoilAtoms: Record<string, any> };
+if (!globalForRecoil.recoilAtoms) globalForRecoil.recoilAtoms = {};
 
-export const worshipAtom = atomFamily<Worship, string>({
+// Helper type for typescript
+const worshipAtomType = atomFamily<Worship, string>({} as any);
+
+export const worshipAtom = (globalForRecoil.recoilAtoms['worshipAtom'] || atomFamily<Worship, string>({
   key: "worshipAtom",
   default: selectorFamily({
     key: "worshipAtom/default",
@@ -61,7 +67,9 @@ export const worshipAtom = atomFamily<Worship, string>({
       }
     }
   })
-})
+})) as typeof worshipAtomType;
+
+if (process.env.NODE_ENV !== 'production') globalForRecoil.recoilAtoms['worshipAtom'] = worshipAtom
 
 export const worshipUpdaterAtom = atom({
   key: "worshipUpdaterAtom",
