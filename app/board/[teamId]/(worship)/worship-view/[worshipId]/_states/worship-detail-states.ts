@@ -31,3 +31,13 @@ export const worshipIndexChangeEventAtom = atom<number>({
     key: 'worshipIndexChangeEventAtom',
     default: 0
 })
+
+export const worshipNoteAtom = atom<string>({
+    key: 'worshipNoteAtom',
+    default: ""
+})
+
+export const worshipUIVisibilityAtom = atom<boolean>({
+    key: 'worshipUIVisibilityAtom',
+    default: true
+})
