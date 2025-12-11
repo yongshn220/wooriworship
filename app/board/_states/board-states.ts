@@ -1,5 +1,5 @@
-import {atom} from "recoil";
-import {SongBoardSortOption} from "@/components/constants/enums";
+import { atom } from "recoil";
+import { SongBoardSortOption } from "@/components/constants/enums";
 
 
 export const songSearchInputAtom = atom({
@@ -9,6 +9,11 @@ export const songSearchInputAtom = atom({
 
 export const searchSelectedTagsAtom = atom<Array<string>>({
   key: "searchSelectedTagsAtom",
+  default: []
+})
+
+export const searchSelectedKeysAtom = atom<Array<string>>({
+  key: "searchSelectedKeysAtom",
   default: []
 })
 

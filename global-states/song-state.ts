@@ -1,7 +1,7 @@
 import { atom, atomFamily, selectorFamily } from "recoil";
 import { Song } from "@/models/song";
 import { SongService } from "@/apis";
-import { searchSelectedTagsAtom, songBoardSelectedSortOptionAtom, songSearchInputAtom } from "@/app/board/_states/board-states";
+import { searchSelectedTagsAtom, searchSelectedKeysAtom, songBoardSelectedSortOptionAtom, songSearchInputAtom } from "@/app/board/_states/board-states";
 import { SongBoardSortOption } from "@/components/constants/enums";
 import { getInitialChar } from "@/components/util/helper/helper-functions";
 
@@ -52,6 +52,12 @@ export const currentTeamSortedSongsAtom = selectorFamily<Array<Song>, string>({
       // Tag Filter
       if (selectedTags && selectedTags.length > 0) {
         songList = songList.filter((song) => song?.tags?.length === 0 || song?.tags?.some((tag: string) => selectedTags.includes(tag) || selectedTags.length === 0))
+      }
+
+      // Key Filter
+      const selectedKeys = get(searchSelectedKeysAtom)
+      if (selectedKeys && selectedKeys.length > 0) {
+        songList = songList.filter((song) => song?.keys && song.keys.some(key => selectedKeys.includes(key)))
       }
 
       // Sort
@@ -139,4 +145,24 @@ export const songAtom = atomFamily<Song, string>({
 export const songUpdaterAtom = atom({
   key: "songUpdaterAtom",
   default: 0
+})
+
+export const teamUniqueKeysSelector = selectorFamily<Array<string>, string>({
+  key: "teamUniqueKeysSelector",
+  get: (teamId) => async ({ get }) => {
+    get(songUpdaterAtom)
+    if (!teamId) return []
+    try {
+      const songList = await SongService.getSong(teamId) as Song[]
+      if (!songList) return []
+
+      const allKeys = new Set<string>()
+      songList.forEach(song => {
+        song.keys?.forEach(key => allKeys.add(key))
+      })
+      return Array.from(allKeys).sort()
+    } catch (e) {
+      return []
+    }
+  }
 })

@@ -93,21 +93,21 @@ export function DownloadMusicSheetDialog({ children, worshipId }: Props) {
                     className={cn(
                       "group relative flex items-center p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer select-none",
                       isSelected
-                        ? "bg-blue-50/50 border-blue-500 shadow-[0_4px_12px_-6px_rgba(59,130,246,0.3)]"
+                        ? "bg-blue-50/50 border-blue-500 shadow-sm"
                         : "bg-white border-transparent hover:bg-gray-50 hover:border-gray-200"
                     )}
                   >
                     {/* Selection Indicator */}
                     <div className={cn(
-                      "mr-4 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300",
+                      "mr-4 w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300",
                       isSelected
                         ? "text-blue-600 scale-110"
                         : "text-gray-300 group-hover:text-gray-400 scale-100"
                     )}>
                       {isSelected ? (
-                        <CheckCircle2 className="w-6 h-6 fill-blue-100" />
+                        <CheckCircle2 className="w-5 h-5 fill-blue-100" />
                       ) : (
-                        <Circle className="w-6 h-6" />
+                        <Circle className="w-5 h-5" />
                       )}
                     </div>
 
@@ -121,15 +121,16 @@ export function DownloadMusicSheetDialog({ children, worshipId }: Props) {
                         </h4>
                       </div>
                       <div className="flex items-center gap-2">
-                        {song.keys && song.keys.length > 0 && (
+                        {song.keys && song.keys.length > 0 ? (
                           <Badge variant="secondary" className={cn(
                             "h-5 px-1.5 text-[10px] sm:text-xs font-mono font-medium border",
                             isSelected ? "bg-white border-blue-200 text-blue-700" : "bg-gray-100 border-gray-200 text-gray-500"
                           )}>
                             {song.keys[0]}
                           </Badge>
+                        ) : (
+                          <span className="text-xs text-gray-400">No Key</span>
                         )}
-                        <span className="text-xs text-gray-400">Music Sheet</span>
                       </div>
                     </div>
 
