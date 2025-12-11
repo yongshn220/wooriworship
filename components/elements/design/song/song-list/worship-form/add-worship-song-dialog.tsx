@@ -1,20 +1,17 @@
 'use client'
 
-import { Search } from "lucide-react";
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
 import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { AddableSongHeaderList } from "@/components/elements/design/song/song-list/worship-form/parts/addable-song-header-list";
 import { LoadingCircle } from "@/components/util/animation/loading-indicator";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { songSearchInputAtom } from "@/app/board/_states/board-states";
 import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Separator } from "@/components/ui/separator";
 import { selectedWorshipSongHeaderListAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
-import { SongTitleBadge } from "@/components/elements/design/song/song-list/worship-form/parts/song-title-badge";
+import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
 
 interface Props {
   teamId: string
@@ -23,7 +20,7 @@ interface Props {
 }
 
 export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
-  const [input, setInput] = useRecoilState(songSearchInputAtom)
+  const input = useRecoilValue(songSearchInputAtom)
   const selectedSongHeaderList = useRecoilValue(selectedWorshipSongHeaderListAtom)
 
   // State for "Cart" view
@@ -33,6 +30,13 @@ export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
   React.useEffect(() => {
     if (!isOpen) setShowSelectedOnly(false)
   }, [isOpen])
+
+  // Reset "Cart" view when user starts searching
+  React.useEffect(() => {
+    if (input.length > 0 && showSelectedOnly) {
+      setShowSelectedOnly(false)
+    }
+  }, [input])
 
   const selectedCount = selectedSongHeaderList.length
 
@@ -49,24 +53,14 @@ export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
           </VisuallyHidden>
 
           {/* Header Search Area */}
-          <div className="w-full shrink-0 px-1 relative">
+          <div className="w-full shrink-0 px-4 pt-4 pb-2 relative">
             <div className="w-full relative">
-              <Search className="absolute top-1/2 left-5 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
-              <Input
-                className="w-full pl-12 py-6 border-0 custom-input-focus text-lg"
-                placeholder={showSelectedOnly ? "Start searching to add more songs..." : "Search songs"}
-                value={input}
-                onChange={(e) => {
-                  setInput(e.target.value)
-                  if (e.target.value.length > 0 && showSelectedOnly) setShowSelectedOnly(false)
-                }}
-              />
-              <Separator />
+              <SearchInput />
             </div>
 
             {/* Mode Indicator Toast/Banner (Optional, but helps UX) */}
             {showSelectedOnly && (
-              <div className="bg-blue-50 text-blue-600 px-6 py-2 text-sm font-medium flex justify-between items-center">
+              <div className="mt-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-medium flex justify-between items-center animate-in fade-in slide-in-from-top-2">
                 <span>Reviewing Selected Songs</span>
                 <button onClick={() => setShowSelectedOnly(false)} className="underline text-xs">View All</button>
               </div>
