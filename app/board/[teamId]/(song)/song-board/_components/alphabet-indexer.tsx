@@ -4,21 +4,22 @@ import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { songAlphabetMapAtom } from "@/global-states/song-state";
 import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface Props {
     teamId: string;
     onScrollRequest: (index: number) => void;
 }
 
+const ITEM_HEIGHT = 40; // Height of each character item
+const VISIBLE_ITEMS = 7; // Number of items visible above/below center
+const WHEEL_RADIUS = 150; // Radius of the 3D wheel
+
 export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
     const alphabetMap = useRecoilValue(songAlphabetMapAtom(teamId));
     const containerRef = useRef<HTMLDivElement>(null);
-    const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-    const [activeDragChar, setActiveDragChar] = useState<string | null>(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [bubbleY, setBubbleY] = useState<number | null>(null);
+    const [scrollTop, setScrollTop] = useState(0);
+    const [selectedChar, setSelectedChar] = useState<string | null>(null);
 
     // Order: # -> English -> Korean
     const chars = useMemo(() => {
@@ -31,143 +32,160 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
         return ['#', ...english, ...korean];
     }, []);
 
-    const clearScrollInterval = () => {
-        if (scrollIntervalRef.current) {
-            clearInterval(scrollIntervalRef.current);
-            scrollIntervalRef.current = null;
-        }
-    };
+    // Handle Scroll
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const newScrollTop = e.currentTarget.scrollTop;
+        setScrollTop(newScrollTop);
 
-    const handleInteraction = (clientY: number) => {
-        if (!containerRef.current) return;
+        // Calculate center item
+        const centerIndex = Math.round(newScrollTop / ITEM_HEIGHT);
+        const safeIndex = Math.max(0, Math.min(centerIndex, chars.length - 1));
+        const char = chars[safeIndex];
 
-        // Bubble Offset: Position bubble 40px ABOVE the finger
-        setBubbleY(clientY - 40);
+        if (char !== selectedChar) {
+            setSelectedChar(char);
+            if (alphabetMap[char] !== undefined) {
+                // Debounce or immediate? Immediate for now as per "wheel" feel, maybe throttle if performance bad
+                onScrollRequest(alphabetMap[char]);
 
-        // Auto-Scroll Logic
-        const rect = containerRef.current.getBoundingClientRect();
-        const EDGE_THRESHOLD = 40;
-        const SCROLL_SPEED = 5;
-
-        clearScrollInterval(); // Clear existing to prevent stacking
-
-        // Scroll Down
-        if (clientY > rect.bottom - EDGE_THRESHOLD) {
-            scrollIntervalRef.current = setInterval(() => {
-                if (containerRef.current) {
-                    containerRef.current.scrollTop += SCROLL_SPEED;
-                }
-            }, 16);
-        }
-        // Scroll Up
-        else if (clientY < rect.top + EDGE_THRESHOLD) {
-            scrollIntervalRef.current = setInterval(() => {
-                if (containerRef.current) {
-                    containerRef.current.scrollTop -= SCROLL_SPEED;
-                }
-            }, 16);
-        }
-
-        // Find Element Logic
-        const centerX = rect.left + rect.width / 2;
-        const element = document.elementFromPoint(centerX, clientY);
-        const button = element?.closest('button');
-
-        if (button) {
-            const char = button.getAttribute('data-char');
-            if (char && alphabetMap[char] !== undefined) {
-                if (activeDragChar !== char) {
-                    setActiveDragChar(char);
-                    onScrollRequest(alphabetMap[char]);
-
-                    if (navigator.vibrate) {
-                        navigator.vibrate(10);
-                    }
+                // Haptic feedback
+                if (navigator.vibrate) {
+                    navigator.vibrate(5);
                 }
             }
         }
     };
 
-    const onPointerDown = (e: React.PointerEvent) => {
-        setIsDragging(true);
-        e.currentTarget.setPointerCapture(e.pointerId);
-        handleInteraction(e.clientY);
-    };
+    // Scroll Sync to center items
+    const handleScrollEnd = () => {
+        if (!containerRef.current) return;
 
-    const onPointerMove = (e: React.PointerEvent) => {
-        if (!isDragging) return;
-        handleInteraction(e.clientY);
-    };
+        const currentScroll = containerRef.current.scrollTop;
+        const nearestIndex = Math.round(currentScroll / ITEM_HEIGHT);
+        const targetScroll = nearestIndex * ITEM_HEIGHT;
 
-    const onPointerUp = (e: React.PointerEvent) => {
-        setIsDragging(false);
-        setActiveDragChar(null);
-        setBubbleY(null);
-        clearScrollInterval();
-        e.currentTarget.releasePointerCapture(e.pointerId);
-    };
+        if (Math.abs(currentScroll - targetScroll) > 1) {
+            containerRef.current.scrollTo({
+                top: targetScroll,
+                behavior: 'smooth'
+            });
+        }
+    }
 
+    // Detect scroll stop for snapping
     useEffect(() => {
-        return () => clearScrollInterval();
-    }, [])
+        const container = containerRef.current;
+        let timeoutId: NodeJS.Timeout;
+
+        const onScroll = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(handleScrollEnd, 100);
+        };
+
+        container?.addEventListener('scroll', onScroll);
+        return () => {
+            container?.removeEventListener('scroll', onScroll);
+            clearTimeout(timeoutId);
+        }
+    }, []);
+
 
     return (
-        <>
-            {/* Floating Bubble Indicator (Follows Finger) - Moved outside to escape transform context */}
-            <AnimatePresence>
-                {isDragging && activeDragChar && bubbleY !== null && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.5, x: 20 }}
-                        animate={{ opacity: 1, scale: 1, x: -45 }}
-                        exit={{ opacity: 0, scale: 0.5, x: 20 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="fixed right-2 w-14 h-14 bg-gray-900 shadow-2xl rounded-full rounded-br-none flex items-center justify-center z-50 pointer-events-none transform -translate-y-1/2 rotate-45"
-                        style={{ top: bubbleY }}
-                    >
-                        <div className="transform -rotate-45 text-white text-2xl font-bold font-sans">
-                            {activeDragChar}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+        <div className="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 h-[500px] w-12 flex items-center justify-center pointer-events-auto select-none">
 
-            <div className="fixed right-0 top-1/2 -translate-y-[50%] z-50 flex flex-col items-center pointer-events-auto touch-none select-none">
-                {/* Index Bar */}
-                <div
-                    ref={containerRef}
-                    className="flex flex-col gap-[2px] py-4 px-2 pr-1 w-12 sm:w-16 items-center max-h-[60vh] 
-                     overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']"
-                    onPointerDown={onPointerDown}
-                    onPointerMove={onPointerMove}
-                    onPointerUp={onPointerUp}
-                    onPointerLeave={onPointerUp}
-                >
-                    {chars.map((char) => {
+            {/* Selection Pointer / Highlight */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-8 bg-blue-500/20 backdrop-blur-sm border border-blue-500/50 rounded-lg shadow-[0_0_15px_rgba(59,130,246,0.5)] z-0 pointer-events-none" />
+            <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-blue-500 border-b-[6px] border-b-transparent hidden sm:block" />
+
+            {/* 3D Wheel Container */}
+            <div
+                ref={containerRef}
+                onScroll={handleScroll}
+                className="h-full w-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory relative perspective-[500px]"
+                style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                }}
+            >
+                <div className="relative w-full" style={{ height: (chars.length + VISIBLE_ITEMS * 2) * ITEM_HEIGHT }}>
+                    {chars.map((char, i) => {
+                        // Calculate relative position to center
+                        // We add padding (VISIBLE_ITEMS * ITEM_HEIGHT) to top/bottom so first/last items can be centered
+                        // The actual item index in the scrollable area needs to account for this padding if we rendered padding divs, 
+                        // but here let's simplify: we'll pad the top/bottom of the container list with huge margins or spacer divs?
+                        // Better: Render items absolutely positioned or just transformed based on scroll?
+                        // Standard scroll approach: List is tall. 
+                        // We need 'padding' visually. Let's add paddingTop/Bottom to container internal div.
+
+                        // Refined Math: 
+                        // The scrollable area height should allow index 0 to be at scrollTop 0? No, scrollTop 0 means index 0 is at top. We want index 0 to be at CENTER.
+                        // So we need clear padding top = containerHeight/2 - itemHeight/2.
+
+                        // Dynamic container height check would be better, but for now we sync with CSS class
+                        // Adjusted Physics for better visibility
+                        const containerHeight = 500;
+
+                        const relativeY = (i * ITEM_HEIGHT) - scrollTop;
+
+                        // Angle calculation:
+                        // Slower rotation per pixel to keep more items in view without them rotating away too fast.
+                        const angle = relativeY / (ITEM_HEIGHT * 2.5);
+                        const rotateX = -angle * 25;
+
+                        // Opacity & Scale:
+                        const distance = Math.abs(relativeY);
+                        // Much slower falloff to keep neighbors visible
+                        const opacity = Math.max(0.15, 1 - distance / (containerHeight * 0.7));
+                        const scale = Math.max(0.65, 1 - distance / (containerHeight * 1.2));
+
+                        // Curve depth
+                        const translateZ = Math.cos(angle) * 40 - 40;
+
                         const isActive = alphabetMap[char] !== undefined;
-                        const isHighlighted = activeDragChar === char;
+
+                        // Render if it has any significant opacity
+                        if (opacity < 0.1) return null;
 
                         return (
-                            <button
+                            <div
                                 key={char}
-                                data-char={char}
-                                type="button"
                                 className={cn(
-                                    "w-4 h-4 flex items-center justify-center text-[10px] font-bold rounded-full transition-all duration-200 shrink-0",
-                                    isActive
-                                        ? "text-blue-500"
-                                        : "text-gray-300",
-                                    isHighlighted
-                                        ? "scale-150 text-gray-900"
-                                        : "opacity-80"
+                                    "absolute left-0 w-full flex items-center justify-center transition-all duration-75 will-change-transform",
+                                    isActive ? "cursor-pointer" : "pointer-events-none"
                                 )}
-                                onClick={(e) => e.preventDefault()}
+                                style={{
+                                    height: ITEM_HEIGHT,
+                                    top: (i * ITEM_HEIGHT) + 230, // center offset
+                                    transform: `
+                        perspective(500px)
+                        rotateX(${rotateX}deg)
+                        scale(${scale})
+                        translateZ(${translateZ}px)
+                    `,
+                                    opacity: isActive ? opacity : opacity * 0.4,
+                                    zIndex: Math.round(100 - distance),
+                                    // Colors optimized for Light Mode (with dark text)
+                                    color: char === selectedChar
+                                        ? (isActive ? '#2563eb' : '#9ca3af') // blue-600 : gray-400
+                                        : 'rgba(0,0,0,0.4)',
+                                    visibility: opacity < 0.1 ? 'hidden' : 'visible'
+                                }}
                             >
-                                {char === '#' ? '•' : char}
-                            </button>
-                        )
+                                <span className={cn(
+                                    "text-sm font-bold transition-colors duration-200",
+                                    char === selectedChar ? "text-xl" : "",
+                                    // Remove Tailwind text classes that conflict with inline styles for color, or keep them if they are strictly structure
+                                    // We rely on inline color for the gradient effect usually, but let's stick to simple classes for selected
+                                )}>
+                                    {char === '#' ? '•' : char}
+                                </span>
+                            </div>
+                        );
                     })}
+                    {/* Spacer at bottom to allow scrolling last item to center */}
+                    <div style={{ height: (chars.length) * ITEM_HEIGHT + 260 }} className="w-px pointer-events-none opacity-0" />
                 </div>
             </div>
-        </>
+        </div>
     );
 }
