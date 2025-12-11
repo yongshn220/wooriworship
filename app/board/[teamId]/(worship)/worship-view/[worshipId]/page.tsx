@@ -16,6 +16,7 @@ import {
 import { WorshipNote } from "./_components/worship-note";
 
 
+import { useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRecoilState } from "recoil";
 import { worshipUIVisibilityAtom } from "./_states/worship-detail-states";
@@ -25,6 +26,7 @@ export default function WorshipLivePage({ params }: any) {
     const worshipId = params.worshipId
     const router = useRouter()
     const [uiVisible, setUiVisible] = useRecoilState(worshipUIVisibilityAtom)
+    const containerRef = useRef(null)
 
     function handleOpenChange(isOpen: boolean) {
         if (!isOpen) {
@@ -43,22 +45,14 @@ export default function WorshipLivePage({ params }: any) {
                     <DialogTitle>Worship Live Page</DialogTitle>
                 </VisuallyHidden>
 
-                <div className="relative w-full h-full bg-white dark:bg-black overflow-hidden" onClick={toggleUI}>
+                <div ref={containerRef} className="relative w-full h-full bg-white dark:bg-black overflow-hidden" onClick={toggleUI}>
                     <WorshipLiveCarousel worshipId={worshipId} />
+
+                    <WorshipNote constraintsRef={containerRef} />
 
                     <AnimatePresence>
                         {uiVisible && (
                             <>
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="pointer-events-none" // Helper wrapper to pass props if needed, or just fragments
-                                >
-                                    <WorshipNote />
-                                </motion.div>
-
                                 <motion.div
                                     initial={{ y: 100, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
