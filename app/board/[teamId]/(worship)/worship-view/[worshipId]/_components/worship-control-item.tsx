@@ -10,7 +10,7 @@ interface Props {
     label?: string
     onClick?: () => void
     isActive?: boolean
-    variant?: "default" | "toggle"
+    variant?: "default" | "toggle" | "button"
     className?: string
 }
 

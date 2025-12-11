@@ -1,10 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion";
-import { useRecoilState } from "recoil";
-import { worshipLiveOptionsAtom } from "../_states/worship-detail-states";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { worshipLiveOptionsAtom, worshipUIVisibilityAtom } from "../_states/worship-detail-states";
 import { WorshipControlItem } from "./worship-control-item";
-import { FileText, Hash, MoreHorizontal } from "lucide-react";
+import { EyeOff, FileText, Hash, MoreHorizontal } from "lucide-react";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { WorshipSettingsMenu } from "./worship-settings-menu";
@@ -17,6 +17,7 @@ interface Props {
 
 export function WorshipControlDock({ teamId, worshipId }: Props) {
     const [option, setOption] = useRecoilState(worshipLiveOptionsAtom)
+    const setUIVisible = useSetRecoilState(worshipUIVisibilityAtom)
     const [preference, prefSetter] = useUserPreferences()
 
     function toggleShowNote() {
@@ -53,6 +54,12 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                 />
 
                 <Separator orientation="vertical" className="h-6 bg-white/10 w-[1px] mx-1" />
+
+                <WorshipControlItem
+                    icon={<EyeOff className="w-5 h-5" />}
+                    variant="button"
+                    onClick={() => setUIVisible(false)}
+                />
 
                 <Popover>
                     <PopoverTrigger asChild>
