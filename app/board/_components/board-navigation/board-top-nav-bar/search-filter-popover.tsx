@@ -62,7 +62,13 @@ export function SearchFilterPopover({ children }: any) {
               )}
             </div>
 
-            <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-1 no-scrollbar">
+            <div
+              className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-1 no-scrollbar overscroll-contain touch-pan-y"
+              data-vaul-no-drag
+              onWheel={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+            >
               {teamTags.length > 0 ? (
                 teamTags.map((tag, i) => {
                   const selected = isTagSelected(tag);
