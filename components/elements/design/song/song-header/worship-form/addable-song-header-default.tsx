@@ -65,57 +65,69 @@ export function AddableSongHeaderDefault({ teamId, songId }: Props) {
         teamId={teamId}
         readOnly={true}
       />
-      <div className="flex w-full px-4 py-3 border-b border-gray-100 hover:bg-gray-50 items-center gap-4 transition-colors">
+      <div className="relative w-full h-[64px] sm:h-[100px] border-b border-gray-100 hover:bg-gray-50 transition-colors group">
+        <div className="flex items-center w-full h-full p-1 sm:p-5 gap-1.5 sm:gap-3">
 
-        {/* Song Info */}
-        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setIsDetailOpen(true)}>
-          <div className="flex items-center gap-2 mb-1">
-            <p className="font-bold text-gray-900 truncate text-base hover:text-blue-600 transition-colors">
+          {/* Song Info (Left Column) */}
+          <div
+            className="flex-1 min-w-0 flex flex-col justify-between h-full py-0.5 sm:py-1 px-1 cursor-pointer"
+            onClick={() => setIsDetailOpen(true)}
+          >
+            {/* Title + Subtitle */}
+            <div className="text-[14px] sm:text-lg font-bold text-gray-900 group-hover:text-blue-700 transition-colors truncate leading-tight -tracking-[0.03em]">
               {song?.title}
-              {song?.subtitle && <span className="text-gray-500 font-medium ml-1 text-sm">({song?.subtitle})</span>}
-            </p>
+              {song?.subtitle && (
+                <span className="text-[11px] sm:text-sm font-normal text-gray-400 ml-1.5 sm:ml-2 align-baseline">
+                  {song?.subtitle}
+                </span>
+              )}
+            </div>
+
+            {/* Author */}
+            <div className="text-[10px] sm:text-xs text-gray-500 truncate mt-auto mb-0.5">
+              {song?.original?.author || "Unknown Artist"}
+            </div>
           </div>
-          <p className="text-sm text-gray-400 truncate">{song?.original?.author || "Unknown Artist"}</p>
-        </div>
 
-        {/* Key Buttons (The Chips) */}
-        <div className="flex items-center gap-2 shrink-0">
-          {musicSheets?.length === 0 && (
-            <button
-              onClick={() => {
-                if (isSelected) {
-                  setSelectedWorshipSongHeaderList(prev => prev.filter(h => h.id !== songId))
-                } else {
-                  setSelectedWorshipSongHeaderList(prev => [...prev, {
-                    id: songId, note: song?.description || "", selected_music_sheet_ids: []
-                  }])
-                }
-              }}
-              className={`h-9 px-4 rounded-full text-sm font-bold transition-all ${isSelected ? "bg-blue-600 text-white shadow-md" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
-            >
-              {isSelected ? "Added" : "Add"}
-            </button>
-          )}
-
-          {musicSheets?.map((sheet, idx) => {
-            const isKeySelected = selectedSheetIds.includes(sheet.id)
-            return (
+          {/* Key Buttons (The Chips) */}
+          <div className="flex items-center gap-2 shrink-0">
+            {musicSheets?.length === 0 && (
               <button
-                key={sheet.id}
-                onClick={() => handleToggleKey(sheet.id)}
-                className={`
+                onClick={() => {
+                  if (isSelected) {
+                    setSelectedWorshipSongHeaderList(prev => prev.filter(h => h.id !== songId))
+                  } else {
+                    setSelectedWorshipSongHeaderList(prev => [...prev, {
+                      id: songId, note: song?.description || "", selected_music_sheet_ids: []
+                    }])
+                  }
+                }}
+                className={`h-9 px-4 rounded-full text-sm font-bold transition-all ${isSelected ? "bg-blue-600 text-white shadow-md" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
+              >
+                {isSelected ? "Added" : "Add"}
+              </button>
+            )}
+
+            {musicSheets?.map((sheet, idx) => {
+              const isKeySelected = selectedSheetIds.includes(sheet.id)
+              return (
+                <button
+                  key={sheet.id}
+                  onClick={() => handleToggleKey(sheet.id)}
+                  className={`
                              h-10 min-w-[3rem] px-3 rounded-xl text-sm font-bold transition-all border
                              ${isKeySelected
-                    ? "bg-blue-600 border-blue-600 text-white shadow-lg scale-105"
-                    : "bg-white border-gray-200 text-gray-600 hover:border-blue-300 hover:bg-blue-50"}
+                      ? "bg-blue-600 border-blue-600 text-white shadow-lg scale-105"
+                      : "bg-white border-gray-200 text-gray-600 hover:border-blue-300 hover:bg-blue-50"}
                            `}
-              >
-                {sheet.key}
-              </button>
-            )
-          })}
-        </div>
+                >
+                  {sheet.key}
+                </button>
+              )
+            })}
+          </div>
 
+        </div>
       </div>
     </>
   )
