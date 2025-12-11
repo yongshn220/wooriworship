@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useRecoilValue } from "recoil";
 import { useState } from "react";
 import { worshipSongListAtom } from "@/global-states/worship-state";
-import { downloadMultipleMusicSheets } from "@/components/util/helper/helper-functions";
+import { downloadMultipleMusicSheets, shareMusicSheets } from "@/components/util/helper/helper-functions";
 
 interface Props {
   children: any
@@ -20,7 +20,7 @@ export function DownloadMusicSheetDialog({ children, worshipId }: Props) {
   async function handleDownload() {
     const downloadSongList = songList.filter((song) => selectedSongIds.includes(song.id))
 
-    await downloadMultipleMusicSheets(downloadSongList)
+    await shareMusicSheets(downloadSongList)
   }
 
   function handleSelectSong(songId: string) {
