@@ -20,8 +20,8 @@ export function WorshipControlItem({ icon, label, onClick, isActive, variant = "
             variant="ghost"
             size="icon"
             className={cn(
-                "relative rounded-full transition-all duration-300 w-10 h-10 hover:bg-white/10",
-                isActive && "bg-white/20 text-white shadow-[0_0_15px_rgba(255,255,255,0.3)]",
+                "relative rounded-full transition-all duration-300 w-10 h-10 hover:bg-white/20 text-white",
+                isActive && "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.5)] ring-0",
                 className
             )}
             onClick={onClick}
@@ -32,12 +32,7 @@ export function WorshipControlItem({ icon, label, onClick, isActive, variant = "
             >
                 {icon}
             </motion.div>
-            {isActive && variant === "toggle" && (
-                <motion.div
-                    layoutId="active-indicator"
-                    className="absolute -bottom-1 w-1 h-1 bg-blue-400 rounded-full"
-                />
-            )}
+            {/* Active Indicator Removed for VisionOS Style */}
         </Button>
     )
 }
