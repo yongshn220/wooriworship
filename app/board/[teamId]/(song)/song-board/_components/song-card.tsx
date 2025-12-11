@@ -21,23 +21,8 @@ export function SongCard({ teamId, songId, index }: Props) {
     if (!song) return null;
 
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{
-                type: "spring",
-                stiffness: 260,
-                damping: 20,
-                delay: index * 0.03
-            }}
-            whileHover={{
-                scale: 1.01,
-                x: 4,
-                zIndex: 10,
-                backgroundColor: "rgba(255, 255, 255, 1)",
-                boxShadow: "0 10px 30px -10px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
-            }}
-            className="relative rounded-xl bg-white/60 backdrop-blur-sm border border-white/50 shadow-sm transition-all duration-200 group h-[64px] sm:h-[100px]"
+        <div
+            className="relative rounded-xl bg-white/60 backdrop-blur-sm border border-white/50 shadow-sm transition-all duration-200 group h-[64px] sm:h-[100px] hover:scale-[1.01] hover:bg-white hover:shadow-lg hover:z-10"
         >
             <SongDetailDialogTrigger teamId={teamId} songId={songId}>
                 <div className="flex items-center w-full h-full p-1 sm:p-5 gap-1.5 sm:gap-3 cursor-pointer">
@@ -83,6 +68,6 @@ export function SongCard({ teamId, songId, index }: Props) {
 
                 </div>
             </SongDetailDialogTrigger>
-        </motion.div>
+        </div>
     );
 }

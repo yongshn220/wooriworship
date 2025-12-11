@@ -54,49 +54,49 @@ export function SearchFilterPopover({ children }: any) {
   }
 
   return (
-    <Popover>
+    <Popover modal={true}>
       <PopoverTrigger asChild>
         {children}
       </PopoverTrigger>
-      <PopoverContent className="mt-2 w-[360px] p-0 overflow-hidden bg-white/80 backdrop-blur-xl border border-gray-100 shadow-2xl rounded-2xl ring-1 ring-gray-900/5" align="end">
-        <div className="p-5 space-y-8">
+      <PopoverContent className="w-[340px] p-0 overflow-hidden bg-white/95 backdrop-blur-3xl border-white/20 shadow-2xl rounded-3xl ring-1 ring-black/5" align="end" sideOffset={8}>
 
-          {/* Tags Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <h4 className="font-bold text-sm text-gray-900">Tags</h4>
-                <p className="text-[11px] text-gray-500 font-medium">Filter by category</p>
-              </div>
-              {selectedTags.length > 0 && (
-                <button
-                  onClick={() => setSelectedTags([])}
-                  className="text-[10px] uppercase tracking-wider font-bold text-blue-500 hover:text-blue-600 transition-colors"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-
-            <div
-              className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-1 no-scrollbar overscroll-contain touch-pan-y"
-              data-vaul-no-drag
-              onWheel={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              onTouchMove={(e) => e.stopPropagation()}
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-3 bg-gradient-to-b from-white to-transparent z-10 relative">
+          <h3 className="font-bold text-lg text-slate-900 tracking-tight">Refine</h3>
+          {(selectedTags.length > 0 || selectedKeys.length > 0) && (
+            <button
+              onClick={() => { setSelectedTags([]); setSelectedKeys([]); }}
+              className="text-xs font-bold text-blue-500 hover:text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-full transition-colors"
             >
+              Reset
+            </button>
+          )}
+        </div>
+
+        {/* Scrollable Content */}
+        <div
+          className="max-h-[60vh] overflow-y-auto overscroll-contain px-5 pb-5 space-y-6 no-scrollbar touch-pan-y"
+          data-vaul-no-drag
+          onWheel={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
+          {/* Tags Section */}
+          <div className="space-y-3">
+            <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Tags</h4>
+            <div className="flex flex-wrap gap-2">
               {teamTags.length > 0 ? (
                 teamTags.map((tag, i) => {
                   const selected = isTagSelected(tag);
                   return (
                     <Badge
                       key={i}
-                      variant={selected ? "default" : "outline"}
+                      variant="outline"
                       className={cn(
-                        "cursor-pointer transition-all duration-200 px-3.5 py-1.5 text-xs font-semibold rounded-full border",
+                        "cursor-pointer transition-all duration-200 px-3 py-1.5 text-xs font-semibold rounded-xl border-2",
                         selected
-                          ? "bg-slate-900 hover:bg-slate-800 text-white border-slate-900 shadow-lg shadow-slate-200"
-                          : "bg-white hover:bg-gray-50 text-gray-500 border-gray-200 hover:border-gray-300"
+                          ? "bg-slate-900 text-white border-slate-900 shadow-md"
+                          : "bg-transparent text-gray-500 border-gray-100 hover:border-gray-200 hover:bg-gray-50"
                       )}
                       onClick={() => handleTagSelect(tag)}
                     >
@@ -113,41 +113,21 @@ export function SearchFilterPopover({ children }: any) {
           <Separator className="bg-gray-100" />
 
           {/* Keys Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <h4 className="font-bold text-sm text-gray-900">Keys</h4>
-                <p className="text-[11px] text-gray-500 font-medium">Filter by musical key</p>
-              </div>
-              {selectedKeys.length > 0 && (
-                <button
-                  onClick={() => setSelectedKeys([])}
-                  className="text-[10px] uppercase tracking-wider font-bold text-blue-500 hover:text-blue-600 transition-colors"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-
-            <div
-              className="flex flex-wrap gap-2 max-h-[140px] overflow-y-auto pr-1 no-scrollbar overscroll-contain touch-pan-y"
-              data-vaul-no-drag
-              onWheel={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              onTouchMove={(e) => e.stopPropagation()}
-            >
+          <div className="space-y-3">
+            <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Musical Key</h4>
+            <div className="flex flex-wrap gap-2">
               {teamKeysLoadable.state === 'hasValue' && teamKeysLoadable.contents.length > 0 ? (
-                teamKeysLoadable.contents.map((key, i) => {
+                teamKeysLoadable.contents.map((key) => {
                   const selected = isKeySelected(key);
                   return (
                     <Badge
                       key={key}
-                      variant={selected ? "default" : "outline"}
+                      variant="outline"
                       className={cn(
-                        "cursor-pointer transition-all duration-200 px-3 py-1.5 text-xs font-semibold rounded-full border w-10 justify-center h-8",
+                        "cursor-pointer transition-all duration-200 px-3 py-1.5 text-xs font-bold rounded-xl border-2 min-w-[2.5rem] justify-center h-9",
                         selected
-                          ? "bg-slate-900 hover:bg-slate-800 text-white border-slate-900 shadow-lg shadow-slate-200"
-                          : "bg-white hover:bg-gray-50 text-gray-500 border-gray-200 hover:border-gray-300"
+                          ? "bg-blue-500 text-white border-blue-500 shadow-md shadow-blue-200"
+                          : "bg-transparent text-gray-600 border-gray-100 hover:border-gray-200 hover:bg-gray-50"
                       )}
                       onClick={() => handleKeySelect(key)}
                     >
@@ -164,45 +144,36 @@ export function SearchFilterPopover({ children }: any) {
           <Separator className="bg-gray-100" />
 
           {/* Sort Section */}
-          <div className="space-y-4">
-            <div className="space-y-0.5">
-              <h4 className="font-bold text-sm text-gray-900">Sort By</h4>
-              <p className="text-[11px] text-gray-500 font-medium">Order preference</p>
-            </div>
+          <div className="space-y-3">
+            <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Sort Order</h4>
 
-            <div className="space-y-3">
-              {/* Sort Group: Title */}
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider w-16 shrink-0">Title</span>
-                <div className="flex flex-1 bg-gray-100 p-1 rounded-xl">
-                  <SortButton
-                    active={selectedSortOption === SongBoardSortOption.TITLE_ASCENDING}
-                    onClick={() => setSelectedSortOption(SongBoardSortOption.TITLE_ASCENDING)}
-                    label="A-Z"
-                  />
-                  <SortButton
-                    active={selectedSortOption === SongBoardSortOption.TITLE_DESCENDING}
-                    onClick={() => setSelectedSortOption(SongBoardSortOption.TITLE_DESCENDING)}
-                    label="Z-A"
-                  />
-                </div>
+            <div className="grid gap-3">
+              {/* Title Group */}
+              <div className="bg-gray-100/80 p-1 rounded-2xl flex gap-1">
+                <SortSegment
+                  active={selectedSortOption === SongBoardSortOption.TITLE_ASCENDING}
+                  onClick={() => setSelectedSortOption(SongBoardSortOption.TITLE_ASCENDING)}
+                  label="Title (A-Z)"
+                />
+                <SortSegment
+                  active={selectedSortOption === SongBoardSortOption.TITLE_DESCENDING}
+                  onClick={() => setSelectedSortOption(SongBoardSortOption.TITLE_DESCENDING)}
+                  label="Title (Z-A)"
+                />
               </div>
 
-              {/* Sort Group: Usage */}
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider w-16 shrink-0">Usage</span>
-                <div className="flex flex-1 bg-gray-100 p-1 rounded-xl">
-                  <SortButton
-                    active={selectedSortOption === SongBoardSortOption.LAST_USED_DATE_DESCENDING}
-                    onClick={() => setSelectedSortOption(SongBoardSortOption.LAST_USED_DATE_DESCENDING)}
-                    label="Newest"
-                  />
-                  <SortButton
-                    active={selectedSortOption === SongBoardSortOption.LAST_USED_DATE_ASCENDING}
-                    onClick={() => setSelectedSortOption(SongBoardSortOption.LAST_USED_DATE_ASCENDING)}
-                    label="Oldest"
-                  />
-                </div>
+              {/* Date Group */}
+              <div className="bg-gray-100/80 p-1 rounded-2xl flex gap-1">
+                <SortSegment
+                  active={selectedSortOption === SongBoardSortOption.LAST_USED_DATE_DESCENDING}
+                  onClick={() => setSelectedSortOption(SongBoardSortOption.LAST_USED_DATE_DESCENDING)}
+                  label="Newest First"
+                />
+                <SortSegment
+                  active={selectedSortOption === SongBoardSortOption.LAST_USED_DATE_ASCENDING}
+                  onClick={() => setSelectedSortOption(SongBoardSortOption.LAST_USED_DATE_ASCENDING)}
+                  label="Oldest First"
+                />
               </div>
             </div>
           </div>
@@ -212,15 +183,15 @@ export function SearchFilterPopover({ children }: any) {
   )
 }
 
-function SortButton({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) {
+function SortSegment({ active, onClick, label }: { active: boolean, onClick: () => void, label: string }) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        "flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
+        "flex-1 py-2.5 rounded-xl text-xs font-bold transition-all duration-200",
         active
-          ? "bg-white text-slate-900 shadow-sm ring-1 ring-black/5"
-          : "text-gray-400 hover:text-gray-600 hover:bg-gray-200/50"
+          ? "bg-white text-slate-900 shadow-sm ring-1 ring-black/5 scale-[1.02]"
+          : "text-gray-400 hover:text-gray-600 hover:bg-black/5"
       )}
     >
       {label}
