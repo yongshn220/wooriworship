@@ -50,7 +50,7 @@ export default function WorshipLivePage({ params }: any) {
         timerRef.current = setTimeout(() => {
             setUiVisible(true)
             setIsPressing(false)
-        }, 2000)
+        }, 1000)
     }
 
     const handlePointerUp = () => {
@@ -81,8 +81,8 @@ export default function WorshipLivePage({ params }: any) {
     }
 
     const indicatorVariants = {
-        visible: { opacity: 1, pointerEvents: "auto" as const },
-        hidden: { opacity: 0, pointerEvents: "none" as const }
+        visible: { opacity: 1 },
+        hidden: { opacity: 0 }
     }
 
     return (
@@ -124,7 +124,7 @@ export default function WorshipLivePage({ params }: any) {
                         initial="visible"
                         animate={uiVisible ? "visible" : "hidden"}
                         transition={{ duration: 0.2 }}
-                        className="pointer-events-none"
+                        className="absolute top-0 left-0 w-full h-full pointer-events-none z-30"
                     >
                         <WorshipIndexIndicator />
                     </motion.div>

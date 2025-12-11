@@ -26,6 +26,7 @@ export function WorshipLiveCarousel({ worshipId }: Props) {
     const worshipIndexChangeEvent = useRecoilValue(worshipIndexChangeEventAtom)
     const [musicSheetCounts, setMusicSheetCounts] = useState<Array<MusicSheetCounts>>([])
     const [api, setApi] = useState<CarouselApi>()
+    const carouselOptions = useMemo(() => ({ align: "start" } as const), [])
 
     const aggregatedSongHeaders = useMemo(() => {
         const headers: Array<WorshipSongHeader> = []
@@ -87,7 +88,7 @@ export function WorshipLiveCarousel({ worshipId }: Props) {
 
     return (
         <div id="song-carousel" className="w-full h-full">
-            <Carousel opts={{ align: "start" }} setApi={setApi} className="w-full h-full">
+            <Carousel opts={carouselOptions} setApi={setApi} className="w-full h-full">
                 <CarouselContent className="h-full">
                     {
                         aggregatedSongHeaders?.map((songHeader, index) => (

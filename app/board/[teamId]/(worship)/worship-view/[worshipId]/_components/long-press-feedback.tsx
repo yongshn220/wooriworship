@@ -29,7 +29,7 @@ export function LongPressFeedback({ isPressing, x, y }: Props) {
                     duration: 1,
                     ease: "linear"
                 }}
-                className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border-2 border-white/50 shadow-[0_0_30px_rgba(255,255,255,0.5)]"
+                className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border-2 border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.5)]"
             />
 
             {/* Progress Fill */}
@@ -38,7 +38,7 @@ export function LongPressFeedback({ isPressing, x, y }: Props) {
                     cx="50"
                     cy="50"
                     r="40"
-                    stroke="rgba(255, 255, 255, 0.2)"
+                    stroke="rgba(59, 130, 246, 0.2)"
                     strokeWidth="4"
                     fill="none"
                 />
@@ -46,12 +46,12 @@ export function LongPressFeedback({ isPressing, x, y }: Props) {
                     cx="50"
                     cy="50"
                     r="40"
-                    stroke="white"
+                    stroke="#3b82f6"
                     strokeWidth="4"
                     fill="none"
                     initial={{ pathLength: 0 }}
                     animate={{ pathLength: 1 }}
-                    transition={{ duration: 2, ease: "linear" }}
+                    transition={{ duration: 1, ease: "linear" }}
                 />
             </svg>
         </div>
