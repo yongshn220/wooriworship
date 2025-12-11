@@ -101,16 +101,23 @@ export function SongList({ teamId }: Props) {
 
 function SongRowSkeleton() {
   return (
-    <div className="relative rounded-xl bg-white border border-gray-100 shadow-sm p-3 sm:px-6 sm:py-3.5 flex items-center gap-4 h-[72px]">
-      {/* Title Placeholder */}
-      <div className="flex-1 flex flex-col gap-2">
-        <div className="h-4 bg-gray-200 rounded w-1/3 animate-pulse"></div>
-        <div className="h-3 bg-gray-100 rounded w-1/4 animate-pulse"></div>
+    <div className="relative rounded-xl bg-white border border-gray-100 shadow-sm flex items-center h-[64px] sm:h-[100px] p-1 sm:p-5">
+      {/* Left Column Skeleton */}
+      <div className="flex-1 flex flex-col justify-between h-full py-0.5 sm:py-1 px-1">
+        {/* Title + Subtitle */}
+        <div className="flex items-center gap-2">
+          <div className="h-4 sm:h-5 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+          <div className="h-2.5 sm:h-3 bg-gray-100 rounded w-1/5 animate-pulse"></div>
+        </div>
+        {/* Author */}
+        <div className="h-2.5 sm:h-3 bg-gray-100 rounded w-1/3 animate-pulse"></div>
+        {/* Key */}
+        <div className="h-3.5 sm:h-4 w-8 bg-gray-200 rounded animate-pulse mt-auto"></div>
       </div>
-      {/* Key Placeholder */}
-      <div className="w-32 flex justify-center gap-1">
-        <div className="h-5 w-6 bg-gray-200 rounded animate-pulse"></div>
-        <div className="h-5 w-6 bg-gray-200 rounded animate-pulse"></div>
+
+      {/* Right Column Skeleton */}
+      <div className="w-5 sm:w-10 flex justify-center items-center shrink-0 border-l border-gray-100 pl-0.5 sm:pl-3 h-2/3">
+        <div className="h-4 w-4 sm:h-6 sm:w-6 bg-gray-200 rounded animate-pulse"></div>
       </div>
     </div>
   )
