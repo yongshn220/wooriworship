@@ -31,6 +31,7 @@ import { worshipAtom, worshipSongListAtom } from "@/global-states/worship-state"
 import { userAtom } from "@/global-states/userState";
 import { planSearchInputAtom } from "@/app/board/_states/board-states";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
+import { DownloadMusicSheetDialog } from "@/app/board/[teamId]/(worship)/worship/[worshipId]/_components/download-music-sheet-dialog";
 import { WorshipHeaderMenu } from "./worship-header-menu";
 
 interface Props {
@@ -118,13 +119,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
     router.push(getPathWorshipView(teamId, worship.id));
   };
 
-  const handleDownload = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toast({
-      title: "Coming Soon",
-      description: "Download functionality is under development.",
-    });
-  };
+
 
   const hasLink = !!worship.link;
   const isPast = worship ? isTimestampPast(worship.worship_date) : false;
@@ -261,10 +256,17 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                             </a>
                           </Button>
                         )}
-                        <Button variant="ghost" size="sm" onClick={handleDownload} className="text-gray-500 hover:text-gray-900 h-8 text-xs sm:text-sm px-2">
-                          <Download className="mr-1.5 h-3 w-3 sm:h-4 sm:w-4" />
-                          Download
-                        </Button>
+                        <DownloadMusicSheetDialog worshipId={worship.id}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-gray-500 hover:text-gray-900 h-8 text-xs sm:text-sm px-2 w-full"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Download className="mr-1.5 h-3 w-3 sm:h-4 sm:w-4" />
+                            Download
+                          </Button>
+                        </DownloadMusicSheetDialog>
                       </div>
                     </div>
                   </div>
