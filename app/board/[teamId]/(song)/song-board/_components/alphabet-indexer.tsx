@@ -101,7 +101,7 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
             <div
                 ref={containerRef}
                 onScroll={handleScroll}
-                className="h-full w-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory relative perspective-[500px]"
+                className="h-full w-full overflow-y-scroll scrollbar-hide relative perspective-[500px]"
                 style={{
                     scrollbarWidth: 'none',
                     msOverflowStyle: 'none',
