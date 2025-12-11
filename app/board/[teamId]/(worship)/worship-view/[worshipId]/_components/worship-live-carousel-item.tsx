@@ -65,12 +65,20 @@ export function WorshipLiveCarouselItem({ index, urls }: WorshipLiveCarouselItem
             <div className="h-full w-full flex flex-col bg-white dark:bg-black overflow-y-auto scrollbar-hide">
                 {
                     urls.map((url, index) => (
-                        <div key={index} className="flex-center w-full h-full p-1 select-none" style={{ WebkitTouchCallout: "none" }} onContextMenu={(e) => e.preventDefault()}>
+                        <div
+                            key={index}
+                            className="relative flex-center w-full h-full p-1 select-none"
+                            style={{ WebkitTouchCallout: "none" }}
+                            onContextMenu={(e) => e.preventDefault()}
+                            onDragStart={(e) => e.preventDefault()}
+                        >
                             <img
                                 alt="Music score"
                                 src={url}
                                 className="max-w-full max-h-full object-contain shadow-sm select-none pointer-events-none"
                             />
+                            {/* Shield to prevent detailed interaction/dragging of the image */}
+                            <div className="absolute inset-0 z-10" />
                         </div>
                     ))
                 }
