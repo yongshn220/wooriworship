@@ -20,8 +20,8 @@ export function WorshipControlItem({ icon, label, onClick, isActive, variant = "
             variant="ghost"
             size="icon"
             className={cn(
-                "relative rounded-full transition-all duration-300 w-10 h-10 hover:bg-white/10 text-white/60 hover:text-white",
-                isActive && "bg-blue-600 text-white shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)] ring-1 ring-black/20",
+                "relative rounded-full transition-all duration-300 w-10 h-10 hover:bg-white/10 text-white/60 hover:text-white focus-visible:ring-0 focus-visible:ring-offset-0",
+                isActive && "bg-blue-400 text-white shadow-[inset_0_3px_6px_rgba(0,0,0,0.4)]",
                 className
             )}
             onClick={onClick}
