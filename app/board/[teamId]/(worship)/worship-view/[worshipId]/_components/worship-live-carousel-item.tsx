@@ -34,7 +34,7 @@ export function WorshipLiveCarouselItemWrapper({ songHeader, setMusicSheetCounts
     useEffect(() => {
         setMusicSheetCounts((prev) => {
             const newCounts = prev.filter((count) => count.id !== songHeader?.id)
-            return [...newCounts, { id: songHeader?.id, count: musicSheets?.length, note: songHeader?.note }]
+            return [...newCounts, { id: songHeader?.id, count: modifiedMusicSheets?.length, note: songHeader?.note }]
         })
     }, [modifiedMusicSheets?.length, setMusicSheetCounts, songHeader?.id, songHeader?.note])
 

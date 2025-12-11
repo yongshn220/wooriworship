@@ -42,6 +42,12 @@ export function WorshipLiveCarousel({ worshipId }: Props) {
         return headers
     }, [worship?.beginning_song, worship?.ending_song, worship?.songs])
 
+    const sortedMusicSheetCounts = useMemo(() => {
+        return aggregatedSongHeaders.map(header =>
+            musicSheetCounts.find(c => c.id === header.id)
+        ).filter((item): item is MusicSheetCounts => !!item)
+    }, [aggregatedSongHeaders, musicSheetCounts])
+
     useEffect(() => {
         if (api) {
             api.scrollTo(worshipIndexChangeEvent);
@@ -59,7 +65,7 @@ export function WorshipLiveCarousel({ worshipId }: Props) {
             let accumulatedCount = 0
             let foundNote = ""
 
-            for (const item of musicSheetCounts) {
+            for (const item of sortedMusicSheetCounts) {
                 if (currentIndex < accumulatedCount + item.count) {
                     foundNote = item.note || ""
                     break
@@ -76,15 +82,15 @@ export function WorshipLiveCarousel({ worshipId }: Props) {
         return () => {
             api.off("select", handleSelect)
         }
-    }, [musicSheetCounts, setWorshipIndex, setWorshipNote, api])
+    }, [sortedMusicSheetCounts, setWorshipIndex, setWorshipNote, api])
 
     useEffect(() => {
         let totalCounts = 0
-        musicSheetCounts.forEach((count) => {
+        sortedMusicSheetCounts.forEach((count) => {
             totalCounts += count?.count
         })
         setWorshipIndex((prev) => ({ ...prev, total: totalCounts }))
-    }, [musicSheetCounts, setWorshipIndex]);
+    }, [sortedMusicSheetCounts, setWorshipIndex]);
 
     return (
         <div id="song-carousel" className="w-full h-full">
