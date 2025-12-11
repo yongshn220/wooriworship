@@ -92,43 +92,47 @@ export function AddableSongHeaderDefault({ teamId, songId }: Props) {
           </div>
 
           {/* Key Buttons (Bottom Row) */}
-          <div className="flex items-center flex-wrap gap-2 w-full">
-            {musicSheets?.length === 0 && (
-              <button
-                onClick={() => {
-                  if (isSelected) {
-                    setSelectedWorshipSongHeaderList(prev => prev.filter(h => h.id !== songId))
-                  } else {
-                    setSelectedWorshipSongHeaderList(prev => [...prev, {
-                      id: songId, note: song?.description || "", selected_music_sheet_ids: []
-                    }])
-                  }
-                }}
-                className={`h-8 px-4 rounded-full text-xs font-bold transition-all ${isSelected ? "bg-blue-600 text-white shadow-md ring-2 ring-blue-600 ring-offset-1" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
-              >
-                {isSelected ? "Added" : "Add Song"}
-              </button>
+          <div className="flex flex-col gap-1 w-full mt-2">
+            {musicSheets && musicSheets.length > 0 && (
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Select Key</span>
             )}
-
-            {musicSheets?.map((sheet, idx) => {
-              const isKeySelected = selectedSheetIds.includes(sheet.id)
-              return (
+            <div className="flex items-center flex-wrap gap-2 w-full">
+              {musicSheets?.length === 0 && (
                 <button
-                  key={sheet.id}
-                  onClick={() => handleToggleKey(sheet.id)}
-                  className={`
+                  onClick={() => {
+                    if (isSelected) {
+                      setSelectedWorshipSongHeaderList(prev => prev.filter(h => h.id !== songId))
+                    } else {
+                      setSelectedWorshipSongHeaderList(prev => [...prev, {
+                        id: songId, note: song?.description || "", selected_music_sheet_ids: []
+                      }])
+                    }
+                  }}
+                  className={`h-8 px-4 rounded-full text-xs font-bold transition-all ${isSelected ? "bg-blue-600 text-white shadow-md ring-2 ring-blue-600 ring-offset-1" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
+                >
+                  {isSelected ? "Added" : "Add Song"}
+                </button>
+              )}
+
+              {musicSheets?.map((sheet, idx) => {
+                const isKeySelected = selectedSheetIds.includes(sheet.id)
+                return (
+                  <button
+                    key={sheet.id}
+                    onClick={() => handleToggleKey(sheet.id)}
+                    className={`
                              h-9 min-w-[3rem] px-3 rounded-lg text-sm font-bold transition-all border
                              ${isKeySelected
-                      ? "bg-blue-600 border-blue-600 text-white shadow-md scale-100 ring-2 ring-blue-600 ring-offset-1"
-                      : "bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"}
+                        ? "bg-blue-600 border-blue-600 text-white shadow-md scale-100 ring-2 ring-blue-600 ring-offset-1"
+                        : "bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"}
                            `}
-                >
-                  {sheet.key}
-                </button>
-              )
-            })}
+                  >
+                    {sheet.key}
+                  </button>
+                )
+              })}
+            </div>
           </div>
-
         </div>
       </div>
     </>

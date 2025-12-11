@@ -9,17 +9,20 @@ import { motion } from "framer-motion";
 interface Props {
     teamId: string;
     onScrollRequest: (index: number) => void;
+    activeIndex: number;
 }
 
 const ITEM_HEIGHT = 40; // Height of each character item
 const VISIBLE_ITEMS = 7; // Number of items visible above/below center
 const WHEEL_RADIUS = 150; // Radius of the 3D wheel
 
-export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
+export function AlphabetIndexer({ teamId, onScrollRequest, activeIndex }: Props) {
     const alphabetMap = useRecoilValue(songAlphabetMapAtom(teamId));
     const containerRef = useRef<HTMLDivElement>(null);
     const [scrollTop, setScrollTop] = useState(0);
     const [selectedChar, setSelectedChar] = useState<string | null>(null);
+    const isSyncing = useRef(false);
+    const isUserInteracting = useRef(false);
 
     // Order: # -> English -> Korean
     const chars = useMemo(() => {
@@ -32,10 +35,64 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
         return ['#', ...english, ...korean];
     }, []);
 
+    // Sync from List -> Indexer
+    useEffect(() => {
+        // If user is currently dragging/scrolling the wheel, ignore updates from the list
+        if (isUserInteracting.current) return;
+
+        // Find the char that corresponds to activeIndex
+        let targetChar = '#';
+
+        // Iterate chars to find the range
+        // alphabetMap maps Char -> Start Index
+        // We want the char where map[char] <= activeIndex
+        // Since chars are ordered, we can just iterate.
+        let maxIndex = -1;
+
+        for (const char of chars) {
+            const index = alphabetMap[char];
+            if (index !== undefined) {
+                if (index <= activeIndex && index > maxIndex) {
+                    maxIndex = index;
+                    targetChar = char;
+                }
+            }
+        }
+
+        if (targetChar !== selectedChar) {
+            isSyncing.current = true;
+            setSelectedChar(targetChar);
+
+            // Scroll wheel to this char
+            const charIndex = chars.indexOf(targetChar);
+            if (charIndex !== -1 && containerRef.current) {
+                containerRef.current.scrollTo({
+                    top: charIndex * ITEM_HEIGHT,
+                    behavior: 'smooth'
+                });
+            }
+
+            // Release lock after animation
+            setTimeout(() => {
+                isSyncing.current = false;
+            }, 800);
+        }
+    }, [activeIndex, alphabetMap, chars, selectedChar]);
+
     // Handle Scroll
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        isUserInteracting.current = true; // Mark as interaction
+
         const newScrollTop = e.currentTarget.scrollTop;
         setScrollTop(newScrollTop);
+
+        // If syncing from list, do NOT trigger list scroll back
+        // But if isUserInteracting is true (which we just set), we assume user intent... 
+        // Wait, isSyncing is set when PROGRAM starts scrolling.
+        if (isSyncing.current) {
+            isUserInteracting.current = false; // It's not user interaction if it's sync
+            return;
+        }
 
         // Calculate center item
         const centerIndex = Math.round(newScrollTop / ITEM_HEIGHT);
@@ -45,20 +102,32 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
         if (char !== selectedChar) {
             setSelectedChar(char);
             if (alphabetMap[char] !== undefined) {
-                // Debounce or immediate? Immediate for now as per "wheel" feel, maybe throttle if performance bad
                 onScrollRequest(alphabetMap[char]);
-
-                // Haptic feedback
-                if (navigator.vibrate) {
-                    navigator.vibrate(5);
-                }
+                if (navigator.vibrate) navigator.vibrate(5);
             }
         }
+
+        // We need to clear isUserInteracting eventually if we scroll and stop.
+        // handleScrollEnd will be called 100ms after stop.
     };
+
+    // User interaction unlocks sync
+    const handleUserInteract = () => {
+        isSyncing.current = false;
+        isUserInteracting.current = true;
+    }
 
     // Scroll Sync to center items
     const handleScrollEnd = () => {
         if (!containerRef.current) return;
+
+        // Reset user interaction flag after snap or stop
+        // Use a slight delay to ensure list has time to start moving if we commanded it
+        // Ideally, we keep it true until the list arrives? 
+        // No, keep it true for a short duration is simpler.
+        setTimeout(() => {
+            isUserInteracting.current = false;
+        }, 500);
 
         const currentScroll = containerRef.current.scrollTop;
         const nearestIndex = Math.round(currentScroll / ITEM_HEIGHT);
@@ -91,7 +160,11 @@ export function AlphabetIndexer({ teamId, onScrollRequest }: Props) {
 
 
     return (
-        <div className="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 h-[500px] w-12 flex items-center justify-center pointer-events-auto select-none">
+        <div
+            className="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 h-[500px] w-12 flex items-center justify-center pointer-events-auto select-none"
+            onPointerDown={handleUserInteract}
+            onTouchStart={handleUserInteract}
+        >
 
             {/* Selection Pointer / Highlight */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-8 bg-blue-500/20 backdrop-blur-sm border border-blue-500/50 rounded-lg shadow-[0_0_15px_rgba(59,130,246,0.5)] z-0 pointer-events-none" />
