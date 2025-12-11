@@ -1,11 +1,11 @@
-import {ImageFileContainer} from "@/components/constants/types";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
-import {X} from "lucide-react";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area";
-import {UploadedImageFileCard} from "@/components/elements/util/image/uploaded-image-file-card";
+import { ImageFileContainer } from "@/components/constants/types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { UploadedImageFileCard } from "@/components/elements/util/image/uploaded-image-file-card";
 import MultipleImageUploader from "@/components/elements/util/image/multiple-image-uploader";
 import PdfUploader from "@/components/elements/util/image/pdf-uploader";
 import React from "react";
@@ -23,7 +23,7 @@ interface Props {
   handleRemoveMusicSheetContainer: Function
 }
 
-export function MusicSheetUploaderBox({index, tempId, imageFileContainers, musicKey, setMusicKey, handleAddImageFileContainer, handleRemoveImageFileContainer, handleRemoveMusicSheetContainer}: Props) {
+export function MusicSheetUploaderBox({ index, tempId, imageFileContainers, musicKey, setMusicKey, handleAddImageFileContainer, handleRemoveImageFileContainer, handleRemoveMusicSheetContainer }: Props) {
   function updateImageFileContainer(newContainer: ImageFileContainer) {
     handleAddImageFileContainer(tempId, newContainer)
   }
@@ -47,6 +47,7 @@ export function MusicSheetUploaderBox({index, tempId, imageFileContainers, music
           <Input
             id="key"
             placeholder="ex) Em"
+            maxLength={5}
             value={musicKey ?? ""}
             onChange={(e) => setMusicKey(tempId, e.target.value)}
             className="bg-white"
@@ -60,7 +61,7 @@ export function MusicSheetUploaderBox({index, tempId, imageFileContainers, music
                 imageFileContainers?.map((imageFileContainer, i) => (
                   <figure key={i} className="shrink-0">
                     <div className="overflow-hidden w-full h-full">
-                      <UploadedImageFileCard imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImageFileContainer(tempId, index)}/>
+                      <UploadedImageFileCard imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImageFileContainer(tempId, index)} />
                     </div>
                   </figure>
                 ))

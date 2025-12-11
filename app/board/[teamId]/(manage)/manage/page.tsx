@@ -53,8 +53,8 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
   }
 
   return (
-    <div className="flex flex-col w-full h-full bg-muted/30 -m-4 p-4 overflow-y-auto">
-      <div className="max-w-md mx-auto w-full pb-10">
+    <div className="flex flex-col w-full h-full bg-muted/30 overflow-y-auto">
+      <div className="w-full pb-10">
 
         {/* Profile Section */}
         <TeamProfileCard
