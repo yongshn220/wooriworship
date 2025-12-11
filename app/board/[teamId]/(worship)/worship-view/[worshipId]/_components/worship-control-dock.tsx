@@ -38,7 +38,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl"
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 border-t-white/20 shadow-2xl"
             >
                 <WorshipControlItem
                     icon={<FileText className="w-5 h-5" />}
