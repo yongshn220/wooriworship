@@ -140,7 +140,7 @@ export function BoardTopNavBar() {
                     <MainLogoSmall />
                   </div>
                 ) : (
-                  <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 tracking-tight">
+                  <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
                     {currentConfig.title}
                   </h1>
                 )}
