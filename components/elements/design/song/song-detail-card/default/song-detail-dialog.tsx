@@ -62,41 +62,40 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
             )}
           </div>
 
-          {/* Right: Key Selector & Menu */}
+          {/* Right: Menu Button */}
           <div className="relative z-10 flex items-center justify-end gap-1 w-[80px]">
-            {/* Key Selector */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 px-2 text-xs font-semibold text-gray-600 gap-1 hover:bg-gray-100/50">
-                  <span className="bg-gray-100 px-1.5 py-0.5 rounded text-[11px] border border-gray-200">
-                    <Suspense fallback={<span>-</span>}>
-                      {selectedMusicSheetId ? <SelectedKeyTrigger musicSheetId={selectedMusicSheetId} /> : <span>-</span>}
-                    </Suspense>
-                  </span>
-                  <ChevronDown className="h-3 w-3 opacity-50" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40 max-h-[50vh] overflow-y-auto z-[100]">
-                <Suspense fallback={<div className="p-2 text-sm text-gray-400">Loading keys...</div>}>
-                  {musicSheetIds?.map((id) => (
-                    <KeyDropdownItem
-                      key={id}
-                      musicSheetId={id}
-                      onSelect={() => setSelectedMusicSheetId(id)}
-                    />
-                  ))}
-                </Suspense>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Menu Button */}
             <SongDetailMenuButton teamId={teamId} songId={songId} songTitle={song?.title} />
           </div>
         </div>
 
         {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto no-scrollbar bg-gray-50">
+        <div className="flex-1 overflow-y-auto no-scrollbar bg-gray-50 relative">
           <Suspense fallback={<div className="h-full flex-center">Loading...</div>}>
+
+            {/* Floating Key Selector (Overlay) */}
+            <div className="absolute top-4 right-4 z-10">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="h-9 px-3 text-sm font-semibold bg-white/90 backdrop-blur shadow-sm border-gray-200 hover:bg-white gap-2">
+                    <Suspense fallback={<span>-</span>}>
+                      {selectedMusicSheetId ? <SelectedKeyTrigger musicSheetId={selectedMusicSheetId} /> : <span>Key</span>}
+                    </Suspense>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-[100]">
+                  <Suspense fallback={<div className="p-2 text-sm text-gray-400">Loading keys...</div>}>
+                    {musicSheetIds?.map((id) => (
+                      <KeyDropdownItem
+                        key={id}
+                        musicSheetId={id}
+                        onSelect={() => setSelectedMusicSheetId(id)}
+                      />
+                    ))}
+                  </Suspense>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
             {/* Full Screen Sheet Area */}
             <div className="w-full min-h-[calc(100vh-70px)] flex flex-col pb-12">
@@ -106,7 +105,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
             </div>
 
             {/* Info Section (Below) */}
-            <div className="bg-white p-4 pb-10 rounded-t-xl -mt-4 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+            <div className="bg-white p-4 pb-10 rounded-t-xl -mt-4 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-20">
               <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-6" />
               <SongDetailContent songId={songId} />
             </div>
@@ -120,7 +119,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
 
 function SelectedKeyTrigger({ musicSheetId }: { musicSheetId: string }) {
   const musicSheet = useRecoilValue(musicSheetAtom(musicSheetId));
-  return <span className="truncate max-w-[8rem]">{musicSheet?.key || "?"}</span>;
+  return <span className="truncate max-w-[12ch] inline-block align-bottom">{musicSheet?.key || "?"}</span>;
 }
 
 function KeyDropdownItem({ musicSheetId, onSelect }: { musicSheetId: string, onSelect: () => void }) {
