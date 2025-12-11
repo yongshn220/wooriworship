@@ -41,20 +41,42 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
       <DrawerContent className="h-screen rounded-none flex flex-col focus:outline-none mt-0">
 
         {/* Top Header Bar */}
-        <div className="relative flex items-center justify-between p-3 border-b bg-white shrink-0 z-20">
+        <div className="relative flex items-center justify-between p-3 border-b bg-white/80 backdrop-blur-md shrink-0 z-20 h-[60px]">
 
-          {/* Key Selector (Left) */}
-          <div className="relative z-10 flex items-center">
+          {/* Left: Close Button */}
+          <div className="relative z-10 flex items-center justify-start w-[80px]">
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="-ml-2 hover:bg-gray-100/50">
+              <X className="h-6 w-6 text-gray-600" />
+            </Button>
+          </div>
+
+          {/* Center: Title & Subtitle (Absolute) */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-180px)] flex flex-col items-center justify-center pointer-events-none">
+            <h3 className="font-bold text-[15px] leading-tight text-center text-gray-900 line-clamp-2">
+              {song?.title || "Untitled"}
+            </h3>
+            {song?.subtitle && (
+              <p className="text-[11px] text-gray-500 font-medium text-center mt-0.5 line-clamp-1">
+                {song.subtitle}
+              </p>
+            )}
+          </div>
+
+          {/* Right: Key Selector & Menu */}
+          <div className="relative z-10 flex items-center justify-end gap-1 w-[80px]">
+            {/* Key Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2 min-w-[4.5rem] justify-between px-3 h-9">
-                  <Suspense fallback={<span>...</span>}>
-                    {selectedMusicSheetId ? <SelectedKeyTrigger musicSheetId={selectedMusicSheetId} /> : <span>Key</span>}
-                  </Suspense>
-                  <ChevronDown className="h-4 w-4 opacity-50" />
+                <Button variant="ghost" size="sm" className="h-8 px-2 text-xs font-semibold text-gray-600 gap-1 hover:bg-gray-100/50">
+                  <span className="bg-gray-100 px-1.5 py-0.5 rounded text-[11px] border border-gray-200">
+                    <Suspense fallback={<span>-</span>}>
+                      {selectedMusicSheetId ? <SelectedKeyTrigger musicSheetId={selectedMusicSheetId} /> : <span>-</span>}
+                    </Suspense>
+                  </span>
+                  <ChevronDown className="h-3 w-3 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 max-h-[50vh] overflow-y-auto z-[100]">
+              <DropdownMenuContent align="end" className="w-40 max-h-[50vh] overflow-y-auto z-[100]">
                 <Suspense fallback={<div className="p-2 text-sm text-gray-400">Loading keys...</div>}>
                   {musicSheetIds?.map((id) => (
                     <KeyDropdownItem
@@ -66,26 +88,9 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
                 </Suspense>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
 
-          {/* Title & Subtitle (Absolute Center) */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] flex flex-col items-center justify-center pointer-events-none">
-            <h3 className="font-bold text-lg leading-tight truncate w-full text-center">
-              {song?.title || "Untitled"}
-            </h3>
-            {song?.subtitle && (
-              <p className="text-xs text-gray-500 font-medium truncate w-full text-center mt-0.5">
-                {song.subtitle}
-              </p>
-            )}
-          </div>
-
-          {/* Exit / Menu (Right) */}
-          <div className="relative z-10 flex items-center gap-1">
+            {/* Menu Button */}
             <SongDetailMenuButton teamId={teamId} songId={songId} songTitle={song?.title} />
-            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
-              <X className="h-6 w-6" />
-            </Button>
           </div>
         </div>
 

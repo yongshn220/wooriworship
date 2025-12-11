@@ -4,12 +4,17 @@
 
 
 
-html, body, :root {
+html,
+body,
+:root {
   height: 100%;
   width: 100%;
+  overflow: hidden;
+  overscroll-behavior-y: none;
 }
 
-input, a {
+input,
+a {
   font-size: 16px;
 }
 
@@ -18,10 +23,14 @@ input, a {
 }
 
 .prevent-text-select {
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE 10+ */
-  user-select: none; /* Standard syntax */
+  -webkit-user-select: none;
+  /* Safari */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* IE 10+ */
+  user-select: none;
+  /* Standard syntax */
 }
 
 @layer base {
@@ -92,6 +101,7 @@ input, a {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -133,14 +143,19 @@ input, a {
 .gradient-border::before {
   content: '';
   position: absolute;
-  top: -3px; /* offset by border width */
-  left: -3px; /* offset by border width */
-  right: -3px; /* offset by border width */
-  bottom: -3px; /* offset by border width */
+  top: -3px;
+  /* offset by border width */
+  left: -3px;
+  /* offset by border width */
+  right: -3px;
+  /* offset by border width */
+  bottom: -3px;
+  /* offset by border width */
   border-radius: inherit;
   background: linear-gradient(319deg, #ba2d0b 0%, #fe7f2d 37%, #ffbf46 100%);
- /* Your gradient colors */
-  z-index: -1; /* Place it behind the main content */
+  /* Your gradient colors */
+  z-index: -1;
+  /* Place it behind the main content */
 }
 
 .gradient-border::after {
@@ -151,8 +166,10 @@ input, a {
   right: 0;
   bottom: 0;
   border-radius: inherit;
-  background-color: white; /* or your desired background color */
-  z-index: 1; /* Place it above the gradient */
+  background-color: white;
+  /* or your desired background color */
+  z-index: 1;
+  /* Place it above the gradient */
 }
 
 .custom-input-focus {
@@ -167,10 +184,21 @@ input, a {
 }
 
 @keyframes blob {
-  0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0px, 0px) scale(1); }
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
 }
 
 .animate-blob {
