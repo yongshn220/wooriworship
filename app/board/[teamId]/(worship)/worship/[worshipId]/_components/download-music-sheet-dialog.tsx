@@ -1,19 +1,19 @@
 'use client'
 
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
-import {Button} from "@/components/ui/button";
-import {Checkbox} from "@/components/ui/checkbox";
-import {useRecoilValue} from "recoil";
-import {useState} from "react";
-import {worshipSongListAtom} from "@/global-states/worship-state";
-import {downloadMultipleMusicSheets} from "@/components/util/helper/helper-functions";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useRecoilValue } from "recoil";
+import { useState } from "react";
+import { worshipSongListAtom } from "@/global-states/worship-state";
+import { downloadMultipleMusicSheets } from "@/components/util/helper/helper-functions";
 
 interface Props {
   children: any
   worshipId: string
 }
 
-export function DownloadMusicSheetDialog({children,  worshipId}: Props) {
+export function DownloadMusicSheetDialog({ children, worshipId }: Props) {
   const songList = useRecoilValue(worshipSongListAtom(worshipId))
   const [selectedSongIds, setSelectedSongIds] = useState<Array<string>>([])
 
@@ -35,9 +35,7 @@ export function DownloadMusicSheetDialog({children,  worshipId}: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="w-full">
-          {children}
-        </div>
+        {children}
       </DialogTrigger>
       <DialogContent className="w-full flex-start flex-col">
         <DialogHeader>
@@ -48,7 +46,7 @@ export function DownloadMusicSheetDialog({children,  worshipId}: Props) {
           {
             songList.map((song) => (
               <div key={song?.id} className="flex items-center space-x-5">
-                <Checkbox id={song?.id} checked={selectedSongIds.includes(song?.id)} onClick={() => handleSelectSong(song?.id)}/>
+                <Checkbox id={song?.id} checked={selectedSongIds.includes(song?.id)} onClick={() => handleSelectSong(song?.id)} />
                 <label htmlFor={song?.id} className="font-medium cursor-pointer">
                   {song?.title}
                 </label>
