@@ -27,7 +27,8 @@ export function WorshipNote({ constraintsRef }: Props) {
                     className="fixed top-20 left-1/2 max-w-lg w-full z-40 mx-auto cursor-grab"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <div className="bg-popover/80 backdrop-blur-md rounded-xl p-4 text-popover-foreground shadow-2xl border border-border/20 text-center text-sm font-serif leading-relaxed select-none">
+                    <div className="bg-popover/80 backdrop-blur-md rounded-xl p-4 text-popover-foreground shadow-2xl border border-border/20 text-center text-sm font-serif leading-relaxed select-none flex flex-col items-center">
+                        <div className="w-8 h-1 bg-zinc-400/80 rounded-full mb-1" />
                         {description}
                     </div>
                 </motion.div>

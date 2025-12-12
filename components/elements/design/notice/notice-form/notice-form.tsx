@@ -14,6 +14,7 @@ import { currentTeamIdAtom } from "@/global-states/teamState";
 import { noticeAtom, noticeUpdaterAtom, noticeIdsUpdaterAtom } from "@/global-states/notice-state";
 
 import { NoticeService, StorageService } from "@/apis";
+import PushNotificationService from "@/apis/PushNotificationService";
 import { toast } from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/components/elements/util/image/multiple-image-uploader";
 import PdfUploader from "@/components/elements/util/image/pdf-uploader";
@@ -141,6 +142,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
         title: `New Notice created!`,
         description: input.title,
       })
+      await PushNotificationService.notifyTeamNewNotice(teamId, authUser.uid, input.title);
       setNoticeIdsUpdater((prev) => prev + 1)
 
       clearContents()

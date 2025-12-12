@@ -13,7 +13,7 @@ class PushNotificationService {
 
     if (setting.push_notification.is_enabled === isEnabled) {
       return;
-    } 
+    }
 
     const notif: PushNotification = {
       ...setting.push_notification,
@@ -33,7 +33,7 @@ class PushNotificationService {
     }
 
     console.log("Refreshing push notification subscription", { uid, deviceId });
-    
+
     const setting = await AccountSettingService.getAccountSetting(uid);
     if (!setting) {
       console.error("Failed to get or create account setting");
@@ -59,17 +59,17 @@ class PushNotificationService {
       }
 
       const notif: PushNotification = {
-        ...setting.push_notification, 
+        ...setting.push_notification,
         subscriptions: [...filteredSubscriptions, subscription],
         updated_time: getFirebaseTimestampNow()
       }
-      
+
       await AccountSettingService.update(uid, {
         push_notification: notif
       });
 
       console.log("Successfully updated push notification subscription", { deviceId });
-    } 
+    }
     catch (error) {
       console.error("Error refreshing push notification subscription:", error);
     }
@@ -115,10 +115,71 @@ class PushNotificationService {
       console.log("Notification sending result:", result);
 
       return result;
-    } 
+    }
     catch (error) {
       console.error("Error sending team notifications:", error);
       return { success: false, error: "Failed to send notifications" };
+    }
+  }
+
+  async notifyTeamNewNotice(teamId: string, creatorUid: string, noticeTitle: string) {
+    try {
+      const team = await TeamService.getById(teamId) as Team;
+      if (!team) return;
+
+      const memberUids = team.users.filter(uid => uid !== creatorUid);
+      const memberSettings = await Promise.all(
+        memberUids.map(uid => AccountSettingService.getAccountSetting(uid))
+      );
+
+      const activeSubscriptions = memberSettings
+        .filter(setting => setting && setting.push_notification.is_enabled)
+        .flatMap(setting => setting.push_notification.subscriptions)
+        .map(sub => JSON.parse(sub.sub) as PushSubscription);
+
+      if (activeSubscriptions.length === 0) return;
+
+      const payload: PushNotificationPayload = {
+        title: "New Notice Posted",
+        body: noticeTitle,
+        icon: '/icon.png'
+      };
+
+      return await sendNotificationToMultipleSubscriptions(activeSubscriptions, payload);
+    } catch (error) {
+      console.error("Error sending notice notifications:", error);
+    }
+  }
+
+  async notifyMembersServingAssignment(teamId: string, creatorUid: string, servingDate: Date, assignedMemberIds: string[]) {
+    try {
+      // Filter out creator if they assigned themselves (optional, usually one wants to notify others)
+      const targetMemberIds = assignedMemberIds.filter(uid => uid !== creatorUid);
+
+      if (targetMemberIds.length === 0) return;
+
+      const memberSettings = await Promise.all(
+        targetMemberIds.map(uid => AccountSettingService.getAccountSetting(uid))
+      );
+
+      const activeSubscriptions = memberSettings
+        .filter(setting => setting && setting.push_notification.is_enabled)
+        .flatMap(setting => setting.push_notification.subscriptions)
+        .map(sub => JSON.parse(sub.sub) as PushSubscription);
+
+      if (activeSubscriptions.length === 0) return;
+
+      const formattedDate = servingDate.toLocaleDateString();
+
+      const payload: PushNotificationPayload = {
+        title: "New Serving Assignment",
+        body: `You are assigned to serve on ${formattedDate}`,
+        icon: '/icon.png'
+      };
+
+      return await sendNotificationToMultipleSubscriptions(activeSubscriptions, payload);
+    } catch (error) {
+      console.error("Error sending serving notifications:", error);
     }
   }
 }
