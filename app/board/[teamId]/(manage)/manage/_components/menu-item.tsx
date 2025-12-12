@@ -79,7 +79,7 @@ export function MenuItem({
       {/* Action Area (Right Side) */}
       <div className="flex items-center gap-3">
         {badge && (
-          <span className="flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground leading-none">
+          <span className="flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-destructive text-xs font-bold text-destructive-foreground leading-none">
             {badge}
           </span>
         )}

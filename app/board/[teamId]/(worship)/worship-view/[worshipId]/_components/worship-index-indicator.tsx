@@ -27,7 +27,7 @@ export function WorshipIndexIndicator() {
                             <div className="w-1 h-1 bg-muted-foreground/30 rounded-full transition-all duration-300 group-hover:bg-foreground/50 group-hover:scale-150 shadow-sm" />
                         </div>
                         :
-                        <div key={i} className="relative z-10 flex-center w-6 h-6 bg-primary rounded-full font-bold text-primary-foreground text-[10px] shadow-lg border border-primary-foreground/10">{i + 1}</div>
+                        <div key={i} className="relative z-10 flex-center w-6 h-6 bg-primary rounded-full font-bold text-primary-foreground text-xs shadow-lg border border-primary-foreground/10">{i + 1}</div>
                 ))
             }
         </div>

@@ -41,7 +41,7 @@ export function WorshipSettingsMenu({ teamId, worshipId }: Props) {
                 <MultipleSheetsViewSelect />
             </div>
 
-            <p className="px-2 pb-1 text-[10px] text-muted-foreground font-normal leading-tight">
+            <p className="px-2 pb-1 text-xs text-muted-foreground font-normal leading-tight">
                 * Set scroll direction for songs with multiple sheets.
             </p>
 
