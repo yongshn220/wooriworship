@@ -6,10 +6,11 @@ import { useRecoilValue } from "recoil";
 import { musicSheetsByIdsAtom } from "@/global-states/music-sheet-state";
 import { cn } from "@/lib/utils";
 import { worshipViewPageModeAtom } from "../_states/worship-detail-states";
-import { WorshipViewPageMode } from "@/components/constants/enums";
 import { MusicSheetCounts } from "./worship-live-carousel";
 import { useEffect, useMemo } from "react";
 import { MusicSheet } from "@/models/music_sheet";
+import { DirectionType, WorshipViewPageMode } from "@/components/constants/enums";
+import { worshipMultipleSheetsViewModeAtom } from "../_states/worship-detail-states";
 
 
 interface Props {
@@ -20,16 +21,32 @@ interface Props {
 export function WorshipLiveCarouselItemWrapper({ songHeader, setMusicSheetCounts }: Props) {
     const musicSheets = useRecoilValue(musicSheetsByIdsAtom(songHeader?.selected_music_sheet_ids))
 
+    const multipleSheetsViewMode = useRecoilValue(worshipMultipleSheetsViewModeAtom)
+
     const modifiedMusicSheets = useMemo(() => {
         const results: Array<MusicSheet> = []
-        musicSheets.forEach(musicSheet => {
-            musicSheet?.urls.forEach(url => {
-                results.push({ ...musicSheet, urls: [url] })
+
+        if (multipleSheetsViewMode === DirectionType.VERTICAL) {
+            // Group all URLs into a single 'sheet' entry so they render in one CarouselItem
+            const allUrls: string[] = []
+            musicSheets.forEach(sheet => {
+                if (sheet?.urls) allUrls.push(...sheet.urls)
             })
-        })
+            if (allUrls.length > 0 && musicSheets.length > 0) {
+                // Create a virtual sheet with all compiled URLs
+                results.push({ ...musicSheets[0], urls: allUrls })
+            }
+        } else {
+            // Horizontal: Split every page into its own 'sheet' entry/CarouselItem
+            musicSheets.forEach(musicSheet => {
+                musicSheet?.urls.forEach(url => {
+                    results.push({ ...musicSheet, urls: [url] })
+                })
+            })
+        }
         return results
 
-    }, [musicSheets])
+    }, [musicSheets, multipleSheetsViewMode])
 
     useEffect(() => {
         setMusicSheetCounts((prev) => {
