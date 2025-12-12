@@ -39,7 +39,7 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
           <div className="flex flex-col w-full pr-4">
             {/* Title */}
             {/* Title */}
-            <h3 className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug tracking-tight">
+            <h3 className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors leading-snug tracking-tight">
               {notice?.title}
               {isExpanded && (
                 <ChevronUp className="h-6 w-6 text-gray-400 animate-in fade-in zoom-in duration-300" />
@@ -51,7 +51,7 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
               <span className="text-gray-700 font-semibold">{user?.name}</span>
               <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
               <span>{timestampToDateStringFormatted(notice?.created_by?.time)}</span>
-              <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-xs">
+              <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
                 {getTimePassedFromTimestampShorten(notice?.created_by?.time)}
               </span>
             </div>

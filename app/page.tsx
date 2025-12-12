@@ -82,7 +82,7 @@ export default function RoutePage() {
                 <div className="flex gap-4">
                   <button
                     onClick={() => window.location.reload()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition"
                   >
                     I verified my email
                   </button>

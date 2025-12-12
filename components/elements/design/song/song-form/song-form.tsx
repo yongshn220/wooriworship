@@ -358,7 +358,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
               className="flex-1 flex flex-col justify-center space-y-8 w-full"
             >
               <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 1</Label>
+                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 1</Label>
                 <h2 className="text-2xl font-bold text-gray-900">Project Identity</h2>
               </div>
 
@@ -370,7 +370,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
                     placeholder="Song Title..."
                     value={songInput.title}
                     onChange={(e) => setSongInput(prev => ({ ...prev, title: e.target.value }))}
-                    className="text-2xl font-black bg-gray-50 border-gray-100 h-16 rounded-2xl focus-visible:ring-blue-500/20"
+                    className="text-2xl font-black bg-gray-50 border-gray-100 h-16 rounded-2xl focus-visible:ring-ring"
                   />
                 </div>
                 <div className="space-y-2">
@@ -379,13 +379,13 @@ export function SongForm({ mode, teamId, songId }: Props) {
                     placeholder="Subtitle (Optional)"
                     value={songInput.subtitle}
                     onChange={(e) => setSongInput(prev => ({ ...prev, subtitle: e.target.value }))}
-                    className="text-lg font-medium bg-gray-50 border-gray-100 h-14 rounded-2xl focus-visible:ring-blue-500/20"
+                    className="text-lg font-medium bg-gray-50 border-gray-100 h-14 rounded-2xl focus-visible:ring-ring"
                   />
                 </div>
               </div>
 
               <Button
-                className="h-14 w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl mt-auto transition-transform active:scale-95"
+                className="h-14 w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shadow-xl mt-auto transition-transform active:scale-95"
                 onClick={nextStep}
                 disabled={!songInput.title}
               >
@@ -407,9 +407,9 @@ export function SongForm({ mode, teamId, songId }: Props) {
               className="flex-1 flex flex-col justify-center space-y-8 w-full"
             >
               <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 2</Label>
+                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 2</Label>
                 <h2 className="text-2xl font-bold text-gray-900">Song Details</h2>
-                <h3 className="text-xl font-medium text-blue-600 break-words">{songInput.title}</h3>
+                <h3 className="text-xl font-medium text-primary break-words">{songInput.title}</h3>
               </div>
 
               <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-4">
@@ -486,7 +486,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
               className="flex-1 flex flex-col justify-center space-y-8 w-full"
             >
               <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 3</Label>
+                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 3</Label>
                 <h2 className="text-2xl font-bold text-gray-900">Context & Tags</h2>
               </div>
 
@@ -502,7 +502,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
                     placeholder="Add any notes or description about the song..."
                     value={songInput.description}
                     onChange={(e) => setSongInput(prev => ({ ...prev, description: e.target.value }))}
-                    className="min-h-[120px] text-base bg-gray-50 border-gray-100 rounded-xl resize-none p-3 focus-visible:ring-blue-500/20"
+                    className="min-h-[120px] text-base bg-gray-50 border-gray-100 rounded-xl resize-none p-3 focus-visible:ring-ring"
                   />
                 </div>
               </div>
@@ -512,7 +512,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
                   <ChevronLeft className="w-6 h-6" />
                 </Button>
                 <Button
-                  className="h-14 flex-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl active:scale-95 transition-all"
+                  className="h-14 flex-1 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shadow-xl active:scale-95 transition-all"
                   onClick={nextStep}
                 >
                   Next Step
@@ -535,10 +535,10 @@ export function SongForm({ mode, teamId, songId }: Props) {
             >
               <div className="flex items-end justify-between px-2 pb-1">
                 <div>
-                  <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Final Step</Label>
+                  <Label className="text-sm font-bold text-primary uppercase tracking-wider">Final Step</Label>
                   <h2 className="text-2xl font-bold text-gray-900 leading-none">Music Sheets</h2>
                 </div>
-                <Button size="sm" variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={handleAddNewMusicSheet}>
+                <Button size="sm" variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={handleAddNewMusicSheet}>
                   <PlusIcon className="h-4 w-4 mr-1" /> Add Sheet
                 </Button>
               </div>
@@ -579,7 +579,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
                 <Button
                   onClick={mode === FormMode.CREATE ? handleCreate : handleEdit}
                   disabled={isLoading}
-                  className="h-14 flex-1 rounded-full bg-blue-600 text-white text-lg font-bold shadow-xl hover:bg-blue-700 active:scale-95 transition-all"
+                  className="h-14 flex-1 rounded-full bg-primary text-primary-foreground text-lg font-bold shadow-xl hover:bg-primary/90 active:scale-95 transition-all"
                 >
                   {isLoading ? "Saving..." : (mode === FormMode.CREATE ? "Create Song" : "Save Changes")} <Check className="ml-2 w-5 h-5" />
                 </Button>

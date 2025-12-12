@@ -237,7 +237,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
               className="flex-1 flex flex-col justify-center space-y-8 w-full"
             >
               <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 1</Label>
+                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 1</Label>
                 <h2 className="text-2xl font-bold text-gray-900">What is this notice about?</h2>
               </div>
 
@@ -249,13 +249,13 @@ export function NoticeForm({ mode, noticeId }: Props) {
                     placeholder="Notice Title..."
                     value={input.title}
                     onChange={(e) => setInput(prev => ({ ...prev, title: e.target.value }))}
-                    className="text-2xl font-black bg-gray-50 border-gray-100 h-16 rounded-2xl focus-visible:ring-blue-500/20 placeholder:text-gray-300"
+                    className="text-2xl font-black bg-gray-50 border-gray-100 h-16 rounded-2xl focus-visible:ring-ring placeholder:text-gray-300"
                   />
                 </div>
               </div>
 
               <Button
-                className="h-14 w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl mt-auto transition-transform active:scale-95 mb-24"
+                className="h-14 w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shadow-xl mt-auto transition-transform active:scale-95 mb-24"
                 onClick={nextStep}
                 disabled={!input.title}
               >
@@ -277,9 +277,9 @@ export function NoticeForm({ mode, noticeId }: Props) {
               className="flex-1 flex flex-col justify-center space-y-8 w-full"
             >
               <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 2</Label>
+                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 2</Label>
                 <h2 className="text-2xl font-bold text-gray-900">Details</h2>
-                {input.title && <h3 className="text-xl font-medium text-blue-600 break-words mt-2 px-4">{input.title}</h3>}
+                {input.title && <h3 className="text-xl font-medium text-primary break-words mt-2 px-4">{input.title}</h3>}
               </div>
 
               <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 flex flex-col min-h-[300px]">
@@ -296,7 +296,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
                   <ChevronLeft className="w-6 h-6" />
                 </Button>
                 <Button
-                  className="h-14 flex-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl active:scale-95 transition-all"
+                  className="h-14 flex-1 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shadow-xl active:scale-95 transition-all"
                   onClick={nextStep}
                 >
                   Next Step
@@ -318,7 +318,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
               className="flex-1 flex flex-col justify-center space-y-4 w-full"
             >
               <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Final Step</Label>
+                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Final Step</Label>
                 <h2 className="text-2xl font-bold text-gray-900">Attachments</h2>
               </div>
 
@@ -327,7 +327,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
                 {/* Upload Buttons */}
                 <div className="flex items-center gap-4 justify-center p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
                   <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
-                    <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all")}>
+                    <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-white hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all")}>
                       <ImageIcon className="h-5 w-5" />
                       <span className="font-bold">Add Image</span>
                     </div>
@@ -336,7 +336,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
                   <div className="h-8 w-px bg-gray-200"></div>
 
                   <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
-                    <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all")}>
+                    <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-white hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all")}>
                       <FileText className="h-5 w-5" />
                       <span className="font-bold">Add PDF</span>
                     </div>
@@ -369,7 +369,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
                 <Button
                   onClick={mode === FormMode.CREATE ? handleCreate : handleEdit}
                   disabled={isLoading}
-                  className="h-14 flex-1 rounded-full bg-blue-600 text-white text-lg font-bold shadow-xl hover:bg-blue-700 active:scale-95 transition-all"
+                  className="h-14 flex-1 rounded-full bg-primary text-primary-foreground text-lg font-bold shadow-xl hover:bg-primary/90 active:scale-95 transition-all"
                 >
                   {isLoading ? "Saving..." : (mode === FormMode.CREATE ? "Publish Notice" : "Save Changes")} <Check className="ml-2 w-5 h-5" />
                 </Button>

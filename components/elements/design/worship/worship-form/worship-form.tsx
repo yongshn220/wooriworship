@@ -239,7 +239,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               className="flex-1 flex flex-col justify-center space-y-8 w-full"
             >
               <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 1</Label>
+                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 1</Label>
                 <h2 className="text-2xl font-bold text-gray-900">What is the Title?</h2>
               </div>
 
@@ -266,7 +266,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                         setBasicInfo(prev => ({ ...prev, title: chip.label }));
                         setDate(chip.date);
                       }}
-                      className="px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100 text-xs font-medium text-gray-500 hover:border-blue-200 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                      className="px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100 text-xs font-medium text-gray-500 hover:border-primary/50 hover:text-primary hover:bg-primary/10 transition-colors"
                     >
                       {chip.label}
                     </button>
@@ -276,7 +276,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
 
               {/* Action */}
               <Button
-                className="h-14 w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl mt-auto transition-transform active:scale-95"
+                className="h-14 w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shadow-xl mt-auto transition-transform active:scale-95"
                 onClick={nextStep}
                 disabled={!basicInfo.title}
               >
@@ -298,9 +298,9 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               className="flex-1 flex flex-col justify-center space-y-8 w-full"
             >
               <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 2</Label>
+                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 2</Label>
                 <h2 className="text-2xl font-bold text-gray-900">When is the Service?</h2>
-                <h3 className="text-xl font-medium text-blue-600 break-keep">{basicInfo.title}</h3>
+                <h3 className="text-xl font-medium text-primary break-keep">{basicInfo.title}</h3>
               </div>
 
               {/* Card */}
@@ -314,7 +314,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                   <ChevronLeft className="w-6 h-6" />
                 </Button>
                 <Button
-                  className="h-14 flex-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl active:scale-95 transition-all"
+                  className="h-14 flex-1 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shadow-xl active:scale-95 transition-all"
                   onClick={nextStep}
                 >
                   Confirm Date
@@ -336,7 +336,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               className="flex-1 flex flex-col justify-center space-y-8 w-full"
             >
               <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 3</Label>
+                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 3</Label>
                 <div className="flex items-baseline justify-center gap-2">
                   <h2 className="text-2xl font-bold text-gray-900">Add Context</h2>
                   <span className="text-gray-400 font-normal text-sm lowercase">(optional)</span>
@@ -370,7 +370,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                 <Button
                   className={cn(
                     "h-14 flex-1 rounded-full text-lg font-bold shadow-xl transition-all active:scale-95",
-                    "bg-blue-600 hover:bg-blue-700 text-white"
+                    "bg-primary hover:bg-primary/90 text-primary-foreground"
                   )}
                   onClick={nextStep}
                 >
@@ -394,10 +394,10 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
             >
               <div className="flex items-end justify-between px-2 pb-1"> {/* Align bottom, added padding */}
                 <div>
-                  <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Final Step</Label>
+                  <Label className="text-sm font-bold text-primary uppercase tracking-wider">Final Step</Label>
                   <h2 className="text-2xl font-bold text-gray-900 leading-none">Setlist</h2>
                 </div>
-                <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-200 mb-1">
+                <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/20 mb-1">
                   {selectedWorshipSongHeaderList.length} Songs
                 </span>
               </div>
@@ -427,7 +427,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                 <Button
                   onClick={mode === FormMode.CREATE ? handleCreate : handleEdit}
                   disabled={isLoading}
-                  className="h-14 flex-1 rounded-full bg-blue-600 text-white text-lg font-bold shadow-xl hover:bg-blue-700 active:scale-95 transition-all"
+                  className="h-14 flex-1 rounded-full bg-primary text-primary-foreground text-lg font-bold shadow-xl hover:bg-primary/90 active:scale-95 transition-all"
                 >
                   {isLoading ? "Saving..." : "Create Plan"} <Check className="ml-2 w-5 h-5" />
                 </Button>

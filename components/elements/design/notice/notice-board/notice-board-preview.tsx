@@ -1,16 +1,16 @@
-import {Button} from "@/components/ui/button";
-import {useRouter} from "next/navigation";
-import {getPathNotice} from "@/components/util/helper/routes";
-import {NoticeHeaderMinimal} from "@/components/elements/design/notice/notice-header/notice-header-minimal";
-import {useRecoilValue} from "recoil";
-import {noticeIdsAtom} from "@/global-states/notice-state";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { getPathNotice } from "@/components/util/helper/routes";
+import { NoticeHeaderMinimal } from "@/components/elements/design/notice/notice-header/notice-header-minimal";
+import { useRecoilValue } from "recoil";
+import { noticeIdsAtom } from "@/global-states/notice-state";
 
 
 interface Props {
   teamId: string
 }
 
-export function NoticeBoardPreview({teamId}: Props) {
+export function NoticeBoardPreview({ teamId }: Props) {
   const router = useRouter()
   const noticeIds = useRecoilValue(noticeIdsAtom(teamId))
 
@@ -20,12 +20,12 @@ export function NoticeBoardPreview({teamId}: Props) {
       <div className="space-y-2">
         {
           noticeIds.slice(0, 1).map((noticeId, index) => (
-            <NoticeHeaderMinimal key={index} teamId={teamId} noticeId={noticeId}/>
+            <NoticeHeaderMinimal key={index} teamId={teamId} noticeId={noticeId} />
           ))
         }
       </div>
       <div className="w-full flex-center">
-        <Button variant="ghost" className="text-blue-500 hover:text-blue-600 hover:bg-none" onClick={() => router.push(getPathNotice(teamId))}>View All</Button>
+        <Button variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => router.push(getPathNotice(teamId))}>View All</Button>
       </div>
     </div>
   )
