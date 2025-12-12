@@ -126,6 +126,11 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {schedule.roles
                                     .filter(r => r.memberIds.includes(currentUserUid!))
+                                    .sort((a, b) => {
+                                        const indexA = roles.findIndex(r => r.id === a.roleId);
+                                        const indexB = roles.findIndex(r => r.id === b.roleId);
+                                        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+                                    })
                                     .map((assignment, idx) => {
                                         const role = roles.find(r => r.id === assignment.roleId);
                                         if (!role) return null;
