@@ -77,7 +77,7 @@ export function WorshipHeaderMenu({ worshipId, createdById, teamId }: Props) {
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-900 data-[state=open]:bg-gray-100">
+                    <Button variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground data-[state=open]:bg-muted">
                         <span className="sr-only">Open menu</span>
                         <MoreHorizontal className="h-5 w-5" />
                     </Button>

@@ -32,11 +32,11 @@ export function ActiveFilterList() {
                 <Badge
                     key={`tag-${tag}`}
                     variant="secondary"
-                    className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-900 text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-foreground text-background hover:bg-foreground/90 transition-colors cursor-pointer"
                     onClick={() => removeTag(tag)}
                 >
                     {tag}
-                    <X className="h-3 w-3 text-slate-400 hover:text-white" />
+                    <X className="h-3 w-3 text-background/50 hover:text-background" />
                 </Badge>
             ))}
 
@@ -44,11 +44,11 @@ export function ActiveFilterList() {
                 <Badge
                     key={`key-${key}`}
                     variant="secondary"
-                    className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-200 transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-colors cursor-pointer"
                     onClick={() => removeKey(key)}
                 >
                     {key}
-                    <X className="h-3 w-3 text-blue-500 hover:text-blue-800" />
+                    <X className="h-3 w-3 text-primary/50 hover:text-primary" />
                 </Badge>
             ))}
 
@@ -56,7 +56,7 @@ export function ActiveFilterList() {
                 variant="ghost"
                 size="sm"
                 onClick={resetFilters}
-                className="h-7 px-2 text-xs font-semibold text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full"
+                className="h-7 px-2 text-xs font-semibold text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full"
             >
                 Reset All
             </Button>

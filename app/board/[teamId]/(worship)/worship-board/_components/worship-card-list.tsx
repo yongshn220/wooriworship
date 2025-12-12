@@ -74,7 +74,7 @@ export function WorshipCardList({ teamId }: Props) {
                 </div>
                 {/* Load More Trigger */}
                 {visibleWorshipIds.length < worshipIds.length && (
-                  <div ref={loadMoreRef} className="h-20 w-full flex-center py-4 text-gray-400 text-sm">
+                  <div ref={loadMoreRef} className="h-20 w-full flex-center py-4 text-muted-foreground text-sm">
                     Loading more...
                   </div>
                 )}
@@ -92,13 +92,13 @@ export function WorshipCardList({ teamId }: Props) {
 
 function WorshipCardSkeleton() {
   return (
-    <div className="w-full h-[400px] border rounded-lg p-4 space-y-4 bg-white animate-pulse">
-      <div className="w-2/3 h-6 bg-gray-200 rounded"></div>
-      <div className="w-1/2 h-4 bg-gray-200 rounded"></div>
-      <div className="w-full h-40 bg-gray-100 rounded-md"></div>
+    <div className="w-full h-[400px] border rounded-lg p-4 space-y-4 bg-card animate-pulse">
+      <div className="w-2/3 h-6 bg-muted rounded"></div>
+      <div className="w-1/2 h-4 bg-muted rounded"></div>
+      <div className="w-full h-40 bg-muted/50 rounded-md"></div>
       <div className="space-y-2">
-        <div className="w-full h-4 bg-gray-200 rounded"></div>
-        <div className="w-5/6 h-4 bg-gray-200 rounded"></div>
+        <div className="w-full h-4 bg-muted rounded"></div>
+        <div className="w-5/6 h-4 bg-muted rounded"></div>
       </div>
     </div>
   )

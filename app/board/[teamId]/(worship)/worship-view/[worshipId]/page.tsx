@@ -101,7 +101,7 @@ export default function WorshipLivePage({ params }: any) {
 
                 <div
                     ref={containerRef}
-                    className="relative w-full h-full bg-white dark:bg-black overflow-hidden touch-none" // touch-none to prevent browser zooming/scrolling interfering
+                    className="relative w-full h-full bg-background overflow-hidden touch-none" // touch-none to prevent browser zooming/scrolling interfering
                     onPointerDown={handlePointerDown}
                     onPointerUp={handlePointerUp}
                     onPointerLeave={handlePointerLeave}

@@ -38,7 +38,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 backdrop-blur-xl border border-black/5 shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-background backdrop-blur-xl border border-border shadow-toss"
             >
                 <WorshipControlItem
                     icon={<FileText className="w-5 h-5" />}
@@ -53,7 +53,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                     onClick={toggleShowNumber}
                 />
 
-                <Separator orientation="vertical" className="h-6 bg-black/10 w-[1px] mx-1" />
+                <Separator orientation="vertical" className="h-6 bg-border w-[1px] mx-1" />
 
                 <WorshipControlItem
                     icon={<EyeOff className="w-5 h-5" />}
@@ -67,7 +67,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                             <WorshipControlItem icon={<MoreHorizontal className="w-5 h-5" />} />
                         </div>
                     </PopoverTrigger>
-                    <PopoverContent side="top" className="mb-4 bg-white/90 backdrop-blur-xl border-black/5 w-80 p-0 overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.08)] rounded-2xl">
+                    <PopoverContent side="top" className="mb-4 bg-background backdrop-blur-xl border-border w-80 p-0 overflow-hidden shadow-toss rounded-2xl">
                         <WorshipSettingsMenu teamId={teamId} worshipId={worshipId} />
                     </PopoverContent>
                 </Popover>
