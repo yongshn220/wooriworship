@@ -9,7 +9,7 @@ export function BaseBottomNavBar({ children, height }: Props) {
   return (
     <div>
       <footer
-        className="sticky bottom-0 bg-white/80 backdrop-blur-md border-t border-white/20 shadow-sm z-50 transition-all duration-300"
+        className="sticky bottom-0 bg-background/80 backdrop-blur-md border-t border-border shadow-sm z-50 transition-all duration-300"
         style={{ height: `${height}px` }}
       >
         {children}

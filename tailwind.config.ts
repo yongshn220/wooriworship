@@ -8,7 +8,7 @@ const config = {
     './userState.ts/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   prefix: "",
   theme: {
     container: {
@@ -58,6 +58,12 @@ const config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        "4xl": "2rem", // 32px
+        "5xl": "2.5rem", // 40px
+      },
+      boxShadow: {
+        'toss': '0 4px 24px rgba(0, 0, 0, 0.08)', // Soft premium shadow
+        'toss-lg': '0 8px 30px rgba(0, 0, 0, 0.12)',
       },
       keyframes: {
         "accordion-down": {
