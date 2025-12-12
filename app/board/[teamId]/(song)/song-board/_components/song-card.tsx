@@ -4,7 +4,7 @@ import { useRecoilValue } from "recoil";
 import { songAtom } from "@/global-states/song-state";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { Clock, Hash, Music2, PlusIcon } from "lucide-react";
+import { Clock, Hash, Music2 } from "lucide-react";
 import { getTimePassedFromTimestampShorten } from "@/components/util/helper/helper-functions";
 import { SongDetailDialogTrigger } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog-trigger";
 import { cn } from "@/lib/utils";
@@ -61,10 +61,7 @@ export function SongCard({ teamId, songId, index }: Props) {
                         </div>
                     </div>
 
-                    {/* Right Column: Plus Icon (Narrower) */}
-                    <div className="w-5 sm:w-10 flex justify-center items-center text-muted-foreground/30 group-hover:text-primary transition-colors shrink-0 border-l border-border pl-0.5 sm:pl-3 h-2/3">
-                        <PlusIcon className="w-4 h-4 sm:w-6 sm:h-6" />
-                    </div>
+
 
                 </div>
             </SongDetailDialogTrigger>

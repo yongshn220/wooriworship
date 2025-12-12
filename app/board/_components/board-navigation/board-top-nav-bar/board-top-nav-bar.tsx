@@ -1,10 +1,10 @@
 import { Page } from "@/components/constants/enums";
 import { cn } from "@/lib/utils";
-import { FilterIcon, SquarePenIcon, SearchIcon, MenuIcon, XIcon, ArrowLeftIcon } from "lucide-react";
+import { SearchIcon, MenuIcon, XIcon, ArrowLeftIcon, Plus } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
-import { getPathCreateNotice, getPathCreatePlan, getPathCreateSong } from "@/components/util/helper/routes";
+import { getPathCreateNotice, getPathCreatePlan, getPathCreateSong, getPathCreateServing } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { SearchPlan } from "./search-plan";
@@ -45,6 +45,17 @@ const ActionButton = ({ onClick, icon: Icon, label, variant = 'default' }: Actio
   </motion.button>
 );
 
+const CreateActionButton = ({ onClick }: { onClick: () => void }) => (
+  <motion.button
+    onClick={onClick}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className="flex items-center justify-center w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-sm hover:opacity-90 transition-opacity"
+  >
+    <Plus className="w-5 h-5 stroke-[3px]" />
+  </motion.button>
+);
+
 export function BoardTopNavBar() {
   const currentPage = useRecoilValue(currentPageAtom);
   const teamId = useRecoilValue(currentTeamIdAtom);
@@ -77,20 +88,20 @@ export function BoardTopNavBar() {
       [Page.NOTICE_BOARD]: {
         title: "Notice",
         actions: (
-          <ActionButton onClick={() => router.push(getPathCreateNotice(teamId))} icon={SquarePenIcon} label="Write" />
+          <CreateActionButton onClick={() => router.push(getPathCreateNotice(teamId))} />
         ),
       },
       [Page.SONG_BOARD]: {
         title: "Song Board",
         actions: (
-          <ActionButton onClick={() => router.push(getPathCreateSong(teamId))} icon={SquarePenIcon} label="New Song" />
+          <CreateActionButton onClick={() => router.push(getPathCreateSong(teamId))} />
         ),
         searchComponent: <SearchInput />
       },
       [Page.WORSHIP_BOARD]: {
         title: "Worship Plan",
         actions: (
-          <ActionButton onClick={() => router.push(getPathCreatePlan(teamId))} icon={SquarePenIcon} label="New Plan" />
+          <CreateActionButton onClick={() => router.push(getPathCreatePlan(teamId))} />
         ),
         searchComponent: <SearchPlan />
       },
@@ -99,7 +110,10 @@ export function BoardTopNavBar() {
       },
       [Page.SERVING]: {
         title: "Serving Schedule",
-        showLogo: false
+        showLogo: false,
+        actions: (
+          <CreateActionButton onClick={() => router.push(getPathCreateServing(teamId))} />
+        )
       },
       [Page.BOARD]: defaultConfig,
       [Page.HOME]: defaultConfig,
