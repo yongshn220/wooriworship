@@ -59,19 +59,26 @@ class ServingService extends BaseService {
             "Bass Guitar", "Acoustic Guitar", "Electric Guitar", "Media Team", "PPT"
         ];
 
-        const currentRoles = await this.getRoles(teamId);
-        if (currentRoles.length > 0) return; // Already initialized
+        const rolesRef = firestore.collection("teams").doc(teamId).collection("serving_roles");
+        const initFlagRef = firestore.collection("teams").doc(teamId).collection("system").doc("serving_init");
 
-        const batch = firestore.batch();
-        const collectionRef = firestore.collection("teams").doc(teamId).collection("serving_roles");
+        try {
+            await firestore.runTransaction(async (transaction) => {
+                const initDoc = await transaction.get(initFlagRef);
+                if (initDoc.exists) return; // Already initialized
 
-        standardRoles.forEach((name, index) => {
-            const ref = collectionRef.doc();
-            const newRole = { id: ref.id, teamId, name, order: index };
-            batch.set(ref, newRole);
-        });
+                // Create standard roles
+                standardRoles.forEach((name, index) => {
+                    const newRoleRef = rolesRef.doc();
+                    transaction.set(newRoleRef, { id: newRoleRef.id, teamId, name, order: index });
+                });
 
-        await batch.commit();
+                // Mark as initialized
+                transaction.set(initFlagRef, { initializedAt: new Date().toISOString() });
+            });
+        } catch (e) {
+            console.error("Failed to initialize standard roles:", e);
+        }
     }
 
     // --- Schedules ---
