@@ -13,7 +13,8 @@ export enum Page {
   SONG_BOARD = "song-board",
   CREATE_SONG = "create-song",
   EDIT_SONG = "edit-song",
-  SERVING = "serving",
+  SERVING = "serving-board",
+  CREATE_SERVING = "create-serving",
   MANAGE = "manage",
 }
 

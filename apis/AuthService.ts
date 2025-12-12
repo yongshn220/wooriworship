@@ -1,6 +1,7 @@
 
 import { auth, firebaseApp } from "@/firebase";
-import { BaseService, UserService } from './';
+import BaseService from './BaseService';
+import { UserService } from './';
 import { User } from "@/models/user";
 
 class AuthService extends BaseService {

@@ -10,10 +10,14 @@ import { Plus } from "lucide-react";
 import { format } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
 
+import { useRouter } from "next/navigation";
+import { getPathCreateServing } from "@/components/util/helper/routes";
+
 export default function ServingPage() {
     const teamId = useRecoilValue(currentTeamIdAtom);
     const [schedules, setSchedules] = useRecoilState(servingSchedulesAtom);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     // Load schedules (e.g., next 3 months)
     useEffect(() => {
@@ -41,7 +45,7 @@ export default function ServingPage() {
     return (
         <div className="flex flex-col h-full bg-muted/30 relative">
             <div className="flex-1 overflow-y-auto p-4 pb-24">
-                <h1 className="text-2xl font-bold mb-6 text-foreground">Serving Schedule</h1>
+                {/* Headers handled by TopNavBar */}
 
                 {loading ? (
                     <div className="flex justify-center p-8">
@@ -79,10 +83,7 @@ export default function ServingPage() {
                 <Button
                     size="icon"
                     className="h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 text-white"
-                    onClick={() => {
-                        // TODO: Open Magic Wizard
-                        alert("Open Wizard");
-                    }}
+                    onClick={() => router.push(getPathCreateServing(teamId))}
                 >
                     <Plus className="h-6 w-6" />
                 </Button>

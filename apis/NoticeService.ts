@@ -1,4 +1,5 @@
-import {BaseService, StorageService} from ".";
+import BaseService from "./BaseService";
+import { StorageService } from ".";
 
 
 class NoticeService extends BaseService {
@@ -34,19 +35,19 @@ class NoticeService extends BaseService {
 
   async updateNotice(noticeId: string, noticeInput: any) {
     const notice: any = {
-        title: noticeInput.title,
-        body: noticeInput.body,
-        last_updated_time: new Date(),
+      title: noticeInput.title,
+      body: noticeInput.body,
+      last_updated_time: new Date(),
     }
     if (noticeInput.file_urls) {
-        notice.file_urls = noticeInput.file_urls
+      notice.file_urls = noticeInput.file_urls
     }
     return await this.update(noticeId, notice);
   }
 
   async deleteNotice(noticeId: string) {
     try {
-      const notice:any = await this.getById(noticeId);
+      const notice: any = await this.getById(noticeId);
       if (!notice) {
         return true;
       }
@@ -54,7 +55,7 @@ class NoticeService extends BaseService {
       await this.delete(noticeId);
       return true;
     } catch (err) {
-      console.log("error occured: "+err);
+      console.log("error occured: " + err);
       return false;
     }
   }

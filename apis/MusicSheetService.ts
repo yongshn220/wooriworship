@@ -1,7 +1,7 @@
-import {BaseService} from "@/apis/index";
-import {MusicSheetContainer} from "@/components/constants/types";
-import {MusicSheet} from "@/models/music_sheet";
-import {getFirebaseTimestampNow} from "@/components/util/helper/helper-functions";
+import BaseService from "./BaseService";
+import { MusicSheetContainer } from "@/components/constants/types";
+import { MusicSheet } from "@/models/music_sheet";
+import { getFirebaseTimestampNow } from "@/components/util/helper/helper-functions";
 
 
 class MusicSheetService extends BaseService {
@@ -11,7 +11,7 @@ class MusicSheetService extends BaseService {
 
   async getSongMusicSheets(songId: string) {
     try {
-      const sheets = await this.getByFilters([{a: "song_id", b: "==", c: songId}]) as Array<MusicSheet>
+      const sheets = await this.getByFilters([{ a: "song_id", b: "==", c: songId }]) as Array<MusicSheet>
       if (!sheets) {
         console.log("err:getSongMusicSheets")
         return []

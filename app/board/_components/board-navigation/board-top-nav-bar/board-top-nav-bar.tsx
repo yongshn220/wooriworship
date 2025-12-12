@@ -97,6 +97,10 @@ export function BoardTopNavBar() {
       [Page.MANAGE]: {
         title: "Manage",
       },
+      [Page.SERVING]: {
+        title: "Serving Schedule",
+        showLogo: false
+      },
       [Page.BOARD]: defaultConfig,
       [Page.HOME]: defaultConfig,
       [Page.WORSHIP]: defaultConfig,

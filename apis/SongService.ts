@@ -1,10 +1,11 @@
-import {BaseService, StorageService} from ".";
+import BaseService from "./BaseService";
+import { StorageService } from ".";
 import SongCommentService from "./SongCommentService";
-import {Song} from "@/models/song";
-import {getAllUrlsFromSongMusicSheets, getFirebaseTimestampNow} from "@/components/util/helper/helper-functions";
+import { Song } from "@/models/song";
+import { getAllUrlsFromSongMusicSheets, getFirebaseTimestampNow } from "@/components/util/helper/helper-functions";
 import MusicSheetService from "@/apis/MusicSheetService";
-import {MusicSheetContainer} from "@/components/constants/types";
-import {SongInput} from "@/components/elements/design/song/song-form/song-form";
+import { MusicSheetContainer } from "@/components/constants/types";
+import { SongInput } from "@/components/elements/design/song/song-form/song-form";
 
 
 class SongService extends BaseService {
@@ -14,21 +15,21 @@ class SongService extends BaseService {
 
   async getSong(teamId: string) {
     const songs: any = await this.getByFilters(
-      [{a: 'team_id', b: '==', c: teamId}]
+      [{ a: 'team_id', b: '==', c: teamId }]
     );
     return songs
   }
 
   async getSongIds(teamId: string) {
     const songs: any = await this.getDocIds(
-      [{a: 'team_id', b: "==", c: teamId}]
+      [{ a: 'team_id', b: "==", c: teamId }]
     )
     return songs
   }
 
   async getSongHeader(teamId: string) {
     const songHeaders = await this.getByFiltersAndFields(
-      [{a: 'team_id', b: "==", c: teamId}],
+      [{ a: 'team_id', b: "==", c: teamId }],
       ["team_id", "title", "subtitle", "keys", "original", "tags", "version", "last_used_time"]
     )
     return songHeaders
@@ -69,7 +70,7 @@ class SongService extends BaseService {
   }
 
   async utilizeSong(songId: string) {
-    return await this.update(songId, {last_used_time:new Date()});
+    return await this.update(songId, { last_used_time: new Date() });
   }
 
   async updateSong(userId: string, songId: string, songInput: SongInput, musicSheetContainers: Array<MusicSheetContainer>) {
@@ -117,12 +118,12 @@ class SongService extends BaseService {
       }
 
       const musicSheetUrls = getAllUrlsFromSongMusicSheets(musicSheets)
-      promises.push(StorageService.deleteFileByUrls(musicSheetUrls?? []))
+      promises.push(StorageService.deleteFileByUrls(musicSheetUrls ?? []))
       await Promise.all(promises);
       await this.delete(songId);
       return true;
     } catch (err) {
-      console.log("error occured: "+err);
+      console.log("error occured: " + err);
       return false;
     }
   }

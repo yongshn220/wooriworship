@@ -1,7 +1,8 @@
-import {BaseService, SongService} from ".";
-import {Timestamp} from "@firebase/firestore";
-import {Worship} from "@/models/worship";
-import {WorshipInput} from "@/components/constants/types";
+import BaseService from "./BaseService";
+import { SongService } from ".";
+import { Timestamp } from "@firebase/firestore";
+import { Worship } from "@/models/worship";
+import { WorshipInput } from "@/components/constants/types";
 
 class WorshipService extends BaseService {
   constructor() {
@@ -70,7 +71,7 @@ class WorshipService extends BaseService {
       return true;
     }
     catch (err) {
-      console.log("error occured: "+err);
+      console.log("error occured: " + err);
       return false;
     }
   }
