@@ -4,7 +4,13 @@ import { WorshipService } from "@/apis";
 import { Song } from "@/models/song";
 import { songAtom } from "@/global-states/song-state";
 
-export const currentTeamWorshipIdsAtom = atomFamily<Array<string>, string>({
+// Workaround for Next.js HMR Duplicate Atom Key
+const globalForRecoil = global as unknown as { recoilAtoms: Record<string, any> };
+if (!globalForRecoil.recoilAtoms) globalForRecoil.recoilAtoms = {};
+
+const currentTeamWorshipIdsAtomType = atomFamily<Array<string>, string>({} as any);
+
+export const currentTeamWorshipIdsAtom = (globalForRecoil.recoilAtoms['currentTeamWorshipIdsAtom'] || atomFamily<Array<string>, string>({
   key: "currentTeamWorshipIdsAtom",
   default: selectorFamily({
     key: "currentTeamWorshipIdsAtom/default",
@@ -35,16 +41,16 @@ export const currentTeamWorshipIdsAtom = atomFamily<Array<string>, string>({
       }
     }
   })
-})
+})) as typeof currentTeamWorshipIdsAtomType;
+
+if (process.env.NODE_ENV !== 'production') globalForRecoil.recoilAtoms['currentTeamWorshipIdsAtom'] = currentTeamWorshipIdsAtom
 
 export const worshipIdsUpdaterAtom = atom({
   key: "worshipIdsUpdaterAtom",
   default: 0
 })
 
-// Workaround for Next.js HMR Duplicate Atom Key
-const globalForRecoil = global as unknown as { recoilAtoms: Record<string, any> };
-if (!globalForRecoil.recoilAtoms) globalForRecoil.recoilAtoms = {};
+
 
 // Helper type for typescript
 const worshipAtomType = atomFamily<Worship, string>({} as any);
@@ -77,7 +83,10 @@ export const worshipUpdaterAtom = atom({
 })
 
 
-export const worshipSongListAtom = atomFamily<Array<Song>, string>({
+// Helper type for typescript
+const worshipSongListAtomType = atomFamily<Array<Song>, string>({} as any);
+
+export const worshipSongListAtom = (globalForRecoil.recoilAtoms['worshipSongListAtom'] || atomFamily<Array<Song>, string>({
   key: "worshipSongListAtom",
   default: selectorFamily({
     key: "worshipSongListAtom/default",
@@ -107,7 +116,9 @@ export const worshipSongListAtom = atomFamily<Array<Song>, string>({
       }
     }
   })
-})
+})) as typeof worshipSongListAtomType;
+
+if (process.env.NODE_ENV !== 'production') globalForRecoil.recoilAtoms['worshipSongListAtom'] = worshipSongListAtom
 
 export const worshipSongUpdaterAtom = atom({
   key: "worshipSongUpdaterAtom",

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useRecoilValue } from "recoil";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { worshipSongListAtom } from "@/global-states/worship-state";
 import { shareMusicSheets } from "@/components/util/helper/helper-functions";
 import { Check, Music } from "lucide-react";
@@ -18,7 +18,7 @@ interface Props {
 
 export function DownloadMusicSheetDialog({ children, worshipId, open, onOpenChange }: Props) {
   const rawSongList = useRecoilValue(worshipSongListAtom(worshipId))
-  const songList = rawSongList.filter((s) => s && s.id); // Guard against null/undefined songs
+  const songList = useMemo(() => rawSongList.filter((s) => s && s.id), [rawSongList]); // Guard against null/undefined songs
   // Default to selecting all songs when opening
   const [selectedSongIds, setSelectedSongIds] = useState<Array<string>>([])
   // Internal state if uncontrolled
