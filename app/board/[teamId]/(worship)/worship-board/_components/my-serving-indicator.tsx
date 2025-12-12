@@ -23,7 +23,7 @@ export function MyServingIndicator({ teamId, date }: { teamId: string, date: str
     if (!isServing) return null;
 
     return (
-        <Badge variant="outline" className="border-primary text-primary bg-primary/5 text-xs">
+        <Badge variant="secondary" className="bg-secondary text-secondary-foreground hover:bg-secondary/80 border-0 text-xs font-medium px-2 py-0.5">
             My Serving
         </Badge>
     );

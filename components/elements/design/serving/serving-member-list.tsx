@@ -40,7 +40,7 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid }: 
                                         className={cn(
                                             "flex items-center gap-1.5 px-2 py-1 rounded-full border text-sm transition-colors",
                                             isMe
-                                                ? "bg-blue-50 border-blue-200 text-blue-700 font-medium"
+                                                ? "bg-primary/10 border-primary/20 text-primary font-medium"
                                                 : "bg-background border-border text-foreground"
                                         )}
                                     >
