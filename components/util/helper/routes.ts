@@ -69,5 +69,5 @@ export function getPathCreateServing(teamId: string) {
 }
 
 export function getPathEditServing(teamId: string, servingId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + "edit-serving" + `/${servingId}`
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.EDIT_SERVING + `/${servingId}`
 }

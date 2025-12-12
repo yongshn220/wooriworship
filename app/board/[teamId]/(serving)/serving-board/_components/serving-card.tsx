@@ -17,6 +17,7 @@ import { usersAtom } from "@/global-states/userState";
 import { auth } from "@/firebase";
 import { getDayPassedFromTimestampShorten } from "@/components/util/helper/helper-functions";
 import { ServingHeaderMenu } from "./serving-header-menu";
+import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
 
 interface Props {
     schedule: ServingSchedule;
@@ -92,52 +93,12 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                             exit={{ opacity: 0, height: 0 }}
                             className="mt-4 pt-4 border-t border-border space-y-4"
                         >
-                            {schedule.roles.length === 0 ? (
-                                <p className="text-sm text-muted-foreground italic">No roles assigned.</p>
-                            ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {/* Group by Role Order if possible, otherwise just map */}
-                                    {schedule.roles.map((assignment, idx) => {
-                                        const role = roles.find(r => r.id === assignment.roleId);
-                                        if (!role) return null; // Should ideally show unknown role but skip for cleaner UI
-
-                                        return (
-                                            <div key={idx} className="space-y-1.5">
-                                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                                    {role.name}
-                                                </p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {assignment.memberIds.map(uid => {
-                                                        const member = getMember(uid);
-                                                        const isMe = uid === currentUserUid;
-
-                                                        return (
-                                                            <div
-                                                                key={uid}
-                                                                className={cn(
-                                                                    "flex items-center gap-1.5 px-2 py-1 rounded-full border text-sm transition-colors",
-                                                                    isMe
-                                                                        ? "bg-blue-50 border-blue-200 text-blue-700 font-medium"
-                                                                        : "bg-background border-border text-foreground"
-                                                                )}
-                                                            >
-                                                                <Avatar className="h-5 w-5">
-
-                                                                    <AvatarFallback className="text-[9px]">{member?.name?.[0]}</AvatarFallback>
-                                                                </Avatar>
-                                                                <span>{member?.name || "Unknown"}</span>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                    {assignment.memberIds.length === 0 && (
-                                                        <span className="text-xs text-muted-foreground">-</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
-                                </div>
-                            )}
+                            <ServingMemberList
+                                schedule={schedule}
+                                roles={roles}
+                                members={members}
+                                currentUserUid={currentUserUid}
+                            />
                         </motion.div>
                     )}
                 </AnimatePresence>

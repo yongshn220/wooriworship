@@ -11,6 +11,9 @@ import { ServingService } from "@/apis";
 import { Spinner } from "@/components/ui/spinner";
 import { ClipboardList } from "lucide-react";
 import { ResponsiveDrawer } from "@/components/ui/responsive-drawer";
+import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase";
 
 interface Props {
     date: string; // YYYY-MM-DD
@@ -22,6 +25,7 @@ export function ServingRosterDialog({ date, teamId, trigger }: Props) {
     const [schedule, setSchedule] = useState<ServingSchedule | null>(null);
     const [loading, setLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+    const [user] = useAuthState(auth as any);
 
     const team = useRecoilValue(teamAtom(teamId));
     const teamMembers = useRecoilValue(usersAtom(team?.users));
@@ -60,19 +64,12 @@ export function ServingRosterDialog({ date, teamId, trigger }: Props) {
                     </div>
                 ) : (
                     <div className="space-y-1">
-                        {roles.map(role => {
-                            const assigned = schedule.roles.find(r => r.roleId === role.id);
-                            if (!assigned || assigned.memberIds.length === 0) return null;
-
-                            return (
-                                <div key={role.id} className="flex flex-col p-3 rounded-lg border bg-card">
-                                    <span className="text-xs font-semibold text-muted-foreground uppercase">{role.name}</span>
-                                    <div className="mt-1 font-medium text-foreground">
-                                        {assigned.memberIds.map(uid => getMemberName(uid)).join(", ")}
-                                    </div>
-                                </div>
-                            );
-                        })}
+                        <ServingMemberList
+                            schedule={schedule}
+                            roles={roles}
+                            members={teamMembers}
+                            currentUserUid={user?.uid}
+                        />
                     </div>
                 )}
             </div>
