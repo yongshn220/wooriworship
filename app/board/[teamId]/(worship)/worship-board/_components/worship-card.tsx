@@ -255,11 +255,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                 <Separator className="my-1" />
 
                 <div className="space-y-3">
-                  {/* Actions & List Header */}
-                  {/* Actions & List Header - Actions removed, kept container for spacing if needed or remove entirely if empty */}
-                  <div className="flex flex-col gap-3 pt-2">
-                    {/* Empty now as buttons moved to bottom */}
-                  </div>
+
 
                   {/* Rich Song List */}
                   <div className="bg-muted/30 rounded-xl p-2 sm:p-3 flex flex-col gap-1">
