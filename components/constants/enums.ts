@@ -15,6 +15,7 @@ export enum Page {
   EDIT_SONG = "edit-song",
   SERVING = "serving-board",
   CREATE_SERVING = "create-serving",
+  EDIT_SERVING = "edit-serving",
   MANAGE = "manage",
 }
 

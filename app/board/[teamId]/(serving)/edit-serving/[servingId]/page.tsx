@@ -1,9 +1,10 @@
 "use client";
 
+import { PageInit } from "@/components/util/page/page-init";
 import { useRecoilValue } from "recoil";
 import { servingSchedulesAtom } from "@/global-states/servingState";
 import { ServingForm } from "@/components/elements/design/serving/serving-form/serving-form";
-import { FormMode } from "@/components/constants/enums";
+import { FormMode, Page } from "@/components/constants/enums";
 import { useEffect, useState } from "react";
 import { ServingService } from "@/apis";
 import { ServingSchedule } from "@/models/serving";
@@ -45,6 +46,7 @@ export default function EditServingPage({ params }: Props) {
     // Modification: I need to add getScheduleById to ServingService.
     return (
         <div className="w-full h-full">
+            <PageInit teamId={teamId} page={Page.EDIT_SERVING} />
             {schedule ? (
                 <ServingForm teamId={teamId} mode={FormMode.EDIT} initialData={schedule} />
             ) : (
