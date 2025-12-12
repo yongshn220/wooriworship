@@ -1,5 +1,5 @@
-import { HomeIcon, Music2Icon, BellIcon, CalendarDaysIcon, LayoutGridIcon, DownloadIcon } from "lucide-react";
-import { getPathHome, getPathManage, getPathNotice, getPathPlan, getPathSong, getPathWorshipView } from "@/components/util/helper/routes";
+import { HomeIcon, Music2Icon, BellIcon, CalendarDaysIcon, LayoutGridIcon, DownloadIcon, ClipboardListIcon } from "lucide-react";
+import { getPathHome, getPathManage, getPathNotice, getPathPlan, getPathServing, getPathSong, getPathWorshipView } from "@/components/util/helper/routes";
 import { useRecoilValue } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { useRouter } from "next/navigation";
@@ -84,6 +84,12 @@ export function DefaultBoardBottomNavBar() {
       icon: Music2Icon,
       label: "Song",
       path: getPathSong(currentTeamId)
+    },
+    {
+      page: Page.SERVING,
+      icon: ClipboardListIcon,
+      label: "Serving",
+      path: getPathServing(currentTeamId)
     },
     {
       page: Page.MANAGE,

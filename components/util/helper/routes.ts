@@ -52,6 +52,10 @@ export function getPathSongDetail(teamId: string, songId: string) {
   return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SONG_BOARD + `/${songId}`
 }
 
+export function getPathServing(teamId: string) {
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SERVING
+}
+
 export function getPathWorship(teamId: string, worshipId: string) {
   return "/" + Page.BOARD + `/${teamId}` + "/" + Page.WORSHIP + `/${worshipId}`
 }

@@ -13,6 +13,7 @@ export enum Page {
   SONG_BOARD = "song-board",
   CREATE_SONG = "create-song",
   EDIT_SONG = "edit-song",
+  SERVING = "serving",
   MANAGE = "manage",
 }
 
@@ -53,6 +54,6 @@ export enum WorshipViewPageMode {
 
 /* Worship Plan */
 export enum WorshipSpecialOrderType {
-  BEGINNING="beginning",
-  ENDING="ending",
+  BEGINNING = "beginning",
+  ENDING = "ending",
 }

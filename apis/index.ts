@@ -1,25 +1,15 @@
-import BaseService from './BaseService';
-import AuthService from './AuthService';
-import UserService from './UserService';
-import TeamService from './TeamService';
-import TagService from './TagService';
-import StorageService from './StorageService';
-import SongService from './SongService';
-import WorshipService from './WorshipService';
-import InvitationService from './InvitationService';
-import NoticeService from './NoticeService';
-import SongCommentService from './SongCommentService';
-
-export {
-    BaseService,
-    AuthService,
-    UserService,
-    TeamService,
-    TagService,
-    StorageService,
-    SongService,
-    WorshipService,
-    InvitationService,
-    NoticeService,
-    SongCommentService
-}
+export { default as AuthService } from './AuthService';
+export { default as TeamService } from './TeamService';
+export { default as WorshipService } from './WorshipService';
+export { default as SongService } from './SongService';
+export { default as UserService } from './UserService';
+export { default as TagService } from './TagService';
+export { default as SongCommentService } from './SongCommentService';
+export { default as InvitationService } from './InvitationService';
+export { default as EmailService } from './EmailService';
+export { default as StorageService } from './StorageService';
+export { default as NoticeService } from './NoticeService';
+export { default as MusicSheetService } from './MusicSheetService';
+export { default as AccountSettingService } from './AccountSettingService';
+export { default as PushNotificationService } from './PushNotificationService';
+export { default as ServingService } from './ServingService';
