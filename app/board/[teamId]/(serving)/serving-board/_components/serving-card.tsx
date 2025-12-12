@@ -50,16 +50,28 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
     // Toggle Handler
     const toggleExpand = () => setIsExpanded(!isExpanded);
 
+    const handleHeaderClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        toggleExpand();
+    };
+
+    const handleCardClick = () => {
+        if (!isExpanded) {
+            toggleExpand();
+        }
+    };
+
     return (
         <Card
             className={cn(
                 "overflow-hidden transition-all duration-300 border shadow-sm hover:shadow-md cursor-pointer",
                 isExpanded ? "ring-2 ring-primary bg-card" : (isPast ? "bg-muted/30" : "bg-card")
             )}
+            onClick={handleCardClick}
         >
             <CardContent className="p-4 sm:p-6">
                 {/* Header */}
-                <div className="flex justify-between items-start mb-4 group cursor-pointer" onClick={toggleExpand}>
+                <div className="flex justify-between items-start mb-4 group cursor-pointer" onClick={handleHeaderClick}>
                     <div className="space-y-1">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <span className={cn(

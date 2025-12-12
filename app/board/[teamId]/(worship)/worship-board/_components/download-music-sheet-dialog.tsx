@@ -17,7 +17,8 @@ interface Props {
 }
 
 export function DownloadMusicSheetDialog({ children, worshipId, open, onOpenChange }: Props) {
-  const songList = useRecoilValue(worshipSongListAtom(worshipId))
+  const rawSongList = useRecoilValue(worshipSongListAtom(worshipId))
+  const songList = rawSongList.filter((s) => s && s.id); // Guard against null/undefined songs
   // Default to selecting all songs when opening
   const [selectedSongIds, setSelectedSongIds] = useState<Array<string>>([])
   // Internal state if uncontrolled
