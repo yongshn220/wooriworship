@@ -138,7 +138,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
         className={cn(
           "overflow-hidden transition-all duration-300 border shadow-sm hover:shadow-md cursor-pointer",
           (isExpanded || !isPast) ? 'bg-card' : 'bg-muted/30', // Apply background based on isExpanded and isPast
-          isExpanded ? "ring-2 ring-primary/10" : ""
+          isExpanded ? "ring-2 ring-primary" : ""
         )}
         onClick={() => !isExpanded && setIsExpanded(true)}
       >
