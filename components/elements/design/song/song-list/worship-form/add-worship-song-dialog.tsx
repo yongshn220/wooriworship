@@ -12,6 +12,7 @@ import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from "@
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { selectedWorshipSongHeaderListAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
 import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
+import { ActiveFilterList } from "@/app/board/_components/active-filter-list";
 
 interface Props {
   teamId: string
@@ -57,6 +58,9 @@ export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
             <div className="w-full relative">
               <SearchInput />
             </div>
+
+            {/* Active Filters */}
+            <ActiveFilterList />
 
             {/* Mode Indicator Toast/Banner (Optional, but helps UX) */}
             {showSelectedOnly && (

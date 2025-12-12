@@ -11,6 +11,7 @@ interface Props {
 }
 
 import { AlphabetIndexer } from "./alphabet-indexer";
+import { ActiveFilterList } from "@/app/board/_components/active-filter-list";
 
 // ... existing imports
 
@@ -120,6 +121,11 @@ export function SongList({ teamId }: Props) {
   return (
     <div className="w-full h-full p-2 sm:p-4 md:p-6 relative">
       <AlphabetIndexer teamId={teamId} onScrollRequest={handleScrollRequest} activeIndex={activeIndex} />
+
+      {/* Active Filters */}
+      <div className="px-6 mb-2">
+        <ActiveFilterList />
+      </div>
 
       {/* Header Row for Desktop */}
       <div className="hidden md:flex items-center px-6 py-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
