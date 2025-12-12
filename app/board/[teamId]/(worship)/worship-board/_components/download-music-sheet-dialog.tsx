@@ -1,25 +1,31 @@
 'use client'
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useRecoilValue } from "recoil";
 import { useState, useEffect } from "react";
 import { worshipSongListAtom } from "@/global-states/worship-state";
 import { shareMusicSheets } from "@/components/util/helper/helper-functions";
-import { motion, AnimatePresence } from "framer-motion";
-import { Check, Download, Music, X } from "lucide-react";
+import { Check, Music } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ResponsiveDrawer } from "@/components/ui/responsive-drawer";
 
 interface Props {
-  children: any
+  children?: any
   worshipId: string
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export function DownloadMusicSheetDialog({ children, worshipId }: Props) {
+export function DownloadMusicSheetDialog({ children, worshipId, open, onOpenChange }: Props) {
   const songList = useRecoilValue(worshipSongListAtom(worshipId))
   // Default to selecting all songs when opening
   const [selectedSongIds, setSelectedSongIds] = useState<Array<string>>([])
-  const [isOpen, setIsOpen] = useState(false)
+  // Internal state if uncontrolled
+  const [internalOpen, setInternalOpen] = useState(false)
+
+  const isControlled = open !== undefined && onOpenChange !== undefined
+  const isOpen = isControlled ? open : internalOpen
+  const setIsOpen = isControlled ? onOpenChange : setInternalOpen
 
   // Reset selection when dialog opens
   useEffect(() => {
@@ -51,24 +57,18 @@ export function DownloadMusicSheetDialog({ children, worshipId }: Props) {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
-      <DialogContent className="max-w-md p-0 overflow-hidden bg-background border-none shadow-toss gap-0 rounded-4xl ring-1 ring-black/5 [&>button]:hidden focus:outline-none select-none">
-
-        {/* Header */}
-        <div className="relative pt-8 px-8 pb-6 z-10 flex items-center justify-between">
-          <DialogTitle className="text-3xl font-bold text-foreground tracking-tight leading-tight text-left">
-            Download Sheets
-          </DialogTitle>
-          <DialogClose className="rounded-full p-2 bg-transparent hover:bg-secondary text-muted-foreground hover:text-foreground transition-all duration-200 -mr-2">
-            <X className="w-5 h-5" />
-          </DialogClose>
-        </div>
-
-        {/* Scrollable Song List */}
-        <div className="relative px-4 pb-4 space-y-0 max-h-[55vh] overflow-y-auto scrollbar-hide z-0 mask-image-b">
+    <ResponsiveDrawer
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      trigger={children}
+      title="Download Sheets"
+    >
+      <div className="flex flex-col h-full">
+        {/* Scrollable Song List - flex-1 is handled by ResponsiveDrawer's content container, 
+               but we need to make sure this inner div fills it or flows correctly. 
+               ResponsiveDrawer has flex-col and overflow-y-auto on the content div. 
+            */}
+        <div className="flex-1 space-y-0">
           {songList.length === 0 ? (
             <div className="py-20 text-center text-muted-foreground flex flex-col items-center justify-center">
               <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
@@ -84,7 +84,7 @@ export function DownloadMusicSheetDialog({ children, worshipId }: Props) {
                   <div
                     key={song.id}
                     onClick={() => handleToggleSong(song.id)}
-                    className="group flex items-center py-3.5 px-4 rounded-2xl transition-all duration-200 cursor-pointer hover:bg-muted/50 active:scale-[0.98]"
+                    className="group flex items-center py-3.5 px-4 rounded-xl transition-all duration-200 cursor-pointer hover:bg-muted/50 active:scale-[0.98]"
                   >
                     {/* Selection Indicator */}
                     <div className={cn(
@@ -123,7 +123,7 @@ export function DownloadMusicSheetDialog({ children, worshipId }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="p-6 pt-4 pb-8 bg-background z-20 flex flex-col gap-4 items-center">
+        <div className="pt-4 pb-8 z-20 flex flex-col gap-4 items-center mt-auto">
           <Button
             onClick={handleDownload}
             disabled={selectedSongIds.length === 0}
@@ -145,7 +145,7 @@ export function DownloadMusicSheetDialog({ children, worshipId }: Props) {
             {selectedSongIds.length === songList.length ? "Unselect All" : "Select All Songs"}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </ResponsiveDrawer>
   )
 }

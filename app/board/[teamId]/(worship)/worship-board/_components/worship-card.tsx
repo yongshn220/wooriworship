@@ -87,6 +87,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
     return false;
   });
   const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
+  const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
 
   // Auto-scroll to this card if it's the expanded one from URL
   useEffect(() => {
@@ -236,7 +237,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                     trigger={
                       <Button variant="outline" size="sm" className="gap-2 text-primary border-primary/20 hover:bg-primary/5">
                         <ClipboardList className="h-4 w-4" />
-                        Service Members
+                        Serving Members
                       </Button>
                     }
                   />
@@ -325,16 +326,15 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                               </a>
                             </Button>
                           )}
-                          <DownloadMusicSheetDialog worshipId={worship.id}>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="justify-start h-9 w-full font-normal"
-                            >
-                              <Download className="mr-2 h-4 w-4" />
-                              Download
-                            </Button>
-                          </DownloadMusicSheetDialog>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="justify-start h-9 w-full font-normal"
+                            onClick={() => setIsDownloadDialogOpen(true)}
+                          >
+                            <Download className="mr-2 h-4 w-4" />
+                            Download
+                          </Button>
                         </div>
                       </PopoverContent>
                     </Popover>
@@ -358,6 +358,13 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
           readOnly={true}
         />
       )}
+
+      {/* Download Dialog */}
+      <DownloadMusicSheetDialog
+        worshipId={worshipId}
+        open={isDownloadDialogOpen}
+        onOpenChange={setIsDownloadDialogOpen}
+      />
     </motion.div>
   )
 }
