@@ -1,11 +1,11 @@
 "use client"
 
-import {useEffect} from "react";
-import {useSetRecoilState} from "recoil";
-import {currentPageAtom} from "@/global-states/page-state";
-import {Page} from "@/components/constants/enums";
+import { useEffect } from "react";
+import { useSetRecoilState } from "recoil";
+import { currentPageAtom } from "@/global-states/page-state";
+import { Page } from "@/components/constants/enums";
 
-export default function CreateWorshipLayout({children}: any) {
+export default function CreateWorshipLayout({ children }: any) {
   const setPage = useSetRecoilState(currentPageAtom)
 
   useEffect(() => {
@@ -13,7 +13,7 @@ export default function CreateWorshipLayout({children}: any) {
   }, [setPage]);
 
   return (
-    <div className="bg-white p-4">
+    <div className="bg-background p-4">
       {children}
     </div>
   )

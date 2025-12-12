@@ -137,8 +137,8 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
       <Card
         className={cn(
           "overflow-hidden transition-all duration-300 border shadow-sm hover:shadow-md cursor-pointer",
-          (isExpanded || !isPast) ? 'bg-white' : 'bg-gray-50', // Apply background based on isExpanded and isPast
-          isExpanded ? "ring-2 ring-blue-500/10" : ""
+          (isExpanded || !isPast) ? 'bg-card' : 'bg-muted/30', // Apply background based on isExpanded and isPast
+          isExpanded ? "ring-2 ring-primary/10" : ""
         )}
         onClick={() => !isExpanded && setIsExpanded(true)}
       >
@@ -146,23 +146,23 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
           {/* Header Section */}
           <div className="flex justify-between items-start mb-4 group cursor-pointer" onClick={handleToggleExpand}>
             <div className="space-y-1">
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>{timestampToDateStringFormatted(worship.worship_date)}</span>
                 <span className={cn(
                   "text-xs px-1.5 py-0.5 rounded-full",
-                  isPast ? "bg-gray-100 text-gray-500" : "bg-blue-100 text-blue-700 font-medium"
+                  isPast ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary font-medium"
                 )}>
                   {getDayPassedFromTimestampShorten(worship.worship_date)}
                 </span>
               </div>
-              <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight text-gray-900 group-hover:text-blue-600 transition-colors">
+              <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
                 {highlightText(worship.title || "Untitled Service", searchInput)}
                 {worship.subtitle && (
-                  <span className="text-base sm:text-lg font-normal text-gray-500 ml-2">
+                  <span className="text-base sm:text-lg font-normal text-muted-foreground ml-2">
                     {highlightText(worship.subtitle, searchInput)}
                   </span>
                 )}
-                {isExpanded && <ChevronUp className="h-6 w-6 text-gray-400 animate-in fade-in zoom-in duration-300" />}
+                {isExpanded && <ChevronUp className="h-6 w-6 text-muted-foreground animate-in fade-in zoom-in duration-300" />}
               </h2>
             </div>
 
@@ -183,9 +183,9 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                 className="space-y-2 pl-1 sm:pl-2"
               >
                 {songs.slice(0, 5).map((song, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-gray-700">
+                  <div key={idx} className="flex items-center gap-2 text-foreground">
                     {song?.keys?.[0] && (
-                      <span className="text-xs font-medium text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded shrink-0">
+                      <span className="text-xs font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">
                         {song.keys[0]}
                       </span>
                     )}
@@ -195,7 +195,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                   </div>
                 ))}
                 {songs.length > 5 && (
-                  <p className="text-xs text-gray-400 pl-4 py-1">
+                  <p className="text-xs text-muted-foreground pl-4 py-1">
                     + {songs.length - 5} more songs...
                   </p>
                 )}
@@ -213,13 +213,13 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                 <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
                   <div className="flex items-center gap-2 sm:gap-4">
                     {team?.name && (
-                      <Badge variant="secondary" className="bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs sm:text-sm">
+                      <Badge variant="secondary" className="bg-muted text-muted-foreground hover:bg-muted/80 text-xs sm:text-sm">
                         {team.name}
                       </Badge>
                     )}
                     {creator?.name && (
-                      <div className="flex items-center gap-1 sm:gap-2 font-medium text-gray-900 px-2 py-1 bg-gray-50 rounded-md text-xs sm:text-sm">
-                        <span className="text-gray-500 font-normal hidden sm:inline">Created by</span>
+                      <div className="flex items-center gap-1 sm:gap-2 font-medium text-foreground px-2 py-1 bg-muted/50 rounded-md text-xs sm:text-sm">
+                        <span className="text-muted-foreground font-normal hidden sm:inline">Created by</span>
                         {creator.name}
                       </div>
                     )}
@@ -229,8 +229,8 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
 
                 {/* Description (Context) */}
                 {worship.description && (
-                  <div className="relative pl-4 border-l-2 border-blue-100 py-1 my-2">
-                    <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed">
+                  <div className="relative pl-4 border-l-2 border-primary/20 py-1 my-2">
+                    <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">
                       {worship.description}
                     </p>
                   </div>
@@ -240,8 +240,8 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                   {/* Actions & List Header */}
                   <div className="flex flex-col gap-3 pt-2">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-base sm:text-lg font-semibold text-gray-800">
-                        <Music className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
+                      <div className="flex items-center gap-2 text-base sm:text-lg font-semibold text-foreground">
+                        <Music className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                         Song List
                       </div>
 
@@ -251,7 +251,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                             variant="ghost"
                             size="sm"
                             asChild
-                            className="text-gray-500 hover:text-blue-600 h-8 text-xs sm:text-sm px-2 cursor-pointer"
+                            className="text-muted-foreground hover:text-primary h-8 text-xs sm:text-sm px-2 cursor-pointer"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <a
@@ -268,7 +268,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-gray-500 hover:text-gray-900 h-8 text-xs sm:text-sm px-2 w-full"
+                            className="text-muted-foreground hover:text-foreground h-8 text-xs sm:text-sm px-2 w-full"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <Download className="mr-1.5 h-3 w-3 sm:h-4 sm:w-4" />
@@ -280,11 +280,11 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                   </div>
 
                   {/* Rich Song List */}
-                  <div className="bg-gray-50 rounded-xl p-2 sm:p-3 flex flex-col gap-1">
+                  <div className="bg-muted/30 rounded-xl p-2 sm:p-3 flex flex-col gap-1">
                     {songs.map((song, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 rounded-lg hover:bg-white hover:shadow-sm transition-all duration-200 cursor-pointer"
+                        className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 rounded-lg hover:bg-card hover:shadow-sm transition-all duration-200 cursor-pointer"
                         onClick={(e) => {
                           e.stopPropagation();
                           if (song?.id) setSelectedSongId(song.id);
@@ -292,27 +292,27 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                       >
                         <div className="w-10 sm:w-12 flex justify-center shrink-0">
                           {song?.keys?.[0] ? (
-                            <Badge variant="outline" className="font-mono text-sm sm:text-base font-bold border-gray-300 text-gray-700 bg-white px-1.5 sm:px-2.5">
+                            <Badge variant="outline" className="font-mono text-sm sm:text-base font-bold border-border text-foreground bg-card px-1.5 sm:px-2.5">
                               {song.keys[0]}
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="text-gray-400 bg-gray-50 text-xs sm:text-sm">?</Badge>
+                            <Badge variant="outline" className="text-muted-foreground bg-muted text-xs sm:text-sm">?</Badge>
                           )}
                         </div>
 
-                        <span className="font-medium text-gray-900 text-base sm:text-lg line-clamp-1">
+                        <span className="font-medium text-foreground text-base sm:text-lg line-clamp-1">
                           {highlightText(song?.title, searchInput)}
                         </span>
                       </div>
                     ))}
                     {songs.length === 0 && (
-                      <div className="p-6 sm:p-8 text-center text-gray-400 italic text-sm">
+                      <div className="p-6 sm:p-8 text-center text-muted-foreground italic text-sm">
                         No songs added yet.
                       </div>
                     )}
                   </div>
 
-                  <Button size="sm" onClick={handleStartWorship} className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-10 sm:h-10 text-sm sm:text-base font-semibold">
+                  <Button size="sm" onClick={handleStartWorship} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm h-10 sm:h-10 text-sm sm:text-base font-semibold">
                     <Play className="mr-2 h-3 w-3 sm:h-4 sm:w-4 fill-current" />
                     Start Worship
                   </Button>

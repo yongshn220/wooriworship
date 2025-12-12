@@ -79,7 +79,7 @@ export function WorshipLiveCarouselItem({ index, urls }: WorshipLiveCarouselItem
 
     return (
         <CarouselItem className={cn("h-full p-0", { "basis-1/2": pageMode === WorshipViewPageMode.DOUBLE_PAGE })}>
-            <div className="h-full w-full flex flex-col bg-white dark:bg-black overflow-y-auto scrollbar-hide">
+            <div className="h-full w-full flex flex-col bg-background overflow-y-auto scrollbar-hide">
                 {
                     urls.map((url, index) => (
                         <div

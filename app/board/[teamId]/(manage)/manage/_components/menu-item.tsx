@@ -54,8 +54,8 @@ export function MenuItem({
         <div className={cn(
           "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
           isDestructive
-            ? "bg-red-100/50 text-red-600"
-            : "bg-primary/5 text-primary"
+            ? "bg-destructive/10 text-destructive"
+            : "bg-primary/10 text-primary"
         )}>
           {icon}
         </div>
@@ -65,7 +65,7 @@ export function MenuItem({
       <div className="flex-1 flex flex-col min-w-0">
         <span className={cn(
           "text-sm font-medium leading-none mb-1",
-          isDestructive ? "text-red-600" : "text-foreground"
+          isDestructive ? "text-destructive" : "text-foreground"
         )}>
           {title}
         </span>
@@ -79,7 +79,7 @@ export function MenuItem({
       {/* Action Area (Right Side) */}
       <div className="flex items-center gap-3">
         {badge && (
-          <span className="flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-red-500 text-[10px] font-bold text-white leading-none">
+          <span className="flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground leading-none">
             {badge}
           </span>
         )}

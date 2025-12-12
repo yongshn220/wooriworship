@@ -81,7 +81,7 @@ export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
 
   return (
     <div className="w-full h-full flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white/70 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8">
+      <div className="w-full max-w-md bg-card/70 backdrop-blur-xl border border-border/50 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-8">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -89,8 +89,8 @@ export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
           className="space-y-6"
         >
           <motion.div variants={itemVariants} className="space-y-2 text-center">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-800">Welcome Back</h1>
-            <p className="text-slate-500 text-sm">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Welcome Back</h1>
+            <p className="text-muted-foreground text-sm">
               Enter your credentials to access your workspace
             </p>
           </motion.div>
@@ -103,11 +103,11 @@ export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-700 font-medium">Email</FormLabel>
+                      <FormLabel className="text-foreground font-medium">Email</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="name@example.com"
-                          className="bg-white/60 border-slate-200 focus:bg-white focus:border-blue-500 transition-all duration-300"
+                          className="bg-background/60 border-border focus:bg-background focus:border-primary transition-all duration-300"
                           {...field}
                         />
                       </FormControl>
@@ -123,7 +123,7 @@ export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-700 font-medium">Password</FormLabel>
+                      <FormLabel className="text-foreground font-medium">Password</FormLabel>
                       <FormControl>
                         <PasswordInput
                           placeholder="••••••••"
@@ -137,7 +137,7 @@ export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
               </motion.div>
 
               {form.formState.errors.root && (
-                <motion.div variants={itemVariants} className="p-3 rounded-lg bg-red-50 text-red-600 border border-red-100">
+                <motion.div variants={itemVariants} className="p-3 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
                   <p className="text-sm font-medium text-center">
                     {form.formState.errors.root.message}
                   </p>
@@ -146,7 +146,7 @@ export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
 
               <motion.div variants={itemVariants}>
                 <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-[1.02]"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300 hover:scale-[1.02]"
                   type="submit"
                   disabled={isLoading}
                 >
@@ -160,16 +160,16 @@ export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
           <motion.div variants={itemVariants} className="flex flex-col items-center gap-4 text-sm pt-2">
             <ForgotPasswordDialog>
               <button
-                className="text-slate-500 hover:text-slate-800 transition-colors underline-offset-4 hover:underline"
+                className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
                 type="button"
               >
                 Forgot your password?
               </button>
             </ForgotPasswordDialog>
-            <div className="text-slate-500">
+            <div className="text-muted-foreground">
               Don&apos;t have an account?{" "}
               <button
-                className="font-semibold text-blue-600 hover:text-blue-700 underline-offset-4 hover:underline transition-colors"
+                className="font-semibold text-primary hover:text-primary/90 underline-offset-4 hover:underline transition-colors"
                 onClick={() => setMode(LandingMode.SIGNUP)}
               >
                 Sign Up

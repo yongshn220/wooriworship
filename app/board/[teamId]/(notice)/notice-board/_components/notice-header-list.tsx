@@ -57,7 +57,7 @@ export function NoticeHeaderList({ teamId }: Props) {
       </div>
       {/* Load More Trigger */}
       {visibleNoticeIdList.length < noticeIdList.length && (
-        <div ref={loadMoreRef} className="h-10 w-full flex-center py-4 text-gray-400 text-sm">
+        <div ref={loadMoreRef} className="h-10 w-full flex-center py-4 text-muted-foreground text-sm">
           Loading more...
         </div>
       )}
@@ -67,18 +67,18 @@ export function NoticeHeaderList({ teamId }: Props) {
 
 function NoticeSkeleton() {
   return (
-    <div className="w-full p-4 border rounded-lg bg-white relative animate-pulse flex flex-col gap-4">
+    <div className="w-full p-4 border border-border rounded-lg bg-card relative animate-pulse flex flex-col gap-4">
       <div className="flex justify-between items-center">
-        <div className="w-32 h-4 bg-gray-200 rounded"></div>
-        <div className="w-8 h-8 rounded-full bg-gray-200"></div>
+        <div className="w-32 h-4 bg-muted rounded"></div>
+        <div className="w-8 h-8 rounded-full bg-muted"></div>
       </div>
       <div className="space-y-2">
-        <div className="w-3/4 h-6 bg-gray-200 rounded"></div>
-        <div className="w-full h-4 bg-gray-200 rounded"></div>
-        <div className="w-full h-4 bg-gray-200 rounded"></div>
-        <div className="w-2/3 h-4 bg-gray-200 rounded"></div>
+        <div className="w-3/4 h-6 bg-muted rounded"></div>
+        <div className="w-full h-4 bg-muted rounded"></div>
+        <div className="w-full h-4 bg-muted rounded"></div>
+        <div className="w-2/3 h-4 bg-muted rounded"></div>
       </div>
-      <div className="w-24 h-4 bg-gray-200 rounded mt-2"></div>
+      <div className="w-24 h-4 bg-muted rounded mt-2"></div>
     </div>
   )
 }

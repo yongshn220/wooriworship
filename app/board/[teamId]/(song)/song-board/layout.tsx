@@ -1,12 +1,12 @@
 "use client"
 
-import {PullToRefresh} from "@/components/elements/util/page/pull-to-refresh";
-import {useEffect} from "react";
-import {useSetRecoilState} from "recoil";
-import {currentPageAtom} from "@/global-states/page-state";
-import {Page} from "@/components/constants/enums";
+import { PullToRefresh } from "@/components/elements/util/page/pull-to-refresh";
+import { useEffect } from "react";
+import { useSetRecoilState } from "recoil";
+import { currentPageAtom } from "@/global-states/page-state";
+import { Page } from "@/components/constants/enums";
 
-export default function SongLayout({children}: any) {
+export default function SongLayout({ children }: any) {
   const setPage = useSetRecoilState(currentPageAtom)
 
   useEffect(() => {
@@ -15,7 +15,7 @@ export default function SongLayout({children}: any) {
 
   return (
     <PullToRefresh>
-      <div className="bg-white">
+      <div className="bg-background">
         {children}
       </div>
     </PullToRefresh>

@@ -1,23 +1,23 @@
 "use client"
 
-import React, {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import MultipleSelector, { Option } from '@/components/ui/multiple-selector';
-import {useRecoilValue} from "recoil";
-import {currentTeamIdAtom} from "@/global-states/teamState";
+import { useRecoilValue } from "recoil";
+import { currentTeamIdAtom } from "@/global-states/teamState";
 import tagService from "@/apis/TagService";
-import {toast} from "@/components/ui/use-toast";
-import {SongInput} from "@/components/elements/design/song/song-form/song-form";
+import { toast } from "@/components/ui/use-toast";
+import { SongInput } from "@/components/elements/design/song/song-form/song-form";
 
 interface Props {
   input: SongInput
   setInput: Dispatch<SetStateAction<SongInput>>
 }
 
-export function TagMultiSelect({input, setInput}: Props) {
+export function TagMultiSelect({ input, setInput }: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
   const [teamTags, setTeamTags] = useState<Array<string>>([])
-  const teamOptions = useMemo(() => (teamTags.map(tag => ({label: tag, value: tag}))), [teamTags])
-  const selectedOptions = useMemo(() => (input.tags.map(tag => ({label: tag, value: tag}))), [input.tags])
+  const teamOptions = useMemo(() => (teamTags.map(tag => ({ label: tag, value: tag }))), [teamTags])
+  const selectedOptions = useMemo(() => (input.tags.map(tag => ({ label: tag, value: tag }))), [input.tags])
 
   useEffect(() => {
     tagService.getTeamTags(teamId).then(_teamTags => {
@@ -27,7 +27,7 @@ export function TagMultiSelect({input, setInput}: Props) {
 
   function handleTagChange(options: Option[]) {
     const selectedTags = options.map(options => options.value)
-    setInput((prev: SongInput) => ({...prev, tags: selectedTags}))
+    setInput((prev: SongInput) => ({ ...prev, tags: selectedTags }))
   }
 
   return (
@@ -44,12 +44,12 @@ export function TagMultiSelect({input, setInput}: Props) {
         }}
         placeholder="Select tags you like"
         emptyIndicator={
-          <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+          <p className="text-center text-lg leading-10 text-muted-foreground">
             no results found.
           </p>
         }
         onChange={(options) => handleTagChange(options)}
-        className="pl-1 bg-white"
+        className="pl-1 bg-background"
       />
     </div>
   );

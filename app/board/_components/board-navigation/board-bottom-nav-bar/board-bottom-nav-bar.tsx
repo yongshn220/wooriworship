@@ -105,7 +105,7 @@ export function DefaultBoardBottomNavBar() {
               key={item.label}
               className={cn(
                 "w-16 h-full flex-col flex-center cursor-pointer transition-colors duration-300",
-                isActive ? "text-foreground" : "text-muted-foreground"
+                isActive ? "text-primary" : "text-muted-foreground"
               )}
               onClick={() => router.push(item.path)}
               whileTap={{ scale: 0.9 }}
@@ -118,7 +118,7 @@ export function DefaultBoardBottomNavBar() {
               </div>
               <p className={cn(
                 "text-[10px] prevent-text-select transition-all duration-300",
-                isActive ? "font-bold text-foreground" : "font-medium text-muted-foreground"
+                isActive ? "font-bold text-primary" : "font-medium text-muted-foreground"
               )}>
                 {item.label}
               </p>

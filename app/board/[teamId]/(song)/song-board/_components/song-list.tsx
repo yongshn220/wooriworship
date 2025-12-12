@@ -128,7 +128,7 @@ export function SongList({ teamId }: Props) {
       </div>
 
       {/* Header Row for Desktop */}
-      <div className="hidden md:flex items-center px-6 py-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+      <div className="hidden md:flex items-center px-6 py-2 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
         <div className="flex-1 pl-4">Title</div>
         <div className="w-32 shrink-0 text-center">Key</div>
       </div>
@@ -148,10 +148,10 @@ export function SongList({ teamId }: Props) {
       {/* Load More Trigger */}
       {visibleSongIds.length < songIds.length && (
         <div ref={loadMoreRef} className="h-24 w-full flex justify-center items-center py-8">
-          <div className="flex gap-2 items-center text-gray-400 text-sm font-medium animate-pulse">
-            <div className="w-2 h-2 rounded-full bg-blue-400"></div>
-            <div className="w-2 h-2 rounded-full bg-blue-400 animation-delay-75"></div>
-            <div className="w-2 h-2 rounded-full bg-blue-400 animation-delay-150"></div>
+          <div className="flex gap-2 items-center text-muted-foreground text-sm font-medium animate-pulse">
+            <div className="w-2 h-2 rounded-full bg-primary/60"></div>
+            <div className="w-2 h-2 rounded-full bg-primary/60 animation-delay-75"></div>
+            <div className="w-2 h-2 rounded-full bg-primary/60 animation-delay-150"></div>
           </div>
         </div>
       )}
@@ -161,23 +161,23 @@ export function SongList({ teamId }: Props) {
 
 function SongRowSkeleton() {
   return (
-    <div className="relative rounded-xl bg-white border border-gray-100 shadow-sm flex items-center h-[64px] sm:h-[100px] p-1 sm:p-5">
+    <div className="relative rounded-xl bg-card border border-border shadow-sm flex items-center h-[64px] sm:h-[100px] p-1 sm:p-5">
       {/* Left Column Skeleton */}
       <div className="flex-1 flex flex-col justify-between h-full py-0.5 sm:py-1 px-1">
         {/* Title + Subtitle */}
         <div className="flex items-center gap-2">
-          <div className="h-4 sm:h-5 bg-gray-200 rounded w-1/3 animate-pulse"></div>
-          <div className="h-2.5 sm:h-3 bg-gray-100 rounded w-1/5 animate-pulse"></div>
+          <div className="h-4 sm:h-5 bg-muted rounded w-1/3 animate-pulse"></div>
+          <div className="h-2.5 sm:h-3 bg-muted rounded w-1/5 animate-pulse"></div>
         </div>
         {/* Author */}
-        <div className="h-2.5 sm:h-3 bg-gray-100 rounded w-1/3 animate-pulse"></div>
+        <div className="h-2.5 sm:h-3 bg-muted rounded w-1/3 animate-pulse"></div>
         {/* Key */}
-        <div className="h-3.5 sm:h-4 w-8 bg-gray-200 rounded animate-pulse mt-auto"></div>
+        <div className="h-3.5 sm:h-4 w-8 bg-muted rounded animate-pulse mt-auto"></div>
       </div>
 
       {/* Right Column Skeleton */}
-      <div className="w-5 sm:w-10 flex justify-center items-center shrink-0 border-l border-gray-100 pl-0.5 sm:pl-3 h-2/3">
-        <div className="h-4 w-4 sm:h-6 sm:w-6 bg-gray-200 rounded animate-pulse"></div>
+      <div className="w-5 sm:w-10 flex justify-center items-center shrink-0 border-l border-border pl-0.5 sm:pl-3 h-2/3">
+        <div className="h-4 w-4 sm:h-6 sm:w-6 bg-muted rounded animate-pulse"></div>
       </div>
     </div>
   )

@@ -15,7 +15,7 @@ export function MenuGroup({ children, title, className }: Props) {
                     {title}
                 </h3>
             )}
-            <div className="bg-white rounded-xl border shadow-sm divide-y overflow-hidden">
+            <div className="bg-card rounded-xl border border-border shadow-sm divide-y divide-border overflow-hidden">
                 {children}
             </div>
         </div>
