@@ -98,7 +98,7 @@ export function ForgotPasswordDialog({ children }: { children: React.ReactNode }
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={isLoading}>
+                        <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Send Reset Link
                         </Button>

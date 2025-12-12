@@ -1,10 +1,10 @@
-import {Separator} from "@/components/ui/separator";
-import {useRecoilValue} from "recoil";
-import {noticeAtom} from "@/global-states/notice-state";
-import {getTimePassedFromTimestampShorten, timestampToDateStringFormatted} from "@/components/util/helper/helper-functions";
+import { Separator } from "@/components/ui/separator";
+import { useRecoilValue } from "recoil";
+import { noticeAtom } from "@/global-states/notice-state";
+import { getTimePassedFromTimestampShorten, timestampToDateStringFormatted } from "@/components/util/helper/helper-functions";
 import Image from 'next/image'
-import {useRouter} from "next/navigation";
-import {getPathNotice} from "@/components/util/helper/routes";
+import { useRouter } from "next/navigation";
+import { getPathNotice } from "@/components/util/helper/routes";
 
 
 interface Props {
@@ -12,17 +12,17 @@ interface Props {
   noticeId: string
 }
 
-export function NoticeHeaderMinimal({teamId, noticeId}: Props) {
+export function NoticeHeaderMinimal({ teamId, noticeId }: Props) {
   const notice = useRecoilValue(noticeAtom(noticeId))
   const router = useRouter()
 
   return (
-    <div className="bg-white border w-full rounded-lg p-2 cursor-pointer hover:border-blue-300" onClick={() => router.push(getPathNotice(teamId))}>
+    <div className="bg-white border w-full rounded-lg p-2 cursor-pointer hover:border-primary/50 transition-colors" onClick={() => router.push(getPathNotice(teamId))}>
       <div className="flex items-center gap-2">
         <p className="text-sm pl-2">{timestampToDateStringFormatted(notice?.last_updated_time)}</p>
         <p className="text-sm text-gray-500">{getTimePassedFromTimestampShorten(notice?.last_updated_time)}</p>
       </div>
-      <Separator/>
+      <Separator />
       <div className="w-full">
         <div className="flex flex-col sm:flex-row">
           <div className="flex-1 p-4">

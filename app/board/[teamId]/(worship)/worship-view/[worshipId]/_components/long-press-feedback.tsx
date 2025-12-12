@@ -29,16 +29,15 @@ export function LongPressFeedback({ isPressing, x, y }: Props) {
                     duration: 1,
                     ease: "linear"
                 }}
-                className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border-2 border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.5)]"
+                className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border-2 border-primary/50 shadow-[0_0_30px_rgba(var(--primary-rgb),0.5)]"
             />
 
             {/* Progress Fill */}
             <svg width="100" height="100" viewBox="0 0 100 100" className="rotate-[-90deg]">
                 <circle
-                    cx="50"
                     cy="50"
                     r="40"
-                    stroke="rgba(59, 130, 246, 0.2)"
+                    stroke="rgba(var(--primary-rgb), 0.2)"
                     strokeWidth="4"
                     fill="none"
                 />
@@ -46,7 +45,7 @@ export function LongPressFeedback({ isPressing, x, y }: Props) {
                     cx="50"
                     cy="50"
                     r="40"
-                    stroke="#3b82f6"
+                    stroke="var(--primary)"
                     strokeWidth="4"
                     fill="none"
                     initial={{ pathLength: 0 }}

@@ -173,8 +173,8 @@ export function AlphabetIndexer({ teamId, onScrollRequest, activeIndex }: Props)
         >
 
             {/* Selection Pointer / Highlight */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-8 bg-blue-500/20 backdrop-blur-sm border border-blue-500/50 rounded-lg shadow-[0_0_15px_rgba(59,130,246,0.5)] z-0 pointer-events-none" />
-            <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-blue-500 border-b-[6px] border-b-transparent hidden sm:block" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-8 bg-primary/20 backdrop-blur-sm border border-primary/50 rounded-lg shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)] z-0 pointer-events-none" />
+            <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-primary border-b-[6px] border-b-transparent hidden sm:block" />
 
             {/* 3D Wheel Container */}
             <div
@@ -232,7 +232,7 @@ export function AlphabetIndexer({ teamId, onScrollRequest, activeIndex }: Props)
                                     zIndex: Math.round(100 - distance),
                                     // Colors optimized for Light Mode (with dark text)
                                     color: char === selectedChar
-                                        ? (isActive ? '#2563eb' : '#9ca3af') // blue-600 : gray-400
+                                        ? (isActive ? 'var(--primary)' : 'var(--muted-foreground)') // primary : muted
                                         : 'rgba(0,0,0,0.4)',
                                     visibility: opacity < 0.1 ? 'hidden' : 'visible'
                                 }}
