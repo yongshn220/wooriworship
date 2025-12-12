@@ -33,6 +33,12 @@ import { planSearchInputAtom } from "@/app/board/_states/board-states";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
 import { DownloadMusicSheetDialog } from "@/app/board/[teamId]/(worship)/worship-board/_components/download-music-sheet-dialog";
 import { WorshipHeaderMenu } from "./worship-header-menu";
+import { ServingRosterDialog } from "@/components/elements/dialog/serving/serving-roster-dialog";
+import { format } from "date-fns";
+import { ServingService } from "@/apis";
+import { auth } from "@/firebase";
+import { ServingSchedule } from "@/models/serving";
+import { MyServingIndicator } from "./my-serving-indicator";
 
 interface Props {
   worshipId: string;
@@ -154,6 +160,9 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                 )}>
                   {getDayPassedFromTimestampShorten(worship.worship_date)}
                 </span>
+
+                {/* My Serving Indicator */}
+                <MyServingIndicator teamId={teamId} date={format(worship.worship_date.toDate(), "yyyy-MM-dd")} />
               </div>
               <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
                 {highlightText(worship.title || "Untitled Service", searchInput)}
@@ -246,6 +255,12 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                       </div>
 
                       <div className="flex items-center gap-1">
+                        {/* Serving Roster Button */}
+                        <ServingRosterDialog
+                          teamId={teamId}
+                          date={format(worship.worship_date.toDate(), "yyyy-MM-dd")}
+                        />
+
                         {hasLink && (
                           <Button
                             variant="ghost"
