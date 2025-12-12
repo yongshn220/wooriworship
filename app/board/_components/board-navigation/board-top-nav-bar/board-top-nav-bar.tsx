@@ -1,4 +1,5 @@
 import { Page } from "@/components/constants/enums";
+import { cn } from "@/lib/utils";
 import { FilterIcon, SquarePenIcon, SearchIcon, MenuIcon, XIcon, ArrowLeftIcon } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -30,16 +31,17 @@ interface ActionButtonProps {
 const ActionButton = ({ onClick, icon: Icon, label, variant = 'default' }: ActionButtonProps) => (
   <motion.button
     onClick={onClick}
-    whileHover={{ scale: 1.05, rotateX: 10, rotateY: 10, y: -2 }}
+    whileHover={{ scale: 1.05 }}
     whileTap={{ scale: 0.95 }}
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    className={`group relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-300 ${variant === 'default' ? 'bg-gradient-to-br from-white to-gray-50 border border-gray-100 shadow-sm hover:shadow-md' : 'hover:bg-gray-100/50'}`}
-    style={{ perspective: 1000 }}
+    className={cn(
+      "group relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200",
+      variant === 'default'
+        ? "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground"
+        : "hover:bg-muted text-muted-foreground hover:text-foreground"
+    )}
   >
-    {variant === 'default' && <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity" />}
-    <Icon className={`w-5 h-5 transition-colors ${variant === 'default' ? 'text-gray-600 group-hover:text-blue-600' : 'text-gray-500 group-hover:text-gray-800'}`} />
-    {label && <span className={`text-sm font-medium transition-colors ${variant === 'default' ? 'text-gray-600 group-hover:text-blue-600' : 'text-gray-500 group-hover:text-gray-800'}`}>{label}</span>}
+    <Icon className="w-6 h-6 stroke-[2px]" />
+    {label && <span className="text-sm font-semibold">{label}</span>}
   </motion.button>
 );
 
@@ -112,7 +114,7 @@ export function BoardTopNavBar() {
   if (!currentConfig) return <></>;
 
   return (
-    <BaseTopNavBar height={64} className="bg-white/80 backdrop-blur-xl border-b border-gray-200/60 shadow-lg shadow-gray-200/40 z-50 supports-[backdrop-filter]:bg-white/60 transition-all duration-300 overflow-hidden">
+    <BaseTopNavBar height={64} className="bg-background/80 backdrop-blur-xl border-b border-border shadow-sm z-50 supports-[backdrop-filter]:bg-background/60 transition-all duration-300 overflow-hidden">
       <div className="w-full h-full max-w-7xl mx-auto px-4 relative flex items-center">
         <AnimatePresence mode="wait">
           {isSearchOpen && currentConfig.searchComponent ? (
@@ -131,7 +133,7 @@ export function BoardTopNavBar() {
                 whileHover={{ scale: 1.1, rotate: 90 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={handleCloseSearch}
-                className="p-2 rounded-full hover:bg-gray-100 text-gray-500"
+                className="p-2 rounded-full hover:bg-muted text-muted-foreground"
               >
                 <XIcon className="w-5 h-5" />
               </motion.button>
@@ -152,7 +154,7 @@ export function BoardTopNavBar() {
                     <MainLogoSmall />
                   </div>
                 ) : (
-                  <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
+                  <h1 className="text-2xl font-bold text-foreground tracking-tight">
                     {currentConfig.title}
                   </h1>
                 )}

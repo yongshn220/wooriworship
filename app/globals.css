@@ -35,10 +35,12 @@ a {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 20% 98%;
+    /* Cool Gray for App Background */
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
+    /* Pure White for Cards */
     --card-foreground: 222.2 84% 4.9%;
 
     --popover: 0 0% 100%;
@@ -63,7 +65,8 @@ a {
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
+    /* Increased default radius to 16px for a softer feel */
   }
 
   .dark {

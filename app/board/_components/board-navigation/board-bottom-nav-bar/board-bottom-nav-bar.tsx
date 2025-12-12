@@ -43,7 +43,7 @@ export function WorshipBottomNavBar() {
     <BaseBottomNavBar height={80}>
       <div className="w-full h-full flex-center px-4 gap-4">
         <motion.div
-          className="w-16 h-16 flex-center flex-col text-gray-500 cursor-pointer"
+          className="w-16 h-16 flex-center flex-col text-muted-foreground cursor-pointer"
           whileTap={{ scale: 0.9 }}
         >
           <DownloadMusicSheetDialog worshipId={worshipId}>
@@ -53,7 +53,7 @@ export function WorshipBottomNavBar() {
             </div>
           </DownloadMusicSheetDialog>
         </motion.div>
-        <Button className="w-full shadow-lg shadow-blue-500/20" onClick={() => router.push(getPathWorshipView(teamId, worshipId))}>
+        <Button className="w-full shadow-toss" onClick={() => router.push(getPathWorshipView(teamId, worshipId))}>
           Worship View
         </Button>
       </div>
@@ -105,27 +105,20 @@ export function DefaultBoardBottomNavBar() {
               key={item.label}
               className={cn(
                 "w-16 h-full flex-col flex-center cursor-pointer transition-colors duration-300",
-                isActive ? "text-blue-600" : "text-gray-400"
+                isActive ? "text-foreground" : "text-muted-foreground"
               )}
               onClick={() => router.push(item.path)}
               whileTap={{ scale: 0.9 }}
             >
-              <div className="relative">
+              <div className="relative mb-1">
                 <Icon
-                  strokeWidth={isActive ? 2.5 : 2}
-                  className={cn("w-6 h-6 transition-all duration-300", isActive && "fill-blue-100")}
+                  strokeWidth={isActive ? 3 : 2}
+                  className={cn("w-6 h-6 transition-all duration-300")}
                 />
-                {isActive && (
-                  <motion.div
-                    layoutId="active-dot"
-                    className="absolute -top-2 right-0 w-1.5 h-1.5 bg-blue-600 rounded-full"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
               </div>
               <p className={cn(
-                "text-[10px] mt-1 font-medium prevent-text-select transition-all duration-300",
-                isActive ? "font-bold text-blue-600" : "font-medium"
+                "text-[10px] prevent-text-select transition-all duration-300",
+                isActive ? "font-bold text-foreground" : "font-medium text-muted-foreground"
               )}>
                 {item.label}
               </p>
