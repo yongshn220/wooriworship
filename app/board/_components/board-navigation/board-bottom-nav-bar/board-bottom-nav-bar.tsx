@@ -49,7 +49,7 @@ export function WorshipBottomNavBar() {
           <DownloadMusicSheetDialog worshipId={worshipId}>
             <div className="flex-center flex-col">
               <DownloadIcon />
-              <p className="text-[10px] mt-1 font-medium">Save</p>
+              <p className="text-xs mt-1 font-medium">Save</p>
             </div>
           </DownloadMusicSheetDialog>
         </motion.div>
@@ -117,7 +117,7 @@ export function DefaultBoardBottomNavBar() {
                 />
               </div>
               <p className={cn(
-                "text-[10px] prevent-text-select transition-all duration-300",
+                "text-xs prevent-text-select transition-all duration-300",
                 isActive ? "font-bold text-primary" : "font-medium text-muted-foreground"
               )}>
                 {item.label}

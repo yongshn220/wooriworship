@@ -83,7 +83,7 @@ export function SearchFilterPopover({ children }: any) {
         >
           {/* Tags Section */}
           <div className="space-y-3">
-            <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Tags</h4>
+            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Tags</h4>
             <div className="flex flex-wrap gap-2">
               {teamTags.length > 0 ? (
                 teamTags.map((tag, i) => {
@@ -114,7 +114,7 @@ export function SearchFilterPopover({ children }: any) {
 
           {/* Keys Section */}
           <div className="space-y-3">
-            <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Musical Key</h4>
+            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Musical Key</h4>
             <div className="flex flex-wrap gap-2">
               {teamKeysLoadable.state === 'hasValue' && teamKeysLoadable.contents.length > 0 ? (
                 teamKeysLoadable.contents.map((key) => {
@@ -145,7 +145,7 @@ export function SearchFilterPopover({ children }: any) {
 
           {/* Sort Section */}
           <div className="space-y-3">
-            <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Sort Order</h4>
+            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Sort Order</h4>
 
             <div className="grid gap-3">
               {/* Title Group */}

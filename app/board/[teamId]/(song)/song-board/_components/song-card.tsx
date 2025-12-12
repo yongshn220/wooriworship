@@ -34,14 +34,14 @@ export function SongCard({ teamId, songId, index }: Props) {
                         <div className="text-sm sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors truncate leading-tight -tracking-[0.03em]">
                             {song.title}
                             {song.subtitle && (
-                                <span className="text-[11px] sm:text-sm font-normal text-muted-foreground ml-1.5 sm:ml-2 align-baseline">
+                                <span className="text-xs sm:text-sm font-normal text-muted-foreground ml-1.5 sm:ml-2 align-baseline">
                                     {song.subtitle}
                                 </span>
                             )}
                         </div>
 
                         {/* Row 2: Author */}
-                        <div className="text-[10px] sm:text-xs text-muted-foreground truncate mt-auto mb-0.5">
+                        <div className="text-xs sm:text-sm text-muted-foreground truncate mt-auto mb-0.5">
                             {song.original?.author || "Unknown"}
                         </div>
 
@@ -49,7 +49,7 @@ export function SongCard({ teamId, songId, index }: Props) {
                         <div className="flex items-center gap-1">
                             {song.keys && song.keys.length > 0 ? (
                                 song.keys.map((key, i) => (
-                                    <span key={i} className="font-mono text-[9px] sm:text-[10px] font-bold text-muted-foreground border border-border bg-muted/50 px-1 py-[1px] sm:px-1.5 sm:py-0.5 rounded-[4px] min-w-[1.1rem] sm:min-w-[1.25rem] text-center leading-none">
+                                    <span key={i} className="font-mono text-xs sm:text-sm font-bold text-muted-foreground border border-border bg-muted/50 px-1 py-[1px] sm:px-1.5 sm:py-0.5 rounded-[4px] min-w-[1.1rem] sm:min-w-[1.25rem] text-center leading-none">
                                         {key}
                                     </span>
                                 ))
