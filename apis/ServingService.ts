@@ -110,6 +110,23 @@ class ServingService extends BaseService {
         }
     }
 
+    async getScheduleById(teamId: string, scheduleId: string): Promise<ServingSchedule | null> {
+        try {
+            const doc = await firestore
+                .collection("teams")
+                .doc(teamId)
+                .collection("serving_schedules")
+                .doc(scheduleId)
+                .get();
+
+            if (!doc.exists) return null;
+            return { id: doc.id, ...doc.data() } as ServingSchedule;
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
+    }
+
     async createSchedule(teamId: string, schedule: Omit<ServingSchedule, "id">): Promise<ServingSchedule> {
         const ref = firestore.collection("teams").doc(teamId).collection("serving_schedules").doc();
         const newSchedule = { ...schedule, id: ref.id };
@@ -124,6 +141,15 @@ class ServingService extends BaseService {
             .collection("serving_schedules")
             .doc(schedule.id)
             .set(schedule, { merge: true });
+    }
+
+    async deleteSchedule(teamId: string, scheduleId: string): Promise<void> {
+        await firestore
+            .collection("teams")
+            .doc(teamId)
+            .collection("serving_schedules")
+            .doc(scheduleId)
+            .delete();
     }
 }
 

@@ -16,6 +16,7 @@ import { fetchServingRolesSelector } from "@/global-states/servingState";
 import { usersAtom } from "@/global-states/userState";
 import { auth } from "@/firebase";
 import { getDayPassedFromTimestampShorten } from "@/components/util/helper/helper-functions";
+import { ServingHeaderMenu } from "./serving-header-menu";
 
 interface Props {
     schedule: ServingSchedule;
@@ -54,14 +55,12 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                 "overflow-hidden transition-all duration-300 border shadow-sm hover:shadow-md cursor-pointer",
                 isExpanded ? "ring-2 ring-primary bg-card" : (isPast ? "bg-muted/30" : "bg-card")
             )}
-            onClick={toggleExpand}
         >
             <CardContent className="p-4 sm:p-6">
                 {/* Header */}
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start mb-4 group cursor-pointer" onClick={toggleExpand}>
                     <div className="space-y-1">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span className="font-medium">{format(scheduleDate, "yyyy. MM. dd (EEE)")}</span>
                             <span className={cn(
                                 "text-xs px-1.5 py-0.5 rounded-full",
                                 isPast ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary font-bold"
@@ -71,12 +70,16 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
 
                         </div>
                         <h3 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
-                            Serving Team
+                            {format(scheduleDate, "yyyy. MM. dd (EEE)")}
                             {isExpanded ?
                                 <ChevronUp className="h-5 w-5 text-muted-foreground animate-in fade-in zoom-in" /> :
                                 <ChevronDown className="h-5 w-5 text-muted-foreground animate-in fade-in zoom-in" />
                             }
                         </h3>
+                    </div>
+
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <ServingHeaderMenu scheduleId={schedule.id} teamId={teamId} />
                     </div>
                 </div>
 
@@ -194,7 +197,7 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                 )}
 
             </CardContent>
-        </Card>
+        </Card >
     );
 }
 

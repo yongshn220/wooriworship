@@ -20,12 +20,16 @@ import { usersAtom } from "@/global-states/userState";
 import { teamAtom } from "@/global-states/teamState";
 import { useRouter } from "next/navigation";
 import { getPathServing } from "@/components/util/helper/routes";
+import { FormMode } from "@/components/constants/enums";
+import { ServingSchedule } from "@/models/serving";
 
 interface Props {
     teamId: string;
+    mode?: FormMode;
+    initialData?: ServingSchedule;
 }
 
-export function ServingForm({ teamId }: Props) {
+export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Props) {
     const router = useRouter();
     const team = useRecoilValue(teamAtom(teamId));
     const teamMembers = useRecoilValue(usersAtom(team?.users));
@@ -45,38 +49,78 @@ export function ServingForm({ teamId }: Props) {
     const [activeRoleForSelection, setActiveRoleForSelection] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Initialize roles
+    // Initialize roles & data
     useEffect(() => {
         if (teamId) {
             ServingService.initStandardRoles(teamId)
                 .then(() => setRolesUpdater(prev => prev + 1))
                 .catch(console.error);
         }
-    }, [teamId, setRolesUpdater]);
+
+        if (mode === FormMode.EDIT && initialData) {
+            // Pre-fill data
+            const date = new Date(initialData.date);
+            // Adjust for timezone offset if necessary, but usually date string yyyy-MM-dd is parsed to local midnight or UTC
+            // Here assuming standard string parsing is sufficient or explicit adjustment needed
+            // Actually, "2024-05-01" -> new Date("2024-05-01") is usually UTC based in some envs or Local in others.
+            // Safest to parse yyyy-MM-dd parts.
+            const [y, m, d] = initialData.date.split('-').map(Number);
+            const parsedDate = new Date(y, m - 1, d);
+
+            setSelectedDate(parsedDate);
+
+            const assignments: Record<string, string[]> = {};
+            initialData.roles.forEach(r => {
+                assignments[r.roleId] = r.memberIds;
+            });
+            setRoleAssignments(assignments);
+        }
+    }, [teamId, setRolesUpdater, mode, initialData]);
 
     // Helpers
     const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || "Unknown";
 
-    const handleCreate = async () => {
+    const handleSubmit = async () => {
         if (!selectedDate) return;
         setIsLoading(true);
         try {
-            const payload = {
-                teamId,
-                date: format(selectedDate, "yyyy-MM-dd"),
-                roles: Object.entries(roleAssignments).map(([roleId, memberIds]) => ({
-                    roleId,
-                    memberIds,
-                })),
-            };
+            const dateString = format(selectedDate, "yyyy-MM-dd");
+            const rolesData = Object.entries(roleAssignments).map(([roleId, memberIds]) => ({
+                roleId,
+                memberIds,
+            }));
 
-            await ServingService.createSchedule(teamId, payload);
-            toast({ title: "Schedule created!" });
+            if (mode === FormMode.CREATE) {
+                const payload = {
+                    teamId,
+                    date: dateString,
+                    roles: rolesData,
+                };
+                await ServingService.createSchedule(teamId, payload);
+                toast({ title: "Schedule created!" });
+            } else {
+                if (!initialData) return;
+                const payload = {
+                    ...initialData,
+                    date: dateString,
+                    roles: rolesData,
+                };
+                await ServingService.updateSchedule(teamId, payload);
+                toast({ title: "Schedule updated!" });
+            }
 
-            // Optimistic update
-            const newSchedule = await ServingService.getScheduleByDate(teamId, payload.date);
+            // Optimistic update / Refetch
+            const newSchedule = await ServingService.getScheduleByDate(teamId, dateString);
             if (newSchedule) {
-                setSchedules(prev => [...prev, newSchedule].sort((a, b) => a.date.localeCompare(b.date)));
+                // Determine how to update atom - simplification: just refetch list or append
+                // Ideally replace item if edit
+                setSchedules(prev => {
+                    if (mode === FormMode.EDIT) {
+                        return prev.map(s => s.id === newSchedule.id ? newSchedule : s);
+                    } else {
+                        return [...prev, newSchedule].sort((a, b) => a.date.localeCompare(b.date));
+                    }
+                });
             }
             router.push(getPathServing(teamId));
         } catch (e) {
@@ -309,11 +353,11 @@ export function ServingForm({ teamId }: Props) {
                                     <ChevronLeft className="w-6 h-6" />
                                 </Button>
                                 <Button
-                                    onClick={handleCreate}
+                                    onClick={handleSubmit}
                                     disabled={isLoading}
                                     className="h-14 flex-1 rounded-full bg-primary text-primary-foreground text-lg font-bold shadow-xl hover:bg-primary/90 active:scale-95 transition-all"
                                 >
-                                    {isLoading ? "Saving..." : "Create Schedule"} <Check className="ml-2 w-5 h-5" />
+                                    {isLoading ? "Saving..." : (mode === FormMode.CREATE ? "Create Schedule" : "Update Schedule")} <Check className="ml-2 w-5 h-5" />
                                 </Button>
                             </div>
                         </motion.div>

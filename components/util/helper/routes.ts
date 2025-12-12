@@ -67,3 +67,7 @@ export function getPathWorshipView(teamId: string, worshipId: string) {
 export function getPathCreateServing(teamId: string) {
   return "/" + Page.BOARD + `/${teamId}` + "/" + "create-serving"
 }
+
+export function getPathEditServing(teamId: string, servingId: string) {
+  return "/" + Page.BOARD + `/${teamId}` + "/" + "edit-serving" + `/${servingId}`
+}

@@ -128,16 +128,7 @@ export default function ServingPage() {
                 )}
             </div>
 
-            {/* Floating Action Button */}
-            <div className="absolute bottom-6 right-6 z-20">
-                <Button
-                    size="icon"
-                    className="h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 text-white transition-transform active:scale-95"
-                    onClick={() => router.push(getPathCreateServing(teamId))}
-                >
-                    <Plus className="h-6 w-6" />
-                </Button>
-            </div>
+            {/* Floating Action Button - Removed as moved to top nav */}
         </div>
     );
 }
