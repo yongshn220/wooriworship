@@ -84,10 +84,7 @@ export default function ServingPage() {
 
                 {/* Upcoming Section */}
                 <section className="space-y-4">
-                    <div className="flex items-center gap-2 text-lg font-bold text-foreground px-1">
-                        <Calendar className="w-5 h-5 text-primary" />
-                        <h2>Upcoming Schedules</h2>
-                    </div>
+
 
                     {upcoming.length === 0 ? (
                         <div className="flex flex-col items-center justify-center p-8 bg-card/50 rounded-xl border border-dashed border-border text-muted-foreground">

@@ -11,8 +11,11 @@ import {
   Eye,
   Download,
   Music,
-  Play
+  Play,
+  ClipboardList
 } from "lucide-react";
+
+import { Separator } from "@/components/ui/separator";
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -218,22 +221,18 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                 exit={{ opacity: 0, height: 0 }}
                 className="space-y-6"
               >
-                {/* Meta Data Row */}
-                <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                  <div className="flex items-center gap-2 sm:gap-4">
-                    {team?.name && (
-                      <Badge variant="secondary" className="bg-muted text-muted-foreground hover:bg-muted/80 text-xs sm:text-sm">
-                        {team.name}
-                      </Badge>
-                    )}
-                    {creator?.name && (
-                      <div className="flex items-center gap-1 sm:gap-2 font-medium text-foreground px-2 py-1 bg-muted/50 rounded-md text-xs sm:text-sm">
-                        <span className="text-muted-foreground font-normal hidden sm:inline">Created by</span>
-                        {creator.name}
-                      </div>
-                    )}
-
-                  </div>
+                {/* Service Members Button */}
+                <div className="flex items-center gap-2">
+                  <ServingRosterDialog
+                    teamId={teamId}
+                    date={format(worship.worship_date.toDate(), "yyyy-MM-dd")}
+                    trigger={
+                      <Button variant="outline" size="sm" className="gap-2 text-primary border-primary/20 hover:bg-primary/5">
+                        <ClipboardList className="h-4 w-4" />
+                        Service Members
+                      </Button>
+                    }
+                  />
                 </div>
 
                 {/* Description (Context) */}
@@ -245,21 +244,15 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                   </div>
                 )}
 
+
+                <Separator className="my-4" />
+
                 <div className="space-y-3">
                   {/* Actions & List Header */}
                   <div className="flex flex-col gap-3 pt-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-base sm:text-lg font-semibold text-foreground">
-                        <Music className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                        Song List
-                      </div>
-
+                    <div className="flex items-center justify-end w-full"> {/* Justify end, remove Song List title */}
                       <div className="flex items-center gap-1">
-                        {/* Serving Roster Button */}
-                        <ServingRosterDialog
-                          teamId={teamId}
-                          date={format(worship.worship_date.toDate(), "yyyy-MM-dd")}
-                        />
+                        {/* Serving Roster Button Removed from here */}
 
                         {hasLink && (
                           <Button
