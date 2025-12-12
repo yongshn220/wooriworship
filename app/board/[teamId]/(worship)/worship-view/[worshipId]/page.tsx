@@ -36,8 +36,10 @@ export default function WorshipLivePage({ params }: any) {
     const timerRef = useRef<NodeJS.Timeout | null>(null)
 
     function handleOpenChange(isOpen: boolean) {
+        // Prevent implicit closing (Esc, Background click) to avoid accidental exits during mode switches
+        // Users must use the "Exit Worship" button in the menu
         if (!isOpen) {
-            router.replace(getPathPlan(teamId) + `?expanded=${worshipId}`)
+            // router.replace(getPathPlan(teamId) + `?expanded=${worshipId}`)
         }
     }
 
@@ -87,7 +89,12 @@ export default function WorshipLivePage({ params }: any) {
 
     return (
         <Dialog open={true} onOpenChange={handleOpenChange}>
-            <DialogContentNoCloseButton className="flex-center w-full max-w-8xl h-full p-0 bg-transparent border-none shadow-none focus:outline-none ring-0 outline-none">
+            <DialogContentNoCloseButton
+                onInteractOutside={(e) => e.preventDefault()}
+                onPointerDownOutside={(e) => e.preventDefault()}
+                onFocusOutside={(e) => e.preventDefault()}
+                className="flex-center w-full max-w-8xl h-full p-0 bg-transparent border-none shadow-none focus:outline-none ring-0 outline-none"
+            >
                 <VisuallyHidden>
                     <DialogTitle>Worship Live Page</DialogTitle>
                 </VisuallyHidden>
