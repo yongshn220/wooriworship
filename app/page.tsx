@@ -40,10 +40,10 @@ export default function RoutePage() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
-        if (!authUser.emailVerified) {
-          setAuthStatus(AuthStatus.EMAIL_NOT_VERIFIED);
-          return;
-        }
+        // if (!authUser.emailVerified) {
+        //   setAuthStatus(AuthStatus.EMAIL_NOT_VERIFIED);
+        //   return;
+        // }
 
         UserService.getById(authUser.uid).then((user: any) => {
           if (!user) {
