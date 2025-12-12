@@ -1,6 +1,6 @@
-import {BaseService} from ".";
-import {SongComment} from "@/models/song_comments";
-import {Timestamp} from "@firebase/firestore";
+import BaseService from "./BaseService";
+import { SongComment } from "@/models/song_comments";
+import { Timestamp } from "@firebase/firestore";
 
 
 class SongCommentService extends BaseService {
@@ -8,18 +8,18 @@ class SongCommentService extends BaseService {
     super("song_comments");
   }
 
-  async getSongComments(songId:string, teamId: string) {
+  async getSongComments(songId: string, teamId: string) {
     const songComments = await this.getByFilters([
-    {
+      {
         a: 'song_id',
         b: '==',
         c: songId
-    },
-    {
+      },
+      {
         a: 'team_id',
         b: '==',
         c: teamId
-    }
+      }
     ]);
     return songComments
   }
@@ -40,8 +40,8 @@ class SongCommentService extends BaseService {
 
   async updateSongComment(commentId: string, comment: any) {
     const songComment: any = {
-        last_updated_time: Timestamp.fromDate(new Date()),
-        comment: comment
+      last_updated_time: Timestamp.fromDate(new Date()),
+      comment: comment
     }
     return await this.update(commentId, songComment);
   }
@@ -51,7 +51,7 @@ class SongCommentService extends BaseService {
       await this.delete(commentId);
       return true;
     } catch (err) {
-      console.log("error occured: "+err);
+      console.log("error occured: " + err);
       return false;
     }
   }

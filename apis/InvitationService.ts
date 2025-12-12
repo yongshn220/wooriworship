@@ -1,5 +1,5 @@
 import { InvitationStatus } from "@/components/constants/enums";
-import { BaseService } from ".";
+import BaseService from "./BaseService";
 import EmailService from "./EmailService";
 
 class InvitationService extends BaseService {
@@ -7,7 +7,7 @@ class InvitationService extends BaseService {
         super("invitations");
     }
 
-    async createInvitation(senderId: string, senderEmail:string, teamId: string, teamName: string, receiverEmail: string) {
+    async createInvitation(senderId: string, senderEmail: string, teamId: string, teamName: string, receiverEmail: string) {
         const registered_user = await this.getByFilters([
             {
                 a: 'email',
@@ -33,7 +33,7 @@ class InvitationService extends BaseService {
         return await this.create(newInvitation)
     }
 
-    async getPendingReceivedInvitations(email:string) {
+    async getPendingReceivedInvitations(email: string) {
         const invitations = await this.getByFilters([
             {
                 a: 'receiver_email',

@@ -1,4 +1,4 @@
-import {BaseService} from ".";
+import BaseService from "./BaseService";
 
 class TagService extends BaseService {
   constructor() {
@@ -18,15 +18,15 @@ class TagService extends BaseService {
 
   async addNewTag(teamId: string, tagName: string) {
     const newTag = {
-        team_id: teamId,
-        name: tagName
+      team_id: teamId,
+      name: tagName
     }
     return await this.update(`${teamId}-스플릿-${tagName}`, newTag);
   }
 
-  async addNewTags(teamId:string, tagNames: Array<string>) {
+  async addNewTags(teamId: string, tagNames: Array<string>) {
     const updates = [];
-    for(let tagName of tagNames) {
+    for (let tagName of tagNames) {
       updates.push(this.addNewTag(teamId, tagName));
     }
     try {
@@ -34,7 +34,7 @@ class TagService extends BaseService {
       console.log('Tag Upload finished');
       return true
     } catch (err) {
-      console.error('Error occured: '+err);
+      console.error('Error occured: ' + err);
       return false
     }
   }
