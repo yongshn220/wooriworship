@@ -5,6 +5,8 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { servingRolesAtom, fetchServingRolesSelector, servingSchedulesAtom, servingRolesUpdaterAtom } from "@/global-states/servingState";
 import { ServingService } from "@/apis";
+import PushNotificationService from "@/apis/PushNotificationService";
+import { auth } from "@/firebase";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -97,6 +99,18 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     roles: rolesData,
                 };
                 await ServingService.createSchedule(teamId, payload);
+
+                // Notify assigned members
+                const allAssignedMembers = Array.from(new Set(
+                    Object.values(roleAssignments).flat()
+                ));
+                await PushNotificationService.notifyMembersServingAssignment(
+                    teamId,
+                    auth.currentUser?.uid || "",
+                    selectedDate,
+                    allAssignedMembers
+                );
+
                 toast({ title: "Schedule created!" });
             } else {
                 if (!initialData) return;
