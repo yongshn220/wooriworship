@@ -6,7 +6,7 @@ import { Carousel, type CarouselApi, CarouselContent, } from "@/components/ui/ca
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { worshipAtom } from "@/global-states/worship-state";
 import { WorshipSongHeader } from "@/models/worship";
-import { worshipIndexAtom, worshipIndexChangeEventAtom, worshipNoteAtom } from "../_states/worship-detail-states";
+import { worshipIndexAtom, worshipIndexChangeEventAtom, worshipNoteAtom, worshipMultipleSheetsViewModeAtom } from "../_states/worship-detail-states";
 import { WorshipLiveCarouselItemWrapper } from "./worship-live-carousel-item";
 
 interface Props {
@@ -83,6 +83,20 @@ export function WorshipLiveCarousel({ worshipId }: Props) {
             api.off("select", handleSelect)
         }
     }, [sortedMusicSheetCounts, setWorshipIndex, setWorshipNote, api])
+
+    const multipleSheetsViewMode = useRecoilValue(worshipMultipleSheetsViewModeAtom)
+
+    // Reset state when view mode changes to prevent stale index/counts causing crashes
+    useEffect(() => {
+        // Do not clear musicSheetCounts here; child components manage their own counts via ID. Clearing causes race conditions.
+        // setMusicSheetCounts([]) 
+
+        // Reset index to 0 to prevent out-of-bounds errors when switching modes (e.g. from 10 pages to 1 page)
+        setWorshipIndex((prev) => ({ ...prev, current: 0 }))
+        if (api) {
+            api.scrollTo(0, true) // Jump to 0 immediately
+        }
+    }, [multipleSheetsViewMode, setWorshipIndex, api])
 
     useEffect(() => {
         let totalCounts = 0
