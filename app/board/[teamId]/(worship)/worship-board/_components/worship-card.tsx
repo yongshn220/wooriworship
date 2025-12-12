@@ -12,8 +12,15 @@ import {
   Download,
   Music,
   Play,
-  ClipboardList
+  ClipboardList,
+  Sparkles
 } from "lucide-react";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import { Separator } from "@/components/ui/separator";
 
@@ -219,7 +226,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="space-y-6"
+                className="space-y-3"
               >
                 {/* Service Members Button */}
                 <div className="flex items-center gap-2">
@@ -245,46 +252,13 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                 )}
 
 
-                <Separator className="my-4" />
+                <Separator className="my-1" />
 
                 <div className="space-y-3">
                   {/* Actions & List Header */}
+                  {/* Actions & List Header - Actions removed, kept container for spacing if needed or remove entirely if empty */}
                   <div className="flex flex-col gap-3 pt-2">
-                    <div className="flex items-center justify-end w-full"> {/* Justify end, remove Song List title */}
-                      <div className="flex items-center gap-1">
-                        {/* Serving Roster Button Removed from here */}
-
-                        {hasLink && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            asChild
-                            className="text-muted-foreground hover:text-primary h-8 text-xs sm:text-sm px-2 cursor-pointer"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <a
-                              href={worship.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <ExternalLink className="mr-1.5 h-3 w-3 sm:h-4 sm:w-4" />
-                              Link
-                            </a>
-                          </Button>
-                        )}
-                        <DownloadMusicSheetDialog worshipId={worship.id}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-muted-foreground hover:text-foreground h-8 text-xs sm:text-sm px-2 w-full"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Download className="mr-1.5 h-3 w-3 sm:h-4 sm:w-4" />
-                            Download
-                          </Button>
-                        </DownloadMusicSheetDialog>
-                      </div>
-                    </div>
+                    {/* Empty now as buttons moved to bottom */}
                   </div>
 
                   {/* Rich Song List */}
@@ -320,10 +294,55 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                     )}
                   </div>
 
-                  <Button size="sm" onClick={handleStartWorship} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm h-10 sm:h-10 text-sm sm:text-base font-semibold">
-                    <Play className="mr-2 h-3 w-3 sm:h-4 sm:w-4 fill-current" />
-                    Start Worship
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button size="sm" onClick={handleStartWorship} className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm h-10 sm:h-10 text-sm sm:text-base font-semibold rounded-full">
+                      <Play className="mr-2 h-3 w-3 sm:h-4 sm:w-4 fill-current" />
+                      Start Worship
+                    </Button>
+
+                    <Popover>
+                      <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-10 w-10 p-0 rounded-full shrink-0 border-2 border-primary text-primary font-bold shadow-md hover:shadow-lg hover:bg-primary/5 transition-all justify-center"
+                        >
+                          <ChevronUp className="h-5 w-5" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-40 p-1 mb-2" align="end" side="top" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex flex-col gap-1">
+                          {hasLink && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              asChild
+                              className="justify-start h-9 w-full font-normal"
+                            >
+                              <a
+                                href={worship.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <ExternalLink className="mr-2 h-4 w-4" />
+                                Link
+                              </a>
+                            </Button>
+                          )}
+                          <DownloadMusicSheetDialog worshipId={worship.id}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="justify-start h-9 w-full font-normal"
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              Download
+                            </Button>
+                          </DownloadMusicSheetDialog>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
 
 
                 </div>
