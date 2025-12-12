@@ -67,7 +67,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                             <WorshipControlItem icon={<MoreHorizontal className="w-5 h-5" />} />
                         </div>
                     </PopoverTrigger>
-                    <PopoverContent side="top" className="mb-4 bg-white/90 backdrop-blur-xl border-white/20 w-64 p-0 overflow-hidden shadow-2xl rounded-2xl">
+                    <PopoverContent side="top" className="mb-4 bg-white/90 backdrop-blur-xl border-black/5 w-80 p-0 overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.08)] rounded-2xl">
                         <WorshipSettingsMenu teamId={teamId} worshipId={worshipId} />
                     </PopoverContent>
                 </Popover>

@@ -16,7 +16,7 @@ export function MultipleSheetsViewSelect() {
 
     return (
         <Select value={mode} onValueChange={(value) => handleSetMode(value as DirectionType)}>
-            <SelectTrigger className="flex-1 flex-end border-0 shadow-none" >
+            <SelectTrigger className="w-[140px] border-none shadow-none focus:ring-0 focus:ring-offset-0 ring-0 outline-none text-right justify-end px-0 font-medium text-gray-900" >
                 <SelectValue placeholder="Mode" />
             </SelectTrigger>
             <SelectContent>
