@@ -18,9 +18,10 @@ interface Props {
   teamId: string
   songTitle: string
   songId: string
+  readOnly?: boolean
 }
 
-export function SongDetailMenuButton({ teamId, songTitle, songId }: Props) {
+export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = false }: Props) {
   const song = useRecoilValue(songAtom(songId))
   const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -83,10 +84,12 @@ export function SongDetailMenuButton({ teamId, songTitle, songId }: Props) {
               <SquarePen className="mr-3 w-5 h-5" />
               <p>Edit</p>
             </Button>
-            <Button variant="ghost" className="text-red-600 focus:bg-red-50 focus:text-red-500 cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteDialogOpen((prev) => !prev)}>
-              <Trash2Icon className="mr-3 w-5 h-5" />
-              <p>Delete</p>
-            </Button>
+            {!readOnly && (
+              <Button variant="ghost" className="text-red-600 focus:bg-red-50 focus:text-red-500 cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteDialogOpen((prev) => !prev)}>
+                <Trash2Icon className="mr-3 w-5 h-5" />
+                <p>Delete</p>
+              </Button>
+            )}
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

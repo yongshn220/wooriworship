@@ -1,6 +1,6 @@
 import { Page } from "@/components/constants/enums";
 import { FilterIcon, SquarePenIcon, SearchIcon, MenuIcon, XIcon, ArrowLeftIcon } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
 import { getPathCreateNotice, getPathCreatePlan, getPathCreateSong } from "@/components/util/helper/routes";
@@ -20,6 +20,29 @@ interface HeaderConfig {
   searchComponent?: React.ReactNode;
 }
 
+interface ActionButtonProps {
+  onClick: () => void;
+  icon: any;
+  label?: string;
+  variant?: 'default' | 'ghost';
+}
+
+const ActionButton = ({ onClick, icon: Icon, label, variant = 'default' }: ActionButtonProps) => (
+  <motion.button
+    onClick={onClick}
+    whileHover={{ scale: 1.05, rotateX: 10, rotateY: 10, y: -2 }}
+    whileTap={{ scale: 0.95 }}
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    className={`group relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-300 ${variant === 'default' ? 'bg-gradient-to-br from-white to-gray-50 border border-gray-100 shadow-sm hover:shadow-md' : 'hover:bg-gray-100/50'}`}
+    style={{ perspective: 1000 }}
+  >
+    {variant === 'default' && <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity" />}
+    <Icon className={`w-5 h-5 transition-colors ${variant === 'default' ? 'text-gray-600 group-hover:text-blue-600' : 'text-gray-500 group-hover:text-gray-800'}`} />
+    {label && <span className={`text-sm font-medium transition-colors ${variant === 'default' ? 'text-gray-600 group-hover:text-blue-600' : 'text-gray-500 group-hover:text-gray-800'}`}>{label}</span>}
+  </motion.button>
+);
+
 export function BoardTopNavBar() {
   const currentPage = useRecoilValue(currentPageAtom);
   const teamId = useRecoilValue(currentTeamIdAtom);
@@ -29,6 +52,10 @@ export function BoardTopNavBar() {
   const setSongSearch = useSetRecoilState(songSearchInputAtom);
   const setPlanSearch = useSetRecoilState(planSearchInputAtom);
 
+  useEffect(() => {
+    setIsSearchOpen(false);
+  }, [currentPage]);
+
   const handleCloseSearch = () => {
     setIsSearchOpen(false);
     // Reset search inputs based on current page or just reset all to be safe/simple
@@ -36,22 +63,7 @@ export function BoardTopNavBar() {
     if (currentPage === Page.WORSHIP_BOARD) setPlanSearch("");
   };
 
-  // Premium 3D Button Component
-  const ActionButton = ({ onClick, icon: Icon, label, variant = 'default' }: { onClick: () => void, icon: any, label?: string, variant?: 'default' | 'ghost' }) => (
-    <motion.button
-      onClick={onClick}
-      whileHover={{ scale: 1.05, rotateX: 10, rotateY: 10, y: -2 }}
-      whileTap={{ scale: 0.95 }}
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      className={`group relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-300 ${variant === 'default' ? 'bg-gradient-to-br from-white to-gray-50 border border-gray-100 shadow-sm hover:shadow-md' : 'hover:bg-gray-100/50'}`}
-      style={{ perspective: 1000 }}
-    >
-      {variant === 'default' && <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity" />}
-      <Icon className={`w-5 h-5 transition-colors ${variant === 'default' ? 'text-gray-600 group-hover:text-blue-600' : 'text-gray-500 group-hover:text-gray-800'}`} />
-      {label && <span className={`text-sm font-medium transition-colors ${variant === 'default' ? 'text-gray-600 group-hover:text-blue-600' : 'text-gray-500 group-hover:text-gray-800'}`}>{label}</span>}
-    </motion.button>
-  );
+
 
   const config: Partial<Record<Page, HeaderConfig>> = useMemo(() => {
     const defaultConfig: HeaderConfig = {

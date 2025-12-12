@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect, useState } from "react";
 import { FormMode } from "@/components/constants/enums";
 import { Label } from "@/components/ui/label";
@@ -9,18 +11,17 @@ import { cn } from "@/lib/utils";
 import { auth } from "@/firebase";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
-import { noticeAtom, noticeIdsAtom, noticeUpdaterAtom, noticeIdsUpdaterAtom } from "@/global-states/notice-state";
+import { noticeAtom, noticeUpdaterAtom, noticeIdsUpdaterAtom } from "@/global-states/notice-state";
 
 import { NoticeService, StorageService } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/components/elements/util/image/multiple-image-uploader";
 import PdfUploader from "@/components/elements/util/image/pdf-uploader";
 import { UploadedImageFileCard } from "@/components/elements/util/image/uploaded-image-file-card";
-import { UploadIcon, ImageIcon, FileText } from "lucide-react";
-import { BaseForm } from "@/components/elements/util/form/base-form";
+import { ImageIcon, FileText, ArrowRight, ChevronLeft, Check, UploadCloud } from "lucide-react";
 import { getPathNotice } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
-
+import { AnimatePresence, motion } from "framer-motion";
 
 interface Props {
   mode: FormMode
@@ -38,6 +39,12 @@ export function NoticeForm({ mode, noticeId }: Props) {
   const setNoticeIdsUpdater = useSetRecoilState(noticeIdsUpdaterAtom)
   const noticeUpdater = useSetRecoilState(noticeUpdaterAtom)
   const notice = useRecoilValue(noticeAtom(noticeId))
+
+  // Form State
+  const [step, setStep] = useState(0); // 0: Title, 1: Content, 2: Attachments
+  const [direction, setDirection] = useState(0);
+  const totalSteps = 3;
+
   const [input, setInput] = useState<NoticeInput>({
     title: (mode === FormMode.EDIT) ? notice?.title ?? "" : "",
     body: (mode === FormMode.EDIT) ? notice?.body ?? "" : "",
@@ -75,6 +82,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
 
   async function handleEdit() {
     try {
+      setIsLoading(true)
       const curImageUrls = imageFileContainers.map(item => item.url)
       const filesToAdd = imageFileContainers.filter(item => !!item.id) as Array<ImageFileContainer>
       const urlsToDelete = notice.file_urls.filter(url => !curImageUrls.includes(url))
@@ -103,6 +111,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
     }
     catch (e) {
       console.log(e);
+      toast({ description: "An error occurred." });
     }
     finally {
       setIsLoading(false)
@@ -125,6 +134,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
         toast({
           description: "Fail to create notice-board. Please try again."
         })
+        return
       }
 
       toast({
@@ -138,6 +148,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
     }
     catch (e) {
       console.log(e);
+      toast({ description: "An error occurred." });
     }
     finally {
       setIsLoading(false)
@@ -145,94 +156,229 @@ export function NoticeForm({ mode, noticeId }: Props) {
     }
   }
 
+  // Navigation Logic
+  const goToStep = (targetStep: number) => {
+    setDirection(targetStep > step ? 1 : -1);
+    setStep(targetStep);
+  }
+
+  const nextStep = () => {
+    if (step < totalSteps - 1) goToStep(step + 1);
+  }
+
+  const prevStep = () => {
+    if (step > 0) goToStep(step - 1);
+  }
+
+  // Animation Variants
+  const slideVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? "100%" : "-100%",
+      opacity: 0,
+      scale: 0.95,
+      rotateY: direction > 0 ? 20 : -20,
+      position: 'absolute' as const
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      rotateY: 0,
+      position: 'relative' as const
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? "100%" : "-100%",
+      opacity: 0,
+      scale: 0.95,
+      rotateY: direction < 0 ? 20 : -20,
+      position: 'absolute' as const
+    })
+  };
+
   return (
-    <BaseForm title="" description="">
-      <div className="flex flex-col w-full max-w-4xl mx-auto min-h-[600px]">
+    <div className="fixed inset-0 z-[40] bg-gray-50 flex flex-col items-center justify-center overflow-hidden">
 
-        {/* Header Action Row */}
-        <div className="flex flex-row justify-between items-start mb-8 pb-4 border-b border-gray-100">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {mode === FormMode.EDIT ? "Edit Notice" : "New Notice"}
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">Share updates and news with your team.</p>
-          </div>
-          <div>
-            {
-              (mode === FormMode.EDIT)
-                ? <Button type="submit" onClick={handleEdit} className="min-w-[100px] bg-gray-900 hover:bg-black text-white">{isLoading ? "Saving..." : "Save Changes"}</Button>
-                : <Button type="submit" onClick={handleCreate} className="min-w-[100px] bg-gray-900 hover:bg-black text-white">{isLoading ? "Creating..." : "Publish"}</Button>
-            }
-          </div>
+      {/* 1. Header Progress */}
+      <div className="fixed top-8 left-0 right-0 z-50 px-6 flex flex-col items-center gap-4">
+        <div className="flex gap-2 p-1 bg-white/50 backdrop-blur-md rounded-full shadow-sm border border-white/20">
+          {["Title", "Content", "Attachments"].map((label, idx) => (
+            <button
+              key={idx}
+              onClick={() => goToStep(idx)}
+              className={cn(
+                "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
+                step === idx
+                  ? "bg-black text-white shadow-md scale-105"
+                  : "text-gray-400 hover:text-gray-600 hover:bg-white/50"
+              )}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-
-        {/* Title Input */}
-        <div className="mb-6 group">
-          <Input
-            id="title"
-            placeholder="Untitled Notice"
-            value={input.title}
-            onChange={(e) => setInput((prev => ({ ...prev, title: e.target.value })))}
-            autoFocus={true}
-            className="text-4xl sm:text-5xl font-extrabold border-none px-0 shadow-none focus-visible:ring-0 placeholder:text-gray-200 text-gray-900 h-auto py-2 bg-transparent transition-all"
-          />
-        </div>
-
-        {/* Body Input */}
-        <div className="flex-1 mb-8 group">
-          <Textarea
-            className="min-h-[400px] w-full text-lg resize-none border-none px-0 shadow-none focus-visible:ring-0 leading-loose text-gray-700 placeholder:text-gray-300 bg-transparent p-0"
-            placeholder="Type '/' for commands or start writing..."
-            value={input.body}
-            onChange={(e) => setInput((prev => ({ ...prev, body: e.target.value })))}
-          />
-        </div>
-
-        {/* Floating/Fixed Bottom Toolbar for Attachments */}
-        <div className="sticky bottom-4 z-10 w-full bg-white/80 backdrop-blur-md border border-gray-200 shadow-lg rounded-xl p-3 transition-all">
-          <div className="flex items-center gap-4">
-            <span className="text-xs font-bold text-gray-400 px-2 uppercase tracking-tight">Add to post</span>
-
-            <div className="h-4 w-px bg-gray-200 mx-1"></div>
-
-            <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
-              <div className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "gap-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer rounded-lg px-3")}>
-                <ImageIcon className="h-4 w-4" />
-                <span className="font-medium">Image</span>
-              </div>
-            </MultipleImageUploader>
-            <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
-              <div className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "gap-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 cursor-pointer rounded-lg px-3")}>
-                <FileText className="h-4 w-4" />
-                <span className="font-medium">PDF</span>
-              </div>
-            </PdfUploader>
-
-            {/* File Count Indicators if any */}
-            {(imageFileContainers.length > 0) && (
-              <div className="ml-auto flex items-center gap-2 text-xs text-blue-600 font-medium bg-blue-50 px-3 py-1.5 rounded-full">
-                <span>{imageFileContainers.length} files attached</span>
-              </div>
-            )}
-          </div>
-
-          {/* Expanded File Preview Area inside the toolbar or just above? */}
-          {/* Putting it above avoids layout shifts in sticky. */}
-        </div>
-
-        {imageFileContainers.length > 0 && (
-          <div className="mt-4 mb-20 flex-start w-full h-auto bg-gray-50 border border-gray-100 rounded-lg p-4">
-            <div className="flex w-full gap-4 overflow-x-auto items-center p-1">
-              {
-                imageFileContainers?.map((imageFileContainer, i) => (
-                  <UploadedImageFileCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImage(index)} />
-                ))
-              }
-            </div>
-          </div>
-        )}
-
       </div>
-    </BaseForm>
+
+      {/* 2. Main Content Area */}
+      <div className="w-full max-w-xl h-full px-4 sm:px-6 pt-24 pb-20 flex flex-col relative perspective-1000">
+        <AnimatePresence initial={false} mode="popLayout" custom={direction}>
+
+          {/* Step 0: Title */}
+          {step === 0 && (
+            <motion.div
+              key="step0"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="flex-1 flex flex-col justify-center space-y-8 w-full"
+            >
+              <div className="space-y-4 text-center">
+                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 1</Label>
+                <h2 className="text-2xl font-bold text-gray-900">What is this notice about?</h2>
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 flex flex-col gap-6">
+                <div className="space-y-2">
+                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Title</Label>
+                  <Input
+                    autoFocus
+                    placeholder="Notice Title..."
+                    value={input.title}
+                    onChange={(e) => setInput(prev => ({ ...prev, title: e.target.value }))}
+                    className="text-2xl font-black bg-gray-50 border-gray-100 h-16 rounded-2xl focus-visible:ring-blue-500/20 placeholder:text-gray-300"
+                  />
+                </div>
+              </div>
+
+              <Button
+                className="h-14 w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl mt-auto transition-transform active:scale-95 mb-24"
+                onClick={nextStep}
+                disabled={!input.title}
+              >
+                Next Step <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </motion.div>
+          )}
+
+          {/* Step 1: Content */}
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="flex-1 flex flex-col justify-center space-y-8 w-full"
+            >
+              <div className="space-y-4 text-center">
+                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Step 2</Label>
+                <h2 className="text-2xl font-bold text-gray-900">Details</h2>
+                {input.title && <h3 className="text-xl font-medium text-blue-600 break-words mt-2 px-4">{input.title}</h3>}
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 flex flex-col min-h-[300px]">
+                <Textarea
+                  className="w-full text-lg resize-none border-none px-0 shadow-none focus-visible:ring-0 leading-loose text-gray-700 placeholder:text-gray-300 bg-transparent p-0 min-h-[250px]"
+                  placeholder="Type '/' for commands or start writing..."
+                  value={input.body}
+                  onChange={(e) => setInput((prev => ({ ...prev, body: e.target.value })))}
+                />
+              </div>
+
+              <div className="flex gap-4 mt-auto pb-32">
+                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
+                  <ChevronLeft className="w-6 h-6" />
+                </Button>
+                <Button
+                  className="h-14 flex-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl active:scale-95 transition-all"
+                  onClick={nextStep}
+                >
+                  Next Step
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 2: Attachments */}
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="flex-1 flex flex-col justify-center space-y-4 w-full"
+            >
+              <div className="space-y-4 text-center">
+                <Label className="text-sm font-bold text-blue-600 uppercase tracking-wider">Final Step</Label>
+                <h2 className="text-2xl font-bold text-gray-900">Attachments</h2>
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-6 flex flex-col overflow-hidden min-h-0 flex-1">
+
+                {/* Upload Buttons */}
+                <div className="flex items-center gap-4 justify-center p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                  <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
+                    <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all")}>
+                      <ImageIcon className="h-5 w-5" />
+                      <span className="font-bold">Add Image</span>
+                    </div>
+                  </MultipleImageUploader>
+
+                  <div className="h-8 w-px bg-gray-200"></div>
+
+                  <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
+                    <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all")}>
+                      <FileText className="h-5 w-5" />
+                      <span className="font-bold">Add PDF</span>
+                    </div>
+                  </PdfUploader>
+                </div>
+
+                <div className="flex-1 overflow-y-auto min-h-[100px]">
+                  {imageFileContainers.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center text-gray-300 space-y-2 py-8">
+                      <UploadCloud className="w-12 h-12 opacity-20" />
+                      <p className="text-sm font-medium">No files attached</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                      {
+                        imageFileContainers?.map((imageFileContainer, i) => (
+                          <UploadedImageFileCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImage(index)} />
+                        ))
+                      }
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+              <div className="flex gap-4 mt-auto pb-32">
+                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
+                  <ChevronLeft className="w-6 h-6" />
+                </Button>
+                <Button
+                  onClick={mode === FormMode.CREATE ? handleCreate : handleEdit}
+                  disabled={isLoading}
+                  className="h-14 flex-1 rounded-full bg-blue-600 text-white text-lg font-bold shadow-xl hover:bg-blue-700 active:scale-95 transition-all"
+                >
+                  {isLoading ? "Saving..." : (mode === FormMode.CREATE ? "Publish Notice" : "Save Changes")} <Check className="ml-2 w-5 h-5" />
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+        </AnimatePresence>
+      </div>
+    </div>
   )
 }
