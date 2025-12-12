@@ -357,7 +357,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                     placeholder="Add a link..."
                     value={basicInfo.link}
                     onChange={(e) => setBasicInfo(prev => ({ ...prev, link: e.target.value }))}
-                    className="border-none shadow-none focus-visible:ring-0 px-0 bg-transparent text-sm"
+                    className="border-none shadow-none focus-visible:ring-0 px-0 bg-transparent text-base"
                   />
                 </div>
               </div>

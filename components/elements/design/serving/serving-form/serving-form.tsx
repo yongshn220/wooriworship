@@ -147,7 +147,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
     // Navigation
     const goToStep = (targetStep: number) => {
-        if (targetStep === 1 && !selectedDate) {
+        if (targetStep > 0 && !selectedDate) {
             toast({ title: "Please select a date first" });
             return;
         }
@@ -196,14 +196,13 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     {["When", "Who", "Review"].map((label, idx) => (
                         <button
                             key={idx}
-                            onClick={() => idx < step ? goToStep(idx) : null}
+                            onClick={() => goToStep(idx)}
                             className={cn(
                                 "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
                                 step === idx
                                     ? "bg-black text-white shadow-md scale-105"
                                     : "text-gray-400 hover:text-gray-600"
                             )}
-                            disabled={idx > step}
                         >
                             {label}
                         </button>
@@ -327,42 +326,44 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             animate="center"
                             exit="exit"
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="flex-1 flex flex-col justify-center space-y-6 w-full"
+                            className="flex-1 flex flex-col h-full w-full"
                         >
-                            <div className="space-y-4 text-center">
-                                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Final Step</Label>
-                                <h2 className="text-2xl font-bold text-gray-900">Review Schedule</h2>
-                            </div>
-
-                            <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-6">
-                                <div className="text-center">
-                                    <span className="text-sm text-muted-foreground block mb-1">Date</span>
-                                    <span className="text-2xl font-bold">
-                                        {selectedDate && format(selectedDate, "MMM d, yyyy (EEE)")}
-                                    </span>
+                            <div className="flex-1 flex flex-col min-h-0 justify-center py-4 space-y-6">
+                                <div className="space-y-4 text-center shrink-0">
+                                    <Label className="text-sm font-bold text-primary uppercase tracking-wider">Final Step</Label>
+                                    <h2 className="text-2xl font-bold text-gray-900">Review Schedule</h2>
                                 </div>
 
-                                <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                                    <h3 className="font-medium text-sm text-muted-foreground">Assignments</h3>
-                                    <div className="divide-y border rounded-xl">
-                                        {roles.filter(r => (roleAssignments[r.id]?.length || 0) > 0).map(role => (
-                                            <div key={role.id} className="p-3 flex justify-between items-center text-sm">
-                                                <span className="text-muted-foreground">{role.name}</span>
-                                                <span className="font-medium text-right">
-                                                    {roleAssignments[role.id].map(uid => getMemberName(uid)).join(", ")}
-                                                </span>
-                                            </div>
-                                        ))}
-                                        {Object.keys(roleAssignments).length === 0 && (
-                                            <div className="p-4 text-center text-muted-foreground text-sm italic">
-                                                No specific roles assigned.
-                                            </div>
-                                        )}
+                                <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 flex flex-col min-h-0 space-y-6 max-h-full">
+                                    <div className="text-center shrink-0">
+                                        <span className="text-sm text-muted-foreground block mb-1">Date</span>
+                                        <span className="text-2xl font-bold">
+                                            {selectedDate && format(selectedDate, "MMM d, yyyy (EEE)")}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex-1 flex flex-col min-h-0 space-y-2 overflow-hidden">
+                                        <h3 className="font-medium text-sm text-muted-foreground shrink-0">Assignments</h3>
+                                        <div className="divide-y border rounded-xl overflow-y-auto">
+                                            {roles.filter(r => (roleAssignments[r.id]?.length || 0) > 0).map(role => (
+                                                <div key={role.id} className="p-3 flex justify-between items-center text-sm">
+                                                    <span className="text-muted-foreground">{role.name}</span>
+                                                    <span className="font-medium text-right">
+                                                        {roleAssignments[role.id].map(uid => getMemberName(uid)).join(", ")}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                            {Object.keys(roleAssignments).length === 0 && (
+                                                <div className="p-4 text-center text-muted-foreground text-sm italic">
+                                                    No specific roles assigned.
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex gap-4 mt-auto pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+                            <div className="flex gap-4 mt-auto shrink-0 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
                                 <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
                                     <ChevronLeft className="w-6 h-6" />
                                 </Button>
