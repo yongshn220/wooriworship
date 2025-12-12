@@ -1,4 +1,4 @@
-import {Timestamp} from "@firebase/firestore";
+import { Timestamp } from "@firebase/firestore";
 
 export interface WorshipSongHeader {
   id: string
@@ -10,6 +10,7 @@ export interface Worship {
   id?: string
   team_id: string
   title: string
+  subtitle?: string
   worship_date: Timestamp
   description: string
   link: string

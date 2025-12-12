@@ -38,7 +38,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 border-t-white/20 shadow-2xl"
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 backdrop-blur-xl border border-black/5 shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
             >
                 <WorshipControlItem
                     icon={<FileText className="w-5 h-5" />}
@@ -53,7 +53,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                     onClick={toggleShowNumber}
                 />
 
-                <Separator orientation="vertical" className="h-6 bg-white/10 w-[1px] mx-1" />
+                <Separator orientation="vertical" className="h-6 bg-black/10 w-[1px] mx-1" />
 
                 <WorshipControlItem
                     icon={<EyeOff className="w-5 h-5" />}
