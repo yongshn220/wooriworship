@@ -63,7 +63,7 @@ export function WorshipCardList({ teamId }: Props) {
           {
             (worshipIds.length > 0) ?
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-10 grid-flow-row-dense grid-rows-[auto]">
+                <div className="grid grid-cols-1 gap-x-4 gap-y-4 grid-flow-row-dense grid-rows-[auto]">
                   {
                     visibleWorshipIds.map((worshipId: string, index: number) => (
                       <Suspense key={worshipId} fallback={<WorshipCardSkeleton />}>

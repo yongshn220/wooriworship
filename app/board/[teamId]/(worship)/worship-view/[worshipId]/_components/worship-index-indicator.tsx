@@ -17,17 +17,17 @@ export function WorshipIndexIndicator() {
             menu.showSongNumber ? "opacity-100" : "opacity-0 pointer-events-none",
             "pointer-events-auto"
         )}>
-            {/* Vertical Line - Slightly brighter and definitely behind dots */}
-            <div className="absolute top-2 bottom-2 w-[3px] bg-black/20 rounded-full" />
+            {/* Vertical Line - Hidden for cleaner look, but structure remains for spacing if needed */}
+            <div className="absolute top-2 bottom-2 w-[3px] bg-transparent rounded-full" />
 
             {
                 Array.from(Array(index.total)).map((_, i) => (
                     (i !== index.current) ?
                         <div key={i} className="relative z-10 group w-6 h-6 flex-center cursor-pointer" onClick={() => setWorshipIndexChangeEvent(i)}>
-                            <div className="w-1.5 h-1.5 bg-black/40 rounded-full transition-all duration-300 group-hover:bg-black group-hover:scale-150 shadow-sm" />
+                            <div className="w-1 h-1 bg-black/10 rounded-full transition-all duration-300 group-hover:bg-black/40 group-hover:scale-150 shadow-sm" />
                         </div>
                         :
-                        <div key={i} className="relative z-10 flex-center w-6 h-6 bg-blue-500 rounded-full font-bold text-white text-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] border border-white/10">{i + 1}</div>
+                        <div key={i} className="relative z-10 flex-center w-6 h-6 bg-[#3182F6] rounded-full font-bold text-white text-[10px] shadow-lg border border-white/10">{i + 1}</div>
                 ))
             }
         </div>

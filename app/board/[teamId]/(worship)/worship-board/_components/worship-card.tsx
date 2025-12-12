@@ -100,11 +100,12 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
   const shouldRenderCard = useMemo(() => {
     if (!normalizedSearchInput) return true;
     if (normalizedWorshipTitle.includes(normalizedSearchInput)) return true;
+    if (worship?.subtitle && normalizeText(worship.subtitle).includes(normalizedSearchInput)) return true;
     return songs.some(song =>
       normalizeText(song?.title).includes(normalizedSearchInput) ||
       normalizeText(song?.subtitle).includes(normalizedSearchInput)
     );
-  }, [normalizedSearchInput, normalizedWorshipTitle, songs]);
+  }, [normalizedSearchInput, normalizedWorshipTitle, worship?.subtitle, songs]);
 
   if (!shouldRenderCard || !worship) return null;
 
@@ -156,6 +157,11 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
               </div>
               <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight text-gray-900 group-hover:text-blue-600 transition-colors">
                 {highlightText(worship.title || "Untitled Service", searchInput)}
+                {worship.subtitle && (
+                  <span className="text-base sm:text-lg font-normal text-gray-500 ml-2">
+                    {highlightText(worship.subtitle, searchInput)}
+                  </span>
+                )}
                 {isExpanded && <ChevronUp className="h-6 w-6 text-gray-400 animate-in fade-in zoom-in duration-300" />}
               </h2>
             </div>
@@ -178,15 +184,14 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
               >
                 {songs.slice(0, 5).map((song, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-gray-700">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0" />
+                    {song?.keys?.[0] && (
+                      <span className="text-xs font-medium text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded shrink-0">
+                        {song.keys[0]}
+                      </span>
+                    )}
                     <span className="font-medium text-sm line-clamp-1">
                       {highlightText(song?.title, searchInput)}
                     </span>
-                    {song?.keys?.[0] && (
-                      <span className="text-xs sm:text-sm text-gray-500 shrink-0">
-                        ({song.keys[0]})
-                      </span>
-                    )}
                   </div>
                 ))}
                 {songs.length > 5 && (

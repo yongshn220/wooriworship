@@ -46,7 +46,7 @@ export function NoticeHeaderList({ teamId }: Props) {
 
   return (
     <div className="w-full items-center">
-      <div className="w-full flex-start flex-col gap-8">
+      <div className="w-full flex-start flex-col gap-4">
         {
           visibleNoticeIdList.map((noticeId) => (
             <Suspense key={noticeId} fallback={<NoticeSkeleton />}>
