@@ -68,11 +68,7 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                             )}>
                                 {getDayPassedFromTimestampShorten({ seconds: scheduleDate.getTime() / 1000, nanoseconds: 0 } as any)}
                             </span>
-                            {isMeServing && (
-                                <Badge variant="outline" className="border-blue-200 text-blue-600 bg-blue-50 text-[10px] px-1.5 h-5">
-                                    Me
-                                </Badge>
-                            )}
+
                         </div>
                         <h3 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
                             Serving Team
