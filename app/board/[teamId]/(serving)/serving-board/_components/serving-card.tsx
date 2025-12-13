@@ -42,7 +42,10 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
     const isMeServing = currentUserUid ? schedule.roles.some(r => r.memberIds.includes(currentUserUid)) : false;
 
     // Date Logic
-    const scheduleDate = new Date(schedule.date);
+    // Parse manually to ensure local time is used (YYYY-MM-DD -> local midnight)
+    // new Date("YYYY-MM-DD") treats it as UTC, which causes shift in western timezones
+    const [year, month, day] = schedule.date.split("-").map(Number);
+    const scheduleDate = new Date(year, month - 1, day);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const isPast = scheduleDate < today;

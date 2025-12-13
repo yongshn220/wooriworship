@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { format } from "date-fns";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { servingSchedulesAtom } from "@/global-states/servingState";
@@ -31,8 +32,8 @@ export default function ServingPage() {
                 const futureDate = new Date();
                 futureDate.setMonth(futureDate.getMonth() + 6);
 
-                const startStr = pastDate.toISOString().split("T")[0];
-                const endStr = futureDate.toISOString().split("T")[0];
+                const startStr = format(pastDate, "yyyy-MM-dd");
+                const endStr = format(futureDate, "yyyy-MM-dd");
 
                 const data = await ServingService.getSchedules(teamId, startStr, endStr);
 
@@ -50,7 +51,7 @@ export default function ServingPage() {
 
     // Split Data
     const { upcoming, history } = useMemo(() => {
-        const todayStr = new Date().toISOString().split("T")[0];
+        const todayStr = format(new Date(), "yyyy-MM-dd");
         const upcomingList: typeof schedules = [];
         const historyList: typeof schedules = [];
 
