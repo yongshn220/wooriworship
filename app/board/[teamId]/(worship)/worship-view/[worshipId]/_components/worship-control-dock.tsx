@@ -51,7 +51,6 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                     bottom: "2rem",
                     left: "1rem",
                     x: "0%",
-                    // Removed width: "3.5rem" - let the content (just the button) dictate the size naturally
                     borderRadius: "9999px",
                     paddingLeft: "0.25rem",
                     paddingRight: "0.25rem",
@@ -64,16 +63,16 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
             }}
         >
             {/* Persistent Trigger Button - Always present */}
-            <motion.div layout="position" className="flex-shrink-0 z-10 p-1">
+            < motion.div layout="position" className="flex-shrink-0 z-10 p-1" >
                 <WorshipControlItem
                     icon={uiVisible ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                     onClick={() => setUIVisible(!uiVisible)}
                     variant="button"
                 />
-            </motion.div>
+            </motion.div >
 
             {/* Collapsible Content */}
-            <AnimatePresence mode="popLayout">
+            < AnimatePresence mode="popLayout" >
                 {uiVisible && (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -112,7 +111,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                         </div>
                     </motion.div>
                 )}
-            </AnimatePresence>
-        </motion.div>
+            </AnimatePresence >
+        </motion.div >
     )
 }
