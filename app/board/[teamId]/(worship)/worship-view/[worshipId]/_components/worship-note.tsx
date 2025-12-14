@@ -27,7 +27,15 @@ export function WorshipNote({ constraintsRef }: Props) {
                     className="fixed top-20 left-1/2 max-w-lg w-full z-40 mx-auto cursor-grab"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <div className="bg-popover/80 backdrop-blur-md rounded-xl p-4 text-popover-foreground shadow-2xl border border-border/20 text-center text-sm font-serif leading-relaxed select-none flex flex-col items-center">
+                    <div
+                        className="rounded-xl font-bold px-4 py-1 text-popover-foreground text-center text-sm font-serif leading-relaxed select-none flex flex-col items-center"
+                        style={{
+                            backgroundColor: "rgba(255, 255, 255, 0.92)",
+                            borderColor: "rgba(255, 255, 255, 0.2)",
+                            borderWidth: "1px",
+                            boxShadow: "0 1px 3px 0px rgba(0, 0, 0, 0.4)"
+                        }}
+                    >
                         <div className="w-8 h-1 bg-zinc-400/80 rounded-full mb-1" />
                         {description}
                     </div>
