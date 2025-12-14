@@ -35,7 +35,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
 
     return (
         <div className={cn(
-            "fixed bottom-8 left-0 w-full z-50 pointer-events-none flex transition-all",
+            "fixed bottom-8 left-0 w-full z-50 pointer-events-none flex",
             uiVisible ? "justify-center" : "justify-start pl-4"
         )}>
             <motion.div
@@ -52,7 +52,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                         transition: { type: "spring", stiffness: 150, damping: 25, mass: 1.2 }
                     }
                 }}
-                className="pointer-events-auto overflow-hidden flex items-center bg-background border border-border/50 shadow-toss"
+                className="pointer-events-auto overflow-hidden flex items-center bg-background border border-border/50 shadow-toss p-1"
                 onClick={(e) => {
                     e.stopPropagation();
                 }}
