@@ -45,14 +45,10 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                 variants={{
                     visible: {
                         borderRadius: "9999px",
-                        paddingLeft: "0.25rem",
-                        paddingRight: "0.25rem",
                         transition: { type: "spring", stiffness: 150, damping: 25, mass: 1.2 }
                     },
                     hidden: {
                         borderRadius: "9999px",
-                        paddingLeft: "0.25rem",
-                        paddingRight: "0.25rem",
                         transition: { type: "spring", stiffness: 150, damping: 25, mass: 1.2 }
                     }
                 }}
