@@ -70,9 +70,9 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                 <AnimatePresence mode="popLayout">
                     {uiVisible && (
                         <motion.div
-                            initial={{ opacity: 0, width: 0 }}
-                            animate={{ opacity: 1, width: "auto", transition: { duration: 0.3 } }}
-                            exit={{ opacity: 0, width: 0, transition: { duration: 0.2 } }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1, transition: { duration: 0.3 } }}
+                            exit={{ opacity: 0, transition: { duration: 0.2 } }}
                             className="flex items-center overflow-hidden whitespace-nowrap h-full pr-3"
                         >
                             {/* Wrapper div to ensure stable layout measurement */}
