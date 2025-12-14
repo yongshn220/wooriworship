@@ -32,12 +32,7 @@ export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
     if (!isOpen) setShowSelectedOnly(false)
   }, [isOpen])
 
-  // Reset "Cart" view when user starts searching
-  React.useEffect(() => {
-    if (input.length > 0 && showSelectedOnly) {
-      setShowSelectedOnly(false)
-    }
-  }, [input])
+
 
   const selectedCount = selectedSongHeaderList.length
 
@@ -55,20 +50,22 @@ export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
 
           {/* Header Search Area */}
           <div className="w-full shrink-0 px-4 pt-4 pb-2 relative">
-            <div className="w-full relative">
-              <SearchInput />
-            </div>
-
-            {/* Active Filters */}
-            <ActiveFilterList />
-
-            {/* Mode Indicator Toast/Banner (Optional, but helps UX) */}
-            {showSelectedOnly && (
-              <div className="mt-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-medium flex justify-between items-center animate-in fade-in slide-in-from-top-2">
-                <span>Reviewing Selected Songs</span>
-                <button onClick={() => setShowSelectedOnly(false)} className="underline text-xs">View All</button>
+            {/* Header Search Area */}
+            {!showSelectedOnly ? (
+              <>
+                <div className="w-full relative">
+                  <SearchInput />
+                </div>
+                {/* Active Filters */}
+                <ActiveFilterList />
+              </>
+            ) : (
+              <div className="w-full py-2 flex items-center justify-between">
+                <h2 className="text-xl font-bold">Selected Songs</h2>
               </div>
             )}
+
+
           </div>
 
           {/* Scrollable Song List */}

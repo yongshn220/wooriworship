@@ -114,16 +114,8 @@ export default function WorshipLivePage({ params }: any) {
                     <LongPressFeedback isPressing={isPressing} x={pressPos.x} y={pressPos.y} />
 
                     {/* Dock - Always rendered, just hidden visually to prevent layout shift */}
-                    <motion.div
-                        variants={uiVariants}
-                        initial="visible"
-                        animate={uiVisible ? "visible" : "hidden"}
-                        transition={{ duration: 0.3 }}
-                        className="absolute bottom-0 w-full flex justify-center z-50"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <WorshipControlDock teamId={teamId} worshipId={worshipId} />
-                    </motion.div>
+                    {/* Dock - Always rendered, control logic inside */}
+                    <WorshipControlDock teamId={teamId} worshipId={worshipId} />
 
                     {/* Indicator - Always rendered */}
                     {/* Indicator - Always rendered, visible based on its own toggle */}

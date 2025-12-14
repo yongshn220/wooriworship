@@ -30,8 +30,7 @@ export function AddableSongHeaderList({ teamId, showSelectedOnly = false }: Prop
 
   let allSongIds = [...rawSongIds]
   if (showSelectedOnly) {
-    const selectedIds = new Set(selectedSongHeaderList.map(h => h.id))
-    allSongIds = allSongIds.filter(id => selectedIds.has(id))
+    allSongIds = selectedSongHeaderList.map(h => h.id)
   }
 
   const visibleSongIds = allSongIds.slice(0, displayedCount)
@@ -59,9 +58,20 @@ export function AddableSongHeaderList({ teamId, showSelectedOnly = false }: Prop
     }
   }, [songIdsLoadable.state, visibleSongIds.length, showSelectedOnly])
 
-  // 3. Render
-  if (songIdsLoadable.state === 'loading') {
-    return <div className="w-full h-80 flex items-center justify-center text-gray-400">Loading songs...</div>;
+  if (!showSelectedOnly && songIdsLoadable.state === 'loading') {
+    return (
+      <div className="w-full px-5 pt-10 space-y-4">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="w-full h-16 bg-gray-100 rounded-lg animate-pulse flex items-center px-4">
+            <div className="h-8 w-8 bg-gray-200 rounded-full mr-4" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-3/4" />
+              <div className="h-3 bg-gray-200 rounded w-1/2" />
+            </div>
+          </div>
+        ))}
+      </div>
+    )
   }
 
   if (songIdsLoadable.state === 'hasError') {
@@ -107,8 +117,17 @@ export function AddableSongHeaderList({ teamId, showSelectedOnly = false }: Prop
               width={200}
               height={200}
             />
-            <p className="text-xl font-semibold">No songs found</p>
-            <p className="text-muted-foreground">Try searching for something else or add new songs.</p>
+            {showSelectedOnly ? (
+              <>
+                <p className="text-xl font-semibold">No songs selected</p>
+                <p className="text-muted-foreground">Add songs from the list to see them here.</p>
+              </>
+            ) : (
+              <>
+                <p className="text-xl font-semibold">No songs found</p>
+                <p className="text-muted-foreground">Try searching for something else or add new songs.</p>
+              </>
+            )}
           </div>
       }
     </div>

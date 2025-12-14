@@ -7,8 +7,24 @@ import { songSearchInputAtom } from "@/app/board/_states/board-states";
 import { SearchFilterPopover } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-filter-popover";
 import { Button } from "@/components/ui/button";
 
+import { useDebounce } from "use-debounce";
+import { useEffect, useState } from "react";
+
 export function SearchInput() {
-  const [input, setInput] = useRecoilState(songSearchInputAtom)
+  const [globalInput, setGlobalInput] = useRecoilState(songSearchInputAtom)
+  const [localInput, setLocalInput] = useState(globalInput)
+  const [debouncedInput] = useDebounce(localInput, 300)
+
+  useEffect(() => {
+    setGlobalInput(debouncedInput)
+  }, [debouncedInput, setGlobalInput])
+
+  // Sync local input if global changes externally (optional but good for consistency)
+  useEffect(() => {
+    if (globalInput !== debouncedInput) {
+      setLocalInput(globalInput)
+    }
+  }, [globalInput])
 
   return (
     <div className="relative w-full">
@@ -16,8 +32,8 @@ export function SearchInput() {
       <Input
         className="w-full pl-10 pr-12 h-11 bg-muted/50 border-0 ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 rounded-full shadow-sm placeholder:text-muted-foreground text-base sm:text-sm transition-all hover:bg-background hover:ring-foreground/20 hover:shadow-md focus:bg-background"
         placeholder="Search songs..."
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
+        value={localInput}
+        onChange={(e) => setLocalInput(e.target.value)}
         autoFocus
       />
       <div className="absolute right-1.5 top-1/2 transform -translate-y-1/2">
