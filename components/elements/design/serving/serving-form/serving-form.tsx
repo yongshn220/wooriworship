@@ -268,7 +268,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             </div>
 
                             <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col">
-                                <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                                <div className="flex-1 overflow-y-auto p-4 space-y-2 overscroll-contain">
                                     {roles.map((role) => {
                                         const assignedIds = roleAssignments[role.id] || [];
                                         return (
@@ -344,7 +344,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                                     <div className="flex-1 flex flex-col min-h-0 space-y-2 overflow-hidden">
                                         <h3 className="font-medium text-sm text-muted-foreground shrink-0">Assignments</h3>
-                                        <div className="divide-y border rounded-xl overflow-y-auto">
+                                        <div className="divide-y border rounded-xl overflow-y-auto overscroll-contain">
                                             {roles.filter(r => (roleAssignments[r.id]?.length || 0) > 0).map(role => (
                                                 <div key={role.id} className="p-3 flex justify-between items-center text-sm">
                                                     <span className="text-muted-foreground">{role.name}</span>

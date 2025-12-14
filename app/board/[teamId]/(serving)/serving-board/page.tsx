@@ -81,7 +81,7 @@ export default function ServingPage() {
 
     return (
         <div className="flex flex-col h-full bg-muted/30 relative">
-            <div className="flex-1 overflow-y-auto p-4 content-container-safe-area pb-24 space-y-8">
+            <div className="flex-1 overflow-y-auto p-4 content-container-safe-area pb-24 space-y-8 overscroll-y-none">
 
                 {/* Upcoming Section */}
                 <section className="space-y-4">
