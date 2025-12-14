@@ -58,7 +58,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                 }}
             >
                 {/* Persistent Trigger Button - Always present */}
-                <motion.div layout className="flex-shrink-0 z-10 p-1">
+                <motion.div layout className="flex-shrink-0 z-10 p-0">
                     <WorshipControlItem
                         icon={uiVisible ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                         onClick={() => setUIVisible(!uiVisible)}
