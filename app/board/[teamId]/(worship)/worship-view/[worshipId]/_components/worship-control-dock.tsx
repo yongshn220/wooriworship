@@ -45,14 +45,24 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                 variants={{
                     visible: {
                         borderRadius: "9999px",
+                        backgroundColor: "var(--background)", // Solid background
+                        backdropFilter: "none",
+                        WebkitBackdropFilter: "none",
+                        borderColor: "rgba(140, 140, 140, 0.2)", // Standard border
+                        boxShadow: "0 1px 3px 0px rgba(0, 0, 0, 0.1)", // Standard shadow-sm
                         transition: { type: "spring", stiffness: 150, damping: 25, mass: 1.2 }
                     },
                     hidden: {
                         borderRadius: "9999px",
+                        backgroundColor: "rgba(255, 255, 255, 0.5)", // 90% transparent
+                        backdropFilter: "none", // No blur as requested
+                        WebkitBackdropFilter: "none",
+                        borderColor: "rgba(255, 255, 255, 0.2)", // Subtle glass border
+                        boxShadow: "0 1px 3px 0px rgba(0, 0, 0, 0.4)", // Standard shadow-sm
                         transition: { type: "spring", stiffness: 150, damping: 25, mass: 1.2 }
                     }
                 }}
-                className="pointer-events-auto overflow-hidden flex items-center bg-background border border-border/50 shadow-toss p-1"
+                className="pointer-events-auto overflow-hidden flex items-center p-1"
                 onClick={(e) => {
                     e.stopPropagation();
                 }}
