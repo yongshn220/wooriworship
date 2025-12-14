@@ -34,6 +34,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
 
     return (
         <motion.div
+            layout // Enable Layout Projection for natural resizing and position morphing
             initial={false}
             animate={uiVisible ? "visible" : "hidden"}
             variants={{
@@ -41,49 +42,46 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                     bottom: "2rem",
                     left: "50%",
                     x: "-50%",
-                    width: "auto", // Allow width to grow with content
-                    height: "3.5rem",
                     borderRadius: "9999px",
                     paddingLeft: "0.25rem",
-                    paddingRight: "0.25rem", // Constant 0.25rem padding
-                    transition: { type: "spring", stiffness: 150, damping: 25, mass: 1.2, restDelta: 0.001 }
+                    paddingRight: "0.25rem",
+                    transition: { type: "spring", stiffness: 150, damping: 25, mass: 1.2 }
                 },
                 hidden: {
                     bottom: "2rem",
                     left: "1rem",
                     x: "0%",
-                    width: "3.5rem",
-                    height: "3.5rem",
+                    // Removed width: "3.5rem" - let the content (just the button) dictate the size naturally
                     borderRadius: "9999px",
                     paddingLeft: "0.25rem",
-                    paddingRight: "0.25rem", // Constant 0.25rem padding
-                    transition: { type: "spring", stiffness: 150, damping: 25, mass: 1.2, restDelta: 0.001 }
+                    paddingRight: "0.25rem",
+                    transition: { type: "spring", stiffness: 150, damping: 25, mass: 1.2 }
                 }
             }}
-            style={{ minWidth: "3.5rem" }} // Constraint to prevent squashing below circle size
             className="fixed z-50 overflow-hidden flex items-center justify-start bg-background border border-border/50 shadow-toss"
             onClick={(e) => {
                 e.stopPropagation();
             }}
         >
             {/* Persistent Trigger Button - Always present */}
-            <div className="flex-shrink-0 z-10 p-1">
+            <motion.div layout="position" className="flex-shrink-0 z-10 p-1">
                 <WorshipControlItem
                     icon={uiVisible ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                     onClick={() => setUIVisible(!uiVisible)}
                     variant="button"
                 />
-            </div>
+            </motion.div>
 
             {/* Collapsible Content */}
-            <AnimatePresence>
+            <AnimatePresence mode="popLayout">
                 {uiVisible && (
                     <motion.div
-                        initial={{ opacity: 0 }} // Removed scale animation to prevent layout recalculation issues
+                        initial={{ opacity: 0 }}
                         animate={{ opacity: 1, transition: { duration: 0.3 } }}
                         exit={{ opacity: 0, transition: { duration: 0.2 } }}
-                        className="flex items-center overflow-hidden whitespace-nowrap h-full pr-3" // added pr-3 (0.75rem) to compensate for outer padding
+                        className="flex items-center overflow-hidden whitespace-nowrap h-full pr-3"
                     >
+                        {/* Wrapper div to ensure stable layout measurement */}
                         <div className="flex items-center gap-2 pr-1">
                             {/* Separator moved to start to divide trigger from content */}
                             <Separator orientation="vertical" className="h-6 bg-border w-[1px] mx-1" />
