@@ -4,12 +4,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { worshipLiveOptionsAtom, worshipUIVisibilityAtom } from "../_states/worship-detail-states";
 import { WorshipControlItem } from "./worship-control-item";
-import { ChevronLeft, ChevronRight, EyeOff, FileText, Hash, MoreHorizontal } from "lucide-react";
+import { LogOut, ChevronLeft, ChevronRight, FileText, Hash, MoreHorizontal } from "lucide-react";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { WorshipSettingsMenu } from "./worship-settings-menu";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { getPathPlan } from "@/components/util/helper/routes";
 
 interface Props {
     teamId: string
@@ -20,6 +22,11 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
     const [option, setOption] = useRecoilState(worshipLiveOptionsAtom)
     const [uiVisible, setUIVisible] = useRecoilState(worshipUIVisibilityAtom)
     const [preference, prefSetter] = useUserPreferences()
+    const router = useRouter()
+
+    function handleExit() {
+        router.replace(getPathPlan(teamId) + `?expanded=${worshipId}`)
+    }
 
     function toggleShowNote() {
         const newVal = !option.showSongNote
@@ -86,7 +93,7 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                             className="flex items-center overflow-hidden whitespace-nowrap h-full pr-3"
                         >
                             {/* Wrapper div to ensure stable layout measurement */}
-                            <div className="flex items-center gap-2 pr-1">
+                            <div className="flex items-center gap-2">
                                 {/* Separator moved to start to divide trigger from content */}
                                 <Separator orientation="vertical" className="h-6 bg-border w-[1px] mx-1" />
 
@@ -113,6 +120,14 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                                         <WorshipSettingsMenu teamId={teamId} worshipId={worshipId} />
                                     </PopoverContent>
                                 </Popover>
+
+                                <Separator orientation="vertical" className="h-6 bg-border w-[1px]" />
+
+                                <WorshipControlItem
+                                    icon={<LogOut className="w-5 h-5" />}
+                                    variant="button"
+                                    onClick={handleExit}
+                                />
                             </div>
                         </motion.div>
                     )}
