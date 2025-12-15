@@ -74,7 +74,7 @@ function MemberItem({ userId, teamId, onClick }: { userId: string, teamId: strin
     const team = useRecoilValue(teamAtom(teamId));
     const roles = useRecoilValue(fetchServingRolesSelector(teamId));
 
-    const isLeader = team?.leaders?.includes(userId);
+    const isAdmin = team?.admins?.includes(userId);
     const assignedRoleNames = roles
         .filter(r => r.default_members?.includes(userId))
         .map(r => r.name);
@@ -94,8 +94,8 @@ function MemberItem({ userId, teamId, onClick }: { userId: string, teamId: strin
                         <p className="text-sm font-medium truncate">
                             {user?.name || "No Name"}
                         </p>
-                        {isLeader && (
-                            <Badge variant="secondary" className="text-[10px] h-4 px-1">Leader</Badge>
+                        {isAdmin && (
+                            <Badge variant="secondary" className="text-[10px] h-4 px-1">Admin</Badge>
                         )}
                     </div>
                     <p className="text-xs text-muted-foreground truncate">

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Check, Shield, User } from "lucide-react";
+import { auth } from "@/firebase";
 
 import { ResponsiveDrawer } from "@/components/ui/responsive-drawer";
 import { Label } from "@/components/ui/label";
@@ -27,31 +28,37 @@ interface Props {
 export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) {
     const user = useRecoilValue(userAtom(userId || ""));
     const team = useRecoilValue(teamAtom(teamId));
+    const currentUser = useRecoilValue(userAtom(auth.currentUser?.uid || ""));
     const roles = useRecoilValue(fetchServingRolesSelector(teamId));
 
     const setServingRolesUpdater = useSetRecoilState(servingRolesUpdaterAtom);
     const setTeamUpdater = useSetRecoilState(teamUpdaterAtom);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    const isLeader = useMemo(() => {
+    const isAdmin = useMemo(() => {
         if (!userId || !team) return false;
-        return team.leaders.includes(userId);
+        return team.admins?.includes(userId);
     }, [team, userId]);
+
+    const isCurrentUserAdmin = useMemo(() => {
+        if (!team || !auth.currentUser?.uid) return false;
+        return team.admins?.includes(auth.currentUser.uid);
+    }, [team]);
 
     if (!userId) return null;
 
-    async function toggleLeader() {
-        if (!userId) return;
-        if (isLeader) {
-            await TeamService.removeLeader(teamId, userId);
+    async function toggleAdmin() {
+        if (!userId || !isCurrentUserAdmin) return;
+        if (isAdmin) {
+            await TeamService.removeAdmin(teamId, userId);
         } else {
-            await TeamService.addLeader(teamId, userId);
+            await TeamService.addAdmin(teamId, userId);
         }
         setTeamUpdater(prev => prev + 1);
     }
 
     async function toggleServingRole(roleId: string, currentDefaultMembers: string[] = []) {
-        if (!userId) return;
+        if (!userId || !isCurrentUserAdmin) return;
         const isAssigned = currentDefaultMembers.includes(userId);
         if (isAssigned) {
             await ServingService.removeDefaultMember(teamId, roleId, userId);
@@ -103,27 +110,36 @@ export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) 
                     </Label>
                     <div
                         className={cn(
-                            "flex items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer",
-                            isLeader ? "bg-primary/5 border-primary" : "bg-card hover:bg-muted"
+                            "flex items-center gap-4 p-4 rounded-xl border transition-all",
+                            isAdmin ? "bg-primary/5 border-primary" : "bg-card"
                         )}
-                        onClick={toggleLeader}
                     >
                         <div className={cn(
                             "h-10 w-10 flex items-center justify-center rounded-full shrink-0",
-                            isLeader ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                            isAdmin ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                         )}>
-                            {isLeader ? <Shield className="h-5 w-5" /> : <User className="h-5 w-5" />}
+                            {isAdmin ? <Shield className="h-5 w-5" /> : <User className="h-5 w-5" />}
                         </div>
                         <div className="flex-1">
                             <div className="flex items-center justify-between mb-0.5">
-                                <span className="font-semibold">{isLeader ? "Team Leader" : "Team Member"}</span>
-                                {isLeader && <Check className="h-5 w-5 text-primary" />}
+                                <span className="font-semibold">{isAdmin ? "Team Admin" : "Team Member"}</span>
+                                {isAdmin && <Check className="h-5 w-5 text-primary" />}
                             </div>
                             <p className="text-xs text-muted-foreground">
-                                {isLeader ? "Can manage team settings, members, and schedules." : "Basic access to view schedules and serve."}
+                                {isAdmin ? "Can manage team settings, members, and schedules." : "Basic access to view schedules and serve."}
                             </p>
                         </div>
                     </div>
+
+                    {isCurrentUserAdmin && (
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={toggleAdmin}
+                        >
+                            {isAdmin ? "Revoke Admin Access" : "Grant Admin Access"}
+                        </Button>
+                    )}
                 </div>
 
                 <Separator />
@@ -139,7 +155,10 @@ export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) 
                             return (
                                 <div
                                     key={role.id}
-                                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                                    className={cn(
+                                        "flex items-center justify-between p-4 transition-colors",
+                                        isCurrentUserAdmin ? "cursor-pointer hover:bg-muted/50" : "opacity-50 cursor-not-allowed"
+                                    )}
                                     onClick={() => toggleServingRole(role.id, role.default_members)}
                                 >
                                     <span className="font-medium text-sm">{role.name}</span>

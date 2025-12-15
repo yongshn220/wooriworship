@@ -14,7 +14,7 @@ class TeamService extends BaseService {
       name: name,
       create_time: Timestamp.fromDate(new Date()),
       last_worship_time: Timestamp.fromDate(new Date()),
-      leaders: [userId],
+      admins: [userId],
       users: [userId],
       option: {
         worship: {
@@ -48,12 +48,12 @@ class TeamService extends BaseService {
     return await this.update(teamId, { option: option })
   }
 
-  async addLeader(teamId: string, userId: string) {
-    return await this.update(teamId, { leaders: arrayUnion(userId) });
+  async addAdmin(teamId: string, userId: string) {
+    return await this.update(teamId, { admins: arrayUnion(userId) });
   }
 
-  async removeLeader(teamId: string, userId: string) {
-    return await this.update(teamId, { leaders: arrayRemove(userId) });
+  async removeAdmin(teamId: string, userId: string) {
+    return await this.update(teamId, { admins: arrayRemove(userId) });
   }
 
   async removeMember(userId: string, teamId: string, singleSide: Boolean) {
