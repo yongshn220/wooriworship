@@ -1,12 +1,12 @@
-import {Timestamp} from "@firebase/firestore";
-import {WorshipSongHeader} from "@/models/worship";
+import { Timestamp } from "@firebase/firestore";
+import { WorshipSongHeader } from "@/models/worship";
 
 export interface Team {
   id?: string
   name: string
   create_time: Timestamp
   last_worship_time: Timestamp
-  leaders: Array<string>
+  admins: Array<string>
   users: Array<string>
   option: TeamOption
 }
