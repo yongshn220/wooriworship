@@ -3,6 +3,7 @@ export interface ServingRole {
     teamId: string;
     name: string;
     order: number;
+    default_members?: string[];
 }
 
 export interface ServingSchedule {

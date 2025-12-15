@@ -5,14 +5,13 @@ import { Separator } from "@/components/ui/separator"
 import { toast } from "@/components/ui/use-toast"
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState"
 import { AuthService } from "@/apis"
-import { Bell, LogOut, Mail, MailIcon, Settings, Users } from 'lucide-react'
+import { Bell, LogOut, Mail, MailIcon, Settings, Users, UserPlus } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import { useRecoilValue, useSetRecoilState } from "recoil"
 import { auth } from "@/firebase"
 import { pendingReceivedInvitationsAtom } from "@/global-states/invitation-state"
 import { invitationInboxDialogOpenStateAtom } from "@/global-states/dialog-state"
 import { TeamIcon } from "@/components/elements/design/team/team-icon";
-import { ManageTeamDialog } from "@/components/elements/dialog/manage-team/manage-team-dialog";
 import { MenuItem } from "@/app/board/[teamId]/(manage)/manage/_components/menu-item";
 import { MenuGroup } from "@/app/board/[teamId]/(manage)/manage/_components/menu-group";
 import { TeamProfileCard } from "@/app/board/[teamId]/(manage)/manage/_components/team-profile-card";
@@ -63,14 +62,21 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
 
         {/* Team Management Group */}
         <MenuGroup title="Team Management">
-          <ManageTeamDialog>
-            <MenuItem
-              icon={<Users className="h-5 w-5" />}
-              title="Manage Team"
-              description="Add or remove team members"
-              showChevron
-            />
-          </ManageTeamDialog>
+          <MenuItem
+            icon={<Users className="h-5 w-5" />}
+            title="Team Members"
+            description="Manage roles and permissions"
+            showChevron
+            onClick={() => router.push(`/board/${teamId}/manage/members`)}
+          />
+
+          <MenuItem
+            icon={<UserPlus className="h-5 w-5" />}
+            title="Invite Members"
+            description="Send team invitations"
+            showChevron
+            onClick={() => router.push(`/board/${teamId}/manage/invitations`)}
+          />
 
           <div onClick={() => setInvitationDialogState(true)}>
             <MenuItem

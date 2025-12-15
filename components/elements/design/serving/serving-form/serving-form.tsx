@@ -388,6 +388,40 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         <DrawerTitle>Select Members</DrawerTitle>
                     </DrawerHeader>
                     <div className="p-4 pt-0 h-full overflow-hidden flex flex-col">
+                        {activeRoleForSelection && roles.find(r => r.id === activeRoleForSelection)?.default_members?.length ? (
+                            <div className="mb-4 space-y-2 shrink-0">
+                                <Label className="text-xs text-muted-foreground uppercase font-semibold">Quick Select</Label>
+                                <div className="flex flex-wrap gap-2">
+                                    {roles.find(r => r.id === activeRoleForSelection)?.default_members?.map(uid => {
+                                        const isSelected = (roleAssignments[activeRoleForSelection] || []).includes(uid);
+                                        return (
+                                            <div
+                                                key={uid}
+                                                onClick={() => {
+                                                    setRoleAssignments(prev => {
+                                                        const current = prev[activeRoleForSelection] || [];
+                                                        if (isSelected) {
+                                                            return { ...prev, [activeRoleForSelection]: current.filter(id => id !== uid) };
+                                                        } else {
+                                                            return { ...prev, [activeRoleForSelection]: [...current, uid] };
+                                                        }
+                                                    });
+                                                }}
+                                                className={cn(
+                                                    "flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium cursor-pointer transition-all active:scale-95",
+                                                    isSelected
+                                                        ? "bg-primary text-primary-foreground border-primary"
+                                                        : "bg-background hover:bg-muted border-border"
+                                                )}
+                                            >
+                                                <span>{getMemberName(uid)}</span>
+                                                {isSelected && <Check className="w-3 h-3" />}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ) : null}
                         <MemberSelector
                             selectedMemberIds={activeRoleForSelection ? (roleAssignments[activeRoleForSelection] || []) : []}
                             onSelect={(uid) => {

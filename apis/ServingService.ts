@@ -1,6 +1,7 @@
 import BaseService from "./BaseService";
 import { ServingRole, ServingSchedule } from "@/models/serving";
 import { firestore } from "@/firebase";
+import { arrayRemove, arrayUnion } from "@firebase/firestore";
 
 class ServingService extends BaseService {
     private static instance: ServingService;
@@ -78,6 +79,49 @@ class ServingService extends BaseService {
             });
         } catch (e) {
             console.error("Failed to initialize standard roles:", e);
+        }
+    }
+
+    async addDefaultMember(teamId: string, roleId: string, memberId: string): Promise<void> {
+        await firestore
+            .collection("teams")
+            .doc(teamId)
+            .collection("serving_roles")
+            .doc(roleId)
+            .update({
+                default_members: arrayUnion(memberId)
+            });
+    }
+
+    async removeDefaultMember(teamId: string, roleId: string, memberId: string): Promise<void> {
+        await firestore
+            .collection("teams")
+            .doc(teamId)
+            .collection("serving_roles")
+            .doc(roleId)
+            .update({
+                default_members: arrayRemove(memberId)
+            });
+    }
+
+    async cleanupMember(teamId: string, memberId: string): Promise<void> {
+        try {
+            const rolesSnapshot = await firestore
+                .collection("teams")
+                .doc(teamId)
+                .collection("serving_roles")
+                .where("default_members", "array-contains", memberId)
+                .get();
+
+            const batch = firestore.batch();
+            rolesSnapshot.docs.forEach((doc) => {
+                batch.update(doc.ref, {
+                    default_members: arrayRemove(memberId)
+                });
+            });
+            await batch.commit();
+        } catch (e) {
+            console.error("Failed to cleanup serving member:", e);
         }
     }
 

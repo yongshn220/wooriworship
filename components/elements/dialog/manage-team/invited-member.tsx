@@ -58,7 +58,11 @@ export function InvitedMember({ userId, teamId }: Props) {
       </div>
 
       <div className="flex-shrink-0 ml-2">
-        <RoleSelect role={team?.leaders.includes(user?.id) ? "Leader" : "Member"} />
+        <RoleSelect
+          userId={userId}
+          teamId={teamId}
+          isLeader={team?.leaders?.includes(userId) || false}
+        />
       </div>
     </div>
   )
