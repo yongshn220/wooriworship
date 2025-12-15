@@ -2,6 +2,7 @@ import BaseService from "./BaseService";
 import { InvitationService, UserService } from ".";
 import { Team, TeamOption } from "@/models/team";
 import { arrayUnion, arrayRemove, Timestamp } from "@firebase/firestore";
+import ServingService from "./ServingService";
 
 class TeamService extends BaseService {
   constructor() {
@@ -47,6 +48,14 @@ class TeamService extends BaseService {
     return await this.update(teamId, { option: option })
   }
 
+  async addLeader(teamId: string, userId: string) {
+    return await this.update(teamId, { leaders: arrayUnion(userId) });
+  }
+
+  async removeLeader(teamId: string, userId: string) {
+    return await this.update(teamId, { leaders: arrayRemove(userId) });
+  }
+
   async removeMember(userId: string, teamId: string, singleSide: Boolean) {
     if (userId && teamId) {
       const promises = [];
@@ -59,6 +68,7 @@ class TeamService extends BaseService {
       if (!singleSide) {
         promises.push(UserService.leaveTeam(userId, teamId, true));
       }
+      promises.push(ServingService.cleanupMember(teamId, userId));
       promises.push(this.update(teamId, { users: arrayRemove(userId) }));
       await Promise.all(promises);
       return userId;

@@ -39,7 +39,7 @@ export function MemberSelector({ selectedMemberIds, onSelect, multiple = false }
                 />
             </div>
 
-            <ScrollArea className="flex-1 -mr-4 pr-4">
+            <ScrollArea className="flex-1 -mr-4 pr-4 min-h-0">
                 <div className="space-y-2 pb-2">
                     {filteredMembers.map((member) => {
                         const isSelected = selectedMemberIds.includes(member.id);
