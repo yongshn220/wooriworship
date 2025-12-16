@@ -1,25 +1,26 @@
 "use client"
 
 import Image from "next/image";
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import * as React from "react";
-import {Invitation} from "@/models/invitation";
-import {teamAtom, teamUpdaterAtom} from "@/global-states/teamState";
-import {useRecoilValue, useSetRecoilState} from "recoil";
-import {timestampToDateStringFormatted} from "@/components/util/helper/helper-functions";
-import {toast} from "@/components/ui/use-toast";
+import { Invitation } from "@/models/invitation";
+import { teamAtom, teamUpdaterAtom } from "@/global-states/teamState";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { timestampToDateStringFormatted } from "@/components/util/helper/helper-functions";
+import { toast } from "@/components/ui/use-toast";
 import { InvitationService, TeamService, UserService } from "@/apis";
 import { InvitationStatus } from "@/components/constants/enums";
 import { auth } from "@/firebase";
-import {userAtom, userUpdaterAtom} from "@/global-states/userState";
-import {pendingReceivedInvitationsUpdaterAtom} from "@/global-states/invitation-state";
+import { userAtom, userUpdaterAtom } from "@/global-states/userState";
+import { pendingReceivedInvitationsUpdaterAtom } from "@/global-states/invitation-state";
 
 
 interface Props {
   invitation: Invitation
+  onResolve?: (id: string) => void
 }
 
-export function InvitationCard({invitation}: Props) {
+export function InvitationCard({ invitation, onResolve }: Props) {
   const user = auth.currentUser
   const sender = useRecoilValue(userAtom(invitation?.sender_id))
   const team = useRecoilValue(teamAtom(invitation?.team_id))
@@ -38,18 +39,19 @@ export function InvitationCard({invitation}: Props) {
 
       if (!addNewTeamResult || !addNewMemberResult) {
         console.log("err: InvitationCard-handleAccept")
-        toast({title:"Failed to accept the team. Please try later again."})
+        toast({ title: "Failed to accept the team. Please try later again." })
       }
       else {
-        toast({title: `You have successfully joined [${team.name}]`})
+        toast({ title: `You have successfully joined [${team.name}]` })
       }
       setUserUpdater(prev => prev + 1)
       setInvitationsUpdater(prev => prev + 1)
       setTeamUpdater(prev => prev + 1)
+      onResolve?.(invitation.id)
     }
     catch (err) {
       console.log("err: ", err);
-      toast({title: "Oops, Something went wrong."})
+      toast({ title: "Oops, Something went wrong." })
     }
   }
 
@@ -57,15 +59,16 @@ export function InvitationCard({invitation}: Props) {
     try {
       const result = await InvitationService.updateInvitation(invitation.id, InvitationStatus.Rejected);
       if (!result) {
-        toast({title: `Fail to declined the invitation. Please try later again.`}); return;
+        toast({ title: `Fail to declined the invitation. Please try later again.` }); return;
       }
 
-      toast({title: `You declined invitation from [${team.name}]`})
+      toast({ title: `You declined invitation from [${team.name}]` })
       setInvitationsUpdater(prev => prev + 1)
+      onResolve?.(invitation.id)
     }
     catch (err) {
-      console.log("error: "+err);
-      toast({title: "Oops, Something went wrong."})
+      console.log("error: " + err);
+      toast({ title: "Oops, Something went wrong." })
     }
   }
 

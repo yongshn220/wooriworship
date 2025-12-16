@@ -2,14 +2,15 @@
 
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState";
-import { useRecoilValue } from "recoil";
+import { useEffect, useState } from "react";
+import { currentTeamIdAtom, teamAtom, teamUpdaterAtom } from "@/global-states/teamState";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { auth } from "@/firebase";
-import { ChevronLeft, ChevronRight, User } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw, User } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { MemberRoleDrawer } from "@/components/elements/manage/member-role-drawer";
-import { userAtom } from "@/global-states/userState";
+import { usersAtom } from "@/global-states/userState";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { fetchServingRolesSelector } from "@/global-states/servingState";
@@ -18,6 +19,25 @@ export default function MembersPage() {
     const router = useRouter();
     const currentTeamId = useRecoilValue(currentTeamIdAtom);
     const team = useRecoilValue(teamAtom(currentTeamId));
+    const setTeamUpdater = useSetRecoilState(teamUpdaterAtom);
+    const users = useRecoilValue(usersAtom(team?.users || []));
+
+    // Refresh State
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    // Initial load & Refresh handler
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        // Small delay to show spinner interaction, and allow Recoil selector to re-eval
+        setTeamUpdater(prev => prev + 1);
+        setTimeout(() => setIsRefreshing(false), 500);
+    };
+
+    // Auto-refresh on mount
+    // Removing auto-refresh to prevent infinite loop with TeamIdValidation unmounting/remounting
+    // useEffect(() => {
+    //     handleRefresh();
+    // }, []);
 
     // Drawer State
     const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
@@ -29,7 +49,15 @@ export default function MembersPage() {
                 <Button variant="ghost" size="icon" className="-ml-2" onClick={() => router.back()}>
                     <ChevronLeft className="w-5 h-5" />
                 </Button>
-                <h1 className="text-lg font-semibold">Manage Members</h1>
+                <h1 className="text-lg font-semibold flex-1">Manage Members</h1>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleRefresh}
+                    disabled={isRefreshing}
+                >
+                    <RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />
+                </Button>
             </div>
 
             {/* Content */}
@@ -40,12 +68,12 @@ export default function MembersPage() {
                         Active Members ({team?.users?.length || 0})
                     </Label>
                     <div className="bg-card rounded-xl border shadow-sm divide-y">
-                        {team?.users?.map((userId) => (
+                        {users?.map((user) => (
                             <MemberItem
-                                key={userId}
-                                userId={userId}
+                                key={user.id}
+                                user={user}
                                 teamId={currentTeamId}
-                                onClick={() => setSelectedMemberId(userId)}
+                                onClick={() => setSelectedMemberId(user.id)}
                             />
                         ))}
                     </div>
@@ -69,14 +97,13 @@ export default function MembersPage() {
     );
 }
 
-function MemberItem({ userId, teamId, onClick }: { userId: string, teamId: string, onClick: () => void }) {
-    const user = useRecoilValue(userAtom(userId));
+function MemberItem({ user, teamId, onClick }: { user: any, teamId: string, onClick: () => void }) {
     const team = useRecoilValue(teamAtom(teamId));
     const roles = useRecoilValue(fetchServingRolesSelector(teamId));
 
-    const isAdmin = team?.admins?.includes(userId);
+    const isAdmin = team?.admins?.includes(user?.id);
     const assignedRoleNames = roles
-        .filter(r => r.default_members?.includes(userId))
+        .filter(r => r.default_members?.includes(user?.id))
         .map(r => r.name);
 
     return (

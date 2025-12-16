@@ -1,7 +1,7 @@
 "use client"
 
-import React, {useState, useEffect, useRef, useCallback} from 'react'
-import {LoadingCircle} from "@/components/util/animation/loading-indicator";
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { LoadingCircle } from "@/components/util/animation/loading-indicator";
 
 export function PullToRefresh({ children }: any) {
   const [startY, setStartY] = useState(0)
@@ -49,9 +49,9 @@ export function PullToRefresh({ children }: any) {
       }
     }
 
-    content.addEventListener('touchstart', touchStart)
-    content.addEventListener('touchmove', touchMove)
-    content.addEventListener('touchend', touchEnd)
+    content.addEventListener('touchstart', touchStart, { passive: true })
+    content.addEventListener('touchmove', touchMove, { passive: true })
+    content.addEventListener('touchend', touchEnd, { passive: true })
 
     return () => {
       content.removeEventListener('touchstart', touchStart)
@@ -73,7 +73,7 @@ export function PullToRefresh({ children }: any) {
         className="absolute top-0 left-0 w-full flex items-center justify-center overflow-hidden transition-all duration-300"
         style={{ height: 0 }}
       >
-        <LoadingCircle/>
+        <LoadingCircle />
       </div>
       <div ref={contentRef} className="w-full h-full">
         {children}

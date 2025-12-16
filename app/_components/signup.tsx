@@ -68,26 +68,28 @@ export function Signup({ setMode }: { setMode: (mode: LandingMode) => void }) {
       switch (err.code) {
         case "auth/email-already-in-use":
           form.setError("email", {
-            message: "Email is already in use.",
-          })
+            type: "manual",
+            message: "This email is already registered. Please sign in instead.",
+          }, { shouldFocus: true })
           break
         case "auth/invalid-email":
           form.setError("email", {
-            message: "Invalid email address.",
-          })
+            type: "manual",
+            message: "Please enter a valid email address.",
+          }, { shouldFocus: true })
           break
         case "auth/weak-password":
           form.setError("password", {
-            message: "Password is too weak.",
-          })
+            type: "manual",
+            message: "Password is too weak. It should be at least 6 characters.",
+          }, { shouldFocus: true })
           break
         default:
           toast({
             title: "Error creating account",
-            description: "Please try again later.",
+            description: err.message || "Something went wrong. Please try again.",
             variant: "destructive",
           })
-          console.error(err) // acceptable for unknown errors, but avoid logging PII
           break
       }
     } finally {
@@ -161,7 +163,15 @@ export function Signup({ setMode }: { setMode: (mode: LandingMode) => void }) {
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
+                        {/* Manually rendering error to ensure visibility for async errors */}
+                        {form.formState.errors.email && (
+                          <p className="text-[0.8rem] font-medium text-destructive mt-1 animate-in fade-in-0 slide-in-from-top-1">
+                            {form.formState.errors.email.message}
+                          </p>
+                        )}
+                        {/* Hide default FormMessage if we match the manual one to avoid duplicates, 
+                            though FormMessage scems to have trouble rendering this specific manual error anyway */}
+                        {!form.formState.errors.email && <FormMessage />}
                       </FormItem>
                     )}
                   />

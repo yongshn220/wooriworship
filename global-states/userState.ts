@@ -1,13 +1,13 @@
-import {atom, atomFamily, selectorFamily} from "recoil";
-import {UserService} from "@/apis";
-import {User} from "@/models/user";
+import { atom, atomFamily, selectorFamily } from "recoil";
+import { UserService } from "@/apis";
+import { User } from "@/models/user";
 
 
 export const userAtom = atomFamily<User, string>({
   key: "userAtom",
   default: selectorFamily({
     key: "userAtom/default",
-    get: (userId: string) => async ({get}) => {
+    get: (userId: string) => async ({ get }) => {
       get(userUpdaterAtom)
       try {
         if (!userId) return null
@@ -30,13 +30,16 @@ export const usersAtom = atomFamily<Array<User>, Array<string>>({
   default: selectorFamily({
     key: 'usersAtom/default',
     get: (userIds: Array<string>) => async ({ get }) => {
-      if (!userIds) return []
+      get(userUpdaterAtom); // Enable refresh trigger
+      if (!userIds || userIds.length === 0) return []
 
-      const users = await Promise.all(userIds.map(async userId => {
-        return get(userAtom(userId));
-      }));
-
-      return users.filter(user => user !== null) as Array<User>;
+      try {
+        const users = await UserService.getByIds([...userIds]) as Array<User>;
+        return users || [];
+      } catch (e) {
+        console.error(e);
+        return [];
+      }
     }
   })
 });
