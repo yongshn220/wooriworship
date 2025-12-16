@@ -16,6 +16,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { MemberSelector } from "./member-selector";
 import { usersAtom } from "@/global-states/userState";
@@ -279,14 +280,10 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                             >
                                                 <div className="flex justify-between items-center">
                                                     <span className="font-medium">{role.name}</span>
-                                                    {assignedIds.length === 0 ? (
-                                                        <UserPlus className="h-4 w-4 text-muted-foreground" />
-                                                    ) : (
-                                                        <Badge variant="secondary" className="text-xs">
-                                                            {assignedIds.length}
-                                                        </Badge>
-                                                    )}
+                                                    <UserPlus className="h-4 w-4 text-muted-foreground" />
                                                 </div>
+
+                                                {/* Assigned Members Display */}
                                                 {assignedIds.length > 0 && (
                                                     <div className="flex flex-wrap gap-1 mt-1">
                                                         {assignedIds.map(uid => (
@@ -294,6 +291,45 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                 {getMemberName(uid)}
                                                             </span>
                                                         ))}
+                                                    </div>
+                                                )}
+
+                                                {/* Inline Suggested Members */}
+                                                {role.default_members && role.default_members.length > 0 && (
+                                                    <div className="mt-2 pt-2 border-t" onClick={(e) => e.stopPropagation()}>
+                                                        <Label className="text-[10px] text-muted-foreground uppercase mb-1.5 block">Suggested</Label>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {role.default_members.map(uid => {
+                                                                const member = teamMembers.find(m => m.id === uid);
+                                                                if (!member) return null;
+                                                                const isSelected = assignedIds.includes(uid);
+
+                                                                return (
+                                                                    <div
+                                                                        key={uid}
+                                                                        onClick={() => {
+                                                                            setRoleAssignments(prev => {
+                                                                                const current = prev[role.id] || [];
+                                                                                if (isSelected) {
+                                                                                    return { ...prev, [role.id]: current.filter(id => id !== uid) };
+                                                                                } else {
+                                                                                    return { ...prev, [role.id]: [...current, uid] };
+                                                                                }
+                                                                            });
+                                                                        }}
+                                                                        className={cn(
+                                                                            "flex items-center gap-2 px-2 py-1 rounded-full border text-xs font-medium cursor-pointer transition-all active:scale-95",
+                                                                            isSelected
+                                                                                ? "bg-primary/10 border-primary text-primary"
+                                                                                : "bg-background hover:bg-muted border-dashed border-gray-300"
+                                                                        )}
+                                                                    >
+                                                                        <span className="whitespace-nowrap">{member.name}</span>
+                                                                        <Check className={cn("w-3 h-3 ml-1 transition-opacity duration-200", isSelected ? "opacity-100" : "opacity-0")} />
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
@@ -383,45 +419,26 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
             {/* Member Selection Drawer */}
             <Drawer open={!!activeRoleForSelection} onOpenChange={(open) => !open && setActiveRoleForSelection(null)}>
-                <DrawerContent className="h-[70vh]">
-                    <DrawerHeader>
-                        <DrawerTitle>Select Members</DrawerTitle>
+                <DrawerContent className="h-[80vh]">
+                    <DrawerHeader className="flex items-center justify-between px-6 py-4 border-b">
+                        <DrawerTitle className="text-lg font-bold">Select Members</DrawerTitle>
+                        {(roleAssignments[activeRoleForSelection!]?.length || 0) > 0 && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 px-3 text-xs font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full transition-colors"
+                                onClick={() => {
+                                    if (activeRoleForSelection) {
+                                        setRoleAssignments(prev => ({ ...prev, [activeRoleForSelection]: [] }));
+                                    }
+                                }}
+                            >
+                                Unselect All
+                            </Button>
+                        )}
                     </DrawerHeader>
-                    <div className="p-4 pt-0 h-full overflow-hidden flex flex-col">
-                        {activeRoleForSelection && roles.find(r => r.id === activeRoleForSelection)?.default_members?.length ? (
-                            <div className="mb-4 space-y-2 shrink-0">
-                                <Label className="text-xs text-muted-foreground uppercase font-semibold">Quick Select</Label>
-                                <div className="flex flex-wrap gap-2">
-                                    {roles.find(r => r.id === activeRoleForSelection)?.default_members?.map(uid => {
-                                        const isSelected = (roleAssignments[activeRoleForSelection] || []).includes(uid);
-                                        return (
-                                            <div
-                                                key={uid}
-                                                onClick={() => {
-                                                    setRoleAssignments(prev => {
-                                                        const current = prev[activeRoleForSelection] || [];
-                                                        if (isSelected) {
-                                                            return { ...prev, [activeRoleForSelection]: current.filter(id => id !== uid) };
-                                                        } else {
-                                                            return { ...prev, [activeRoleForSelection]: [...current, uid] };
-                                                        }
-                                                    });
-                                                }}
-                                                className={cn(
-                                                    "flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium cursor-pointer transition-all active:scale-95",
-                                                    isSelected
-                                                        ? "bg-primary text-primary-foreground border-primary"
-                                                        : "bg-background hover:bg-muted border-border"
-                                                )}
-                                            >
-                                                <span>{getMemberName(uid)}</span>
-                                                {isSelected && <Check className="w-3 h-3" />}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        ) : null}
+                    <div className="px-6 py-4 h-full overflow-hidden flex flex-col">
+
                         <MemberSelector
                             selectedMemberIds={activeRoleForSelection ? (roleAssignments[activeRoleForSelection] || []) : []}
                             onSelect={(uid) => {
