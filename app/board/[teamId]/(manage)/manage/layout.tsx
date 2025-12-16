@@ -6,12 +6,19 @@ import { currentPageAtom } from "@/global-states/page-state";
 import { useEffect } from "react";
 import { Page } from "@/components/constants/enums";
 
+import { usePathname } from "next/navigation";
+
 export default function ManageLayout({ children }: any) {
   const setPage = useSetRecoilState(currentPageAtom)
+  const pathname = usePathname()
 
   useEffect(() => {
-    setPage(Page.MANAGE)
-  }, [setPage]);
+    if (pathname.endsWith("/manage")) {
+      setPage(Page.MANAGE)
+    } else {
+      setPage(Page.MANAGE_SUBPAGE)
+    }
+  }, [setPage, pathname]);
 
   return (
     <PullToRefresh>

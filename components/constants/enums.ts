@@ -17,6 +17,7 @@ export enum Page {
   CREATE_SERVING = "create-serving",
   EDIT_SERVING = "edit-serving",
   MANAGE = "manage",
+  MANAGE_SUBPAGE = "manage-subpage",
 }
 
 
