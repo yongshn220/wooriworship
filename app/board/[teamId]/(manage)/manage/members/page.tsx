@@ -2,7 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { currentTeamIdAtom, teamAtom, teamUpdaterAtom } from "@/global-states/teamState";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { auth } from "@/firebase";
@@ -21,6 +21,16 @@ export default function MembersPage() {
     const team = useRecoilValue(teamAtom(currentTeamId));
     const setTeamUpdater = useSetRecoilState(teamUpdaterAtom);
     const users = useRecoilValue(usersAtom(team?.users || []));
+
+    const sortedUsers = useMemo(() => {
+        return [...users].sort((a, b) => {
+            const isAdminA = team?.admins?.includes(a.id);
+            const isAdminB = team?.admins?.includes(b.id);
+            if (isAdminA && !isAdminB) return -1;
+            if (!isAdminA && isAdminB) return 1;
+            return (a.email || "").localeCompare(b.email || "");
+        });
+    }, [users, team?.admins]);
 
     // Refresh State
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -68,7 +78,7 @@ export default function MembersPage() {
                         Active Members ({team?.users?.length || 0})
                     </Label>
                     <div className="bg-card rounded-xl border shadow-sm divide-y">
-                        {users?.map((user) => (
+                        {sortedUsers?.map((user) => (
                             <MemberItem
                                 key={user.id}
                                 user={user}

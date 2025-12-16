@@ -19,6 +19,8 @@ import { accountSettingAtom } from "@/global-states/account-setting"
 import PushNotificationService from "@/apis/PushNotificationService"
 import { TeamSelect } from "@/components/elements/design/team/team-select";
 import { ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { InvitationDrawer } from "@/components/elements/manage/invitation-drawer";
 
 export default function ManagePage({ params }: { params: { teamId: string } }) {
   const authUser = auth.currentUser
@@ -27,6 +29,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
   const accountSetting = useRecoilValue(accountSettingAtom(authUser?.uid))
   const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
   const setInvitationDialogState = useSetRecoilState(invitationInboxDialogOpenStateAtom)
+  const [isInvitationDrawerOpen, setInvitationDrawerOpen] = useState(false)
 
   // Badge logic
   const pendingInvitations = useRecoilValue(pendingReceivedInvitationsAtom(authUser?.email || ""))
@@ -93,7 +96,12 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
             title="Invite Members"
             description="Send team invitations"
             showChevron
-            onClick={() => router.push(`/board/${teamId}/manage/invitations`)}
+            onClick={() => setInvitationDrawerOpen(true)}
+          />
+
+          <InvitationDrawer
+            open={isInvitationDrawerOpen}
+            onOpenChange={setInvitationDrawerOpen}
           />
 
           <div onClick={() => setInvitationDialogState(true)}>

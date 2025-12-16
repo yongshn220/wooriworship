@@ -182,15 +182,19 @@ export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) 
                     </p>
                 </div>
 
-                <Separator />
+                {isCurrentUserAdmin && (
+                    <>
+                        <Separator />
 
-                <Button
-                    variant="destructive"
-                    className="w-full"
-                    onClick={() => setShowDeleteDialog(true)}
-                >
-                    Remove from Team
-                </Button>
+                        <Button
+                            variant="destructive"
+                            className="w-full"
+                            onClick={() => setShowDeleteDialog(true)}
+                        >
+                            Remove from Team
+                        </Button>
+                    </>
+                )}
 
             </div>
         </ResponsiveDrawer>

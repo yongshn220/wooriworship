@@ -94,7 +94,7 @@ export function InvitationCard({ invitation, onResolve }: Props) {
               <p className="text-xs text-gray-200 border p-1 rounded-sm">{timestampToDateStringFormatted(invitation?.invite_date)}</p>
             </div>
             <Button variant="ghost" onClick={handleDecline} className="hover:bg-white/20 hover:text-white">Decline</Button>
-            <Button onClick={handleAccept} className="hover:bg-purple-900">Join</Button>
+            <Button onClick={handleAccept} className="bg-[#A594F9] text-white hover:bg-[#8F7EE5]">Join</Button>
           </div>
         </div>
       </div>
