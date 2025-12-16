@@ -178,7 +178,7 @@ export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) 
                         )}
                     </div>
                     <p className="text-xs text-muted-foreground px-1">
-                        Assigning roles here puts them in the "Quick Select" list when creating schedules.
+                        Assigning roles here puts them in the &quot;Quick Select&quot; list when creating schedules.
                     </p>
                 </div>
 
