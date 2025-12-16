@@ -6,10 +6,10 @@ interface Props {
     name?: string
     description?: string
     teamCount?: number
-    onSwitchClick?: () => void
+    action?: React.ReactNode
 }
 
-export function TeamProfileCard({ name, description, teamCount, onSwitchClick }: Props) {
+export function TeamProfileCard({ name, description, teamCount, action }: Props) {
     return (
         <div className="bg-card p-6 rounded-2xl border border-border shadow-sm flex flex-col items-center justify-center text-center mb-6">
             <div className="mb-4 transform scale-125">
@@ -24,17 +24,7 @@ export function TeamProfileCard({ name, description, teamCount, onSwitchClick }:
                 Current Workspace
             </div>
 
-            {onSwitchClick && (
-                <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded-full h-8 px-4 text-xs font-medium"
-                    onClick={onSwitchClick}
-                >
-                    Switch Team
-                    <ChevronRight className="w-3 h-3 ml-1 opacity-50" />
-                </Button>
-            )}
+            {action}
         </div>
     )
 }

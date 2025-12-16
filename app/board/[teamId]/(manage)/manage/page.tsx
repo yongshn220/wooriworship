@@ -17,6 +17,8 @@ import { MenuGroup } from "@/app/board/[teamId]/(manage)/manage/_components/menu
 import { TeamProfileCard } from "@/app/board/[teamId]/(manage)/manage/_components/team-profile-card";
 import { accountSettingAtom } from "@/global-states/account-setting"
 import PushNotificationService from "@/apis/PushNotificationService"
+import { TeamSelect } from "@/components/elements/design/team/team-select";
+import { ChevronRight } from "lucide-react";
 
 export default function ManagePage({ params }: { params: { teamId: string } }) {
   const authUser = auth.currentUser
@@ -58,6 +60,22 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
         {/* Profile Section */}
         <TeamProfileCard
           name={team?.name}
+          action={
+            <TeamSelect
+              createOption={true}
+              onTeamChange={(newTeamId) => router.replace(`/board/${newTeamId}/manage`)}
+              customTrigger={
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full h-8 px-4 text-xs font-medium"
+                >
+                  Switch Team
+                  <ChevronRight className="w-3 h-3 ml-1 opacity-50" />
+                </Button>
+              }
+            />
+          }
         />
 
         {/* Team Management Group */}
