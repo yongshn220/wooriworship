@@ -7,10 +7,11 @@ import { musicSheetsByIdsAtom } from "@/global-states/music-sheet-state";
 import { cn } from "@/lib/utils";
 import { worshipViewPageModeAtom } from "../_states/worship-detail-states";
 import { MusicSheetCounts } from "./worship-live-carousel";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MusicSheet } from "@/models/music_sheet";
 import { DirectionType, WorshipViewPageMode } from "@/components/constants/enums";
 import { worshipMultipleSheetsViewModeAtom } from "../_states/worship-detail-states";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 
 interface Props {
@@ -76,30 +77,47 @@ interface WorshipLiveCarouselItemProps {
 
 export function WorshipLiveCarouselItem({ index, urls }: WorshipLiveCarouselItemProps) {
     const pageMode = useRecoilValue(worshipViewPageModeAtom)
+    const [enablePan, setEnablePan] = useState(false)
 
     return (
         <CarouselItem className={cn("h-full p-0", { "basis-1/2": pageMode === WorshipViewPageMode.DOUBLE_PAGE })}>
-            <div className="h-full w-full flex flex-col bg-background overflow-y-auto scrollbar-hide overscroll-contain">
-                {
-                    urls.map((url, index) => (
-                        <div
-                            key={index}
-                            className="relative flex-center w-full h-full p-1 select-none"
-                            style={{ WebkitTouchCallout: "none" }}
-                            onContextMenu={(e) => e.preventDefault()}
-                            onDragStart={(e) => e.preventDefault()}
-                        >
-                            <img
-                                alt="Music score"
-                                src={url}
-                                className="max-w-full max-h-full object-contain shadow-sm select-none pointer-events-none"
-                            />
-                            {/* Shield to prevent detailed interaction/dragging of the image */}
-                            <div className="absolute inset-0 z-10" />
-                        </div>
-                    ))
-                }
-            </div>
+            <TransformWrapper
+                initialScale={1}
+                minScale={1}
+                maxScale={4}
+                wheel={{ disabled: true }}
+                panning={{ disabled: !enablePan }}
+                onTransformed={(e) => {
+                    setEnablePan(e.state.scale > 1.01)
+                }}
+            >
+                <TransformComponent
+                    wrapperStyle={{ width: "100%", height: "100%" }}
+                    contentStyle={{ width: "100%", height: "100%" }}
+                >
+                    <div className="h-full w-full flex flex-col bg-background overflow-y-auto scrollbar-hide overscroll-contain">
+                        {
+                            urls.map((url, index) => (
+                                <div
+                                    key={index}
+                                    className="relative flex-center w-full h-full p-1 select-none"
+                                    style={{ WebkitTouchCallout: "none" }}
+                                    onContextMenu={(e) => e.preventDefault()}
+                                    onDragStart={(e) => e.preventDefault()}
+                                >
+                                    <img
+                                        alt="Music score"
+                                        src={url}
+                                        className="max-w-full max-h-full object-contain shadow-sm select-none pointer-events-none"
+                                    />
+                                    {/* Shield to prevent detailed interaction/dragging of the image */}
+                                    <div className="absolute inset-0 z-10" />
+                                </div>
+                            ))
+                        }
+                    </div>
+                </TransformComponent>
+            </TransformWrapper>
         </CarouselItem>
     )
 }
