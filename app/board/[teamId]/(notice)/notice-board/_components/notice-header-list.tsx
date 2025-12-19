@@ -27,13 +27,14 @@ export function NoticeHeaderList({ teamId }: Props) {
       { threshold: 1.0 }
     );
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
+    const target = loadMoreRef.current;
+    if (target) {
+      observer.observe(target);
     }
 
     return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
+      if (target) {
+        observer.unobserve(target);
       }
     };
   }, [noticeIdList]);

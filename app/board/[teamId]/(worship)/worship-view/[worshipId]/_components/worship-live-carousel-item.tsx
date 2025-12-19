@@ -1,4 +1,5 @@
 import * as React from "react";
+import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { CarouselItem } from "@/components/ui/carousel";
 import { WorshipSongHeader } from "@/models/worship";
@@ -105,10 +106,12 @@ export function WorshipLiveCarouselItem({ index, urls }: WorshipLiveCarouselItem
                                     onContextMenu={(e) => e.preventDefault()}
                                     onDragStart={(e) => e.preventDefault()}
                                 >
-                                    <img
+                                    <Image
                                         alt="Music score"
                                         src={url}
-                                        className="max-w-full max-h-full object-contain shadow-sm select-none pointer-events-none"
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                        className="object-contain shadow-sm select-none pointer-events-none"
                                     />
                                     {/* Shield to prevent detailed interaction/dragging of the image */}
                                     <div className="absolute inset-0 z-10" />

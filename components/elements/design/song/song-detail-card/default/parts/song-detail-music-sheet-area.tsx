@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRecoilValue } from "recoil";
 import { musicSheetAtom } from "@/global-states/music-sheet-state";
 import {
@@ -46,11 +47,14 @@ export function SongDetailMusicSheetArea({ musicSheetId }: Props) {
     return (
       <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 py-2 pb-12">
         <div className="relative w-full flex justify-center items-center">
-          <img
+          <Image
             src={musicSheet.urls[0]}
             alt="Sheet 1"
+            width={0}
+            height={0}
+            sizes="100vw"
             className="w-full h-auto max-h-[calc(100vh-80px)] object-contain shadow-sm"
-            loading="lazy"
+            style={{ width: "100%", height: "auto" }}
           />
         </div>
       </div>
@@ -65,11 +69,14 @@ export function SongDetailMusicSheetArea({ musicSheetId }: Props) {
           {musicSheet.urls.map((url: string, i: number) => (
             <CarouselItem key={i} className="flex justify-center items-center">
               <div className="relative w-full flex justify-center items-center">
-                <img
+                <Image
                   src={url}
                   alt={`Sheet ${i + 1}`}
+                  width={0}
+                  height={0}
+                  sizes="100vw"
                   className="w-full h-auto max-h-[calc(100vh-80px)] object-contain shadow-sm"
-                  loading="lazy"
+                  style={{ width: "100%", height: "auto" }}
                 />
               </div>
             </CarouselItem>
