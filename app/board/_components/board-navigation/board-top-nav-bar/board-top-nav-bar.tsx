@@ -133,7 +133,7 @@ export function BoardTopNavBar() {
 
   return (
     <BaseTopNavBar height={64} className="bg-background/80 backdrop-blur-xl border-b border-border shadow-sm z-50 supports-[backdrop-filter]:bg-background/60 transition-all duration-300 overflow-hidden">
-      <div className="w-full h-full max-w-7xl mx-auto px-4 relative flex items-center">
+      <div className="w-full h-full max-w-7xl mx-auto px-4 relative flex items-center static-shell">
         <AnimatePresence mode="wait">
           {isSearchOpen && currentConfig.searchComponent ? (
             <motion.div
