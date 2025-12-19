@@ -101,7 +101,7 @@ export function WorshipLiveCarouselItem({ index, urls }: WorshipLiveCarouselItem
                             urls.map((url, index) => (
                                 <div
                                     key={index}
-                                    className="relative flex-center w-full h-full p-1 select-none"
+                                    className="relative flex-center w-full h-full p-1 select-none shrink-0"
                                     style={{ WebkitTouchCallout: "none" }}
                                     onContextMenu={(e) => e.preventDefault()}
                                     onDragStart={(e) => e.preventDefault()}
