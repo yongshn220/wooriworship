@@ -81,7 +81,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     }, [teamId, setRolesUpdater, mode, initialData]);
 
     // Helpers
-    const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || "Unknown";
+    const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || id; // Fallback to ID (name) for manual entries
 
     const handleSubmit = async () => {
         if (!selectedDate) return;

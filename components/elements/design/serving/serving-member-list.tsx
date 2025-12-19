@@ -40,6 +40,7 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid }: 
                                 {assignment.memberIds.map(uid => {
                                     const member = getMember(uid);
                                     const isMe = uid === currentUserUid;
+                                    const displayName = member?.name || uid; // Manual entry support
 
                                     return (
                                         <div
@@ -52,9 +53,9 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid }: 
                                             )}
                                         >
                                             <Avatar className="h-5 w-5">
-                                                <AvatarFallback className="text-[9px]">{member?.name?.[0]}</AvatarFallback>
+                                                <AvatarFallback className="text-[9px]">{displayName[0]}</AvatarFallback>
                                             </Avatar>
-                                            <span>{member?.name || "Unknown"}</span>
+                                            <span>{displayName}</span>
                                         </div>
                                     );
                                 })}

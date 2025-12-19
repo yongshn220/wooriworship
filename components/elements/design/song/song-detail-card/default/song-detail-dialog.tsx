@@ -1,4 +1,4 @@
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { Suspense, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { X, ChevronDown } from "lucide-react";
@@ -39,7 +39,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
   return (
     <Drawer open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
       <DrawerContent className="h-screen rounded-none flex flex-col focus:outline-none mt-0">
-
+        <DrawerTitle className="hidden">{song?.title || "Song Detail"}</DrawerTitle>
         {/* Top Header Bar */}
         <div className="relative flex items-center justify-between p-3 border-b bg-white/80 backdrop-blur-md shrink-0 z-20 h-[60px]">
 
