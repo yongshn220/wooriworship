@@ -87,6 +87,7 @@ export function WorshipLiveCarouselItem({ index, urls }: WorshipLiveCarouselItem
                 minScale={1}
                 maxScale={4}
                 wheel={{ disabled: true }}
+                doubleClick={{ mode: "toggle" }}
                 panning={{ disabled: !enablePan }}
                 onTransformed={(e) => {
                     setEnablePan(e.state.scale > 1.01)
