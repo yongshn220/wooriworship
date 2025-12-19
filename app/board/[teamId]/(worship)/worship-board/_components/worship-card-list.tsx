@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useRef } from "react";
+import React, { Suspense, useEffect, useRef, useMemo } from "react";
 import { currentTeamWorshipIdsAtom, worshipListDisplayedCountAtom } from "@/global-states/worship-state";
 import { WorshipCard } from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-card";
 import { EmptyWorshipBoardPage } from "@/app/board/[teamId]/(worship)/worship-board/_components/empty-worship-board-page/empty-worship-board-page";
@@ -19,7 +19,7 @@ export function WorshipCardList({ teamId }: Props) {
   const searchParams = useSearchParams();
   const expandedId = searchParams.get("expanded");
 
-  const worshipIds = (worshipIdsLoadable.state === 'hasValue') ? worshipIdsLoadable.contents : [];
+  const worshipIds = useMemo(() => (worshipIdsLoadable.state === 'hasValue') ? worshipIdsLoadable.contents : [], [worshipIdsLoadable]);
   const visibleWorshipIds = worshipIds.slice(0, displayedCount);
 
   useEffect(() => {
@@ -32,21 +32,22 @@ export function WorshipCardList({ teamId }: Props) {
       { threshold: 1.0 }
     );
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
+    const target = loadMoreRef.current;
+    if (target) {
+      observer.observe(target);
     }
 
     return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
+      if (target) {
+        observer.unobserve(target);
       }
     };
-  }, [worshipIds]);
+  }, [worshipIds, setDisplayedCount]);
 
   // Auto-expand list to include target if expanded param exists
   useEffect(() => {
     if (worshipIdsLoadable.state === 'hasValue' && expandedId && worshipIds.length > 0) {
-      const index = worshipIds.findIndex(id => id === expandedId);
+      const index = worshipIds.findIndex((id: string) => id === expandedId);
       if (index >= 0 && index >= displayedCount) {
         // Load enough to show the target item + a few more
         setDisplayedCount(prev => Math.max(prev, index + 3));

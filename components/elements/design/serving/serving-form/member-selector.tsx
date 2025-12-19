@@ -62,7 +62,7 @@ export function MemberSelector({ selectedMemberIds, onSelect, multiple = false }
                                 +
                             </div>
                             <div>
-                                <p className="font-medium text-sm text-primary">Add "{searchQuery}"</p>
+                                <p className="font-medium text-sm text-primary">Add &quot;{searchQuery}&quot;</p>
                                 <p className="text-xs text-muted-foreground">Guest / Manual Entry</p>
                             </div>
                         </div>

@@ -108,7 +108,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
   const searchInput = useRecoilValue(planSearchInputAtom);
 
   // Derived Values
-  const songs = worshipSongListLoadable.state === 'hasValue' ? worshipSongListLoadable.contents : [];
+  const songs = useMemo(() => worshipSongListLoadable.state === 'hasValue' ? worshipSongListLoadable.contents : [], [worshipSongListLoadable]);
 
   // Search Filtering Logic
   const normalizedSearchInput = useMemo(() => normalizeText(searchInput), [searchInput]);
