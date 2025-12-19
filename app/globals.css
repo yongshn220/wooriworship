@@ -13,6 +13,8 @@ body,
   overscroll-behavior-y: none;
   touch-action: pan-x pan-y;
   scroll-behavior: auto;
+  background-color: var(--background) !important;
+  /* Force theme background to remove black void */
 }
 
 .app-root {
