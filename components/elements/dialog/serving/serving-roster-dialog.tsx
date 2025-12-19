@@ -40,7 +40,7 @@ export function ServingRosterDialog({ date, teamId, trigger }: Props) {
         }
     }, [isOpen, teamId, date]);
 
-    const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || "Unknown";
+    const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || id;
 
     return (
         <ResponsiveDrawer
