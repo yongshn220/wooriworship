@@ -110,13 +110,13 @@ export function WorshipControlDock({ teamId, worshipId }: Props) {
                                     onClick={toggleShowNumber}
                                 />
 
-                                <Popover>
+                                <Popover modal={true}>
                                     <PopoverTrigger asChild>
                                         <div>
                                             <WorshipControlItem icon={<MoreHorizontal className="w-5 h-5" />} />
                                         </div>
                                     </PopoverTrigger>
-                                    <PopoverContent side="top" className="mb-4 bg-background backdrop-blur-xl border-border w-80 p-0 overflow-hidden shadow-toss rounded-2xl">
+                                    <PopoverContent side="top" className="mb-4 bg-background backdrop-blur-xl border-border w-80 p-0 overflow-hidden shadow-toss rounded-2xl z-[60]">
                                         <WorshipSettingsMenu teamId={teamId} worshipId={worshipId} />
                                     </PopoverContent>
                                 </Popover>
