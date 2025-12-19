@@ -12,8 +12,8 @@ export function BaseTopNavBar({ children, height, className }: Props) {
   return (
     <div className="relative z-50">
       <header
-        className={`sticky top-0 w-full border-b transition-all duration-300 ${className || "bg-white/80 backdrop-blur-md border-white/20 shadow-sm"}`}
-        style={{ height: typeof height === 'number' ? `${height}px` : height }}
+        className={`relative w-full border-b transition-all duration-300 pt-[env(safe-area-inset-top)] static-shell ${className || "bg-white/80 backdrop-blur-md border-white/20 shadow-sm"}`}
+        style={{ height: typeof height === 'number' ? `calc(${height}px + env(safe-area-inset-top))` : height }}
       >
         {children}
       </header>

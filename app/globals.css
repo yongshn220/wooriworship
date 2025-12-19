@@ -9,9 +9,28 @@ body,
 :root {
   height: 100%;
   width: 100%;
-  overflow: hidden;
+  /* overflow: hidden; Removed to fix Vaul drawer scroll jump */
   overscroll-behavior-y: none;
   touch-action: pan-x pan-y;
+  scroll-behavior: auto;
+}
+
+.app-root {
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.static-shell {
+  touch-action: none !important;
+  overscroll-behavior: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
 input,

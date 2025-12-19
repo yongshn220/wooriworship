@@ -18,6 +18,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -34,7 +35,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Provider>
             <Toaster />
             <BaseContainer>
-              {children}
+              <div className="app-root" vaul-drawer-wrapper="">
+                {children}
+              </div>
             </BaseContainer>
           </Provider>
         </main>
