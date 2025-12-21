@@ -1,18 +1,19 @@
 "use client"
 
-import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
-import {WorshipSpecialOrderType} from "@/components/constants/enums";
-import {Checkbox} from "@/components/ui/checkbox";
-import {useEffect, useState} from "react";
-import {teamAtom} from "@/global-states/teamState";
-import {TeamOption} from "@/models/team";
-import {TeamService} from "@/apis";
-import {toast} from "@/components/ui/use-toast";
-import {songAtom} from "@/global-states/song-state";
-import {WorshipSongHeader} from "@/models/worship";
-import {worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom} from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
-import {AddableSongDetailDialogTrigger} from "@/components/elements/design/song/song-detail-card/worship-form/addable-song-detail-dialog-trigger";
-import {AddedSongInnerHeader} from "@/components/elements/design/song/song-header/worship-form/parts/added-song-inner-header";
+import { useRecoilState, useRecoilValueLoadable, useSetRecoilState } from "recoil";
+import { WorshipSpecialOrderType } from "@/components/constants/enums";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { teamAtom } from "@/global-states/teamState";
+import { TeamOption } from "@/models/team";
+import { TeamService } from "@/apis";
+import { toast } from "@/components/ui/use-toast";
+import { songAtom } from "@/global-states/song-state";
+import { WorshipSongHeader } from "@/models/worship";
+import { worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
+import { AddableSongDetailDialogTrigger } from "@/components/elements/design/song/song-detail-card/worship-form/addable-song-detail-dialog-trigger";
+import { AddedSongInnerHeader } from "@/components/elements/design/song/song-header/worship-form/parts/added-song-inner-header";
 
 interface Props {
   teamId: string
@@ -22,12 +23,22 @@ interface Props {
 
 type CheckState = boolean | "indeterminate"
 
-export function AddedSongHeaderStatic({teamId, specialOrderType, songHeader}: Props) {
-  const song = useRecoilValue(songAtom(songHeader?.id))
-  const [team, setTeam] = useRecoilState(teamAtom(teamId))
+export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader }: Props) {
+  const songLoadable = useRecoilValueLoadable(songAtom(songHeader?.id))
+  // Utilize Loadable for teamAtom to prevent Suspense
+  const teamLoadable = useRecoilValueLoadable(teamAtom(teamId))
+  const setTeam = useSetRecoilState(teamAtom(teamId))
   const setWorshipBeginningSongHeader = useSetRecoilState(worshipBeginningSongHeaderAtom)
   const setWorshipEndingSongHeader = useSetRecoilState(worshipEndingSongHeaderAtom)
   const [isDefaultChecked, setDefaultChecked] = useState<CheckState>(false)
+
+
+
+  if (songLoadable.state === 'loading' || teamLoadable.state === 'loading') {
+    return <Skeleton className="w-full h-[100px] rounded-md" />
+  }
+  const song = songLoadable.contents
+  const team = teamLoadable.contents
 
   useEffect(() => {
     const option = team?.option?.worship
@@ -80,13 +91,13 @@ export function AddedSongHeaderStatic({teamId, specialOrderType, songHeader}: Pr
 
       if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
         teamOption.worship.beginning_song = (state)
-          ? {id: songHeader?.id, note: songHeader?.note, selected_music_sheet_ids: songHeader?.selected_music_sheet_ids}
-          : {id: null, note: "", selected_music_sheet_ids: []}
+          ? { id: songHeader?.id, note: songHeader?.note, selected_music_sheet_ids: songHeader?.selected_music_sheet_ids }
+          : { id: null, note: "", selected_music_sheet_ids: [] }
       }
       else {
         teamOption.worship.ending_song = (state)
-          ? {id: songHeader?.id, note: songHeader?.note, selected_music_sheet_ids: songHeader?.selected_music_sheet_ids}
-          : {id: null, note: "", selected_music_sheet_ids: []}
+          ? { id: songHeader?.id, note: songHeader?.note, selected_music_sheet_ids: songHeader?.selected_music_sheet_ids }
+          : { id: null, note: "", selected_music_sheet_ids: [] }
       }
 
       if (await TeamService.updateTeamOption(teamId, teamOption) === false) {
@@ -99,7 +110,7 @@ export function AddedSongHeaderStatic({teamId, specialOrderType, songHeader}: Pr
       }
 
       /* On Success */
-      setTeam((prev) => ({...prev, option: teamOption}))
+      setTeam((prev) => ({ ...prev, option: teamOption }))
       if (state) {
         toast({
           title: `Default ${(specialOrderType === WorshipSpecialOrderType.BEGINNING) ? "Beginning" : "Ending"} song updated`,
@@ -124,10 +135,10 @@ export function AddedSongHeaderStatic({teamId, specialOrderType, songHeader}: Pr
 
   function setMusicSheetIds(ids: Array<string>) {
     if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
-      setWorshipBeginningSongHeader((prev) => ({...prev, selected_music_sheet_ids: ids}))
+      setWorshipBeginningSongHeader((prev) => ({ ...prev, selected_music_sheet_ids: ids }))
     }
     else {
-      setWorshipEndingSongHeader((prev) => ({...prev, selected_music_sheet_ids: ids}))
+      setWorshipEndingSongHeader((prev) => ({ ...prev, selected_music_sheet_ids: ids }))
     }
   }
 
@@ -144,12 +155,12 @@ export function AddedSongHeaderStatic({teamId, specialOrderType, songHeader}: Pr
           setMusicSheetIds={(musicSheetIds) => setMusicSheetIds(musicSheetIds)}
           isStatic={true}
         >
-          <AddedSongInnerHeader songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids}/>
+          <AddedSongInnerHeader songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids} />
         </AddableSongDetailDialogTrigger>
       </div>
       <div className="flex-between px-2 pt-1">
         <div className="flex items-center space-x-2">
-          <Checkbox id={`checkedBox_${specialOrderType}`} checked={isDefaultChecked} onCheckedChange={(state) => handleCheckStateChange(state)}/>
+          <Checkbox id={`checkedBox_${specialOrderType}`} checked={isDefaultChecked} onCheckedChange={(state) => handleCheckStateChange(state)} />
           <label
             htmlFor={`checkedBox_${specialOrderType}`}
             className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-500 cursor-pointer"
