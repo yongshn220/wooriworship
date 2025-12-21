@@ -1,13 +1,15 @@
 import { Textarea } from "@/components/ui/textarea";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValueLoadable } from "recoil";
 import { toPlainObject } from "@/components/util/helper/helper-functions";
 import { WorshipSongHeader } from "@/models/worship";
+import { MusicSheet } from "@/models/music_sheet";
 import { songAtom } from "@/global-states/song-state";
 import { SwapOrderButton } from "@/components/elements/design/song/song-header/worship-form/parts/swap-order-button";
 import { selectedWorshipSongHeaderListAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
 import React from "react";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog"; // Use read-only detail dialog
 import { musicSheetsBySongIdAtom } from "@/global-states/music-sheet-state";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -18,11 +20,18 @@ interface Props {
 
 export function AddedSongHeaderDefault({ teamId, songOrder, songHeader }: Props) {
   const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
-  const song = useRecoilValue(songAtom(songHeader?.id))
+  const songLoadable = useRecoilValueLoadable(songAtom(songHeader?.id))
   // Fetch all available keys for this song to render toggle buttons
-  const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songHeader?.id))
+  const musicSheetsLoadable = useRecoilValueLoadable(musicSheetsBySongIdAtom(songHeader?.id))
 
   const [isDetailOpen, setIsDetailOpen] = React.useState(false)
+
+  if (songLoadable.state === 'loading' || musicSheetsLoadable.state === 'loading') {
+    return <Skeleton className="w-full h-[220px] rounded-2xl" />
+  }
+
+  const song = songLoadable.contents
+  const musicSheets = musicSheetsLoadable.contents
 
   // Current selected keys for this instance
   const selectedKeys = songHeader?.selected_music_sheet_ids || []
@@ -99,7 +108,7 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader }: Props)
 
         {/* Inline Key Toggles */}
         <div className="flex flex-wrap gap-2">
-          {musicSheets?.map((sheet) => {
+          {musicSheets?.map((sheet: MusicSheet) => {
             const isSelected = selectedKeys.includes(sheet.id)
             return (
               <button

@@ -178,7 +178,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       opacity: 0,
       scale: 0.95,
       rotateY: direction > 0 ? 20 : -20,
-      position: 'absolute' as const
+      zIndex: 0,
     }),
     center: {
       zIndex: 1,
@@ -186,7 +186,6 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       opacity: 1,
       scale: 1,
       rotateY: 0,
-      position: 'relative' as const
     },
     exit: (direction: number) => ({
       zIndex: 0,
@@ -194,7 +193,6 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       opacity: 0,
       scale: 0.95,
       rotateY: direction < 0 ? 20 : -20,
-      position: 'absolute' as const
     })
   };
 
@@ -223,8 +221,8 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       </div>
 
       {/* 2. Main Content Area */}
-      <div className="w-full max-w-xl h-full px-4 sm:px-6 pt-24 pb-20 flex flex-col relative perspective-1000">
-        <AnimatePresence initial={false} mode="popLayout" custom={direction}>
+      <div className="w-full max-w-xl h-full px-4 sm:px-6 pt-24 pb-20 grid grid-cols-1 grid-rows-1 relative perspective-1000">
+        <AnimatePresence initial={false} custom={direction}>
 
           {/* Step 1: Title */}
           {step === 0 && (
@@ -236,7 +234,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               animate="center"
               exit="exit"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 flex flex-col justify-center space-y-8 w-full"
+              className="col-start-1 row-start-1 flex-1 flex flex-col justify-center space-y-8 w-full h-full"
             >
               <div className="space-y-4 text-center">
                 <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 1</Label>
@@ -295,7 +293,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               animate="center"
               exit="exit"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 flex flex-col justify-center space-y-8 w-full"
+              className="col-start-1 row-start-1 flex-1 flex flex-col justify-center space-y-8 w-full h-full"
             >
               <div className="space-y-4 text-center">
                 <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 2</Label>
@@ -333,7 +331,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               animate="center"
               exit="exit"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 flex flex-col justify-center space-y-8 w-full"
+              className="col-start-1 row-start-1 flex-1 flex flex-col justify-center space-y-8 w-full h-full"
             >
               <div className="space-y-4 text-center">
                 <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 3</Label>
@@ -390,7 +388,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               animate="center"
               exit="exit"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 flex flex-col h-full space-y-3 w-full leading-relaxed" // Reduced space-y-6 to space-y-3
+              className="col-start-1 row-start-1 flex-1 flex flex-col h-full space-y-3 w-full leading-relaxed" // Reduced space-y-6 to space-y-3
             >
               <div className="flex items-end justify-between px-2 pb-1"> {/* Align bottom, added padding */}
                 <div>

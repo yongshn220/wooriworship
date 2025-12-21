@@ -1,6 +1,6 @@
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { Suspense, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilValueLoadable } from "recoil";
 import { X, ChevronDown } from "lucide-react";
 
 import { songAtom } from "@/global-states/song-state";
@@ -26,8 +26,12 @@ interface Props {
 }
 
 export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly = false }: Props) {
-  const song = useRecoilValue(songAtom(songId));
-  const musicSheetIds = useRecoilValue(musicSheetIdsAtom(songId));
+  const songLoadable = useRecoilValueLoadable(songAtom(songId));
+  const musicSheetIdsLoadable = useRecoilValueLoadable(musicSheetIdsAtom(songId));
+
+  const song = songLoadable.state === 'hasValue' ? songLoadable.contents : null;
+  const musicSheetIds = musicSheetIdsLoadable.state === 'hasValue' ? musicSheetIdsLoadable.contents : [];
+
   const [selectedMusicSheetId, setSelectedMusicSheetId] = useState<string>("");
 
   useEffect(() => {
