@@ -366,675 +366,680 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             scale: 1,
             position: 'relative' as const
         },
-        position: 'absolute' as const
-    })
-};
+        exit: (direction: number) => ({
+            zIndex: 0,
+            x: direction < 0 ? "100%" : "-100%",
+            opacity: 0,
+            scale: 0.95,
+            position: 'absolute' as const
+        })
+    };
 
-return (
-    <div className="fixed inset-0 z-[40] bg-gray-50 flex flex-col overflow-y-auto overflow-x-hidden">
+    return (
+        <div className="fixed inset-0 z-[40] bg-gray-50 flex flex-col overflow-y-auto overflow-x-hidden">
 
-        {/* STICKY HEADER MASK */}
-        <div className="sticky top-0 z-50 w-full px-6 pt-10 pb-6 bg-gray-50/80 backdrop-blur-xl border-b border-gray-100/50 flex flex-col items-center gap-6 shadow-sm">
-            <div className="flex gap-2 p-1 bg-white/60 rounded-full shadow-sm border border-white/40">
-                {["When", "Who", "What", "Review"].map((label, idx) => (
-                    <button
-                        key={idx}
-                        onClick={() => goToStep(idx)}
-                        className={cn(
-                            "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
-                            step === idx
-                                ? "bg-black text-white shadow-md scale-105"
-                                : "text-gray-400 hover:text-gray-600"
-                        )}
-                    >
-                        {label}
-                    </button>
-                ))}
+            {/* STICKY HEADER MASK */}
+            <div className="sticky top-0 z-50 w-full px-6 pt-10 pb-6 bg-gray-50/80 backdrop-blur-xl border-b border-gray-100/50 flex flex-col items-center gap-6 shadow-sm">
+                <div className="flex gap-2 p-1 bg-white/60 rounded-full shadow-sm border border-white/40">
+                    {["When", "Who", "What", "Review"].map((label, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => goToStep(idx)}
+                            className={cn(
+                                "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
+                                step === idx
+                                    ? "bg-black text-white shadow-md scale-105"
+                                    : "text-gray-400 hover:text-gray-600"
+                            )}
+                        >
+                            {label}
+                        </button>
+                    ))}
+                </div>
             </div>
-        </div>
 
-        {/* MAIN CONTENT AREA */}
-        <main className="flex-1 w-full max-w-2xl mx-auto px-6 py-8">
-            <AnimatePresence mode="wait" custom={direction}>
-                {/* Step 1: When */}
-                {step === 0 && (
-                    <motion.div
-                        key="step0"
-                        custom={direction}
-                        variants={slideVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className="flex flex-col gap-8 w-full"
-                    >
-                        <div className="space-y-2 text-center">
-                            <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 1</Label>
-                            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Select Date</h2>
-                        </div>
+            {/* MAIN CONTENT AREA */}
+            <main className="flex-1 w-full max-w-2xl mx-auto px-6 py-8">
+                <AnimatePresence mode="wait" custom={direction}>
+                    {/* Step 1: When */}
+                    {step === 0 && (
+                        <motion.div
+                            key="step0"
+                            custom={direction}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="flex flex-col gap-8 w-full"
+                        >
+                            <div className="space-y-2 text-center">
+                                <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 1</Label>
+                                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Select Date</h2>
+                            </div>
 
-                        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-2">
-                            <Calendar
-                                mode="single"
-                                selected={selectedDate}
-                                onSelect={(date) => {
-                                    if (date) {
-                                        setSelectedDate(date);
-                                        nextStep();
-                                    }
-                                }}
-                                className="rounded-2xl"
-                            />
-                        </div>
-                    </motion.div>
-                )}
+                            <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-2">
+                                <Calendar
+                                    mode="single"
+                                    selected={selectedDate}
+                                    onSelect={(date) => {
+                                        if (date) {
+                                            setSelectedDate(date);
+                                            nextStep();
+                                        }
+                                    }}
+                                    className="rounded-2xl"
+                                />
+                            </div>
+                        </motion.div>
+                    )}
 
-                {/* Step 2: Who (Assign Roles) */}
-                {step === 1 && (
-                    <motion.div
-                        key="who-step"
-                        custom={direction}
-                        variants={slideVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className="flex flex-col gap-8 w-full"
-                    >
-                        <div className="space-y-2 text-center">
-                            <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 2</Label>
-                            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Assign Roles</h2>
-                        </div>
+                    {/* Step 2: Who (Assign Roles) */}
+                    {step === 1 && (
+                        <motion.div
+                            key="who-step"
+                            custom={direction}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="flex flex-col gap-8 w-full"
+                        >
+                            <div className="space-y-2 text-center">
+                                <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 2</Label>
+                                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Assign Roles</h2>
+                            </div>
 
-                        <div className="space-y-4">
-                            {roles.map(role => {
-                                const assignment = items.find(item => item.title === '찬양팀 구성')?.assignments.find(a => a.roleId === role.id);
-                                const memberIds = assignment?.memberIds || [];
-
-                                return (
-                                    <div
-                                        key={role.id}
-                                        className="group flex flex-col gap-4 p-6 rounded-3xl border bg-white shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <div className="flex-1">
-                                                <h3 className="font-bold text-lg text-gray-900">{role.name}</h3>
-                                                <p className="text-sm text-gray-400 font-medium">
-                                                    {memberIds.length > 0 ? `${memberIds.length} members assigned` : "No one assigned"}
-                                                </p>
-                                            </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-10 w-10 rounded-full bg-gray-50 group-hover:bg-primary/10 group-hover:text-primary transition-colors"
-                                                onClick={() => {
-                                                    let newItems = [...items];
-                                                    let ptItemIdx = newItems.findIndex(i => i.title === '찬양팀 구성');
-                                                    if (ptItemIdx === -1) {
-                                                        newItems.push({
-                                                            id: Math.random().toString(36).substr(2, 9),
-                                                            order: items.length,
-                                                            title: '찬양팀 구성',
-                                                            assignments: [],
-                                                            type: 'FLOW'
-                                                        });
-                                                        ptItemIdx = newItems.length - 1;
-                                                    }
-
-                                                    const newAssignments = [...newItems[ptItemIdx].assignments];
-                                                    let aIdx = newAssignments.findIndex(a => a.roleId === role.id);
-                                                    if (aIdx === -1) {
-                                                        newAssignments.push({ roleId: role.id, memberIds: [] });
-                                                        aIdx = newAssignments.length - 1;
-                                                    }
-
-                                                    setItems(newItems.map((it, idx) => idx === ptItemIdx ? { ...it, assignments: newAssignments } : it));
-                                                    setActiveSelection({ itemId: newItems[ptItemIdx].id, assignmentIndex: aIdx });
-                                                }}
-                                            >
-                                                <UserPlus className="h-5 w-5" />
-                                            </Button>
-                                        </div>
-
-                                        <div className="flex flex-wrap gap-2">
-                                            {memberIds.map(uid => (
-                                                <Badge
-                                                    key={uid}
-                                                    variant="secondary"
-                                                    className="px-3 py-1.5 rounded-full bg-gray-50 text-gray-600 border-none flex items-center gap-1.5 text-xs font-semibold"
-                                                >
-                                                    {getMemberName(uid)}
-                                                    <button
-                                                        className="hover:text-destructive transition-colors ml-1"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            const roleItemIdx = items.findIndex(i => i.title === '찬양팀 구성');
-                                                            if (roleItemIdx === -1) return;
-                                                            const newItems = [...items];
-                                                            const assgnIdx = newItems[roleItemIdx].assignments.findIndex(a => a.roleId === role.id);
-                                                            const currentAssgn = newItems[roleItemIdx].assignments[assgnIdx];
-                                                            newItems[roleItemIdx] = {
-                                                                ...newItems[roleItemIdx],
-                                                                assignments: newItems[roleItemIdx].assignments.map((a, i) =>
-                                                                    i === assgnIdx ? { ...a, memberIds: a.memberIds.filter(id => id !== uid) } : a
-                                                                )
-                                                            };
-                                                            setItems(newItems);
-                                                        }}
-                                                    >
-                                                        &times;
-                                                    </button>
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="w-full h-14 border-dashed border-2 text-muted-foreground hover:text-primary transition-colors hover:bg-primary/5 rounded-2xl text-sm font-bold"
-                                onClick={() => setIsRoleDialogOpen(true)}
-                            >
-                                <Plus className="h-5 w-5 mr-2" /> Add New Role
-                            </Button>
-                        </div>
-                    </motion.div>
-                )}
-
-                {/* Step 3: What (Worship Timeline) */}
-                {step === 2 && (
-                    <motion.div
-                        key="what-step"
-                        custom={direction}
-                        variants={slideVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className="flex flex-col gap-8 w-full"
-                    >
-                        <div className="space-y-2 text-center">
-                            <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 3</Label>
-                            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Timeline</h2>
-                        </div>
-
-                        <div className="flex flex-col gap-6">
-                            {/* Template Header & Actions */}
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between gap-4">
-                                    <div className="flex-1 relative group">
-                                        <input
-                                            value={templates.find(t => t.id === selectedTemplateId)?.name || ""}
-                                            onChange={(e) => handleUpdateTemplateName(e.target.value)}
-                                            className="text-2xl font-black bg-transparent border-b-2 border-gray-100 focus:border-primary/40 focus:ring-0 p-0 w-full placeholder:text-gray-300 transition-all hover:border-gray-300"
-                                            placeholder="Template Name..."
-                                        />
-                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-30 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                            <Pencil className="w-4 h-4 text-gray-400" />
-                                        </div>
-                                    </div>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-white shadow-sm border border-gray-100">
-                                                <MoreHorizontal className="h-5 w-5" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-56 rounded-3xl p-2 shadow-2xl border-0">
-                                            <DropdownMenuItem
-                                                className={cn("rounded-2xl py-3 cursor-pointer", hasTemplateChanges ? "text-primary font-bold bg-primary/5" : "text-muted-foreground")}
-                                                disabled={!selectedTemplateId || !hasTemplateChanges}
-                                                onClick={handleUpdateTemplate}
-                                            >
-                                                <Save className="mr-2 h-4 w-4" />
-                                                Save to Current
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                className="rounded-2xl py-3 cursor-pointer font-bold"
-                                                onClick={() => {
-                                                    const currentTemp = templates.find(t => t.id === selectedTemplateId);
-                                                    setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
-                                                    setIsTemplateDialogOpen(true);
-                                                }}
-                                            >
-                                                <Plus className="mr-2 h-4 w-4" />
-                                                Save as New
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator className="my-2 bg-gray-50" />
-                                            <DropdownMenuItem
-                                                className="rounded-2xl py-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 font-bold"
-                                                onClick={handleDeleteTemplate}
-                                            >
-                                                <Trash2 className="mr-2 h-4 w-4" />
-                                                Delete Template
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
+                                {roles.map(role => {
+                                    const assignment = items.find(item => item.title === '찬양팀 구성')?.assignments.find(a => a.roleId === role.id);
+                                    const memberIds = assignment?.memberIds || [];
 
-                                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
-                                    {templates.map(tmp => (
-                                        <Button
-                                            key={tmp.id}
-                                            variant={selectedTemplateId === tmp.id ? "default" : "outline"}
-                                            size="sm"
-                                            className="rounded-full text-xs h-9 whitespace-nowrap px-6 shadow-sm"
-                                            onClick={() => {
-                                                setSelectedTemplateId(tmp.id);
-                                                setItems(tmp.items.map((it: any, idx: number) => ({
-                                                    ...it,
-                                                    id: Math.random().toString(36).substr(2, 9),
-                                                    order: idx,
-                                                    assignments: it.title === '찬양팀 구성'
-                                                        ? (items.find(i => i.title === '찬양팀 구성')?.assignments || [])
-                                                        : []
-                                                })));
-                                            }}
+                                    return (
+                                        <div
+                                            key={role.id}
+                                            className="group flex flex-col gap-4 p-6 rounded-3xl border bg-white shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
                                         >
-                                            {tmp.name}
-                                        </Button>
-                                    ))}
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="rounded-full text-xs h-9 border-dashed border-2 px-5 text-muted-foreground hover:text-primary transition-colors bg-white/50"
-                                        onClick={() => {
-                                            setNewTemplateName("");
-                                            setIsTemplateDialogOpen(true);
-                                        }}
-                                    >
-                                        <Plus className="h-4 w-4 mr-2" /> Add
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                {!isTemplatesLoaded ? (
-                                    Array.from({ length: 5 }).map((_, i) => (
-                                        <div key={i} className="animate-pulse p-6 rounded-3xl bg-white space-y-3">
-                                            <div className="h-5 bg-gray-100 rounded w-1/3" />
-                                            <div className="h-4 bg-gray-100 rounded w-1/2" />
-                                        </div>
-                                    ))
-                                ) : (
-                                    <>
-                                        {templates.length === 0 && (
-                                            <div className="px-6 py-5 mb-2 bg-primary/5 rounded-3xl border border-primary/10 border-dashed text-center">
-                                                <p className="text-sm font-bold text-primary mb-1">✨ Sample Flow Ready</p>
-                                                <p className="text-xs text-muted-foreground leading-tight px-4">
-                                                    No templates found in DB. We&apos;ve prepared a sample flow to get you started!
-                                                </p>
-                                            </div>
-                                        )}
-                                        {items.sort((a, b) => a.order - b.order).map((item, itemIdx) => (
-                                            <div
-                                                key={item.id}
-                                                className="group flex flex-col gap-6 p-6 rounded-3xl bg-white shadow-sm hover:shadow-md transition-all"
-                                            >
-                                                <div className="flex justify-between items-start gap-3">
-                                                    <div className="flex-1 space-y-2">
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="text-[10px] font-black bg-gray-900 text-white px-2 py-0.5 rounded-full uppercase tracking-tighter">{itemIdx + 1}</span>
-                                                            <input
-                                                                value={item.title}
-                                                                onChange={(e) => {
-                                                                    const newItems = [...items];
-                                                                    newItems[itemIdx] = { ...item, title: e.target.value };
-                                                                    setItems(newItems);
-                                                                }}
-                                                                className="font-black bg-transparent border-0 focus:ring-0 p-0 text-xl w-full text-gray-900"
-                                                                placeholder="Sequence title..."
-                                                            />
-                                                        </div>
-                                                        <input
-                                                            value={item.remarks || ""}
-                                                            onChange={(e) => {
-                                                                const newItems = [...items];
-                                                                newItems[itemIdx] = { ...item, remarks: e.target.value };
-                                                                setItems(newItems);
-                                                            }}
-                                                            className="text-sm font-medium text-gray-400 bg-transparent border-0 focus:ring-0 p-0 w-full"
-                                                            placeholder="Add notes or scripture references..."
-                                                        />
-                                                    </div>
-                                                    <div className="flex gap-1">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-8 w-8 rounded-full"
-                                                            disabled={itemIdx === 0}
-                                                            onClick={() => {
-                                                                const newItems = [...items];
-                                                                const target = newItems[itemIdx];
-                                                                newItems[itemIdx] = newItems[itemIdx - 1];
-                                                                newItems[itemIdx - 1] = target;
-                                                                newItems.forEach((it, idx) => it.order = idx);
-                                                                setItems(newItems);
-                                                            }}
-                                                        >
-                                                            <ChevronUp className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-8 w-8 rounded-full"
-                                                            disabled={itemIdx === items.length - 1}
-                                                            onClick={() => {
-                                                                const newItems = [...items];
-                                                                const target = newItems[itemIdx];
-                                                                newItems[itemIdx] = newItems[itemIdx + 1];
-                                                                newItems[itemIdx + 1] = target;
-                                                                newItems.forEach((it, idx) => it.order = idx);
-                                                                setItems(newItems);
-                                                            }}
-                                                        >
-                                                            <ChevronDown className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-8 w-8 rounded-full text-gray-300 hover:text-destructive transition-colors"
-                                                            onClick={() => setItems(items.filter(i => i.id !== item.id))}
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-3">
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {item.assignments.map((a, aIdx) => (
-                                                            <div key={aIdx} className="flex flex-wrap gap-1.5 p-1 bg-gray-50 rounded-2xl border border-gray-100">
-                                                                <span className="text-[10px] font-bold text-gray-400 uppercase px-2 py-1">{roles.find(r => r.id === a.roleId)?.name || 'Role'}</span>
-                                                                {a.memberIds.map(uid => (
-                                                                    <Badge key={uid} variant="secondary" className="bg-white text-gray-700 shadow-sm border-0 font-bold px-3">
-                                                                        {getMemberName(uid)}
-                                                                        <button className="ml-1 text-gray-300 hover:text-destructive" onClick={() => {
-                                                                            const newItems = [...items];
-                                                                            const newAssignments = [...item.assignments];
-                                                                            newAssignments[aIdx] = { ...a, memberIds: a.memberIds.filter(id => id !== uid) };
-                                                                            newItems[itemIdx] = { ...item, assignments: newAssignments };
-                                                                            setItems(newItems);
-                                                                        }}>&times;</button>
-                                                                    </Badge>
-                                                                ))}
-                                                                <Button variant="ghost" size="sm" className="h-6 w-6 rounded-full p-0 bg-white shadow-sm" onClick={() => setActiveSelection({ itemId: item.id, assignmentIndex: aIdx })}>
-                                                                    <UserPlus className="h-3 w-3" />
-                                                                </Button>
-                                                            </div>
-                                                        ))}
-                                                        <Button
-                                                            variant="ghost" size="sm" className="h-8 px-4 text-[10px] font-black text-primary hover:bg-primary/5 uppercase tracking-wider rounded-full border border-primary/10"
-                                                            onClick={() => {
-                                                                const newItems = [...items];
-                                                                const newAssignments = [...item.assignments, { memberIds: [] }];
-                                                                newItems[itemIdx] = { ...item, assignments: newAssignments };
-                                                                setItems(newItems);
-                                                                setActiveSelection({ itemId: item.id, assignmentIndex: newAssignments.length - 1 });
-                                                            }}
-                                                        >
-                                                            <Plus className="h-3 w-3 mr-1" /> Add Person
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </>
-                                )}
-
-                                <Button
-                                    variant="outline" className="w-full h-16 rounded-3xl border-dashed border-2 hover:bg-white hover:shadow-md transition-all border-gray-200 text-gray-400 font-bold"
-                                    onClick={() => setItems([...items, { id: Math.random().toString(36).substr(2, 9), order: items.length, title: "", assignments: [], type: 'FLOW' }])}>
-                                    <Plus className="w-6 h-6 mr-3" /> Add Sequence
-                                </Button>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-
-                {/* Step 4: Review */}
-                {step === 3 && (
-                    <motion.div
-                        key="review-step"
-                        custom={direction}
-                        variants={slideVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className="flex flex-col gap-8 w-full pb-10"
-                    >
-                        <div className="space-y-2 text-center">
-                            <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 4</Label>
-                            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Review Plans</h2>
-                        </div>
-
-                        <div className="bg-white rounded-[3rem] p-8 shadow-2xl shadow-primary/10 border border-primary/5 space-y-8">
-                            <div className="text-center space-y-1">
-                                <span className="text-[10px] font-black text-primary uppercase tracking-widest block">Event Date</span>
-                                <span className="text-3xl font-black text-gray-900 leading-none">
-                                    {selectedDate && format(selectedDate, "MMM d, yyyy")}
-                                </span>
-                                <span className="text-sm font-bold text-gray-400 block mt-1">{selectedDate && format(selectedDate, "EEEE")}</span>
-                            </div>
-
-                            <div className="space-y-4">
-                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest pl-2">Timeline Summary</h3>
-                                <div className="bg-gray-50/50 rounded-[2rem] border border-gray-100 divide-y divide-gray-100 overflow-hidden">
-                                    {items.filter(item => item.assignments.length > 0).map(item => (
-                                        <div key={item.id} className="p-6 space-y-3">
                                             <div className="flex justify-between items-center">
-                                                <span className="font-black text-gray-900 text-lg">{item.title}</span>
+                                                <div className="flex-1">
+                                                    <h3 className="font-bold text-lg text-gray-900">{role.name}</h3>
+                                                    <p className="text-sm text-gray-400 font-medium">
+                                                        {memberIds.length > 0 ? `${memberIds.length} members assigned` : "No one assigned"}
+                                                    </p>
+                                                </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-10 w-10 rounded-full bg-gray-50 group-hover:bg-primary/10 group-hover:text-primary transition-colors"
+                                                    onClick={() => {
+                                                        let newItems = [...items];
+                                                        let ptItemIdx = newItems.findIndex(i => i.title === '찬양팀 구성');
+                                                        if (ptItemIdx === -1) {
+                                                            newItems.push({
+                                                                id: Math.random().toString(36).substr(2, 9),
+                                                                order: items.length,
+                                                                title: '찬양팀 구성',
+                                                                assignments: [],
+                                                                type: 'FLOW'
+                                                            });
+                                                            ptItemIdx = newItems.length - 1;
+                                                        }
+
+                                                        const newAssignments = [...newItems[ptItemIdx].assignments];
+                                                        let aIdx = newAssignments.findIndex(a => a.roleId === role.id);
+                                                        if (aIdx === -1) {
+                                                            newAssignments.push({ roleId: role.id, memberIds: [] });
+                                                            aIdx = newAssignments.length - 1;
+                                                        }
+
+                                                        setItems(newItems.map((it, idx) => idx === ptItemIdx ? { ...it, assignments: newAssignments } : it));
+                                                        setActiveSelection({ itemId: newItems[ptItemIdx].id, assignmentIndex: aIdx });
+                                                    }}
+                                                >
+                                                    <UserPlus className="h-5 w-5" />
+                                                </Button>
                                             </div>
+
                                             <div className="flex flex-wrap gap-2">
-                                                {item.assignments.map((a, i) => (
-                                                    <div key={i} className="flex flex-col gap-1 p-3 bg-white rounded-2xl border border-gray-100 min-w-[120px]">
-                                                        <span className="text-[10px] font-black text-primary uppercase tracking-tighter">
-                                                            {a.label || roles.find(r => r.id === a.roleId)?.name}
-                                                        </span>
-                                                        <span className="text-sm font-bold text-gray-600">
-                                                            {a.memberIds.map(uid => getMemberName(uid)).join(", ") || "Unassigned"}
-                                                        </span>
-                                                    </div>
+                                                {memberIds.map(uid => (
+                                                    <Badge
+                                                        key={uid}
+                                                        variant="secondary"
+                                                        className="px-3 py-1.5 rounded-full bg-gray-50 text-gray-600 border-none flex items-center gap-1.5 text-xs font-semibold"
+                                                    >
+                                                        {getMemberName(uid)}
+                                                        <button
+                                                            className="hover:text-destructive transition-colors ml-1"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                const roleItemIdx = items.findIndex(i => i.title === '찬양팀 구성');
+                                                                if (roleItemIdx === -1) return;
+                                                                const newItems = [...items];
+                                                                const assgnIdx = newItems[roleItemIdx].assignments.findIndex(a => a.roleId === role.id);
+                                                                const currentAssgn = newItems[roleItemIdx].assignments[assgnIdx];
+                                                                newItems[roleItemIdx] = {
+                                                                    ...newItems[roleItemIdx],
+                                                                    assignments: newItems[roleItemIdx].assignments.map((a, i) =>
+                                                                        i === assgnIdx ? { ...a, memberIds: a.memberIds.filter(id => id !== uid) } : a
+                                                                    )
+                                                                };
+                                                                setItems(newItems);
+                                                            }}
+                                                        >
+                                                            &times;
+                                                        </button>
+                                                    </Badge>
                                                 ))}
                                             </div>
                                         </div>
-                                    ))}
-                                    {items.every(item => item.assignments.length === 0) && (
-                                        <div className="p-6 text-center text-muted-foreground text-sm italic">
-                                            No specific roles assigned.
+                                    );
+                                })}
+
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full h-14 border-dashed border-2 text-muted-foreground hover:text-primary transition-colors hover:bg-primary/5 rounded-2xl text-sm font-bold"
+                                    onClick={() => setIsRoleDialogOpen(true)}
+                                >
+                                    <Plus className="h-5 w-5 mr-2" /> Add New Role
+                                </Button>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* Step 3: What (Worship Timeline) */}
+                    {step === 2 && (
+                        <motion.div
+                            key="what-step"
+                            custom={direction}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="flex flex-col gap-8 w-full"
+                        >
+                            <div className="space-y-2 text-center">
+                                <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 3</Label>
+                                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Timeline</h2>
+                            </div>
+
+                            <div className="flex flex-col gap-6">
+                                {/* Template Header & Actions */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div className="flex-1 relative group">
+                                            <input
+                                                value={templates.find(t => t.id === selectedTemplateId)?.name || ""}
+                                                onChange={(e) => handleUpdateTemplateName(e.target.value)}
+                                                className="text-2xl font-black bg-transparent border-b-2 border-gray-100 focus:border-primary/40 focus:ring-0 p-0 w-full placeholder:text-gray-300 transition-all hover:border-gray-300"
+                                                placeholder="Template Name..."
+                                            />
+                                            <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-30 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                <Pencil className="w-4 h-4 text-gray-400" />
+                                            </div>
                                         </div>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-white shadow-sm border border-gray-100">
+                                                    <MoreHorizontal className="h-5 w-5" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="w-56 rounded-3xl p-2 shadow-2xl border-0">
+                                                <DropdownMenuItem
+                                                    className={cn("rounded-2xl py-3 cursor-pointer", hasTemplateChanges ? "text-primary font-bold bg-primary/5" : "text-muted-foreground")}
+                                                    disabled={!selectedTemplateId || !hasTemplateChanges}
+                                                    onClick={handleUpdateTemplate}
+                                                >
+                                                    <Save className="mr-2 h-4 w-4" />
+                                                    Save to Current
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    className="rounded-2xl py-3 cursor-pointer font-bold"
+                                                    onClick={() => {
+                                                        const currentTemp = templates.find(t => t.id === selectedTemplateId);
+                                                        setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
+                                                        setIsTemplateDialogOpen(true);
+                                                    }}
+                                                >
+                                                    <Plus className="mr-2 h-4 w-4" />
+                                                    Save as New
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator className="my-2 bg-gray-50" />
+                                                <DropdownMenuItem
+                                                    className="rounded-2xl py-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 font-bold"
+                                                    onClick={handleDeleteTemplate}
+                                                >
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    Delete Template
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
+                                        {templates.map(tmp => (
+                                            <Button
+                                                key={tmp.id}
+                                                variant={selectedTemplateId === tmp.id ? "default" : "outline"}
+                                                size="sm"
+                                                className="rounded-full text-xs h-9 whitespace-nowrap px-6 shadow-sm"
+                                                onClick={() => {
+                                                    setSelectedTemplateId(tmp.id);
+                                                    setItems(tmp.items.map((it: any, idx: number) => ({
+                                                        ...it,
+                                                        id: Math.random().toString(36).substr(2, 9),
+                                                        order: idx,
+                                                        assignments: it.title === '찬양팀 구성'
+                                                            ? (items.find(i => i.title === '찬양팀 구성')?.assignments || [])
+                                                            : []
+                                                    })));
+                                                }}
+                                            >
+                                                {tmp.name}
+                                            </Button>
+                                        ))}
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="rounded-full text-xs h-9 border-dashed border-2 px-5 text-muted-foreground hover:text-primary transition-colors bg-white/50"
+                                            onClick={() => {
+                                                setNewTemplateName("");
+                                                setIsTemplateDialogOpen(true);
+                                            }}
+                                        >
+                                            <Plus className="h-4 w-4 mr-2" /> Add
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {!isTemplatesLoaded ? (
+                                        Array.from({ length: 5 }).map((_, i) => (
+                                            <div key={i} className="animate-pulse p-6 rounded-3xl bg-white space-y-3">
+                                                <div className="h-5 bg-gray-100 rounded w-1/3" />
+                                                <div className="h-4 bg-gray-100 rounded w-1/2" />
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <>
+                                            {templates.length === 0 && (
+                                                <div className="px-6 py-5 mb-2 bg-primary/5 rounded-3xl border border-primary/10 border-dashed text-center">
+                                                    <p className="text-sm font-bold text-primary mb-1">✨ Sample Flow Ready</p>
+                                                    <p className="text-xs text-muted-foreground leading-tight px-4">
+                                                        No templates found in DB. We&apos;ve prepared a sample flow to get you started!
+                                                    </p>
+                                                </div>
+                                            )}
+                                            {items.sort((a, b) => a.order - b.order).map((item, itemIdx) => (
+                                                <div
+                                                    key={item.id}
+                                                    className="group flex flex-col gap-6 p-6 rounded-3xl bg-white shadow-sm hover:shadow-md transition-all"
+                                                >
+                                                    <div className="flex justify-between items-start gap-3">
+                                                        <div className="flex-1 space-y-2">
+                                                            <div className="flex items-center gap-3">
+                                                                <span className="text-[10px] font-black bg-gray-900 text-white px-2 py-0.5 rounded-full uppercase tracking-tighter">{itemIdx + 1}</span>
+                                                                <input
+                                                                    value={item.title}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...items];
+                                                                        newItems[itemIdx] = { ...item, title: e.target.value };
+                                                                        setItems(newItems);
+                                                                    }}
+                                                                    className="font-black bg-transparent border-0 focus:ring-0 p-0 text-xl w-full text-gray-900"
+                                                                    placeholder="Sequence title..."
+                                                                />
+                                                            </div>
+                                                            <input
+                                                                value={item.remarks || ""}
+                                                                onChange={(e) => {
+                                                                    const newItems = [...items];
+                                                                    newItems[itemIdx] = { ...item, remarks: e.target.value };
+                                                                    setItems(newItems);
+                                                                }}
+                                                                className="text-sm font-medium text-gray-400 bg-transparent border-0 focus:ring-0 p-0 w-full"
+                                                                placeholder="Add notes or scripture references..."
+                                                            />
+                                                        </div>
+                                                        <div className="flex gap-1">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-8 w-8 rounded-full"
+                                                                disabled={itemIdx === 0}
+                                                                onClick={() => {
+                                                                    const newItems = [...items];
+                                                                    const target = newItems[itemIdx];
+                                                                    newItems[itemIdx] = newItems[itemIdx - 1];
+                                                                    newItems[itemIdx - 1] = target;
+                                                                    newItems.forEach((it, idx) => it.order = idx);
+                                                                    setItems(newItems);
+                                                                }}
+                                                            >
+                                                                <ChevronUp className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-8 w-8 rounded-full"
+                                                                disabled={itemIdx === items.length - 1}
+                                                                onClick={() => {
+                                                                    const newItems = [...items];
+                                                                    const target = newItems[itemIdx];
+                                                                    newItems[itemIdx] = newItems[itemIdx + 1];
+                                                                    newItems[itemIdx + 1] = target;
+                                                                    newItems.forEach((it, idx) => it.order = idx);
+                                                                    setItems(newItems);
+                                                                }}
+                                                            >
+                                                                <ChevronDown className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-8 w-8 rounded-full text-gray-300 hover:text-destructive transition-colors"
+                                                                onClick={() => setItems(items.filter(i => i.id !== item.id))}
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-3">
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {item.assignments.map((a, aIdx) => (
+                                                                <div key={aIdx} className="flex flex-wrap gap-1.5 p-1 bg-gray-50 rounded-2xl border border-gray-100">
+                                                                    <span className="text-[10px] font-bold text-gray-400 uppercase px-2 py-1">{roles.find(r => r.id === a.roleId)?.name || 'Role'}</span>
+                                                                    {a.memberIds.map(uid => (
+                                                                        <Badge key={uid} variant="secondary" className="bg-white text-gray-700 shadow-sm border-0 font-bold px-3">
+                                                                            {getMemberName(uid)}
+                                                                            <button className="ml-1 text-gray-300 hover:text-destructive" onClick={() => {
+                                                                                const newItems = [...items];
+                                                                                const newAssignments = [...item.assignments];
+                                                                                newAssignments[aIdx] = { ...a, memberIds: a.memberIds.filter(id => id !== uid) };
+                                                                                newItems[itemIdx] = { ...item, assignments: newAssignments };
+                                                                                setItems(newItems);
+                                                                            }}>&times;</button>
+                                                                        </Badge>
+                                                                    ))}
+                                                                    <Button variant="ghost" size="sm" className="h-6 w-6 rounded-full p-0 bg-white shadow-sm" onClick={() => setActiveSelection({ itemId: item.id, assignmentIndex: aIdx })}>
+                                                                        <UserPlus className="h-3 w-3" />
+                                                                    </Button>
+                                                                </div>
+                                                            ))}
+                                                            <Button
+                                                                variant="ghost" size="sm" className="h-8 px-4 text-[10px] font-black text-primary hover:bg-primary/5 uppercase tracking-wider rounded-full border border-primary/10"
+                                                                onClick={() => {
+                                                                    const newItems = [...items];
+                                                                    const newAssignments = [...item.assignments, { memberIds: [] }];
+                                                                    newItems[itemIdx] = { ...item, assignments: newAssignments };
+                                                                    setItems(newItems);
+                                                                    setActiveSelection({ itemId: item.id, assignmentIndex: newAssignments.length - 1 });
+                                                                }}
+                                                            >
+                                                                <Plus className="h-3 w-3 mr-1" /> Add Person
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </>
                                     )}
+
+                                    <Button
+                                        variant="outline" className="w-full h-16 rounded-3xl border-dashed border-2 hover:bg-white hover:shadow-md transition-all border-gray-200 text-gray-400 font-bold"
+                                        onClick={() => setItems([...items, { id: Math.random().toString(36).substr(2, 9), order: items.length, title: "", assignments: [], type: 'FLOW' }])}>
+                                        <Plus className="w-6 h-6 mr-3" /> Add Sequence
+                                    </Button>
                                 </div>
                             </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </main>
-
-        {/* STICKY FOOTER MASK */}
-        <div className="sticky bottom-0 z-50 w-full px-6 pt-6 pb-12 bg-gray-50/80 backdrop-blur-xl border-t border-gray-100/50">
-            <div className="flex gap-4 w-full max-w-2xl mx-auto">
-                <Button
-                    variant="ghost"
-                    className="h-16 w-16 rounded-3xl bg-white shadow-sm border border-gray-100 text-gray-400 hover:text-gray-900 hover:bg-white active:scale-95 transition-all"
-                    onClick={prevStep}
-                    disabled={step === 0}
-                >
-                    <ChevronLeft className="w-8 h-8" />
-                </Button>
-                <Button
-                    className="h-16 flex-1 rounded-3xl bg-primary text-white text-xl font-black shadow-2xl shadow-primary/30 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 group"
-                    onClick={step === totalSteps - 1 ? handleSubmit : nextStep}
-                    disabled={isLoading || (step === 0 && !selectedDate)}
-                >
-                    {isLoading ? (
-                        "Saving..."
-                    ) : step === totalSteps - 1 ? (
-                        <>Confirm & Save <Check className="w-6 h-6 ml-1 group-hover:scale-110 transition-transform" /></>
-                    ) : (
-                        <>Continue <ArrowRight className="w-6 h-6 ml-1 group-hover:translate-x-1 transition-transform" /></>
+                        </motion.div>
                     )}
-                </Button>
-            </div>
-        </div>
 
-        {/* Member Selection Drawer */}
-        <Drawer open={!!activeSelection} onOpenChange={(open) => !open && setActiveSelection(null)}>
-            <DrawerContent className="h-[80vh]">
-                <DrawerHeader className="flex items-center justify-between px-6 py-4 border-b">
-                    <DrawerTitle className="text-lg font-bold">Select Members</DrawerTitle>
-                    {activeSelection && (items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds.length || 0) > 0 && (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 px-3 text-xs font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full transition-colors"
-                            onClick={() => {
-                                if (activeSelection) {
-                                    const newItems = [...items];
-                                    const itemIdx = newItems.findIndex(i => i.id === activeSelection.itemId);
-                                    const newAssignments = [...newItems[itemIdx].assignments];
-                                    newAssignments[activeSelection.assignmentIndex] = {
-                                        ...newAssignments[activeSelection.assignmentIndex],
-                                        memberIds: []
-                                    };
-                                    newItems[itemIdx] = { ...newItems[itemIdx], assignments: newAssignments };
-                                    setItems(newItems);
+                    {/* Step 4: Review */}
+                    {step === 3 && (
+                        <motion.div
+                            key="review-step"
+                            custom={direction}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="flex flex-col gap-8 w-full pb-10"
+                        >
+                            <div className="space-y-2 text-center">
+                                <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 4</Label>
+                                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Review Plans</h2>
+                            </div>
+
+                            <div className="bg-white rounded-[3rem] p-8 shadow-2xl shadow-primary/10 border border-primary/5 space-y-8">
+                                <div className="text-center space-y-1">
+                                    <span className="text-[10px] font-black text-primary uppercase tracking-widest block">Event Date</span>
+                                    <span className="text-3xl font-black text-gray-900 leading-none">
+                                        {selectedDate && format(selectedDate, "MMM d, yyyy")}
+                                    </span>
+                                    <span className="text-sm font-bold text-gray-400 block mt-1">{selectedDate && format(selectedDate, "EEEE")}</span>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest pl-2">Timeline Summary</h3>
+                                    <div className="bg-gray-50/50 rounded-[2rem] border border-gray-100 divide-y divide-gray-100 overflow-hidden">
+                                        {items.filter(item => item.assignments.length > 0).map(item => (
+                                            <div key={item.id} className="p-6 space-y-3">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-black text-gray-900 text-lg">{item.title}</span>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {item.assignments.map((a, i) => (
+                                                        <div key={i} className="flex flex-col gap-1 p-3 bg-white rounded-2xl border border-gray-100 min-w-[120px]">
+                                                            <span className="text-[10px] font-black text-primary uppercase tracking-tighter">
+                                                                {a.label || roles.find(r => r.id === a.roleId)?.name}
+                                                            </span>
+                                                            <span className="text-sm font-bold text-gray-600">
+                                                                {a.memberIds.map(uid => getMemberName(uid)).join(", ") || "Unassigned"}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {items.every(item => item.assignments.length === 0) && (
+                                            <div className="p-6 text-center text-muted-foreground text-sm italic">
+                                                No specific roles assigned.
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </main>
+
+            {/* STICKY FOOTER MASK */}
+            <div className="sticky bottom-0 z-50 w-full px-6 pt-6 pb-12 bg-gray-50/80 backdrop-blur-xl border-t border-gray-100/50">
+                <div className="flex gap-4 w-full max-w-2xl mx-auto">
+                    <Button
+                        variant="ghost"
+                        className="h-16 w-16 rounded-3xl bg-white shadow-sm border border-gray-100 text-gray-400 hover:text-gray-900 hover:bg-white active:scale-95 transition-all"
+                        onClick={prevStep}
+                        disabled={step === 0}
+                    >
+                        <ChevronLeft className="w-8 h-8" />
+                    </Button>
+                    <Button
+                        className="h-16 flex-1 rounded-3xl bg-primary text-white text-xl font-black shadow-2xl shadow-primary/30 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 group"
+                        onClick={step === totalSteps - 1 ? handleSubmit : nextStep}
+                        disabled={isLoading || (step === 0 && !selectedDate)}
+                    >
+                        {isLoading ? (
+                            "Saving..."
+                        ) : step === totalSteps - 1 ? (
+                            <>Confirm & Save <Check className="w-6 h-6 ml-1 group-hover:scale-110 transition-transform" /></>
+                        ) : (
+                            <>Continue <ArrowRight className="w-6 h-6 ml-1 group-hover:translate-x-1 transition-transform" /></>
+                        )}
+                    </Button>
+                </div>
+            </div>
+
+            {/* Member Selection Drawer */}
+            <Drawer open={!!activeSelection} onOpenChange={(open) => !open && setActiveSelection(null)}>
+                <DrawerContent className="h-[80vh]">
+                    <DrawerHeader className="flex items-center justify-between px-6 py-4 border-b">
+                        <DrawerTitle className="text-lg font-bold">Select Members</DrawerTitle>
+                        {activeSelection && (items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds.length || 0) > 0 && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 px-3 text-xs font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full transition-colors"
+                                onClick={() => {
+                                    if (activeSelection) {
+                                        const newItems = [...items];
+                                        const itemIdx = newItems.findIndex(i => i.id === activeSelection.itemId);
+                                        const newAssignments = [...newItems[itemIdx].assignments];
+                                        newAssignments[activeSelection.assignmentIndex] = {
+                                            ...newAssignments[activeSelection.assignmentIndex],
+                                            memberIds: []
+                                        };
+                                        newItems[itemIdx] = { ...newItems[itemIdx], assignments: newAssignments };
+                                        setItems(newItems);
+                                    }
+                                }}
+                            >
+                                Unselect All
+                            </Button>
+                        )}
+                    </DrawerHeader>
+                    <div className="px-6 py-4 h-full overflow-hidden flex flex-col">
+                        {activeSelection && (
+                            <MemberSelector
+                                selectedMemberIds={items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds || []}
+                                onSelect={(uid) => {
+                                    setItems(prev => {
+                                        const newItems = [...prev];
+                                        const itemIdx = newItems.findIndex(i => i.id === activeSelection.itemId);
+                                        if (itemIdx === -1) return prev;
+
+                                        const newAssignments = [...newItems[itemIdx].assignments];
+                                        const currentIds = newAssignments[activeSelection.assignmentIndex].memberIds;
+
+                                        if (currentIds.includes(uid)) {
+                                            newAssignments[activeSelection.assignmentIndex] = {
+                                                ...newAssignments[activeSelection.assignmentIndex],
+                                                memberIds: currentIds.filter(id => id !== uid)
+                                            };
+                                        } else {
+                                            newAssignments[activeSelection.assignmentIndex] = {
+                                                ...newAssignments[activeSelection.assignmentIndex],
+                                                memberIds: [...currentIds, uid]
+                                            };
+                                        }
+
+                                        newItems[itemIdx] = { ...newItems[itemIdx], assignments: newAssignments };
+                                        return newItems;
+                                    });
+                                }}
+                                multiple={true}
+                            />
+                        )}
+                        <Button className="w-full mt-4" onClick={() => setActiveSelection(null)}>
+                            Done
+                        </Button>
+                    </div>
+                </DrawerContent>
+            </Drawer>
+            {/* Role Creation Dialog */}
+            <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
+                <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
+                    <DialogHeader className="space-y-3">
+                        <DialogTitle className="text-2xl font-bold text-center">New Role</DialogTitle>
+                        <p className="text-sm text-center text-muted-foreground font-medium">
+                            Create a new role for your praise team.
+                        </p>
+                    </DialogHeader>
+                    <div className="py-6 space-y-4">
+                        <Input
+                            placeholder="e.g. Acoustic Guitar"
+                            value={newRoleName}
+                            onChange={(e) => setNewRoleName(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && newRoleName.trim()) {
+                                    handleCreateRole();
                                 }
                             }}
-                        >
-                            Unselect All
-                        </Button>
-                    )}
-                </DrawerHeader>
-                <div className="px-6 py-4 h-full overflow-hidden flex flex-col">
-                    {activeSelection && (
-                        <MemberSelector
-                            selectedMemberIds={items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds || []}
-                            onSelect={(uid) => {
-                                setItems(prev => {
-                                    const newItems = [...prev];
-                                    const itemIdx = newItems.findIndex(i => i.id === activeSelection.itemId);
-                                    if (itemIdx === -1) return prev;
-
-                                    const newAssignments = [...newItems[itemIdx].assignments];
-                                    const currentIds = newAssignments[activeSelection.assignmentIndex].memberIds;
-
-                                    if (currentIds.includes(uid)) {
-                                        newAssignments[activeSelection.assignmentIndex] = {
-                                            ...newAssignments[activeSelection.assignmentIndex],
-                                            memberIds: currentIds.filter(id => id !== uid)
-                                        };
-                                    } else {
-                                        newAssignments[activeSelection.assignmentIndex] = {
-                                            ...newAssignments[activeSelection.assignmentIndex],
-                                            memberIds: [...currentIds, uid]
-                                        };
-                                    }
-
-                                    newItems[itemIdx] = { ...newItems[itemIdx], assignments: newAssignments };
-                                    return newItems;
-                                });
-                            }}
-                            multiple={true}
+                            className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
+                            autoFocus
                         />
-                    )}
-                    <Button className="w-full mt-4" onClick={() => setActiveSelection(null)}>
-                        Done
-                    </Button>
-                </div>
-            </DrawerContent>
-        </Drawer>
-        {/* Role Creation Dialog */}
-        <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
-            <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
-                <DialogHeader className="space-y-3">
-                    <DialogTitle className="text-2xl font-bold text-center">New Role</DialogTitle>
-                    <p className="text-sm text-center text-muted-foreground font-medium">
-                        Create a new role for your praise team.
-                    </p>
-                </DialogHeader>
-                <div className="py-6 space-y-4">
-                    <Input
-                        placeholder="e.g. Acoustic Guitar"
-                        value={newRoleName}
-                        onChange={(e) => setNewRoleName(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter" && newRoleName.trim()) {
-                                handleCreateRole();
-                            }
-                        }}
-                        className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
-                        autoFocus
-                    />
-                </div>
-                <DialogFooter className="flex sm:flex-row gap-3">
-                    <Button
-                        variant="ghost"
-                        className="h-12 flex-1 rounded-2xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                        onClick={() => setIsRoleDialogOpen(false)}
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
-                        onClick={handleCreateRole}
-                        disabled={!newRoleName.trim()}
-                    >
-                        Create Role
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-
-        {/* Template Saving Dialog */}
-        <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
-            <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
-                <DialogHeader className="space-y-3">
-                    <div className="flex justify-center">
-                        <div className="p-3 bg-primary/10 rounded-full">
-                            <Save className="w-8 h-8 text-primary" />
-                        </div>
                     </div>
-                    <DialogTitle className="text-2xl font-bold text-center">Save Template</DialogTitle>
-                    <p className="text-sm text-center text-muted-foreground font-medium leading-relaxed">
-                        Save this timeline as a template to reuse it for future worship services.
-                    </p>
-                </DialogHeader>
-                <div className="py-6">
-                    <Input
-                        placeholder="e.g. Sunday Morning Worship"
-                        value={newTemplateName}
-                        onChange={(e) => setNewTemplateName(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter" && newTemplateName.trim()) {
-                                handleSaveTemplate();
-                            }
-                        }}
-                        className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
-                        autoFocus
-                    />
-                </div>
-                <DialogFooter className="flex sm:flex-row gap-3">
-                    <Button
-                        variant="ghost"
-                        className="h-12 flex-1 rounded-2xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                        onClick={() => setIsTemplateDialogOpen(false)}
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
-                        onClick={handleSaveTemplate}
-                        disabled={!newTemplateName.trim()}
-                    >
-                        Save
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    </div>
-);
+                    <DialogFooter className="flex sm:flex-row gap-3">
+                        <Button
+                            variant="ghost"
+                            className="h-12 flex-1 rounded-2xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                            onClick={() => setIsRoleDialogOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
+                            onClick={handleCreateRole}
+                            disabled={!newRoleName.trim()}
+                        >
+                            Create Role
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Template Saving Dialog */}
+            <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
+                <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
+                    <DialogHeader className="space-y-3">
+                        <div className="flex justify-center">
+                            <div className="p-3 bg-primary/10 rounded-full">
+                                <Save className="w-8 h-8 text-primary" />
+                            </div>
+                        </div>
+                        <DialogTitle className="text-2xl font-bold text-center">Save Template</DialogTitle>
+                        <p className="text-sm text-center text-muted-foreground font-medium leading-relaxed">
+                            Save this timeline as a template to reuse it for future worship services.
+                        </p>
+                    </DialogHeader>
+                    <div className="py-6">
+                        <Input
+                            placeholder="e.g. Sunday Morning Worship"
+                            value={newTemplateName}
+                            onChange={(e) => setNewTemplateName(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && newTemplateName.trim()) {
+                                    handleSaveTemplate();
+                                }
+                            }}
+                            className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
+                            autoFocus
+                        />
+                    </div>
+                    <DialogFooter className="flex sm:flex-row gap-3">
+                        <Button
+                            variant="ghost"
+                            className="h-12 flex-1 rounded-2xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                            onClick={() => setIsTemplateDialogOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
+                            onClick={handleSaveTemplate}
+                            disabled={!newTemplateName.trim()}
+                        >
+                            Save
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div>
+    );
 }

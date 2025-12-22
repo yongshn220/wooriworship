@@ -34,14 +34,10 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader }: 
 
 
 
-  if (songLoadable.state === 'loading' || teamLoadable.state === 'loading') {
-    return <Skeleton className="w-full h-[100px] rounded-md" />
-  }
-  const song = songLoadable.contents
-  const team = teamLoadable.contents
-
   useEffect(() => {
-    const option = team?.option?.worship
+    const option = teamLoadable.state === 'hasValue' ? teamLoadable.contents?.option?.worship : null
+    if (!option) return
+
     if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
       if (option?.beginning_song?.id && option?.beginning_song?.id === songHeader?.id) {
         let checked = true
@@ -64,7 +60,13 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader }: 
         setDefaultChecked(checked)
       }
     }
-  }, [songHeader?.id, songHeader?.selected_music_sheet_ids, specialOrderType, team?.option?.worship])
+  }, [songHeader?.id, songHeader?.selected_music_sheet_ids, specialOrderType, teamLoadable.state, teamLoadable.contents])
+
+  if (songLoadable.state === 'loading' || teamLoadable.state === 'loading') {
+    return <Skeleton className="w-full h-[100px] rounded-md" />
+  }
+  const song = songLoadable.contents
+  const team = teamLoadable.contents
 
   function handleRemoveSong() {
     if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
