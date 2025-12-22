@@ -32,3 +32,10 @@ export interface ServingSchedule {
     }[];
     note?: string;
 }
+
+export interface ServingTemplate {
+    id: string;
+    teamId: string;
+    name: string;
+    items: Omit<ServingItem, "id" | "assignments">[];
+}

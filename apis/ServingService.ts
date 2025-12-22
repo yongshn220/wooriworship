@@ -202,6 +202,45 @@ class ServingService extends BaseService {
             .doc(scheduleId)
             .delete();
     }
+
+    // --- Templates ---
+
+    async getTemplates(teamId: string): Promise<any[]> {
+        try {
+            const snapshot = await firestore
+                .collection("teams")
+                .doc(teamId)
+                .collection("serving_templates")
+                .get();
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    async createTemplate(teamId: string, template: any): Promise<void> {
+        const ref = firestore.collection("teams").doc(teamId).collection("serving_templates").doc();
+        await ref.set({ ...template, id: ref.id });
+    }
+
+    async deleteTemplate(teamId: string, templateId: string): Promise<void> {
+        await firestore.collection("teams").doc(teamId).collection("serving_templates").doc(templateId).delete();
+    }
+
+    // --- Helpers ---
+
+    async findRoleByName(teamId: string, name: string): Promise<ServingRole | null> {
+        const snapshot = await firestore
+            .collection("teams")
+            .doc(teamId)
+            .collection("serving_roles")
+            .where("name", "==", name)
+            .limit(1)
+            .get();
+        if (snapshot.empty) return null;
+        return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as ServingRole;
+    }
 }
 
 export default ServingService.getInstance();
