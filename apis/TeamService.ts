@@ -39,7 +39,7 @@ class TeamService extends BaseService {
       await this.update(teamId, { users: arrayUnion(userId) });
       return teamId;
     } else {
-      console.log("there is an error.")
+      console.error("there is an error.")
       return null;
     }
   }
@@ -61,7 +61,7 @@ class TeamService extends BaseService {
       const promises = [];
       const quiter: any = await UserService.getById(userId);
       if (quiter.email == null) {
-        console.log("user email is missing");
+        console.error("user email is missing");
         return false;
       }
       promises.push(InvitationService.deleteTeamReceiverInvitations(teamId, quiter.email))
@@ -73,7 +73,7 @@ class TeamService extends BaseService {
       await Promise.all(promises);
       return userId;
     } else {
-      console.log("user id or team id is missing");
+      console.error("user id or team id is missing");
       return false;
     }
   }
@@ -92,7 +92,7 @@ class TeamService extends BaseService {
       await Promise.all(promises);
       return true;
     } catch (e) {
-      console.log(e)
+      console.error(e)
       return false;
     }
   }

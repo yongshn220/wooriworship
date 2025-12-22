@@ -64,7 +64,7 @@ class SongService extends BaseService {
       return await this.create(newSong);
     }
     catch (e) {
-      console.log("err:addNewSong", e)
+      console.error("err:addNewSong", e)
       return null
     }
   }
@@ -96,7 +96,7 @@ class SongService extends BaseService {
       return await this.update(songId, song);
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
     }
   }
 
@@ -123,7 +123,7 @@ class SongService extends BaseService {
       await this.delete(songId);
       return true;
     } catch (err) {
-      console.log("error occured: " + err);
+      console.error("error occured: " + err);
       return false;
     }
   }

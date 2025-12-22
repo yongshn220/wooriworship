@@ -111,7 +111,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
       router.push(getPathNotice(teamId))
     }
     catch (e) {
-      console.log(e);
+      console.error(e);
       toast({ description: "An error occurred." });
     }
     finally {
@@ -129,7 +129,6 @@ export function NoticeForm({ mode, noticeId }: Props) {
         body: input.body,
         file_urls: downloadUrls
       }
-      console.log(noticeInput)
       const noticeId = await NoticeService.addNewNotice(authUser.uid, teamId, noticeInput);
       if (!noticeId) {
         toast({
@@ -149,7 +148,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
       router.push(getPathNotice(teamId))
     }
     catch (e) {
-      console.log(e);
+      console.error(e);
       toast({ description: "An error occurred." });
     }
     finally {

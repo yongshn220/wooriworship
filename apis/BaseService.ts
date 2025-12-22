@@ -1,4 +1,4 @@
-import {firestore} from "@/firebase";
+import { firestore } from "@/firebase";
 
 export default class BaseService {
   collectionName: string;
@@ -36,13 +36,13 @@ export default class BaseService {
       const ref = firestore.collection(this.collectionName).doc(id);
       const res = await ref.get();
       if (res.exists) {
-        return {id: id, ...res.data()};
+        return { id: id, ...res.data() };
       }
       else {
         return null;
       }
     } catch (e) {
-      console.log(e)
+      console.error(e)
       return null
     }
   }
@@ -71,11 +71,11 @@ export default class BaseService {
         ref = await ref.get();
       }
       ref.forEach((element: any) => {
-        result.push({id: element.id, ...element.data()});
+        result.push({ id: element.id, ...element.data() });
       })
       return result;
     } catch (e) {
-      console.log(e)
+      console.error(e)
       return null
     }
   }
@@ -131,16 +131,16 @@ export default class BaseService {
       const snapshot = await cRef.get();
 
       snapshot.forEach((doc: any) => {
-        result.push({id: doc.id, ...doc.data()});
+        result.push({ id: doc.id, ...doc.data() });
       });
 
       // 마지막 문서 반환
       const lastVisible = snapshot.docs[snapshot.docs.length - 1];
 
-      return {songs: result, lastDoc: lastVisible};
+      return { songs: result, lastDoc: lastVisible };
     }
     catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }
@@ -155,7 +155,7 @@ export default class BaseService {
       await Promise.all(promises);
       return true;
     } catch (e) {
-      console.log(e)
+      console.error(e)
       return false;
     }
   }
@@ -165,7 +165,6 @@ export default class BaseService {
       if (filter) {
         const promises = [];
         const result: any = [];
-        console.log(filter.c);
         while (filter.c.length) {
           const subFilters = filter.c.splice(0, 10);
           promises.push(
@@ -175,7 +174,7 @@ export default class BaseService {
               subFilters
             ).get().then(x => {
               x.forEach(element => {
-                result.push({id: element.id, ...element.data()});
+                result.push({ id: element.id, ...element.data() });
               })
             })
           )
@@ -183,10 +182,9 @@ export default class BaseService {
         await Promise.all(promises);
         return result;
       }
-      console.log("queryByArray: filter is not exist.")
       return null;
     } catch (e) {
-      console.log(e)
+      console.error(e)
       return null
     }
   }
@@ -196,7 +194,7 @@ export default class BaseService {
       const ref = await firestore.collection(this.collectionName).add(data);
       return ref.id;
     } catch (e) {
-      console.log(e)
+      console.error(e)
       return null
     }
   }
@@ -206,9 +204,9 @@ export default class BaseService {
       const docRef = firestore.collection(this.collectionName).doc(id);
       await docRef.set(data);
       return id;
-    } 
+    }
     catch (e) {
-      console.log(e);
+      console.error(e);
       return null;
     }
   }
@@ -216,11 +214,11 @@ export default class BaseService {
 
   async update(id: string, data: any) {
     try {
-      await firestore.collection(this.collectionName).doc(id).set(data, {merge: true});
+      await firestore.collection(this.collectionName).doc(id).set(data, { merge: true });
       return true
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
       return false
     }
   }
@@ -230,7 +228,7 @@ export default class BaseService {
       await firestore.collection(this.collectionName).doc(id).delete();
       return true
     } catch (e) {
-      console.log(e)
+      console.error(e)
       return false
     }
   }

@@ -153,7 +153,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
   }
 
   const handleError = (e: any) => {
-    console.log("err", e)
+    console.error("err", e)
     toast({ title: "Something went wrong", variant: "destructive" })
     setIsLoading(false)
   }

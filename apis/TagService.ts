@@ -31,7 +31,6 @@ class TagService extends BaseService {
     }
     try {
       await Promise.all(updates);
-      console.log('Tag Upload finished');
       return true
     } catch (err) {
       console.error('Error occured: ' + err);

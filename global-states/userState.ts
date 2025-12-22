@@ -18,7 +18,7 @@ export const userAtom = atomFamily<User, string>({
         return user
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return null
       }
     }

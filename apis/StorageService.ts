@@ -1,6 +1,6 @@
-import {storage} from "@/firebase"
-import {deleteObject, ref} from "firebase/storage";
-import {ImageFileContainer, MusicSheetContainer} from "@/components/constants/types";
+import { storage } from "@/firebase"
+import { deleteObject, ref } from "firebase/storage";
+import { ImageFileContainer, MusicSheetContainer } from "@/components/constants/types";
 
 class StorageService {
   constructor() {
@@ -26,13 +26,13 @@ class StorageService {
     if (!file) return null
 
     try {
-      const fileName = (prefix)?  `${prefix}-스플릿-${file?.name}` : file?.name
+      const fileName = (prefix) ? `${prefix}-스플릿-${file?.name}` : file?.name
       const fileRef = storage.ref(`${folder_name}/${fileName}`);
       await fileRef.put(file)
       return await fileRef.getDownloadURL()
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
       return null
     }
   }
@@ -52,7 +52,7 @@ class StorageService {
         uploads.push(fileRef.put(files[i]));
       }
       uploads = await Promise.all(uploads);
-      console.log("multiple files have been uploaded");
+      console.error("multiple files have been uploaded");
       return await Promise.all(uploads.map((x: any) => x.ref.getDownloadURL()));
     } catch (err) {
       console.error("Error uploading file:", err);
@@ -66,7 +66,7 @@ class StorageService {
       const downloadUrl = await fileRef.getDownloadURL();
       return downloadUrl;
     } catch (err) {
-      console.log("Error getting download url: " + err);
+      console.error("Error getting download url: " + err);
     }
   }
 
@@ -76,7 +76,7 @@ class StorageService {
       await deleteObject(fileRef);
       return true;
     } catch (err) {
-      console.log("Delete failed: " + err);
+      console.error("Delete failed: " + err);
       return false;
     }
   }
@@ -106,18 +106,18 @@ class StorageService {
     if (!musicSheetContainer || musicSheetContainer.imageFileContainers.length === 0) return null
 
     try {
-      const newMusicSheetContainer = {...musicSheetContainer}
+      const newMusicSheetContainer = { ...musicSheetContainer }
       for (const imageFileContainer of newMusicSheetContainer.imageFileContainers) {
         if (!imageFileContainer.file) {
-          console.log("uploadMusicSheetContainer: file not exists."); continue
+          console.error("uploadMusicSheetContainer: file not exists."); continue
         }
         if (imageFileContainer.isUploadedInDatabase === true) {
-          console.log("uploadMusicSheetContainer: file already exists in database."); continue
+          console.error("uploadMusicSheetContainer: file already exists in database."); continue
         }
 
         const downloadUrl = await this.uploadFile(team_id, imageFileContainer.file, imageFileContainer.id)
         if (!downloadUrl) {
-          console.log ("uploadMusicSheetContainer: fail to get download url."); continue
+          console.error("uploadMusicSheetContainer: fail to get download url."); continue
         }
         imageFileContainer.isUploadedInDatabase = true
         imageFileContainer.url = downloadUrl
@@ -125,7 +125,7 @@ class StorageService {
       return newMusicSheetContainer
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
       return null
     }
   }
@@ -165,7 +165,6 @@ class StorageService {
   async updateMusicSheets(teamId: string, new_sheets: Array<ImageFileContainer>, delete_sheets: Array<string>) {
     try {
       await this.deleteFileByUrls(delete_sheets);
-      console.log(new_sheets.length)
       if (new_sheets.length === 0) {
         return [];
       }

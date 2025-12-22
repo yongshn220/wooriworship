@@ -1,5 +1,5 @@
-import {atom, atomFamily, selectorFamily} from "recoil";
-import {MusicSheet} from "@/models/music_sheet";
+import { atom, atomFamily, selectorFamily } from "recoil";
+import { MusicSheet } from "@/models/music_sheet";
 import MusicSheetService from "@/apis/MusicSheetService";
 
 
@@ -7,18 +7,18 @@ export const musicSheetIdsAtom = atomFamily<Array<string>, string>({
   key: "musicSheetIdsAtom",
   default: selectorFamily({
     key: "musicSheetIdsAtom/default",
-    get: (songId: string) => async ({get}) => {
+    get: (songId: string) => async ({ get }) => {
       if (!songId) return []
       try {
         get(musicSheetIdsUpdaterAtom)
 
-        const musicSheetList = await MusicSheetService.getByFilters([{a: 'song_id', b: '==', c: songId}]) as Array<MusicSheet>
+        const musicSheetList = await MusicSheetService.getByFilters([{ a: 'song_id', b: '==', c: songId }]) as Array<MusicSheet>
         if (!musicSheetList) return []
 
         return musicSheetList?.map(sheet => sheet.id)
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return []
       }
     }
@@ -34,29 +34,29 @@ export const musicSheetsBySongIdAtom = atomFamily<Array<MusicSheet>, string>({
   key: "musicSheetsAtom",
   default: selectorFamily({
     key: "musicSheetsAtom/default",
-    get: (songId: string) => async ({get}) => {
+    get: (songId: string) => async ({ get }) => {
       try {
         if (!songId) return []
 
-        const musicSheetIds =  get(musicSheetIdsAtom(songId))
+        const musicSheetIds = get(musicSheetIdsAtom(songId))
         if (!musicSheetIds) {
-          console.log("err:musicSheetsBySongIdAtom. musicSheetIds not exists"); return []
+          console.error("err:musicSheetsBySongIdAtom. musicSheetIds not exists"); return []
         }
 
         const musicSheetListPromise = musicSheetIds?.map(id => get(musicSheetAtom(id)))
         if (!musicSheetListPromise) {
-          console.log("err:musicSheetsBySongIdAtom. musicSheetListPromise not exists"); return []
+          console.error("err:musicSheetsBySongIdAtom. musicSheetListPromise not exists"); return []
         }
 
         const songMusicSheetList = await Promise.all(musicSheetListPromise)
         if (!songMusicSheetList) {
-          console.log("err:musicSheetsBySongIdAtom. songMusicSheetList not exists"); return []
+          console.error("err:musicSheetsBySongIdAtom. songMusicSheetList not exists"); return []
         }
 
         return songMusicSheetList
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return []
       }
     }
@@ -67,26 +67,26 @@ export const musicSheetsByIdsAtom = atomFamily<Array<MusicSheet>, Array<string>>
   key: "musicSheetsByIdsAtom",
   default: selectorFamily({
     key: "musicSheetsByIdsAtom/default",
-    get: (musicSheetIds) => async ({get}) => {
+    get: (musicSheetIds) => async ({ get }) => {
       try {
         if (!musicSheetIds) {
-          console.log("No music sheet ids exist."); return []
+          console.error("No music sheet ids exist."); return []
         }
 
         const promises = musicSheetIds.map(id => get(musicSheetAtom(id)))
         if (!promises) {
-          console.log("Fail while loading music sheet promises."); return []
+          console.error("Fail while loading music sheet promises."); return []
         }
 
         const musicSheetList = await Promise.all(promises)
         if (!musicSheetList) {
-          console.log("Fail while loading music sheet list."); return []
+          console.error("Fail while loading music sheet list."); return []
         }
 
         return musicSheetList
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return []
       }
     }
@@ -98,7 +98,7 @@ export const musicSheetAtom = atomFamily<MusicSheet, string>({
   key: "musicSheetAtom",
   default: selectorFamily({
     key: "musicSheetAtom/default",
-    get: (musicSheetId) => async ({get}) => {
+    get: (musicSheetId) => async ({ get }) => {
       get(musicSheetUpdaterAtom)
       try {
         const musicSheet = await MusicSheetService.getById(musicSheetId) as MusicSheet
@@ -107,7 +107,7 @@ export const musicSheetAtom = atomFamily<MusicSheet, string>({
         return musicSheet
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return null
       }
     }

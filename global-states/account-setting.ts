@@ -10,7 +10,7 @@ export const accountSettingAtom = atomFamily({
     get: (userId: string) => async () => {
       const accountSetting = await AccountSettingService.getAccountSetting(userId)
       if (!accountSetting) {
-        console.log("Failed to get account setting");
+        console.error("Failed to get account setting");
         return null
       }
 

@@ -1,5 +1,5 @@
-import {atom, atomFamily, selectorFamily} from "recoil";
-import {Notice} from "@/models/notice";
+import { atom, atomFamily, selectorFamily } from "recoil";
+import { Notice } from "@/models/notice";
 import NoticeService from "@/apis/NoticeService";
 
 
@@ -7,7 +7,7 @@ export const noticeIdsAtom = atomFamily<Array<string>, string>({
   key: "noticeIdsAtom",
   default: selectorFamily({
     key: "noticeIdsAtom/default",
-    get: (teamId) => async ({get}) => {
+    get: (teamId) => async ({ get }) => {
       if (!teamId) return []
       get(noticeIdsUpdaterAtom)
 
@@ -29,7 +29,7 @@ export const noticeIdsAtom = atomFamily<Array<string>, string>({
         return noticeList.map((noticeList => noticeList.id))
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return []
       }
     }
@@ -45,7 +45,7 @@ export const noticeAtom = atomFamily<Notice, string>({
   key: "noticeAtom",
   default: selectorFamily({
     key: "noticeAtom/default",
-    get: (noticeId) => async ({get}) => {
+    get: (noticeId) => async ({ get }) => {
       get(noticeUpdaterAtom)
       try {
         const notice = await NoticeService.getById(noticeId) as Notice
@@ -54,7 +54,7 @@ export const noticeAtom = atomFamily<Notice, string>({
         return notice
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return null
       }
     }

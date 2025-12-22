@@ -20,7 +20,7 @@ export const songIdsAtom = atomFamily<Array<string>, string>({
         return songIds
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return []
       }
     }
@@ -80,7 +80,7 @@ export const currentTeamSortedSongsAtom = selectorFamily<Array<Song>, string>({
       return songList
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
       return []
     }
   }
@@ -135,7 +135,7 @@ export const songAtom = atomFamily<Song, string>({
         return song
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return null
       }
     }

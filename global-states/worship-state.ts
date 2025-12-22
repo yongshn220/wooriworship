@@ -36,7 +36,7 @@ export const currentTeamWorshipIdsAtom = (globalForRecoil.recoilAtoms['currentTe
         return worshipList.map((worship => worship.id))
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return []
       }
     }
@@ -68,7 +68,7 @@ export const worshipAtom = (globalForRecoil.recoilAtoms['worshipAtom'] || atomFa
         return worship
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return null
       }
     }
@@ -95,23 +95,23 @@ export const worshipSongListAtom = (globalForRecoil.recoilAtoms['worshipSongList
       try {
         const worship = get(worshipAtom(worshipId))
         if (!worship) {
-          console.log("Worship is not exists."); return []
+          console.error("Worship is not exists."); return []
         }
 
         const songListPromise = worship.songs?.map(song => get(songAtom(song.id)))
         if (!songListPromise) {
-          console.log("Fail while loading song-board list promises."); return []
+          console.error("Fail while loading song-board list promises."); return []
         }
 
         const songList = await Promise.all(songListPromise)
         if (!songList) {
-          console.log(("Fail while loading song-board lists.")); return []
+          console.error(("Fail while loading song-board lists.")); return []
         }
 
         return songList
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return []
       }
     }
