@@ -33,14 +33,16 @@ interface Props {
     initialData?: ServingSchedule;
 }
 
-const PRAISE_TEAM_ROLES = [
-    { id: 'leader', label: '찬양인도' },
-    { id: 'piano', label: '건반' },
-    { id: 'synth', label: '신디' },
-    { id: 'drum', label: '드럼' },
-    { id: 'bass', label: '베이스' },
-    { id: 'electric', label: '일렉기타' },
-    { id: 'singer', label: '싱어' },
+const SAMPLE_FLOW: Partial<ServingItem>[] = [
+    { title: '예배의 부르심', type: 'FLOW' },
+    { title: '교독문', type: 'FLOW' },
+    { title: '기도', type: 'FLOW' },
+    { title: '찬양팀 구성', type: 'FLOW' },
+    { title: '설교', type: 'FLOW' },
+    { title: '봉헌 및 광고', type: 'FLOW' },
+    { title: '축도', type: 'FLOW' },
+    { title: '자막/영상', type: 'SUPPORT' },
+    { title: '음향', type: 'SUPPORT' },
 ];
 
 export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Props) {
@@ -61,6 +63,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(nextSunday(new Date()));
     const [items, setItems] = useState<ServingItem[]>([]);
     const [templates, setTemplates] = useState<any[]>([]);
+    const [isTemplatesLoaded, setIsTemplatesLoaded] = useState(false);
     const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
 
     // For Member Selection Drawer
@@ -79,7 +82,10 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 .catch(console.error);
 
             ServingService.getTemplates(teamId)
-                .then(setTemplates)
+                .then(data => {
+                    setTemplates(data);
+                    setIsTemplatesLoaded(true);
+                })
                 .catch(console.error);
         }
     }, [teamId, setRolesUpdater]); // Only run when teamId changes
@@ -106,28 +112,31 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 }));
                 setItems(migratedItems);
             }
-        } else if (mode === FormMode.CREATE && items.length === 0) {
-            // Default Flow Template
-            const defaultFlow: Partial<ServingItem>[] = [
-                { title: '예배의 부르심', type: 'FLOW' },
-                { title: '교독문', type: 'FLOW' },
-                { title: '기도', type: 'FLOW' },
-                { title: '찬양팀 구성', type: 'FLOW' },
-                { title: '설교', type: 'FLOW' },
-                { title: '봉헌 및 광고', type: 'FLOW' },
-                { title: '축도', type: 'FLOW' },
-                { title: '자막/영상', type: 'SUPPORT' },
-                { title: '음향', type: 'SUPPORT' },
-            ];
-            setItems(defaultFlow.map((item, idx) => ({
-                id: Math.random().toString(36).substr(2, 9),
-                order: idx,
-                title: item.title || '',
-                assignments: [] as ServingAssignment[],
-                type: item.type as 'FLOW' | 'SUPPORT',
-            })));
+        } else if (mode === FormMode.CREATE && items.length === 0 && isTemplatesLoaded) {
+            // Priority 1: Use first template from DB
+            if (templates.length > 0) {
+                const template = templates[0];
+                setItems(template.items.map((item: any, idx: number) => ({
+                    id: Math.random().toString(36).substr(2, 9),
+                    order: idx,
+                    title: item.title,
+                    remarks: item.remarks,
+                    assignments: [] as ServingAssignment[],
+                    type: item.type,
+                })));
+                setSelectedTemplateId(template.id);
+            } else {
+                // Priority 2: Fallback to Sample Flow
+                setItems(SAMPLE_FLOW.map((item, idx) => ({
+                    id: Math.random().toString(36).substr(2, 9),
+                    order: idx,
+                    title: item.title || '',
+                    assignments: [] as ServingAssignment[],
+                    type: item.type as 'FLOW' | 'SUPPORT',
+                })));
+            }
         }
-    }, [mode, initialData, roles, items.length]);
+    }, [mode, initialData, roles, items.length, isTemplatesLoaded, templates]);
 
     // Helpers
     const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || id; // Fallback to ID (name) for manual entries
@@ -464,121 +473,141 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                             <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col min-h-0">
                                 <div className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain">
-                                    {items.sort((a, b) => a.order - b.order).map((item, itemIdx) => (
-                                        <div
-                                            key={item.id}
-                                            className="group flex flex-col gap-3 p-4 rounded-2xl border bg-card hover:border-primary/30 transition-all shadow-sm"
-                                        >
-                                            <div className="flex justify-between items-start gap-3">
-                                                <div className="flex-1 space-y-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-[10px] font-bold bg-muted px-1.5 py-0.5 rounded text-muted-foreground">#{itemIdx + 1}</span>
-                                                        <input
-                                                            id={`item-title-${item.id}`}
-                                                            name={`item-title-${item.id}`}
-                                                            value={item.title}
-                                                            onChange={(e) => {
-                                                                const newItems = [...items];
-                                                                newItems[itemIdx] = { ...item, title: e.target.value };
-                                                                setItems(newItems);
-                                                            }}
-                                                            className="font-bold bg-transparent border-0 focus:ring-0 p-0 text-lg w-full"
-                                                            placeholder="Order title..."
-                                                        />
-                                                    </div>
-                                                    <input
-                                                        id={`item-remarks-${item.id}`}
-                                                        name={`item-remarks-${item.id}`}
-                                                        value={item.remarks || ""}
-                                                        onChange={(e) => {
-                                                            const newItems = [...items];
-                                                            newItems[itemIdx] = { ...item, remarks: e.target.value };
-                                                            setItems(newItems);
-                                                        }}
-                                                        className="text-xs text-muted-foreground bg-transparent border-0 focus:ring-0 p-0 w-full"
-                                                        placeholder="Notes/Scripture..."
-                                                    />
-                                                </div>
-                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <div className="flex flex-col gap-0.5">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-6 w-6 rounded-full"
-                                                            disabled={itemIdx === 0}
-                                                            onClick={() => {
-                                                                const newItems = [...items];
-                                                                const target = newItems[itemIdx];
-                                                                newItems[itemIdx] = newItems[itemIdx - 1];
-                                                                newItems[itemIdx - 1] = target;
-                                                                newItems.forEach((it, idx) => it.order = idx);
-                                                                setItems(newItems);
-                                                            }}
-                                                        >
-                                                            <ChevronUp className="h-3 w-3" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-6 w-6 rounded-full"
-                                                            disabled={itemIdx === items.length - 1}
-                                                            onClick={() => {
-                                                                const newItems = [...items];
-                                                                const target = newItems[itemIdx];
-                                                                newItems[itemIdx] = newItems[itemIdx + 1];
-                                                                newItems[itemIdx + 1] = target;
-                                                                newItems.forEach((it, idx) => it.order = idx);
-                                                                setItems(newItems);
-                                                            }}
-                                                        >
-                                                            <ChevronDown className="h-3 w-3" />
-                                                        </Button>
-                                                    </div>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10" onClick={() => setItems(items.filter(i => i.id !== item.id))}>
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
+                                    {!isTemplatesLoaded ? (
+                                        // Loading Skeletons
+                                        Array.from({ length: 5 }).map((_, i) => (
+                                            <div key={i} className="animate-pulse p-4 rounded-2xl border bg-card space-y-3">
+                                                <div className="h-4 bg-muted rounded w-1/3" />
+                                                <div className="h-3 bg-muted rounded w-1/2" />
                                             </div>
-
-                                            {/* Assignments for this item */}
-                                            <div className="space-y-2">
-                                                {item.assignments.map((assignment, aIdx) => (
-                                                    <div key={aIdx} className="flex flex-wrap items-center gap-2">
-                                                        <Badge variant="outline" className="h-7 px-2 py-0 font-normal border-dashed">
-                                                            {assignment.label || roles.find(r => r.id === assignment.roleId)?.name || "Role"}
-                                                        </Badge>
-                                                        {assignment.memberIds.map(uid => (
-                                                            <Badge key={uid} className="h-7 px-2 bg-primary/10 text-primary hover:bg-primary/20 border-0">
-                                                                {getMemberName(uid)}
-                                                                <button className="ml-1 hover:text-destructive" onClick={() => {
-                                                                    const newItems = [...items];
-                                                                    const newAssignments = [...item.assignments];
-                                                                    newAssignments[aIdx] = { ...assignment, memberIds: assignment.memberIds.filter(id => id !== uid) };
-                                                                    newItems[itemIdx] = { ...item, assignments: newAssignments };
-                                                                    setItems(newItems);
-                                                                }}>&times;</button>
-                                                            </Badge>
-                                                        ))}
-                                                        <Button variant="ghost" size="sm" className="h-7 w-7 rounded-full p-0 bg-muted/50" onClick={() => setActiveSelection({ itemId: item.id, assignmentIndex: aIdx })}>
-                                                            <UserPlus className="h-3 w-3" />
-                                                        </Button>
-                                                    </div>
-                                                ))}
-                                                <Button
-                                                    variant="ghost" size="sm" className="h-7 px-2 text-[10px] font-bold text-muted-foreground hover:bg-muted"
-                                                    onClick={() => {
-                                                        const newItems = [...items];
-                                                        const newAssignments = [...item.assignments, { memberIds: [] }];
-                                                        newItems[itemIdx] = { ...item, assignments: newAssignments };
-                                                        setItems(newItems);
-                                                        setActiveSelection({ itemId: item.id, assignmentIndex: newAssignments.length - 1 });
-                                                    }}
+                                        ))
+                                    ) : (
+                                        <>
+                                            {templates.length === 0 && (
+                                                <div className="px-2 py-4 mb-2 bg-primary/5 rounded-2xl border border-primary/10 border-dashed text-center">
+                                                    <p className="text-xs font-bold text-primary mb-1">✨ Sample Flow Ready</p>
+                                                    <p className="text-[10px] text-muted-foreground leading-tight px-4">
+                                                        No templates found in DB. We&apos;ve prepared a sample flow to get you started!
+                                                    </p>
+                                                </div>
+                                            )}
+                                            {items.sort((a, b) => a.order - b.order).map((item, itemIdx) => (
+                                                <div
+                                                    key={item.id}
+                                                    className="group flex flex-col gap-3 p-4 rounded-2xl border bg-card hover:border-primary/30 transition-all shadow-sm"
                                                 >
-                                                    <Plus className="h-3 w-3 mr-1" /> Add Person
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ))}
+                                                    <div className="flex justify-between items-start gap-3">
+                                                        <div className="flex-1 space-y-1">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-[10px] font-bold bg-muted px-1.5 py-0.5 rounded text-muted-foreground">#{itemIdx + 1}</span>
+                                                                <input
+                                                                    id={`item-title-${item.id}`}
+                                                                    name={`item-title-${item.id}`}
+                                                                    value={item.title}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...items];
+                                                                        newItems[itemIdx] = { ...item, title: e.target.value };
+                                                                        setItems(newItems);
+                                                                    }}
+                                                                    className="font-bold bg-transparent border-0 focus:ring-0 p-0 text-lg w-full"
+                                                                    placeholder="Order title..."
+                                                                />
+                                                            </div>
+                                                            <input
+                                                                id={`item-remarks-${item.id}`}
+                                                                name={`item-remarks-${item.id}`}
+                                                                value={item.remarks || ""}
+                                                                onChange={(e) => {
+                                                                    const newItems = [...items];
+                                                                    newItems[itemIdx] = { ...item, remarks: e.target.value };
+                                                                    setItems(newItems);
+                                                                }}
+                                                                className="text-xs text-muted-foreground bg-transparent border-0 focus:ring-0 p-0 w-full"
+                                                                placeholder="Notes/Scripture..."
+                                                            />
+                                                        </div>
+                                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <div className="flex flex-col gap-0.5">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-6 w-6 rounded-full"
+                                                                    disabled={itemIdx === 0}
+                                                                    onClick={() => {
+                                                                        const newItems = [...items];
+                                                                        const target = newItems[itemIdx];
+                                                                        newItems[itemIdx] = newItems[itemIdx - 1];
+                                                                        newItems[itemIdx - 1] = target;
+                                                                        newItems.forEach((it, idx) => it.order = idx);
+                                                                        setItems(newItems);
+                                                                    }}
+                                                                >
+                                                                    <ChevronUp className="h-3 w-3" />
+                                                                </Button>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-6 w-6 rounded-full"
+                                                                    disabled={itemIdx === items.length - 1}
+                                                                    onClick={() => {
+                                                                        const newItems = [...items];
+                                                                        const target = newItems[itemIdx];
+                                                                        newItems[itemIdx] = newItems[itemIdx + 1];
+                                                                        newItems[itemIdx + 1] = target;
+                                                                        newItems.forEach((it, idx) => it.order = idx);
+                                                                        setItems(newItems);
+                                                                    }}
+                                                                >
+                                                                    <ChevronDown className="h-3 w-3" />
+                                                                </Button>
+                                                            </div>
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10" onClick={() => setItems(items.filter(i => i.id !== item.id))}>
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Assignments for this item */}
+                                                    <div className="space-y-2">
+                                                        {item.assignments.map((assignment, aIdx) => (
+                                                            <div key={aIdx} className="flex flex-wrap items-center gap-2">
+                                                                <Badge variant="outline" className="h-7 px-2 py-0 font-normal border-dashed">
+                                                                    {assignment.label || roles.find(r => r.id === assignment.roleId)?.name || "Role"}
+                                                                </Badge>
+                                                                {assignment.memberIds.map(uid => (
+                                                                    <Badge key={uid} className="h-7 px-2 bg-primary/10 text-primary hover:bg-primary/20 border-0">
+                                                                        {getMemberName(uid)}
+                                                                        <button className="ml-1 hover:text-destructive" onClick={() => {
+                                                                            const newItems = [...items];
+                                                                            const newAssignments = [...item.assignments];
+                                                                            newAssignments[aIdx] = { ...assignment, memberIds: assignment.memberIds.filter(id => id !== uid) };
+                                                                            newItems[itemIdx] = { ...item, assignments: newAssignments };
+                                                                            setItems(newItems);
+                                                                        }}>&times;</button>
+                                                                    </Badge>
+                                                                ))}
+                                                                <Button variant="ghost" size="sm" className="h-7 w-7 rounded-full p-0 bg-muted/50" onClick={() => setActiveSelection({ itemId: item.id, assignmentIndex: aIdx })}>
+                                                                    <UserPlus className="h-3 w-3" />
+                                                                </Button>
+                                                            </div>
+                                                        ))}
+                                                        <Button
+                                                            variant="ghost" size="sm" className="h-7 px-2 text-[10px] font-bold text-muted-foreground hover:bg-muted"
+                                                            onClick={() => {
+                                                                const newItems = [...items];
+                                                                const newAssignments = [...item.assignments, { memberIds: [] }];
+                                                                newItems[itemIdx] = { ...item, assignments: newAssignments };
+                                                                setItems(newItems);
+                                                                setActiveSelection({ itemId: item.id, assignmentIndex: newAssignments.length - 1 });
+                                                            }}
+                                                        >
+                                                            <Plus className="h-3 w-3 mr-1" /> Add Person
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </>
+                                    )}
 
                                     <Button
                                         variant="outline" className="w-full h-12 rounded-2xl border-dashed border-2 hover:bg-muted/50 border-muted-foreground/20 text-muted-foreground"
