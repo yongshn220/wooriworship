@@ -16,7 +16,13 @@ import { getPathPlan } from "@/components/util/helper/routes";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 
 
-export function CreateNewTeamDialog({ children }: { children: ReactNode }) {
+interface Props {
+  children?: ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
+export function CreateNewTeamDialog({ children, open, onOpenChange }: Props) {
   const authUser = auth.currentUser
   const setUserUpdater = useSetRecoilState(userUpdaterAtom)
   const setTeamId = useSetRecoilState(currentTeamIdAtom)
@@ -54,12 +60,14 @@ export function CreateNewTeamDialog({ children }: { children: ReactNode }) {
   }
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <div>
-          {children}
-        </div>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {children && (
+        <DialogTrigger asChild>
+          <div>
+            {children}
+          </div>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle className="text-2xl">Create new team</DialogTitle>

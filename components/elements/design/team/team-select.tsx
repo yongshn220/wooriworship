@@ -11,6 +11,7 @@ import useUserPreferences from "@/components/util/hook/use-local-preference";
 import { CreateNewTeamDialog } from "@/components/elements/dialog/create-new-team/create-new-team-dialog";
 import { Plus } from "lucide-react";
 import * as SelectPrimitive from "@radix-ui/react-select";
+import { useState } from "react";
 
 interface Props {
   createOption: boolean
@@ -22,6 +23,7 @@ export function TeamSelect({ createOption, customTrigger, onTeamChange }: Props)
   const [currentTeamId, setCurrentTeamId] = useRecoilState(currentTeamIdAtom)
   const user = useRecoilValue(userAtom(authUser?.uid))
   const [_, prefSetter] = useUserPreferences()
+  const [isCreateDialogOpen, setCreateDialogOpen] = useState(false)
 
   function updatePreferenceSelectedTeamId(id: string) {
     prefSetter.boardSelectedTeamId(id)
@@ -36,35 +38,46 @@ export function TeamSelect({ createOption, customTrigger, onTeamChange }: Props)
   }
 
   return (
-    <Select value={currentTeamId?.toString()} onValueChange={(teamId) => handleChangeTeam(teamId)}>
-      {customTrigger ? (
-        <SelectPrimitive.Trigger asChild>
-          {customTrigger}
-        </SelectPrimitive.Trigger>
-      ) : (
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select a Team" />
-        </SelectTrigger>
-      )}
-      <SelectContent >
-        <SelectGroup>
-          <SelectLabel>Teams ({user?.teams.length})</SelectLabel>
-          {
-            user?.teams?.map((teamId) => (
-              <TeamItem key={teamId} teamId={teamId} />
-            ))
-          }
-          {
-            createOption &&
-            <CreateNewTeamDialog>
-              <Button className="w-full" variant="outline">
+    <>
+      <Select value={currentTeamId?.toString()} onValueChange={(teamId) => handleChangeTeam(teamId)}>
+        {customTrigger ? (
+          <SelectPrimitive.Trigger asChild>
+            {customTrigger}
+          </SelectPrimitive.Trigger>
+        ) : (
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a Team" />
+          </SelectTrigger>
+        )}
+        <SelectContent >
+          <SelectGroup>
+            <SelectLabel>Teams ({user?.teams.length})</SelectLabel>
+            {
+              user?.teams?.map((teamId) => (
+                <TeamItem key={teamId} teamId={teamId} />
+              ))
+            }
+            {
+              createOption &&
+              <Button
+                className="w-full mt-2"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setCreateDialogOpen(true)
+                }}
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Create New Team
               </Button>
-            </CreateNewTeamDialog>
-          }
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+            }
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      <CreateNewTeamDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+      />
+    </>
   )
 }
