@@ -51,7 +51,7 @@ class SongCommentService extends BaseService {
       await this.delete(commentId);
       return true;
     } catch (err) {
-      console.log("error occured: " + err);
+      console.error("error occured: " + err);
       return false;
     }
   }

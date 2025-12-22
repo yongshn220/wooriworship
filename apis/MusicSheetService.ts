@@ -13,14 +13,14 @@ class MusicSheetService extends BaseService {
     try {
       const sheets = await this.getByFilters([{ a: "song_id", b: "==", c: songId }]) as Array<MusicSheet>
       if (!sheets) {
-        console.log("err:getSongMusicSheets")
+        console.error("err:getSongMusicSheets")
         return []
       }
 
       return sheets
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
       return []
     }
   }
@@ -28,7 +28,7 @@ class MusicSheetService extends BaseService {
   async addNewMusicSheet(userId: string, songId: string, musicSheetContainer: MusicSheetContainer) {
     try {
       if (!musicSheetContainer) {
-        console.log("err:addNewMusicSheet, no music sheet container."); return null;
+        console.error("err:addNewMusicSheet, no music sheet container."); return null;
       }
 
       const newMusicSheet: MusicSheet = {
@@ -48,7 +48,7 @@ class MusicSheetService extends BaseService {
       return await this.create(newMusicSheet)
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
       return null
     }
   }
@@ -70,7 +70,7 @@ class MusicSheetService extends BaseService {
       return await this.update(musicSheetContainer?.id, data)
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
       return null
     }
   }
@@ -85,7 +85,7 @@ class MusicSheetService extends BaseService {
       return true
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
       return false
     }
   }

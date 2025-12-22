@@ -1,6 +1,6 @@
-import {atom, atomFamily, selectorFamily} from "recoil";
-import {InvitationService} from "@/apis";
-import {Invitation} from "@/models/invitation";
+import { atom, atomFamily, selectorFamily } from "recoil";
+import { InvitationService } from "@/apis";
+import { Invitation } from "@/models/invitation";
 
 
 
@@ -9,7 +9,7 @@ export const sentInvitationsAtom = atomFamily<Array<Invitation>, { userId: strin
   key: "sentInvitationsAtom",
   default: selectorFamily({
     key: "sentInvitationsAtom/default",
-    get: ({userId, teamId}) => async ({get}) => {
+    get: ({ userId, teamId }) => async ({ get }) => {
       try {
         get(sentInvitationsUpdaterAtom)
         if (!userId || !teamId) return []
@@ -20,7 +20,7 @@ export const sentInvitationsAtom = atomFamily<Array<Invitation>, { userId: strin
         return invitations
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return []
       }
     }
@@ -37,7 +37,7 @@ export const pendingReceivedInvitationsAtom = atomFamily<Array<Invitation>, stri
   key: "pendingReceivedInvitationsAtom",
   default: selectorFamily({
     key: "pendingReceivedInvitationsAtom/default",
-    get: (receiverEmail: string) => async ({get}) => {
+    get: (receiverEmail: string) => async ({ get }) => {
       get(pendingReceivedInvitationsUpdaterAtom)
 
       if (!receiverEmail) return []
@@ -49,7 +49,7 @@ export const pendingReceivedInvitationsAtom = atomFamily<Array<Invitation>, stri
         return invitations
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return []
       }
     }

@@ -5,7 +5,7 @@ import { userAtom } from "@/global-states/userState";
 import Image from 'next/image'
 import { NoticeHeaderMenu } from "@/components/elements/design/notice/notice-header/parts/notice-header-menu";
 import React, { useState } from "react";
-import { ImageFullScreenDialog } from "@/components/elements/dialog/image-full-screen/image-full-screen-dialog";
+import { ImageFullScreenDrawer } from "@/components/elements/drawer/image-full-screen/image-full-screen-drawer";
 import { Linkify } from "@/components/elements/util/text/linkify";
 import { motion, AnimatePresence } from "framer-motion";
 import { ImageIcon, ChevronUp } from "lucide-react";
@@ -29,7 +29,7 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
 
   return (
     <div className="w-full">
-      <ImageFullScreenDialog isOpen={fullScreenOn.state} setIsOpen={(state: boolean) => setFullScreenOn((prev: any) => ({ ...prev, state: state }))} imageUrls={fullScreenOn.urls} />
+      <ImageFullScreenDrawer isOpen={fullScreenOn.state} setIsOpen={(state: boolean) => setFullScreenOn((prev: any) => ({ ...prev, state: state }))} imageUrls={fullScreenOn.urls} />
 
       <div
         className="w-full bg-white p-5 sm:p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-gray-200 transition-all duration-300 cursor-pointer group relative hover:-translate-y-[1px]"

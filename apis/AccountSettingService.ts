@@ -9,7 +9,7 @@ class AccountSettingService extends BaseService {
 
   async getAccountSetting(userId: string) {
     if (!userId) {
-      console.log("getAccountSetting: userId is required");
+      console.error("getAccountSetting: userId is required");
       return null;
     }
     return await this.ensureAccountSetting(userId);

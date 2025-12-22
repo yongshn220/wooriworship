@@ -1,5 +1,5 @@
-import {atom, atomFamily, selectorFamily} from "recoil";
-import {Team} from "@/models/team";
+import { atom, atomFamily, selectorFamily } from "recoil";
+import { Team } from "@/models/team";
 import TeamService from "@/apis/TeamService";
 
 
@@ -16,7 +16,7 @@ export const teamAtom = atomFamily<Team, string>({
   key: "teamAtom",
   default: selectorFamily({
     key: "teamAtom/default",
-    get: (teamId) => async ({get}) => {
+    get: (teamId) => async ({ get }) => {
       get(teamUpdaterAtom)
       try {
         if (!teamId) return null
@@ -27,7 +27,7 @@ export const teamAtom = atomFamily<Team, string>({
         return team
       }
       catch (e) {
-        console.log(e)
+        console.error(e)
         return null
       }
     }

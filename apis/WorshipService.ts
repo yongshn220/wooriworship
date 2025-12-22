@@ -71,7 +71,7 @@ class WorshipService extends BaseService {
       return true;
     }
     catch (err) {
-      console.log("error occured: " + err);
+      console.error("error occured: " + err);
       return false;
     }
   }

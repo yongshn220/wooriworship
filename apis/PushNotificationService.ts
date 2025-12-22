@@ -32,7 +32,6 @@ class PushNotificationService {
       return;
     }
 
-    console.log("Refreshing push notification subscription", { uid, deviceId });
 
     const setting = await AccountSettingService.getAccountSetting(uid);
     if (!setting) {
@@ -68,7 +67,6 @@ class PushNotificationService {
         push_notification: notif
       });
 
-      console.log("Successfully updated push notification subscription", { deviceId });
     }
     catch (error) {
       console.error("Error refreshing push notification subscription:", error);
@@ -97,7 +95,6 @@ class PushNotificationService {
         .map(sub => JSON.parse(sub.sub) as PushSubscription);
 
       if (activeSubscriptions.length === 0) {
-        console.log("No active subscriptions found for team members");
         return;
       }
 
@@ -112,7 +109,6 @@ class PushNotificationService {
       };
 
       const result = await sendNotificationToMultipleSubscriptions(activeSubscriptions, payload);
-      console.log("Notification sending result:", result);
 
       return result;
     }
