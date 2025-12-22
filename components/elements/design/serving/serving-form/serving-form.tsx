@@ -562,10 +562,10 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                             <input
                                                 value={templates.find(t => t.id === selectedTemplateId)?.name || ""}
                                                 onChange={(e) => handleUpdateTemplateName(e.target.value)}
-                                                className="text-2xl font-black bg-transparent border-b-2 border-transparent focus:border-primary/30 focus:ring-0 p-0 w-full placeholder:text-gray-300 transition-all group-hover:border-gray-200"
+                                                className="text-2xl font-black bg-transparent border-b-2 border-gray-100 focus:border-primary/40 focus:ring-0 p-0 w-full placeholder:text-gray-300 transition-all hover:border-gray-300"
                                                 placeholder="Template Name..."
                                             />
-                                            <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                            <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-30 group-hover:opacity-100 transition-opacity pointer-events-none">
                                                 <Pencil className="w-4 h-4 text-gray-400" />
                                             </div>
                                         </div>
