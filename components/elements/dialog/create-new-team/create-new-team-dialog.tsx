@@ -1,22 +1,22 @@
 'use client'
 
-import {Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,} from "@/components/ui/dialog";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
-import {TeamIcon} from "@/components/elements/design/team/team-icon";
-import {ReactNode, useState} from "react";
-import {toast} from "@/components/ui/use-toast";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { TeamIcon } from "@/components/elements/design/team/team-icon";
+import { ReactNode, useState } from "react";
+import { toast } from "@/components/ui/use-toast";
 import { TeamService, UserService } from '@/apis';
-import {auth} from "@/firebase";
-import {useSetRecoilState} from "recoil";
-import {userUpdaterAtom} from "@/global-states/userState";
-import {useRouter} from "next/navigation";
-import {getPathPlan} from "@/components/util/helper/routes";
-import {currentTeamIdAtom} from "@/global-states/teamState";
+import { auth } from "@/firebase";
+import { useSetRecoilState } from "recoil";
+import { userUpdaterAtom } from "@/global-states/userState";
+import { useRouter } from "next/navigation";
+import { getPathPlan } from "@/components/util/helper/routes";
+import { currentTeamIdAtom } from "@/global-states/teamState";
 
 
-export function CreateNewTeamDialog({children}: {children: ReactNode}) {
+export function CreateNewTeamDialog({ children }: { children: ReactNode }) {
   const authUser = auth.currentUser
   const setUserUpdater = useSetRecoilState(userUpdaterAtom)
   const setTeamId = useSetRecoilState(currentTeamIdAtom)
@@ -31,7 +31,7 @@ export function CreateNewTeamDialog({children}: {children: ReactNode}) {
         const teamId = await TeamService.addNewTeam(authUser.uid, teamName);
         UserService.addNewTeam(authUser.uid, teamId).then(teamId => {
           if (!teamId) {
-            toast({title: "Oops, fail to create team. Please try again later.",})
+            toast({ title: "Oops, fail to create team. Please try again later.", })
           }
           else {
             setUserUpdater(prev => prev + 1)
@@ -44,7 +44,7 @@ export function CreateNewTeamDialog({children}: {children: ReactNode}) {
           }
         });
       }
-      catch(err) {
+      catch (err) {
         console.log(err);
         alert({
           title: "Error on creating New Team from Server"
@@ -75,15 +75,15 @@ export function CreateNewTeamDialog({children}: {children: ReactNode}) {
             <Input
               id="name"
               value={teamName}
-              onChange={(e) => {setTeamName(e.target.value)}}
+              onChange={(e) => { setTeamName(e.target.value) }}
             />
-            <TeamIcon name={teamName}/>
+            <TeamIcon name={teamName} />
           </div>
         </div>
         <div className="w-full flex-center">
         </div>
-        <DialogClose className="flex-end">
-          <Button type="submit" onClick={handleCreateNewTeam}>Create</Button>
+        <DialogClose asChild>
+          <Button type="submit" onClick={handleCreateNewTeam} className="ml-auto">Create</Button>
         </DialogClose>
       </DialogContent>
     </Dialog>
