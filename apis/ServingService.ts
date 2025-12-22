@@ -143,6 +143,19 @@ class ServingService extends BaseService {
         }
     }
 
+    async getRecentSchedules(teamId: string, limit: number = 5): Promise<ServingSchedule[]> {
+        try {
+            const snapshot = await firestore.collection("teams").doc(teamId).collection("serving_schedules")
+                .orderBy("date", "desc")
+                .limit(limit)
+                .get();
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServingSchedule));
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
     async getScheduleByDate(teamId: string, date: string): Promise<ServingSchedule | null> {
         try {
             const snapshot = await firestore
@@ -222,6 +235,10 @@ class ServingService extends BaseService {
     async createTemplate(teamId: string, template: any): Promise<void> {
         const ref = firestore.collection("teams").doc(teamId).collection("serving_templates").doc();
         await ref.set({ ...template, id: ref.id });
+    }
+
+    async updateTemplate(teamId: string, templateId: string, template: any): Promise<void> {
+        await firestore.collection("teams").doc(teamId).collection("serving_templates").doc(templateId).update(template);
     }
 
     async deleteTemplate(teamId: string, templateId: string): Promise<void> {

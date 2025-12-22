@@ -67,6 +67,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [templates, setTemplates] = useState<any[]>([]);
     const [isTemplatesLoaded, setIsTemplatesLoaded] = useState(false);
     const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+    const [hasTemplateChanges, setHasTemplateChanges] = useState(false);
 
     // For Member Selection Drawer
     const [activeSelection, setActiveSelection] = useState<{
@@ -90,12 +91,32 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 .then(() => setRolesUpdater(prev => prev + 1))
                 .catch(console.error);
 
-            ServingService.getTemplates(teamId)
-                .then(data => {
-                    setTemplates(data);
-                    setIsTemplatesLoaded(true);
-                })
-                .catch(console.error);
+            const loadInitialData = async () => {
+                let data = await ServingService.getTemplates(teamId);
+
+                // 1. Auto-initialize "예배" template if empty
+                if (data.length === 0) {
+                    const defaultTemplate = {
+                        name: "예배",
+                        teamId,
+                        items: SAMPLE_FLOW.map(i => ({ title: i.title, type: i.type, remarks: "" }))
+                    };
+                    await ServingService.createTemplate(teamId, defaultTemplate);
+                    data = await ServingService.getTemplates(teamId);
+                }
+                setTemplates(data);
+
+                // 2. Track last used template from recent schedule
+                const latestSchedules = await ServingService.getRecentSchedules(teamId, 5);
+                const lastUsedTemplateId = latestSchedules.find(s => s.templateId)?.templateId;
+                if (lastUsedTemplateId) {
+                    setSelectedTemplateId(lastUsedTemplateId);
+                }
+
+                setIsTemplatesLoaded(true);
+            };
+
+            loadInitialData().catch(console.error);
         }
     }, [teamId, setRolesUpdater]); // Only run when teamId changes
 
@@ -122,10 +143,10 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 setItems(migratedItems);
             }
         } else if (mode === FormMode.CREATE && items.length === 0 && isTemplatesLoaded) {
-            // Priority 1: Use first template from DB
-            if (templates.length > 0) {
-                const template = templates[0];
-                setItems(template.items.map((item: any, idx: number) => ({
+            // Priority 1: Use selectedTemplateId (last used) or first template
+            const templateToLoad = templates.find(t => t.id === selectedTemplateId) || templates[0];
+            if (templateToLoad) {
+                setItems(templateToLoad.items.map((item: any, idx: number) => ({
                     id: Math.random().toString(36).substr(2, 9),
                     order: idx,
                     title: item.title,
@@ -133,19 +154,36 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     assignments: [] as ServingAssignment[],
                     type: item.type,
                 })));
-                setSelectedTemplateId(template.id);
-            } else {
-                // Priority 2: Fallback to Sample Flow
-                setItems(SAMPLE_FLOW.map((item, idx) => ({
-                    id: Math.random().toString(36).substr(2, 9),
-                    order: idx,
-                    title: item.title || '',
-                    assignments: [] as ServingAssignment[],
-                    type: item.type as 'FLOW' | 'SUPPORT',
-                })));
+                setSelectedTemplateId(templateToLoad.id);
             }
         }
-    }, [mode, initialData, roles, items.length, isTemplatesLoaded, templates]);
+    }, [mode, initialData, roles, items.length, isTemplatesLoaded, templates, selectedTemplateId]);
+
+    // Track template changes
+    useEffect(() => {
+        if (!selectedTemplateId) {
+            setHasTemplateChanges(true);
+            return;
+        }
+
+        const currentTemplate = templates.find(t => t.id === selectedTemplateId);
+        if (!currentTemplate) return;
+
+        const currentItemsSimplifed = items.map(i => ({
+            title: i.title,
+            type: i.type,
+            remarks: i.remarks || ""
+        }));
+
+        const templateItemsSimplified = currentTemplate.items.map((i: any) => ({
+            title: i.title,
+            type: i.type,
+            remarks: i.remarks || ""
+        }));
+
+        const isSame = JSON.stringify(currentItemsSimplifed) === JSON.stringify(templateItemsSimplified);
+        setHasTemplateChanges(!isSame);
+    }, [items, selectedTemplateId, templates]);
 
     // Helpers
     const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || id; // Fallback to ID (name) for manual entries
@@ -183,6 +221,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     ...initialData,
                     date: dateString,
                     items: items,
+                    templateId: selectedTemplateId || undefined,
                 };
                 await ServingService.updateSchedule(teamId, updatePayload);
                 toast({ title: "Schedule updated!" });
@@ -226,11 +265,12 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const handleSaveTemplate = async () => {
         if (!newTemplateName.trim()) return;
         try {
-            await ServingService.createTemplate(teamId, {
+            const templateData = {
                 name: newTemplateName.trim(),
                 teamId,
                 items: items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }))
-            });
+            };
+            await ServingService.createTemplate(teamId, templateData);
             const newTemps = await ServingService.getTemplates(teamId);
             setTemplates(newTemps);
             setNewTemplateName("");
@@ -242,6 +282,22 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         } catch (e) {
             console.error(e);
             toast({ title: "Failed to save template", variant: "destructive" });
+        }
+    };
+
+    const handleUpdateTemplate = async () => {
+        if (!selectedTemplateId) return;
+        try {
+            const templateData = {
+                items: items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }))
+            };
+            await ServingService.updateTemplate(teamId, selectedTemplateId, templateData);
+            const newTemps = await ServingService.getTemplates(teamId);
+            setTemplates(newTemps);
+            toast({ title: "Template updated!" });
+        } catch (e) {
+            console.error(e);
+            toast({ title: "Failed to update template", variant: "destructive" });
         }
     };
 
@@ -468,36 +524,68 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             </div>
 
                             {/* Template Selector */}
-                            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar shrink-0">
-                                {templates.map(tmp => (
+                            <div className="flex items-center gap-2 shrink-0 overflow-x-auto pb-1 no-scrollbar">
+                                <div className="flex gap-2">
+                                    {templates.map(tmp => (
+                                        <Button
+                                            key={tmp.id}
+                                            variant={selectedTemplateId === tmp.id ? "default" : "outline"}
+                                            size="sm"
+                                            className="rounded-full text-[10px] h-7 whitespace-nowrap"
+                                            onClick={() => {
+                                                setSelectedTemplateId(tmp.id);
+                                                setItems(tmp.items.map((it: any, idx: number) => ({
+                                                    ...it,
+                                                    id: Math.random().toString(36).substr(2, 9),
+                                                    order: idx,
+                                                    assignments: it.title === '찬양팀 구성'
+                                                        ? (items.find(i => i.title === '찬양팀 구성')?.assignments || [])
+                                                        : []
+                                                })));
+                                            }}
+                                        >
+                                            {tmp.name}
+                                        </Button>
+                                    ))}
                                     <Button
-                                        key={tmp.id}
-                                        variant={selectedTemplateId === tmp.id ? "default" : "outline"}
+                                        variant="ghost"
                                         size="sm"
-                                        className="rounded-full text-[10px] h-7 whitespace-nowrap"
+                                        className="rounded-full text-[10px] h-7 border-dashed border text-muted-foreground hover:text-primary transition-colors"
                                         onClick={() => {
-                                            setSelectedTemplateId(tmp.id);
-                                            setItems(tmp.items.map((it: any, idx: number) => ({
-                                                ...it,
-                                                id: Math.random().toString(36).substr(2, 9),
-                                                order: idx,
-                                                assignments: it.title === '찬양팀 구성'
-                                                    ? (items.find(i => i.title === '찬양팀 구성')?.assignments || [])
-                                                    : []
-                                            })));
+                                            setNewTemplateName("");
+                                            setIsTemplateDialogOpen(true);
                                         }}
                                     >
-                                        {tmp.name}
+                                        <Plus className="h-3 w-3 mr-1" /> Add
                                     </Button>
-                                ))}
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="rounded-full text-[10px] h-7 border-dashed border text-primary bg-primary/5 hover:bg-primary/10 transition-colors"
-                                    onClick={() => setIsTemplateDialogOpen(true)}
-                                >
-                                    <Save className="h-3 w-3 mr-1" /> Save Template
-                                </Button>
+                                </div>
+
+                                <div className="ml-auto flex items-center gap-1.5 pl-2 border-l border-gray-100">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={!selectedTemplateId || !hasTemplateChanges}
+                                        className={cn(
+                                            "rounded-full text-[10px] h-7 px-3 font-bold transition-all",
+                                            hasTemplateChanges ? "border-primary text-primary bg-primary/5" : "opacity-50"
+                                        )}
+                                        onClick={handleUpdateTemplate}
+                                    >
+                                        Save
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="rounded-full text-[10px] h-7 px-3 font-bold text-muted-foreground hover:bg-muted"
+                                        onClick={() => {
+                                            const currentTemp = templates.find(t => t.id === selectedTemplateId);
+                                            setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
+                                            setIsTemplateDialogOpen(true);
+                                        }}
+                                    >
+                                        Save as New
+                                    </Button>
+                                </div>
                             </div>
 
                             <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col min-h-0">

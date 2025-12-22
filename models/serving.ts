@@ -26,6 +26,7 @@ export interface ServingSchedule {
     teamId: string;
     date: string; // YYYY-MM-DD
     items?: ServingItem[]; // New cue-sheet based structure
+    templateId?: string; // Track which template was used
     roles?: { // Keep for backward compatibility
         roleId: string;
         memberIds: string[];
