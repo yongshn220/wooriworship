@@ -31,7 +31,13 @@ class TeamService extends BaseService {
         }
       }
     }
-    return await this.create(team);
+    const teamId = await this.create(team);
+    if (teamId) {
+      // Init Serving defaults
+      await ServingService.initStandardRoles(teamId);
+      await ServingService.initDefaultTemplate(teamId);
+    }
+    return teamId;
   }
 
   async addNewMember(userId: string, teamId: string) {

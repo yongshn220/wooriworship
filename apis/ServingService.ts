@@ -245,6 +245,30 @@ class ServingService extends BaseService {
         await firestore.collection("teams").doc(teamId).collection("serving_templates").doc(templateId).delete();
     }
 
+    async initDefaultTemplate(teamId: string): Promise<void> {
+        const SAMPLE_FLOW = [
+            { title: '예배의 부르심', type: 'FLOW' },
+            { title: '교독문', type: 'FLOW' },
+            { title: '기도', type: 'FLOW' },
+            { title: '찬양팀 구성', type: 'FLOW' },
+            { title: '설교', type: 'FLOW' },
+            { title: '봉헌 및 광고', type: 'FLOW' },
+            { title: '축도', type: 'FLOW' },
+            { title: '자막/영상', type: 'SUPPORT' },
+            { title: '음향', type: 'SUPPORT' },
+        ];
+
+        const templates = await this.getTemplates(teamId);
+        if (templates.length > 0) return;
+
+        const defaultTemplate = {
+            name: "예배",
+            teamId,
+            items: SAMPLE_FLOW.map(i => ({ title: i.title, type: i.type, remarks: "" }))
+        };
+        await this.createTemplate(teamId, defaultTemplate);
+    }
+
     // --- Helpers ---
 
     async findRoleByName(teamId: string, name: string): Promise<ServingRole | null> {
