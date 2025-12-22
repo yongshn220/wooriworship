@@ -25,6 +25,8 @@ import { getPathServing } from "@/components/util/helper/routes";
 import { FormMode } from "@/components/constants/enums";
 import { ServingSchedule, ServingItem, ServingAssignment } from "@/models/serving";
 import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 
 interface Props {
@@ -73,6 +75,13 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     } | null>(null);
 
     const [isLoading, setIsLoading] = useState(false);
+
+    // Dialog States
+    const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
+    const [newRoleName, setNewRoleName] = useState("");
+
+    const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+    const [newTemplateName, setNewTemplateName] = useState("");
 
     // Initialize roles & data
     useEffect(() => {
@@ -196,6 +205,43 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             toast({ title: "Failed to save schedule", variant: "destructive" });
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    // Actions
+    const handleCreateRole = async () => {
+        if (!newRoleName.trim() || !teamId) return;
+        try {
+            await ServingService.createRole(teamId, { teamId, name: newRoleName.trim(), order: roles.length });
+            setRolesUpdater(prev => prev + 1);
+            setNewRoleName("");
+            setIsRoleDialogOpen(false);
+            toast({ title: "Role created successfully!" });
+        } catch (e) {
+            console.error(e);
+            toast({ title: "Failed to create role", variant: "destructive" });
+        }
+    };
+
+    const handleSaveTemplate = async () => {
+        if (!newTemplateName.trim()) return;
+        try {
+            await ServingService.createTemplate(teamId, {
+                name: newTemplateName.trim(),
+                teamId,
+                items: items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }))
+            });
+            const newTemps = await ServingService.getTemplates(teamId);
+            setTemplates(newTemps);
+            setNewTemplateName("");
+            setIsTemplateDialogOpen(false);
+            toast({
+                title: "Template saved!",
+                description: `'${newTemplateName}' is now available for reuse.`
+            });
+        } catch (e) {
+            console.error(e);
+            toast({ title: "Failed to save template", variant: "destructive" });
         }
     };
 
@@ -382,14 +428,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="w-full h-10 border-dashed border-2 text-muted-foreground hover:text-primary transition-colors"
-                                        onClick={async () => {
-                                            const name = window.prompt("New Role Name:");
-                                            if (name && teamId) {
-                                                await ServingService.createRole(teamId, { teamId, name, order: roles.length });
-                                                setRolesUpdater(prev => prev + 1);
-                                            }
-                                        }}
+                                        className="w-full h-10 border-dashed border-2 text-muted-foreground hover:text-primary transition-colors hover:bg-primary/5 rounded-xl text-xs"
+                                        onClick={() => setIsRoleDialogOpen(true)}
                                     >
                                         <Plus className="h-4 w-4 mr-1" /> Add New Role
                                     </Button>
@@ -453,19 +493,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="rounded-full text-[10px] h-7 border-dashed border text-primary"
-                                    onClick={async () => {
-                                        const name = window.prompt("Save current timeline as template:");
-                                        if (name) {
-                                            await ServingService.createTemplate(teamId, {
-                                                name,
-                                                teamId,
-                                                items: items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }))
-                                            });
-                                            const newTemps = await ServingService.getTemplates(teamId);
-                                            setTemplates(newTemps);
-                                        }
-                                    }}
+                                    className="rounded-full text-[10px] h-7 border-dashed border text-primary bg-primary/5 hover:bg-primary/10 transition-colors"
+                                    onClick={() => setIsTemplateDialogOpen(true)}
                                 >
                                     <Save className="h-3 w-3 mr-1" /> Save Template
                                 </Button>
@@ -768,6 +797,94 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     </div>
                 </DrawerContent>
             </Drawer>
+            {/* Role Creation Dialog */}
+            <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
+                <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
+                    <DialogHeader className="space-y-3">
+                        <DialogTitle className="text-2xl font-bold text-center">New Role</DialogTitle>
+                        <p className="text-sm text-center text-muted-foreground font-medium">
+                            Create a new role for your praise team.
+                        </p>
+                    </DialogHeader>
+                    <div className="py-6 space-y-4">
+                        <Input
+                            placeholder="e.g. Acoustic Guitar"
+                            value={newRoleName}
+                            onChange={(e) => setNewRoleName(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && newRoleName.trim()) {
+                                    handleCreateRole();
+                                }
+                            }}
+                            className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
+                            autoFocus
+                        />
+                    </div>
+                    <DialogFooter className="flex sm:flex-row gap-3">
+                        <Button
+                            variant="ghost"
+                            className="h-12 flex-1 rounded-2xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                            onClick={() => setIsRoleDialogOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
+                            onClick={handleCreateRole}
+                            disabled={!newRoleName.trim()}
+                        >
+                            Create Role
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Template Saving Dialog */}
+            <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
+                <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
+                    <DialogHeader className="space-y-3">
+                        <div className="flex justify-center">
+                            <div className="p-3 bg-primary/10 rounded-full">
+                                <Save className="w-8 h-8 text-primary" />
+                            </div>
+                        </div>
+                        <DialogTitle className="text-2xl font-bold text-center">Save Template</DialogTitle>
+                        <p className="text-sm text-center text-muted-foreground font-medium leading-relaxed">
+                            Save this timeline as a template to reuse it for future worship services.
+                        </p>
+                    </DialogHeader>
+                    <div className="py-6">
+                        <Input
+                            placeholder="e.g. Sunday Morning Worship"
+                            value={newTemplateName}
+                            onChange={(e) => setNewTemplateName(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && newTemplateName.trim()) {
+                                    handleSaveTemplate();
+                                }
+                            }}
+                            className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
+                            autoFocus
+                        />
+                    </div>
+                    <DialogFooter className="flex sm:flex-row gap-3">
+                        <Button
+                            variant="ghost"
+                            className="h-12 flex-1 rounded-2xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                            onClick={() => setIsTemplateDialogOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
+                            onClick={handleSaveTemplate}
+                            disabled={!newTemplateName.trim()}
+                        >
+                            Save
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
