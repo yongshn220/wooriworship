@@ -31,7 +31,10 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
     const roles = useRecoilValue(fetchServingRolesSelector(teamId));
 
     // Gather all member IDs involved in this schedule for batch fetching
-    const allMemberIds = schedule.roles.flatMap(r => r.memberIds);
+    const allMemberIds = schedule.items
+        ? schedule.items.flatMap(item => item.assignments.flatMap(a => a.memberIds))
+        : (schedule.roles?.flatMap(r => r.memberIds) || []);
+
     const members = useRecoilValue(usersAtom(allMemberIds));
 
     // Data Helpers
@@ -39,11 +42,13 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
     const getMember = (uid: string) => members.find(m => m.id === uid);
 
     // Check if current user is serving in this schedule
-    const isMeServing = currentUserUid ? schedule.roles.some(r => r.memberIds.includes(currentUserUid)) : false;
+    const isMeServing = currentUserUid ? (
+        schedule.items
+            ? schedule.items.some(item => item.assignments.some(a => a.memberIds.includes(currentUserUid)))
+            : (schedule.roles?.some(r => r.memberIds.includes(currentUserUid)) || false)
+    ) : false;
 
     // Date Logic
-    // Parse manually to ensure local time is used (YYYY-MM-DD -> local midnight)
-    // new Date("YYYY-MM-DD") treats it as UTC, which causes shift in western timezones
     const [year, month, day] = schedule.date.split("-").map(Number);
     const scheduleDate = new Date(year, month - 1, day);
     const today = new Date();
@@ -127,51 +132,64 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                     >
                         {isMeServing ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {schedule.roles
-                                    .filter(r => r.memberIds.includes(currentUserUid!))
-                                    .sort((a, b) => {
-                                        const indexA = roles.findIndex(r => r.id === a.roleId);
-                                        const indexB = roles.findIndex(r => r.id === b.roleId);
-                                        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-                                    })
-                                    .map((assignment, idx) => {
-                                        const role = roles.find(r => r.id === assignment.roleId);
-                                        if (!role) return null;
-
-                                        return (
-                                            <div key={idx} className="space-y-1.5">
-                                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                                    {role.name}
-                                                </p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {/* Show ONLY Me in collapsed view per user request? Or all members in that role? 
-                                                         "만약 내가 있다면 hide 하지말고 표시되게 하라는거야 (같은 ui가)" 
-                                                         Usually implies seeing the context of that role. 
-                                                         But strictly "hide everything else" might mean only show ME.
-                                                         However, purely showing ME chip might look odd if others are in the same role.
-                                                         The screenshot shows "Yongjung Shin" in a chip.
-                                                         I'll show ONLY the user chip to be safe and strictly follow "hide others".
-                                                     */}
+                                {schedule.items ? (
+                                    // New structure: collect all assignments for this user
+                                    schedule.items.flatMap(item =>
+                                        item.assignments
+                                            .filter(a => a.memberIds.includes(currentUserUid || ""))
+                                            .map((a, idx) => ({
+                                                id: `${item.id}-${idx}`,
+                                                label: a.label || roles.find(r => r.id === a.roleId)?.name || "Role"
+                                            }))
+                                    ).map(myAssignment => (
+                                        <div key={myAssignment.id} className="space-y-1.5">
+                                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                                {myAssignment.label}
+                                            </p>
+                                            <div
+                                                className={cn(
+                                                    "flex items-center gap-1.5 px-2 py-1 rounded-full border text-sm transition-colors w-fit",
+                                                    "bg-blue-50 border-blue-200 text-blue-700 font-medium"
+                                                )}
+                                            >
+                                                <Avatar className="h-5 w-5">
+                                                    <AvatarFallback className="text-[9px]">{getMember(currentUserUid!)?.name?.[0]}</AvatarFallback>
+                                                </Avatar>
+                                                <span>{getMember(currentUserUid!)?.name || "Me"}</span>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    // Legacy structure
+                                    schedule.roles?.filter(r => r.memberIds.includes(currentUserUid!))
+                                        .map((assignment, idx) => {
+                                            const role = roles.find(r => r.id === assignment.roleId);
+                                            if (!role) return null;
+                                            return (
+                                                <div key={idx} className="space-y-1.5">
+                                                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                                        {role.name}
+                                                    </p>
                                                     <div
                                                         className={cn(
-                                                            "flex items-center gap-1.5 px-2 py-1 rounded-full border text-sm transition-colors",
+                                                            "flex items-center gap-1.5 px-2 py-1 rounded-full border text-sm transition-colors w-fit",
                                                             "bg-blue-50 border-blue-200 text-blue-700 font-medium"
                                                         )}
                                                     >
                                                         <Avatar className="h-5 w-5">
                                                             <AvatarFallback className="text-[9px]">{getMember(currentUserUid!)?.name?.[0]}</AvatarFallback>
                                                         </Avatar>
-                                                        <span>{getMember(currentUserUid!)?.name || "Unknown"}</span>
+                                                        <span>{getMember(currentUserUid!)?.name || "Me"}</span>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        )
-                                    })
-                                }
+                                            )
+                                        })
+                                )}
                             </div>
                         ) : (
                             <p className="mt-2 text-sm text-muted-foreground line-clamp-1">
-                                {schedule.roles.length} roles, {allMemberIds.length} members assigned
+                                {schedule.items ? `${schedule.items.length} items` : `${schedule.roles?.length || 0} roles`}
+                                , {allMemberIds.length} members assigned
                             </p>
                         )}
                     </motion.div>
@@ -181,4 +199,3 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
         </Card >
     );
 }
-

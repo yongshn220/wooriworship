@@ -6,11 +6,27 @@ export interface ServingRole {
     default_members?: string[];
 }
 
+export interface ServingAssignment {
+    roleId?: string;       // Existing role reference
+    label?: string;        // Manual label (e.g., "Prayer")
+    memberIds: string[];
+}
+
+export interface ServingItem {
+    id: string;
+    order: number;
+    title: string;
+    assignments: ServingAssignment[];
+    remarks?: string;
+    type: 'FLOW' | 'SUPPORT';
+}
+
 export interface ServingSchedule {
     id: string;
     teamId: string;
     date: string; // YYYY-MM-DD
-    roles: {
+    items?: ServingItem[]; // New cue-sheet based structure
+    roles?: { // Keep for backward compatibility
         roleId: string;
         memberIds: string[];
     }[];
