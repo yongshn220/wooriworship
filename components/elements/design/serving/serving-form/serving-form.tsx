@@ -76,7 +76,9 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 .then(() => setRolesUpdater(prev => prev + 1))
                 .catch(console.error);
         }
+    }, [teamId, setRolesUpdater]); // Only run when teamId changes
 
+    useEffect(() => {
         if (mode === FormMode.EDIT && initialData) {
             const [y, m, d] = initialData.date.split('-').map(Number);
             const parsedDate = new Date(y, m - 1, d);
@@ -98,7 +100,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 }));
                 setItems(migratedItems);
             }
-        } else if (mode === FormMode.CREATE) {
+        } else if (mode === FormMode.CREATE && items.length === 0) {
             // Default Flow Template
             const defaultFlow: Partial<ServingItem>[] = [
                 { title: '예배의 부르심', type: 'FLOW' },
@@ -119,7 +121,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 type: item.type as 'FLOW' | 'SUPPORT',
             })));
         }
-    }, [teamId, setRolesUpdater, mode, initialData, roles]);
+    }, [mode, initialData, roles, items.length]);
 
     // Helpers
     const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || id; // Fallback to ID (name) for manual entries
@@ -316,6 +318,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-[10px] font-bold bg-muted px-1.5 py-0.5 rounded text-muted-foreground">#{itemIdx + 1}</span>
                                                         <input
+                                                            id={`item-title-${item.id}`}
+                                                            name={`item-title-${item.id}`}
                                                             value={item.title}
                                                             onChange={(e) => {
                                                                 const newItems = [...items];
@@ -327,6 +331,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                         />
                                                     </div>
                                                     <input
+                                                        id={`item-remarks-${item.id}`}
+                                                        name={`item-remarks-${item.id}`}
                                                         value={item.remarks || ""}
                                                         onChange={(e) => {
                                                             const newItems = [...items];
