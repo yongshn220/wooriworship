@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState, useRecoilValueLoadable } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { servingRolesAtom, fetchServingRolesSelector, servingSchedulesAtom, servingRolesUpdaterAtom } from "@/global-states/servingState";
 import { ServingService } from "@/apis";
@@ -11,7 +11,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format, nextSunday } from "date-fns";
-import { ArrowLeft, ArrowRight, ChevronLeft, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus, Pencil } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus, Pencil, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,7 @@ import { ServingSchedule, ServingItem, ServingAssignment } from "@/models/servin
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 interface Props {
@@ -53,9 +54,12 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const teamMembers = useRecoilValue(usersAtom(team?.users));
 
     // Recoil
-    const roles = useRecoilValue(fetchServingRolesSelector(teamId));
+    const rolesLoadable = useRecoilValueLoadable(fetchServingRolesSelector(teamId));
     const setSchedules = useSetRecoilState(servingSchedulesAtom);
     const setRolesUpdater = useSetRecoilState(servingRolesUpdaterAtom);
+
+    const roles = rolesLoadable.state === 'hasValue' ? rolesLoadable.contents : [];
+
 
     // Form State
     const [step, setStep] = useState(0); // 0: When, 1: Who, 2: What, 3: Review
@@ -375,20 +379,35 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         })
     };
 
-    return (
-        <div className="fixed inset-0 z-[40] bg-gray-50 flex flex-col overflow-y-auto overflow-x-hidden">
+    if (rolesLoadable.state === 'loading') {
+        return <ServingFormSkeleton />;
+    }
 
-            {/* STICKY HEADER MASK */}
-            <div className="sticky top-0 z-50 w-full px-6 pt-10 pb-6 bg-gray-50/80 backdrop-blur-xl border-b border-gray-100/50 flex flex-col items-center gap-6 shadow-sm">
-                <div className="flex gap-2 p-1 bg-white/60 rounded-full shadow-sm border border-white/40">
+    return (
+        <div className="fixed inset-0 z-[100] bg-gray-50 flex flex-col overflow-y-auto overflow-x-hidden">
+
+            {/* STICKY HEADER - Minimal with Gradient Mask */}
+            <div className="sticky top-0 z-50 w-full px-6 pt-8 pb-8 flex items-center justify-between pointer-events-none bg-gradient-to-b from-gray-50 via-gray-50/90 to-transparent">
+                {/* Exit Button - Left aligned */}
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 rounded-full bg-white/50 hover:bg-white shadow-sm pointer-events-auto backdrop-blur-sm"
+                    onClick={() => router.back()}
+                >
+                    <X className="w-5 h-5 text-gray-500" />
+                </Button>
+
+                {/* Step Bar - Centered */}
+                <div className="flex gap-1 p-1 bg-white/50 backdrop-blur-md rounded-full shadow-sm pointer-events-auto absolute left-1/2 -translate-x-1/2">
                     {["When", "Who", "What", "Review"].map((label, idx) => (
                         <button
                             key={idx}
                             onClick={() => goToStep(idx)}
                             className={cn(
-                                "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
+                                "px-3 py-1.5 rounded-full text-[10px] font-bold transition-all",
                                 step === idx
-                                    ? "bg-black text-white shadow-md scale-105"
+                                    ? "bg-primary text-white shadow-sm"
                                     : "text-gray-400 hover:text-gray-600"
                             )}
                         >
@@ -396,11 +415,13 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         </button>
                     ))}
                 </div>
+
+                <div className="w-10" /> {/* Spacer for centering */}
             </div>
 
             {/* MAIN CONTENT AREA */}
-            <main className="flex-1 w-full max-w-2xl mx-auto px-6 py-8">
-                <AnimatePresence mode="wait" custom={direction}>
+            <main className="flex-1 w-full max-w-2xl mx-auto px-6 py-4 pb-32 relative">
+                <AnimatePresence initial={false} custom={direction}>
                     {/* Step 1: When */}
                     {step === 0 && (
                         <motion.div
@@ -410,7 +431,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             initial="enter"
                             animate="center"
                             exit="exit"
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.8 }}
                             className="flex flex-col gap-8 w-full"
                         >
                             <div className="space-y-2 text-center">
@@ -443,7 +464,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             initial="enter"
                             animate="center"
                             exit="exit"
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.8 }}
                             className="flex flex-col gap-8 w-full"
                         >
                             <div className="space-y-2 text-center">
@@ -557,7 +578,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             initial="enter"
                             animate="center"
                             exit="exit"
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.8 }}
                             className="flex flex-col gap-8 w-full"
                         >
                             <div className="space-y-2 text-center">
@@ -859,28 +880,28 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 </AnimatePresence>
             </main>
 
-            {/* STICKY FOOTER MASK */}
-            <div className="sticky bottom-0 z-50 w-full px-6 pt-6 pb-12 bg-gray-50/80 backdrop-blur-xl border-t border-gray-100/50">
-                <div className="flex gap-4 w-full max-w-2xl mx-auto">
+            {/* STICKY FOOTER - Minimal with Gradient Mask */}
+            <div className="sticky bottom-0 z-50 w-full px-6 pb-8 pt-12 pointer-events-none bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent">
+                <div className="flex gap-3 w-full max-w-2xl mx-auto pointer-events-auto">
                     <Button
-                        variant="ghost"
-                        className="h-16 w-16 rounded-3xl bg-white shadow-sm border border-gray-100 text-gray-400 hover:text-gray-900 hover:bg-white active:scale-95 transition-all"
+                        variant="outline"
+                        className="h-12 w-12 rounded-full border-gray-200 bg-white/80 backdrop-blur-sm hover:bg-white text-gray-500 shadow-sm"
                         onClick={prevStep}
                         disabled={step === 0}
                     >
-                        <ChevronLeft className="w-8 h-8" />
+                        <ChevronLeft className="w-6 h-6" />
                     </Button>
                     <Button
-                        className="h-16 flex-1 rounded-3xl bg-primary text-white text-xl font-black shadow-2xl shadow-primary/30 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 group"
+                        className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
                         onClick={step === totalSteps - 1 ? handleSubmit : nextStep}
                         disabled={isLoading || (step === 0 && !selectedDate)}
                     >
                         {isLoading ? (
                             "Saving..."
                         ) : step === totalSteps - 1 ? (
-                            <>Confirm & Save <Check className="w-6 h-6 ml-1 group-hover:scale-110 transition-transform" /></>
+                            <>Confirm <Check className="w-5 h-5 ml-1" /></>
                         ) : (
-                            <>Continue <ArrowRight className="w-6 h-6 ml-1 group-hover:translate-x-1 transition-transform" /></>
+                            <>Next <ArrowRight className="w-5 h-5 ml-1" /></>
                         )}
                     </Button>
                 </div>
@@ -1042,4 +1063,39 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             </Dialog>
         </div>
     );
+}
+
+function ServingFormSkeleton() {
+    return (
+        <div className="fixed inset-0 z-[100] bg-gray-50 flex flex-col overflow-hidden">
+            {/* Header Skeleton */}
+            <div className="sticky top-0 z-50 w-full px-6 pt-8 pb-4 flex items-center justify-between pointer-events-none">
+                <Skeleton className="h-10 w-10 rounded-full bg-gray-200" />
+                <div className="flex gap-1">
+                    <Skeleton className="h-6 w-12 rounded-full bg-gray-200" />
+                    <Skeleton className="h-6 w-12 rounded-full bg-gray-200" />
+                    <Skeleton className="h-6 w-12 rounded-full bg-gray-200" />
+                    <Skeleton className="h-6 w-12 rounded-full bg-gray-200" />
+                </div>
+                <div className="w-10" />
+            </div>
+
+            {/* Content Skeleton */}
+            <div className="flex-1 w-full max-w-2xl mx-auto px-6 py-8 flex flex-col gap-8">
+                <div className="space-y-4 text-center flex flex-col items-center">
+                    <Skeleton className="h-4 w-16 bg-gray-200" />
+                    <Skeleton className="h-8 w-48 bg-gray-200" />
+                </div>
+                <Skeleton className="w-full h-[300px] rounded-3xl bg-gray-200" />
+            </div>
+
+            {/* Footer Skeleton */}
+            <div className="sticky bottom-0 z-50 w-full px-6 pb-8 pt-4 pointer-events-none">
+                <div className="flex gap-3 w-full max-w-2xl mx-auto pointer-events-auto">
+                    <Skeleton className="h-12 w-12 rounded-full bg-gray-200" />
+                    <Skeleton className="h-12 flex-1 rounded-full bg-gray-200" />
+                </div>
+            </div>
+        </div>
+    )
 }
