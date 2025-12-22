@@ -11,7 +11,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format, nextSunday } from "date-fns";
-import { ArrowLeft, ArrowRight, ChevronLeft, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus, Pencil } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -319,12 +319,17 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     };
 
     const handleUpdateTemplateName = async (newName: string) => {
-        if (!selectedTemplateId || !newName.trim()) return;
-        try {
-            await ServingService.updateTemplate(teamId, selectedTemplateId, { name: newName.trim() });
-            setTemplates(prev => prev.map(t => t.id === selectedTemplateId ? { ...t, name: newName.trim() } : t));
-        } catch (e) {
-            console.error(e);
+        if (!selectedTemplateId) return;
+        // Update local state immediately to allow typing/deleting everything
+        setTemplates(prev => prev.map(t => t.id === selectedTemplateId ? { ...t, name: newName } : t));
+
+        // Update DB only if not empty (to avoid empty names in DB if desired) or just update anyway
+        if (newName.trim()) {
+            try {
+                await ServingService.updateTemplate(teamId, selectedTemplateId, { name: newName.trim() });
+            } catch (e) {
+                console.error(e);
+            }
         }
     };
 
@@ -552,14 +557,17 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             <div className="flex-1 min-h-0 flex flex-col gap-4">
                                 {/* Template Header & Actions */}
                                 <div className="flex flex-col gap-3 px-1">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex-1">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div className="flex-1 relative group">
                                             <input
                                                 value={templates.find(t => t.id === selectedTemplateId)?.name || ""}
                                                 onChange={(e) => handleUpdateTemplateName(e.target.value)}
-                                                className="text-xl font-black bg-transparent border-0 focus:ring-0 p-0 w-full placeholder:text-gray-300"
+                                                className="text-2xl font-black bg-transparent border-b-2 border-transparent focus:border-primary/30 focus:ring-0 p-0 w-full placeholder:text-gray-300 transition-all group-hover:border-gray-200"
                                                 placeholder="Template Name..."
                                             />
+                                            <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                <Pencil className="w-4 h-4 text-gray-400" />
+                                            </div>
                                         </div>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
