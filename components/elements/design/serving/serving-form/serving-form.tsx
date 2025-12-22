@@ -36,17 +36,6 @@ interface Props {
     initialData?: ServingSchedule;
 }
 
-const SAMPLE_FLOW: Partial<ServingItem>[] = [
-    { title: '예배의 부르심', type: 'FLOW' },
-    { title: '교독문', type: 'FLOW' },
-    { title: '기도', type: 'FLOW' },
-    { title: '찬양팀 구성', type: 'FLOW' },
-    { title: '설교', type: 'FLOW' },
-    { title: '봉헌 및 광고', type: 'FLOW' },
-    { title: '축도', type: 'FLOW' },
-    { title: '자막/영상', type: 'SUPPORT' },
-    { title: '음향', type: 'SUPPORT' },
-];
 
 export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Props) {
     const router = useRouter();
@@ -69,7 +58,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(nextSunday(new Date()));
     const [items, setItems] = useState<ServingItem[]>([]);
     const [templates, setTemplates] = useState<any[]>([]);
-    const [isTemplatesLoaded, setIsTemplatesLoaded] = useState(false);
+
     const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
     const [hasTemplateChanges, setHasTemplateChanges] = useState(false);
 
@@ -91,23 +80,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     // Initialize roles & data
     useEffect(() => {
         if (teamId) {
-            ServingService.initStandardRoles(teamId)
-                .then(() => setRolesUpdater(prev => prev + 1))
-                .catch(console.error);
-
             const loadInitialData = async () => {
-                let data = await ServingService.getTemplates(teamId);
-
-                // 1. Auto-initialize "예배" template if empty
-                if (data.length === 0) {
-                    const defaultTemplate = {
-                        name: "예배",
-                        teamId,
-                        items: SAMPLE_FLOW.map(i => ({ title: i.title, type: i.type, remarks: "" }))
-                    };
-                    await ServingService.createTemplate(teamId, defaultTemplate);
-                    data = await ServingService.getTemplates(teamId);
-                }
+                const data = await ServingService.getTemplates(teamId);
                 setTemplates(data);
 
                 // 2. Track last used template from recent schedule
@@ -116,13 +90,11 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 if (lastUsedTemplateId) {
                     setSelectedTemplateId(lastUsedTemplateId);
                 }
-
-                setIsTemplatesLoaded(true);
             };
 
             loadInitialData().catch(console.error);
         }
-    }, [teamId, setRolesUpdater]); // Only run when teamId changes
+    }, [teamId]); // Only run when teamId changes
 
     useEffect(() => {
         if (mode === FormMode.EDIT && initialData) {
@@ -146,7 +118,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 }));
                 setItems(migratedItems);
             }
-        } else if (mode === FormMode.CREATE && items.length === 0 && isTemplatesLoaded) {
+        } else if (mode === FormMode.CREATE && items.length === 0 && templates.length > 0) {
             // Priority 1: Use selectedTemplateId (last used) or first template
             const templateToLoad = templates.find(t => t.id === selectedTemplateId) || templates[0];
             if (templateToLoad) {
@@ -161,7 +133,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 setSelectedTemplateId(templateToLoad.id);
             }
         }
-    }, [mode, initialData, roles, items.length, isTemplatesLoaded, templates, selectedTemplateId]);
+    }, [mode, initialData, roles, items.length, templates, selectedTemplateId]);
 
     // Track template changes
     useEffect(() => {
@@ -360,26 +332,24 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         enter: (direction: number) => ({
             x: direction > 0 ? "100%" : "-100%",
             opacity: 0,
-            scale: 0.95,
             position: 'absolute' as const
         }),
         center: {
             zIndex: 1,
             x: 0,
             opacity: 1,
-            scale: 1,
             position: 'relative' as const
         },
         exit: (direction: number) => ({
             zIndex: 0,
             x: direction < 0 ? "100%" : "-100%",
             opacity: 0,
-            scale: 0.95,
             position: 'absolute' as const
         })
     };
 
-    if (rolesLoadable.state === 'loading') {
+    // Prevent flash: Show skeleton if fetching or if data is not ready
+    if (rolesLoadable.state !== 'hasValue') {
         return <ServingFormSkeleton />;
     }
 
@@ -439,7 +409,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                 <h2 className="text-3xl font-black text-gray-900 tracking-tight">Select Date</h2>
                             </div>
 
-                            <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-2">
+                            <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-2 flex justify-center">
                                 <Calendar
                                     mode="single"
                                     selected={selectedDate}
