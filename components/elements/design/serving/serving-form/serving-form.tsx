@@ -54,12 +54,14 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const setRolesUpdater = useSetRecoilState(servingRolesUpdaterAtom);
 
     // Form State
-    const [step, setStep] = useState(0); // 0: Date, 1: Flow, 2: Review
+    const [step, setStep] = useState(0); // 0: When, 1: Who, 2: What, 3: Review
     const [direction, setDirection] = useState(0);
-    const totalSteps = 3;
+    const totalSteps = 4;
 
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(nextSunday(new Date()));
     const [items, setItems] = useState<ServingItem[]>([]);
+    const [templates, setTemplates] = useState<any[]>([]);
+    const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
 
     // For Member Selection Drawer
     const [activeSelection, setActiveSelection] = useState<{
@@ -74,6 +76,10 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         if (teamId) {
             ServingService.initStandardRoles(teamId)
                 .then(() => setRolesUpdater(prev => prev + 1))
+                .catch(console.error);
+
+            ServingService.getTemplates(teamId)
+                .then(setTemplates)
                 .catch(console.error);
         }
     }, [teamId, setRolesUpdater]); // Only run when teamId changes
@@ -232,7 +238,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             {/* Header Progress */}
             <div className="fixed top-8 left-0 right-0 z-50 px-6 flex flex-col items-center gap-4">
                 <div className="flex gap-2 p-1 bg-white/50 backdrop-blur-md rounded-full shadow-sm border border-white/20">
-                    {["When", "Who", "Review"].map((label, idx) => (
+                    {["When", "Who", "What", "Review"].map((label, idx) => (
                         <button
                             key={idx}
                             onClick={() => goToStep(idx)}
@@ -289,7 +295,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         </motion.div>
                     )}
 
-                    {/* Step 1: Flow / Cue Sheet Builder */}
+                    {/* Step 2: Who (Praise Team Assignment) */}
                     {step === 1 && (
                         <motion.div
                             key="step1"
@@ -299,14 +305,164 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             animate="center"
                             exit="exit"
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="flex-1 flex flex-col h-full space-y-3 w-full"
+                            className="flex-1 flex flex-col h-full space-y-4 w-full min-h-0"
                         >
-                            <div className="text-center pb-2">
+                            <div className="text-center shrink-0">
                                 <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 2</Label>
+                                <h2 className="text-2xl font-bold text-gray-900">Assign Roles</h2>
+                            </div>
+
+                            <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col min-h-0">
+                                <div className="flex-1 overflow-y-auto p-6 space-y-4 overscroll-contain">
+                                    {roles.map((role) => {
+                                        const assignments = items.find(i => i.title === '찬양팀 구성')?.assignments || [];
+                                        const roleAssignment = assignments.find(a => a.roleId === role.id);
+                                        const memberIds = roleAssignment?.memberIds || [];
+
+                                        return (
+                                            <div key={role.id} className="p-4 rounded-2xl border bg-card hover:border-primary/30 transition-all shadow-sm space-y-3">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-bold text-gray-800">{role.name}</span>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-8 w-8 rounded-full p-0 bg-muted/50"
+                                                        onClick={() => {
+                                                            let newItems = [...items];
+                                                            let ptItemIdx = newItems.findIndex(i => i.title === '찬양팀 구성');
+                                                            if (ptItemIdx === -1) {
+                                                                newItems.push({
+                                                                    id: Math.random().toString(36).substr(2, 9),
+                                                                    order: items.length,
+                                                                    title: '찬양팀 구성',
+                                                                    assignments: [],
+                                                                    type: 'FLOW'
+                                                                });
+                                                                ptItemIdx = newItems.length - 1;
+                                                            }
+
+                                                            const newAssignments = [...newItems[ptItemIdx].assignments];
+                                                            let aIdx = newAssignments.findIndex(a => a.roleId === role.id);
+                                                            if (aIdx === -1) {
+                                                                newAssignments.push({ roleId: role.id, memberIds: [] });
+                                                                aIdx = newAssignments.length - 1;
+                                                            }
+
+                                                            setItems(newItems.map((it, idx) => idx === ptItemIdx ? { ...it, assignments: newAssignments } : it));
+                                                            setActiveSelection({ itemId: newItems[ptItemIdx].id, assignmentIndex: aIdx });
+                                                        }}
+                                                    >
+                                                        <UserPlus className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {memberIds.map(uid => (
+                                                        <Badge key={uid} className="px-3 py-1 bg-primary/10 text-primary border-0 rounded-full text-xs">
+                                                            {getMemberName(uid)}
+                                                        </Badge>
+                                                    ))}
+                                                    {memberIds.length === 0 && (
+                                                        <span className="text-xs text-muted-foreground italic">No one assigned</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+
+                                    {/* Quick Role Add */}
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="w-full h-10 border-dashed border-2 text-muted-foreground hover:text-primary transition-colors"
+                                        onClick={async () => {
+                                            const name = window.prompt("New Role Name:");
+                                            if (name && teamId) {
+                                                await ServingService.createRole(teamId, { teamId, name, order: roles.length });
+                                                setRolesUpdater(prev => prev + 1);
+                                            }
+                                        }}
+                                    >
+                                        <Plus className="h-4 w-4 mr-1" /> Add New Role
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4 mt-auto shrink-0 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+                                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
+                                    <ChevronLeft className="w-6 h-6" />
+                                </Button>
+                                <Button
+                                    className="h-14 flex-1 rounded-full bg-primary text-primary-foreground text-lg font-bold shadow-xl hover:bg-primary/90 active:scale-95 transition-all"
+                                    onClick={nextStep}
+                                >
+                                    Build Timeline <ArrowRight className="ml-2 w-5 h-5" />
+                                </Button>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* Step 3: What (Worship Timeline) */}
+                    {step === 2 && (
+                        <motion.div
+                            key="step2"
+                            custom={direction}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="flex-1 flex flex-col h-full space-y-3 w-full min-h-0"
+                        >
+                            <div className="text-center shrink-0">
+                                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 3</Label>
                                 <h2 className="text-2xl font-bold text-gray-900">Worship Timeline</h2>
                             </div>
 
-                            <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col">
+                            {/* Template Selector */}
+                            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar shrink-0">
+                                {templates.map(tmp => (
+                                    <Button
+                                        key={tmp.id}
+                                        variant={selectedTemplateId === tmp.id ? "default" : "outline"}
+                                        size="sm"
+                                        className="rounded-full text-[10px] h-7 whitespace-nowrap"
+                                        onClick={() => {
+                                            setSelectedTemplateId(tmp.id);
+                                            setItems(tmp.items.map((it: any, idx: number) => ({
+                                                ...it,
+                                                id: Math.random().toString(36).substr(2, 9),
+                                                order: idx,
+                                                assignments: it.title === '찬양팀 구성'
+                                                    ? (items.find(i => i.title === '찬양팀 구성')?.assignments || [])
+                                                    : []
+                                            })));
+                                        }}
+                                    >
+                                        {tmp.name}
+                                    </Button>
+                                ))}
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="rounded-full text-[10px] h-7 border-dashed border text-primary"
+                                    onClick={async () => {
+                                        const name = window.prompt("Save current timeline as template:");
+                                        if (name) {
+                                            await ServingService.createTemplate(teamId, {
+                                                name,
+                                                teamId,
+                                                items: items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }))
+                                            });
+                                            const newTemps = await ServingService.getTemplates(teamId);
+                                            setTemplates(newTemps);
+                                        }
+                                    }}
+                                >
+                                    <Save className="h-3 w-3 mr-1" /> Save Template
+                                </Button>
+                            </div>
+
+                            <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col min-h-0">
                                 <div className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain">
                                     {items.sort((a, b) => a.order - b.order).map((item, itemIdx) => (
                                         <div
@@ -355,7 +511,6 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                 const target = newItems[itemIdx];
                                                                 newItems[itemIdx] = newItems[itemIdx - 1];
                                                                 newItems[itemIdx - 1] = target;
-                                                                // Update orders
                                                                 newItems.forEach((it, idx) => it.order = idx);
                                                                 setItems(newItems);
                                                             }}
@@ -372,7 +527,6 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                 const target = newItems[itemIdx];
                                                                 newItems[itemIdx] = newItems[itemIdx + 1];
                                                                 newItems[itemIdx + 1] = target;
-                                                                // Update orders
                                                                 newItems.forEach((it, idx) => it.order = idx);
                                                                 setItems(newItems);
                                                             }}
@@ -380,113 +534,61 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                             <ChevronDown className="h-3 w-3" />
                                                         </Button>
                                                     </div>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10"
-                                                        onClick={() => setItems(items.filter(i => i.id !== item.id))}
-                                                    >
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10" onClick={() => setItems(items.filter(i => i.id !== item.id))}>
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 </div>
                                             </div>
 
-                                            {/* Assignments List */}
+                                            {/* Assignments for this item */}
                                             <div className="space-y-2">
                                                 {item.assignments.map((assignment, aIdx) => (
                                                     <div key={aIdx} className="flex flex-wrap items-center gap-2">
                                                         <Badge variant="outline" className="h-7 px-2 py-0 font-normal border-dashed">
                                                             {assignment.label || roles.find(r => r.id === assignment.roleId)?.name || "Role"}
                                                         </Badge>
-
                                                         {assignment.memberIds.map(uid => (
                                                             <Badge key={uid} className="h-7 px-2 bg-primary/10 text-primary hover:bg-primary/20 border-0">
                                                                 {getMemberName(uid)}
-                                                                <button
-                                                                    className="ml-1 hover:text-destructive"
-                                                                    onClick={() => {
-                                                                        const newItems = [...items];
-                                                                        const newAssignments = [...item.assignments];
-                                                                        newAssignments[aIdx] = {
-                                                                            ...assignment,
-                                                                            memberIds: assignment.memberIds.filter(id => id !== uid)
-                                                                        };
-                                                                        newItems[itemIdx] = { ...item, assignments: newAssignments };
-                                                                        setItems(newItems);
-                                                                    }}
-                                                                >
-                                                                    &times;
-                                                                </button>
+                                                                <button className="ml-1 hover:text-destructive" onClick={() => {
+                                                                    const newItems = [...items];
+                                                                    const newAssignments = [...item.assignments];
+                                                                    newAssignments[aIdx] = { ...assignment, memberIds: assignment.memberIds.filter(id => id !== uid) };
+                                                                    newItems[itemIdx] = { ...item, assignments: newAssignments };
+                                                                    setItems(newItems);
+                                                                }}>&times;</button>
                                                             </Badge>
                                                         ))}
-
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            className="h-7 w-7 rounded-full p-0 bg-muted/50"
-                                                            onClick={() => setActiveSelection({ itemId: item.id, assignmentIndex: aIdx })}
-                                                        >
+                                                        <Button variant="ghost" size="sm" className="h-7 w-7 rounded-full p-0 bg-muted/50" onClick={() => setActiveSelection({ itemId: item.id, assignmentIndex: aIdx })}>
                                                             <UserPlus className="h-3 w-3" />
                                                         </Button>
                                                     </div>
                                                 ))}
-
-                                                {/* Add Role / Member Trigger */}
-                                                <div className="flex gap-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-7 px-2 text-[10px] font-bold text-muted-foreground hover:bg-muted"
-                                                        onClick={() => {
-                                                            const newItems = [...items];
-                                                            const newAssignments = [...item.assignments, { memberIds: [] }];
-                                                            newItems[itemIdx] = { ...item, assignments: newAssignments };
-                                                            setItems(newItems);
-                                                            setActiveSelection({ itemId: item.id, assignmentIndex: newAssignments.length - 1 });
-                                                        }}
-                                                    >
-                                                        <Plus className="h-3 w-3 mr-1" /> Add Person
-                                                    </Button>
-
-                                                    {item.title.includes('찬양팀') && item.assignments.length === 0 && (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            className="h-7 px-2 text-[10px] font-bold text-primary hover:bg-primary/5"
-                                                            onClick={() => {
-                                                                const newItems = [...items];
-                                                                newItems[itemIdx] = {
-                                                                    ...item,
-                                                                    assignments: PRAISE_TEAM_ROLES.map((r): ServingAssignment => ({ label: r.label, memberIds: [] }))
-                                                                };
-                                                                setItems(newItems);
-                                                            }}
-                                                        >
-                                                            <Plus className="h-3 w-3 mr-1" /> Praise Team Preset
-                                                        </Button>
-                                                    )}
-                                                </div>
+                                                <Button
+                                                    variant="ghost" size="sm" className="h-7 px-2 text-[10px] font-bold text-muted-foreground hover:bg-muted"
+                                                    onClick={() => {
+                                                        const newItems = [...items];
+                                                        const newAssignments = [...item.assignments, { memberIds: [] }];
+                                                        newItems[itemIdx] = { ...item, assignments: newAssignments };
+                                                        setItems(newItems);
+                                                        setActiveSelection({ itemId: item.id, assignmentIndex: newAssignments.length - 1 });
+                                                    }}
+                                                >
+                                                    <Plus className="h-3 w-3 mr-1" /> Add Person
+                                                </Button>
                                             </div>
                                         </div>
                                     ))}
 
                                     <Button
-                                        variant="outline"
-                                        className="w-full h-12 rounded-2xl border-dashed border-2 hover:bg-muted/50 border-muted-foreground/20 text-muted-foreground"
-                                        onClick={() => setItems([...items, {
-                                            id: Math.random().toString(36).substr(2, 9),
-                                            order: items.length,
-                                            title: "",
-                                            assignments: [],
-                                            type: 'FLOW'
-                                        }])}
-                                    >
+                                        variant="outline" className="w-full h-12 rounded-2xl border-dashed border-2 hover:bg-muted/50 border-muted-foreground/20 text-muted-foreground"
+                                        onClick={() => setItems([...items, { id: Math.random().toString(36).substr(2, 9), order: items.length, title: "", assignments: [], type: 'FLOW' }])}>
                                         <Plus className="w-5 h-5 mr-2" /> Add Sequence
                                     </Button>
                                 </div>
                             </div>
 
-                            <div className="flex gap-4 mt-auto pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+                            <div className="flex gap-4 mt-auto shrink-0 pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
                                 <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
                                     <ChevronLeft className="w-6 h-6" />
                                 </Button>
@@ -494,16 +596,16 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                     className="h-14 flex-1 rounded-full bg-primary text-primary-foreground text-lg font-bold shadow-xl hover:bg-primary/90 active:scale-95 transition-all"
                                     onClick={nextStep}
                                 >
-                                    Review <ArrowRight className="ml-2 w-5 h-5" />
+                                    Review Plan <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
                             </div>
                         </motion.div>
                     )}
 
-                    {/* Step 3: Review */}
-                    {step === 2 && (
+                    {/* Step 4: Review */}
+                    {step === 3 && (
                         <motion.div
-                            key="step2"
+                            key="step3"
                             custom={direction}
                             variants={slideVariants}
                             initial="enter"
