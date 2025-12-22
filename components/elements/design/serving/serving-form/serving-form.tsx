@@ -11,7 +11,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format, nextSunday } from "date-fns";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronUp, ChevronDown, Check, UserPlus, Save } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -24,9 +24,9 @@ import { useRouter } from "next/navigation";
 import { getPathServing } from "@/components/util/helper/routes";
 import { FormMode } from "@/components/constants/enums";
 import { ServingSchedule, ServingItem, ServingAssignment } from "@/models/serving";
-import { Plus, Trash2, GripVertical } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 
 interface Props {
@@ -288,7 +288,9 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const handleUpdateTemplate = async () => {
         if (!selectedTemplateId) return;
         try {
+            const currentTemp = templates.find(t => t.id === selectedTemplateId);
             const templateData = {
+                name: currentTemp?.name, // Preserve name if not explicitly changed elsewhere
                 items: items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }))
             };
             await ServingService.updateTemplate(teamId, selectedTemplateId, templateData);
@@ -298,6 +300,31 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         } catch (e) {
             console.error(e);
             toast({ title: "Failed to update template", variant: "destructive" });
+        }
+    };
+
+    const handleDeleteTemplate = async () => {
+        if (!selectedTemplateId) return;
+        if (!window.confirm("Are you sure you want to delete this template?")) return;
+        try {
+            await ServingService.deleteTemplate(teamId, selectedTemplateId);
+            const newTemps = await ServingService.getTemplates(teamId);
+            setTemplates(newTemps);
+            setSelectedTemplateId(newTemps.length > 0 ? newTemps[0].id : null);
+            toast({ title: "Template deleted" });
+        } catch (e) {
+            console.error(e);
+            toast({ title: "Failed to delete template", variant: "destructive" });
+        }
+    };
+
+    const handleUpdateTemplateName = async (newName: string) => {
+        if (!selectedTemplateId || !newName.trim()) return;
+        try {
+            await ServingService.updateTemplate(teamId, selectedTemplateId, { name: newName.trim() });
+            setTemplates(prev => prev.map(t => t.id === selectedTemplateId ? { ...t, name: newName.trim() } : t));
+        } catch (e) {
+            console.error(e);
         }
     };
 
@@ -522,215 +549,236 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                 <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 3</Label>
                                 <h2 className="text-2xl font-bold text-gray-900">Worship Timeline</h2>
                             </div>
+                            <div className="flex-1 min-h-0 flex flex-col gap-4">
+                                {/* Template Header & Actions */}
+                                <div className="flex flex-col gap-3 px-1">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex-1">
+                                            <input
+                                                value={templates.find(t => t.id === selectedTemplateId)?.name || ""}
+                                                onChange={(e) => handleUpdateTemplateName(e.target.value)}
+                                                className="text-xl font-black bg-transparent border-0 focus:ring-0 p-0 w-full placeholder:text-gray-300"
+                                                placeholder="Template Name..."
+                                            />
+                                        </div>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2">
+                                                <DropdownMenuItem
+                                                    className={cn("rounded-xl py-2 cursor-pointer", hasTemplateChanges ? "text-primary font-bold" : "text-muted-foreground")}
+                                                    disabled={!selectedTemplateId || !hasTemplateChanges}
+                                                    onClick={handleUpdateTemplate}
+                                                >
+                                                    <Save className="mr-2 h-4 w-4" />
+                                                    Save to Current
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    className="rounded-xl py-2 cursor-pointer font-medium"
+                                                    onClick={() => {
+                                                        const currentTemp = templates.find(t => t.id === selectedTemplateId);
+                                                        setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
+                                                        setIsTemplateDialogOpen(true);
+                                                    }}
+                                                >
+                                                    <Plus className="mr-2 h-4 w-4" />
+                                                    Save as New
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem
+                                                    className="rounded-xl py-2 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
+                                                    onClick={handleDeleteTemplate}
+                                                >
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    Delete Template
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
 
-                            {/* Template Selector */}
-                            <div className="flex items-center gap-2 shrink-0 overflow-x-auto pb-1 no-scrollbar">
-                                <div className="flex gap-2">
-                                    {templates.map(tmp => (
+                                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                                        {templates.map(tmp => (
+                                            <Button
+                                                key={tmp.id}
+                                                variant={selectedTemplateId === tmp.id ? "default" : "outline"}
+                                                size="sm"
+                                                className="rounded-full text-[10px] h-7 whitespace-nowrap px-4"
+                                                onClick={() => {
+                                                    setSelectedTemplateId(tmp.id);
+                                                    setItems(tmp.items.map((it: any, idx: number) => ({
+                                                        ...it,
+                                                        id: Math.random().toString(36).substr(2, 9),
+                                                        order: idx,
+                                                        assignments: it.title === '찬양팀 구성'
+                                                            ? (items.find(i => i.title === '찬양팀 구성')?.assignments || [])
+                                                            : []
+                                                    })));
+                                                }}
+                                            >
+                                                {tmp.name}
+                                            </Button>
+                                        ))}
                                         <Button
-                                            key={tmp.id}
-                                            variant={selectedTemplateId === tmp.id ? "default" : "outline"}
+                                            variant="ghost"
                                             size="sm"
-                                            className="rounded-full text-[10px] h-7 whitespace-nowrap"
+                                            className="rounded-full text-[10px] h-7 border-dashed border px-3 text-muted-foreground hover:text-primary transition-colors"
                                             onClick={() => {
-                                                setSelectedTemplateId(tmp.id);
-                                                setItems(tmp.items.map((it: any, idx: number) => ({
-                                                    ...it,
-                                                    id: Math.random().toString(36).substr(2, 9),
-                                                    order: idx,
-                                                    assignments: it.title === '찬양팀 구성'
-                                                        ? (items.find(i => i.title === '찬양팀 구성')?.assignments || [])
-                                                        : []
-                                                })));
+                                                setNewTemplateName("");
+                                                setIsTemplateDialogOpen(true);
                                             }}
                                         >
-                                            {tmp.name}
+                                            <Plus className="h-3 w-3 mr-1" /> Add
                                         </Button>
-                                    ))}
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="rounded-full text-[10px] h-7 border-dashed border text-muted-foreground hover:text-primary transition-colors"
-                                        onClick={() => {
-                                            setNewTemplateName("");
-                                            setIsTemplateDialogOpen(true);
-                                        }}
-                                    >
-                                        <Plus className="h-3 w-3 mr-1" /> Add
-                                    </Button>
+                                    </div>
                                 </div>
 
-                                <div className="ml-auto flex items-center gap-1.5 pl-2 border-l border-gray-100">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        disabled={!selectedTemplateId || !hasTemplateChanges}
-                                        className={cn(
-                                            "rounded-full text-[10px] h-7 px-3 font-bold transition-all",
-                                            hasTemplateChanges ? "border-primary text-primary bg-primary/5" : "opacity-50"
-                                        )}
-                                        onClick={handleUpdateTemplate}
-                                    >
-                                        Save
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="rounded-full text-[10px] h-7 px-3 font-bold text-muted-foreground hover:bg-muted"
-                                        onClick={() => {
-                                            const currentTemp = templates.find(t => t.id === selectedTemplateId);
-                                            setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
-                                            setIsTemplateDialogOpen(true);
-                                        }}
-                                    >
-                                        Save as New
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col min-h-0">
-                                <div className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain">
-                                    {!isTemplatesLoaded ? (
-                                        // Loading Skeletons
-                                        Array.from({ length: 5 }).map((_, i) => (
-                                            <div key={i} className="animate-pulse p-4 rounded-2xl border bg-card space-y-3">
-                                                <div className="h-4 bg-muted rounded w-1/3" />
-                                                <div className="h-3 bg-muted rounded w-1/2" />
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <>
-                                            {templates.length === 0 && (
-                                                <div className="px-2 py-4 mb-2 bg-primary/5 rounded-2xl border border-primary/10 border-dashed text-center">
-                                                    <p className="text-xs font-bold text-primary mb-1">✨ Sample Flow Ready</p>
-                                                    <p className="text-[10px] text-muted-foreground leading-tight px-4">
-                                                        No templates found in DB. We&apos;ve prepared a sample flow to get you started!
-                                                    </p>
+                                <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col min-h-0">
+                                    <div className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain">
+                                        {!isTemplatesLoaded ? (
+                                            // Loading Skeletons
+                                            Array.from({ length: 5 }).map((_, i) => (
+                                                <div key={i} className="animate-pulse p-4 rounded-2xl border bg-card space-y-3">
+                                                    <div className="h-4 bg-muted rounded w-1/3" />
+                                                    <div className="h-3 bg-muted rounded w-1/2" />
                                                 </div>
-                                            )}
-                                            {items.sort((a, b) => a.order - b.order).map((item, itemIdx) => (
-                                                <div
-                                                    key={item.id}
-                                                    className="group flex flex-col gap-3 p-4 rounded-2xl border bg-card hover:border-primary/30 transition-all shadow-sm"
-                                                >
-                                                    <div className="flex justify-between items-start gap-3">
-                                                        <div className="flex-1 space-y-1">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-[10px] font-bold bg-muted px-1.5 py-0.5 rounded text-muted-foreground">#{itemIdx + 1}</span>
+                                            ))
+                                        ) : (
+                                            <>
+                                                {templates.length === 0 && (
+                                                    <div className="px-2 py-4 mb-2 bg-primary/5 rounded-2xl border border-primary/10 border-dashed text-center">
+                                                        <p className="text-xs font-bold text-primary mb-1">✨ Sample Flow Ready</p>
+                                                        <p className="text-[10px] text-muted-foreground leading-tight px-4">
+                                                            No templates found in DB. We&apos;ve prepared a sample flow to get you started!
+                                                        </p>
+                                                    </div>
+                                                )}
+                                                {items.sort((a, b) => a.order - b.order).map((item, itemIdx) => (
+                                                    <div
+                                                        key={item.id}
+                                                        className="group flex flex-col gap-3 p-4 rounded-2xl border bg-card hover:border-primary/30 transition-all shadow-sm"
+                                                    >
+                                                        <div className="flex justify-between items-start gap-3">
+                                                            <div className="flex-1 space-y-1">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-[10px] font-bold bg-muted px-1.5 py-0.5 rounded text-muted-foreground">#{itemIdx + 1}</span>
+                                                                    <input
+                                                                        id={`item-title-${item.id}`}
+                                                                        name={`item-title-${item.id}`}
+                                                                        value={item.title}
+                                                                        onChange={(e) => {
+                                                                            const newItems = [...items];
+                                                                            newItems[itemIdx] = { ...item, title: e.target.value };
+                                                                            setItems(newItems);
+                                                                        }}
+                                                                        className="font-bold bg-transparent border-0 focus:ring-0 p-0 text-lg w-full"
+                                                                        placeholder="Order title..."
+                                                                    />
+                                                                </div>
                                                                 <input
-                                                                    id={`item-title-${item.id}`}
-                                                                    name={`item-title-${item.id}`}
-                                                                    value={item.title}
+                                                                    id={`item-remarks-${item.id}`}
+                                                                    name={`item-remarks-${item.id}`}
+                                                                    value={item.remarks || ""}
                                                                     onChange={(e) => {
                                                                         const newItems = [...items];
-                                                                        newItems[itemIdx] = { ...item, title: e.target.value };
+                                                                        newItems[itemIdx] = { ...item, remarks: e.target.value };
                                                                         setItems(newItems);
                                                                     }}
-                                                                    className="font-bold bg-transparent border-0 focus:ring-0 p-0 text-lg w-full"
-                                                                    placeholder="Order title..."
+                                                                    className="text-xs text-muted-foreground bg-transparent border-0 focus:ring-0 p-0 w-full"
+                                                                    placeholder="Notes/Scripture..."
                                                                 />
                                                             </div>
-                                                            <input
-                                                                id={`item-remarks-${item.id}`}
-                                                                name={`item-remarks-${item.id}`}
-                                                                value={item.remarks || ""}
-                                                                onChange={(e) => {
-                                                                    const newItems = [...items];
-                                                                    newItems[itemIdx] = { ...item, remarks: e.target.value };
-                                                                    setItems(newItems);
-                                                                }}
-                                                                className="text-xs text-muted-foreground bg-transparent border-0 focus:ring-0 p-0 w-full"
-                                                                placeholder="Notes/Scripture..."
-                                                            />
-                                                        </div>
-                                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <div className="flex flex-col gap-0.5">
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-6 w-6 rounded-full"
-                                                                    disabled={itemIdx === 0}
-                                                                    onClick={() => {
-                                                                        const newItems = [...items];
-                                                                        const target = newItems[itemIdx];
-                                                                        newItems[itemIdx] = newItems[itemIdx - 1];
-                                                                        newItems[itemIdx - 1] = target;
-                                                                        newItems.forEach((it, idx) => it.order = idx);
-                                                                        setItems(newItems);
-                                                                    }}
-                                                                >
-                                                                    <ChevronUp className="h-3 w-3" />
-                                                                </Button>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-6 w-6 rounded-full"
-                                                                    disabled={itemIdx === items.length - 1}
-                                                                    onClick={() => {
-                                                                        const newItems = [...items];
-                                                                        const target = newItems[itemIdx];
-                                                                        newItems[itemIdx] = newItems[itemIdx + 1];
-                                                                        newItems[itemIdx + 1] = target;
-                                                                        newItems.forEach((it, idx) => it.order = idx);
-                                                                        setItems(newItems);
-                                                                    }}
-                                                                >
-                                                                    <ChevronDown className="h-3 w-3" />
+                                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <div className="flex flex-col gap-0.5">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        className="h-6 w-6 rounded-full"
+                                                                        disabled={itemIdx === 0}
+                                                                        onClick={() => {
+                                                                            const newItems = [...items];
+                                                                            const target = newItems[itemIdx];
+                                                                            newItems[itemIdx] = newItems[itemIdx - 1];
+                                                                            newItems[itemIdx - 1] = target;
+                                                                            newItems.forEach((it, idx) => it.order = idx);
+                                                                            setItems(newItems);
+                                                                        }}
+                                                                    >
+                                                                        <ChevronUp className="h-3 w-3" />
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        className="h-6 w-6 rounded-full"
+                                                                        disabled={itemIdx === items.length - 1}
+                                                                        onClick={() => {
+                                                                            const newItems = [...items];
+                                                                            const target = newItems[itemIdx];
+                                                                            newItems[itemIdx] = newItems[itemIdx + 1];
+                                                                            newItems[itemIdx + 1] = target;
+                                                                            newItems.forEach((it, idx) => it.order = idx);
+                                                                            setItems(newItems);
+                                                                        }}
+                                                                    >
+                                                                        <ChevronDown className="h-3 w-3" />
+                                                                    </Button>
+                                                                </div>
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10" onClick={() => setItems(items.filter(i => i.id !== item.id))}>
+                                                                    <Trash2 className="h-4 w-4" />
                                                                 </Button>
                                                             </div>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10" onClick={() => setItems(items.filter(i => i.id !== item.id))}>
-                                                                <Trash2 className="h-4 w-4" />
+                                                        </div>
+
+                                                        {/* Assignments for this item */}
+                                                        <div className="space-y-2">
+                                                            {item.assignments.map((assignment, aIdx) => (
+                                                                <div key={aIdx} className="flex flex-wrap items-center gap-2">
+                                                                    <Badge variant="outline" className="h-7 px-2 py-0 font-normal border-dashed">
+                                                                        {assignment.label || roles.find(r => r.id === assignment.roleId)?.name || "Role"}
+                                                                    </Badge>
+                                                                    {assignment.memberIds.map(uid => (
+                                                                        <Badge key={uid} className="h-7 px-2 bg-primary/10 text-primary hover:bg-primary/20 border-0">
+                                                                            {getMemberName(uid)}
+                                                                            <button className="ml-1 hover:text-destructive" onClick={() => {
+                                                                                const newItems = [...items];
+                                                                                const newAssignments = [...item.assignments];
+                                                                                newAssignments[aIdx] = { ...assignment, memberIds: assignment.memberIds.filter(id => id !== uid) };
+                                                                                newItems[itemIdx] = { ...item, assignments: newAssignments };
+                                                                                setItems(newItems);
+                                                                            }}>&times;</button>
+                                                                        </Badge>
+                                                                    ))}
+                                                                    <Button variant="ghost" size="sm" className="h-7 w-7 rounded-full p-0 bg-muted/50" onClick={() => setActiveSelection({ itemId: item.id, assignmentIndex: aIdx })}>
+                                                                        <UserPlus className="h-3 w-3" />
+                                                                    </Button>
+                                                                </div>
+                                                            ))}
+                                                            <Button
+                                                                variant="ghost" size="sm" className="h-7 px-2 text-[10px] font-bold text-muted-foreground hover:bg-muted"
+                                                                onClick={() => {
+                                                                    const newItems = [...items];
+                                                                    const newAssignments = [...item.assignments, { memberIds: [] }];
+                                                                    newItems[itemIdx] = { ...item, assignments: newAssignments };
+                                                                    setItems(newItems);
+                                                                    setActiveSelection({ itemId: item.id, assignmentIndex: newAssignments.length - 1 });
+                                                                }}
+                                                            >
+                                                                <Plus className="h-3 w-3 mr-1" /> Add Person
                                                             </Button>
                                                         </div>
                                                     </div>
+                                                ))}
+                                            </>
+                                        )}
 
-                                                    {/* Assignments for this item */}
-                                                    <div className="space-y-2">
-                                                        {item.assignments.map((assignment, aIdx) => (
-                                                            <div key={aIdx} className="flex flex-wrap items-center gap-2">
-                                                                <Badge variant="outline" className="h-7 px-2 py-0 font-normal border-dashed">
-                                                                    {assignment.label || roles.find(r => r.id === assignment.roleId)?.name || "Role"}
-                                                                </Badge>
-                                                                {assignment.memberIds.map(uid => (
-                                                                    <Badge key={uid} className="h-7 px-2 bg-primary/10 text-primary hover:bg-primary/20 border-0">
-                                                                        {getMemberName(uid)}
-                                                                        <button className="ml-1 hover:text-destructive" onClick={() => {
-                                                                            const newItems = [...items];
-                                                                            const newAssignments = [...item.assignments];
-                                                                            newAssignments[aIdx] = { ...assignment, memberIds: assignment.memberIds.filter(id => id !== uid) };
-                                                                            newItems[itemIdx] = { ...item, assignments: newAssignments };
-                                                                            setItems(newItems);
-                                                                        }}>&times;</button>
-                                                                    </Badge>
-                                                                ))}
-                                                                <Button variant="ghost" size="sm" className="h-7 w-7 rounded-full p-0 bg-muted/50" onClick={() => setActiveSelection({ itemId: item.id, assignmentIndex: aIdx })}>
-                                                                    <UserPlus className="h-3 w-3" />
-                                                                </Button>
-                                                            </div>
-                                                        ))}
-                                                        <Button
-                                                            variant="ghost" size="sm" className="h-7 px-2 text-[10px] font-bold text-muted-foreground hover:bg-muted"
-                                                            onClick={() => {
-                                                                const newItems = [...items];
-                                                                const newAssignments = [...item.assignments, { memberIds: [] }];
-                                                                newItems[itemIdx] = { ...item, assignments: newAssignments };
-                                                                setItems(newItems);
-                                                                setActiveSelection({ itemId: item.id, assignmentIndex: newAssignments.length - 1 });
-                                                            }}
-                                                        >
-                                                            <Plus className="h-3 w-3 mr-1" /> Add Person
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </>
-                                    )}
-
-                                    <Button
-                                        variant="outline" className="w-full h-12 rounded-2xl border-dashed border-2 hover:bg-muted/50 border-muted-foreground/20 text-muted-foreground"
-                                        onClick={() => setItems([...items, { id: Math.random().toString(36).substr(2, 9), order: items.length, title: "", assignments: [], type: 'FLOW' }])}>
-                                        <Plus className="w-5 h-5 mr-2" /> Add Sequence
-                                    </Button>
+                                        <Button
+                                            variant="outline" className="w-full h-12 rounded-2xl border-dashed border-2 hover:bg-muted/50 border-muted-foreground/20 text-muted-foreground"
+                                            onClick={() => setItems([...items, { id: Math.random().toString(36).substr(2, 9), order: items.length, title: "", assignments: [], type: 'FLOW' }])}>
+                                            <Plus className="w-5 h-5 mr-2" /> Add Sequence
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
 
