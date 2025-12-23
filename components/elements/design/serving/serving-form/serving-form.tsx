@@ -836,61 +836,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                         {/* Unified Scroll Area */}
                         <ScrollArea className="flex-1">
-                            <div className="flex flex-col gap-8 pb-32 pt-2 px-8">
-                                {/* Standard Groups (Timeline Only) */}
-                                {activeSelection?.itemId && (
-                                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                                        <p className="text-xs font-bold tracking-wider text-muted-foreground uppercase px-1">
-                                            Standard Groups
-                                        </p>
-                                        <div className="flex flex-wrap gap-2.5">
-                                            {standardGroups.map((group, idx) => (
-                                                <div
-                                                    key={`group-${idx}`}
-                                                    className="group flex items-center gap-2 px-4 py-2.5 rounded-full bg-primary text-primary-foreground shadow-sm transition-all"
-                                                >
-                                                    <button
-                                                        onClick={() => {
-                                                            if (activeSelection.itemId && activeSelection.assignmentIndex !== undefined) {
-                                                                handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, `group:${group}`);
-                                                            }
-                                                        }}
-                                                        className="text-[15px] font-semibold hover:opacity-80 transition-all"
-                                                    >
-                                                        {group}
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setStandardGroups(standardGroups.filter((_, i) => i !== idx));
-                                                        }}
-                                                        className="p-0.5 hover:bg-white/20 rounded-full transition-all"
-                                                    >
-                                                        <X className="w-3.5 h-3.5" />
-                                                    </button>
-                                                </div>
-                                            ))}
-
-                                            {/* Add Group Input */}
-                                            <div className="relative min-w-[140px] flex-1 max-w-[200px]">
-                                                <input
-                                                    value={newGroupInput}
-                                                    onChange={(e) => setNewGroupInput(e.target.value)}
-                                                    onKeyDown={(e) => {
-                                                        if (e.nativeEvent.isComposing) return;
-                                                        if (e.key === 'Enter' && newGroupInput.trim()) {
-                                                            setStandardGroups([...standardGroups, newGroupInput.trim()]);
-                                                            setNewGroupInput("");
-                                                        }
-                                                    }}
-                                                    placeholder="+ Add Group"
-                                                    className="h-[46px] w-full rounded-full bg-muted/40 border-2 border-dashed border-muted-foreground/20 px-5 text-sm font-medium focus:border-primary/50 focus:bg-white transition-all outline-none"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="w-full h-px bg-border/50 mt-4" />
-                                    </div>
-                                )}
+                            <div className="flex flex-col gap-8 pb-32 pt-6 px-8">
 
                                 <MemberSelector
                                     selectedMemberIds={
@@ -908,6 +854,13 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                         }
                                     }}
                                     multiple
+                                    groups={activeSelection?.itemId ? standardGroups : []}
+                                    onAddGroup={(name) => {
+                                        setStandardGroups([...standardGroups, name]);
+                                    }}
+                                    onRemoveGroup={(idx) => {
+                                        setStandardGroups(standardGroups.filter((_, i) => i !== idx));
+                                    }}
                                 />
                             </div>
                         </ScrollArea>
@@ -922,11 +875,11 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             </Button>
                         </div>
                     </div>
-                </DrawerContent>
-            </Drawer>
+                </DrawerContent >
+            </Drawer >
 
             {/* Role Creation Dialog */}
-            <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
+            < Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen} >
                 <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
                     <DialogHeader className="space-y-3">
                         <DialogTitle className="text-2xl font-bold text-center">New Role</DialogTitle>
@@ -966,10 +919,10 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         </Button>
                     </DialogFooter>
                 </DialogContent>
-            </Dialog>
+            </Dialog >
 
             {/* Template Saving Dialog */}
-            <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
+            < Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen} >
                 <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
                     <DialogHeader className="space-y-3">
                         <div className="flex justify-center">
@@ -1014,7 +967,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         </Button>
                     </DialogFooter>
                 </DialogContent>
-            </Dialog>
+            </Dialog >
 
             <DeleteConfirmationDialog
                 isOpen={deleteConfirm.open}
