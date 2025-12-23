@@ -13,7 +13,8 @@ import {
   Music,
   Play,
   ClipboardList,
-  Sparkles
+  Sparkles,
+  Star
 } from "lucide-react";
 
 import {
@@ -304,7 +305,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                           size="sm"
                           className="h-10 w-10 p-0 rounded-full shrink-0 border-2 border-primary text-primary font-bold shadow-md hover:shadow-lg hover:bg-primary/5 transition-all justify-center"
                         >
-                          <ChevronUp className="h-5 w-5" />
+                          <Star className="h-5 w-5" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-40 p-1 mb-2" align="end" side="top" onClick={(e) => e.stopPropagation()}>
