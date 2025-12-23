@@ -77,9 +77,9 @@ export function MemberSuggestionList({ members, selectedIds, onSelect }: MemberS
     if (members.length === 0) return null;
 
     return (
-        <div className="flex flex-col gap-2 mt-2">
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">SUGGESTED</p>
-            <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-3 mt-2">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider pl-1">SUGGESTED</p>
+            <div className="flex flex-wrap gap-2.5">
                 {members.map((member) => {
                     const isSelected = selectedIds.includes(member.id);
                     return (
@@ -90,10 +90,10 @@ export function MemberSuggestionList({ members, selectedIds, onSelect }: MemberS
                                 onSelect(member.id);
                             }}
                             className={cn(
-                                "flex items-center gap-1.2 px-3 py-1 rounded-full border transition-all text-xs font-medium",
+                                "flex items-center gap-1.2 px-4 py-2 rounded-full border transition-all text-[15px] font-medium active:scale-95",
                                 isSelected
-                                    ? "bg-secondary border-primary text-foreground"
-                                    : "bg-secondary/50 border-border/50 text-muted-foreground hover:bg-secondary hover:text-foreground hover:border-border"
+                                    ? "bg-secondary border-primary text-foreground shadow-sm"
+                                    : "bg-secondary/50 border-border/50 text-muted-foreground active:bg-secondary active:text-foreground active:border-border"
                             )}
                         >
                             {member.name}
@@ -116,14 +116,14 @@ export function MemberBadge({ name, onRemove, className }: MemberBadgeProps) {
         <Badge
             variant="secondary"
             className={cn(
-                "px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground border-0 flex items-center gap-1.5 text-xs font-medium shadow-sm transition-all",
+                "pl-4 pr-1.5 py-1.5 rounded-full bg-secondary text-secondary-foreground border-0 flex items-center gap-1 text-[15px] font-medium shadow-sm transition-all",
                 className
             )}
         >
             {name}
             {onRemove && (
                 <button
-                    className="hover:text-destructive transition-colors ml-1 rounded-full p-0.5 hover:bg-destructive/10"
+                    className="hover:text-destructive transition-colors ml-1 rounded-full p-2.5 active:bg-destructive/10"
                     onClick={(e) => {
                         e.stopPropagation();
                         onRemove();
@@ -131,8 +131,8 @@ export function MemberBadge({ name, onRemove, className }: MemberBadgeProps) {
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
+                        width="14"
+                        height="14"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"

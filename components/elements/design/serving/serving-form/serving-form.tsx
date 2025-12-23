@@ -822,13 +822,13 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             </DrawerTitle>
                         </DrawerHeader>
                         {activeSelection?.itemId && (
-                            <div className="mb-6 space-y-3 flex-shrink-0">
-                                <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Standard Groups</h4>
-                                <div className="flex flex-wrap gap-2">
+                            <div className="mb-8 space-y-4 flex-shrink-0 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-wider pl-1">Standard Groups</h4>
+                                <div className="flex flex-wrap gap-2.5">
                                     {standardGroups.map((group, idx) => (
                                         <div
                                             key={`group-${idx}`}
-                                            className="group flex items-center gap-1.2 px-3 py-1.5 rounded-full bg-secondary/50 border border-transparent hover:border-primary/30 hover:bg-secondary transition-all"
+                                            className="group flex items-center gap-1.2 px-4 py-2.5 rounded-full bg-secondary/70 border border-transparent active:border-primary/50 active:bg-secondary transition-all"
                                         >
                                             <button
                                                 onClick={() => {
@@ -836,7 +836,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                         handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, `group:${group}`);
                                                     }
                                                 }}
-                                                className="text-xs font-semibold text-foreground hover:text-primary transition-colors text-left"
+                                                className="text-[15px] font-semibold text-foreground hover:text-primary transition-colors text-left"
                                             >
                                                 {group}
                                             </button>
@@ -845,41 +845,43 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                     e.stopPropagation();
                                                     setStandardGroups(standardGroups.filter((_, i) => i !== idx));
                                                 }}
-                                                className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-destructive/10 hover:text-destructive rounded-full transition-all ml-1"
+                                                className="p-1 hover:bg-destructive/10 hover:text-destructive rounded-full transition-all ml-1.5"
                                             >
-                                                <X className="w-3 h-3" />
+                                                <X className="w-4 h-4" />
                                             </button>
                                         </div>
                                     ))}
-                                    <div className="flex items-center gap-1">
-                                        <input
-                                            value={newGroupInput}
-                                            onChange={(e) => setNewGroupInput(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' && newGroupInput.trim()) {
-                                                    setStandardGroups([...standardGroups, newGroupInput.trim()]);
-                                                    setNewGroupInput("");
-                                                }
-                                            }}
-                                            placeholder="Add group..."
-                                            className="h-8 rounded-full bg-transparent border border-border px-3 text-xs w-24 focus:w-32 transition-all focus:border-primary focus:ring-0"
-                                        />
-                                        {newGroupInput.trim() && (
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-7 w-7 rounded-full text-primary hover:bg-primary/10"
-                                                onClick={() => {
-                                                    setStandardGroups([...standardGroups, newGroupInput.trim()]);
-                                                    setNewGroupInput("");
+                                    <div className="flex items-center gap-2 w-full mt-1">
+                                        <div className="relative flex-1">
+                                            <input
+                                                value={newGroupInput}
+                                                onChange={(e) => setNewGroupInput(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' && newGroupInput.trim()) {
+                                                        setStandardGroups([...standardGroups, newGroupInput.trim()]);
+                                                        setNewGroupInput("");
+                                                    }
                                                 }}
-                                            >
-                                                <Plus className="h-4 w-4" />
-                                            </Button>
-                                        )}
+                                                placeholder="Add new group (e.g. All)"
+                                                className="h-12 w-full rounded-2xl bg-secondary/30 border-gray-100 px-5 text-base font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
+                                            />
+                                            {newGroupInput.trim() && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="absolute right-1 top-1 h-10 w-10 rounded-xl text-primary hover:bg-primary/10 transition-all"
+                                                    onClick={() => {
+                                                        setStandardGroups([...standardGroups, newGroupInput.trim()]);
+                                                        setNewGroupInput("");
+                                                    }}
+                                                >
+                                                    <Plus className="h-5 w-5" />
+                                                </Button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="w-full h-px bg-border/50 mt-4" />
+                                <div className="w-full h-[2px] bg-primary/5 mt-6 mb-2 rounded-full" />
                             </div>
                         )}
                         <div className="flex-1 min-h-0">
@@ -1068,34 +1070,34 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                     <div className="flex items-center gap-2">
                         <div
                             onPointerDown={(e) => controls.start(e)}
-                            className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors p-1 -ml-1 touch-none"
+                            className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors p-3 -ml-3 touch-none"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <GripVertical className="h-4 w-4" />
+                            <GripVertical className="h-5 w-5" />
                         </div>
                         <h3 className="font-bold text-lg text-foreground">{role.name}</h3>
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-6 w-6 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors ml-1"
+                            className="h-11 w-11 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors ml-0.5"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onOpenAdd();
                             }}
                         >
-                            <UserPlus className="h-4 w-4" />
+                            <UserPlus className="h-5 w-5" />
                         </Button>
                     </div>
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors -mr-2 -mt-1"
+                        className="h-11 w-11 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors -mr-2 -mt-1.5"
                         onClick={(e) => {
                             e.stopPropagation();
                             onDeleteRole();
                         }}
                     >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-5 w-5" />
                     </Button>
                 </div>
 
@@ -1142,12 +1144,12 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                     <div className="flex items-center gap-2 flex-1">
                         <div
                             onPointerDown={(e) => controls.start(e)}
-                            className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors p-1 -ml-1 mt-1 touch-none"
+                            className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors p-3 -ml-3 mt-0.5 touch-none"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <GripVertical className="h-4 w-4" />
+                            <GripVertical className="h-5 w-5" />
                         </div>
-                        <div className="flex-1 space-y-1" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex-1 space-y-1.5" onClick={(e) => e.stopPropagation()}>
                             <input
                                 value={item.title}
                                 onChange={(e) => onUpdate({ ...item, title: e.target.value })}
@@ -1157,32 +1159,32 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                             <input
                                 value={item.remarks || ""}
                                 onChange={(e) => onUpdate({ ...item, remarks: e.target.value })}
-                                className="text-sm font-medium text-muted-foreground bg-transparent border-0 focus:ring-0 p-0 w-full placeholder:text-muted-foreground/30"
+                                className="text-base font-medium text-muted-foreground bg-transparent border-0 focus:ring-0 p-0 w-full placeholder:text-muted-foreground/30"
                                 placeholder="Add notes or scripture references..."
                             />
                         </div>
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-6 w-6 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors ml-1 mt-1"
+                            className="h-11 w-11 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors ml-0.5 mt-0.5"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onOpenAdd(0);
                             }}
                         >
-                            <UserPlus className="h-4 w-4" />
+                            <UserPlus className="h-5 w-5" />
                         </Button>
                     </div>
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors -mr-2 -mt-1"
+                        className="h-11 w-11 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors -mr-2 -mt-1.5"
                         onClick={(e) => {
                             e.stopPropagation();
                             onDelete();
                         }}
                     >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-5 w-5" />
                     </Button>
                 </div>
 
