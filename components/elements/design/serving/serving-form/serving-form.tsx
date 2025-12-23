@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRecoilValue, useSetRecoilState, useRecoilValueLoadable } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { servingRolesAtom, fetchServingRolesSelector, servingSchedulesAtom, servingRolesUpdaterAtom } from "@/global-states/servingState";
@@ -43,6 +43,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const router = useRouter();
     const team = useRecoilValue(teamAtom(teamId));
     const teamMembers = useRecoilValue(usersAtom(team?.users));
+    const containerRef = useRef<HTMLDivElement>(null);
 
     // Recoil
     const rolesLoadable = useRecoilValueLoadable(fetchServingRolesSelector(teamId));
@@ -344,6 +345,13 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         if (step > 0) goToStep(step - 1);
     };
 
+    // Scroll to top on step change
+    useEffect(() => {
+        if (containerRef.current) {
+            containerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    }, [step]);
+
     // Animation Variants
     const slideVariants = {
         enter: (direction: number) => ({
@@ -371,7 +379,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     }
 
     return (
-        <div className="fixed inset-0 z-[100] bg-gray-50 flex flex-col overflow-y-auto overflow-x-hidden">
+        <div ref={containerRef} className="fixed inset-0 z-[100] bg-gray-50 flex flex-col overflow-y-auto overflow-x-hidden">
 
             {/* STICKY HEADER - Minimal with Gradient Mask */}
             {/* STICKY HEADER - Minimal with Gradient Mask */}
