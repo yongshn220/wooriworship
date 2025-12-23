@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format, nextSunday } from "date-fns";
 import { ArrowLeft, ArrowRight, ChevronLeft, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus, Pencil, X, Calendar as CalendarIcon } from "lucide-react";
-import { AnimatePresence, motion, Reorder } from "framer-motion";
+import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -527,59 +527,16 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                         const assignment = ptItem?.assignments.find(a => a.roleId === role.id);
                                         const memberIds = assignment?.memberIds || [];
 
-                                        // handleAddMemberByRole is now in main scope
-
                                         return (
-                                            <Reorder.Item key={role.id} value={role}>
-                                                <ServingCard>
-                                                    <div className="flex justify-between items-start mb-3">
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors p-1 -ml-1">
-                                                                <GripVertical className="h-4 w-4" />
-                                                            </div>
-                                                            <h3 className="font-bold text-lg text-foreground">{role.name}</h3>
-                                                        </div>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-8 w-8 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors -mr-2 -mt-1"
-                                                            onClick={() => setDeleteConfirm({ type: 'role', id: role.id, open: true })}
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-
-                                                    <div className="flex flex-wrap gap-2 items-center">
-                                                        <Button
-                                                            variant="default"
-                                                            size="sm"
-                                                            className="h-7 px-3 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all border-none text-xs font-bold gap-1.5 shadow-none"
-                                                            onClick={() => setActiveSelection({ roleId: role.id })}
-                                                        >
-                                                            <Plus className="h-3 w-3" />
-                                                            Add Member
-                                                        </Button>
-                                                        {memberIds.map(uid => (
-                                                            <MemberBadge
-                                                                key={uid}
-                                                                name={getMemberName(uid)}
-                                                                onRemove={() => handleAddMemberByRole(role.id, uid)}
-                                                            />
-                                                        ))}
-                                                    </div>
-
-                                                    {/* Always visible suggestions */}
-                                                    <MemberSuggestionList
-                                                        members={
-                                                            role.default_members && role.default_members.length > 0
-                                                                ? teamMembers.filter(m => role.default_members?.includes(m.id))
-                                                                : []
-                                                        }
-                                                        selectedIds={memberIds}
-                                                        onSelect={(uid) => handleAddMemberByRole(role.id, uid)}
-                                                    />
-                                                </ServingCard>
-                                            </Reorder.Item>
+                                            <SortableRoleItem
+                                                key={role.id}
+                                                role={role}
+                                                memberIds={memberIds}
+                                                teamMembers={teamMembers}
+                                                onAddMember={handleAddMemberByRole}
+                                                onDeleteRole={() => setDeleteConfirm({ type: 'role', id: role.id, open: true })}
+                                                onOpenAdd={() => setActiveSelection({ roleId: role.id })}
+                                            />
                                         );
                                     })}
                                 </Reorder.Group>
@@ -722,86 +679,24 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                 setItems([...otherItems, ...newOrdered]);
                                             }} className="flex flex-col gap-4">
                                                 {items.filter(i => i.title !== '찬양팀 구성').map((item, index) => (
-                                                    <Reorder.Item key={item.id} value={item}>
-                                                        <ServingCard>
-                                                            <div className="flex justify-between items-start mb-3">
-                                                                <div className="flex items-center gap-2 flex-1">
-                                                                    <div className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors p-1 -ml-1 mt-1">
-                                                                        <GripVertical className="h-4 w-4" />
-                                                                    </div>
-                                                                    <div className="flex-1 space-y-1">
-                                                                        <input
-                                                                            value={item.title}
-                                                                            onChange={(e) => {
-                                                                                const newItems = items.map(i => i.id === item.id ? { ...i, title: e.target.value } : i);
-                                                                                setItems(newItems);
-                                                                            }}
-                                                                            className="font-bold bg-transparent border-0 focus:ring-0 p-0 text-xl w-full text-foreground placeholder:text-muted-foreground/50"
-                                                                            placeholder="Sequence title..."
-                                                                        />
-                                                                        <input
-                                                                            value={item.remarks || ""}
-                                                                            onChange={(e) => {
-                                                                                const newItems = items.map(i => i.id === item.id ? { ...i, remarks: e.target.value } : i);
-                                                                                setItems(newItems);
-                                                                            }}
-                                                                            className="text-sm font-medium text-muted-foreground bg-transparent border-0 focus:ring-0 p-0 w-full placeholder:text-muted-foreground/30"
-                                                                            placeholder="Add notes or scripture references..."
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-8 w-8 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors -mr-2 -mt-1"
-                                                                    onClick={() => setItems(items.filter(i => i.id !== item.id))}
-                                                                >
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                </Button>
-                                                            </div>
-
-                                                            <div className="space-y-3">
-                                                                <div className="flex flex-col gap-3">
-                                                                    {(() => {
-                                                                        // Ensure at least one assignment exists for Timeline items
-                                                                        const assignment = item.assignments[0] || { memberIds: [] };
-                                                                        const aIdx = 0;
-                                                                        if (item.assignments.length === 0) {
-                                                                            // Auto-fix if missing (shouldn't happen with new logic relative to init, but safe for existing)
-                                                                            // Ideally we touch state, but for render we just use defaults.
-                                                                            // To persist, handled in addMember or on init.
-                                                                        }
-
-                                                                        return (
-                                                                            <div className="flex flex-wrap gap-2">
-                                                                                <Button
-                                                                                    variant="default"
-                                                                                    size="sm"
-                                                                                    className="h-7 px-3 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all border-none text-xs font-bold gap-1.5 shadow-none"
-                                                                                    onClick={() => setActiveSelection({
-                                                                                        itemId: item.id,
-                                                                                        assignmentIndex: aIdx,
-                                                                                        roleId: "timeline-default" // Dummy role ID for drawer context
-                                                                                    })}
-                                                                                >
-                                                                                    <Plus className="h-3 w-3" />
-                                                                                    Add Member
-                                                                                </Button>
-                                                                                {assignment.memberIds.map(uid => (
-                                                                                    <MemberBadge
-                                                                                        key={uid}
-                                                                                        name={getMemberName(uid)}
-                                                                                        onRemove={() => handleAddMember(item.id, aIdx, uid)}
-                                                                                    />
-                                                                                ))}
-                                                                            </div>
-                                                                        );
-                                                                    })()}
-
-                                                                </div>
-                                                            </div>
-                                                        </ServingCard>
-                                                    </Reorder.Item>
+                                                    <SortableTimelineItem
+                                                        key={item.id}
+                                                        item={item}
+                                                        getMemberName={getMemberName}
+                                                        onUpdate={(newItem) => {
+                                                            const newItems = items.map(i => i.id === item.id ? newItem : i);
+                                                            setItems(newItems);
+                                                        }}
+                                                        onDelete={() => setItems(items.filter(i => i.id !== item.id))}
+                                                        onOpenAdd={(aIdx) => setActiveSelection({
+                                                            itemId: item.id,
+                                                            assignmentIndex: aIdx,
+                                                            roleId: "timeline-default"
+                                                        })}
+                                                        onRemoveMember={(aIdx, uid) => {
+                                                            handleAddMember(item.id, aIdx, uid);
+                                                        }}
+                                                    />
                                                 ))}
                                             </Reorder.Group>
 
@@ -1086,4 +981,168 @@ function ServingFormSkeleton() {
             </div>
         </div>
     )
+}
+
+interface SortableRoleItemProps {
+    role: any;
+    memberIds: string[];
+    teamMembers: any[];
+    onAddMember: (roleId: string, uid: string) => void;
+    onDeleteRole: () => void;
+    onOpenAdd: () => void;
+}
+
+function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteRole, onOpenAdd }: SortableRoleItemProps) {
+    const controls = useDragControls();
+
+    return (
+        <Reorder.Item value={role} dragListener={false} dragControls={controls}>
+            <ServingCard onClick={onOpenAdd}>
+                <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-2">
+                        <div
+                            onPointerDown={(e) => controls.start(e)}
+                            className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors p-1 -ml-1 touch-none"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <GripVertical className="h-4 w-4" />
+                        </div>
+                        <h3 className="font-bold text-lg text-foreground">{role.name}</h3>
+                    </div>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors -mr-2 -mt-1"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteRole();
+                        }}
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                </div>
+
+                <div className="flex flex-wrap gap-2 items-center">
+                    <Button
+                        variant="default"
+                        size="sm"
+                        className="h-7 px-3 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all border-none text-xs font-bold gap-1.5 shadow-none"
+                        onClick={(e) => {
+                            e.stopPropagation(); // Prevent card click
+                            onOpenAdd();
+                        }}
+                    >
+                        <Plus className="h-3 w-3" />
+                        Add Member
+                    </Button>
+                    {memberIds.map(uid => (
+                        <MemberBadge
+                            key={uid}
+                            name={teamMembers.find(m => m.id === uid)?.name || uid}
+                            onRemove={() => onAddMember(role.id, uid)}
+                        />
+                    ))}
+                </div>
+
+                <MemberSuggestionList
+                    members={
+                        role.default_members && role.default_members.length > 0
+                            ? teamMembers.filter(m => role.default_members?.includes(m.id))
+                            : []
+                    }
+                    selectedIds={memberIds}
+                    onSelect={(uid) => onAddMember(role.id, uid)}
+                />
+            </ServingCard>
+        </Reorder.Item>
+    );
+}
+
+interface SortableTimelineItemProps {
+    item: any;
+    getMemberName: (id: string) => string;
+    onUpdate: (newItem: any) => void;
+    onDelete: () => void;
+    onOpenAdd: (assignmentIndex: number) => void;
+    onRemoveMember: (assignmentIndex: number, uid: string) => void;
+}
+
+function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenAdd, onRemoveMember }: SortableTimelineItemProps) {
+    const controls = useDragControls();
+
+    return (
+        <Reorder.Item value={item} dragListener={false} dragControls={controls}>
+            <ServingCard onClick={() => onOpenAdd(0)}>
+                <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-2 flex-1">
+                        <div
+                            onPointerDown={(e) => controls.start(e)}
+                            className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors p-1 -ml-1 mt-1 touch-none"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <GripVertical className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 space-y-1" onClick={(e) => e.stopPropagation()}>
+                            <input
+                                value={item.title}
+                                onChange={(e) => onUpdate({ ...item, title: e.target.value })}
+                                className="font-bold bg-transparent border-0 focus:ring-0 p-0 text-xl w-full text-foreground placeholder:text-muted-foreground/50"
+                                placeholder="Sequence title..."
+                            />
+                            <input
+                                value={item.remarks || ""}
+                                onChange={(e) => onUpdate({ ...item, remarks: e.target.value })}
+                                className="text-sm font-medium text-muted-foreground bg-transparent border-0 focus:ring-0 p-0 w-full placeholder:text-muted-foreground/30"
+                                placeholder="Add notes or scripture references..."
+                            />
+                        </div>
+                    </div>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors -mr-2 -mt-1"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete();
+                        }}
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                </div>
+
+                <div className="space-y-3">
+                    <div className="flex flex-col gap-3">
+                        {(() => {
+                            const assignment = item.assignments[0] || { memberIds: [] };
+                            const aIdx = 0;
+
+                            return (
+                                <div className="flex flex-wrap gap-2">
+                                    <Button
+                                        variant="default"
+                                        size="sm"
+                                        className="h-7 px-3 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all border-none text-xs font-bold gap-1.5 shadow-none"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onOpenAdd(aIdx);
+                                        }}
+                                    >
+                                        <Plus className="h-3 w-3" />
+                                        Add Member
+                                    </Button>
+                                    {assignment.memberIds.map((uid: string) => (
+                                        <MemberBadge
+                                            key={uid}
+                                            name={getMemberName(uid)}
+                                            onRemove={() => onRemoveMember(aIdx, uid)}
+                                        />
+                                    ))}
+                                </div>
+                            );
+                        })()}
+                    </div>
+                </div>
+            </ServingCard>
+        </Reorder.Item>
+    );
 }

@@ -78,7 +78,7 @@ export function MemberSuggestionList({ members, selectedIds, onSelect }: MemberS
 
     return (
         <div className="flex flex-col gap-2 mt-2">
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Suggested Members</p>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">SUGGESTED</p>
             <div className="flex flex-wrap gap-2">
                 {members.map((member) => {
                     const isSelected = selectedIds.includes(member.id);
@@ -92,8 +92,8 @@ export function MemberSuggestionList({ members, selectedIds, onSelect }: MemberS
                             className={cn(
                                 "flex items-center gap-1.2 px-3 py-1 rounded-full border transition-all text-xs font-medium",
                                 isSelected
-                                    ? "bg-primary text-primary-foreground border-primary"
-                                    : "bg-secondary/50 text-muted-foreground border-transparent hover:bg-secondary hover:text-foreground"
+                                    ? "bg-secondary border-primary text-foreground"
+                                    : "bg-secondary/50 border-border/50 text-muted-foreground hover:bg-secondary hover:text-foreground hover:border-border"
                             )}
                         >
                             {member.name}
