@@ -117,6 +117,17 @@ export function MemberSelector({
                                     </div>
                                 );
                             })}
+
+                            {/* Add as Group Button */}
+                            {searchQuery && onAddGroup && !groups.find(g => g.toLowerCase() === searchQuery.toLowerCase()) && (
+                                <button
+                                    className="w-full flex flex-col items-start gap-1 p-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left"
+                                    onClick={handleAddAsGroup}
+                                >
+                                    <span className="text-xs font-bold text-primary/60 uppercase tracking-tighter">New Group</span>
+                                    <span className="font-bold text-primary truncate w-full px-1">Add &quot;{searchQuery}&quot;</span>
+                                </button>
+                            )}
                         </div>
                         <div className="h-px bg-border/50 mx-1" />
                     </div>
@@ -129,27 +140,17 @@ export function MemberSelector({
                     </p>
 
                     <div className="space-y-1">
-                        {/* Smart Add Options */}
+                        {/* Add as Member Button */}
                         {searchQuery &&
-                            !filteredMembers.find(m => m.name.toLowerCase() === searchQuery.toLowerCase()) &&
-                            !filteredGroups.find(g => g.toLowerCase() === searchQuery.toLowerCase()) &&
+                            !members.find(m => m.name.toLowerCase() === searchQuery.toLowerCase()) &&
                             !manualEntries.includes(searchQuery) && (
-                                <div className="grid grid-cols-2 gap-3 pb-2 pt-1 px-1">
-                                    <button
-                                        className="flex flex-col items-start gap-1 p-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left group"
-                                        onClick={handleAddAsGroup}
-                                    >
-                                        <span className="text-xs font-bold text-primary/60 uppercase tracking-tighter">New Group</span>
-                                        <span className="font-bold text-primary truncate w-full">Add &quot;{searchQuery}&quot;</span>
-                                    </button>
-                                    <button
-                                        className="flex flex-col items-start gap-1 p-4 rounded-2xl border border-dashed border-muted-foreground/30 bg-muted/20 hover:bg-muted/30 transition-all text-left"
-                                        onClick={handleAddAsMember}
-                                    >
-                                        <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-tighter">New Member</span>
-                                        <span className="font-bold text-foreground truncate w-full">Add &quot;{searchQuery}&quot;</span>
-                                    </button>
-                                </div>
+                                <button
+                                    className="w-full flex flex-col items-start gap-1 p-4 rounded-2xl border border-dashed border-muted-foreground/30 bg-muted/20 hover:bg-muted/30 transition-all text-left mb-2"
+                                    onClick={handleAddAsMember}
+                                >
+                                    <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-tighter">New Member</span>
+                                    <span className="font-bold text-foreground truncate w-full px-1">Add &quot;{searchQuery}&quot;</span>
+                                </button>
                             )}
 
                         {/* Manual Entries List */}
