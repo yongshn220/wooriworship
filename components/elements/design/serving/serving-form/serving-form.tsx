@@ -73,9 +73,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [hasTemplateChanges, setHasTemplateChanges] = useState(false);
 
     // For Member Selection Drawer
-    const [activeSelection, setActiveSelection] = useState<{
-        roleId: string;
-    } | null>(null);
+    const [activeSelection, setActiveSelection] = useState<{ itemId?: string; assignmentIndex?: number; roleId: string } | null>(null);
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -173,6 +171,54 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
     // Helpers
     const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || id; // Fallback to ID (name) for manual entries
+
+    const handleAddMember = (itemId: string, assignmentIndex: number, uid: string) => {
+        setItems(prevItems => prevItems.map(item => {
+            if (item.id === itemId) {
+                const newAssignments = item.assignments.map((asg, idx) => {
+                    if (idx === assignmentIndex) {
+                        const memberIds = asg.memberIds.includes(uid)
+                            ? asg.memberIds.filter(id => id !== uid)
+                            : [...asg.memberIds, uid];
+                        return { ...asg, memberIds };
+                    }
+                    return asg;
+                });
+                return { ...item, assignments: newAssignments };
+            }
+            return item;
+        }));
+    };
+
+    const handleAddMemberByRole = (roleId: string, uid: string) => {
+        let newItems = [...items];
+        let ptItemIdx = newItems.findIndex(i => i.title === '찬양팀 구성');
+        if (ptItemIdx === -1) {
+            newItems.push({
+                id: Math.random().toString(36).substr(2, 9),
+                order: items.length,
+                title: '찬양팀 구성',
+                assignments: [],
+                type: 'FLOW'
+            });
+            ptItemIdx = newItems.length - 1;
+        }
+
+        const newAssignments = [...newItems[ptItemIdx].assignments];
+        let aIdx = newAssignments.findIndex(a => a.roleId === roleId);
+        if (aIdx === -1) {
+            newAssignments.push({ roleId: roleId, memberIds: [uid] });
+        } else {
+            const currentIds = newAssignments[aIdx].memberIds;
+            if (currentIds.includes(uid)) {
+                newAssignments[aIdx] = { ...newAssignments[aIdx], memberIds: currentIds.filter(id => id !== uid) };
+            } else {
+                newAssignments[aIdx] = { ...newAssignments[aIdx], memberIds: [...currentIds, uid] };
+            }
+        }
+
+        setItems(newItems.map((it, idx) => idx === ptItemIdx ? { ...it, assignments: newAssignments } : it));
+    };
 
     const handleSubmit = async () => {
         if (!selectedDate) return;
@@ -475,35 +521,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                         const assignment = ptItem?.assignments.find(a => a.roleId === role.id);
                                         const memberIds = assignment?.memberIds || [];
 
-                                        const handleAddMember = (uid: string) => {
-                                            let newItems = [...items];
-                                            let ptItemIdx = newItems.findIndex(i => i.title === '찬양팀 구성');
-                                            if (ptItemIdx === -1) {
-                                                newItems.push({
-                                                    id: Math.random().toString(36).substr(2, 9),
-                                                    order: items.length,
-                                                    title: '찬양팀 구성',
-                                                    assignments: [],
-                                                    type: 'FLOW'
-                                                });
-                                                ptItemIdx = newItems.length - 1;
-                                            }
-
-                                            const newAssignments = [...newItems[ptItemIdx].assignments];
-                                            let aIdx = newAssignments.findIndex(a => a.roleId === role.id);
-                                            if (aIdx === -1) {
-                                                newAssignments.push({ roleId: role.id, memberIds: [uid] });
-                                            } else {
-                                                const currentIds = newAssignments[aIdx].memberIds;
-                                                if (currentIds.includes(uid)) {
-                                                    newAssignments[aIdx] = { ...newAssignments[aIdx], memberIds: currentIds.filter(id => id !== uid) };
-                                                } else {
-                                                    newAssignments[aIdx] = { ...newAssignments[aIdx], memberIds: [...currentIds, uid] };
-                                                }
-                                            }
-
-                                            setItems(newItems.map((it, idx) => idx === ptItemIdx ? { ...it, assignments: newAssignments } : it));
-                                        };
+                                        // handleAddMemberByRole is now in main scope
 
                                         return (
                                             <Reorder.Item key={role.id} value={role}>
@@ -527,46 +545,33 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                                                     <div className="flex flex-wrap gap-2 items-center">
                                                         <Button
-                                                            variant="ghost"
+                                                            variant="outline"
                                                             size="sm"
-                                                            className="h-7 w-7 rounded-full p-0 bg-secondary hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border-2 border-dashed border-border hover:border-primary/30"
-                                                            onClick={() => {
-                                                                setActiveSelection((prev) =>
-                                                                    prev?.roleId === role.id ? null : { roleId: role.id }
-                                                                );
-                                                            }}
+                                                            className="h-7 px-3 rounded-full bg-background hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border-dashed border-border hover:border-primary/30 text-xs font-semibold gap-1.5"
+                                                            onClick={() => setActiveSelection({ roleId: role.id })}
                                                         >
-                                                            <UserPlus className="h-3.5 w-3.5" />
+                                                            <UserPlus className="h-3 w-3" />
+                                                            Add Member
                                                         </Button>
                                                         {memberIds.map(uid => (
                                                             <MemberBadge
                                                                 key={uid}
                                                                 name={getMemberName(uid)}
-                                                                onRemove={() => handleAddMember(uid)}
+                                                                onRemove={() => handleAddMemberByRole(role.id, uid)}
                                                             />
                                                         ))}
                                                     </div>
 
-                                                    <AnimatePresence>
-                                                        {activeSelection?.roleId === role.id && (
-                                                            <motion.div
-                                                                initial={{ opacity: 0, height: 0 }}
-                                                                animate={{ opacity: 1, height: "auto" }}
-                                                                exit={{ opacity: 0, height: 0 }}
-                                                                className="overflow-hidden"
-                                                            >
-                                                                <MemberSuggestionList
-                                                                    members={
-                                                                        role.default_members && role.default_members.length > 0
-                                                                            ? teamMembers.filter(m => role.default_members?.includes(m.id))
-                                                                            : teamMembers
-                                                                    }
-                                                                    selectedIds={memberIds}
-                                                                    onSelect={handleAddMember}
-                                                                />
-                                                            </motion.div>
-                                                        )}
-                                                    </AnimatePresence>
+                                                    {/* Always visible suggestions */}
+                                                    <MemberSuggestionList
+                                                        members={
+                                                            role.default_members && role.default_members.length > 0
+                                                                ? teamMembers.filter(m => role.default_members?.includes(m.id))
+                                                                : teamMembers
+                                                        }
+                                                        selectedIds={memberIds}
+                                                        onSelect={(uid) => handleAddMemberByRole(role.id, uid)}
+                                                    />
                                                 </ServingCard>
                                             </Reorder.Item>
                                         );
@@ -770,54 +775,38 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                                 </Button>
                                                                             </div>
 
-                                                                            <div className="flex flex-wrap gap-2 items-center">
+                                                                            <div className="flex flex-wrap gap-2">
                                                                                 <Button
-                                                                                    variant="ghost"
+                                                                                    variant="outline"
                                                                                     size="sm"
-                                                                                    className="h-7 w-7 rounded-full p-0 bg-background hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border-2 border-dashed border-border hover:border-primary/30"
-                                                                                    onClick={() => setActiveSelection({ roleId: a.roleId })}
+                                                                                    className="h-7 px-3 rounded-full bg-background hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border-dashed border-border hover:border-primary/30 text-xs font-semibold gap-1.5"
+                                                                                    onClick={() => setActiveSelection({
+                                                                                        itemId: item.id,
+                                                                                        assignmentIndex: aIdx,
+                                                                                        roleId: a.roleId
+                                                                                    })}
                                                                                 >
-                                                                                    <UserPlus className="h-3.5 w-3.5" />
+                                                                                    <UserPlus className="h-3 w-3" />
+                                                                                    Add Member
                                                                                 </Button>
                                                                                 {a.memberIds.map(uid => (
                                                                                     <MemberBadge
                                                                                         key={uid}
                                                                                         name={getMemberName(uid)}
-                                                                                        onRemove={() => {
-                                                                                            const newItems = items.map(i => i.id === item.id ? {
-                                                                                                ...i, assignments: i.assignments.map((asg, idx) => idx === aIdx ? { ...asg, memberIds: asg.memberIds.filter(id => id !== uid) } : asg)
-                                                                                            } : i);
-                                                                                            setItems(newItems);
-                                                                                        }}
+                                                                                        onRemove={() => handleAddMember(item.id, aIdx, uid)}
                                                                                     />
                                                                                 ))}
                                                                             </div>
 
-                                                                            <AnimatePresence>
-                                                                                {activeSelection?.roleId === a.roleId && (
-                                                                                    <motion.div
-                                                                                        initial={{ opacity: 0, height: 0 }}
-                                                                                        animate={{ opacity: 1, height: "auto" }}
-                                                                                        exit={{ opacity: 0, height: 0 }}
-                                                                                        className="overflow-hidden mt-1"
-                                                                                    >
-                                                                                        <MemberSuggestionList
-                                                                                            members={teamMembers}
-                                                                                            selectedIds={a.memberIds}
-                                                                                            onSelect={(uid) => {
-                                                                                                const newItems = items.map(i => i.id === item.id ? {
-                                                                                                    ...i, assignments: i.assignments.map((asg, idx) => idx === aIdx ? {
-                                                                                                        ...asg, memberIds: asg.memberIds.includes(uid)
-                                                                                                            ? asg.memberIds.filter(id => id !== uid)
-                                                                                                            : [...asg.memberIds, uid]
-                                                                                                    } : asg)
-                                                                                                } : i);
-                                                                                                setItems(newItems);
-                                                                                            }}
-                                                                                        />
-                                                                                    </motion.div>
-                                                                                )}
-                                                                            </AnimatePresence>
+                                                                            {/* Always visible suggestions */}
+                                                                            <MemberSuggestionList
+                                                                                members={(roles.find(r => r.id === a.roleId)?.default_members || [])
+                                                                                    .map(mid => teamMembers.find(m => m.id === mid))
+                                                                                    .filter((m): m is NonNullable<typeof m> => !!m)
+                                                                                }
+                                                                                selectedIds={a.memberIds}
+                                                                                onSelect={(memberId) => handleAddMember(item.id, aIdx, memberId)}
+                                                                            />
                                                                         </div>
                                                                     ))}
 
@@ -939,6 +928,38 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     </Button>
                 </div>
             </div>
+
+            {/* Member Selection Drawer */}
+            <Drawer open={!!activeSelection} onOpenChange={(open) => !open && setActiveSelection(null)}>
+                <DrawerContent className="h-[85vh] rounded-t-[2rem]">
+                    <div className="mx-auto w-full max-w-sm h-full flex flex-col p-6">
+                        <DrawerHeader className="p-0 mb-4 text-left">
+                            <DrawerTitle className="text-2xl font-black text-gray-900 tracking-tight">
+                                Select Member
+                            </DrawerTitle>
+                        </DrawerHeader>
+                        <div className="flex-1 min-h-0">
+                            <MemberSelector
+                                selectedMemberIds={
+                                    activeSelection?.itemId && activeSelection.assignmentIndex !== undefined
+                                        ? items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds || []
+                                        : activeSelection?.roleId
+                                            ? items.find(i => i.title === '찬양팀 구성')?.assignments.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
+                                            : []
+                                }
+                                onSelect={(memberId) => {
+                                    if (activeSelection?.itemId && activeSelection.assignmentIndex !== undefined) {
+                                        handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, memberId);
+                                    } else if (activeSelection?.roleId) {
+                                        handleAddMemberByRole(activeSelection.roleId, memberId);
+                                    }
+                                }}
+                                multiple
+                            />
+                        </div>
+                    </div>
+                </DrawerContent>
+            </Drawer>
 
             {/* Role Creation Dialog */}
             <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
