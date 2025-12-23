@@ -5,7 +5,7 @@ import { useRecoilValue } from "recoil";
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
 import { Input } from "@/components/ui/input";
-import { Check, Search } from "lucide-react";
+import { Check, Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -121,11 +121,11 @@ export function MemberSelector({
                             {/* Add as Group Button */}
                             {searchQuery && onAddGroup && !groups.find(g => g.toLowerCase() === searchQuery.toLowerCase()) && (
                                 <button
-                                    className="w-full flex flex-col items-start gap-1 p-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left"
+                                    className="w-full flex items-center gap-3 p-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left"
                                     onClick={handleAddAsGroup}
                                 >
-                                    <span className="text-xs font-bold text-primary/60 uppercase tracking-tighter">New Group</span>
-                                    <span className="font-bold text-primary truncate w-full px-1">Add &quot;{searchQuery}&quot;</span>
+                                    <Plus className="h-5 w-5 text-primary" />
+                                    <span className="font-bold text-primary truncate flex-1">Add &quot;{searchQuery}&quot;</span>
                                 </button>
                             )}
                         </div>
@@ -145,11 +145,11 @@ export function MemberSelector({
                             !members.find(m => m.name.toLowerCase() === searchQuery.toLowerCase()) &&
                             !manualEntries.includes(searchQuery) && (
                                 <button
-                                    className="w-full flex flex-col items-start gap-1 p-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left mb-2"
+                                    className="w-full flex items-center gap-3 p-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left mb-2"
                                     onClick={handleAddAsMember}
                                 >
-                                    <span className="text-xs font-bold text-primary/60 uppercase tracking-tighter">New Member</span>
-                                    <span className="font-bold text-primary truncate w-full px-1">Add &quot;{searchQuery}&quot;</span>
+                                    <Plus className="h-5 w-5 text-primary" />
+                                    <span className="font-bold text-primary truncate flex-1">Add &quot;{searchQuery}&quot;</span>
                                 </button>
                             )}
 
