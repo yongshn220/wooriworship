@@ -82,7 +82,7 @@ export function MemberSelector({ selectedMemberIds, onSelect, multiple = false }
                                     <AvatarFallback className="bg-primary text-primary-foreground">{name[0]}</AvatarFallback>
                                 </Avatar>
                                 <div>
-                                    <p className="font-medium text-sm">{name}</p>
+                                    <p className="text-sm font-medium">{name}</p>
                                     <p className="text-xs text-muted-foreground">Guest</p>
                                 </div>
                             </div>
@@ -108,9 +108,9 @@ export function MemberSelector({ selectedMemberIds, onSelect, multiple = false }
                                     <Avatar className="h-10 w-10">
                                         <AvatarFallback>{member.name?.[0]}</AvatarFallback>
                                     </Avatar>
-                                    <div>
-                                        <p className="font-medium text-sm">{member.name}</p>
-                                        <p className="text-xs text-muted-foreground">{member.email}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium text-foreground truncate">{member.name}</p>
+                                        <p className="text-xs text-muted-foreground truncate">{member.email}</p>
                                     </div>
                                 </div>
                                 {isSelected && <Check className="h-5 w-5 text-primary" />}

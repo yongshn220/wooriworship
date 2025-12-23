@@ -24,7 +24,7 @@ export function AddActionButton({ label, onClick, icon, className }: AddActionBu
             variant="ghost"
             size="sm"
             className={cn(
-                "w-full h-14 border-dashed border-2 text-muted-foreground hover:text-primary transition-colors hover:bg-primary/5 rounded-2xl text-sm font-bold gap-2",
+                "w-full h-14 border-dashed border-2 text-muted-foreground hover:text-primary transition-colors hover:bg-primary/5 rounded-2xl text-sm font-semibold gap-2",
                 className
             )}
             onClick={onClick}
@@ -78,7 +78,7 @@ export function MemberSuggestionList({ members, selectedIds, onSelect }: MemberS
 
     return (
         <div className="flex flex-col gap-2 mt-2">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Suggested Members</p>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Suggested Members</p>
             <div className="flex flex-wrap gap-2">
                 {members.map((member) => {
                     const isSelected = selectedIds.includes(member.id);
@@ -119,7 +119,7 @@ export function MemberBadge({ name, onRemove, className }: MemberBadgeProps) {
         <Badge
             variant="secondary"
             className={cn(
-                "px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground border-0 flex items-center gap-1.5 text-xs font-semibold shadow-sm transition-all",
+                "px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground border-0 flex items-center gap-1.5 text-xs font-medium shadow-sm transition-all",
                 className
             )}
         >
