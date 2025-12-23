@@ -145,11 +145,11 @@ export function MemberSelector({
                             !members.find(m => m.name.toLowerCase() === searchQuery.toLowerCase()) &&
                             !manualEntries.includes(searchQuery) && (
                                 <button
-                                    className="w-full flex flex-col items-start gap-1 p-4 rounded-2xl border border-dashed border-muted-foreground/30 bg-muted/20 hover:bg-muted/30 transition-all text-left mb-2"
+                                    className="w-full flex flex-col items-start gap-1 p-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left mb-2"
                                     onClick={handleAddAsMember}
                                 >
-                                    <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-tighter">New Member</span>
-                                    <span className="font-bold text-foreground truncate w-full px-1">Add &quot;{searchQuery}&quot;</span>
+                                    <span className="text-xs font-bold text-primary/60 uppercase tracking-tighter">New Member</span>
+                                    <span className="font-bold text-primary truncate w-full px-1">Add &quot;{searchQuery}&quot;</span>
                                 </button>
                             )}
 
