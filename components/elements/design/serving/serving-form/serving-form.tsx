@@ -835,8 +835,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         </div>
 
                         {/* Unified Scroll Area */}
-                        <ScrollArea className="flex-1 px-8">
-                            <div className="flex flex-col gap-8 pb-32 pt-2">
+                        <ScrollArea className="flex-1">
+                            <div className="flex flex-col gap-8 pb-32 pt-2 px-8">
                                 {/* Standard Groups (Timeline Only) */}
                                 {activeSelection?.itemId && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
