@@ -756,71 +756,44 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                                                             <div className="space-y-3">
                                                                 <div className="flex flex-col gap-3">
-                                                                    {item.assignments.map((a, aIdx) => (
-                                                                        <div key={aIdx} className="flex flex-col gap-2 p-3 bg-secondary/30 rounded-2xl border border-secondary/50">
-                                                                            <div className="flex justify-between items-center">
-                                                                                <span className="text-[10px] font-bold text-muted-foreground uppercase px-2 py-1 bg-background/50 rounded-md">
-                                                                                    {roles.find(r => r.id === a.roleId)?.name || 'Role'}
-                                                                                </span>
-                                                                                <Button
-                                                                                    variant="ghost" size="icon" className="h-6 w-6 rounded-full text-muted-foreground hover:text-destructive"
-                                                                                    onClick={() => {
-                                                                                        const newItems = items.map(i => i.id === item.id ? {
-                                                                                            ...i, assignments: i.assignments.filter((_, idx) => idx !== aIdx)
-                                                                                        } : i);
-                                                                                        setItems(newItems);
-                                                                                    }}
-                                                                                >
-                                                                                    <X className="h-3 w-3" />
-                                                                                </Button>
+                                                                    {(() => {
+                                                                        // Ensure at least one assignment exists for Timeline items
+                                                                        const assignment = item.assignments[0] || { memberIds: [] };
+                                                                        const aIdx = 0;
+                                                                        if (item.assignments.length === 0) {
+                                                                            // Auto-fix if missing (shouldn't happen with new logic relative to init, but safe for existing)
+                                                                            // Ideally we touch state, but for render we just use defaults.
+                                                                            // To persist, handled in addMember or on init.
+                                                                        }
+
+                                                                        return (
+                                                                            <div className="flex flex-col gap-2 p-3 bg-secondary/30 rounded-2xl border border-secondary/50">
+                                                                                <div className="flex flex-wrap gap-2">
+                                                                                    <Button
+                                                                                        variant="outline"
+                                                                                        size="sm"
+                                                                                        className="h-7 px-3 rounded-full bg-background hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border-dashed border-border hover:border-primary/30 text-xs font-semibold gap-1.5"
+                                                                                        onClick={() => setActiveSelection({
+                                                                                            itemId: item.id,
+                                                                                            assignmentIndex: aIdx,
+                                                                                            roleId: "timeline-default" // Dummy role ID for drawer context
+                                                                                        })}
+                                                                                    >
+                                                                                        <UserPlus className="h-3 w-3" />
+                                                                                        Add Member
+                                                                                    </Button>
+                                                                                    {assignment.memberIds.map(uid => (
+                                                                                        <MemberBadge
+                                                                                            key={uid}
+                                                                                            name={getMemberName(uid)}
+                                                                                            onRemove={() => handleAddMember(item.id, aIdx, uid)}
+                                                                                        />
+                                                                                    ))}
+                                                                                </div>
                                                                             </div>
+                                                                        );
+                                                                    })()}
 
-                                                                            <div className="flex flex-wrap gap-2">
-                                                                                <Button
-                                                                                    variant="outline"
-                                                                                    size="sm"
-                                                                                    className="h-7 px-3 rounded-full bg-background hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border-dashed border-border hover:border-primary/30 text-xs font-semibold gap-1.5"
-                                                                                    onClick={() => setActiveSelection({
-                                                                                        itemId: item.id,
-                                                                                        assignmentIndex: aIdx,
-                                                                                        roleId: a.roleId
-                                                                                    })}
-                                                                                >
-                                                                                    <UserPlus className="h-3 w-3" />
-                                                                                    Add Member
-                                                                                </Button>
-                                                                                {a.memberIds.map(uid => (
-                                                                                    <MemberBadge
-                                                                                        key={uid}
-                                                                                        name={getMemberName(uid)}
-                                                                                        onRemove={() => handleAddMember(item.id, aIdx, uid)}
-                                                                                    />
-                                                                                ))}
-                                                                            </div>
-
-                                                                            {/* Always visible suggestions */}
-                                                                            <MemberSuggestionList
-                                                                                members={(roles.find(r => r.id === a.roleId)?.default_members || [])
-                                                                                    .map(mid => teamMembers.find(m => m.id === mid))
-                                                                                    .filter((m): m is NonNullable<typeof m> => !!m)
-                                                                                }
-                                                                                selectedIds={a.memberIds}
-                                                                                onSelect={(memberId) => handleAddMember(item.id, aIdx, memberId)}
-                                                                            />
-                                                                        </div>
-                                                                    ))}
-
-                                                                    <Button
-                                                                        variant="ghost" size="sm" className="self-start text-xs text-muted-foreground hover:text-primary pl-1 gap-1"
-                                                                        onClick={() => {
-                                                                            const newItems = items.map(i => i.id === item.id ? {
-                                                                                ...i, assignments: [...i.assignments, { roleId: roles[0]?.id || '', memberIds: [] }]
-                                                                            } : i);
-                                                                            setItems(newItems);
-                                                                        }}
-                                                                    >
-                                                                        <Plus className="h-3 w-3" /> Add Role Row
-                                                                    </Button>
                                                                 </div>
                                                             </div>
                                                         </ServingCard>
@@ -830,7 +803,13 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                                             <AddActionButton
                                                 label="Add Sequence"
-                                                onClick={() => setItems([...items, { id: Math.random().toString(36).substr(2, 9), order: items.length, title: "", assignments: [], type: 'FLOW' }])}
+                                                onClick={() => setItems([...items, {
+                                                    id: Math.random().toString(36).substr(2, 9),
+                                                    order: items.length,
+                                                    title: "",
+                                                    assignments: [{ memberIds: [] }],
+                                                    type: 'FLOW'
+                                                }])}
                                             />
                                         </>
                                     )}
@@ -1066,7 +1045,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     }
                 }}
             />
-        </div>
+        </div >
     );
 }
 
