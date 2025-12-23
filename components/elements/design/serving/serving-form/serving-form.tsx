@@ -29,7 +29,7 @@ import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
-import { AddActionButton, ServingCard, MemberSuggestionList } from "./serving-components";
+import { AddActionButton, ServingCard, MemberSuggestionList, MemberBadge } from "./serving-components";
 
 
 interface Props {
@@ -374,15 +374,16 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         <div className="fixed inset-0 z-[100] bg-gray-50 flex flex-col overflow-y-auto overflow-x-hidden">
 
             {/* STICKY HEADER - Minimal with Gradient Mask */}
-            <div className="sticky top-0 z-50 w-full px-6 pt-8 pb-8 flex items-center justify-between pointer-events-none bg-gradient-to-b from-gray-50 via-gray-50/90 to-transparent">
+            {/* STICKY HEADER - Minimal with Gradient Mask */}
+            <div className="sticky top-0 z-50 w-full px-6 pt-8 pb-8 flex items-center justify-between pointer-events-none bg-gradient-to-b from-background via-background/90 to-transparent">
                 {/* Exit Button - Left aligned */}
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="h-10 w-10 rounded-full bg-white/50 hover:bg-white shadow-sm pointer-events-auto backdrop-blur-sm"
+                    className="h-10 w-10 rounded-full bg-background/50 hover:bg-background shadow-sm pointer-events-auto backdrop-blur-sm"
                     onClick={() => router.back()}
                 >
-                    <X className="w-5 h-5 text-gray-500" />
+                    <X className="w-5 h-5 text-muted-foreground" />
                 </Button>
 
                 {/* Step Bar - Centered */}
@@ -423,10 +424,10 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         >
                             <div className="space-y-2 text-center">
                                 <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 1</Label>
-                                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Select Date</h2>
+                                <h2 className="text-3xl font-black text-foreground tracking-tight">Select Date</h2>
                             </div>
 
-                            <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-2 flex justify-center">
+                            <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-2 flex justify-center">
                                 <Calendar
                                     mode="single"
                                     selected={selectedDate}
@@ -499,8 +500,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                         <ServingCard key={role.id}>
                                             <div className="flex justify-between items-center">
                                                 <div className="flex-1">
-                                                    <h3 className="font-bold text-lg text-gray-900">{role.name}</h3>
-                                                    <p className="text-sm text-gray-400 font-medium">
+                                                    <h3 className="font-bold text-lg text-foreground">{role.name}</h3>
+                                                    <p className="text-sm text-muted-foreground font-medium">
                                                         {memberIds.length > 0 ? `${memberIds.length} members assigned` : "No one assigned"}
                                                     </p>
                                                 </div>
@@ -549,22 +550,11 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                                             <div className="flex flex-wrap gap-2">
                                                 {memberIds.map(uid => (
-                                                    <Badge
+                                                    <MemberBadge
                                                         key={uid}
-                                                        variant="secondary"
-                                                        className="px-3 py-1.5 rounded-full bg-gray-50 text-gray-600 border-none flex items-center gap-1.5 text-xs font-semibold"
-                                                    >
-                                                        {getMemberName(uid)}
-                                                        <button
-                                                            className="hover:text-destructive transition-colors ml-1"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleAddMember(uid);
-                                                            }}
-                                                        >
-                                                            &times;
-                                                        </button>
-                                                    </Badge>
+                                                        name={getMemberName(uid)}
+                                                        onRemove={() => handleAddMember(uid)}
+                                                    />
                                                 ))}
                                             </div>
 
@@ -602,7 +592,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         >
                             <div className="space-y-2 text-center">
                                 <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 3</Label>
-                                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Timeline</h2>
+                                <h2 className="text-3xl font-black text-foreground tracking-tight">Timeline</h2>
                             </div>
 
                             <div className="flex flex-col gap-6">
@@ -613,16 +603,16 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                             <input
                                                 value={templates.find(t => t.id === selectedTemplateId)?.name || ""}
                                                 onChange={(e) => handleUpdateTemplateName(e.target.value)}
-                                                className="text-2xl font-black bg-transparent border-b-2 border-gray-100 focus:border-primary/40 focus:ring-0 p-0 w-full placeholder:text-gray-300 transition-all hover:border-gray-300"
+                                                className="text-2xl font-black bg-transparent border-b-2 border-border/50 focus:border-primary/40 focus:ring-0 p-0 w-full placeholder:text-muted-foreground/50 transition-all hover:border-border"
                                                 placeholder="Template Name..."
                                             />
                                             <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-30 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                                <Pencil className="w-4 h-4 text-gray-400" />
+                                                <Pencil className="w-4 h-4 text-muted-foreground" />
                                             </div>
                                         </div>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-white shadow-sm border border-gray-100">
+                                                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background shadow-sm border border-border">
                                                     <MoreHorizontal className="h-5 w-5" />
                                                 </Button>
                                             </DropdownMenuTrigger>
@@ -697,9 +687,9 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                 <div className="space-y-4">
                                     {!isTemplatesLoaded ? (
                                         Array.from({ length: 5 }).map((_, i) => (
-                                            <div key={i} className="animate-pulse p-6 rounded-3xl bg-white space-y-3">
-                                                <div className="h-5 bg-gray-100 rounded w-1/3" />
-                                                <div className="h-4 bg-gray-100 rounded w-1/2" />
+                                            <div key={i} className="animate-pulse p-6 rounded-3xl bg-card space-y-3 border border-border/50">
+                                                <div className="h-5 bg-muted rounded w-1/3" />
+                                                <div className="h-4 bg-muted rounded w-1/2" />
                                             </div>
                                         ))
                                     ) : (
@@ -725,7 +715,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                         newItems[itemIdx] = { ...item, title: e.target.value };
                                                                         setItems(newItems);
                                                                     }}
-                                                                    className="font-black bg-transparent border-0 focus:ring-0 p-0 text-xl w-full text-gray-900"
+                                                                    className="font-black bg-transparent border-0 focus:ring-0 p-0 text-xl w-full text-foreground"
                                                                     placeholder="Sequence title..."
                                                                 />
                                                             </div>
@@ -736,7 +726,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                     newItems[itemIdx] = { ...item, remarks: e.target.value };
                                                                     setItems(newItems);
                                                                 }}
-                                                                className="text-sm font-medium text-gray-400 bg-transparent border-0 focus:ring-0 p-0 w-full"
+                                                                className="text-sm font-medium text-muted-foreground bg-transparent border-0 focus:ring-0 p-0 w-full"
                                                                 placeholder="Add notes or scripture references..."
                                                             />
                                                         </div>
@@ -787,21 +777,25 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                     <div className="space-y-3">
                                                         <div className="flex flex-wrap gap-2">
                                                             {item.assignments.map((a, aIdx) => (
-                                                                <div key={aIdx} className="flex flex-wrap gap-1.5 p-1 bg-gray-50 rounded-2xl border border-gray-100">
-                                                                    <span className="text-[10px] font-bold text-gray-400 uppercase px-2 py-1">{roles.find(r => r.id === a.roleId)?.name || 'Role'}</span>
+                                                                <div key={aIdx} className="flex flex-wrap gap-1.5 p-1 bg-secondary/30 rounded-2xl border border-secondary/50">
+                                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase px-2 py-1">{roles.find(r => r.id === a.roleId)?.name || 'Role'}</span>
                                                                     {a.memberIds.map(uid => (
-                                                                        <Badge key={uid} variant="secondary" className="bg-white text-gray-700 shadow-sm border-0 font-bold px-3">
-                                                                            {getMemberName(uid)}
-                                                                            <button className="ml-1 text-gray-300 hover:text-destructive" onClick={() => {
+                                                                        <MemberBadge
+                                                                            key={uid}
+                                                                            name={getMemberName(uid)}
+                                                                            onRemove={() => {
                                                                                 const newItems = [...items];
                                                                                 const newAssignments = [...item.assignments];
                                                                                 newAssignments[aIdx] = { ...a, memberIds: a.memberIds.filter(id => id !== uid) };
                                                                                 newItems[itemIdx] = { ...item, assignments: newAssignments };
                                                                                 setItems(newItems);
-                                                                            }}>&times;</button>
-                                                                        </Badge>
+                                                                            }}
+                                                                        />
                                                                     ))}
-                                                                    <Button variant="ghost" size="sm" className="h-6 w-6 rounded-full p-0 bg-white shadow-sm" onClick={() => setActiveSelection({ itemId: item.id, assignmentIndex: aIdx })}>
+                                                                    <Button
+                                                                        variant="ghost" size="sm" className="h-6 w-6 rounded-full p-0 bg-secondary/50 hover:bg-primary/10 hover:text-primary transition-colors"
+                                                                        onClick={() => setActiveSelection({ itemId: item.id, assignmentIndex: aIdx })}
+                                                                    >
                                                                         <UserPlus className="h-3 w-3" />
                                                                     </Button>
                                                                 </div>
@@ -851,30 +845,30 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                 <h2 className="text-3xl font-black text-gray-900 tracking-tight">Review Plans</h2>
                             </div>
 
-                            <div className="bg-white rounded-[3rem] p-8 shadow-2xl shadow-primary/10 border border-primary/5 space-y-8">
+                            <div className="bg-card rounded-[3rem] p-8 shadow-2xl shadow-primary/5 border border-primary/5 space-y-8">
                                 <div className="text-center space-y-1">
                                     <span className="text-[10px] font-black text-primary uppercase tracking-widest block">Event Date</span>
-                                    <span className="text-3xl font-black text-gray-900 leading-none">
+                                    <span className="text-3xl font-black text-foreground leading-none">
                                         {selectedDate && format(selectedDate, "MMM d, yyyy")}
                                     </span>
-                                    <span className="text-sm font-bold text-gray-400 block mt-1">{selectedDate && format(selectedDate, "EEEE")}</span>
+                                    <span className="text-sm font-bold text-muted-foreground block mt-1">{selectedDate && format(selectedDate, "EEEE")}</span>
                                 </div>
 
                                 <div className="space-y-4">
-                                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest pl-2">Timeline Summary</h3>
-                                    <div className="bg-gray-50/50 rounded-[2rem] border border-gray-100 divide-y divide-gray-100 overflow-hidden">
+                                    <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-2">Timeline Summary</h3>
+                                    <div className="bg-secondary/20 rounded-[2rem] border border-border/50 divide-y divide-border/50 overflow-hidden">
                                         {items.filter(item => item.assignments.length > 0).map(item => (
                                             <div key={item.id} className="p-6 space-y-3">
                                                 <div className="flex justify-between items-center">
-                                                    <span className="font-black text-gray-900 text-lg">{item.title}</span>
+                                                    <span className="font-black text-foreground text-lg">{item.title}</span>
                                                 </div>
                                                 <div className="flex flex-wrap gap-2">
                                                     {item.assignments.map((a, i) => (
-                                                        <div key={i} className="flex flex-col gap-1 p-3 bg-white rounded-2xl border border-gray-100 min-w-[120px]">
+                                                        <div key={i} className="flex flex-col gap-1 p-3 bg-background rounded-2xl border border-border/50 min-w-[120px]">
                                                             <span className="text-[10px] font-black text-primary uppercase tracking-tighter">
                                                                 {a.label || roles.find(r => r.id === a.roleId)?.name}
                                                             </span>
-                                                            <span className="text-sm font-bold text-gray-600">
+                                                            <span className="text-sm font-bold text-muted-foreground">
                                                                 {a.memberIds.map(uid => getMemberName(uid)).join(", ") || "Unassigned"}
                                                             </span>
                                                         </div>
@@ -900,7 +894,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 <div className="flex gap-3 w-full max-w-2xl mx-auto pointer-events-auto">
                     <Button
                         variant="outline"
-                        className="h-12 w-12 rounded-full border-gray-200 bg-white/80 backdrop-blur-sm hover:bg-white text-gray-500 shadow-sm"
+                        className="h-12 w-12 rounded-full border-border bg-background/80 backdrop-blur-sm hover:bg-background text-muted-foreground shadow-sm"
                         onClick={prevStep}
                         disabled={step === 0}
                     >

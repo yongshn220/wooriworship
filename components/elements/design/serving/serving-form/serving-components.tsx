@@ -78,7 +78,7 @@ export function MemberSuggestionList({ members, selectedIds, onSelect }: MemberS
 
     return (
         <div className="flex flex-col gap-2 mt-2">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Suggested Members</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Suggested Members</p>
             <div className="flex flex-wrap gap-2">
                 {members.map((member) => {
                     const isSelected = selectedIds.includes(member.id);
@@ -92,12 +92,12 @@ export function MemberSuggestionList({ members, selectedIds, onSelect }: MemberS
                             className={cn(
                                 "flex items-center gap-1.5 px-2 py-1 rounded-full border transition-all text-xs font-semibold",
                                 isSelected
-                                    ? "bg-primary text-white border-primary shadow-sm"
-                                    : "bg-white text-gray-500 border-gray-100 hover:border-primary/30 hover:bg-primary/5"
+                                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                    : "bg-background text-muted-foreground border-transparent hover:border-primary/30 hover:bg-primary/5 shadow-sm"
                             )}
                         >
                             <Avatar className="h-4 w-4">
-                                <AvatarFallback className="text-[8px]">{member.name[0]}</AvatarFallback>
+                                <AvatarFallback className="text-[8px] bg-primary/10 text-primary">{member.name[0]}</AvatarFallback>
                             </Avatar>
                             {member.name}
                         </button>
@@ -105,5 +105,49 @@ export function MemberSuggestionList({ members, selectedIds, onSelect }: MemberS
                 })}
             </div>
         </div>
+    );
+}
+
+interface MemberBadgeProps {
+    name: string;
+    onRemove?: () => void;
+    className?: string;
+}
+
+export function MemberBadge({ name, onRemove, className }: MemberBadgeProps) {
+    return (
+        <Badge
+            variant="secondary"
+            className={cn(
+                "px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground border-0 flex items-center gap-1.5 text-xs font-semibold shadow-sm transition-all",
+                className
+            )}
+        >
+            {name}
+            {onRemove && (
+                <button
+                    className="hover:text-destructive transition-colors ml-1 rounded-full p-0.5 hover:bg-destructive/10"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onRemove();
+                    }}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                    </svg>
+                </button>
+            )}
+        </Badge>
     );
 }
