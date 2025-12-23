@@ -90,15 +90,12 @@ export function MemberSuggestionList({ members, selectedIds, onSelect }: MemberS
                                 onSelect(member.id);
                             }}
                             className={cn(
-                                "flex items-center gap-1.2 px-2.5 py-1 rounded-full border transition-all text-[11px] font-medium",
+                                "flex items-center gap-1.2 px-3 py-1 rounded-full border transition-all text-xs font-medium",
                                 isSelected
                                     ? "bg-primary text-primary-foreground border-primary"
                                     : "bg-secondary/50 text-muted-foreground border-transparent hover:bg-secondary hover:text-foreground"
                             )}
                         >
-                            <Avatar className="h-4 w-4">
-                                <AvatarFallback className="text-[8px] bg-primary/10 text-primary">{member.name[0]}</AvatarFallback>
-                            </Avatar>
                             {member.name}
                         </button>
                     );
