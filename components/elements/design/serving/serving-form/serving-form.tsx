@@ -617,7 +617,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                             <input
                                                 value={templates.find(t => t.id === selectedTemplateId)?.name || ""}
                                                 onChange={(e) => handleUpdateTemplateName(e.target.value)}
-                                                className="text-2xl font-black bg-transparent border-b-2 border-border/50 focus:border-primary/40 focus:ring-0 p-0 w-full placeholder:text-muted-foreground/50 transition-all hover:border-border"
+                                                className="text-2xl font-bold bg-transparent border-b-2 border-border/50 focus:border-primary/40 focus:ring-0 p-0 w-full placeholder:text-muted-foreground/50 transition-all hover:border-border"
                                                 placeholder="Template Name..."
                                             />
                                             <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-30 group-hover:opacity-100 transition-opacity pointer-events-none">
@@ -736,7 +736,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                                 const newItems = items.map(i => i.id === item.id ? { ...i, title: e.target.value } : i);
                                                                                 setItems(newItems);
                                                                             }}
-                                                                            className="font-black bg-transparent border-0 focus:ring-0 p-0 text-xl w-full text-foreground placeholder:text-muted-foreground/50"
+                                                                            className="font-bold bg-transparent border-0 focus:ring-0 p-0 text-xl w-full text-foreground placeholder:text-muted-foreground/50"
                                                                             placeholder="Sequence title..."
                                                                         />
                                                                         <input
@@ -841,11 +841,11 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                             <div className="bg-card rounded-[3rem] p-8 shadow-2xl shadow-primary/5 border border-primary/5 space-y-8">
                                 <div className="text-center space-y-1">
-                                    <span className="text-xs font-bold text-primary uppercase tracking-wider block">Event Date</span>
-                                    <span className="text-2xl font-bold text-foreground tracking-tight leading-none">
+                                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Event Date</span>
+                                    <span className="text-3xl font-bold text-foreground tracking-tight leading-none">
                                         {selectedDate && format(selectedDate, "MMM d, yyyy")}
                                     </span>
-                                    <span className="text-base font-medium text-muted-foreground block mt-1">{selectedDate && format(selectedDate, "EEEE")}</span>
+                                    <span className="text-lg font-semibold text-muted-foreground block mt-1">{selectedDate && format(selectedDate, "EEEE")}</span>
                                 </div>
 
                                 <div className="space-y-4">
@@ -917,7 +917,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 <DrawerContent className="h-[85vh] rounded-t-[2rem]">
                     <div className="mx-auto w-full max-w-md h-full flex flex-col p-6">
                         <DrawerHeader className="p-0 mb-4 text-left">
-                            <DrawerTitle className="text-2xl font-black text-gray-900 tracking-tight">
+                            <DrawerTitle className="text-2xl font-bold text-gray-900 tracking-tight">
                                 Select Member
                             </DrawerTitle>
                         </DrawerHeader>
