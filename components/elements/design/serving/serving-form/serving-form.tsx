@@ -82,6 +82,11 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [newRoleName, setNewRoleName] = useState("");
     const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
     const [newTemplateName, setNewTemplateName] = useState("");
+
+    // Timeline Groups
+    const [standardGroups, setStandardGroups] = useState<string[]>([]);
+    const [newGroupInput, setNewGroupInput] = useState("");
+
     const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'role' | 'template'; id: string; open: boolean }>({ type: 'role', id: '', open: false });
 
     // Initialize roles & data
@@ -816,6 +821,53 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                 Select Member
                             </DrawerTitle>
                         </DrawerHeader>
+                        {activeSelection?.itemId && (
+                            <div className="mb-6 space-y-3 flex-shrink-0">
+                                <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Standard Groups</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {standardGroups.map((group, idx) => (
+                                        <button
+                                            key={`group-${idx}`}
+                                            onClick={() => {
+                                                if (activeSelection.itemId && activeSelection.assignmentIndex !== undefined) {
+                                                    handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, `group:${group}`);
+                                                }
+                                            }}
+                                            className="flex items-center gap-1.2 px-3 py-1.5 rounded-full bg-secondary/50 border border-transparent hover:border-primary/30 hover:bg-secondary text-xs font-semibold text-foreground transition-all"
+                                        >
+                                            {group}
+                                        </button>
+                                    ))}
+                                    <div className="flex items-center gap-1">
+                                        <input
+                                            value={newGroupInput}
+                                            onChange={(e) => setNewGroupInput(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && newGroupInput.trim()) {
+                                                    setStandardGroups([...standardGroups, newGroupInput.trim()]);
+                                                    setNewGroupInput("");
+                                                }
+                                            }}
+                                            placeholder="Add group..."
+                                            className="h-8 rounded-full bg-transparent border border-border px-3 text-xs w-24 focus:w-32 transition-all focus:border-primary focus:ring-0"
+                                        />
+                                        {newGroupInput.trim() && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-7 w-7 rounded-full text-primary hover:bg-primary/10"
+                                                onClick={() => {
+                                                    setStandardGroups([...standardGroups, newGroupInput.trim()]);
+                                                    setNewGroupInput("");
+                                                }}
+                                            >
+                                                <Plus className="h-4 w-4" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         <div className="flex-1 min-h-0">
                             <MemberSelector
                                 selectedMemberIds={
@@ -1008,6 +1060,17 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                             <GripVertical className="h-4 w-4" />
                         </div>
                         <h3 className="font-bold text-lg text-foreground">{role.name}</h3>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors ml-1"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onOpenAdd();
+                            }}
+                        >
+                            <UserPlus className="h-4 w-4" />
+                        </Button>
                     </div>
                     <Button
                         variant="ghost"
@@ -1023,18 +1086,6 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                 </div>
 
                 <div className="flex flex-wrap gap-2 items-center">
-                    <Button
-                        variant="default"
-                        size="sm"
-                        className="h-7 px-3 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all border-none text-xs font-bold gap-1.5 shadow-none"
-                        onClick={(e) => {
-                            e.stopPropagation(); // Prevent card click
-                            onOpenAdd();
-                        }}
-                    >
-                        <Plus className="h-3 w-3" />
-                        Add Member
-                    </Button>
                     {memberIds.map(uid => (
                         <MemberBadge
                             key={uid}
@@ -1096,6 +1147,17 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                                 placeholder="Add notes or scripture references..."
                             />
                         </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors ml-1 mt-1"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onOpenAdd(0);
+                            }}
+                        >
+                            <UserPlus className="h-4 w-4" />
+                        </Button>
                     </div>
                     <Button
                         variant="ghost"
@@ -1118,18 +1180,6 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
 
                             return (
                                 <div className="flex flex-wrap gap-2">
-                                    <Button
-                                        variant="default"
-                                        size="sm"
-                                        className="h-7 px-3 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all border-none text-xs font-bold gap-1.5 shadow-none"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onOpenAdd(aIdx);
-                                        }}
-                                    >
-                                        <Plus className="h-3 w-3" />
-                                        Add Member
-                                    </Button>
                                     {assignment.memberIds.map((uid: string) => (
                                         <MemberBadge
                                             key={uid}
