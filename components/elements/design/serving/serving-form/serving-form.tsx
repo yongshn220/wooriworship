@@ -483,8 +483,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             className="flex flex-col gap-8 w-full"
                         >
                             <div className="space-y-2 text-center">
-                                <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 1</Label>
-                                <h2 className="text-3xl font-black text-foreground tracking-tight">Select Date</h2>
+                                <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 1</Label>
+                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Date</h2>
                             </div>
 
                             <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-2 flex justify-center">
@@ -516,8 +516,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             className="flex flex-col gap-8 w-full"
                         >
                             <div className="space-y-2 text-center">
-                                <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 2</Label>
-                                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Assign Roles</h2>
+                                <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 2</Label>
+                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Assign Roles</h2>
                             </div>
 
                             <div className="flex flex-col gap-4">
@@ -605,8 +605,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             className="flex flex-col gap-8 w-full"
                         >
                             <div className="space-y-2 text-center">
-                                <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 3</Label>
-                                <h2 className="text-3xl font-black text-foreground tracking-tight">Timeline</h2>
+                                <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 3</Label>
+                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Timeline</h2>
                             </div>
 
                             <div className="flex flex-col gap-6">
@@ -835,34 +835,34 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             className="flex flex-col gap-8 w-full pb-10"
                         >
                             <div className="space-y-2 text-center">
-                                <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 4</Label>
-                                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Review Plans</h2>
+                                <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 4</Label>
+                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Review Plans</h2>
                             </div>
 
                             <div className="bg-card rounded-[3rem] p-8 shadow-2xl shadow-primary/5 border border-primary/5 space-y-8">
                                 <div className="text-center space-y-1">
-                                    <span className="text-[10px] font-black text-primary uppercase tracking-widest block">Event Date</span>
-                                    <span className="text-3xl font-black text-foreground leading-none">
+                                    <span className="text-xs font-bold text-primary uppercase tracking-wider block">Event Date</span>
+                                    <span className="text-2xl font-bold text-foreground tracking-tight leading-none">
                                         {selectedDate && format(selectedDate, "MMM d, yyyy")}
                                     </span>
-                                    <span className="text-sm font-bold text-muted-foreground block mt-1">{selectedDate && format(selectedDate, "EEEE")}</span>
+                                    <span className="text-base font-medium text-muted-foreground block mt-1">{selectedDate && format(selectedDate, "EEEE")}</span>
                                 </div>
 
                                 <div className="space-y-4">
-                                    <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-2">Timeline Summary</h3>
+                                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider pl-2">Timeline Summary</h3>
                                     <div className="bg-secondary/20 rounded-[2rem] border border-border/50 divide-y divide-border/50 overflow-hidden">
                                         {items.filter(item => item.assignments.length > 0).map(item => (
                                             <div key={item.id} className="p-6 space-y-3">
                                                 <div className="flex justify-between items-center">
-                                                    <span className="font-black text-foreground text-lg">{item.title}</span>
+                                                    <span className="text-base font-bold text-foreground">{item.title}</span>
                                                 </div>
                                                 <div className="flex flex-wrap gap-2">
                                                     {item.assignments.map((a, i) => (
                                                         <div key={i} className="flex flex-col gap-1 p-3 bg-background rounded-2xl border border-border/50 min-w-[120px]">
-                                                            <span className="text-[10px] font-black text-primary uppercase tracking-tighter">
+                                                            <span className="text-xs font-bold text-primary uppercase tracking-wider">
                                                                 {a.label || roles.find(r => r.id === a.roleId)?.name}
                                                             </span>
-                                                            <span className="text-sm font-bold text-muted-foreground">
+                                                            <span className="text-sm font-medium text-muted-foreground">
                                                                 {a.memberIds.map(uid => getMemberName(uid)).join(", ") || "Unassigned"}
                                                             </span>
                                                         </div>
