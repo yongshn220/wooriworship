@@ -92,7 +92,7 @@ export function MemberSuggestionList({ members, selectedIds, onSelect }: MemberS
                             className={cn(
                                 "flex items-center gap-1.5 px-2 py-1 rounded-full border transition-all text-xs font-semibold",
                                 isSelected
-                                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                    ? "bg-background text-primary border-primary ring-1 ring-primary shadow-sm"
                                     : "bg-background text-muted-foreground border-transparent hover:border-primary/30 hover:bg-primary/5 shadow-sm"
                             )}
                         >
