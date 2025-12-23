@@ -36,36 +36,40 @@ export function MemberSelector({ selectedMemberIds, onSelect, multiple = false }
     );
 
     return (
-        <div className="flex flex-col h-full gap-4">
+        <div className="flex flex-col gap-6">
             <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                     id="member-search"
                     name="member-search"
-                    placeholder="Search or type name..."
+                    placeholder="Search name or email..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 bg-muted/50 border-0"
+                    className="pl-10 h-12 bg-muted/40 border-0 rounded-2xl text-base"
                 />
             </div>
 
-            <ScrollArea className="flex-1 -mr-4 pr-4 min-h-0">
-                <div className="space-y-2 pb-2">
+            <div className="space-y-4">
+                <p className="text-xs font-bold tracking-wider text-muted-foreground uppercase px-1">
+                    Members
+                </p>
+
+                <div className="grid gap-3">
                     {/* Option to add custom name */}
                     {searchQuery && !filteredMembers.find(m => m.name.toLowerCase() === searchQuery.toLowerCase()) && !manualEntries.includes(searchQuery) && (
                         <div
-                            className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-primary/50 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
+                            className="flex items-center gap-4 p-4 rounded-2xl border border-dashed border-primary/40 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
                             onClick={() => {
                                 onSelect(searchQuery);
                                 setSearchQuery("");
                             }}
                         >
-                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
                                 +
                             </div>
                             <div>
-                                <p className="font-medium text-sm text-primary">Add &quot;{searchQuery}&quot;</p>
-                                <p className="text-xs text-muted-foreground">Guest / Manual Entry</p>
+                                <p className="font-semibold text-primary">Add &quot;{searchQuery}&quot;</p>
+                                <p className="text-sm text-muted-foreground">Guest / Manual Entry</p>
                             </div>
                         </div>
                     )}
@@ -74,19 +78,21 @@ export function MemberSelector({ selectedMemberIds, onSelect, multiple = false }
                     {displayedManualEntries.map((name) => (
                         <div
                             key={name}
-                            className="flex items-center justify-between p-3 rounded-xl border bg-primary/10 border-primary cursor-pointer transition-all"
+                            className="flex items-center justify-between p-4 rounded-2xl border-2 bg-primary/5 border-primary cursor-pointer shadow-sm transition-all"
                             onClick={() => onSelect(name)}
                         >
-                            <div className="flex items-center gap-3">
-                                <Avatar className="h-10 w-10 border-2 border-white">
-                                    <AvatarFallback className="bg-primary text-primary-foreground">{name[0]}</AvatarFallback>
+                            <div className="flex items-center gap-4">
+                                <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
+                                    <AvatarFallback className="bg-primary text-primary-foreground font-bold">{name[0]}</AvatarFallback>
                                 </Avatar>
                                 <div>
-                                    <p className="text-sm font-medium">{name}</p>
-                                    <p className="text-xs text-muted-foreground">Guest</p>
+                                    <p className="font-semibold text-foreground">{name}</p>
+                                    <p className="text-sm text-muted-foreground">Guest</p>
                                 </div>
                             </div>
-                            <Check className="h-5 w-5 text-primary" />
+                            <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center">
+                                <Check className="h-4 w-4 text-primary-foreground stroke-[3px]" />
+                            </div>
                         </div>
                     ))}
 
@@ -97,34 +103,41 @@ export function MemberSelector({ selectedMemberIds, onSelect, multiple = false }
                             <div
                                 key={member.id}
                                 className={cn(
-                                    "flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all",
+                                    "flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer",
                                     isSelected
-                                        ? "bg-primary/10 border-primary"
-                                        : "bg-card border-border hover:bg-muted"
+                                        ? "bg-primary/5 border-primary shadow-sm"
+                                        : "bg-card border-transparent hover:bg-muted/50"
                                 )}
                                 onClick={() => onSelect(member.id)}
                             >
-                                <div className="flex items-center gap-3">
-                                    <Avatar className="h-10 w-10">
-                                        <AvatarFallback>{member.name?.[0]}</AvatarFallback>
+                                <div className="flex items-center gap-4 min-w-0">
+                                    <Avatar className="h-12 w-12 shadow-sm">
+                                        <AvatarFallback className="font-bold bg-muted text-muted-foreground">{member.name?.[0]}</AvatarFallback>
                                     </Avatar>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-foreground truncate">{member.name}</p>
-                                        <p className="text-xs text-muted-foreground truncate">{member.email}</p>
+                                    <div className="min-w-0">
+                                        <p className="font-semibold text-foreground truncate">{member.name}</p>
+                                        <p className="text-sm text-muted-foreground truncate">{member.email}</p>
                                     </div>
                                 </div>
-                                {isSelected && <Check className="h-5 w-5 text-primary" />}
+                                <div className={cn(
+                                    "h-6 w-6 rounded-full flex items-center justify-center transition-all",
+                                    isSelected
+                                        ? "bg-primary shadow-sm"
+                                        : "border-2 border-muted"
+                                )}>
+                                    {isSelected && <Check className="h-3.5 w-3.5 text-primary-foreground stroke-[4px]" />}
+                                </div>
                             </div>
                         );
                     })}
 
                     {filteredMembers.length === 0 && displayedManualEntries.length === 0 && !searchQuery && (
-                        <div className="text-center py-8 text-muted-foreground text-sm">
-                            Start typing to search or add a guest
+                        <div className="text-center py-12 text-muted-foreground text-sm">
+                            Search members or add guests by name
                         </div>
                     )}
                 </div>
-            </ScrollArea>
+            </div>
         </div>
     );
 }
