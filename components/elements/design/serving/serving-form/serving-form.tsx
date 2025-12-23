@@ -28,6 +28,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
+import { AddActionButton, ServingCard, MemberSuggestionList } from "./serving-components";
 
 
 interface Props {
@@ -58,6 +60,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(nextSunday(new Date()));
     const [items, setItems] = useState<ServingItem[]>([]);
     const [templates, setTemplates] = useState<any[]>([]);
+    const [isTemplatesLoaded, setIsTemplatesLoaded] = useState(false);
 
     const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
     const [hasTemplateChanges, setHasTemplateChanges] = useState(false);
@@ -70,12 +73,12 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
     const [isLoading, setIsLoading] = useState(false);
 
-    // Dialog States
+    // Modals & Drawers
     const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
     const [newRoleName, setNewRoleName] = useState("");
-
     const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
     const [newTemplateName, setNewTemplateName] = useState("");
+    const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'role' | 'template'; id: string; open: boolean }>({ type: 'role', id: '', open: false });
 
     // Initialize roles & data
     useEffect(() => {
@@ -83,6 +86,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             const loadInitialData = async () => {
                 const data = await ServingService.getTemplates(teamId);
                 setTemplates(data);
+                setIsTemplatesLoaded(true);
 
                 // 2. Track last used template from recent schedule
                 const latestSchedules = await ServingService.getRecentSchedules(teamId, 5);
@@ -238,6 +242,18 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         }
     };
 
+    const handleDeleteRole = async (roleId: string) => {
+        try {
+            await ServingService.deleteRole(teamId, roleId);
+            setRolesUpdater(prev => prev + 1);
+            toast({ title: "Role deleted" });
+            setDeleteConfirm(prev => ({ ...prev, open: false }));
+        } catch (e) {
+            console.error(e);
+            toast({ title: "Failed to delete role", variant: "destructive" });
+        }
+    };
+
     const handleSaveTemplate = async () => {
         if (!newTemplateName.trim()) return;
         try {
@@ -281,13 +297,14 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
     const handleDeleteTemplate = async () => {
         if (!selectedTemplateId) return;
-        if (!window.confirm("Are you sure you want to delete this template?")) return;
         try {
             await ServingService.deleteTemplate(teamId, selectedTemplateId);
             const newTemps = await ServingService.getTemplates(teamId);
             setTemplates(newTemps);
-            setSelectedTemplateId(newTemps.length > 0 ? newTemps[0].id : null);
+            setSelectedTemplateId(null);
+            setItems([]);
             toast({ title: "Template deleted" });
+            setDeleteConfirm(prev => ({ ...prev, open: false }));
         } catch (e) {
             console.error(e);
             toast({ title: "Failed to delete template", variant: "destructive" });
@@ -444,14 +461,42 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                             <div className="space-y-4">
                                 {roles.map(role => {
-                                    const assignment = items.find(item => item.title === '찬양팀 구성')?.assignments.find(a => a.roleId === role.id);
+                                    const ptItem = items.find(item => item.title === '찬양팀 구성');
+                                    const assignment = ptItem?.assignments.find(a => a.roleId === role.id);
                                     const memberIds = assignment?.memberIds || [];
 
+                                    const handleAddMember = (uid: string) => {
+                                        let newItems = [...items];
+                                        let ptItemIdx = newItems.findIndex(i => i.title === '찬양팀 구성');
+                                        if (ptItemIdx === -1) {
+                                            newItems.push({
+                                                id: Math.random().toString(36).substr(2, 9),
+                                                order: items.length,
+                                                title: '찬양팀 구성',
+                                                assignments: [],
+                                                type: 'FLOW'
+                                            });
+                                            ptItemIdx = newItems.length - 1;
+                                        }
+
+                                        const newAssignments = [...newItems[ptItemIdx].assignments];
+                                        let aIdx = newAssignments.findIndex(a => a.roleId === role.id);
+                                        if (aIdx === -1) {
+                                            newAssignments.push({ roleId: role.id, memberIds: [uid] });
+                                        } else {
+                                            const currentIds = newAssignments[aIdx].memberIds;
+                                            if (currentIds.includes(uid)) {
+                                                newAssignments[aIdx] = { ...newAssignments[aIdx], memberIds: currentIds.filter(id => id !== uid) };
+                                            } else {
+                                                newAssignments[aIdx] = { ...newAssignments[aIdx], memberIds: [...currentIds, uid] };
+                                            }
+                                        }
+
+                                        setItems(newItems.map((it, idx) => idx === ptItemIdx ? { ...it, assignments: newAssignments } : it));
+                                    };
+
                                     return (
-                                        <div
-                                            key={role.id}
-                                            className="group flex flex-col gap-4 p-6 rounded-3xl border bg-white shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
-                                        >
+                                        <ServingCard key={role.id}>
                                             <div className="flex justify-between items-center">
                                                 <div className="flex-1">
                                                     <h3 className="font-bold text-lg text-gray-900">{role.name}</h3>
@@ -459,37 +504,47 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                         {memberIds.length > 0 ? `${memberIds.length} members assigned` : "No one assigned"}
                                                     </p>
                                                 </div>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-10 w-10 rounded-full bg-gray-50 group-hover:bg-primary/10 group-hover:text-primary transition-colors"
-                                                    onClick={() => {
-                                                        let newItems = [...items];
-                                                        let ptItemIdx = newItems.findIndex(i => i.title === '찬양팀 구성');
-                                                        if (ptItemIdx === -1) {
-                                                            newItems.push({
-                                                                id: Math.random().toString(36).substr(2, 9),
-                                                                order: items.length,
-                                                                title: '찬양팀 구성',
-                                                                assignments: [],
-                                                                type: 'FLOW'
-                                                            });
-                                                            ptItemIdx = newItems.length - 1;
-                                                        }
+                                                <div className="flex items-center gap-1">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-10 w-10 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                                                        onClick={() => setDeleteConfirm({ type: 'role', id: role.id, open: true })}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-10 w-10 rounded-full bg-secondary/50 hover:bg-primary/10 hover:text-primary transition-colors"
+                                                        onClick={() => {
+                                                            let newItems = [...items];
+                                                            let ptItemIdx = newItems.findIndex(i => i.title === '찬양팀 구성');
+                                                            if (ptItemIdx === -1) {
+                                                                newItems.push({
+                                                                    id: Math.random().toString(36).substr(2, 9),
+                                                                    order: items.length,
+                                                                    title: '찬양팀 구성',
+                                                                    assignments: [],
+                                                                    type: 'FLOW'
+                                                                });
+                                                                ptItemIdx = newItems.length - 1;
+                                                            }
 
-                                                        const newAssignments = [...newItems[ptItemIdx].assignments];
-                                                        let aIdx = newAssignments.findIndex(a => a.roleId === role.id);
-                                                        if (aIdx === -1) {
-                                                            newAssignments.push({ roleId: role.id, memberIds: [] });
-                                                            aIdx = newAssignments.length - 1;
-                                                        }
+                                                            const newAssignments = [...newItems[ptItemIdx].assignments];
+                                                            let aIdx = newAssignments.findIndex(a => a.roleId === role.id);
+                                                            if (aIdx === -1) {
+                                                                newAssignments.push({ roleId: role.id, memberIds: [] });
+                                                                aIdx = newAssignments.length - 1;
+                                                            }
 
-                                                        setItems(newItems.map((it, idx) => idx === ptItemIdx ? { ...it, assignments: newAssignments } : it));
-                                                        setActiveSelection({ itemId: newItems[ptItemIdx].id, assignmentIndex: aIdx });
-                                                    }}
-                                                >
-                                                    <UserPlus className="h-5 w-5" />
-                                                </Button>
+                                                            setItems(newItems.map((it, idx) => idx === ptItemIdx ? { ...it, assignments: newAssignments } : it));
+                                                            setActiveSelection({ itemId: newItems[ptItemIdx].id, assignmentIndex: aIdx });
+                                                        }}
+                                                    >
+                                                        <UserPlus className="h-5 w-5" />
+                                                    </Button>
+                                                </div>
                                             </div>
 
                                             <div className="flex flex-wrap gap-2">
@@ -504,18 +559,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                             className="hover:text-destructive transition-colors ml-1"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                const roleItemIdx = items.findIndex(i => i.title === '찬양팀 구성');
-                                                                if (roleItemIdx === -1) return;
-                                                                const newItems = [...items];
-                                                                const assgnIdx = newItems[roleItemIdx].assignments.findIndex(a => a.roleId === role.id);
-                                                                const currentAssgn = newItems[roleItemIdx].assignments[assgnIdx];
-                                                                newItems[roleItemIdx] = {
-                                                                    ...newItems[roleItemIdx],
-                                                                    assignments: newItems[roleItemIdx].assignments.map((a, i) =>
-                                                                        i === assgnIdx ? { ...a, memberIds: a.memberIds.filter(id => id !== uid) } : a
-                                                                    )
-                                                                };
-                                                                setItems(newItems);
+                                                                handleAddMember(uid);
                                                             }}
                                                         >
                                                             &times;
@@ -523,18 +567,23 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                     </Badge>
                                                 ))}
                                             </div>
-                                        </div>
+
+                                            <MemberSuggestionList
+                                                members={teamMembers
+                                                    .filter(m => role.default_members?.includes(m.id))
+                                                    .map(m => ({ id: m.id, name: m.name }))
+                                                }
+                                                selectedIds={memberIds}
+                                                onSelect={handleAddMember}
+                                            />
+                                        </ServingCard>
                                     );
                                 })}
 
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full h-14 border-dashed border-2 text-muted-foreground hover:text-primary transition-colors hover:bg-primary/5 rounded-2xl text-sm font-bold"
+                                <AddActionButton
+                                    label="Add New Role"
                                     onClick={() => setIsRoleDialogOpen(true)}
-                                >
-                                    <Plus className="h-5 w-5 mr-2" /> Add New Role
-                                </Button>
+                                />
                             </div>
                         </motion.div>
                     )}
@@ -600,7 +649,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                 <DropdownMenuSeparator className="my-2 bg-gray-50" />
                                                 <DropdownMenuItem
                                                     className="rounded-2xl py-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 font-bold"
-                                                    onClick={handleDeleteTemplate}
+                                                    onClick={() => setDeleteConfirm({ type: 'template', id: selectedTemplateId || '', open: true })}
                                                 >
                                                     <Trash2 className="mr-2 h-4 w-4" />
                                                     Delete Template
@@ -664,10 +713,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                 </div>
                                             )}
                                             {items.sort((a, b) => a.order - b.order).map((item, itemIdx) => (
-                                                <div
-                                                    key={item.id}
-                                                    className="group flex flex-col gap-6 p-6 rounded-3xl bg-white shadow-sm hover:shadow-md transition-all"
-                                                >
+                                                <ServingCard key={item.id}>
                                                     <div className="flex justify-between items-start gap-3">
                                                         <div className="flex-1 space-y-2">
                                                             <div className="flex items-center gap-3">
@@ -730,7 +776,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="h-8 w-8 rounded-full text-gray-300 hover:text-destructive transition-colors"
+                                                                className="h-8 w-8 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                                                                 onClick={() => setItems(items.filter(i => i.id !== item.id))}
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
@@ -761,7 +807,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                 </div>
                                                             ))}
                                                             <Button
-                                                                variant="ghost" size="sm" className="h-8 px-4 text-[10px] font-black text-primary hover:bg-primary/5 uppercase tracking-wider rounded-full border border-primary/10"
+                                                                variant="ghost" size="sm" className="h-6 w-6 rounded-full p-0 bg-white shadow-sm"
                                                                 onClick={() => {
                                                                     const newItems = [...items];
                                                                     const newAssignments = [...item.assignments, { memberIds: [] }];
@@ -770,20 +816,19 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                     setActiveSelection({ itemId: item.id, assignmentIndex: newAssignments.length - 1 });
                                                                 }}
                                                             >
-                                                                <Plus className="h-3 w-3 mr-1" /> Add Person
+                                                                <UserPlus className="h-3 w-3" />
                                                             </Button>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </ServingCard>
                                             ))}
                                         </>
                                     )}
 
-                                    <Button
-                                        variant="outline" className="w-full h-16 rounded-3xl border-dashed border-2 hover:bg-white hover:shadow-md transition-all border-gray-200 text-gray-400 font-bold"
-                                        onClick={() => setItems([...items, { id: Math.random().toString(36).substr(2, 9), order: items.length, title: "", assignments: [], type: 'FLOW' }])}>
-                                        <Plus className="w-6 h-6 mr-3" /> Add Sequence
-                                    </Button>
+                                    <AddActionButton
+                                        label="Add Sequence"
+                                        onClick={() => setItems([...items, { id: Math.random().toString(36).substr(2, 9), order: items.length, title: "", assignments: [], type: 'FLOW' }])}
+                                    />
                                 </div>
                             </div>
                         </motion.div>
@@ -1009,14 +1054,14 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                     handleSaveTemplate();
                                 }
                             }}
-                            className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
+                            className="h-14 rounded-2xl border-gray-100 bg-secondary/30 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
                             autoFocus
                         />
                     </div>
                     <DialogFooter className="flex sm:flex-row gap-3">
                         <Button
                             variant="ghost"
-                            className="h-12 flex-1 rounded-2xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                            className="h-12 flex-1 rounded-2xl font-bold text-muted-foreground hover:text-foreground hover:bg-secondary"
                             onClick={() => setIsTemplateDialogOpen(false)}
                         >
                             Cancel
@@ -1031,6 +1076,23 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <DeleteConfirmationDialog
+                isOpen={deleteConfirm.open}
+                setOpen={(open: boolean) => setDeleteConfirm(prev => ({ ...prev, open }))}
+                title={deleteConfirm.type === 'role' ? "Delete Role" : "Delete Template"}
+                description={deleteConfirm.type === 'role'
+                    ? "Are you sure you want to delete this role from the team? This action cannot be undone."
+                    : "Are you sure you want to delete this template? This action cannot be undone."
+                }
+                onDeleteHandler={() => {
+                    if (deleteConfirm.type === 'role') {
+                        return handleDeleteRole(deleteConfirm.id);
+                    } else {
+                        return handleDeleteTemplate();
+                    }
+                }}
+            />
         </div>
     );
 }
