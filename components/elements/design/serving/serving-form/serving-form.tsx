@@ -915,7 +915,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             {/* Member Selection Drawer */}
             <Drawer open={!!activeSelection} onOpenChange={(open) => !open && setActiveSelection(null)}>
                 <DrawerContent className="h-[85vh] rounded-t-[2rem]">
-                    <div className="mx-auto w-full max-w-sm h-full flex flex-col p-6">
+                    <div className="mx-auto w-full max-w-md h-full flex flex-col p-6">
                         <DrawerHeader className="p-0 mb-4 text-left">
                             <DrawerTitle className="text-2xl font-black text-gray-900 tracking-tight">
                                 Select Member
