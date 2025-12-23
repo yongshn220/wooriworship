@@ -586,7 +586,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                                 <AddActionButton
                                     label="Add Role"
-                                    onClick={handleCreateRole}
+                                    onClick={() => setIsRoleDialogOpen(true)}
                                 />
                             </div>
                         </motion.div>
