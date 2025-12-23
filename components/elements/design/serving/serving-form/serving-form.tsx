@@ -16,6 +16,7 @@ import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { MemberSelector } from "./member-selector";
 import { usersAtom } from "@/global-states/userState";
@@ -814,94 +815,111 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
             {/* Member Selection Drawer */}
             <Drawer open={!!activeSelection} onOpenChange={(open) => !open && setActiveSelection(null)}>
-                <DrawerContent className="h-[85vh] rounded-t-[2rem]">
-                    <div className="mx-auto w-full max-w-md h-full flex flex-col p-6">
-                        <DrawerHeader className="p-0 mb-4 text-left">
-                            <DrawerTitle className="text-2xl font-bold text-gray-900 tracking-tight">
-                                Select Member
-                            </DrawerTitle>
-                        </DrawerHeader>
-                        {activeSelection?.itemId && (
-                            <div className="mb-8 space-y-4 flex-shrink-0 animate-in fade-in slide-in-from-top-2 duration-300">
-                                <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-wider pl-1">Standard Groups</h4>
-                                <div className="flex flex-wrap gap-2.5">
-                                    {standardGroups.map((group, idx) => (
-                                        <div
-                                            key={`group-${idx}`}
-                                            className="group flex items-center gap-1.2 px-4 py-2.5 rounded-full bg-secondary/70 border border-transparent active:border-primary/50 active:bg-secondary transition-all"
-                                        >
-                                            <button
-                                                onClick={() => {
-                                                    if (activeSelection.itemId && activeSelection.assignmentIndex !== undefined) {
-                                                        handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, `group:${group}`);
-                                                    }
-                                                }}
-                                                className="text-[15px] font-semibold text-foreground hover:text-primary transition-colors text-left"
-                                            >
-                                                {group}
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setStandardGroups(standardGroups.filter((_, i) => i !== idx));
-                                                }}
-                                                className="p-1 hover:bg-destructive/10 hover:text-destructive rounded-full transition-all ml-1.5"
-                                            >
-                                                <X className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <div className="flex items-center gap-2 w-full mt-1">
-                                        <div className="relative flex-1">
-                                            <input
-                                                value={newGroupInput}
-                                                onChange={(e) => setNewGroupInput(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter' && newGroupInput.trim()) {
-                                                        setStandardGroups([...standardGroups, newGroupInput.trim()]);
-                                                        setNewGroupInput("");
-                                                    }
-                                                }}
-                                                placeholder="Add new group (e.g. All)"
-                                                className="h-12 w-full rounded-2xl bg-secondary/30 border-gray-100 px-5 text-base font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
-                                            />
-                                            {newGroupInput.trim() && (
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="absolute right-1 top-1 h-10 w-10 rounded-xl text-primary hover:bg-primary/10 transition-all"
-                                                    onClick={() => {
-                                                        setStandardGroups([...standardGroups, newGroupInput.trim()]);
-                                                        setNewGroupInput("");
-                                                    }}
-                                                >
-                                                    <Plus className="h-5 w-5" />
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-full h-[2px] bg-primary/5 mt-6 mb-2 rounded-full" />
+                <DrawerContent className="h-[85vh] rounded-t-[2.5rem]">
+                    <div className="mx-auto w-full max-w-lg h-full flex flex-col pt-2 relative">
+                        {/* Header */}
+                        <div className="flex flex-col gap-1 px-8 pt-6 pb-2">
+                            <div className="flex items-center justify-between">
+                                <DrawerTitle className="text-2xl font-bold text-foreground tracking-tight">
+                                    Select Member
+                                </DrawerTitle>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="rounded-full hover:bg-muted h-10 w-10"
+                                    onClick={() => setActiveSelection(null)}
+                                >
+                                    <X className="h-5 w-5 text-muted-foreground" />
+                                </Button>
                             </div>
-                        )}
-                        <div className="flex-1 min-h-0">
-                            <MemberSelector
-                                selectedMemberIds={
-                                    activeSelection?.itemId && activeSelection.assignmentIndex !== undefined
-                                        ? items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds || []
-                                        : activeSelection?.roleId
-                                            ? items.find(i => i.title === '찬양팀 구성')?.assignments.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
-                                            : []
-                                }
-                                onSelect={(memberId) => {
-                                    if (activeSelection?.itemId && activeSelection.assignmentIndex !== undefined) {
-                                        handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, memberId);
-                                    } else if (activeSelection?.roleId) {
-                                        handleAddMemberByRole(activeSelection.roleId, memberId);
+                        </div>
+
+                        {/* Unified Scroll Area */}
+                        <ScrollArea className="flex-1 px-8">
+                            <div className="flex flex-col gap-8 pb-32 pt-2">
+                                {/* Standard Groups (Timeline Only) */}
+                                {activeSelection?.itemId && (
+                                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <p className="text-xs font-bold tracking-wider text-muted-foreground uppercase px-1">
+                                            Standard Groups
+                                        </p>
+                                        <div className="flex flex-wrap gap-2.5">
+                                            {standardGroups.map((group, idx) => (
+                                                <div
+                                                    key={`group-${idx}`}
+                                                    className="group flex items-center gap-2 px-4 py-2.5 rounded-full bg-primary text-primary-foreground shadow-sm transition-all"
+                                                >
+                                                    <button
+                                                        onClick={() => {
+                                                            if (activeSelection.itemId && activeSelection.assignmentIndex !== undefined) {
+                                                                handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, `group:${group}`);
+                                                            }
+                                                        }}
+                                                        className="text-[15px] font-semibold hover:opacity-80 transition-all"
+                                                    >
+                                                        {group}
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setStandardGroups(standardGroups.filter((_, i) => i !== idx));
+                                                        }}
+                                                        className="p-0.5 hover:bg-white/20 rounded-full transition-all"
+                                                    >
+                                                        <X className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                            ))}
+
+                                            {/* Add Group Input */}
+                                            <div className="relative min-w-[140px] flex-1 max-w-[200px]">
+                                                <input
+                                                    value={newGroupInput}
+                                                    onChange={(e) => setNewGroupInput(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.nativeEvent.isComposing) return;
+                                                        if (e.key === 'Enter' && newGroupInput.trim()) {
+                                                            setStandardGroups([...standardGroups, newGroupInput.trim()]);
+                                                            setNewGroupInput("");
+                                                        }
+                                                    }}
+                                                    placeholder="+ Add Group"
+                                                    className="h-[46px] w-full rounded-full bg-muted/40 border-2 border-dashed border-muted-foreground/20 px-5 text-sm font-medium focus:border-primary/50 focus:bg-white transition-all outline-none"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="w-full h-px bg-border/50 mt-4" />
+                                    </div>
+                                )}
+
+                                <MemberSelector
+                                    selectedMemberIds={
+                                        activeSelection?.itemId && activeSelection.assignmentIndex !== undefined
+                                            ? items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds || []
+                                            : activeSelection?.roleId
+                                                ? items.find(i => i.title === '찬양팀 구성')?.assignments.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
+                                                : []
                                     }
-                                }}
-                                multiple
-                            />
+                                    onSelect={(memberId) => {
+                                        if (activeSelection?.itemId && activeSelection.assignmentIndex !== undefined) {
+                                            handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, memberId);
+                                        } else if (activeSelection?.roleId) {
+                                            handleAddMemberByRole(activeSelection.roleId, memberId);
+                                        }
+                                    }}
+                                    multiple
+                                />
+                            </div>
+                        </ScrollArea>
+
+                        {/* Sticky Bottom Action */}
+                        <div className="absolute bottom-0 left-0 right-0 p-8 pt-10 pb-10 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none">
+                            <Button
+                                className="w-full h-14 rounded-2xl bg-primary text-primary-foreground text-lg font-bold shadow-xl pointer-events-auto active:scale-95 transition-all"
+                                onClick={() => setActiveSelection(null)}
+                            >
+                                Done
+                            </Button>
                         </div>
                     </div>
                 </DrawerContent>
@@ -922,6 +940,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             value={newRoleName}
                             onChange={(e) => setNewRoleName(e.target.value)}
                             onKeyDown={(e) => {
+                                if (e.nativeEvent.isComposing) return;
                                 if (e.key === "Enter" && newRoleName.trim()) {
                                     handleCreateRole();
                                 }
@@ -969,6 +988,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             value={newTemplateName}
                             onChange={(e) => setNewTemplateName(e.target.value)}
                             onKeyDown={(e) => {
+                                if (e.nativeEvent.isComposing) return;
                                 if (e.key === "Enter" && newTemplateName.trim()) {
                                     handleSaveTemplate();
                                 }
