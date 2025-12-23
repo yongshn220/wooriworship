@@ -573,7 +573,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                         members={
                                                             role.default_members && role.default_members.length > 0
                                                                 ? teamMembers.filter(m => role.default_members?.includes(m.id))
-                                                                : teamMembers
+                                                                : []
                                                         }
                                                         selectedIds={memberIds}
                                                         onSelect={(uid) => handleAddMemberByRole(role.id, uid)}
