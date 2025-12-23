@@ -11,7 +11,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format, nextSunday } from "date-fns";
-import { ArrowLeft, ArrowRight, ChevronLeft, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus, Pencil, X, Calendar as CalendarIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus, Pencil, X, Calendar as CalendarIcon } from "lucide-react";
 import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -624,14 +624,10 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>
-
-                                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
+                                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2 -mx-5 px-5">
                                         {templates.map(tmp => (
-                                            <Button
+                                            <button
                                                 key={tmp.id}
-                                                variant={selectedTemplateId === tmp.id ? "default" : "outline"}
-                                                size="sm"
-                                                className="rounded-full text-xs h-9 whitespace-nowrap px-6 shadow-sm"
                                                 onClick={() => {
                                                     setSelectedTemplateId(tmp.id);
                                                     setItems(tmp.items.map((it: any, idx: number) => ({
@@ -643,21 +639,25 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                             : []
                                                     })));
                                                 }}
+                                                className={cn(
+                                                    "flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-semibold shadow-sm active:scale-95 transition-transform",
+                                                    selectedTemplateId === tmp.id
+                                                        ? "bg-gray-900 text-white"
+                                                        : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                                                )}
                                             >
                                                 {tmp.name}
-                                            </Button>
+                                            </button>
                                         ))}
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="rounded-full text-xs h-9 border-dashed border-2 px-5 text-muted-foreground hover:text-primary transition-colors bg-white/50"
+                                        <button
+                                            className="flex-shrink-0 px-4 py-2 bg-white text-gray-600 border border-gray-200 rounded-full text-[13px] font-medium shadow-sm active:scale-95 transition-transform hover:bg-gray-50 flex items-center gap-1"
                                             onClick={() => {
                                                 setNewTemplateName("");
                                                 setIsTemplateDialogOpen(true);
                                             }}
                                         >
-                                            <Plus className="h-4 w-4 mr-2" /> Add
-                                        </Button>
+                                            <Plus className="h-3.5 w-3.5" /> Add
+                                        </button>
                                     </div>
                                 </div>
 
@@ -1110,76 +1110,101 @@ interface SortableTimelineItemProps {
 function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenAdd, onRemoveMember }: SortableTimelineItemProps) {
     const controls = useDragControls();
 
+    const assignment = item.assignments[0] || { memberIds: [] };
+    const memberCount = assignment.memberIds.length;
+    const isAssigned = memberCount > 0;
+
     return (
         <Reorder.Item value={item} dragListener={false} dragControls={controls}>
-            <ServingCard onClick={() => onOpenAdd(0)}>
-                <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center gap-2 flex-1">
-                        <div
-                            onPointerDown={(e) => controls.start(e)}
-                            className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors p-3 -ml-3 mt-0.5 touch-none"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <GripVertical className="h-5 w-5" />
-                        </div>
-                        <div className="flex-1 space-y-1.5" onClick={(e) => e.stopPropagation()}>
+            <ServingCard className="p-0 overflow-hidden border-none shadow-sm rounded-xl bg-white relative group transition-transform duration-200" onClick={() => onOpenAdd(0)}>
+                {/* Drag Handle - Top Left */}
+                <div
+                    className="absolute left-3 top-5 p-2 flex items-center justify-center cursor-grab active:cursor-grabbing z-10 hover:bg-gray-50 rounded-lg transition-colors touch-none"
+                    onPointerDown={(e) => controls.start(e)}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <GripVertical className="text-gray-300 w-5 h-5" />
+                </div>
+
+                {/* Delete Button - Absolute Top Right */}
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-3 right-3 p-2 h-auto w-auto text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-20"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete();
+                    }}
+                >
+                    <Trash2 className="w-5 h-5" />
+                </Button>
+
+                {/* Main Content - Top (Title/Remarks) */}
+                <div className="pl-12 pr-12 pt-6 pb-0">
+                    <div className="flex flex-col gap-1.5">
+                        {/* Title Input */}
+                        <div className="flex items-center gap-2 group/edit w-full">
                             <input
                                 value={item.title}
                                 onChange={(e) => onUpdate({ ...item, title: e.target.value })}
-                                className="font-bold bg-transparent border-0 focus:ring-0 p-0 text-xl w-full text-foreground placeholder:text-muted-foreground/50"
-                                placeholder="Sequence title..."
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-[18px] font-bold text-gray-900 bg-transparent border-0 focus:ring-0 p-0 placeholder:text-gray-300 w-full leading-tight"
+                                placeholder="Sequence Title"
                             />
+                            <Pencil className="w-4 h-4 text-gray-300 group-hover/edit:text-blue-500 transition-colors opacity-0 group-hover/edit:opacity-100" />
+                        </div>
+                        {/* Remarks Input */}
+                        <div className="flex items-center gap-2 group/edit w-full">
                             <input
                                 value={item.remarks || ""}
                                 onChange={(e) => onUpdate({ ...item, remarks: e.target.value })}
-                                className="text-base font-medium text-muted-foreground bg-transparent border-0 focus:ring-0 p-0 w-full placeholder:text-muted-foreground/30"
-                                placeholder="Add notes or scripture references..."
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-[14px] text-gray-400 font-medium bg-transparent border-0 focus:ring-0 p-0 placeholder:text-gray-300 w-full"
+                                placeholder="Add note..."
                             />
+                            <Pencil className="w-3.5 h-3.5 text-gray-300 group-hover/edit:text-blue-500 transition-colors opacity-0 group-hover/edit:opacity-100" />
                         </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-11 w-11 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors ml-0.5 mt-0.5"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onOpenAdd(0);
-                            }}
-                        >
-                            <UserPlus className="h-5 w-5" />
-                        </Button>
                     </div>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-11 w-11 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors -mr-2 -mt-1.5"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDelete();
-                        }}
-                    >
-                        <Trash2 className="h-5 w-5" />
-                    </Button>
                 </div>
 
-                <div className="space-y-3">
-                    <div className="flex flex-col gap-3">
-                        {(() => {
-                            const assignment = item.assignments[0] || { memberIds: [] };
-                            const aIdx = 0;
+                {/* Divider */}
+                <div className="h-px bg-gray-100/60 mx-5" />
 
-                            return (
-                                <div className="flex flex-wrap gap-2">
-                                    {assignment.memberIds.map((uid: string) => (
-                                        <MemberBadge
-                                            key={uid}
-                                            name={getMemberName(uid)}
-                                            onRemove={() => onRemoveMember(aIdx, uid)}
-                                        />
-                                    ))}
+                {/* Bottom Row - Assignments (Full Width Padding) */}
+                <div className="px-5 py-4 flex items-center justify-between">
+                    <div className="flex flex-wrap gap-2.5">
+                        {isAssigned ? (
+                            assignment.memberIds.map((uid: string) => {
+                                const name = getMemberName(uid);
+                                const initial = name.charAt(0);
+                                return (
+                                    <button
+                                        key={uid}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onRemoveMember(0, uid);
+                                        }}
+                                        className="inline-flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 bg-white border border-gray-100/80 rounded-full shadow-sm hover:shadow-md transition-all active:scale-95 group/member"
+                                    >
+                                        <div className="w-7 h-7 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-[12px] font-black">
+                                            {initial}
+                                        </div>
+                                        <span className="text-[14px] font-bold text-gray-600 group-hover/member:text-gray-900">
+                                            {name}
+                                        </span>
+                                    </button>
+                                );
+                            })
+                        ) : (
+                            <button className="flex items-center gap-3 text-gray-400 group-hover:text-blue-500 transition-colors py-1">
+                                <div className="w-6 h-6 rounded-full border border-dashed border-current flex items-center justify-center">
+                                    <Plus className="w-3.5 h-3.5" />
                                 </div>
-                            );
-                        })()}
+                                <span className="text-[13px] font-bold">담당자 할당하기</span>
+                            </button>
+                        )}
                     </div>
+                    <ChevronRight className="text-gray-200 w-5 h-5 group-hover:text-blue-500 transition-colors" />
                 </div>
             </ServingCard>
         </Reorder.Item>
