@@ -826,17 +826,30 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                 <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Standard Groups</h4>
                                 <div className="flex flex-wrap gap-2">
                                     {standardGroups.map((group, idx) => (
-                                        <button
+                                        <div
                                             key={`group-${idx}`}
-                                            onClick={() => {
-                                                if (activeSelection.itemId && activeSelection.assignmentIndex !== undefined) {
-                                                    handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, `group:${group}`);
-                                                }
-                                            }}
-                                            className="flex items-center gap-1.2 px-3 py-1.5 rounded-full bg-secondary/50 border border-transparent hover:border-primary/30 hover:bg-secondary text-xs font-semibold text-foreground transition-all"
+                                            className="group flex items-center gap-1.2 px-3 py-1.5 rounded-full bg-secondary/50 border border-transparent hover:border-primary/30 hover:bg-secondary transition-all"
                                         >
-                                            {group}
-                                        </button>
+                                            <button
+                                                onClick={() => {
+                                                    if (activeSelection.itemId && activeSelection.assignmentIndex !== undefined) {
+                                                        handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, `group:${group}`);
+                                                    }
+                                                }}
+                                                className="text-xs font-semibold text-foreground hover:text-primary transition-colors text-left"
+                                            >
+                                                {group}
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setStandardGroups(standardGroups.filter((_, i) => i !== idx));
+                                                }}
+                                                className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-destructive/10 hover:text-destructive rounded-full transition-all ml-1"
+                                            >
+                                                <X className="w-3 h-3" />
+                                            </button>
+                                        </div>
                                     ))}
                                     <div className="flex items-center gap-1">
                                         <input
@@ -866,6 +879,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                         )}
                                     </div>
                                 </div>
+                                <div className="w-full h-px bg-border/50 mt-4" />
                             </div>
                         )}
                         <div className="flex-1 min-h-0">
