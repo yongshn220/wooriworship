@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Check, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -82,9 +81,6 @@ export function MemberSelector({ selectedMemberIds, onSelect, multiple = false }
                             onClick={() => onSelect(name)}
                         >
                             <div className="flex items-center gap-4">
-                                <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
-                                    <AvatarFallback className="bg-primary text-primary-foreground font-bold">{name[0]}</AvatarFallback>
-                                </Avatar>
                                 <div>
                                     <p className="font-semibold text-foreground">{name}</p>
                                     <p className="text-sm text-muted-foreground">Guest</p>
@@ -111,9 +107,6 @@ export function MemberSelector({ selectedMemberIds, onSelect, multiple = false }
                                 onClick={() => onSelect(member.id)}
                             >
                                 <div className="flex items-center gap-4 min-w-0">
-                                    <Avatar className="h-12 w-12 shadow-sm">
-                                        <AvatarFallback className="font-bold bg-muted text-muted-foreground">{member.name?.[0]}</AvatarFallback>
-                                    </Avatar>
                                     <div className="min-w-0">
                                         <p className="font-semibold text-foreground truncate">{member.name}</p>
                                         <p className="text-sm text-muted-foreground truncate">{member.email}</p>
