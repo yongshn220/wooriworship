@@ -390,12 +390,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             {/* STICKY HEADER - Minimal with Gradient Mask */}
             <div className="sticky top-0 z-50 w-full px-6 pt-8 pb-8 flex items-center justify-between pointer-events-none bg-gradient-to-b from-background via-background/90 to-transparent">
                 {/* Exit Button - Left aligned */}
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-10 w-10 rounded-full bg-background/50 hover:bg-background shadow-sm pointer-events-auto backdrop-blur-sm"
-                    onClick={() => router.back()}
-                >
+                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/50 hover:bg-background shadow-sm pointer-events-auto backdrop-blur-sm" onClick={() => router.back()}>
                     <X className="w-5 h-5 text-muted-foreground" />
                 </Button>
 
@@ -710,466 +705,381 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                     </p>
                                                 </div>
                                             )}
-                                            {items.sort((a, b) => a.order - b.order).map((item, itemIdx) => (
-                                                <ServingCard key={item.id}>
-                                                    <div className="flex justify-between items-start gap-3">
-                                                        <div className="flex-1 space-y-2">
-                                                            <div className="flex items-center gap-3">
-                                                                <span className="text-[10px] font-black bg-gray-900 text-white px-2 py-0.5 rounded-full uppercase tracking-tighter">{itemIdx + 1}</span>
-                                                                <input
-                                                                    value={item.title}
-                                                                    onChange={(e) => {
-                                                                        const newItems = [...items];
-                                                                        newItems[itemIdx] = { ...item, title: e.target.value };
-                                                                        setItems(newItems);
-                                                                    }}
-                                                                    className="font-black bg-transparent border-0 focus:ring-0 p-0 text-xl w-full text-foreground"
-                                                                    placeholder="Sequence title..."
-                                                                />
+                                            <Reorder.Group axis="y" values={items.filter(i => i.title !== '찬양팀 구성')} onReorder={(newOrdered) => {
+                                                // Handle reordering logic merging with '찬양팀 구성' item if exists
+                                                const otherItems = items.filter(i => i.title === '찬양팀 구성');
+                                                setItems([...otherItems, ...newOrdered]);
+                                            }} className="flex flex-col gap-4">
+                                                {items.filter(i => i.title !== '찬양팀 구성').map((item, index) => (
+                                                    <Reorder.Item key={item.id} value={item}>
+                                                        <ServingCard>
+                                                            <div className="flex justify-between items-start mb-3">
+                                                                <div className="flex items-center gap-2 flex-1">
+                                                                    <div className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors p-1 -ml-1 mt-1">
+                                                                        <GripVertical className="h-4 w-4" />
+                                                                    </div>
+                                                                    <div className="flex-1 space-y-1">
+                                                                        <input
+                                                                            value={item.title}
+                                                                            onChange={(e) => {
+                                                                                const newItems = items.map(i => i.id === item.id ? { ...i, title: e.target.value } : i);
+                                                                                setItems(newItems);
+                                                                            }}
+                                                                            className="font-black bg-transparent border-0 focus:ring-0 p-0 text-xl w-full text-foreground placeholder:text-muted-foreground/50"
+                                                                            placeholder="Sequence title..."
+                                                                        />
+                                                                        <input
+                                                                            value={item.remarks || ""}
+                                                                            onChange={(e) => {
+                                                                                const newItems = items.map(i => i.id === item.id ? { ...i, remarks: e.target.value } : i);
+                                                                                setItems(newItems);
+                                                                            }}
+                                                                            className="text-sm font-medium text-muted-foreground bg-transparent border-0 focus:ring-0 p-0 w-full placeholder:text-muted-foreground/30"
+                                                                            placeholder="Add notes or scripture references..."
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-8 w-8 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors -mr-2 -mt-1"
+                                                                    onClick={() => setItems(items.filter(i => i.id !== item.id))}
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </Button>
                                                             </div>
-                                                            <Reorder.Group axis="y" values={items.filter(i => i.title !== '찬양팀 구성')} onReorder={(newOrdered) => {
-                                                                // Handle reordering logic merging with '찬양팀 구성' item if exists
-                                                                const otherItems = items.filter(i => i.title === '찬양팀 구성');
-                                                                setItems([...otherItems, ...newOrdered]);
-                                                            }} className="flex flex-col gap-4">
-                                                                {items.filter(i => i.title !== '찬양팀 구성').map((item, index) => (
-                                                                    <Reorder.Item key={item.id} value={item}>
-                                                                        <ServingCard>
-                                                                            <div className="flex justify-between items-start mb-3">
-                                                                                <div className="flex items-center gap-2 flex-1">
-                                                                                    <div className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors p-1 -ml-1 mt-1">
-                                                                                        <GripVertical className="h-4 w-4" />
-                                                                                    </div>
-                                                                                    <div className="flex-1 space-y-1">
-                                                                                        <input
-                                                                                            value={item.title}
-                                                                                            onChange={(e) => {
-                                                                                                const newItems = items.map(i => i.id === item.id ? { ...i, title: e.target.value } : i);
-                                                                                                setItems(newItems);
-                                                                                            }}
-                                                                                            className="font-black bg-transparent border-0 focus:ring-0 p-0 text-xl w-full text-foreground placeholder:text-muted-foreground/50"
-                                                                                            placeholder="Sequence title..."
-                                                                                        />
-                                                                                        <input
-                                                                                            value={item.remarks || ""}
-                                                                                            onChange={(e) => {
-                                                                                                const newItems = items.map(i => i.id === item.id ? { ...i, remarks: e.target.value } : i);
-                                                                                                setItems(newItems);
-                                                                                            }}
-                                                                                            className="text-sm font-medium text-muted-foreground bg-transparent border-0 focus:ring-0 p-0 w-full placeholder:text-muted-foreground/30"
-                                                                                            placeholder="Add notes or scripture references..."
-                                                                                        />
-                                                                                    </div>
-                                                                                </div>
+
+                                                            <div className="space-y-3">
+                                                                <div className="flex flex-col gap-3">
+                                                                    {item.assignments.map((a, aIdx) => (
+                                                                        <div key={aIdx} className="flex flex-col gap-2 p-3 bg-secondary/30 rounded-2xl border border-secondary/50">
+                                                                            <div className="flex justify-between items-center">
+                                                                                <span className="text-[10px] font-bold text-muted-foreground uppercase px-2 py-1 bg-background/50 rounded-md">
+                                                                                    {roles.find(r => r.id === a.roleId)?.name || 'Role'}
+                                                                                </span>
                                                                                 <Button
-                                                                                    variant="ghost"
-                                                                                    size="icon"
-                                                                                    className="h-8 w-8 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors -mr-2 -mt-1"
-                                                                                    onClick={() => setItems(items.filter(i => i.id !== item.id))}
+                                                                                    variant="ghost" size="icon" className="h-6 w-6 rounded-full text-muted-foreground hover:text-destructive"
+                                                                                    onClick={() => {
+                                                                                        const newItems = items.map(i => i.id === item.id ? {
+                                                                                            ...i, assignments: i.assignments.filter((_, idx) => idx !== aIdx)
+                                                                                        } : i);
+                                                                                        setItems(newItems);
+                                                                                    }}
                                                                                 >
-                                                                                    <Trash2 className="h-4 w-4" />
+                                                                                    <X className="h-3 w-3" />
                                                                                 </Button>
                                                                             </div>
 
-                                                                            <div className="space-y-3">
-                                                                                <div className="flex flex-col gap-3">
-                                                                                    {item.assignments.map((a, aIdx) => (
-                                                                                        <div key={aIdx} className="flex flex-col gap-2 p-3 bg-secondary/30 rounded-2xl border border-secondary/50">
-                                                                                            <div className="flex justify-between items-center">
-                                                                                                <span className="text-[10px] font-bold text-muted-foreground uppercase px-2 py-1 bg-background/50 rounded-md">
-                                                                                                    {roles.find(r => r.id === a.roleId)?.name || 'Role'}
-                                                                                                </span>
-                                                                                                <Button
-                                                                                                    variant="ghost" size="icon" className="h-6 w-6 rounded-full text-muted-foreground hover:text-destructive"
-                                                                                                    onClick={() => {
-                                                                                                        const newItems = items.map(i => i.id === item.id ? {
-                                                                                                            ...i, assignments: i.assignments.filter((_, idx) => idx !== aIdx)
-                                                                                                        } : i);
-                                                                                                        setItems(newItems);
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <X className="h-3 w-3" />
-                                                                                                </Button>
-                                                                                            </div>
-
-                                                                                            <div className="flex flex-wrap gap-2 items-center">
-                                                                                                <Button
-                                                                                                    variant="ghost"
-                                                                                                    size="sm"
-                                                                                                    className="h-7 w-7 rounded-full p-0 bg-background hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border-2 border-dashed border-border hover:border-primary/30"
-                                                                                                    onClick={() => setActiveSelection({ roleId: a.roleId })}
-                                                                                                >
-                                                                                                    <UserPlus className="h-3.5 w-3.5" />
-                                                                                                </Button>
-                                                                                                {a.memberIds.map(uid => (
-                                                                                                    <MemberBadge
-                                                                                                        key={uid}
-                                                                                                        name={getMemberName(uid)}
-                                                                                                        onRemove={() => {
-                                                                                                            const newItems = items.map(i => i.id === item.id ? {
-                                                                                                                ...i, assignments: i.assignments.map((asg, idx) => idx === aIdx ? { ...asg, memberIds: asg.memberIds.filter(id => id !== uid) } : asg)
-                                                                                                            } : i);
-                                                                                                            setItems(newItems);
-                                                                                                        }}
-                                                                                                    />
-                                                                                                ))}
-                                                                                            </div>
-
-                                                                                            <AnimatePresence>
-                                                                                                {activeSelection?.roleId === a.roleId && (
-                                                                                                    <motion.div
-                                                                                                        initial={{ opacity: 0, height: 0 }}
-                                                                                                        animate={{ opacity: 1, height: "auto" }}
-                                                                                                        exit={{ opacity: 0, height: 0 }}
-                                                                                                        className="overflow-hidden mt-1"
-                                                                                                    >
-                                                                                                        <MemberSuggestionList
-                                                                                                            members={teamMembers}
-                                                                                                            selectedIds={a.memberIds}
-                                                                                                            onSelect={(uid) => {
-                                                                                                                const newItems = items.map(i => i.id === item.id ? {
-                                                                                                                    ...i, assignments: i.assignments.map((asg, idx) => idx === aIdx ? {
-                                                                                                                        ...asg, memberIds: asg.memberIds.includes(uid)
-                                                                                                                            ? asg.memberIds.filter(id => id !== uid)
-                                                                                                                            : [...asg.memberIds, uid]
-                                                                                                                    } : asg)
-                                                                                                                } : i);
-                                                                                                                setItems(newItems);
-                                                                                                            }}
-                                                                                                        />
-                                                                                                    </motion.div>
-                                                                                                )}
-                                                                                            </AnimatePresence>
-                                                                                        </div>
-                                                                                    ))}
-
-                                                                                    <Button
-                                                                                        variant="ghost" size="sm" className="self-start text-xs text-muted-foreground hover:text-primary pl-1 gap-1"
-                                                                                        onClick={() => {
-                                                                                            // Add a default assignment row? Or logic to add role? 
-                                                                                            // For simplicity, let's assume we pick the first role or show role selector?
-                                                                                            // Current UI: Just adds empty assignments.
+                                                                            <div className="flex flex-wrap gap-2 items-center">
+                                                                                <Button
+                                                                                    variant="ghost"
+                                                                                    size="sm"
+                                                                                    className="h-7 w-7 rounded-full p-0 bg-background hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border-2 border-dashed border-border hover:border-primary/30"
+                                                                                    onClick={() => setActiveSelection({ roleId: a.roleId })}
+                                                                                >
+                                                                                    <UserPlus className="h-3.5 w-3.5" />
+                                                                                </Button>
+                                                                                {a.memberIds.map(uid => (
+                                                                                    <MemberBadge
+                                                                                        key={uid}
+                                                                                        name={getMemberName(uid)}
+                                                                                        onRemove={() => {
                                                                                             const newItems = items.map(i => i.id === item.id ? {
-                                                                                                ...i, assignments: [...i.assignments, { roleId: roles[0]?.id || '', memberIds: [] }]
+                                                                                                ...i, assignments: i.assignments.map((asg, idx) => idx === aIdx ? { ...asg, memberIds: asg.memberIds.filter(id => id !== uid) } : asg)
                                                                                             } : i);
                                                                                             setItems(newItems);
                                                                                         }}
-                                                                                    >
-                                                                                        <Plus className="h-3 w-3" /> Add Role Row
-                                                                                    </Button>
-                                                                                </div>
+                                                                                    />
+                                                                                ))}
                                                                             </div>
-                                                                        </ServingCard>
-                                                                    </Reorder.Item>
-                                                                ))}
-                                                            </Reorder.Group>
-                                    )}
 
-                                                            <AddActionButton
-                                                                label="Add Sequence"
-                                                                onClick={() => setItems([...items, { id: Math.random().toString(36).substr(2, 9), order: items.length, title: "", assignments: [], type: 'FLOW' }])}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </motion.div>
-                                            )}
-
-                                            {/* Step 4: Review */}
-                                            {step === 3 && (
-                                                <motion.div
-                                                    key="review-step"
-                                                    custom={direction}
-                                                    variants={slideVariants}
-                                                    initial="enter"
-                                                    animate="center"
-                                                    exit="exit"
-                                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                                    className="flex flex-col gap-8 w-full pb-10"
-                                                >
-                                                    <div className="space-y-2 text-center">
-                                                        <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 4</Label>
-                                                        <h2 className="text-3xl font-black text-gray-900 tracking-tight">Review Plans</h2>
-                                                    </div>
-
-                                                    <div className="bg-card rounded-[3rem] p-8 shadow-2xl shadow-primary/5 border border-primary/5 space-y-8">
-                                                        <div className="text-center space-y-1">
-                                                            <span className="text-[10px] font-black text-primary uppercase tracking-widest block">Event Date</span>
-                                                            <span className="text-3xl font-black text-foreground leading-none">
-                                                                {selectedDate && format(selectedDate, "MMM d, yyyy")}
-                                                            </span>
-                                                            <span className="text-sm font-bold text-muted-foreground block mt-1">{selectedDate && format(selectedDate, "EEEE")}</span>
-                                                        </div>
-
-                                                        <div className="space-y-4">
-                                                            <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-2">Timeline Summary</h3>
-                                                            <div className="bg-secondary/20 rounded-[2rem] border border-border/50 divide-y divide-border/50 overflow-hidden">
-                                                                {items.filter(item => item.assignments.length > 0).map(item => (
-                                                                    <div key={item.id} className="p-6 space-y-3">
-                                                                        <div className="flex justify-between items-center">
-                                                                            <span className="font-black text-foreground text-lg">{item.title}</span>
+                                                                            <AnimatePresence>
+                                                                                {activeSelection?.roleId === a.roleId && (
+                                                                                    <motion.div
+                                                                                        initial={{ opacity: 0, height: 0 }}
+                                                                                        animate={{ opacity: 1, height: "auto" }}
+                                                                                        exit={{ opacity: 0, height: 0 }}
+                                                                                        className="overflow-hidden mt-1"
+                                                                                    >
+                                                                                        <MemberSuggestionList
+                                                                                            members={teamMembers}
+                                                                                            selectedIds={a.memberIds}
+                                                                                            onSelect={(uid) => {
+                                                                                                const newItems = items.map(i => i.id === item.id ? {
+                                                                                                    ...i, assignments: i.assignments.map((asg, idx) => idx === aIdx ? {
+                                                                                                        ...asg, memberIds: asg.memberIds.includes(uid)
+                                                                                                            ? asg.memberIds.filter(id => id !== uid)
+                                                                                                            : [...asg.memberIds, uid]
+                                                                                                    } : asg)
+                                                                                                } : i);
+                                                                                                setItems(newItems);
+                                                                                            }}
+                                                                                        />
+                                                                                    </motion.div>
+                                                                                )}
+                                                                            </AnimatePresence>
                                                                         </div>
-                                                                        <div className="flex flex-wrap gap-2">
-                                                                            {item.assignments.map((a, i) => (
-                                                                                <div key={i} className="flex flex-col gap-1 p-3 bg-background rounded-2xl border border-border/50 min-w-[120px]">
-                                                                                    <span className="text-[10px] font-black text-primary uppercase tracking-tighter">
-                                                                                        {a.label || roles.find(r => r.id === a.roleId)?.name}
-                                                                                    </span>
-                                                                                    <span className="text-sm font-bold text-muted-foreground">
-                                                                                        {a.memberIds.map(uid => getMemberName(uid)).join(", ") || "Unassigned"}
-                                                                                    </span>
-                                                                                </div>
-                                                                            ))}
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                                {items.every(item => item.assignments.length === 0) && (
-                                                                    <div className="p-6 text-center text-muted-foreground text-sm italic">
-                                                                        No specific roles assigned.
-                                                                    </div>
-                                                                )}
+                                                                    ))}
+
+                                                                    <Button
+                                                                        variant="ghost" size="sm" className="self-start text-xs text-muted-foreground hover:text-primary pl-1 gap-1"
+                                                                        onClick={() => {
+                                                                            const newItems = items.map(i => i.id === item.id ? {
+                                                                                ...i, assignments: [...i.assignments, { roleId: roles[0]?.id || '', memberIds: [] }]
+                                                                            } : i);
+                                                                            setItems(newItems);
+                                                                        }}
+                                                                    >
+                                                                        <Plus className="h-3 w-3" /> Add Role Row
+                                                                    </Button>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                </main>
+                                                        </ServingCard>
+                                                    </Reorder.Item>
+                                                ))}
+                                            </Reorder.Group>
 
-                                {/* STICKY FOOTER - Minimal with Gradient Mask */}
-                                <div className="sticky bottom-0 z-50 w-full px-6 pb-8 pt-12 pointer-events-none bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent">
-                                    <div className="flex gap-3 w-full max-w-2xl mx-auto pointer-events-auto">
-                                        <div className="w-12 h-12 flex-none">
-                                            <Button
-                                                variant="outline"
-                                                className="h-12 w-12 rounded-full border-border bg-background/80 backdrop-blur-sm hover:bg-background text-muted-foreground shadow-sm disabled:opacity-0 disabled:pointer-events-none transition-opacity duration-300"
-                                                onClick={prevStep}
-                                                disabled={step === 0}
-                                            >
-                                                <ChevronLeft className="w-6 h-6" />
-                                            </Button>
-                                        </div>
-                                        <Button
-                                            className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
-                                            onClick={step === totalSteps - 1 ? handleSubmit : nextStep}
-                                            disabled={isLoading || (step === 0 && !selectedDate)}
-                                        >
-                                            {isLoading ? (
-                                                "Saving..."
-                                            ) : step === totalSteps - 1 ? (
-                                                <>Confirm <Check className="w-5 h-5 ml-1" /></>
-                                            ) : (
-                                                <>Next <ArrowRight className="w-5 h-5 ml-1" /></>
-                                            )}
-                                        </Button>
-                                    </div>
+                                            <AddActionButton
+                                                label="Add Sequence"
+                                                onClick={() => setItems([...items, { id: Math.random().toString(36).substr(2, 9), order: items.length, title: "", assignments: [], type: 'FLOW' }])}
+                                            />
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* Step 4: Review */}
+                    {step === 3 && (
+                        <motion.div
+                            key="review-step"
+                            custom={direction}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="flex flex-col gap-8 w-full pb-10"
+                        >
+                            <div className="space-y-2 text-center">
+                                <Label className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Step 4</Label>
+                                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Review Plans</h2>
+                            </div>
+
+                            <div className="bg-card rounded-[3rem] p-8 shadow-2xl shadow-primary/5 border border-primary/5 space-y-8">
+                                <div className="text-center space-y-1">
+                                    <span className="text-[10px] font-black text-primary uppercase tracking-widest block">Event Date</span>
+                                    <span className="text-3xl font-black text-foreground leading-none">
+                                        {selectedDate && format(selectedDate, "MMM d, yyyy")}
+                                    </span>
+                                    <span className="text-sm font-bold text-muted-foreground block mt-1">{selectedDate && format(selectedDate, "EEEE")}</span>
                                 </div>
 
-                                {/* Member Selection Drawer */}
-                                <Drawer open={!!activeSelection} onOpenChange={(open) => !open && setActiveSelection(null)}>
-                                    <DrawerContent className="h-[80vh]">
-                                        <DrawerHeader className="flex items-center justify-between px-6 py-4 border-b">
-                                            <DrawerTitle className="text-lg font-bold">Select Members</DrawerTitle>
-                                            {activeSelection && (items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds.length || 0) > 0 && (
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-8 px-3 text-xs font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full transition-colors"
-                                                    onClick={() => {
-                                                        if (activeSelection) {
-                                                            const newItems = [...items];
-                                                            const itemIdx = newItems.findIndex(i => i.id === activeSelection.itemId);
-                                                            const newAssignments = [...newItems[itemIdx].assignments];
-                                                            newAssignments[activeSelection.assignmentIndex] = {
-                                                                ...newAssignments[activeSelection.assignmentIndex],
-                                                                memberIds: []
-                                                            };
-                                                            newItems[itemIdx] = { ...newItems[itemIdx], assignments: newAssignments };
-                                                            setItems(newItems);
-                                                        }
-                                                    }}
-                                                >
-                                                    Unselect All
-                                                </Button>
-                                            )}
-                                        </DrawerHeader>
-                                        <div className="px-6 py-4 h-full overflow-hidden flex flex-col">
-                                            {activeSelection && (
-                                                <MemberSelector
-                                                    selectedMemberIds={items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds || []}
-                                                    onSelect={(uid) => {
-                                                        setItems(prev => {
-                                                            const newItems = [...prev];
-                                                            const itemIdx = newItems.findIndex(i => i.id === activeSelection.itemId);
-                                                            if (itemIdx === -1) return prev;
-
-                                                            const newAssignments = [...newItems[itemIdx].assignments];
-                                                            const currentIds = newAssignments[activeSelection.assignmentIndex].memberIds;
-
-                                                            if (currentIds.includes(uid)) {
-                                                                newAssignments[activeSelection.assignmentIndex] = {
-                                                                    ...newAssignments[activeSelection.assignmentIndex],
-                                                                    memberIds: currentIds.filter(id => id !== uid)
-                                                                };
-                                                            } else {
-                                                                newAssignments[activeSelection.assignmentIndex] = {
-                                                                    ...newAssignments[activeSelection.assignmentIndex],
-                                                                    memberIds: [...currentIds, uid]
-                                                                };
-                                                            }
-
-                                                            newItems[itemIdx] = { ...newItems[itemIdx], assignments: newAssignments };
-                                                            return newItems;
-                                                        });
-                                                    }}
-                                                    multiple={true}
-                                                />
-                                            )}
-                                            <Button className="w-full mt-4" onClick={() => setActiveSelection(null)}>
-                                                Done
-                                            </Button>
-                                        </div>
-                                    </DrawerContent>
-                                </Drawer>
-                                {/* Role Creation Dialog */}
-                                <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
-                                    <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
-                                        <DialogHeader className="space-y-3">
-                                            <DialogTitle className="text-2xl font-bold text-center">New Role</DialogTitle>
-                                            <p className="text-sm text-center text-muted-foreground font-medium">
-                                                Create a new role for your praise team.
-                                            </p>
-                                        </DialogHeader>
-                                        <div className="py-6 space-y-4">
-                                            <Input
-                                                placeholder="e.g. Acoustic Guitar"
-                                                value={newRoleName}
-                                                onChange={(e) => setNewRoleName(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === "Enter" && newRoleName.trim()) {
-                                                        handleCreateRole();
-                                                    }
-                                                }}
-                                                className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
-                                                autoFocus
-                                            />
-                                        </div>
-                                        <DialogFooter className="flex sm:flex-row gap-3">
-                                            <Button
-                                                variant="ghost"
-                                                className="h-12 flex-1 rounded-2xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                                                onClick={() => setIsRoleDialogOpen(false)}
-                                            >
-                                                Cancel
-                                            </Button>
-                                            <Button
-                                                className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
-                                                onClick={handleCreateRole}
-                                                disabled={!newRoleName.trim()}
-                                            >
-                                                Create Role
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
-
-                                {/* Template Saving Dialog */}
-                                <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
-                                    <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
-                                        <DialogHeader className="space-y-3">
-                                            <div className="flex justify-center">
-                                                <div className="p-3 bg-primary/10 rounded-full">
-                                                    <Save className="w-8 h-8 text-primary" />
+                                <div className="space-y-4">
+                                    <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-2">Timeline Summary</h3>
+                                    <div className="bg-secondary/20 rounded-[2rem] border border-border/50 divide-y divide-border/50 overflow-hidden">
+                                        {items.filter(item => item.assignments.length > 0).map(item => (
+                                            <div key={item.id} className="p-6 space-y-3">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-black text-foreground text-lg">{item.title}</span>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {item.assignments.map((a, i) => (
+                                                        <div key={i} className="flex flex-col gap-1 p-3 bg-background rounded-2xl border border-border/50 min-w-[120px]">
+                                                            <span className="text-[10px] font-black text-primary uppercase tracking-tighter">
+                                                                {a.label || roles.find(r => r.id === a.roleId)?.name}
+                                                            </span>
+                                                            <span className="text-sm font-bold text-muted-foreground">
+                                                                {a.memberIds.map(uid => getMemberName(uid)).join(", ") || "Unassigned"}
+                                                            </span>
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </div>
-                                            <DialogTitle className="text-2xl font-bold text-center">Save Template</DialogTitle>
-                                            <p className="text-sm text-center text-muted-foreground font-medium leading-relaxed">
-                                                Save this timeline as a template to reuse it for future worship services.
-                                            </p>
-                                        </DialogHeader>
-                                        <div className="py-6">
-                                            <Input
-                                                placeholder="e.g. Sunday Morning Worship"
-                                                value={newTemplateName}
-                                                onChange={(e) => setNewTemplateName(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === "Enter" && newTemplateName.trim()) {
-                                                        handleSaveTemplate();
-                                                    }
-                                                }}
-                                                className="h-14 rounded-2xl border-gray-100 bg-secondary/30 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
-                                                autoFocus
-                                            />
-                                        </div>
-                                        <DialogFooter className="flex sm:flex-row gap-3">
-                                            <Button
-                                                variant="ghost"
-                                                className="h-12 flex-1 rounded-2xl font-bold text-muted-foreground hover:text-foreground hover:bg-secondary"
-                                                onClick={() => setIsTemplateDialogOpen(false)}
-                                            >
-                                                Cancel
-                                            </Button>
-                                            <Button
-                                                className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
-                                                onClick={handleSaveTemplate}
-                                                disabled={!newTemplateName.trim()}
-                                            >
-                                                Save
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
-
-                                <DeleteConfirmationDialog
-                                    isOpen={deleteConfirm.open}
-                                    setOpen={(open: boolean) => setDeleteConfirm(prev => ({ ...prev, open }))}
-                                    title={deleteConfirm.type === 'role' ? "Delete Role" : "Delete Template"}
-                                    description={deleteConfirm.type === 'role'
-                                        ? "Are you sure you want to delete this role from the team? This action cannot be undone."
-                                        : "Are you sure you want to delete this template? This action cannot be undone."
-                                    }
-                                    onDeleteHandler={() => {
-                                        if (deleteConfirm.type === 'role') {
-                                            return handleDeleteRole(deleteConfirm.id);
-                                        } else {
-                                            return handleDeleteTemplate();
-                                        }
-                                    }}
-                                />
+                                        ))}
+                                        {items.every(item => item.assignments.length === 0) && (
+                                            <div className="p-6 text-center text-muted-foreground text-sm italic">
+                                                No specific roles assigned.
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-                            );
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </main>
+
+            {/* STICKY FOOTER - Minimal with Gradient Mask */}
+            <div className="sticky bottom-0 z-50 w-full px-6 pb-8 pt-12 pointer-events-none bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent">
+                <div className="flex gap-3 w-full max-w-2xl mx-auto pointer-events-auto">
+                    <div className="w-12 h-12 flex-none">
+                        <Button
+                            variant="outline"
+                            className="h-12 w-12 rounded-full border-border bg-background/80 backdrop-blur-sm hover:bg-background text-muted-foreground shadow-sm disabled:opacity-0 disabled:pointer-events-none transition-opacity duration-300"
+                            onClick={prevStep}
+                            disabled={step === 0}
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </Button>
+                    </div>
+                    <Button
+                        className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
+                        onClick={step === totalSteps - 1 ? handleSubmit : nextStep}
+                        disabled={isLoading || (step === 0 && !selectedDate)}
+                    >
+                        {isLoading ? (
+                            "Saving..."
+                        ) : step === totalSteps - 1 ? (
+                            <>Confirm <Check className="w-5 h-5 ml-1" /></>
+                        ) : (
+                            <>Next <ArrowRight className="w-5 h-5 ml-1" /></>
+                        )}
+                    </Button>
+                </div>
+            </div>
+
+            {/* Role Creation Dialog */}
+            <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
+                <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
+                    <DialogHeader className="space-y-3">
+                        <DialogTitle className="text-2xl font-bold text-center">New Role</DialogTitle>
+                        <p className="text-sm text-center text-muted-foreground font-medium">
+                            Create a new role for your praise team.
+                        </p>
+                    </DialogHeader>
+                    <div className="py-6 space-y-4">
+                        <Input
+                            placeholder="e.g. Acoustic Guitar"
+                            value={newRoleName}
+                            onChange={(e) => setNewRoleName(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && newRoleName.trim()) {
+                                    handleCreateRole();
+                                }
+                            }}
+                            className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
+                            autoFocus
+                        />
+                    </div>
+                    <DialogFooter className="flex sm:flex-row gap-3">
+                        <Button
+                            variant="ghost"
+                            className="h-12 flex-1 rounded-2xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                            onClick={() => setIsRoleDialogOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
+                            onClick={handleCreateRole}
+                            disabled={!newRoleName.trim()}
+                        >
+                            Create Role
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Template Saving Dialog */}
+            <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
+                <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
+                    <DialogHeader className="space-y-3">
+                        <div className="flex justify-center">
+                            <div className="p-3 bg-primary/10 rounded-full">
+                                <Save className="w-8 h-8 text-primary" />
+                            </div>
+                        </div>
+                        <DialogTitle className="text-2xl font-bold text-center">Save Template</DialogTitle>
+                        <p className="text-sm text-center text-muted-foreground font-medium leading-relaxed">
+                            Save this timeline as a template to reuse it for future worship services.
+                        </p>
+                    </DialogHeader>
+                    <div className="py-6">
+                        <Input
+                            placeholder="e.g. Sunday Morning Worship"
+                            value={newTemplateName}
+                            onChange={(e) => setNewTemplateName(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && newTemplateName.trim()) {
+                                    handleSaveTemplate();
+                                }
+                            }}
+                            className="h-14 rounded-2xl border-gray-100 bg-secondary/30 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
+                            autoFocus
+                        />
+                    </div>
+                    <DialogFooter className="flex sm:flex-row gap-3">
+                        <Button
+                            variant="ghost"
+                            className="h-12 flex-1 rounded-2xl font-bold text-muted-foreground hover:text-foreground hover:bg-secondary"
+                            onClick={() => setIsTemplateDialogOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
+                            onClick={handleSaveTemplate}
+                            disabled={!newTemplateName.trim()}
+                        >
+                            Save
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <DeleteConfirmationDialog
+                isOpen={deleteConfirm.open}
+                setOpen={(open: boolean) => setDeleteConfirm(prev => ({ ...prev, open }))}
+                title={deleteConfirm.type === 'role' ? "Delete Role" : "Delete Template"}
+                description={deleteConfirm.type === 'role'
+                    ? "Are you sure you want to delete this role from the team? This action cannot be undone."
+                    : "Are you sure you want to delete this template? This action cannot be undone."
+                }
+                onDeleteHandler={() => {
+                    if (deleteConfirm.type === 'role') {
+                        return handleDeleteRole(deleteConfirm.id);
+                    } else {
+                        return handleDeleteTemplate();
+                    }
+                }}
+            />
+        </div>
+    );
 }
 
-                            function ServingFormSkeleton() {
+function ServingFormSkeleton() {
     return (
-                            <div className="fixed inset-0 z-[100] bg-gray-50 flex flex-col overflow-hidden">
-                                {/* Header Skeleton */}
-                                <div className="sticky top-0 z-50 w-full px-6 pt-8 pb-4 flex items-center justify-between pointer-events-none">
-                                    <Skeleton className="h-10 w-10 rounded-full bg-gray-200" />
-                                    <div className="flex gap-1">
-                                        <Skeleton className="h-6 w-12 rounded-full bg-gray-200" />
-                                        <Skeleton className="h-6 w-12 rounded-full bg-gray-200" />
-                                        <Skeleton className="h-6 w-12 rounded-full bg-gray-200" />
-                                        <Skeleton className="h-6 w-12 rounded-full bg-gray-200" />
-                                    </div>
-                                    <div className="w-10" />
-                                </div>
+        <div className="fixed inset-0 z-[100] bg-gray-50 flex flex-col overflow-hidden">
+            {/* Header Skeleton */}
+            <div className="sticky top-0 z-50 w-full px-6 pt-8 pb-4 flex items-center justify-between pointer-events-none">
+                <Skeleton className="h-10 w-10 rounded-full bg-gray-200" />
+                <div className="flex gap-1">
+                    <Skeleton className="h-6 w-12 rounded-full bg-gray-200" />
+                    <Skeleton className="h-6 w-12 rounded-full bg-gray-200" />
+                    <Skeleton className="h-6 w-12 rounded-full bg-gray-200" />
+                    <Skeleton className="h-6 w-12 rounded-full bg-gray-200" />
+                </div>
+                <div className="w-10" />
+            </div>
 
-                                {/* Content Skeleton */}
-                                <div className="flex-1 w-full max-w-2xl mx-auto px-6 py-8 flex flex-col gap-8">
-                                    <div className="space-y-4 text-center flex flex-col items-center">
-                                        <Skeleton className="h-4 w-16 bg-gray-200" />
-                                        <Skeleton className="h-8 w-48 bg-gray-200" />
-                                    </div>
-                                    <Skeleton className="w-full h-[300px] rounded-3xl bg-gray-200" />
-                                </div>
+            {/* Content Skeleton */}
+            <div className="flex-1 w-full max-w-2xl mx-auto px-6 py-8 flex flex-col gap-8">
+                <div className="space-y-4 text-center flex flex-col items-center">
+                    <Skeleton className="h-4 w-16 bg-gray-200" />
+                    <Skeleton className="h-8 w-48 bg-gray-200" />
+                </div>
+                <Skeleton className="w-full h-[300px] rounded-3xl bg-gray-200" />
+            </div>
 
-                                {/* Footer Skeleton */}
-                                <div className="sticky bottom-0 z-50 w-full px-6 pb-8 pt-4 pointer-events-none">
-                                    <div className="flex gap-3 w-full max-w-2xl mx-auto pointer-events-auto">
-                                        <Skeleton className="h-12 w-12 rounded-full bg-gray-200" />
-                                        <Skeleton className="h-12 flex-1 rounded-full bg-gray-200" />
-                                    </div>
-                                </div>
-                            </div>
-                            )
+            {/* Footer Skeleton */}
+            <div className="sticky bottom-0 z-50 w-full px-6 pb-8 pt-4 pointer-events-none">
+                <div className="flex gap-3 w-full max-w-2xl mx-auto pointer-events-auto">
+                    <Skeleton className="h-12 w-12 rounded-full bg-gray-200" />
+                    <Skeleton className="h-12 flex-1 rounded-full bg-gray-200" />
+                </div>
+            </div>
+        </div>
+    )
 }
