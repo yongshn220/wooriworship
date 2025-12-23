@@ -175,7 +175,13 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const handleAddMember = (itemId: string, assignmentIndex: number, uid: string) => {
         setItems(prevItems => prevItems.map(item => {
             if (item.id === itemId) {
-                const newAssignments = item.assignments.map((asg, idx) => {
+                // Ensure assignments exist up to assignmentIndex
+                const newAssignments = [...item.assignments];
+                while (newAssignments.length <= assignmentIndex) {
+                    newAssignments.push({ memberIds: [] });
+                }
+
+                const updatedAssignments = newAssignments.map((asg, idx) => {
                     if (idx === assignmentIndex) {
                         const memberIds = asg.memberIds.includes(uid)
                             ? asg.memberIds.filter(id => id !== uid)
@@ -184,7 +190,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     }
                     return asg;
                 });
-                return { ...item, assignments: newAssignments };
+                return { ...item, assignments: updatedAssignments };
             }
             return item;
         }));
@@ -545,12 +551,12 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                                                     <div className="flex flex-wrap gap-2 items-center">
                                                         <Button
-                                                            variant="outline"
+                                                            variant="default"
                                                             size="sm"
-                                                            className="h-7 px-3 rounded-full bg-background hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border-dashed border-border hover:border-primary/30 text-xs font-semibold gap-1.5"
+                                                            className="h-7 px-3 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all border-none text-xs font-bold gap-1.5 shadow-none"
                                                             onClick={() => setActiveSelection({ roleId: role.id })}
                                                         >
-                                                            <UserPlus className="h-3 w-3" />
+                                                            <Plus className="h-3 w-3" />
                                                             Add Member
                                                         </Button>
                                                         {memberIds.map(uid => (
@@ -767,29 +773,27 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                         }
 
                                                                         return (
-                                                                            <div className="flex flex-col gap-2 p-3 bg-secondary/30 rounded-2xl border border-secondary/50">
-                                                                                <div className="flex flex-wrap gap-2">
-                                                                                    <Button
-                                                                                        variant="outline"
-                                                                                        size="sm"
-                                                                                        className="h-7 px-3 rounded-full bg-background hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border-dashed border-border hover:border-primary/30 text-xs font-semibold gap-1.5"
-                                                                                        onClick={() => setActiveSelection({
-                                                                                            itemId: item.id,
-                                                                                            assignmentIndex: aIdx,
-                                                                                            roleId: "timeline-default" // Dummy role ID for drawer context
-                                                                                        })}
-                                                                                    >
-                                                                                        <UserPlus className="h-3 w-3" />
-                                                                                        Add Member
-                                                                                    </Button>
-                                                                                    {assignment.memberIds.map(uid => (
-                                                                                        <MemberBadge
-                                                                                            key={uid}
-                                                                                            name={getMemberName(uid)}
-                                                                                            onRemove={() => handleAddMember(item.id, aIdx, uid)}
-                                                                                        />
-                                                                                    ))}
-                                                                                </div>
+                                                                            <div className="flex flex-wrap gap-2">
+                                                                                <Button
+                                                                                    variant="default"
+                                                                                    size="sm"
+                                                                                    className="h-7 px-3 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all border-none text-xs font-bold gap-1.5 shadow-none"
+                                                                                    onClick={() => setActiveSelection({
+                                                                                        itemId: item.id,
+                                                                                        assignmentIndex: aIdx,
+                                                                                        roleId: "timeline-default" // Dummy role ID for drawer context
+                                                                                    })}
+                                                                                >
+                                                                                    <Plus className="h-3 w-3" />
+                                                                                    Add Member
+                                                                                </Button>
+                                                                                {assignment.memberIds.map(uid => (
+                                                                                    <MemberBadge
+                                                                                        key={uid}
+                                                                                        name={getMemberName(uid)}
+                                                                                        onRemove={() => handleAddMember(item.id, aIdx, uid)}
+                                                                                    />
+                                                                                ))}
                                                                             </div>
                                                                         );
                                                                     })()}

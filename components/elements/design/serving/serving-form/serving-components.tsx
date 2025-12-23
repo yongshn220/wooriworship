@@ -90,10 +90,10 @@ export function MemberSuggestionList({ members, selectedIds, onSelect }: MemberS
                                 onSelect(member.id);
                             }}
                             className={cn(
-                                "flex items-center gap-1.5 px-2 py-1 rounded-full border transition-all text-xs font-semibold",
+                                "flex items-center gap-1.2 px-2.5 py-1 rounded-full border transition-all text-[11px] font-medium",
                                 isSelected
-                                    ? "bg-background text-primary border-primary ring-1 ring-primary shadow-sm"
-                                    : "bg-background text-muted-foreground border-transparent hover:border-primary/30 hover:bg-primary/5 shadow-sm"
+                                    ? "bg-primary text-primary-foreground border-primary"
+                                    : "bg-secondary/50 text-muted-foreground border-transparent hover:bg-secondary hover:text-foreground"
                             )}
                         >
                             <Avatar className="h-4 w-4">
