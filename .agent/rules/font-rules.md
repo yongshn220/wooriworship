@@ -19,6 +19,7 @@ trigger: always_on
 - **Body 1 (Default):** `text-base` (16px) / `font-normal` / `leading-relaxed` / `text-foreground`
 - **Body 2 (Sub/Desc):** `text-sm` (14px) / `font-normal` / `text-muted-foreground`
 - **Caption/Small:** `text-xs` (12px) / `font-normal` / `text-muted-foreground`
+- Typography Hierarchy는 UX 를 고려하여 유저의 시선 흐름을 자연스럽게 하는 것에 집중합니다.
 
 ### 3. Global Constraints (From global.css)
 - **Interactive Elements:** `input`, `a` 태그는 반드시 `text-[16px]`를 유지할 것 (iOS 줌 방지 및 가독성).
