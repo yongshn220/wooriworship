@@ -900,14 +900,16 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             {/* STICKY FOOTER - Minimal with Gradient Mask */}
             <div className="sticky bottom-0 z-50 w-full px-6 pb-8 pt-12 pointer-events-none bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent">
                 <div className="flex gap-3 w-full max-w-2xl mx-auto pointer-events-auto">
-                    <Button
-                        variant="outline"
-                        className="h-12 w-12 rounded-full border-border bg-background/80 backdrop-blur-sm hover:bg-background text-muted-foreground shadow-sm"
-                        onClick={prevStep}
-                        disabled={step === 0}
-                    >
-                        <ChevronLeft className="w-6 h-6" />
-                    </Button>
+                    <div className="w-12 h-12 flex-none">
+                        <Button
+                            variant="outline"
+                            className="h-12 w-12 rounded-full border-border bg-background/80 backdrop-blur-sm hover:bg-background text-muted-foreground shadow-sm disabled:opacity-0 disabled:pointer-events-none transition-opacity duration-300"
+                            onClick={prevStep}
+                            disabled={step === 0}
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </Button>
+                    </div>
                     <Button
                         className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
                         onClick={step === totalSteps - 1 ? handleSubmit : nextStep}
