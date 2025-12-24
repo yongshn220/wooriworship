@@ -294,6 +294,46 @@ class ServingService extends BaseService {
         if (snapshot.empty) return null;
         return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as ServingRole;
     }
+
+    // --- Config (Custom Groups & Members) ---
+
+    async getServingConfig(teamId: string): Promise<{ customGroups: string[], customNames: string[] }> {
+        try {
+            const doc = await firestore
+                .collection("teams")
+                .doc(teamId)
+                .collection("serving_config")
+                .doc("general")
+                .get();
+            if (!doc.exists) return { customGroups: [], customNames: [] };
+            const data = doc.data();
+            return {
+                customGroups: data?.custom_groups || [],
+                customNames: data?.custom_names || []
+            };
+        } catch (e) {
+            console.error(e);
+            return { customGroups: [], customNames: [] };
+        }
+    }
+
+    async addCustomGroup(teamId: string, groupName: string): Promise<void> {
+        await firestore
+            .collection("teams")
+            .doc(teamId)
+            .collection("serving_config")
+            .doc("general")
+            .set({ custom_groups: arrayUnion(groupName) }, { merge: true });
+    }
+
+    async addCustomMemberName(teamId: string, name: string): Promise<void> {
+        await firestore
+            .collection("teams")
+            .doc(teamId)
+            .collection("serving_config")
+            .doc("general")
+            .set({ custom_names: arrayUnion(name) }, { merge: true });
+    }
 }
 
 export default ServingService.getInstance();
