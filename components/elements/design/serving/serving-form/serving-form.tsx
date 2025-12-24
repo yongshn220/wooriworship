@@ -524,11 +524,14 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         >
                             <div className="space-y-2 text-center">
                                 <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 2</Label>
-                                <h2 className="text-2xl font-bold text-foreground tracking-tight">찬양팀 멤버 선택</h2>
+                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Worship Team</h2>
                             </div>
 
                             <div className="flex flex-col gap-4">
-                                <Reorder.Group axis="y" values={roles} onReorder={setRoles} className="flex flex-col gap-4">
+                                <Reorder.Group axis="y" values={roles} onReorder={(newRoles) => {
+                                    setRoles(newRoles);
+                                    ServingService.updateRolesOrder(teamId, newRoles).catch(console.error);
+                                }} className="flex flex-col gap-4">
                                     {roles.map((role) => {
                                         const ptItem = items.find(item => item.title === '찬양팀 구성');
                                         const assignment = ptItem?.assignments.find(a => a.roleId === role.id);
@@ -570,7 +573,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         >
                             <div className="space-y-2 text-center">
                                 <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 3</Label>
-                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Timeline</h2>
+                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Set up Cuelist</h2>
                             </div>
 
                             <div className="flex flex-col gap-6">
@@ -759,54 +762,37 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                             <span className="text-xl font-bold text-muted-foreground/40 font-mono tracking-tighter">
                                                 {(index + 1).toString().padStart(2, '0')}
                                             </span>
-                                            {item.type === 'SONG' && (
-                                                <div className="h-full w-px bg-border/40 mt-1 mb-2 group-last:hidden" />
-                                            )}
                                         </div>
 
                                         {/* Right: Content */}
-                                        <div className="flex-1 min-w-0 space-y-3">
-                                            {/* Header */}
-                                            <div className="flex justify-between items-start gap-2">
-                                                <h3 className={cn(
-                                                    "text-lg font-bold leading-tight break-keep",
-                                                    item.type === 'SONG' ? "text-primary" : "text-foreground"
-                                                )}>
+                                        <div className="flex-1 min-w-0 space-y-1.5">
+                                            {/* Header Row: Title & Who */}
+                                            <div className="flex flex-row justify-between items-start gap-4">
+                                                <h3 className="text-lg font-bold leading-tight break-keep text-foreground pt-1">
                                                     {item.title || "Untitled Sequence"}
                                                 </h3>
-                                                {item.type && (
-                                                    <Badge variant="outline" className="text-[10px] h-5 px-1.5 text-muted-foreground/60 border-border/40 uppercase tracking-wider shrink-0">
-                                                        {item.type}
-                                                    </Badge>
-                                                )}
+
+                                                {/* Assignments / Who (Chips - Vertical Stack) */}
+                                                <div className="flex flex-col items-end gap-1.5 min-w-[40%]">
+                                                    {item.assignments.flatMap(a =>
+                                                        a.memberIds.map(uid => (
+                                                            <MemberBadge
+                                                                key={`${a.roleId}-${uid}`}
+                                                                name={getMemberName(uid)}
+                                                                className="bg-secondary/40 border-transparent"
+                                                            />
+                                                        ))
+                                                    )}
+                                                </div>
                                             </div>
 
                                             {/* Notes / Remarks - Prominent Display */}
                                             {item.remarks && (
-                                                <div className="relative pl-3 py-1">
+                                                <div className="relative pl-3 mt-1.5">
                                                     <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-yellow-400/50 rounded-full" />
                                                     <p className="text-sm text-foreground/80 leading-relaxed font-medium whitespace-pre-wrap">
                                                         {item.remarks}
                                                     </p>
-                                                </div>
-                                            )}
-
-                                            {/* Assignments / Roles */}
-                                            {item.assignments.length > 0 && (
-                                                <div className="flex flex-wrap gap-2 pt-1">
-                                                    {item.assignments.map((a, i) => {
-                                                        const roleName = a.label || roles.find(r => r.id === a.roleId)?.name;
-                                                        const members = a.memberIds.map(uid => getMemberName(uid));
-
-                                                        return (
-                                                            <div key={i} className="flex items-center text-xs bg-secondary/30 rounded-md px-2 py-1.5 border border-transparent hover:border-border/60 transition-colors">
-                                                                <span className="font-semibold text-muted-foreground mr-1.5 opacity-80">{roleName}:</span>
-                                                                <span className="font-medium text-foreground truncate max-w-[150px]">
-                                                                    {members.length > 0 ? members.join(", ") : <span className="text-muted-foreground/50 italic">Unassigned</span>}
-                                                                </span>
-                                                            </div>
-                                                        );
-                                                    })}
                                                 </div>
                                             )}
                                         </div>
@@ -1145,7 +1131,7 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
 
     return (
         <Reorder.Item value={role} dragListener={false} dragControls={controls}>
-            <ServingCard className="p-0 gap-0 overflow-hidden border-none shadow-sm rounded-xl bg-white relative group transition-transform duration-200" onClick={onOpenAdd}>
+            <ServingCard className="p-0 gap-0 overflow-hidden border-none shadow-sm rounded-xl bg-white relative group transition-transform duration-200">
                 {/* Drag Handle - Top Left */}
                 <div
                     className="absolute left-3 top-5 p-2 flex items-center justify-center cursor-grab active:cursor-grabbing z-10 hover:bg-gray-50 rounded-lg transition-colors touch-none"
@@ -1159,7 +1145,7 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute top-3 right-3 p-2 h-auto w-auto text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-20"
+                    className="absolute top-3 right-5 p-2 h-auto w-auto text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-20"
                     onClick={(e) => {
                         e.stopPropagation();
                         onDeleteRole();
@@ -1177,9 +1163,15 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                 <div className="h-px bg-gray-100/60 mx-5" />
 
                 {/* Bottom Row - Assignments & Suggestions */}
-                <div className="px-5 pt-2 pb-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex flex-wrap gap-2.5">
+                <div
+                    className="px-5 pt-2 pb-4 cursor-pointer hover:bg-gray-50 active:bg-gray-100/70 transition-colors"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenAdd();
+                    }}
+                >
+                    <div className="flex items-center justify-between pointer-events-none">
+                        <div className="flex flex-wrap gap-2.5 pointer-events-auto">
                             {memberIds.map(uid => (
                                 <MemberBadge
                                     key={uid}
@@ -1196,7 +1188,7 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                                         e.stopPropagation();
                                         onAddMember(role.id, member.id);
                                     }}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-transparent border border-dashed border-gray-100 rounded-full text-[13px] font-bold text-gray-400 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all active:scale-95"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-transparent border border-dashed border-gray-300 rounded-full text-[13px] font-bold text-gray-500 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all active:scale-95"
                                 >
                                     <Plus className="w-3.5 h-3.5" />
                                     {member.name.replace(/^group:/, "")}
@@ -1204,7 +1196,13 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                             ))}
 
                             {!isAssigned && suggestions.length === 0 && (
-                                <button className="flex items-center gap-3 text-gray-400 group-hover:text-blue-500 transition-colors py-1">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onOpenAdd();
+                                    }}
+                                    className="flex items-center gap-3 text-gray-400 group-hover:text-blue-500 transition-colors py-1 pointer-events-auto"
+                                >
                                     <div className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center group-hover:border-blue-100 group-hover:bg-blue-50 transition-colors">
                                         <Plus className="text-gray-300 w-4 h-4 group-hover:text-blue-500" />
                                     </div>
@@ -1242,7 +1240,7 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
 
     return (
         <Reorder.Item value={item} dragListener={false} dragControls={controls}>
-            <ServingCard className="p-0 gap-0 overflow-hidden border-none shadow-sm rounded-xl bg-white relative group transition-transform duration-200" onClick={() => onOpenAdd(0)}>
+            <ServingCard className="p-0 gap-0 overflow-hidden border-none shadow-sm rounded-xl bg-white relative group transition-transform duration-200">
                 {/* Drag Handle - Top Left */}
                 <div
                     className="absolute left-3 top-5 p-2 flex items-center justify-center cursor-grab active:cursor-grabbing z-10 hover:bg-gray-50 rounded-lg transition-colors touch-none"
@@ -1256,7 +1254,7 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute top-3 right-3 p-2 h-auto w-auto text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-20"
+                    className="absolute top-3 right-5 h-8 w-8 p-0 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-20"
                     onClick={(e) => {
                         e.stopPropagation();
                         onDelete();
@@ -1297,8 +1295,14 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                 <div className="h-px bg-gray-100/60 mx-5" />
 
                 {/* Bottom Row - Assignments (Full Width Padding) */}
-                <div className="px-5 pt-2 pb-4 flex items-center justify-between">
-                    <div className="flex flex-wrap gap-2.5">
+                <div
+                    className="px-5 pt-2 pb-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 active:bg-gray-100/70 transition-colors"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenAdd(0);
+                    }}
+                >
+                    <div className="flex flex-wrap gap-2.5 pointer-events-auto">
                         {isAssigned ? (
                             assignment.memberIds.map((uid: string) => {
                                 const name = getMemberName(uid);
@@ -1323,7 +1327,13 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                                 );
                             })
                         ) : (
-                            <button className="flex items-center gap-3 text-gray-400 group-hover:text-blue-500 transition-colors py-1">
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onOpenAdd(0);
+                                }}
+                                className="flex items-center gap-3 text-gray-400 group-hover:text-blue-500 transition-colors py-1 pointer-events-auto"
+                            >
                                 <div className="w-6 h-6 rounded-full border border-dashed border-current flex items-center justify-center">
                                     <Plus className="w-3.5 h-3.5" />
                                 </div>
@@ -1332,7 +1342,7 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                         )}
                     </div>
                     {isAssigned && (
-                        <div className="w-8 h-8 rounded-full border border-blue-100 bg-blue-50 flex items-center justify-center transition-colors">
+                        <div className="w-8 h-8 rounded-full border border-blue-100 bg-blue-50 flex items-center justify-center transition-colors flex-shrink-0 ml-2">
                             <Plus className="text-blue-500 w-4 h-4" />
                         </div>
                     )}
