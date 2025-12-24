@@ -11,7 +11,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format, nextSunday } from "date-fns";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus, Pencil, X, Calendar as CalendarIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus, User, Users, Pencil, X, Calendar as CalendarIcon } from "lucide-react";
 import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -82,7 +82,9 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
     const [newRoleName, setNewRoleName] = useState("");
     const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+    const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
     const [newTemplateName, setNewTemplateName] = useState("");
+    const [tempTemplateName, setTempTemplateName] = useState("");
 
     // Timeline Groups
     const [standardGroups, setStandardGroups] = useState<string[]>([]);
@@ -574,57 +576,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                             <div className="flex flex-col gap-6">
                                 {/* Template Header & Actions */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between gap-4">
-                                        <div className="flex-1 relative group">
-                                            <input
-                                                value={templates.find(t => t.id === selectedTemplateId)?.name || ""}
-                                                onChange={(e) => handleUpdateTemplateName(e.target.value)}
-                                                className="text-2xl font-bold bg-transparent border-b-2 border-border/50 focus:border-primary/40 focus:ring-0 p-0 w-full placeholder:text-muted-foreground/50 transition-all hover:border-border"
-                                                placeholder="Template Name..."
-                                            />
-                                            <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-30 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                                <Pencil className="w-4 h-4 text-muted-foreground" />
-                                            </div>
-                                        </div>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background shadow-sm border border-border">
-                                                    <MoreHorizontal className="h-5 w-5" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="w-56 rounded-3xl p-2 shadow-2xl border-0">
-                                                <DropdownMenuItem
-                                                    className={cn("rounded-2xl py-3 cursor-pointer", hasTemplateChanges ? "text-primary font-bold bg-primary/5" : "text-muted-foreground")}
-                                                    disabled={!selectedTemplateId || !hasTemplateChanges}
-                                                    onClick={handleUpdateTemplate}
-                                                >
-                                                    <Save className="mr-2 h-4 w-4" />
-                                                    Save to Current
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    className="rounded-2xl py-3 cursor-pointer font-bold"
-                                                    onClick={() => {
-                                                        const currentTemp = templates.find(t => t.id === selectedTemplateId);
-                                                        setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
-                                                        setIsTemplateDialogOpen(true);
-                                                    }}
-                                                >
-                                                    <Plus className="mr-2 h-4 w-4" />
-                                                    Save as New
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator className="my-2 bg-gray-50" />
-                                                <DropdownMenuItem
-                                                    className="rounded-2xl py-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 font-bold"
-                                                    onClick={() => setDeleteConfirm({ type: 'template', id: selectedTemplateId || '', open: true })}
-                                                >
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Delete Template
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2 -mx-5 px-5">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar py-2 -mx-5 px-5">
                                         {templates.map(tmp => (
                                             <button
                                                 key={tmp.id}
@@ -640,25 +593,75 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                     })));
                                                 }}
                                                 className={cn(
-                                                    "flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-semibold shadow-sm active:scale-95 transition-transform",
+                                                    "flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-semibold transition-all active:scale-95",
                                                     selectedTemplateId === tmp.id
-                                                        ? "bg-gray-900 text-white"
-                                                        : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                                                        ? "bg-gray-900 text-white shadow-md shadow-gray-200"
+                                                        : "bg-white text-gray-500 border border-gray-100 hover:border-gray-200"
                                                 )}
                                             >
                                                 {tmp.name}
                                             </button>
                                         ))}
                                         <button
-                                            className="flex-shrink-0 px-4 py-2 bg-white text-gray-600 border border-gray-200 rounded-full text-[13px] font-medium shadow-sm active:scale-95 transition-transform hover:bg-gray-50 flex items-center gap-1"
+                                            className="flex-shrink-0 px-4 py-2 bg-transparent text-gray-400 border border-dashed border-gray-200 rounded-full text-[13px] font-medium active:scale-95 transition-all hover:bg-gray-50 hover:border-gray-300 flex items-center gap-1"
                                             onClick={() => {
                                                 setNewTemplateName("");
                                                 setIsTemplateDialogOpen(true);
                                             }}
                                         >
-                                            <Plus className="h-3.5 w-3.5" /> Add
+                                            <Plus className="h-3.5 w-3.5" />
+                                            Add
                                         </button>
                                     </div>
+
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-gray-300 hover:text-gray-900 hover:bg-gray-50 transition-colors flex-shrink-0">
+                                                <MoreHorizontal className="h-5 w-5" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-56 rounded-3xl p-2 shadow-2xl border-0">
+                                            <DropdownMenuItem
+                                                className="rounded-2xl py-3 cursor-pointer font-bold"
+                                                disabled={!selectedTemplateId}
+                                                onClick={() => {
+                                                    setTempTemplateName(templates.find(t => t.id === selectedTemplateId)?.name || "");
+                                                    setIsRenameDialogOpen(true);
+                                                }}
+                                            >
+                                                <Pencil className="mr-2 h-4 w-4" />
+                                                Rename Template
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator className="my-2 bg-gray-50" />
+                                            <DropdownMenuItem
+                                                className={cn("rounded-2xl py-3 cursor-pointer", hasTemplateChanges ? "text-primary font-bold bg-primary/5" : "text-muted-foreground")}
+                                                disabled={!selectedTemplateId || !hasTemplateChanges}
+                                                onClick={handleUpdateTemplate}
+                                            >
+                                                <Save className="mr-2 h-4 w-4" />
+                                                Save to Current
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                className="rounded-2xl py-3 cursor-pointer font-bold"
+                                                onClick={() => {
+                                                    const currentTemp = templates.find(t => t.id === selectedTemplateId);
+                                                    setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
+                                                    setIsTemplateDialogOpen(true);
+                                                }}
+                                            >
+                                                <Plus className="mr-2 h-4 w-4" />
+                                                Save as New
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator className="my-2 bg-gray-50" />
+                                            <DropdownMenuItem
+                                                className="rounded-2xl py-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 font-bold"
+                                                onClick={() => setDeleteConfirm({ type: 'template', id: selectedTemplateId || '', open: true })}
+                                            >
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                Delete Template
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
 
                                 <div className="space-y-4">
@@ -786,6 +789,25 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
             {/* STICKY FOOTER - Minimal with Gradient Mask */}
             <div className="sticky bottom-0 z-50 w-full px-6 pb-8 pt-12 pointer-events-none bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent">
+                <AnimatePresence>
+                    {(step === 1 || step === 2) && hasTemplateChanges && selectedTemplateId && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            className="w-full max-w-2xl mx-auto mb-4 pointer-events-auto flex justify-center"
+                        >
+                            <button
+                                onClick={handleUpdateTemplate}
+                                className="px-5 py-2.5 rounded-full bg-white border border-gray-100 shadow-xl shadow-gray-200/50 hover:border-primary/20 hover:bg-primary/5 transition-all group active:scale-95"
+                            >
+                                <span className="text-[13px] font-bold text-gray-400 group-hover:text-primary transition-colors">
+                                    Save to {templates.find(t => t.id === selectedTemplateId)?.name}
+                                </span>
+                            </button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
                 <div className="flex gap-3 w-full max-w-2xl mx-auto pointer-events-auto">
                     <div className="w-12 h-12 flex-none">
                         <Button
@@ -969,6 +991,45 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 </DialogContent>
             </Dialog >
 
+            {/* Template Rename Dialog */}
+            <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
+                <DialogContent className="max-w-[calc(100%-40px)] w-[400px] rounded-3xl border-0 p-0 overflow-hidden shadow-2xl">
+                    <DialogHeader className="p-8 pb-4 text-left">
+                        <DialogTitle className="text-2xl font-bold tracking-tight">Rename Template</DialogTitle>
+                    </DialogHeader>
+                    <div className="px-8 pb-8 space-y-6">
+                        <div className="space-y-4">
+                            <Label className="text-[13px] font-bold text-primary uppercase tracking-wider ml-1">NEW NAME</Label>
+                            <Input
+                                value={tempTemplateName}
+                                onChange={(e) => setTempTemplateName(e.target.value)}
+                                placeholder="Enter template name..."
+                                className="h-14 px-5 rounded-2xl bg-gray-50/50 border-gray-100 focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all text-lg font-medium"
+                                autoFocus
+                            />
+                        </div>
+                        <div className="flex gap-3 pt-2">
+                            <Button
+                                variant="outline"
+                                className="flex-1 h-14 rounded-2xl border-gray-100 text-gray-500 font-bold hover:bg-gray-50 transition-all"
+                                onClick={() => setIsRenameDialogOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                className="flex-1 h-14 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-bold shadow-lg shadow-gray-200 active:scale-[0.98] transition-all"
+                                onClick={() => {
+                                    handleUpdateTemplateName(tempTemplateName);
+                                    setIsRenameDialogOpen(false);
+                                }}
+                            >
+                                Save Changes
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
             <DeleteConfirmationDialog
                 isOpen={deleteConfirm.open}
                 setOpen={(open: boolean) => setDeleteConfirm(prev => ({ ...prev, open }))}
@@ -1035,64 +1096,89 @@ interface SortableRoleItemProps {
 
 function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteRole, onOpenAdd }: SortableRoleItemProps) {
     const controls = useDragControls();
+    const isAssigned = memberIds.length > 0;
+
+    // Get suggested members who are NOT yet assigned
+    const suggestions = (role.default_members && role.default_members.length > 0
+        ? teamMembers.filter(m => role.default_members?.includes(m.id) && !memberIds.includes(m.id))
+        : []);
 
     return (
         <Reorder.Item value={role} dragListener={false} dragControls={controls}>
-            <ServingCard onClick={onOpenAdd}>
-                <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center gap-2">
-                        <div
-                            onPointerDown={(e) => controls.start(e)}
-                            className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors p-3 -ml-3 touch-none"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <GripVertical className="h-5 w-5" />
+            <ServingCard className="p-0 gap-0 overflow-hidden border-none shadow-sm rounded-xl bg-white relative group transition-transform duration-200" onClick={onOpenAdd}>
+                {/* Drag Handle - Top Left */}
+                <div
+                    className="absolute left-3 top-5 p-2 flex items-center justify-center cursor-grab active:cursor-grabbing z-10 hover:bg-gray-50 rounded-lg transition-colors touch-none"
+                    onPointerDown={(e) => controls.start(e)}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <GripVertical className="text-gray-300 w-5 h-5" />
+                </div>
+
+                {/* Delete Button - Absolute Top Right */}
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-3 right-3 p-2 h-auto w-auto text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-20"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteRole();
+                    }}
+                >
+                    <Trash2 className="w-5 h-5" />
+                </Button>
+
+                {/* Main Content - Top (Role Name) */}
+                <div className="pl-12 pr-12 pt-6 pb-3">
+                    <h3 className="text-[18px] font-bold text-gray-900 leading-tight">{role.name}</h3>
+                </div>
+
+                {/* Divider */}
+                <div className="h-px bg-gray-100/60 mx-5" />
+
+                {/* Bottom Row - Assignments & Suggestions */}
+                <div className="px-5 pt-2 pb-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap gap-2.5">
+                            {memberIds.map(uid => (
+                                <MemberBadge
+                                    key={uid}
+                                    name={teamMembers.find(m => m.id === uid)?.name || uid}
+                                    onRemove={() => onAddMember(role.id, uid)}
+                                />
+                            ))}
+
+                            {/* Suggested Chips with Dashed Border */}
+                            {suggestions.map(member => (
+                                <button
+                                    key={member.id}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onAddMember(role.id, member.id);
+                                    }}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-transparent border border-dashed border-gray-100 rounded-full text-[13px] font-bold text-gray-400 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all active:scale-95"
+                                >
+                                    <Plus className="w-3.5 h-3.5" />
+                                    {member.name.replace(/^group:/, "")}
+                                </button>
+                            ))}
+
+                            {!isAssigned && suggestions.length === 0 && (
+                                <button className="flex items-center gap-3 text-gray-400 group-hover:text-blue-500 transition-colors py-1">
+                                    <div className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center group-hover:border-blue-100 group-hover:bg-blue-50 transition-colors">
+                                        <Plus className="text-gray-300 w-4 h-4 group-hover:text-blue-500" />
+                                    </div>
+                                    <span className="text-[13px] font-bold">담당자 할당하기</span>
+                                </button>
+                            )}
                         </div>
-                        <h3 className="font-bold text-lg text-foreground">{role.name}</h3>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-11 w-11 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors ml-0.5"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onOpenAdd();
-                            }}
-                        >
-                            <UserPlus className="h-5 w-5" />
-                        </Button>
+                        {(isAssigned || suggestions.length > 0) && (
+                            <div className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center group-hover:border-blue-100 group-hover:bg-blue-50 transition-colors flex-shrink-0 ml-2">
+                                <Plus className="text-gray-300 w-4 h-4 group-hover:text-blue-500" />
+                            </div>
+                        )}
                     </div>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-11 w-11 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors -mr-2 -mt-1.5"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDeleteRole();
-                        }}
-                    >
-                        <Trash2 className="h-5 w-5" />
-                    </Button>
                 </div>
-
-                <div className="flex flex-wrap gap-2 items-center">
-                    {memberIds.map(uid => (
-                        <MemberBadge
-                            key={uid}
-                            name={teamMembers.find(m => m.id === uid)?.name || uid}
-                            onRemove={() => onAddMember(role.id, uid)}
-                        />
-                    ))}
-                </div>
-
-                <MemberSuggestionList
-                    members={
-                        role.default_members && role.default_members.length > 0
-                            ? teamMembers.filter(m => role.default_members?.includes(m.id))
-                            : []
-                    }
-                    selectedIds={memberIds}
-                    onSelect={(uid) => onAddMember(role.id, uid)}
-                />
             </ServingCard>
         </Reorder.Item>
     );
@@ -1116,7 +1202,7 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
 
     return (
         <Reorder.Item value={item} dragListener={false} dragControls={controls}>
-            <ServingCard className="p-0 overflow-hidden border-none shadow-sm rounded-xl bg-white relative group transition-transform duration-200" onClick={() => onOpenAdd(0)}>
+            <ServingCard className="p-0 gap-0 overflow-hidden border-none shadow-sm rounded-xl bg-white relative group transition-transform duration-200" onClick={() => onOpenAdd(0)}>
                 {/* Drag Handle - Top Left */}
                 <div
                     className="absolute left-3 top-5 p-2 flex items-center justify-center cursor-grab active:cursor-grabbing z-10 hover:bg-gray-50 rounded-lg transition-colors touch-none"
@@ -1140,7 +1226,7 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                 </Button>
 
                 {/* Main Content - Top (Title/Remarks) */}
-                <div className="pl-12 pr-12 pt-6 pb-0">
+                <div className="pl-12 pr-12 pt-6 pb-3">
                     <div className="flex flex-col gap-1.5">
                         {/* Title Input */}
                         <div className="flex items-center gap-2 group/edit w-full">
@@ -1171,12 +1257,13 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                 <div className="h-px bg-gray-100/60 mx-5" />
 
                 {/* Bottom Row - Assignments (Full Width Padding) */}
-                <div className="px-5 py-4 flex items-center justify-between">
+                <div className="px-5 pt-2 pb-4 flex items-center justify-between">
                     <div className="flex flex-wrap gap-2.5">
                         {isAssigned ? (
                             assignment.memberIds.map((uid: string) => {
                                 const name = getMemberName(uid);
-                                const initial = name.charAt(0);
+                                const isGroup = name.startsWith('group:') || uid.startsWith('group:');
+                                const displayName = name.replace(/^group:/, '');
                                 return (
                                     <button
                                         key={uid}
@@ -1184,13 +1271,13 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                                             e.stopPropagation();
                                             onRemoveMember(0, uid);
                                         }}
-                                        className="inline-flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 bg-white border border-gray-100/80 rounded-full shadow-sm hover:shadow-md transition-all active:scale-95 group/member"
+                                        className="inline-flex items-center gap-1.5 pl-1 pr-3 py-1 bg-white border border-gray-100/80 rounded-full shadow-sm hover:shadow-md transition-all active:scale-95 group/member"
                                     >
-                                        <div className="w-7 h-7 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-[12px] font-black">
-                                            {initial}
+                                        <div className="w-6 h-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
+                                            {isGroup ? <Users className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
                                         </div>
-                                        <span className="text-[14px] font-bold text-gray-600 group-hover/member:text-gray-900">
-                                            {name}
+                                        <span className="text-[13px] font-bold text-gray-600 group-hover/member:text-gray-900">
+                                            {displayName}
                                         </span>
                                     </button>
                                 );
@@ -1204,7 +1291,11 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                             </button>
                         )}
                     </div>
-                    <ChevronRight className="text-gray-200 w-5 h-5 group-hover:text-blue-500 transition-colors" />
+                    {isAssigned && (
+                        <div className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center group-hover:border-blue-100 group-hover:bg-blue-50 transition-colors">
+                            <Plus className="text-gray-300 w-4 h-4 group-hover:text-blue-500" />
+                        </div>
+                    )}
                 </div>
             </ServingCard>
         </Reorder.Item>
