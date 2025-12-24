@@ -54,6 +54,18 @@ class ServingService extends BaseService {
         await firestore.collection("teams").doc(teamId).collection("serving_roles").doc(roleId).delete();
     }
 
+    async updateRolesOrder(teamId: string, roles: ServingRole[]): Promise<void> {
+        const batch = firestore.batch();
+        const collectionRef = firestore.collection("teams").doc(teamId).collection("serving_roles");
+
+        roles.forEach((role, index) => {
+            const docRef = collectionRef.doc(role.id);
+            batch.update(docRef, { order: index });
+        });
+
+        await batch.commit();
+    }
+
     async initStandardRoles(teamId: string): Promise<void> {
         const standardRoles = [
             "Leader", "Piano", "Synthesizer", "Drum", "Singer",
