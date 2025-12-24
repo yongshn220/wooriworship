@@ -524,7 +524,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         >
                             <div className="space-y-2 text-center">
                                 <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 2</Label>
-                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Assign Roles</h2>
+                                <h2 className="text-2xl font-bold text-foreground tracking-tight">찬양팀 멤버 선택</h2>
                             </div>
 
                             <div className="flex flex-col gap-4">
@@ -735,51 +735,92 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             animate="center"
                             exit="exit"
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="flex flex-col gap-8 w-full pb-10"
+                            className="flex flex-col w-full pb-20"
                         >
-                            <div className="space-y-2 text-center">
-                                <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 4</Label>
-                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Review Plans</h2>
+                            {/* Minimal Header for Step 4 */}
+                            <div className="flex flex-col items-center justify-center py-6 border-b border-border/10 mb-2">
+                                <Label className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 opacity-80">Final Review</Label>
+                                <div className="text-center">
+                                    <h2 className="text-3xl font-bold text-foreground tracking-tight leading-none mb-1">
+                                        {selectedDate && format(selectedDate, "MMM d")}
+                                    </h2>
+                                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide opacity-70">
+                                        {selectedDate && format(selectedDate, "EEEE, yyyy")}
+                                    </p>
+                                </div>
                             </div>
 
-                            <div className="bg-card rounded-[3rem] p-8 shadow-2xl shadow-primary/5 border border-primary/5 space-y-8">
-                                <div className="text-center space-y-1">
-                                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Event Date</span>
-                                    <span className="text-3xl font-bold text-foreground tracking-tight leading-none">
-                                        {selectedDate && format(selectedDate, "MMM d, yyyy")}
-                                    </span>
-                                    <span className="text-lg font-semibold text-muted-foreground block mt-1">{selectedDate && format(selectedDate, "EEEE")}</span>
-                                </div>
+                            {/* CUE SHEET / TIMELINE LIST */}
+                            <div className="flex flex-col w-full">
+                                {items.filter(item => item.title !== "찬양팀 구성").map((item, index) => (
+                                    <div key={item.id} className="group flex gap-4 py-5 border-b border-border/40 last:border-0 relative">
+                                        {/* Left: Index / Time Marker */}
+                                        <div className="flex-shrink-0 w-12 pt-1 flex flex-col items-center gap-1">
+                                            <span className="text-xl font-bold text-muted-foreground/40 font-mono tracking-tighter">
+                                                {(index + 1).toString().padStart(2, '0')}
+                                            </span>
+                                            {item.type === 'SONG' && (
+                                                <div className="h-full w-px bg-border/40 mt-1 mb-2 group-last:hidden" />
+                                            )}
+                                        </div>
 
-                                <div className="space-y-4">
-                                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider pl-2">Timeline Summary</h3>
-                                    <div className="bg-secondary/20 rounded-[2rem] border border-border/50 divide-y divide-border/50 overflow-hidden">
-                                        {items.filter(item => item.assignments.length > 0).map(item => (
-                                            <div key={item.id} className="p-6 space-y-3">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-base font-bold text-foreground">{item.title}</span>
-                                                </div>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {item.assignments.map((a, i) => (
-                                                        <div key={i} className="flex flex-col gap-1 p-3 bg-background rounded-2xl border border-border/50 min-w-[120px]">
-                                                            <span className="text-xs font-bold text-primary uppercase tracking-wider">
-                                                                {a.label || roles.find(r => r.id === a.roleId)?.name}
-                                                            </span>
-                                                            <span className="text-sm font-medium text-muted-foreground">
-                                                                {a.memberIds.map(uid => getMemberName(uid)).join(", ") || "Unassigned"}
-                                                            </span>
-                                                        </div>
-                                                    ))}
-                                                </div>
+                                        {/* Right: Content */}
+                                        <div className="flex-1 min-w-0 space-y-3">
+                                            {/* Header */}
+                                            <div className="flex justify-between items-start gap-2">
+                                                <h3 className={cn(
+                                                    "text-lg font-bold leading-tight break-keep",
+                                                    item.type === 'SONG' ? "text-primary" : "text-foreground"
+                                                )}>
+                                                    {item.title || "Untitled Sequence"}
+                                                </h3>
+                                                {item.type && (
+                                                    <Badge variant="outline" className="text-[10px] h-5 px-1.5 text-muted-foreground/60 border-border/40 uppercase tracking-wider shrink-0">
+                                                        {item.type}
+                                                    </Badge>
+                                                )}
                                             </div>
-                                        ))}
-                                        {items.every(item => item.assignments.length === 0) && (
-                                            <div className="p-6 text-center text-muted-foreground text-sm italic">
-                                                No specific roles assigned.
-                                            </div>
-                                        )}
+
+                                            {/* Notes / Remarks - Prominent Display */}
+                                            {item.remarks && (
+                                                <div className="relative pl-3 py-1">
+                                                    <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-yellow-400/50 rounded-full" />
+                                                    <p className="text-sm text-foreground/80 leading-relaxed font-medium whitespace-pre-wrap">
+                                                        {item.remarks}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* Assignments / Roles */}
+                                            {item.assignments.length > 0 && (
+                                                <div className="flex flex-wrap gap-2 pt-1">
+                                                    {item.assignments.map((a, i) => {
+                                                        const roleName = a.label || roles.find(r => r.id === a.roleId)?.name;
+                                                        const members = a.memberIds.map(uid => getMemberName(uid));
+
+                                                        return (
+                                                            <div key={i} className="flex items-center text-xs bg-secondary/30 rounded-md px-2 py-1.5 border border-transparent hover:border-border/60 transition-colors">
+                                                                <span className="font-semibold text-muted-foreground mr-1.5 opacity-80">{roleName}:</span>
+                                                                <span className="font-medium text-foreground truncate max-w-[150px]">
+                                                                    {members.length > 0 ? members.join(", ") : <span className="text-muted-foreground/50 italic">Unassigned</span>}
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
+                                ))}
+
+                                {items.length === 0 && (
+                                    <div className="py-12 text-center space-y-3">
+                                        <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center mx-auto">
+                                            <FileText className="w-5 h-5 text-muted-foreground/50" />
+                                        </div>
+                                        <p className="text-muted-foreground text-sm">No items in the plan yet.</p>
+                                    </div>
+                                )}
                             </div>
                         </motion.div>
                     )}
