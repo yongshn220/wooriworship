@@ -119,7 +119,7 @@ export function MemberBadge({ name, onRemove, className }: MemberBadgeProps) {
         <Badge
             variant="secondary"
             className={cn(
-                "pl-1 pr-1.5 py-1 rounded-full bg-white border border-gray-100 text-gray-600 flex items-center gap-1.5 text-[13px] font-bold shadow-sm transition-all",
+                "pl-1 pr-1.5 py-1 rounded-full bg-gray-50/50 text-gray-600 flex items-center gap-1.5 text-[13px] font-bold shadow-sm transition-all",
                 className
             )}
         >
