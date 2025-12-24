@@ -594,7 +594,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                 className={cn(
                                                     "flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-semibold transition-all active:scale-95",
                                                     selectedTemplateId === tmp.id
-                                                        ? "bg-gray-900 text-white shadow-md shadow-gray-200"
+                                                        ? "bg-primary/5 text-primary border border-primary shadow-sm"
                                                         : "bg-white text-gray-500 border border-gray-100 hover:border-gray-200"
                                                 )}
                                             >
