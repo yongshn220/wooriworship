@@ -88,6 +88,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
     // Timeline Groups
     const [standardGroups, setStandardGroups] = useState<string[]>([]);
+    const [customMemberNames, setCustomMemberNames] = useState<string[]>([]);
     const [newGroupInput, setNewGroupInput] = useState("");
 
     const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'role' | 'template'; id: string; open: boolean }>({ type: 'role', id: '', open: false });
@@ -96,9 +97,20 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     useEffect(() => {
         if (teamId) {
             const loadInitialData = async () => {
-                const data = await ServingService.getTemplates(teamId);
+                const [data, config] = await Promise.all([
+                    ServingService.getTemplates(teamId),
+                    ServingService.getServingConfig(teamId)
+                ]);
                 setTemplates(data);
                 setIsTemplatesLoaded(true);
+
+                // Initialize groups and custom members
+                if (config.customGroups.length > 0) {
+                    setStandardGroups(prev => Array.from(new Set([...prev, ...config.customGroups])));
+                }
+                if (config.customNames.length > 0) {
+                    setCustomMemberNames(config.customNames);
+                }
 
                 // 2. Track last used template from recent schedule
                 const latestSchedules = await ServingService.getRecentSchedules(teamId, 5);
@@ -852,7 +864,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             {/* STICKY FOOTER - Minimal with Gradient Mask */}
             <div className="sticky bottom-0 z-50 w-full px-6 pb-8 pt-12 pointer-events-none bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent">
                 <AnimatePresence>
-                    {(step === 1 || step === 2) && hasTemplateChanges && selectedTemplateId && (
+                    {step === 2 && hasTemplateChanges && selectedTemplateId && (
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -938,12 +950,18 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                         }
                                     }}
                                     multiple
-                                    groups={activeSelection?.itemId ? standardGroups : []}
+                                    groups={standardGroups}
                                     onAddGroup={(name) => {
-                                        setStandardGroups([...standardGroups, name]);
+                                        setStandardGroups(prev => [...prev, name]);
+                                        ServingService.addCustomGroup(teamId, name).catch(console.error);
                                     }}
                                     onRemoveGroup={(idx) => {
                                         setStandardGroups(standardGroups.filter((_, i) => i !== idx));
+                                    }}
+                                    customMemberNames={customMemberNames}
+                                    onAddCustomMember={(name) => {
+                                        setCustomMemberNames(prev => [...prev, name]);
+                                        ServingService.addCustomMemberName(teamId, name).catch(console.error);
                                     }}
                                 />
                             </div>

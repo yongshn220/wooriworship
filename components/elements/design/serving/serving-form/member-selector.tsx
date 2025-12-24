@@ -17,6 +17,8 @@ interface Props {
     groups?: string[];
     onAddGroup?: (name: string) => void;
     onRemoveGroup?: (index: number) => void;
+    customMemberNames?: string[];
+    onAddCustomMember?: (name: string) => void;
 }
 
 export function MemberSelector({
@@ -25,7 +27,9 @@ export function MemberSelector({
     multiple = false,
     groups = [],
     onAddGroup,
-    onRemoveGroup
+    onRemoveGroup,
+    customMemberNames = [],
+    onAddCustomMember
 }: Props) {
     const teamId = useRecoilValue(currentTeamIdAtom);
     const team = useRecoilValue(teamAtom(teamId));
@@ -59,7 +63,11 @@ export function MemberSelector({
     };
 
     const handleAddAsMember = () => {
-        onSelect(searchQuery.trim());
+        const name = searchQuery.trim();
+        onSelect(name);
+        if (onAddCustomMember) {
+            onAddCustomMember(name);
+        }
         setSearchQuery("");
     };
 
@@ -144,6 +152,30 @@ export function MemberSelector({
                     </p>
 
                     <div className="space-y-1">
+                        {/* Custom Saved Members (Not currently selected but available) */}
+                        {searchQuery === "" && customMemberNames
+                            .filter(name => !selectedMemberIds.includes(name) && !members.find(m => m.name === name))
+                            .map(name => (
+                                <div
+                                    key={name}
+                                    className="flex items-center justify-between p-4 rounded-2xl hover:bg-muted/50 transition-all cursor-pointer group"
+                                    onClick={() => onSelect(name)}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <Avatar className="h-10 w-10">
+                                            <AvatarFallback className="bg-muted/50 text-muted-foreground/60">
+                                                <User className="h-5 w-5" />
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="font-bold text-lg text-foreground">{name}</p>
+                                            <p className="text-sm text-muted-foreground font-medium">Guest</p>
+                                        </div>
+                                    </div>
+                                    <div className="h-6 w-6 rounded-full border-2 border-muted flex items-center justify-center">
+                                    </div>
+                                </div>
+                            ))}
                         {/* Add as Member Button */}
                         {searchQuery &&
                             !members.find(m => m.name.toLowerCase() === searchQuery.toLowerCase()) &&
