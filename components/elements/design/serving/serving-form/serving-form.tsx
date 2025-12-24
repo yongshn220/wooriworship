@@ -638,7 +638,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                 onClick={handleUpdateTemplate}
                                             >
                                                 <Save className="mr-2 h-4 w-4" />
-                                                Save to Current
+                                                Save to "{templates.find(t => t.id === selectedTemplateId)?.name}"
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 className="rounded-2xl py-3 cursor-pointer font-bold"
