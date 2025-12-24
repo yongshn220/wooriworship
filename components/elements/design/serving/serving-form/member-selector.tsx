@@ -165,7 +165,7 @@ export function MemberSelector({
                                 onClick={() => onSelect(name)}
                             >
                                 <div className="flex items-center gap-4">
-                                    <Avatar className="h-10 w-10 border border-border/50">
+                                    <Avatar className="h-10 w-10">
                                         <AvatarFallback className="bg-primary/5 text-primary">
                                             <User className="h-5 w-5" />
                                         </AvatarFallback>
@@ -196,7 +196,7 @@ export function MemberSelector({
                                     onClick={() => onSelect(member.id)}
                                 >
                                     <div className="flex items-center gap-4 min-w-0">
-                                        <Avatar className="h-10 w-10 border border-border/50 flex-shrink-0">
+                                        <Avatar className="h-10 w-10 flex-shrink-0">
                                             <AvatarFallback className="bg-muted/50 text-muted-foreground/60">
                                                 <User className="h-5 w-5" />
                                             </AvatarFallback>

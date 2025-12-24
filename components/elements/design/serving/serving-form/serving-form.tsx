@@ -1270,7 +1270,7 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                                             e.stopPropagation();
                                             onRemoveMember(0, uid);
                                         }}
-                                        className="inline-flex items-center gap-1.5 pl-1 pr-3 py-1 bg-white border border-gray-100/80 rounded-full shadow-sm hover:shadow-md transition-all active:scale-95 group/member"
+                                        className="inline-flex items-center gap-1.5 pl-1 pr-3 py-1 bg-gray-50/50 rounded-full shadow-sm hover:shadow-md transition-all active:scale-95 group/member"
                                     >
                                         <div className="w-6 h-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
                                             {isGroup ? <Users className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
