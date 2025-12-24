@@ -1172,8 +1172,8 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                             )}
                         </div>
                         {(isAssigned || suggestions.length > 0) && (
-                            <div className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center group-hover:border-blue-100 group-hover:bg-blue-50 transition-colors flex-shrink-0 ml-2">
-                                <Plus className="text-gray-300 w-4 h-4 group-hover:text-blue-500" />
+                            <div className="w-8 h-8 rounded-full border border-blue-100 bg-blue-50 flex items-center justify-center transition-colors flex-shrink-0 ml-2">
+                                <Plus className="text-blue-500 w-4 h-4" />
                             </div>
                         )}
                     </div>
@@ -1291,8 +1291,8 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                         )}
                     </div>
                     {isAssigned && (
-                        <div className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center group-hover:border-blue-100 group-hover:bg-blue-50 transition-colors">
-                            <Plus className="text-gray-300 w-4 h-4 group-hover:text-blue-500" />
+                        <div className="w-8 h-8 rounded-full border border-blue-100 bg-blue-50 flex items-center justify-center transition-colors">
+                            <Plus className="text-blue-500 w-4 h-4" />
                         </div>
                     )}
                 </div>
