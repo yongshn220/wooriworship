@@ -1,8 +1,5 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ServingRole, ServingSchedule, ServingAssignment } from "@/models/serving";
-import { User } from "@/models/user";
-import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { MemberBadge, WorshipTeamRoleRow } from "./serving-form/serving-components";
 
 interface Props {
     schedule: ServingSchedule;
@@ -12,67 +9,76 @@ interface Props {
 }
 
 export function ServingMemberList({ schedule, roles, members, currentUserUid }: Props) {
-    const getMember = (uid: string) => members.find(m => m.id === uid);
+    const getMemberName = (uid: string) => {
+        const member = members.find(m => m.id === uid);
+        return member?.name || uid;
+    };
 
     // 1. New Timeline View (If items exist)
     if (schedule.items && schedule.items.length > 0) {
         return (
-            <div className="space-y-6 relative before:absolute before:left-[17px] before:top-2 before:bottom-2 before:w-[2px] before:bg-muted-foreground/10">
-                {schedule.items.sort((a, b) => a.order - b.order).map((item, idx) => (
-                    <div key={item.id} className="relative pl-10">
-                        {/* Timeline Dot */}
-                        <div className={cn(
-                            "absolute left-0 top-1.5 w-9 h-9 rounded-full bg-background border-2 flex items-center justify-center font-bold text-xs shadow-sm z-10",
-                            item.assignments.some(a => a.memberIds.includes(currentUserUid || ""))
-                                ? "border-primary text-primary"
-                                : "border-muted text-muted-foreground"
-                        )}>
-                            {idx + 1}
+            <div className="flex flex-col w-full">
+                {schedule.items.sort((a, b) => a.order - b.order).map((item, index) => (
+                    <div key={item.id} className="group flex gap-4 py-5 border-b border-border/40 last:border-0 relative text-left">
+                        {/* Left: Index / Time Marker */}
+                        <div className="flex-shrink-0 w-12 pt-1 flex flex-col items-center gap-1">
+                            <span className="text-xl font-bold text-muted-foreground/40 font-mono tracking-tighter">
+                                {(index + 1).toString().padStart(2, '0')}
+                            </span>
                         </div>
 
-                        <div className="space-y-2">
-                            <div className="flex flex-col">
-                                <h4 className="font-bold text-foreground flex items-center gap-2">
-                                    {item.title}
-                                    {item.type === 'SUPPORT' && <Badge variant="secondary" className="text-[9px] h-4 py-0 font-normal opacity-70">Support</Badge>}
-                                </h4>
-                                {item.remarks && <p className="text-xs text-muted-foreground italic">{item.remarks}</p>}
-                            </div>
+                        {/* Right: Content */}
+                        <div className="flex-1 min-w-0 space-y-1.5">
+                            {/* Header Row: Title & Who */}
+                            <div className="flex flex-row justify-between items-start gap-4">
+                                <h3 className="text-lg font-bold leading-tight break-keep text-foreground pt-1">
+                                    {item.title || "Untitled Sequence"}
+                                </h3>
 
-                            {/* Grouped Assignments (Praise Team style) */}
-                            <div className="flex flex-wrap gap-2">
-                                {item.assignments.map((assignment, aIdx) => (
-                                    <div key={aIdx} className="flex items-center gap-1.5 flex-wrap">
-                                        {(assignment.label || assignment.roleId) && (
-                                            <span className="text-[10px] font-bold text-muted-foreground uppercase bg-muted/50 px-1.5 py-0.5 rounded">
-                                                {assignment.label || roles.find(r => r.id === assignment.roleId)?.name}
-                                            </span>
+                                {/* Standard Assignments (Right Aligned) - EXCEPT for Worship Team */}
+                                {item.type !== 'WORSHIP_TEAM' && item.assignments && (
+                                    <div className="flex flex-col items-end gap-1.5 min-w-[40%]">
+                                        {item.assignments.flatMap(a =>
+                                            a.memberIds.map(uid => (
+                                                <MemberBadge
+                                                    key={`${a.roleId}-${uid}`}
+                                                    name={getMemberName(uid)}
+                                                    className="bg-secondary/40 border-transparent"
+                                                />
+                                            ))
                                         )}
-                                        {assignment.memberIds.map(uid => {
-                                            const member = getMember(uid);
-                                            const isMe = uid === currentUserUid;
-                                            const displayName = member?.name || uid;
-
-                                            return (
-                                                <div
-                                                    key={uid}
-                                                    className={cn(
-                                                        "flex items-center gap-1.5 px-2 py-1 rounded-full border text-[11px] transition-colors",
-                                                        isMe
-                                                            ? "bg-primary/10 border-primary/20 text-primary font-medium"
-                                                            : "bg-muted/30 border-transparent text-foreground"
-                                                    )}
-                                                >
-                                                    <Avatar className="h-4 w-4">
-                                                        <AvatarFallback className="text-[7px]">{displayName[0]}</AvatarFallback>
-                                                    </Avatar>
-                                                    <span>{displayName}</span>
-                                                </div>
-                                            );
-                                        })}
                                     </div>
-                                ))}
+                                )}
                             </div>
+
+                            {/* Full Width Assignments for Worship Team (Indented Below) */}
+                            {item.type === 'WORSHIP_TEAM' && item.assignments && (
+                                <div className="w-full flex flex-col gap-3 mt-3 pl-1">
+                                    {item.assignments.map(assign => {
+                                        if (assign.memberIds.length === 0) return null;
+                                        const roleName = roles.find(r => r.id === assign.roleId)?.name || "Role";
+                                        return (
+                                            <WorshipTeamRoleRow
+                                                key={assign.roleId}
+                                                roleName={roleName}
+                                                memberIds={assign.memberIds}
+                                                getMemberName={getMemberName}
+                                                className="py-1 border-b border-border/30 last:border-0"
+                                            />
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            {/* Notes / Remarks - Prominent Display */}
+                            {item.remarks && (
+                                <div className="relative pl-3 mt-1.5">
+                                    <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-yellow-400/50 rounded-full" />
+                                    <p className="text-sm text-foreground/80 leading-relaxed font-medium whitespace-pre-wrap">
+                                        {item.remarks}
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ))}
