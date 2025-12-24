@@ -5,9 +5,10 @@ import { useRecoilValue } from "recoil";
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
 import { Input } from "@/components/ui/input";
-import { Check, Plus, Search } from "lucide-react";
+import { Check, Plus, Search, Users, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Props {
     selectedMemberIds: string[];
@@ -101,6 +102,9 @@ export function MemberSelector({
                                         onClick={() => onSelect(groupId)}
                                     >
                                         <div className="flex items-center gap-4">
+                                            <div className="h-10 w-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground/60">
+                                                <Users className="h-5 w-5" />
+                                            </div>
                                             <p className={cn(
                                                 "font-bold text-lg",
                                                 isSelected ? "text-primary" : "text-foreground"
@@ -161,9 +165,14 @@ export function MemberSelector({
                                 onClick={() => onSelect(name)}
                             >
                                 <div className="flex items-center gap-4">
+                                    <Avatar className="h-10 w-10 border border-border/50">
+                                        <AvatarFallback className="bg-primary/5 text-primary">
+                                            <User className="h-5 w-5" />
+                                        </AvatarFallback>
+                                    </Avatar>
                                     <div>
                                         <p className="font-bold text-primary text-lg">{name}</p>
-                                        <p className="text-sm text-primary/60">Guest</p>
+                                        <p className="text-sm text-primary/60 font-medium">Guest</p>
                                     </div>
                                 </div>
                                 <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center">
@@ -187,13 +196,18 @@ export function MemberSelector({
                                     onClick={() => onSelect(member.id)}
                                 >
                                     <div className="flex items-center gap-4 min-w-0">
+                                        <Avatar className="h-10 w-10 border border-border/50 flex-shrink-0">
+                                            <AvatarFallback className="bg-muted/50 text-muted-foreground/60">
+                                                <User className="h-5 w-5" />
+                                            </AvatarFallback>
+                                        </Avatar>
                                         <div className="min-w-0">
                                             <p className={cn(
                                                 "font-bold text-lg truncate",
                                                 isSelected ? "text-primary" : "text-foreground"
                                             )}>{member.name}</p>
                                             <p className={cn(
-                                                "text-sm truncate",
+                                                "text-sm truncate font-medium",
                                                 isSelected ? "text-primary/60" : "text-muted-foreground"
                                             )}>{member.email}</p>
                                         </div>
