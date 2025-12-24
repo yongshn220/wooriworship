@@ -1166,7 +1166,7 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
         : []);
 
     return (
-        <Reorder.Item value={role} dragListener={false} dragControls={controls}>
+        <Reorder.Item value={role} dragListener={false} dragControls={controls} className="select-none relative">
             <ServingCard className="p-0 gap-0 overflow-hidden border-none shadow-sm rounded-xl bg-white relative group transition-transform duration-200">
                 {/* Drag Handle - Top Left */}
                 <div
@@ -1282,7 +1282,7 @@ function SortableWorshipItem({ item, getMemberName, onGoToStep2, onUpdate, roles
     const remainingCount = activeRoles.length - MAX_DISPLAY;
 
     return (
-        <Reorder.Item value={item} dragListener={false} dragControls={controls} className="relative z-0">
+        <Reorder.Item value={item} dragListener={false} dragControls={controls} className="relative z-0 select-none">
             <div className="group flex flex-col gap-4 p-5 rounded-3xl border bg-gradient-to-br from-blue-50/50 to-white shadow-sm hover:shadow-md transition-all">
                 {/* Header */}
                 <div className="flex items-start justify-between gap-3">
@@ -1372,7 +1372,7 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
     const isAssigned = memberCount > 0;
 
     return (
-        <Reorder.Item value={item} dragListener={false} dragControls={controls}>
+        <Reorder.Item value={item} dragListener={false} dragControls={controls} className="select-none relative">
             <ServingCard className="p-0 gap-0 overflow-hidden border-none shadow-sm rounded-xl bg-white relative group transition-transform duration-200">
                 {/* Drag Handle - Top Left */}
                 <div
