@@ -30,7 +30,7 @@ import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
-import { AddActionButton, ServingCard, MemberSuggestionList, MemberBadge } from "./serving-components";
+import { AddActionButton, ServingCard, MemberSuggestionList, MemberBadge, WorshipTeamRoleRow } from "./serving-components";
 
 
 interface Props {
@@ -206,14 +206,14 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
     const handleAddMemberByRole = (roleId: string, uid: string) => {
         let newItems = [...items];
-        let ptItemIdx = newItems.findIndex(i => i.title === '찬양팀 구성');
+        let ptItemIdx = newItems.findIndex(i => i.type === 'WORSHIP_TEAM');
         if (ptItemIdx === -1) {
             newItems.push({
                 id: Math.random().toString(36).substr(2, 9),
                 order: items.length,
                 title: '찬양팀 구성',
                 assignments: [],
-                type: 'FLOW'
+                type: 'WORSHIP_TEAM'
             });
             ptItemIdx = newItems.length - 1;
         }
@@ -533,7 +533,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                     ServingService.updateRolesOrder(teamId, newRoles).catch(console.error);
                                 }} className="flex flex-col gap-4">
                                     {roles.map((role) => {
-                                        const ptItem = items.find(item => item.title === '찬양팀 구성');
+                                        const ptItem = items.find(item => item.type === 'WORSHIP_TEAM');
                                         const assignment = ptItem?.assignments.find(a => a.roleId === role.id);
                                         const memberIds = assignment?.memberIds || [];
 
@@ -589,8 +589,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                         ...it,
                                                         id: Math.random().toString(36).substr(2, 9),
                                                         order: idx,
-                                                        assignments: it.title === '찬양팀 구성'
-                                                            ? (items.find(i => i.title === '찬양팀 구성')?.assignments || [])
+                                                        assignments: it.type === 'WORSHIP_TEAM'
+                                                            ? (items.find(i => i.type === 'WORSHIP_TEAM')?.assignments || [])
                                                             : []
                                                     })));
                                                 }}
@@ -684,31 +684,46 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                     </p>
                                                 </div>
                                             )}
-                                            <Reorder.Group axis="y" values={items.filter(i => i.title !== '찬양팀 구성')} onReorder={(newOrdered) => {
-                                                // Handle reordering logic merging with '찬양팀 구성' item if exists
-                                                const otherItems = items.filter(i => i.title === '찬양팀 구성');
-                                                setItems([...otherItems, ...newOrdered]);
+                                            <Reorder.Group axis="y" values={items} onReorder={(newOrdered) => {
+                                                setItems(newOrdered);
                                             }} className="flex flex-col gap-4">
-                                                {items.filter(i => i.title !== '찬양팀 구성').map((item, index) => (
-                                                    <SortableTimelineItem
-                                                        key={item.id}
-                                                        item={item}
-                                                        getMemberName={getMemberName}
-                                                        onUpdate={(newItem) => {
-                                                            const newItems = items.map(i => i.id === item.id ? newItem : i);
-                                                            setItems(newItems);
-                                                        }}
-                                                        onDelete={() => setItems(items.filter(i => i.id !== item.id))}
-                                                        onOpenAdd={(aIdx) => setActiveSelection({
-                                                            itemId: item.id,
-                                                            assignmentIndex: aIdx,
-                                                            roleId: "timeline-default"
-                                                        })}
-                                                        onRemoveMember={(aIdx, uid) => {
-                                                            handleAddMember(item.id, aIdx, uid);
-                                                        }}
-                                                    />
-                                                ))}
+                                                {items.map((item, index) => {
+                                                    if (item.type === 'WORSHIP_TEAM') {
+                                                        return (
+                                                            <SortableWorshipItem
+                                                                key={item.id}
+                                                                item={item}
+                                                                getMemberName={getMemberName}
+                                                                onGoToStep2={() => goToStep(1)}
+                                                                onUpdate={(newItem) => {
+                                                                    const newItems = items.map(i => i.id === item.id ? newItem : i);
+                                                                    setItems(newItems);
+                                                                }}
+                                                                roles={roles}
+                                                            />
+                                                        );
+                                                    }
+                                                    return (
+                                                        <SortableTimelineItem
+                                                            key={item.id}
+                                                            item={item}
+                                                            getMemberName={getMemberName}
+                                                            onUpdate={(newItem) => {
+                                                                const newItems = items.map(i => i.id === item.id ? newItem : i);
+                                                                setItems(newItems);
+                                                            }}
+                                                            onDelete={() => setItems(items.filter(i => i.id !== item.id))}
+                                                            onOpenAdd={(aIdx) => setActiveSelection({
+                                                                itemId: item.id,
+                                                                assignmentIndex: aIdx,
+                                                                roleId: "timeline-default"
+                                                            })}
+                                                            onRemoveMember={(aIdx, uid) => {
+                                                                handleAddMember(item.id, aIdx, uid);
+                                                            }}
+                                                        />
+                                                    )
+                                                })}
                                             </Reorder.Group>
 
                                             <AddActionButton
@@ -755,7 +770,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                             {/* CUE SHEET / TIMELINE LIST */}
                             <div className="flex flex-col w-full">
-                                {items.filter(item => item.title !== "찬양팀 구성").map((item, index) => (
+                                {items.map((item, index) => (
                                     <div key={item.id} className="group flex gap-4 py-5 border-b border-border/40 last:border-0 relative">
                                         {/* Left: Index / Time Marker */}
                                         <div className="flex-shrink-0 w-12 pt-1 flex flex-col items-center gap-1">
@@ -772,19 +787,40 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                     {item.title || "Untitled Sequence"}
                                                 </h3>
 
-                                                {/* Assignments / Who (Chips - Vertical Stack) */}
-                                                <div className="flex flex-col items-end gap-1.5 min-w-[40%]">
-                                                    {item.assignments.flatMap(a =>
-                                                        a.memberIds.map(uid => (
-                                                            <MemberBadge
-                                                                key={`${a.roleId}-${uid}`}
-                                                                name={getMemberName(uid)}
-                                                                className="bg-secondary/40 border-transparent"
-                                                            />
-                                                        ))
-                                                    )}
-                                                </div>
+                                                {/* Standard Assignments (Right Aligned) - EXCEPT for Worship Team */}
+                                                {item.type !== 'WORSHIP_TEAM' && (
+                                                    <div className="flex flex-col items-end gap-1.5 min-w-[40%]">
+                                                        {item.assignments.flatMap(a =>
+                                                            a.memberIds.map(uid => (
+                                                                <MemberBadge
+                                                                    key={`${a.roleId}-${uid}`}
+                                                                    name={getMemberName(uid)}
+                                                                    className="bg-secondary/40 border-transparent"
+                                                                />
+                                                            ))
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
+
+                                            {/* Full Width Assignments for Worship Team (Indented Below) */}
+                                            {item.type === 'WORSHIP_TEAM' && (
+                                                <div className="w-full flex flex-col gap-3 mt-3 pl-1">
+                                                    {item.assignments.map(assign => {
+                                                        if (assign.memberIds.length === 0) return null;
+                                                        const roleName = roles.find(r => r.id === assign.roleId)?.name || "Role";
+                                                        return (
+                                                            <WorshipTeamRoleRow
+                                                                key={assign.roleId}
+                                                                roleName={roleName}
+                                                                memberIds={assign.memberIds}
+                                                                getMemberName={getMemberName}
+                                                                className="py-1 border-b border-border/30 last:border-0"
+                                                            />
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
 
                                             {/* Notes / Remarks - Prominent Display */}
                                             {item.remarks && (
@@ -1218,6 +1254,103 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                     </div>
                 </div>
             </ServingCard>
+        </Reorder.Item>
+    );
+}
+
+
+interface SortableWorshipItemProps {
+    item: ServingItem;
+    getMemberName: (id: string) => string;
+    onGoToStep2: () => void;
+    onUpdate: (newItem: ServingItem) => void;
+    roles: any[]; // Using any to avoid strict type issues if ServingRole isn't imported, but assuming roles structure
+}
+
+function SortableWorshipItem({ item, getMemberName, onGoToStep2, onUpdate, roles }: SortableWorshipItemProps) {
+    const controls = useDragControls();
+
+    // Determine active roles (those with assigned members)
+    const activeRoles = roles.filter(role => {
+        const assignment = item.assignments.find(a => a.roleId === role.id);
+        return assignment && assignment.memberIds.length > 0;
+    });
+
+    const MAX_DISPLAY = 6;
+    const hasMore = activeRoles.length > MAX_DISPLAY;
+    const displayRoles = hasMore ? activeRoles.slice(0, MAX_DISPLAY) : activeRoles;
+    const remainingCount = activeRoles.length - MAX_DISPLAY;
+
+    return (
+        <Reorder.Item value={item} dragListener={false} dragControls={controls} className="relative z-0">
+            <div className="group flex flex-col gap-4 p-5 rounded-3xl border bg-gradient-to-br from-blue-50/50 to-white shadow-sm hover:shadow-md transition-all">
+                {/* Header */}
+                <div className="flex items-start justify-between gap-3">
+                    <div className="mt-1 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500" onPointerDown={(e) => controls.start(e)}>
+                        <GripVertical className="h-5 w-5" />
+                    </div>
+
+                    <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-[10px] text-blue-600 border-blue-200 bg-blue-50 whitespace-nowrap">
+                                Fixed Item
+                            </Badge>
+                            <div className="flex items-center gap-2 group/edit w-full">
+                                <input
+                                    value={item.title}
+                                    onChange={(e) => onUpdate({ ...item, title: e.target.value })}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="text-lg font-bold text-gray-900 bg-transparent border-0 focus:ring-0 p-0 placeholder:text-gray-300 w-full leading-tight"
+                                    placeholder="Title"
+                                />
+                                <Pencil className="w-4 h-4 text-gray-300 group-hover/edit:text-blue-500 transition-colors opacity-0 group-hover/edit:opacity-100" />
+                            </div>
+                        </div>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={onGoToStep2} className="text-xs text-primary hover:bg-primary/10 h-8 rounded-full whitespace-nowrap">
+                        Edit
+                    </Button>
+                </div>
+
+                {/* Content: Read-only list of assigned roles */}
+                <div className="pl-8 space-y-2">
+                    {activeRoles.length > 0 ? (
+                        <div className="flex flex-col gap-3 w-full">
+                            {displayRoles.map(role => {
+                                const assignment = item.assignments.find(a => a.roleId === role.id);
+                                if (!assignment) return null;
+
+                                return (
+                                    <WorshipTeamRoleRow
+                                        key={role.id}
+                                        roleName={role.name}
+                                        memberIds={assignment.memberIds}
+                                        getMemberName={getMemberName}
+                                        className="border-b border-gray-50 pb-2 last:border-0 last:pb-0"
+                                    />
+                                );
+                            })}
+
+                            {hasMore && (
+                                <button
+                                    onClick={onGoToStep2}
+                                    className="w-full py-2 bg-gray-50 hover:bg-gray-100 rounded-xl border border-dashed border-gray-200 text-xs font-bold text-gray-400 hover:text-primary transition-colors mt-1"
+                                >
+                                    View {remainingCount} more roles...
+                                </button>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm text-muted-foreground italic">No members assigned.</p>
+                            <Button variant="link" size="sm" onClick={onGoToStep2} className="h-auto p-0 text-primary">
+                                Assign in Step 2
+                            </Button>
+                        </div>
+                    )
+                    }
+                </div>
+            </div>
         </Reorder.Item>
     );
 }

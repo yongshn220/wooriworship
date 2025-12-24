@@ -18,7 +18,7 @@ export interface ServingItem {
     title: string;
     assignments: ServingAssignment[];
     remarks?: string;
-    type: 'FLOW' | 'SUPPORT';
+    type: 'FLOW' | 'SUPPORT' | 'WORSHIP_TEAM';
 }
 
 export interface ServingSchedule {
