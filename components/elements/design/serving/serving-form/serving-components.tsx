@@ -154,3 +154,46 @@ export function MemberBadge({ name, onRemove, className }: MemberBadgeProps) {
         </Badge>
     );
 }
+
+/**
+ * Reusable Row Component for Worship Team displaying Role and Members vertically or horizontally.
+ * Used in Step 3 (SortableWorshipItem) and Step 4 (Review).
+ */
+interface WorshipTeamRoleRowProps {
+    roleName: string;
+    memberIds: string[];
+    getMemberName: (id: string) => string;
+    className?: string;
+}
+
+export function WorshipTeamRoleRow({ roleName, memberIds, getMemberName, className }: WorshipTeamRoleRowProps) {
+    if (memberIds.length === 0) return null;
+
+    return (
+        <div className={cn("flex flex-row items-start justify-between w-full gap-4", className)}>
+            {/* Role Name - Left (or Right depending on context if flipped, but default is Left) */}
+            {/* Based on user request "Left Role, Right Member List". In Step 4 usually it's "Right Aligned" structure.
+                But the user explicitly said: "Left Role, Right Member List... Full width".
+                The Step 4 existing structure was Role on Left of the *content block*.
+                Wait, Step 4 has a Timeline layout:
+                [Index] [Content Block]
+                        [Title]   [Assignments]
+
+                If the user wants "Left Role, Right Name" for the *Worship Team* item specifically, inside that content block?
+                Yes. "cuelist 에서 찬양팀 구성 member name list 는 특별하게 왼쪽에 role 오른쪽에 사람 이름 listup 하도록 바꿔."
+            */}
+            <span className="text-[13px] font-bold text-gray-500 uppercase tracking-tight mt-1.5 min-w-fit text-left">
+                {roleName}:
+            </span>
+            <div className="flex flex-col items-end gap-1 flex-1">
+                {memberIds.map(uid => (
+                    <MemberBadge
+                        key={uid}
+                        name={getMemberName(uid)}
+                        className="bg-secondary/40 border-transparent h-7 text-xs px-2.5 max-w-[140px] truncate justify-between w-auto" // Adjusted for better visibility
+                    />
+                ))}
+            </div>
+        </div>
+    );
+}
