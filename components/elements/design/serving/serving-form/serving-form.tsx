@@ -447,8 +447,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         <div ref={containerRef} className="fixed inset-0 z-[100] bg-gray-50 flex flex-col overflow-y-auto overflow-x-hidden">
 
             {/* STICKY HEADER - Minimal with Gradient Mask */}
-            {/* STICKY HEADER - Minimal with Gradient Mask */}
-            <div className="sticky top-0 z-50 w-full px-6 pt-8 pb-8 flex items-center justify-between pointer-events-none bg-gradient-to-b from-background via-background/90 to-transparent">
+            <div className="sticky top-0 z-50 w-full px-6 pt-8 pb-12 flex items-center justify-between pointer-events-none bg-gradient-to-b from-gray-50 via-gray-50/90 to-transparent">
                 {/* Exit Button - Left aligned */}
                 <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/50 hover:bg-background shadow-sm pointer-events-auto backdrop-blur-sm" onClick={() => router.back()}>
                     <X className="w-5 h-5 text-muted-foreground" />
@@ -799,10 +798,10 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         >
                             <button
                                 onClick={handleUpdateTemplate}
-                                className="px-5 py-2.5 rounded-full bg-white border border-gray-100 shadow-xl shadow-gray-200/50 hover:border-primary/20 hover:bg-primary/5 transition-all group active:scale-95"
+                                className="px-6 py-2 rounded-full bg-white/40 backdrop-blur-xl group active:scale-95 transition-all"
                             >
-                                <span className="text-[13px] font-bold text-gray-400 group-hover:text-primary transition-colors">
-                                    Save to {templates.find(t => t.id === selectedTemplateId)?.name}
+                                <span className="text-[13px] font-bold text-primary">
+                                    Save to "{templates.find(t => t.id === selectedTemplateId)?.name}"
                                 </span>
                             </button>
                         </motion.div>
