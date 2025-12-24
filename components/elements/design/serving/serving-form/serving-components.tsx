@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, UserPlus } from "lucide-react";
+import { Plus, UserPlus, User, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -90,13 +90,13 @@ export function MemberSuggestionList({ members, selectedIds, onSelect }: MemberS
                                 onSelect(member.id);
                             }}
                             className={cn(
-                                "flex items-center gap-1.2 px-4 py-2 rounded-full border transition-all text-[15px] font-medium active:scale-95",
+                                "flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all text-[13px] font-bold active:scale-95",
                                 isSelected
-                                    ? "bg-secondary border-primary text-foreground shadow-sm"
-                                    : "bg-secondary/50 border-border/50 text-muted-foreground active:bg-secondary active:text-foreground active:border-border"
+                                    ? "bg-gray-900 border-gray-900 text-white shadow-sm"
+                                    : "bg-white border-gray-100 text-gray-500 hover:border-gray-200 active:bg-gray-50"
                             )}
                         >
-                            {member.name}
+                            {member.name.replace(/^group:/, "")}
                         </button>
                     );
                 })}
@@ -112,18 +112,24 @@ interface MemberBadgeProps {
 }
 
 export function MemberBadge({ name, onRemove, className }: MemberBadgeProps) {
+    const isGroup = name.startsWith("group:");
+    const displayName = name.replace(/^group:/, "");
+
     return (
         <Badge
             variant="secondary"
             className={cn(
-                "pl-4 pr-1.5 py-1.5 rounded-full bg-secondary text-secondary-foreground border-0 flex items-center gap-1 text-[15px] font-medium shadow-sm transition-all",
+                "pl-1 pr-1.5 py-1 rounded-full bg-white border border-gray-100 text-gray-600 flex items-center gap-1.5 text-[13px] font-bold shadow-sm transition-all",
                 className
             )}
         >
-            {name}
+            <div className="w-6 h-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
+                {isGroup ? <Users className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+            </div>
+            {displayName}
             {onRemove && (
                 <button
-                    className="hover:text-destructive transition-colors ml-1 rounded-full p-2.5 active:bg-destructive/10"
+                    className="hover:text-red-500 transition-colors ml-0.5 rounded-full p-1 active:bg-red-50"
                     onClick={(e) => {
                         e.stopPropagation();
                         onRemove();
@@ -131,8 +137,8 @@ export function MemberBadge({ name, onRemove, className }: MemberBadgeProps) {
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
+                        width="12"
+                        height="12"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
