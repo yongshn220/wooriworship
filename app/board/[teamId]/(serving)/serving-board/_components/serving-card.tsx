@@ -158,10 +158,20 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                         animate={{ opacity: 1 }}
                         className="mt-4 pt-4 border-t border-border space-y-4"
                     >
-                        <p className="mt-2 text-sm text-muted-foreground line-clamp-1">
-                            {schedule.items ? `${schedule.items.length} items` : `${schedule.roles?.length || 0} roles`}
-                            , {allMemberIds.length} members assigned
-                        </p>
+                        {isMeServing ? (
+                            <ServingMemberList
+                                schedule={schedule}
+                                roles={roles}
+                                members={members}
+                                currentUserUid={currentUserUid}
+                                filterMine={true}
+                            />
+                        ) : (
+                            <p className="mt-2 text-sm text-muted-foreground line-clamp-1">
+                                {schedule.items ? `${schedule.items.length} items` : `${schedule.roles?.length || 0} roles`}
+                                , {allMemberIds.length} members assigned
+                            </p>
+                        )}
                     </motion.div>
                 )}
 
