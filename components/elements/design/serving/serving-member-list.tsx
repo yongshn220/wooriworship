@@ -24,7 +24,7 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid }: 
         return (
             <div className="flex flex-col w-full">
                 {schedule.items.slice().sort((a, b) => a.order - b.order).map((item, index) => (
-                    <div key={item.id} className="group flex gap-4 py-5 border-b border-border/40 last:border-0 relative text-left">
+                    <div key={item.id} className="group flex gap-4 py-3 border-b border-border/40 last:border-0 relative text-left">
                         {/* Left: Index / Time Marker */}
                         <div className="flex-shrink-0 w-12 pt-1 flex flex-col items-center gap-1">
                             <span className="text-xl font-bold text-muted-foreground/40 font-mono tracking-tighter">

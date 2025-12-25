@@ -19,7 +19,6 @@ import { auth } from "@/firebase";
 import { getDayPassedFromTimestampShorten } from "@/components/util/helper/helper-functions";
 import { ServingHeaderMenu } from "./serving-header-menu";
 import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
-import { ServingReviewHeader } from "@/components/elements/design/serving/serving-review-header";
 
 interface Props {
     schedule: ServingSchedule;
@@ -119,7 +118,16 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                                 </Button>
                             </div>
 
-                            <ServingReviewHeader date={scheduleDate} />
+                            <div className="flex flex-col items-center justify-center py-4 border-b border-border/10 mb-0 mx-auto">
+                                <div className="text-center">
+                                    <h2 className="text-3xl font-bold text-foreground tracking-tight leading-none mb-1">
+                                        {format(scheduleDate, "MMM d")}
+                                    </h2>
+                                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide opacity-70">
+                                        {format(scheduleDate, "EEEE, yyyy")}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -131,7 +139,7 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="mt-4 pt-4 space-y-4"
+                            className="space-y-4"
                         >
                             <ServingMemberList
                                 schedule={schedule}

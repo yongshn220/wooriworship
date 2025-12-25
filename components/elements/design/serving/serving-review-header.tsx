@@ -12,7 +12,7 @@ interface ServingReviewHeaderProps {
 
 export function ServingReviewHeader({ date, className }: ServingReviewHeaderProps) {
     return (
-        <div className={cn("flex flex-col items-center justify-center py-6 border-b border-border/10 mb-6 mx-auto", className)}>
+        <div className={cn("flex flex-col items-center justify-center py-4 border-b border-border/10 mb-0 mx-auto", className)}>
             <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 opacity-80">Final Review</span>
             <div className="text-center">
                 <h2 className="text-3xl font-bold text-foreground tracking-tight leading-none mb-1">
