@@ -1,3 +1,7 @@
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ServingRole, ServingSchedule } from "@/models/serving";
+import { User } from "@/models/user";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { MemberBadge, WorshipTeamRoleRow } from "./serving-form/serving-components";
 
@@ -13,12 +17,13 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid }: 
         const member = members.find(m => m.id === uid);
         return member?.name || uid;
     };
+    const getMember = (uid: string) => members.find(m => m.id === uid);
 
     // 1. New Timeline View (If items exist)
     if (schedule.items && schedule.items.length > 0) {
         return (
             <div className="flex flex-col w-full">
-                {schedule.items.sort((a, b) => a.order - b.order).map((item, index) => (
+                {schedule.items.slice().sort((a, b) => a.order - b.order).map((item, index) => (
                     <div key={item.id} className="group flex gap-4 py-5 border-b border-border/40 last:border-0 relative text-left">
                         {/* Left: Index / Time Marker */}
                         <div className="flex-shrink-0 w-12 pt-1 flex flex-col items-center gap-1">
