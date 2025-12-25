@@ -126,16 +126,19 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         }
     }, [teamId]); // Only run when teamId changes
 
+    const isInitialDataLoaded = useRef(false);
+
     // Initialize Data (EDIT Mode)
     useEffect(() => {
-        if (mode === FormMode.EDIT && initialData) {
+        if (mode === FormMode.EDIT && initialData && !isInitialDataLoaded.current) {
             const [y, m, d] = initialData.date.split('-').map(Number);
             const parsedDate = new Date(y, m - 1, d);
             setSelectedDate(parsedDate);
 
-            if (initialData.items) {
+            if (initialData.items && initialData.items.length > 0) {
                 setItems(initialData.items);
-            } else if (initialData.roles) {
+                isInitialDataLoaded.current = true;
+            } else if (initialData.roles && roles.length > 0) {
                 // Migration: Convert old roles to items
                 const migratedItems: ServingItem[] = initialData.roles.map((r, idx) => ({
                     id: Math.random().toString(36).substr(2, 9),
@@ -148,9 +151,10 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     type: 'FLOW'
                 }));
                 setItems(migratedItems);
+                isInitialDataLoaded.current = true;
             }
         }
-    }, [mode, initialData, roles]); // Removed items.length dependency
+    }, [mode, initialData, roles]);
 
     // Auto-load Template (CREATE Mode)
     useEffect(() => {
