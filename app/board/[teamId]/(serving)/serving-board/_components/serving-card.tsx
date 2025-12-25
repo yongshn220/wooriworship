@@ -8,6 +8,7 @@ import { ChevronDown, ChevronUp, User } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -18,6 +19,7 @@ import { auth } from "@/firebase";
 import { getDayPassedFromTimestampShorten } from "@/components/util/helper/helper-functions";
 import { ServingHeaderMenu } from "./serving-header-menu";
 import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
+import { ServingReviewHeader } from "@/components/elements/design/serving/serving-review-header";
 
 interface Props {
     schedule: ServingSchedule;
@@ -26,7 +28,8 @@ interface Props {
     defaultExpanded?: boolean;
 }
 
-export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded = false }: Props) {
+// Default expanded to true as requested
+export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded = true }: Props) {
     const [isExpanded, setIsExpanded] = useState(defaultExpanded);
     const roles = useRecoilValue(fetchServingRolesSelector(teamId));
 
@@ -79,29 +82,46 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
         >
             <CardContent className="p-4 sm:p-6">
                 {/* Header */}
-                <div className="flex justify-between items-start mb-4 group cursor-pointer" onClick={handleHeaderClick}>
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span className={cn(
-                                "text-xs px-1.5 py-0.5 rounded-full",
-                                isPast ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary font-bold"
-                            )}>
-                                {getDayPassedFromTimestampShorten({ seconds: scheduleDate.getTime() / 1000, nanoseconds: 0 } as any)}
-                            </span>
-
+                {/* Header */}
+                <div className="group cursor-pointer" onClick={handleHeaderClick}>
+                    {/* Collapsed Header */}
+                    {!isExpanded && (
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <span className={cn(
+                                        "text-xs px-1.5 py-0.5 rounded-full",
+                                        isPast ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary font-bold"
+                                    )}>
+                                        {getDayPassedFromTimestampShorten({ seconds: scheduleDate.getTime() / 1000, nanoseconds: 0 } as any)}
+                                    </span>
+                                </div>
+                                <h3 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
+                                    {format(scheduleDate, "yyyy. MM. dd (EEE)")}
+                                    <ChevronDown className="h-5 w-5 text-muted-foreground animate-in fade-in zoom-in" />
+                                </h3>
+                            </div>
+                            <div onClick={(e) => e.stopPropagation()}>
+                                <ServingHeaderMenu scheduleId={schedule.id} teamId={teamId} />
+                            </div>
                         </div>
-                        <h3 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
-                            {format(scheduleDate, "yyyy. MM. dd (EEE)")}
-                            {isExpanded ?
-                                <ChevronUp className="h-5 w-5 text-muted-foreground animate-in fade-in zoom-in" /> :
-                                <ChevronDown className="h-5 w-5 text-muted-foreground animate-in fade-in zoom-in" />
-                            }
-                        </h3>
-                    </div>
+                    )}
 
-                    <div onClick={(e) => e.stopPropagation()}>
-                        <ServingHeaderMenu scheduleId={schedule.id} teamId={teamId} />
-                    </div>
+                    {/* Expanded Header (Final Review Style) */}
+                    {isExpanded && (
+                        <div className="relative">
+                            <div className="absolute right-0 top-0" onClick={(e) => e.stopPropagation()}>
+                                <ServingHeaderMenu scheduleId={schedule.id} teamId={teamId} />
+                            </div>
+                            <div className="absolute left-0 top-0">
+                                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); toggleExpand(); }} className="h-8 w-8 -ml-2 text-muted-foreground">
+                                    <ChevronUp className="h-5 w-5" />
+                                </Button>
+                            </div>
+
+                            <ServingReviewHeader date={scheduleDate} />
+                        </div>
+                    )}
                 </div>
 
                 {/* Body */}
@@ -111,7 +131,7 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="mt-4 pt-4 border-t border-border space-y-4"
+                            className="mt-4 pt-4 space-y-4"
                         >
                             <ServingMemberList
                                 schedule={schedule}
@@ -130,68 +150,10 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                         animate={{ opacity: 1 }}
                         className="mt-4 pt-4 border-t border-border space-y-4"
                     >
-                        {isMeServing ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {schedule.items ? (
-                                    // New structure: collect all assignments for this user
-                                    schedule.items.flatMap(item =>
-                                        item.assignments
-                                            .filter(a => a.memberIds.includes(currentUserUid || ""))
-                                            .map((a, idx) => ({
-                                                id: `${item.id}-${idx}`,
-                                                label: a.label || roles.find(r => r.id === a.roleId)?.name || "Role"
-                                            }))
-                                    ).map(myAssignment => (
-                                        <div key={myAssignment.id} className="space-y-1.5">
-                                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                                {myAssignment.label}
-                                            </p>
-                                            <div
-                                                className={cn(
-                                                    "flex items-center gap-1.5 px-2 py-1 rounded-full border text-sm transition-colors w-fit",
-                                                    "bg-blue-50 border-blue-200 text-blue-700 font-medium"
-                                                )}
-                                            >
-                                                <Avatar className="h-5 w-5">
-                                                    <AvatarFallback className="text-[9px]">{getMember(currentUserUid!)?.name?.[0]}</AvatarFallback>
-                                                </Avatar>
-                                                <span>{getMember(currentUserUid!)?.name || "Me"}</span>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    // Legacy structure
-                                    schedule.roles?.filter(r => r.memberIds.includes(currentUserUid!))
-                                        .map((assignment, idx) => {
-                                            const role = roles.find(r => r.id === assignment.roleId);
-                                            if (!role) return null;
-                                            return (
-                                                <div key={idx} className="space-y-1.5">
-                                                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                                        {role.name}
-                                                    </p>
-                                                    <div
-                                                        className={cn(
-                                                            "flex items-center gap-1.5 px-2 py-1 rounded-full border text-sm transition-colors w-fit",
-                                                            "bg-blue-50 border-blue-200 text-blue-700 font-medium"
-                                                        )}
-                                                    >
-                                                        <Avatar className="h-5 w-5">
-                                                            <AvatarFallback className="text-[9px]">{getMember(currentUserUid!)?.name?.[0]}</AvatarFallback>
-                                                        </Avatar>
-                                                        <span>{getMember(currentUserUid!)?.name || "Me"}</span>
-                                                    </div>
-                                                </div>
-                                            )
-                                        })
-                                )}
-                            </div>
-                        ) : (
-                            <p className="mt-2 text-sm text-muted-foreground line-clamp-1">
-                                {schedule.items ? `${schedule.items.length} items` : `${schedule.roles?.length || 0} roles`}
-                                , {allMemberIds.length} members assigned
-                            </p>
-                        )}
+                        <p className="mt-2 text-sm text-muted-foreground line-clamp-1">
+                            {schedule.items ? `${schedule.items.length} items` : `${schedule.roles?.length || 0} roles`}
+                            , {allMemberIds.length} members assigned
+                        </p>
                     </motion.div>
                 )}
 

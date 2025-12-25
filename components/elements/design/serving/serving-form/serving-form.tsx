@@ -32,6 +32,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { AddActionButton, ServingCard, MemberSuggestionList, MemberBadge, WorshipTeamRoleRow } from "./serving-components";
 import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
+import { ServingReviewHeader } from "@/components/elements/design/serving/serving-review-header";
 
 
 interface Props {
@@ -769,17 +770,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             className="flex flex-col w-full pb-20"
                         >
                             {/* Minimal Header for Step 4 */}
-                            <div className="flex flex-col items-center justify-center py-6 border-b border-border/10 mb-2">
-                                <Label className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 opacity-80">Final Review</Label>
-                                <div className="text-center">
-                                    <h2 className="text-3xl font-bold text-foreground tracking-tight leading-none mb-1">
-                                        {selectedDate && format(selectedDate, "MMM d")}
-                                    </h2>
-                                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide opacity-70">
-                                        {selectedDate && format(selectedDate, "EEEE, yyyy")}
-                                    </p>
-                                </div>
-                            </div>
+                            {/* Minimal Header for Step 4 */}
+                            {selectedDate && <ServingReviewHeader date={selectedDate} className="mb-2" />}
 
                             {/* CUE SHEET / TIMELINE LIST */}
                             <div className="flex flex-col w-full">
