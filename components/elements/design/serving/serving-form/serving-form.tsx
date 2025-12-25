@@ -32,7 +32,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { AddActionButton, ServingCard, MemberSuggestionList, MemberBadge, WorshipTeamRoleRow } from "./serving-components";
 import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
-import { ServingReviewHeader } from "@/components/elements/design/serving/serving-review-header";
 
 
 interface Props {
@@ -281,7 +280,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     ...initialData,
                     date: dateString,
                     items: items,
-                    templateId: selectedTemplateId || undefined,
+                    templateId: selectedTemplateId || null,
                 };
                 await ServingService.updateSchedule(teamId, updatePayload);
                 toast({ title: "Schedule updated!" });
@@ -770,8 +769,19 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             className="flex flex-col w-full pb-20"
                         >
                             {/* Minimal Header for Step 4 */}
-                            {/* Minimal Header for Step 4 */}
-                            {selectedDate && <ServingReviewHeader date={selectedDate} className="mb-2" />}
+                            {selectedDate && (
+                                <div className="flex flex-col items-center justify-center py-4 border-b border-border/10 mb-0 mx-auto mb-2">
+                                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 opacity-80">Final Review</span>
+                                    <div className="text-center">
+                                        <h2 className="text-3xl font-bold text-foreground tracking-tight leading-none mb-1">
+                                            {format(selectedDate, "MMM d")}
+                                        </h2>
+                                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide opacity-70">
+                                            {format(selectedDate, "EEEE, yyyy")}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* CUE SHEET / TIMELINE LIST */}
                             <div className="flex flex-col w-full">
@@ -1194,7 +1204,7 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                                     <div className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center group-hover:border-blue-100 group-hover:bg-blue-50 transition-colors">
                                         <Plus className="text-gray-300 w-4 h-4 group-hover:text-blue-500" />
                                     </div>
-                                    <span className="text-[13px] font-bold">담당자 할당하기</span>
+                                    <span className="text-[13px] font-bold">Assign Member</span>
                                 </button>
                             )}
                         </div>
@@ -1339,7 +1349,7 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute top-3 right-5 h-8 w-8 p-0 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-20"
+                    className="absolute top-3 right-5 h-8 w-8 p-0 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-50 pointer-events-auto"
                     onClick={(e) => {
                         e.stopPropagation();
                         onDelete();
@@ -1422,7 +1432,7 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                                 <div className="w-6 h-6 rounded-full border border-dashed border-current flex items-center justify-center">
                                     <Plus className="w-3.5 h-3.5" />
                                 </div>
-                                <span className="text-[13px] font-bold">담당자 할당하기</span>
+                                <span className="text-[13px] font-bold">Assign Member</span>
                             </button>
                         )}
                     </div>
