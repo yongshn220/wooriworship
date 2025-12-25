@@ -86,6 +86,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
     const [newTemplateName, setNewTemplateName] = useState("");
     const [tempTemplateName, setTempTemplateName] = useState("");
+    const [createEmptyMode, setCreateEmptyMode] = useState(false);
 
     // Timeline Groups
     const [standardGroups, setStandardGroups] = useState<string[]>([]);
@@ -125,6 +126,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         }
     }, [teamId]); // Only run when teamId changes
 
+    // Initialize Data (EDIT Mode)
     useEffect(() => {
         if (mode === FormMode.EDIT && initialData) {
             const [y, m, d] = initialData.date.split('-').map(Number);
@@ -147,7 +149,12 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 }));
                 setItems(migratedItems);
             }
-        } else if (mode === FormMode.CREATE && items.length === 0 && templates.length > 0) {
+        }
+    }, [mode, initialData, roles]); // Removed items.length dependency
+
+    // Auto-load Template (CREATE Mode)
+    useEffect(() => {
+        if (mode === FormMode.CREATE && items.length === 0 && templates.length > 0) {
             // Priority 1: Use selectedTemplateId (last used) or first template
             const templateToLoad = templates.find(t => t.id === selectedTemplateId) || templates[0];
             if (templateToLoad) {
@@ -162,7 +169,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 setSelectedTemplateId(templateToLoad.id);
             }
         }
-    }, [mode, initialData, roles, items.length, templates, selectedTemplateId]);
+    }, [mode, items.length, templates, selectedTemplateId]);
 
     // Track template changes
     useEffect(() => {
@@ -336,18 +343,32 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const handleSaveTemplate = async () => {
         if (!newTemplateName.trim()) return;
         try {
+            const itemsToSave = createEmptyMode ? [] : items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }));
             const templateData = {
                 name: newTemplateName.trim(),
                 teamId,
-                items: items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }))
+                items: itemsToSave
             };
             await ServingService.createTemplate(teamId, templateData);
             const newTemps = await ServingService.getTemplates(teamId);
             setTemplates(newTemps);
+
+            // Select the new template
+            const createdTemplate = newTemps.find(t => t.name === newTemplateName.trim());
+            if (createdTemplate) {
+                setSelectedTemplateId(createdTemplate.id);
+                // If we created an empty template, clear the items on screen
+                if (createEmptyMode) {
+                    setItems([]);
+                }
+                // If we saved current items as new template, we don't need to change items, but we are now "on" that template.
+            }
+
             setNewTemplateName("");
+            setCreateEmptyMode(false);
             setIsTemplateDialogOpen(false);
             toast({
-                title: "Template saved!",
+                title: createEmptyMode ? "Empty template created!" : "Template saved!",
                 description: `'${newTemplateName}' is now available for reuse.`
             });
         } catch (e) {
@@ -457,7 +478,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     }
 
     return (
-        <div ref={containerRef} className="fixed inset-0 z-[100] bg-gray-50 flex flex-col overflow-y-auto overflow-x-hidden">
+        <div ref={containerRef} className="fixed inset-0 z-[100] bg-gray-50 flex flex-col overflow-y-auto overflow-x-hidden no-scrollbar">
 
             {/* STICKY HEADER - Minimal with Gradient Mask */}
             <div className="sticky top-0 z-50 w-full px-6 pt-8 pb-12 flex items-center justify-between pointer-events-none bg-gradient-to-b from-gray-50 via-gray-50/90 to-transparent">
@@ -621,6 +642,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                             className="flex-shrink-0 px-4 py-2 bg-transparent text-gray-400 border border-dashed border-gray-200 rounded-full text-[13px] font-medium active:scale-95 transition-all hover:bg-gray-50 hover:border-gray-300 flex items-center gap-1"
                                             onClick={() => {
                                                 setNewTemplateName("");
+                                                setCreateEmptyMode(true);
                                                 setIsTemplateDialogOpen(true);
                                             }}
                                         >
@@ -631,7 +653,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-gray-300 hover:text-gray-900 hover:bg-gray-50 transition-colors flex-shrink-0">
+                                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-zinc-900 hover:text-black hover:bg-gray-50 transition-colors flex-shrink-0">
                                                 <MoreHorizontal className="h-5 w-5" />
                                             </Button>
                                         </DropdownMenuTrigger>
@@ -661,6 +683,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                 onClick={() => {
                                                     const currentTemp = templates.find(t => t.id === selectedTemplateId);
                                                     setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
+                                                    setCreateEmptyMode(false);
                                                     setIsTemplateDialogOpen(true);
                                                 }}
                                             >
@@ -725,7 +748,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                 const newItems = items.map(i => i.id === item.id ? newItem : i);
                                                                 setItems(newItems);
                                                             }}
-                                                            onDelete={() => setItems(items.filter(i => i.id !== item.id))}
+                                                            onDelete={() => setItems(prev => prev.filter(i => i.id !== item.id))}
                                                             onOpenAdd={(aIdx) => setActiveSelection({
                                                                 itemId: item.id,
                                                                 assignmentIndex: aIdx,
@@ -973,12 +996,16 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     <DialogHeader className="space-y-3">
                         <div className="flex justify-center">
                             <div className="p-3 bg-primary/10 rounded-full">
-                                <Save className="w-8 h-8 text-primary" />
+                                {createEmptyMode ? <Plus className="w-8 h-8 text-primary" /> : <Save className="w-8 h-8 text-primary" />}
                             </div>
                         </div>
-                        <DialogTitle className="text-2xl font-bold text-center">Save Template</DialogTitle>
+                        <DialogTitle className="text-2xl font-bold text-center">
+                            {createEmptyMode ? "Create New Template" : "Save Template"}
+                        </DialogTitle>
                         <p className="text-sm text-center text-muted-foreground font-medium leading-relaxed">
-                            Save this timeline as a template to reuse it for future worship services.
+                            {createEmptyMode
+                                ? "Create a new empty template to start designing a fresh timeline."
+                                : "Save this timeline as a template to reuse it for future worship services."}
                         </p>
                     </DialogHeader>
                     <div className="py-6">
@@ -1009,7 +1036,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             onClick={handleSaveTemplate}
                             disabled={!newTemplateName.trim()}
                         >
-                            Save
+                            {createEmptyMode ? "Create" : "Save"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
