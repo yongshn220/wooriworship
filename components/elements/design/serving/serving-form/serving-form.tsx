@@ -661,9 +661,12 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                             <DropdownMenuItem
                                                 className="rounded-2xl py-3 cursor-pointer font-bold"
                                                 disabled={!selectedTemplateId}
-                                                onClick={() => {
-                                                    setTempTemplateName(templates.find(t => t.id === selectedTemplateId)?.name || "");
-                                                    setIsRenameDialogOpen(true);
+                                                onSelect={() => {
+                                                    setTimeout(() => {
+                                                        const currentTemp = templates.find(t => t.id === selectedTemplateId);
+                                                        setTempTemplateName(currentTemp?.name || "");
+                                                        setIsRenameDialogOpen(true);
+                                                    }, 150);
                                                 }}
                                             >
                                                 <Pencil className="mr-2 h-4 w-4" />
@@ -673,18 +676,22 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                             <DropdownMenuItem
                                                 className={cn("rounded-2xl py-3 cursor-pointer", hasTemplateChanges ? "text-primary font-bold bg-primary/5" : "text-muted-foreground")}
                                                 disabled={!selectedTemplateId || !hasTemplateChanges}
-                                                onClick={handleUpdateTemplate}
+                                                onSelect={() => {
+                                                    handleUpdateTemplate();
+                                                }}
                                             >
                                                 <Save className="mr-2 h-4 w-4" />
                                                 Save to "{templates.find(t => t.id === selectedTemplateId)?.name}"
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 className="rounded-2xl py-3 cursor-pointer font-bold"
-                                                onClick={() => {
+                                                onSelect={() => {
                                                     const currentTemp = templates.find(t => t.id === selectedTemplateId);
                                                     setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
                                                     setCreateEmptyMode(false);
-                                                    setIsTemplateDialogOpen(true);
+                                                    setTimeout(() => {
+                                                        setIsTemplateDialogOpen(true);
+                                                    }, 150);
                                                 }}
                                             >
                                                 <Plus className="mr-2 h-4 w-4" />
@@ -693,7 +700,11 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                             <DropdownMenuSeparator className="my-2 bg-gray-50" />
                                             <DropdownMenuItem
                                                 className="rounded-2xl py-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 font-bold"
-                                                onClick={() => setDeleteConfirm({ type: 'template', id: selectedTemplateId || '', open: true })}
+                                                onSelect={() => {
+                                                    setTimeout(() => {
+                                                        setDeleteConfirm({ type: 'template', id: selectedTemplateId || '', open: true });
+                                                    }, 150);
+                                                }}
                                             >
                                                 <Trash2 className="mr-2 h-4 w-4" />
                                                 Delete Template
