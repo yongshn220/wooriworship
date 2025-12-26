@@ -336,6 +336,13 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         try {
             await ServingService.deleteRole(teamId, roleId);
             setRolesUpdater(prev => prev + 1);
+
+            // Cleanup assignments for this role
+            setItems(prevItems => prevItems.map(item => ({
+                ...item,
+                assignments: item.assignments.filter(a => a.roleId !== roleId)
+            })));
+
             toast({ title: "Role deleted" });
             setDeleteConfirm(prev => ({ ...prev, open: false }));
         } catch (e) {
