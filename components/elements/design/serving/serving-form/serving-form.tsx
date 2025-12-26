@@ -1374,7 +1374,7 @@ function SortableWorshipItem({ item, getMemberName, onGoToStep2, onUpdate, roles
 
     return (
         <Reorder.Item value={item} dragListener={false} dragControls={controls} className="relative z-0 select-none">
-            <div className="group flex flex-col gap-4 p-5 rounded-3xl border bg-gradient-to-br from-blue-50/50 to-white shadow-sm hover:shadow-md transition-all">
+            <div className="group flex flex-col gap-4 p-5 rounded-xl border bg-gradient-to-br from-blue-50/50 to-white shadow-sm hover:shadow-md transition-all">
                 {/* Header */}
                 <div className="flex items-start justify-between gap-3">
                     <div className="mt-1 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500" onPointerDown={(e) => controls.start(e)}>

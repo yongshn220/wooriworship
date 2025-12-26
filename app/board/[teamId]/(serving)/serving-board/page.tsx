@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { getPathCreateServing } from "@/components/util/helper/routes";
 import { ServingCard } from "./_components/serving-card";
 import { auth } from "@/firebase";
+import { ServingListSkeleton } from "./_components/serving-list-skeleton";
 
 export default function ServingPage() {
     const teamId = useRecoilValue(currentTeamIdAtom);
@@ -72,11 +73,7 @@ export default function ServingPage() {
     const currentUserUid = auth.currentUser?.uid;
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-full">
-                <Spinner />
-            </div>
-        );
+        return <ServingListSkeleton />;
     }
 
     return (

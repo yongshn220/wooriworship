@@ -4,6 +4,7 @@ import { WorshipCard } from "@/app/board/[teamId]/(worship)/worship-board/_compo
 import { EmptyWorshipBoardPage } from "@/app/board/[teamId]/(worship)/worship-board/_components/empty-worship-board-page/empty-worship-board-page";
 import { useRecoilValueLoadable, useRecoilState } from "recoil";
 import { useSearchParams } from "next/navigation";
+import { WorshipListSkeleton, WorshipCardSkeleton } from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-list-skeleton";
 
 
 interface Props {
@@ -56,7 +57,7 @@ export function WorshipCardList({ teamId }: Props) {
   }, [worshipIdsLoadable.state, expandedId, worshipIds, setDisplayedCount, displayedCount]);
 
   switch (worshipIdsLoadable.state) {
-    case 'loading': return <></>
+    case 'loading': return <WorshipListSkeleton />
     case 'hasError': throw worshipIdsLoadable.contents
     case 'hasValue':
       return (
@@ -87,20 +88,5 @@ export function WorshipCardList({ teamId }: Props) {
       )
   }
   return <></>;
-  // Fallback if needed, though switch covers cases provided the state is valid. 
-  // Typescript might complain if switch isn't exhaustive? Recoil Loadable state is 'loading' | 'hasValue' | 'hasError'.
 }
 
-function WorshipCardSkeleton() {
-  return (
-    <div className="w-full h-[400px] border rounded-lg p-4 space-y-4 bg-card animate-pulse">
-      <div className="w-2/3 h-6 bg-muted rounded"></div>
-      <div className="w-1/2 h-4 bg-muted rounded"></div>
-      <div className="w-full h-40 bg-muted/50 rounded-md"></div>
-      <div className="space-y-2">
-        <div className="w-full h-4 bg-muted rounded"></div>
-        <div className="w-5/6 h-4 bg-muted rounded"></div>
-      </div>
-    </div>
-  )
-}
