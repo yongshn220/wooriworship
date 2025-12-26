@@ -12,6 +12,7 @@ interface Props {
 
 import { AlphabetIndexer } from "./alphabet-indexer";
 import { ActiveFilterList } from "@/app/board/_components/active-filter-list";
+import { SongRowSkeleton } from "@/app/board/[teamId]/(song)/song-board/_components/song-list-skeleton";
 
 // ... existing imports
 
@@ -160,26 +161,5 @@ export function SongList({ teamId }: Props) {
   )
 }
 
-function SongRowSkeleton() {
-  return (
-    <div className="relative rounded-xl bg-card border border-border shadow-sm flex items-center h-[64px] sm:h-[100px] p-1 sm:p-5">
-      {/* Left Column Skeleton */}
-      <div className="flex-1 flex flex-col justify-between h-full py-0.5 sm:py-1 px-1">
-        {/* Title + Subtitle */}
-        <div className="flex items-center gap-2">
-          <div className="h-4 sm:h-5 bg-muted rounded w-1/3 animate-pulse"></div>
-          <div className="h-2.5 sm:h-3 bg-muted rounded w-1/5 animate-pulse"></div>
-        </div>
-        {/* Author */}
-        <div className="h-2.5 sm:h-3 bg-muted rounded w-1/3 animate-pulse"></div>
-        {/* Key */}
-        <div className="h-3.5 sm:h-4 w-8 bg-muted rounded animate-pulse mt-auto"></div>
-      </div>
+// function SongRowSkeleton() { ... } removed
 
-      {/* Right Column Skeleton */}
-      <div className="w-5 sm:w-10 flex justify-center items-center shrink-0 border-l border-border pl-0.5 sm:pl-3 h-2/3">
-        <div className="h-4 w-4 sm:h-6 sm:w-6 bg-muted rounded animate-pulse"></div>
-      </div>
-    </div>
-  )
-}
