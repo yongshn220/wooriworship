@@ -18,6 +18,8 @@ import { teamUpdaterAtom, teamAtom } from "@/global-states/teamState";
 import { ServingService, TeamService } from "@/apis";
 import { userAtom } from "@/global-states/userState";
 
+import { ConfirmationDialog } from "@/components/elements/dialog/user-confirmation/confirmation-dialog";
+
 interface Props {
     userId: string | null;
     teamId: string;
@@ -34,6 +36,7 @@ export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) 
     const setServingRolesUpdater = useSetRecoilState(servingRolesUpdaterAtom);
     const setTeamUpdater = useSetRecoilState(teamUpdaterAtom);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showRevokeDialog, setShowRevokeDialog] = useState(false);
 
     const isAdmin = useMemo(() => {
         if (!userId || !team) return false;
@@ -45,15 +48,35 @@ export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) 
         return team.admins?.includes(auth.currentUser.uid);
     }, [team]);
 
+    const adminCount = useMemo(() => {
+        return team?.admins?.length || 0;
+    }, [team?.admins]);
+
     if (!userId) return null;
 
     async function toggleAdmin() {
         if (!userId || !isCurrentUserAdmin) return;
+
         if (isAdmin) {
-            await TeamService.removeAdmin(teamId, userId);
+            // Check if this is the last admin
+            if (adminCount <= 1) {
+                toast({
+                    title: "Cannot revoke admin access",
+                    description: "You are the only admin. Assign another admin before removing yourself.",
+                    variant: "destructive"
+                });
+                return;
+            }
+            setShowRevokeDialog(true);
         } else {
             await TeamService.addAdmin(teamId, userId);
+            setTeamUpdater(prev => prev + 1);
         }
+    }
+
+    async function handleRevokeAdmin() {
+        if (!userId) return;
+        await TeamService.removeAdmin(teamId, userId);
         setTeamUpdater(prev => prev + 1);
     }
 
@@ -99,6 +122,14 @@ export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) 
                 title="Remove Team Member"
                 description={`Are you sure you want to remove ${user?.name} from the team? This action cannot be undone.`}
                 onDeleteHandler={handleRemoveMember}
+            />
+
+            <ConfirmationDialog
+                isOpen={showRevokeDialog}
+                setOpen={setShowRevokeDialog}
+                title="Revoke Admin Access"
+                description={`Are you sure you want to remove admin privileges from ${user?.name}? They will no longer be able to manage team settings.`}
+                onDeleteHandler={handleRevokeAdmin}
             />
 
             <div className="flex flex-col gap-6 pb-6">

@@ -358,7 +358,15 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const handleSaveTemplate = async () => {
         if (!newTemplateName.trim()) return;
         try {
-            const itemsToSave = createEmptyMode ? [] : items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }));
+            // Default fixed item for new templates
+            const defaultFixedItem = {
+                title: '찬양',
+                type: 'WORSHIP_TEAM',
+                remarks: "",
+                assignments: [] as ServingAssignment[]
+            };
+
+            const itemsToSave = createEmptyMode ? [defaultFixedItem] : items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }));
             const templateData = {
                 name: newTemplateName.trim(),
                 teamId,
@@ -372,9 +380,14 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             const createdTemplate = newTemps.find(t => t.name === newTemplateName.trim());
             if (createdTemplate) {
                 setSelectedTemplateId(createdTemplate.id);
-                // If we created an empty template, clear the items on screen
+                // If we created an empty template, set the items to the default fixed item
                 if (createEmptyMode) {
-                    setItems([]);
+                    setItems([{
+                        ...defaultFixedItem,
+                        id: Math.random().toString(36).substr(2, 9),
+                        order: 0,
+                        assignments: []
+                    } as ServingItem]);
                 }
                 // If we saved current items as new template, we don't need to change items, but we are now "on" that template.
             }
@@ -383,8 +396,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             setCreateEmptyMode(false);
             setIsTemplateDialogOpen(false);
             toast({
-                title: createEmptyMode ? "Empty template created!" : "Template saved!",
-                description: `'${newTemplateName}' is now available for reuse.`
+                title: createEmptyMode ? "New template created!" : "Template saved!",
+                description: `'${newTemplateName}' is now available.`
             });
         } catch (e) {
             console.error(e);
@@ -599,7 +612,14 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                                 {/* Calendar Card */}
                                 <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 flex flex-col items-center gap-4">
-                                    <Label className="text-sm font-semibold text-muted-foreground self-start ml-1">Date</Label>
+                                    <div className="w-full flex items-center justify-between ml-1">
+                                        <Label className="text-sm font-semibold text-muted-foreground">Date</Label>
+                                        {selectedDate && (
+                                            <span className="text-sm font-bold text-primary bg-primary/5 px-3 py-1 rounded-full">
+                                                {format(selectedDate, "yyyy-MM-dd (eee)")}
+                                            </span>
+                                        )}
+                                    </div>
                                     <Calendar
                                         mode="single"
                                         selected={selectedDate}
@@ -1367,6 +1387,7 @@ function SortableWorshipItem({ item, getMemberName, onGoToStep2, onUpdate, roles
                                 Fixed Item
                             </Badge>
                             <div className="flex items-center gap-2 group/edit w-full">
+                                <Pencil className="w-3.5 h-3.5 text-blue-500/30 flex-shrink-0" />
                                 <input
                                     value={item.title}
                                     onChange={(e) => onUpdate({ ...item, title: e.target.value })}
@@ -1374,7 +1395,6 @@ function SortableWorshipItem({ item, getMemberName, onGoToStep2, onUpdate, roles
                                     className="text-lg font-bold text-gray-900 bg-transparent border-0 focus:ring-0 p-0 placeholder:text-gray-300 w-full leading-tight"
                                     placeholder="Title"
                                 />
-                                <Pencil className="w-4 h-4 text-gray-300 group-hover/edit:text-blue-500 transition-colors opacity-0 group-hover/edit:opacity-100" />
                             </div>
                         </div>
                     </div>
@@ -1458,7 +1478,7 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute top-3 right-5 h-8 w-8 p-0 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-50 pointer-events-auto"
+                    className="absolute top-5 right-5 h-8 w-8 p-0 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-50 pointer-events-auto"
                     onClick={(e) => {
                         e.stopPropagation();
                         onDelete();
@@ -1468,10 +1488,11 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                 </Button>
 
                 {/* Main Content - Top (Title/Remarks) */}
-                <div className="pl-12 pr-12 pt-6 pb-3">
+                <div className="pl-12 pr-16 pt-6 pb-3">
                     <div className="flex flex-col gap-1.5">
                         {/* Title Input */}
                         <div className="flex items-center gap-2 group/edit w-full">
+                            <Pencil className="w-3.5 h-3.5 text-blue-500/30 flex-shrink-0" />
                             <input
                                 value={item.title}
                                 onChange={(e) => onUpdate({ ...item, title: e.target.value })}
@@ -1479,10 +1500,10 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                                 className="text-[18px] font-bold text-gray-900 bg-transparent border-0 focus:ring-0 p-0 placeholder:text-gray-300 w-full leading-tight"
                                 placeholder="Sequence Title"
                             />
-                            <Pencil className="w-4 h-4 text-gray-300 group-hover/edit:text-blue-500 transition-colors opacity-0 group-hover/edit:opacity-100" />
                         </div>
                         {/* Remarks Input */}
                         <div className="flex items-center gap-2 group/edit w-full">
+                            <Pencil className="w-3 h-3 text-blue-500/30 flex-shrink-0" />
                             <input
                                 value={item.remarks || ""}
                                 onChange={(e) => onUpdate({ ...item, remarks: e.target.value })}
@@ -1490,7 +1511,6 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                                 className="text-[14px] text-gray-400 font-medium bg-transparent border-0 focus:ring-0 p-0 placeholder:text-gray-300 w-full"
                                 placeholder="Add note..."
                             />
-                            <Pencil className="w-3.5 h-3.5 text-gray-300 group-hover/edit:text-blue-500 transition-colors opacity-0 group-hover/edit:opacity-100" />
                         </div>
                     </div>
                 </div>
