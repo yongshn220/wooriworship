@@ -25,6 +25,7 @@ export interface ServingSchedule {
     id: string;
     teamId: string;
     date: string; // YYYY-MM-DD
+    title?: string; // Optional title for the service (e.g. "Christmas Service")
     items?: ServingItem[]; // New cue-sheet based structure
     templateId?: string; // Track which template was used
     roles?: { // Keep for backward compatibility

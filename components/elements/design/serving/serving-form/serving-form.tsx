@@ -10,7 +10,7 @@ import { auth } from "@/firebase";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { format, nextSunday } from "date-fns";
+import { format, nextSunday, nextFriday } from "date-fns";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus, User, Users, Pencil, X, Calendar as CalendarIcon } from "lucide-react";
 import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -67,6 +67,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const totalSteps = 4;
 
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(nextSunday(new Date()));
+    const [title, setTitle] = useState("");
     const [items, setItems] = useState<ServingItem[]>([]);
     const [templates, setTemplates] = useState<any[]>([]);
     const [isTemplatesLoaded, setIsTemplatesLoaded] = useState(false);
@@ -134,6 +135,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             const [y, m, d] = initialData.date.split('-').map(Number);
             const parsedDate = new Date(y, m - 1, d);
             setSelectedDate(parsedDate);
+            setTitle(initialData.title || "");
 
             if (initialData.items && initialData.items.length > 0) {
                 setItems(initialData.items);
@@ -267,6 +269,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             const payload: Omit<ServingSchedule, "id"> = {
                 teamId,
                 date: dateString,
+                title: title.trim(),
                 items: items,
             };
 
@@ -290,6 +293,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 const updatePayload = {
                     ...initialData,
                     date: dateString,
+                    title: title.trim(),
                     items: items,
                     templateId: selectedTemplateId || null,
                 };
@@ -536,21 +540,64 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         >
                             <div className="space-y-2 text-center">
                                 <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 1</Label>
-                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Date</h2>
+                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Date & Title</h2>
                             </div>
 
-                            <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-2 flex justify-center">
-                                <Calendar
-                                    mode="single"
-                                    selected={selectedDate}
-                                    onSelect={(date) => {
-                                        if (date) {
-                                            setSelectedDate(date);
-                                            nextStep();
-                                        }
-                                    }}
-                                    className="rounded-2xl"
-                                />
+                            <div className="space-y-6">
+                                {/* Title Card */}
+                                <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 space-y-4">
+                                    <div className="space-y-2">
+                                        <Label className="text-sm font-semibold text-muted-foreground ml-1">Title</Label>
+                                        <Input
+                                            placeholder="e.g. Sunday Service"
+                                            value={title}
+                                            onChange={(e) => setTitle(e.target.value)}
+                                            className="h-14 text-lg bg-gray-50/50 border-gray-100 focus:bg-white transition-all rounded-2xl px-4 font-bold placeholder:font-normal placeholder:text-muted-foreground/50"
+                                        />
+                                    </div>
+
+                                    {/* Suggestions */}
+                                    <div className="flex flex-wrap gap-2">
+                                        <Label className="text-xs font-bold text-muted-foreground/70 uppercase tracking-wider w-full mb-1 ml-1">Quick Select</Label>
+                                        <button
+                                            onClick={() => {
+                                                const d = nextSunday(new Date());
+                                                setSelectedDate(d);
+                                                setTitle("주일예배");
+                                                toast({ title: "Applied Weekly Sunday Service" });
+                                            }}
+                                            className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95"
+                                        >
+                                            {format(nextSunday(new Date()), "yyyy-MM-dd")} 주일예배
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                const d = nextFriday(new Date());
+                                                setSelectedDate(d);
+                                                setTitle("금요예배");
+                                                toast({ title: "Applied Friday Service" });
+                                            }}
+                                            className="px-4 py-2 rounded-xl bg-violet-50 text-violet-600 border border-violet-100 text-xs font-bold hover:bg-violet-100 hover:border-violet-200 transition-all active:scale-95"
+                                        >
+                                            {format(nextFriday(new Date()), "yyyy-MM-dd")} 금요예배
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Calendar Card */}
+                                <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 flex flex-col items-center gap-4">
+                                    <Label className="text-sm font-semibold text-muted-foreground self-start ml-1">Date</Label>
+                                    <Calendar
+                                        mode="single"
+                                        selected={selectedDate}
+                                        onSelect={(date) => {
+                                            if (date) {
+                                                setSelectedDate(date);
+                                            }
+                                        }}
+                                        className="rounded-2xl border-0"
+                                    />
+                                </div>
                             </div>
                         </motion.div>
                     )}
@@ -692,7 +739,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                 }}
                                             >
                                                 <Save className="mr-2 h-4 w-4" />
-                                                Save to "{templates.find(t => t.id === selectedTemplateId)?.name}"
+                                                Save to &quot;{templates.find(t => t.id === selectedTemplateId)?.name}&quot;
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 className="rounded-2xl py-3 cursor-pointer font-bold"
@@ -865,7 +912,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                 className="px-6 py-2 rounded-full bg-white/40 backdrop-blur-xl group active:scale-95 transition-all"
                             >
                                 <span className="text-[13px] font-bold text-primary">
-                                    Save to "{templates.find(t => t.id === selectedTemplateId)?.name}"
+                                    Save to &quot;{templates.find(t => t.id === selectedTemplateId)?.name}&quot;
                                 </span>
                             </button>
                         </motion.div>
