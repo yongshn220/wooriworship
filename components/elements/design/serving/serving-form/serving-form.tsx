@@ -557,30 +557,32 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                     </div>
 
                                     {/* Suggestions */}
+                                    {/* Suggestions */}
                                     <div className="flex flex-wrap gap-2">
-                                        <Label className="text-xs font-bold text-muted-foreground/70 uppercase tracking-wider w-full mb-1 ml-1">Quick Select</Label>
-                                        <button
-                                            onClick={() => {
-                                                const d = nextSunday(new Date());
-                                                setSelectedDate(d);
-                                                setTitle("주일예배");
-                                                toast({ title: "Applied Weekly Sunday Service" });
-                                            }}
-                                            className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95"
-                                        >
-                                            {format(nextSunday(new Date()), "yyyy-MM-dd")} 주일예배
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                const d = nextFriday(new Date());
-                                                setSelectedDate(d);
-                                                setTitle("금요예배");
-                                                toast({ title: "Applied Friday Service" });
-                                            }}
-                                            className="px-4 py-2 rounded-xl bg-violet-50 text-violet-600 border border-violet-100 text-xs font-bold hover:bg-violet-100 hover:border-violet-200 transition-all active:scale-95"
-                                        >
-                                            {format(nextFriday(new Date()), "yyyy-MM-dd")} 금요예배
-                                        </button>
+                                        {[
+                                            {
+                                                date: nextFriday(new Date()),
+                                                title: "금요예배",
+                                                toast: "Applied Friday Service"
+                                            },
+                                            {
+                                                date: nextSunday(new Date()),
+                                                title: "주일예배",
+                                                toast: "Applied Weekly Sunday Service"
+                                            }
+                                        ].sort((a, b) => a.date.getTime() - b.date.getTime()).map((option) => (
+                                            <button
+                                                key={option.title}
+                                                onClick={() => {
+                                                    setSelectedDate(option.date);
+                                                    setTitle(option.title);
+                                                    toast({ title: option.toast });
+                                                }}
+                                                className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95"
+                                            >
+                                                {format(option.date, "yyyy-MM-dd")} {option.title}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
 
