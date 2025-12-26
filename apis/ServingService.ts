@@ -262,7 +262,7 @@ class ServingService extends BaseService {
             { title: '예배의 부르심', type: 'FLOW' },
             { title: '교독문', type: 'FLOW' },
             { title: '기도', type: 'FLOW' },
-            { title: '찬양팀 구성', type: 'FLOW' },
+            { title: '찬양', type: 'FLOW' },
             { title: '설교', type: 'FLOW' },
             { title: '봉헌 및 광고', type: 'FLOW' },
             { title: '축도', type: 'FLOW' },
