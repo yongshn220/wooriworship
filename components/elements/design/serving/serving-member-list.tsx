@@ -71,11 +71,14 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid, fi
                                             // WORKSHOP_TEAM Filter: If filtered, only show roles containing me
                                             if (filterMine && !assign.memberIds.includes(currentUserUid || "")) return null;
 
-                                            const roleName = roles.find(r => r.id === assign.roleId)?.name || "Role";
+                                            const role = roles.find(r => r.id === assign.roleId);
+                                            // Hide orphaned assignments (role deleted but assignment remains)
+                                            if (!role) return null;
+
                                             return (
                                                 <WorshipTeamRoleRow
                                                     key={assign.roleId}
-                                                    roleName={roleName}
+                                                    roleName={role.name}
                                                     memberIds={assign.memberIds}
                                                     getMemberName={getMemberName}
                                                     className="py-1 border-b border-border/30 last:border-0"
