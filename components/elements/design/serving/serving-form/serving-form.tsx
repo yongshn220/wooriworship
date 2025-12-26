@@ -10,7 +10,7 @@ import { auth } from "@/firebase";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { format, nextSunday, nextFriday } from "date-fns";
+import { format, nextSunday, nextFriday, addDays, isSaturday, isSunday } from "date-fns";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus, User, Users, Pencil, X, Calendar as CalendarIcon } from "lucide-react";
 import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -561,6 +561,17 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                     <div className="flex flex-wrap gap-2">
                                         {[
                                             {
+                                                date: (() => {
+                                                    let d = addDays(new Date(), 1);
+                                                    while (isSaturday(d) || isSunday(d)) {
+                                                        d = addDays(d, 1);
+                                                    }
+                                                    return d;
+                                                })(),
+                                                title: "새벽예배",
+                                                toast: "Applied Early Morning Prayer"
+                                            },
+                                            {
                                                 date: nextFriday(new Date()),
                                                 title: "금요예배",
                                                 toast: "Applied Friday Service"
@@ -580,7 +591,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                 }}
                                                 className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95"
                                             >
-                                                {format(option.date, "yyyy-MM-dd")} {option.title}
+                                                {format(option.date, "MM-dd")} {option.title}
                                             </button>
                                         ))}
                                     </div>
