@@ -1,4 +1,4 @@
-import { atom, atomFamily, selectorFamily } from "recoil";
+import { atom, atomFamily, selectorFamily, RecoilState } from "recoil";
 import { Worship } from "@/models/worship";
 import { WorshipService } from "@/apis";
 import { Song } from "@/models/song";
@@ -10,10 +10,10 @@ if (!globalForRecoil.recoilAtoms) globalForRecoil.recoilAtoms = {};
 
 const currentTeamWorshipIdsAtomType = atomFamily<Array<string>, string>({} as any);
 
-export const currentTeamWorshipIdsAtom = (globalForRecoil.recoilAtoms['currentTeamWorshipIdsAtom'] || atomFamily<Array<string>, string>({
-  key: "currentTeamWorshipIdsAtom",
+export const currentTeamWorshipListAtom = (globalForRecoil.recoilAtoms['currentTeamWorshipListAtom'] || atomFamily<Array<Worship>, string>({
+  key: "currentTeamWorshipListAtom",
   default: selectorFamily({
-    key: "currentTeamWorshipIdsAtom/default",
+    key: "currentTeamWorshipListAtom/default",
     get: (teamId) => async ({ get }) => {
       if (!teamId) return []
 
@@ -33,12 +33,26 @@ export const currentTeamWorshipIdsAtom = (globalForRecoil.recoilAtoms['currentTe
           }
         });
 
-        return worshipList.map((worship => worship.id))
+        return worshipList
       }
       catch (e) {
         console.error(e)
         return []
       }
+    }
+  })
+})) as (param: string) => RecoilState<Array<Worship>>;
+
+if (process.env.NODE_ENV !== 'production') globalForRecoil.recoilAtoms['currentTeamWorshipListAtom'] = currentTeamWorshipListAtom
+
+
+export const currentTeamWorshipIdsAtom = (globalForRecoil.recoilAtoms['currentTeamWorshipIdsAtom'] || atomFamily<Array<string>, string>({
+  key: "currentTeamWorshipIdsAtom",
+  default: selectorFamily({
+    key: "currentTeamWorshipIdsAtom/default",
+    get: (teamId) => ({ get }) => {
+      const worshipList = get(currentTeamWorshipListAtom(teamId) as any) as Array<Worship>;
+      return worshipList.map(w => w.id as string);
     }
   })
 })) as typeof currentTeamWorshipIdsAtomType;

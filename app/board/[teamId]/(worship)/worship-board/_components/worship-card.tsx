@@ -14,7 +14,8 @@ import {
   Play,
   ClipboardList,
   Sparkles,
-  Star
+  Star,
+  User
 } from "lucide-react";
 
 import {
@@ -163,7 +164,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
         <CardContent className="p-4 sm:p-6">
           {/* Header Section */}
           <div className="flex justify-between items-start mb-4 group cursor-pointer" onClick={handleToggleExpand}>
-            <div className="space-y-1">
+            <div className="space-y-2 mt-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>{timestampToDateStringFormatted(worship.worship_date)}</span>
                 <span className={cn(
@@ -183,12 +184,18 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                     {highlightText(worship.subtitle, searchInput)}
                   </span>
                 )}
-                {isExpanded && <ChevronUp className="h-6 w-6 text-muted-foreground animate-in fade-in zoom-in duration-300" />}
               </h2>
             </div>
 
-            <div onClick={(e) => e.stopPropagation()}>
-              <WorshipHeaderMenu worshipId={worship.id} createdById={worship.created_by.id} teamId={teamId} />
+            <div className="flex flex-col items-center gap-3">
+              <div onClick={(e) => e.stopPropagation()}>
+                <WorshipHeaderMenu worshipId={worship.id} createdById={worship.created_by.id} teamId={teamId} />
+              </div>
+              {isExpanded ? (
+                <ChevronUp className="h-5 w-5 text-muted-foreground/50" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-muted-foreground/50" />
+              )}
             </div>
           </div>
 
@@ -236,8 +243,8 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                     teamId={teamId}
                     date={format(worship.worship_date.toDate(), "yyyy-MM-dd")}
                     trigger={
-                      <Button variant="outline" size="sm" className="gap-2 text-primary border-primary/20 hover:bg-primary/5">
-                        <ClipboardList className="h-4 w-4" />
+                      <Button variant="outline" className="w-full h-11 gap-2 text-sm font-normal text-primary border border-border shadow-none hover:bg-primary/5 hover:text-primary hover:border-primary/20 transition-all">
+                        <User className="h-4 w-4" />
                         Serving Members
                       </Button>
                     }
@@ -253,8 +260,6 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
                   </div>
                 )}
 
-
-                <Separator className="my-1" />
 
                 <div className="space-y-3">
 
