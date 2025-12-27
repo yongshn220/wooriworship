@@ -132,8 +132,13 @@ export function WorshipCardList({ teamId }: Props) {
     case 'loading': return <WorshipListSkeleton />
     case 'hasError': throw worshipListLoadable.contents
     case 'hasValue':
+      const isEmpty = worshipIds.length === 0;
+
       return (
-        <div className="flex flex-col h-full w-full bg-muted/30 relative">
+        <div className={cn(
+          "flex flex-col h-full w-full relative",
+          isEmpty ? "bg-background" : "bg-muted/30"
+        )}>
           <div className="flex-1 overflow-y-auto content-container-safe-area pb-24 overscroll-y-none flex flex-col">
 
             {/* Tabs (Only show if not searching) */}
@@ -151,7 +156,7 @@ export function WorshipCardList({ teamId }: Props) {
             )}
 
             {
-              (worshipIds.length > 0) ?
+              !isEmpty ?
                 <div className="px-4 md:px-6 space-y-6">
                   <div className="grid grid-cols-1 gap-6">
                     {
@@ -170,7 +175,7 @@ export function WorshipCardList({ teamId }: Props) {
                   )}
                 </div>
                 :
-                <div className="flex-1 flex flex-col">
+                <div className="flex-1 flex flex-col items-center justify-center -mt-20">
                   <EmptyWorshipBoardPage />
                 </div>
             }
