@@ -134,11 +134,11 @@ export function WorshipCardList({ teamId }: Props) {
     case 'hasValue':
       return (
         <div className="flex flex-col h-full w-full bg-muted/30 relative">
-          <div className="flex-1 overflow-y-auto p-4 md:p-6 content-container-safe-area pb-24 space-y-6 overscroll-y-none">
+          <div className="flex-1 overflow-y-auto content-container-safe-area pb-24 overscroll-y-none flex flex-col">
 
             {/* Tabs (Only show if not searching) */}
             {!searchInput && (
-              <div className="mb-4">
+              <div className="px-4 md:px-6 pt-4 md:pt-6 mb-6">
                 <SegmentedControl
                   value={activeTab}
                   onChange={(val) => setActiveTab(val)}
@@ -152,7 +152,7 @@ export function WorshipCardList({ teamId }: Props) {
 
             {
               (worshipIds.length > 0) ?
-                <>
+                <div className="px-4 md:px-6 space-y-6">
                   <div className="grid grid-cols-1 gap-6">
                     {
                       visibleWorshipIds.map((worshipId: string, index: number) => (
@@ -168,9 +168,11 @@ export function WorshipCardList({ teamId }: Props) {
                       Loading more...
                     </div>
                   )}
-                </>
+                </div>
                 :
-                <EmptyWorshipBoardPage />
+                <div className="flex-1 flex flex-col">
+                  <EmptyWorshipBoardPage />
+                </div>
             }
           </div>
         </div>
