@@ -506,7 +506,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     }
 
     return (
-        <div className="fixed inset-0 z-[100] bg-gray-50 relative flex flex-col">
+        <div className="fixed inset-0 z-[100] bg-gray-50 flex flex-col">
 
             {/* HEADER - Absolute */}
             <div className="absolute top-0 left-0 right-0 z-50 w-full px-6 pt-8 pb-12 flex items-center justify-between pointer-events-none bg-gradient-to-b from-gray-50 via-gray-50/90 to-transparent">
@@ -541,7 +541,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 ref={containerRef}
                 className="absolute inset-0 overflow-y-auto overflow-x-hidden no-scrollbar pt-24"
             >
-                <main className="w-full max-w-2xl mx-auto px-6 pb-32 relative min-h-full">
+                <main className="w-full max-w-2xl mx-auto px-6 pb-32 relative">
                     <AnimatePresence initial={false} custom={direction}>
                         {/* Step 1: When */}
                         {step === 0 && (
@@ -895,7 +895,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                 animate="center"
                                 exit="exit"
                                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                className="flex flex-col w-full pb-20"
+                                className="flex flex-col w-full"
                             >
                                 {/* Minimal Header for Step 4 */}
                                 {selectedDate && (
