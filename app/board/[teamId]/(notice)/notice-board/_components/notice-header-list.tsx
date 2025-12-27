@@ -41,12 +41,14 @@ export function NoticeHeaderList({ teamId }: Props) {
 
   if (noticeIdList.length === 0) {
     return (
-      <EmptyNoticeBoardPage />
+      <div className="w-full h-full flex items-center justify-center bg-background p-6">
+        <EmptyNoticeBoardPage />
+      </div>
     )
   }
 
   return (
-    <div className="w-full items-center">
+    <div className="w-full items-center p-4">
       <div className="w-full flex-start flex-col gap-4">
         {
           visibleNoticeIdList.map((noticeId) => (

@@ -15,6 +15,7 @@ import { ServingCard } from "./_components/serving-card";
 import { auth } from "@/firebase";
 import { ServingListSkeleton } from "./_components/serving-list-skeleton";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import { EmptyServingBoardPage } from "./_components/empty-serving-board-page";
 
 export default function ServingPage() {
     const teamId = useRecoilValue(currentTeamIdAtom);
@@ -79,6 +80,25 @@ export default function ServingPage() {
     }
 
     const currentList = activeTab === "upcoming" ? upcoming : history;
+    const isEmpty = currentList.length === 0;
+
+    if (isEmpty) {
+        return (
+            <div className="flex flex-col h-full w-full bg-background relative">
+                <div className="px-4 py-4 w-full z-10">
+                    <SegmentedControl
+                        value={activeTab}
+                        onChange={(val) => setActiveTab(val)}
+                        options={[
+                            { label: "Upcoming", value: "upcoming" },
+                            { label: "History", value: "history" },
+                        ]}
+                    />
+                </div>
+                <EmptyServingBoardPage />
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-col h-full bg-muted/30 relative">
@@ -97,30 +117,17 @@ export default function ServingPage() {
 
                 {/* List Section */}
                 <section className="space-y-4">
-                    {currentList.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center p-8 bg-card/50 rounded-xl border border-dashed border-border text-muted-foreground">
-                            {activeTab === "upcoming" ? (
-                                <>
-                                    <p>No upcoming schedules.</p>
-                                    <p className="text-sm">Create one to get started!</p>
-                                </>
-                            ) : (
-                                <p>No past schedules.</p>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="grid gap-4">
-                            {currentList.map(schedule => (
-                                <ServingCard
-                                    key={schedule.id}
-                                    schedule={schedule}
-                                    teamId={teamId}
-                                    currentUserUid={currentUserUid}
-                                    defaultExpanded={false}
-                                />
-                            ))}
-                        </div>
-                    )}
+                    <div className="grid gap-4">
+                        {currentList.map(schedule => (
+                            <ServingCard
+                                key={schedule.id}
+                                schedule={schedule}
+                                teamId={teamId}
+                                currentUserUid={currentUserUid}
+                                defaultExpanded={false}
+                            />
+                        ))}
+                    </div>
                 </section>
             </div>
             {/* Floating Action Button - Removed as moved to top nav */}
