@@ -14,12 +14,14 @@ import { getPathCreateServing } from "@/components/util/helper/routes";
 import { ServingCard } from "./_components/serving-card";
 import { auth } from "@/firebase";
 import { ServingListSkeleton } from "./_components/serving-list-skeleton";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 
 export default function ServingPage() {
     const teamId = useRecoilValue(currentTeamIdAtom);
     const [schedules, setSchedules] = useRecoilState(servingSchedulesAtom);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const [activeTab, setActiveTab] = useState<"upcoming" | "history">("upcoming");
 
     // Load schedules
     useEffect(() => {
@@ -76,22 +78,39 @@ export default function ServingPage() {
         return <ServingListSkeleton />;
     }
 
+    const currentList = activeTab === "upcoming" ? upcoming : history;
+
     return (
         <div className="flex flex-col h-full bg-muted/30 relative">
-            <div className="flex-1 overflow-y-auto p-4 content-container-safe-area pb-24 space-y-8 overscroll-y-none">
+            <div className="flex-1 overflow-y-auto p-4 content-container-safe-area pb-24 space-y-6 overscroll-y-none">
 
-                {/* Upcoming Section */}
+                <div className="mb-4">
+                    <SegmentedControl
+                        value={activeTab}
+                        onChange={(val) => setActiveTab(val)}
+                        options={[
+                            { label: "Upcoming", value: "upcoming" },
+                            { label: "History", value: "history" },
+                        ]}
+                    />
+                </div>
+
+                {/* List Section */}
                 <section className="space-y-4">
-
-
-                    {upcoming.length === 0 ? (
+                    {currentList.length === 0 ? (
                         <div className="flex flex-col items-center justify-center p-8 bg-card/50 rounded-xl border border-dashed border-border text-muted-foreground">
-                            <p>No upcoming schedules.</p>
-                            <p className="text-sm">Create one to get started!</p>
+                            {activeTab === "upcoming" ? (
+                                <>
+                                    <p>No upcoming schedules.</p>
+                                    <p className="text-sm">Create one to get started!</p>
+                                </>
+                            ) : (
+                                <p>No past schedules.</p>
+                            )}
                         </div>
                     ) : (
                         <div className="grid gap-4">
-                            {upcoming.map(schedule => (
+                            {currentList.map(schedule => (
                                 <ServingCard
                                     key={schedule.id}
                                     schedule={schedule}
@@ -103,29 +122,7 @@ export default function ServingPage() {
                         </div>
                     )}
                 </section>
-
-                {/* Historical Section */}
-                {history.length > 0 && (
-                    <section className="space-y-4">
-                        <div className="flex items-center gap-2 text-lg font-bold text-muted-foreground px-1 mt-8">
-                            <History className="w-5 h-5" />
-                            <h2>Past Schedules</h2>
-                        </div>
-                        <div className="grid gap-4 opacity-80">
-                            {history.map(schedule => (
-                                <ServingCard
-                                    key={schedule.id}
-                                    schedule={schedule}
-                                    teamId={teamId}
-                                    currentUserUid={currentUserUid}
-                                    defaultExpanded={false}
-                                />
-                            ))}
-                        </div>
-                    </section>
-                )}
             </div>
-
             {/* Floating Action Button - Removed as moved to top nav */}
         </div>
     );

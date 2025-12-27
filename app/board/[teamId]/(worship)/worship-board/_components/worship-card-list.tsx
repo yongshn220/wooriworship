@@ -9,6 +9,7 @@ import { planSearchInputAtom } from "@/app/board/_states/board-states";
 import { Worship } from "@/models/worship";
 
 import { cn } from "@/lib/utils";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 
 
 interface Props {
@@ -138,30 +139,14 @@ export function WorshipCardList({ teamId }: Props) {
             {/* Tabs (Only show if not searching) */}
             {!searchInput && (
               <div className="mb-4">
-                <div className="grid grid-cols-2 p-1 bg-secondary rounded-lg w-full">
-                  <button
-                    onClick={() => setActiveTab("upcoming")}
-                    className={cn(
-                      "px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200",
-                      activeTab === "upcoming"
-                        ? "bg-background text-primary shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    Upcoming
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("history")}
-                    className={cn(
-                      "px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200",
-                      activeTab === "history"
-                        ? "bg-background text-primary shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    History
-                  </button>
-                </div>
+                <SegmentedControl
+                  value={activeTab}
+                  onChange={(val) => setActiveTab(val)}
+                  options={[
+                    { label: "Upcoming", value: "upcoming" },
+                    { label: "History", value: "history" },
+                  ]}
+                />
               </div>
             )}
 
