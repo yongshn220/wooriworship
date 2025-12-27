@@ -15,7 +15,7 @@ export default function SongLayout({ children }: any) {
 
   return (
     <PullToRefresh>
-      <div className="bg-background">
+      <div className="bg-background w-full h-full">
         {children}
       </div>
     </PullToRefresh>
