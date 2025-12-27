@@ -13,7 +13,7 @@ export default function PlanLayout({ children }: any) {
   }, [setPage]);
 
   return (
-    <div className="p-4">
+    <div className="w-full h-full">
       {children}
     </div>
   )
