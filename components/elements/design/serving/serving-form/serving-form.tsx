@@ -506,10 +506,10 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     }
 
     return (
-        <div ref={containerRef} className="fixed inset-0 z-[100] bg-gray-50 flex flex-col overflow-y-auto overflow-x-hidden no-scrollbar">
+        <div className="fixed inset-0 z-[100] bg-gray-50 relative flex flex-col">
 
-            {/* STICKY HEADER - Minimal with Gradient Mask */}
-            <div className="sticky top-0 z-50 w-full px-6 pt-8 pb-12 flex items-center justify-between pointer-events-none bg-gradient-to-b from-gray-50 via-gray-50/90 to-transparent">
+            {/* HEADER - Absolute */}
+            <div className="absolute top-0 left-0 right-0 z-50 w-full px-6 pt-8 pb-12 flex items-center justify-between pointer-events-none bg-gradient-to-b from-gray-50 via-gray-50/90 to-transparent">
                 {/* Exit Button - Left aligned */}
                 <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/50 hover:bg-background shadow-sm pointer-events-auto backdrop-blur-sm" onClick={() => router.back()}>
                     <X className="w-5 h-5 text-muted-foreground" />
@@ -536,402 +536,407 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 <div className="w-10" /> {/* Spacer for centering */}
             </div>
 
-            {/* MAIN CONTENT AREA */}
-            <main className="flex-1 w-full max-w-2xl mx-auto px-6 py-4 pb-32 relative">
-                <AnimatePresence initial={false} custom={direction}>
-                    {/* Step 1: When */}
-                    {step === 0 && (
-                        <motion.div
-                            key="step0"
-                            custom={direction}
-                            variants={slideVariants}
-                            initial="enter"
-                            animate="center"
-                            exit="exit"
-                            transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.8 }}
-                            className="flex flex-col gap-8 w-full"
-                        >
-                            <div className="space-y-2 text-center">
-                                <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 1</Label>
-                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Date & Title</h2>
-                            </div>
+            {/* SCROLLABLE CONTENT AREA */}
+            <div
+                ref={containerRef}
+                className="absolute inset-0 overflow-y-auto overflow-x-hidden no-scrollbar pt-24"
+            >
+                <main className="w-full max-w-2xl mx-auto px-6 pb-32 relative min-h-full">
+                    <AnimatePresence initial={false} custom={direction}>
+                        {/* Step 1: When */}
+                        {step === 0 && (
+                            <motion.div
+                                key="step0"
+                                custom={direction}
+                                variants={slideVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.8 }}
+                                className="flex flex-col gap-8 w-full"
+                            >
+                                <div className="space-y-2 text-center">
+                                    <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 1</Label>
+                                    <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Date & Title</h2>
+                                </div>
 
-                            <div className="space-y-6">
-                                {/* Title Card */}
-                                <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 space-y-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-semibold text-muted-foreground ml-1">Title</Label>
-                                        <Input
-                                            placeholder="e.g. Sunday Service"
-                                            value={title}
-                                            onChange={(e) => setTitle(e.target.value)}
-                                            className="h-14 text-lg bg-gray-50/50 border-gray-100 focus:bg-white transition-all rounded-2xl px-4 font-bold placeholder:font-normal placeholder:text-muted-foreground/50"
+                                <div className="space-y-6">
+                                    {/* Title Card */}
+                                    <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 space-y-4">
+                                        <div className="space-y-2">
+                                            <Label className="text-sm font-semibold text-muted-foreground ml-1">Title</Label>
+                                            <Input
+                                                placeholder="e.g. Sunday Service"
+                                                value={title}
+                                                onChange={(e) => setTitle(e.target.value)}
+                                                className="h-14 text-lg bg-gray-50/50 border-gray-100 focus:bg-white transition-all rounded-2xl px-4 font-bold placeholder:font-normal placeholder:text-muted-foreground/50"
+                                            />
+                                        </div>
+
+                                        {/* Suggestions */}
+                                        {/* Suggestions */}
+                                        <div className="flex flex-wrap gap-2">
+                                            {[
+                                                {
+                                                    date: (() => {
+                                                        let d = addDays(new Date(), 1);
+                                                        while (isSaturday(d) || isSunday(d)) {
+                                                            d = addDays(d, 1);
+                                                        }
+                                                        return d;
+                                                    })(),
+                                                    title: "새벽예배",
+                                                    toast: "Applied Early Morning Prayer"
+                                                },
+                                                {
+                                                    date: nextFriday(new Date()),
+                                                    title: "금요예배",
+                                                    toast: "Applied Friday Service"
+                                                },
+                                                {
+                                                    date: nextSunday(new Date()),
+                                                    title: "주일예배",
+                                                    toast: "Applied Weekly Sunday Service"
+                                                }
+                                            ].sort((a, b) => a.date.getTime() - b.date.getTime()).map((option) => (
+                                                <button
+                                                    key={option.title}
+                                                    onClick={() => {
+                                                        setSelectedDate(option.date);
+                                                        setTitle(option.title);
+                                                        toast({ title: option.toast });
+                                                    }}
+                                                    className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95"
+                                                >
+                                                    {format(option.date, "MM-dd")} {option.title}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Calendar Card */}
+                                    <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 flex flex-col items-center gap-4">
+                                        <div className="w-full flex items-center justify-between ml-1">
+                                            <Label className="text-sm font-semibold text-muted-foreground">Date</Label>
+                                            {selectedDate && (
+                                                <span className="text-sm font-bold text-primary bg-primary/5 px-3 py-1 rounded-full">
+                                                    {format(selectedDate, "yyyy-MM-dd (eee)")}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <Calendar
+                                            mode="single"
+                                            selected={selectedDate}
+                                            onSelect={(date) => {
+                                                if (date) {
+                                                    setSelectedDate(date);
+                                                }
+                                            }}
+                                            className="rounded-2xl border-0"
                                         />
                                     </div>
+                                </div>
+                            </motion.div>
+                        )}
 
-                                    {/* Suggestions */}
-                                    {/* Suggestions */}
-                                    <div className="flex flex-wrap gap-2">
-                                        {[
-                                            {
-                                                date: (() => {
-                                                    let d = addDays(new Date(), 1);
-                                                    while (isSaturday(d) || isSunday(d)) {
-                                                        d = addDays(d, 1);
-                                                    }
-                                                    return d;
-                                                })(),
-                                                title: "새벽예배",
-                                                toast: "Applied Early Morning Prayer"
-                                            },
-                                            {
-                                                date: nextFriday(new Date()),
-                                                title: "금요예배",
-                                                toast: "Applied Friday Service"
-                                            },
-                                            {
-                                                date: nextSunday(new Date()),
-                                                title: "주일예배",
-                                                toast: "Applied Weekly Sunday Service"
-                                            }
-                                        ].sort((a, b) => a.date.getTime() - b.date.getTime()).map((option) => (
-                                            <button
-                                                key={option.title}
-                                                onClick={() => {
-                                                    setSelectedDate(option.date);
-                                                    setTitle(option.title);
-                                                    toast({ title: option.toast });
-                                                }}
-                                                className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95"
-                                            >
-                                                {format(option.date, "MM-dd")} {option.title}
-                                            </button>
-                                        ))}
-                                    </div>
+                        {/* Step 2: Who (Assign Roles) */}
+                        {step === 1 && (
+                            <motion.div
+                                key="who-step"
+                                custom={direction}
+                                variants={slideVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.8 }}
+                                className="flex flex-col gap-8 w-full"
+                            >
+                                <div className="space-y-2 text-center">
+                                    <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 2</Label>
+                                    <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Worship Team</h2>
                                 </div>
 
-                                {/* Calendar Card */}
-                                <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 flex flex-col items-center gap-4">
-                                    <div className="w-full flex items-center justify-between ml-1">
-                                        <Label className="text-sm font-semibold text-muted-foreground">Date</Label>
-                                        {selectedDate && (
-                                            <span className="text-sm font-bold text-primary bg-primary/5 px-3 py-1 rounded-full">
-                                                {format(selectedDate, "yyyy-MM-dd (eee)")}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <Calendar
-                                        mode="single"
-                                        selected={selectedDate}
-                                        onSelect={(date) => {
-                                            if (date) {
-                                                setSelectedDate(date);
-                                            }
-                                        }}
-                                        className="rounded-2xl border-0"
+                                <div className="flex flex-col gap-4">
+                                    <Reorder.Group axis="y" values={roles} onReorder={(newRoles) => {
+                                        setRoles(newRoles);
+                                        ServingService.updateRolesOrder(teamId, newRoles).catch(console.error);
+                                    }} className="flex flex-col gap-4">
+                                        {roles.map((role) => {
+                                            const ptItem = items.find(item => item.type === 'WORSHIP_TEAM');
+                                            const assignment = ptItem?.assignments.find(a => a.roleId === role.id);
+                                            const memberIds = assignment?.memberIds || [];
+
+                                            return (
+                                                <SortableRoleItem
+                                                    key={role.id}
+                                                    role={role}
+                                                    memberIds={memberIds}
+                                                    teamMembers={teamMembers}
+                                                    onAddMember={handleAddMemberByRole}
+                                                    onDeleteRole={() => setDeleteConfirm({ type: 'role', id: role.id, open: true })}
+                                                    onOpenAdd={() => setActiveSelection({ roleId: role.id })}
+                                                />
+                                            );
+                                        })}
+                                    </Reorder.Group>
+
+                                    <AddActionButton
+                                        label="Add Role"
+                                        onClick={() => setIsRoleDialogOpen(true)}
                                     />
                                 </div>
-                            </div>
-                        </motion.div>
-                    )}
+                            </motion.div>
+                        )}
 
-                    {/* Step 2: Who (Assign Roles) */}
-                    {step === 1 && (
-                        <motion.div
-                            key="who-step"
-                            custom={direction}
-                            variants={slideVariants}
-                            initial="enter"
-                            animate="center"
-                            exit="exit"
-                            transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.8 }}
-                            className="flex flex-col gap-8 w-full"
-                        >
-                            <div className="space-y-2 text-center">
-                                <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 2</Label>
-                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Worship Team</h2>
-                            </div>
-
-                            <div className="flex flex-col gap-4">
-                                <Reorder.Group axis="y" values={roles} onReorder={(newRoles) => {
-                                    setRoles(newRoles);
-                                    ServingService.updateRolesOrder(teamId, newRoles).catch(console.error);
-                                }} className="flex flex-col gap-4">
-                                    {roles.map((role) => {
-                                        const ptItem = items.find(item => item.type === 'WORSHIP_TEAM');
-                                        const assignment = ptItem?.assignments.find(a => a.roleId === role.id);
-                                        const memberIds = assignment?.memberIds || [];
-
-                                        return (
-                                            <SortableRoleItem
-                                                key={role.id}
-                                                role={role}
-                                                memberIds={memberIds}
-                                                teamMembers={teamMembers}
-                                                onAddMember={handleAddMemberByRole}
-                                                onDeleteRole={() => setDeleteConfirm({ type: 'role', id: role.id, open: true })}
-                                                onOpenAdd={() => setActiveSelection({ roleId: role.id })}
-                                            />
-                                        );
-                                    })}
-                                </Reorder.Group>
-
-                                <AddActionButton
-                                    label="Add Role"
-                                    onClick={() => setIsRoleDialogOpen(true)}
-                                />
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {/* Step 3: What (Worship Timeline) */}
-                    {step === 2 && (
-                        <motion.div
-                            key="what-step"
-                            custom={direction}
-                            variants={slideVariants}
-                            initial="enter"
-                            animate="center"
-                            exit="exit"
-                            transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.8 }}
-                            className="flex flex-col gap-8 w-full"
-                        >
-                            <div className="space-y-2 text-center">
-                                <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 3</Label>
-                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Set up Cuelist</h2>
-                            </div>
-
-                            <div className="flex flex-col gap-6">
-                                {/* Template Header & Actions */}
-                                <div className="flex items-center gap-3">
-                                    <div className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar py-2 -mx-5 px-5">
-                                        {templates.map(tmp => (
-                                            <button
-                                                key={tmp.id}
-                                                onClick={() => {
-                                                    setSelectedTemplateId(tmp.id);
-                                                    setItems(tmp.items.map((it: any, idx: number) => ({
-                                                        ...it,
-                                                        id: Math.random().toString(36).substr(2, 9),
-                                                        order: idx,
-                                                        assignments: it.type === 'WORSHIP_TEAM'
-                                                            ? (items.find(i => i.type === 'WORSHIP_TEAM')?.assignments || [])
-                                                            : []
-                                                    })));
-                                                }}
-                                                className={cn(
-                                                    "flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-semibold transition-all active:scale-95",
-                                                    selectedTemplateId === tmp.id
-                                                        ? "bg-primary/5 text-primary border border-primary shadow-sm"
-                                                        : "bg-white text-gray-500 border border-gray-100 hover:border-gray-200"
-                                                )}
-                                            >
-                                                {tmp.name}
-                                            </button>
-                                        ))}
-                                        <button
-                                            className="flex-shrink-0 px-4 py-2 bg-transparent text-gray-400 border border-dashed border-gray-200 rounded-full text-[13px] font-medium active:scale-95 transition-all hover:bg-gray-50 hover:border-gray-300 flex items-center gap-1"
-                                            onClick={() => {
-                                                setNewTemplateName("");
-                                                setCreateEmptyMode(true);
-                                                setIsTemplateDialogOpen(true);
-                                            }}
-                                        >
-                                            <Plus className="h-3.5 w-3.5" />
-                                            Add
-                                        </button>
-                                    </div>
-
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-zinc-900 hover:text-black hover:bg-gray-50 transition-colors flex-shrink-0">
-                                                <MoreHorizontal className="h-5 w-5" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-56 rounded-3xl p-2 shadow-2xl border-0">
-                                            <DropdownMenuItem
-                                                className="rounded-2xl py-3 cursor-pointer font-bold"
-                                                disabled={!selectedTemplateId}
-                                                onSelect={() => {
-                                                    setTimeout(() => {
-                                                        const currentTemp = templates.find(t => t.id === selectedTemplateId);
-                                                        setTempTemplateName(currentTemp?.name || "");
-                                                        setIsRenameDialogOpen(true);
-                                                    }, 150);
-                                                }}
-                                            >
-                                                <Pencil className="mr-2 h-4 w-4" />
-                                                Rename Template
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator className="my-2 bg-gray-50" />
-                                            <DropdownMenuItem
-                                                className={cn("rounded-2xl py-3 cursor-pointer", hasTemplateChanges ? "text-primary font-bold bg-primary/5" : "text-muted-foreground")}
-                                                disabled={!selectedTemplateId || !hasTemplateChanges}
-                                                onSelect={() => {
-                                                    handleUpdateTemplate();
-                                                }}
-                                            >
-                                                <Save className="mr-2 h-4 w-4" />
-                                                Save to &quot;{templates.find(t => t.id === selectedTemplateId)?.name}&quot;
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                className="rounded-2xl py-3 cursor-pointer font-bold"
-                                                onSelect={() => {
-                                                    const currentTemp = templates.find(t => t.id === selectedTemplateId);
-                                                    setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
-                                                    setCreateEmptyMode(false);
-                                                    setTimeout(() => {
-                                                        setIsTemplateDialogOpen(true);
-                                                    }, 150);
-                                                }}
-                                            >
-                                                <Plus className="mr-2 h-4 w-4" />
-                                                Save as New
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator className="my-2 bg-gray-50" />
-                                            <DropdownMenuItem
-                                                className="rounded-2xl py-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 font-bold"
-                                                onSelect={() => {
-                                                    setTimeout(() => {
-                                                        setDeleteConfirm({ type: 'template', id: selectedTemplateId || '', open: true });
-                                                    }, 150);
-                                                }}
-                                            >
-                                                <Trash2 className="mr-2 h-4 w-4" />
-                                                Delete Template
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                        {/* Step 3: What (Worship Timeline) */}
+                        {step === 2 && (
+                            <motion.div
+                                key="what-step"
+                                custom={direction}
+                                variants={slideVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.8 }}
+                                className="flex flex-col gap-8 w-full"
+                            >
+                                <div className="space-y-2 text-center">
+                                    <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 3</Label>
+                                    <h2 className="text-2xl font-bold text-foreground tracking-tight">Set up Cuelist</h2>
                                 </div>
 
-                                <div className="space-y-4">
-                                    {!isTemplatesLoaded ? (
-                                        Array.from({ length: 5 }).map((_, i) => (
-                                            <div key={i} className="animate-pulse p-6 rounded-3xl bg-card space-y-3 border border-border/50">
-                                                <div className="h-5 bg-muted rounded w-1/3" />
-                                                <div className="h-4 bg-muted rounded w-1/2" />
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <>
-                                            {templates.length === 0 && (
-                                                <div className="px-6 py-5 mb-2 bg-primary/5 rounded-3xl border border-primary/10 border-dashed text-center">
-                                                    <p className="text-sm font-bold text-primary mb-1">✨ Sample Flow Ready</p>
-                                                    <p className="text-xs text-muted-foreground leading-tight px-4">
-                                                        No templates found in DB. We&apos;ve prepared a sample flow to get you started!
-                                                    </p>
+                                <div className="flex flex-col gap-6">
+                                    {/* Template Header & Actions */}
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar py-2 -mx-5 px-5">
+                                            {templates.map(tmp => (
+                                                <button
+                                                    key={tmp.id}
+                                                    onClick={() => {
+                                                        setSelectedTemplateId(tmp.id);
+                                                        setItems(tmp.items.map((it: any, idx: number) => ({
+                                                            ...it,
+                                                            id: Math.random().toString(36).substr(2, 9),
+                                                            order: idx,
+                                                            assignments: it.type === 'WORSHIP_TEAM'
+                                                                ? (items.find(i => i.type === 'WORSHIP_TEAM')?.assignments || [])
+                                                                : []
+                                                        })));
+                                                    }}
+                                                    className={cn(
+                                                        "flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-semibold transition-all active:scale-95",
+                                                        selectedTemplateId === tmp.id
+                                                            ? "bg-primary/5 text-primary border border-primary shadow-sm"
+                                                            : "bg-white text-gray-500 border border-gray-100 hover:border-gray-200"
+                                                    )}
+                                                >
+                                                    {tmp.name}
+                                                </button>
+                                            ))}
+                                            <button
+                                                className="flex-shrink-0 px-4 py-2 bg-transparent text-gray-400 border border-dashed border-gray-200 rounded-full text-[13px] font-medium active:scale-95 transition-all hover:bg-gray-50 hover:border-gray-300 flex items-center gap-1"
+                                                onClick={() => {
+                                                    setNewTemplateName("");
+                                                    setCreateEmptyMode(true);
+                                                    setIsTemplateDialogOpen(true);
+                                                }}
+                                            >
+                                                <Plus className="h-3.5 w-3.5" />
+                                                Add
+                                            </button>
+                                        </div>
+
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-zinc-900 hover:text-black hover:bg-gray-50 transition-colors flex-shrink-0">
+                                                    <MoreHorizontal className="h-5 w-5" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="w-56 rounded-3xl p-2 shadow-2xl border-0">
+                                                <DropdownMenuItem
+                                                    className="rounded-2xl py-3 cursor-pointer font-bold"
+                                                    disabled={!selectedTemplateId}
+                                                    onSelect={() => {
+                                                        setTimeout(() => {
+                                                            const currentTemp = templates.find(t => t.id === selectedTemplateId);
+                                                            setTempTemplateName(currentTemp?.name || "");
+                                                            setIsRenameDialogOpen(true);
+                                                        }, 150);
+                                                    }}
+                                                >
+                                                    <Pencil className="mr-2 h-4 w-4" />
+                                                    Rename Template
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator className="my-2 bg-gray-50" />
+                                                <DropdownMenuItem
+                                                    className={cn("rounded-2xl py-3 cursor-pointer", hasTemplateChanges ? "text-primary font-bold bg-primary/5" : "text-muted-foreground")}
+                                                    disabled={!selectedTemplateId || !hasTemplateChanges}
+                                                    onSelect={() => {
+                                                        handleUpdateTemplate();
+                                                    }}
+                                                >
+                                                    <Save className="mr-2 h-4 w-4" />
+                                                    Save to &quot;{templates.find(t => t.id === selectedTemplateId)?.name}&quot;
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    className="rounded-2xl py-3 cursor-pointer font-bold"
+                                                    onSelect={() => {
+                                                        const currentTemp = templates.find(t => t.id === selectedTemplateId);
+                                                        setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
+                                                        setCreateEmptyMode(false);
+                                                        setTimeout(() => {
+                                                            setIsTemplateDialogOpen(true);
+                                                        }, 150);
+                                                    }}
+                                                >
+                                                    <Plus className="mr-2 h-4 w-4" />
+                                                    Save as New
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator className="my-2 bg-gray-50" />
+                                                <DropdownMenuItem
+                                                    className="rounded-2xl py-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 font-bold"
+                                                    onSelect={() => {
+                                                        setTimeout(() => {
+                                                            setDeleteConfirm({ type: 'template', id: selectedTemplateId || '', open: true });
+                                                        }, 150);
+                                                    }}
+                                                >
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    Delete Template
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        {!isTemplatesLoaded ? (
+                                            Array.from({ length: 5 }).map((_, i) => (
+                                                <div key={i} className="animate-pulse p-6 rounded-3xl bg-card space-y-3 border border-border/50">
+                                                    <div className="h-5 bg-muted rounded w-1/3" />
+                                                    <div className="h-4 bg-muted rounded w-1/2" />
                                                 </div>
-                                            )}
-                                            <Reorder.Group axis="y" values={items} onReorder={(newOrdered) => {
-                                                setItems(newOrdered);
-                                            }} className="flex flex-col gap-4">
-                                                {items.map((item, index) => {
-                                                    if (item.type === 'WORSHIP_TEAM') {
+                                            ))
+                                        ) : (
+                                            <>
+                                                {templates.length === 0 && (
+                                                    <div className="px-6 py-5 mb-2 bg-primary/5 rounded-3xl border border-primary/10 border-dashed text-center">
+                                                        <p className="text-sm font-bold text-primary mb-1">✨ Sample Flow Ready</p>
+                                                        <p className="text-xs text-muted-foreground leading-tight px-4">
+                                                            No templates found in DB. We&apos;ve prepared a sample flow to get you started!
+                                                        </p>
+                                                    </div>
+                                                )}
+                                                <Reorder.Group axis="y" values={items} onReorder={(newOrdered) => {
+                                                    setItems(newOrdered);
+                                                }} className="flex flex-col gap-4">
+                                                    {items.map((item, index) => {
+                                                        if (item.type === 'WORSHIP_TEAM') {
+                                                            return (
+                                                                <SortableWorshipItem
+                                                                    key={item.id}
+                                                                    item={item}
+                                                                    getMemberName={getMemberName}
+                                                                    onGoToStep2={() => goToStep(1)}
+                                                                    onUpdate={(newItem) => {
+                                                                        const newItems = items.map(i => i.id === item.id ? newItem : i);
+                                                                        setItems(newItems);
+                                                                    }}
+                                                                    roles={roles}
+                                                                />
+                                                            );
+                                                        }
                                                         return (
-                                                            <SortableWorshipItem
+                                                            <SortableTimelineItem
                                                                 key={item.id}
                                                                 item={item}
                                                                 getMemberName={getMemberName}
-                                                                onGoToStep2={() => goToStep(1)}
                                                                 onUpdate={(newItem) => {
                                                                     const newItems = items.map(i => i.id === item.id ? newItem : i);
                                                                     setItems(newItems);
                                                                 }}
-                                                                roles={roles}
+                                                                onDelete={() => setItems(prev => prev.filter(i => i.id !== item.id))}
+                                                                onOpenAdd={(aIdx) => setActiveSelection({
+                                                                    itemId: item.id,
+                                                                    assignmentIndex: aIdx,
+                                                                    roleId: "timeline-default"
+                                                                })}
+                                                                onRemoveMember={(aIdx, uid) => {
+                                                                    handleAddMember(item.id, aIdx, uid);
+                                                                }}
                                                             />
-                                                        );
-                                                    }
-                                                    return (
-                                                        <SortableTimelineItem
-                                                            key={item.id}
-                                                            item={item}
-                                                            getMemberName={getMemberName}
-                                                            onUpdate={(newItem) => {
-                                                                const newItems = items.map(i => i.id === item.id ? newItem : i);
-                                                                setItems(newItems);
-                                                            }}
-                                                            onDelete={() => setItems(prev => prev.filter(i => i.id !== item.id))}
-                                                            onOpenAdd={(aIdx) => setActiveSelection({
-                                                                itemId: item.id,
-                                                                assignmentIndex: aIdx,
-                                                                roleId: "timeline-default"
-                                                            })}
-                                                            onRemoveMember={(aIdx, uid) => {
-                                                                handleAddMember(item.id, aIdx, uid);
-                                                            }}
-                                                        />
-                                                    )
-                                                })}
-                                            </Reorder.Group>
+                                                        )
+                                                    })}
+                                                </Reorder.Group>
 
-                                            <AddActionButton
-                                                label="Add Sequence"
-                                                onClick={() => setItems([...items, {
-                                                    id: Math.random().toString(36).substr(2, 9),
-                                                    order: items.length,
-                                                    title: "",
-                                                    assignments: [{ memberIds: [] }],
-                                                    type: 'FLOW'
-                                                }])}
-                                            />
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {/* Step 4: Review */}
-                    {step === 3 && (
-                        <motion.div
-                            key="review-step"
-                            custom={direction}
-                            variants={slideVariants}
-                            initial="enter"
-                            animate="center"
-                            exit="exit"
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="flex flex-col w-full pb-20"
-                        >
-                            {/* Minimal Header for Step 4 */}
-                            {selectedDate && (
-                                <div className="flex flex-col items-center justify-center py-4 border-b border-border/10 mb-0 mx-auto mb-2">
-                                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 opacity-80">Final Review</span>
-                                    <div className="text-center">
-                                        <h2 className="text-3xl font-bold text-foreground tracking-tight leading-none mb-1">
-                                            {format(selectedDate, "MMM d")}
-                                        </h2>
-                                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide opacity-70">
-                                            {format(selectedDate, "EEEE, yyyy")}
-                                        </p>
+                                                <AddActionButton
+                                                    label="Add Sequence"
+                                                    onClick={() => setItems([...items, {
+                                                        id: Math.random().toString(36).substr(2, 9),
+                                                        order: items.length,
+                                                        title: "",
+                                                        assignments: [{ memberIds: [] }],
+                                                        type: 'FLOW'
+                                                    }])}
+                                                />
+                                            </>
+                                        )}
                                     </div>
                                 </div>
-                            )}
+                            </motion.div>
+                        )}
 
-                            {/* CUE SHEET / TIMELINE LIST */}
-                            <div className="flex flex-col w-full">
-                                <ServingMemberList
-                                    schedule={{ items, id: "", date: "", teamId: "" } as any} // Mocking minimal schedule object
-                                    roles={roles}
-                                    members={teamMembers}
-                                    currentUserUid={auth.currentUser?.uid}
-                                />
-                                {items.length === 0 && (
-                                    <div className="py-12 text-center space-y-3">
-                                        <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center mx-auto">
-                                            <FileText className="w-5 h-5 text-muted-foreground/50" />
+                        {/* Step 4: Review */}
+                        {step === 3 && (
+                            <motion.div
+                                key="review-step"
+                                custom={direction}
+                                variants={slideVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                className="flex flex-col w-full pb-20"
+                            >
+                                {/* Minimal Header for Step 4 */}
+                                {selectedDate && (
+                                    <div className="flex flex-col items-center justify-center py-4 border-b border-border/10 mb-0 mx-auto mb-2">
+                                        <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 opacity-80">Final Review</span>
+                                        <div className="text-center">
+                                            <h2 className="text-3xl font-bold text-foreground tracking-tight leading-none mb-1">
+                                                {format(selectedDate, "MMM d")}
+                                            </h2>
+                                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide opacity-70">
+                                                {format(selectedDate, "EEEE, yyyy")}
+                                            </p>
                                         </div>
-                                        <p className="text-muted-foreground text-sm">No items in the plan yet.</p>
                                     </div>
                                 )}
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </main>
 
-            {/* STICKY FOOTER - Minimal with Gradient Mask */}
-            <div className="sticky bottom-0 z-50 w-full px-6 pb-8 pt-12 pointer-events-none bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent">
+                                {/* CUE SHEET / TIMELINE LIST */}
+                                <div className="flex flex-col w-full">
+                                    <ServingMemberList
+                                        schedule={{ items, id: "", date: "", teamId: "" } as any} // Mocking minimal schedule object
+                                        roles={roles}
+                                        members={teamMembers}
+                                        currentUserUid={auth.currentUser?.uid}
+                                    />
+                                    {items.length === 0 && (
+                                        <div className="py-12 text-center space-y-3">
+                                            <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center mx-auto">
+                                                <FileText className="w-5 h-5 text-muted-foreground/50" />
+                                            </div>
+                                            <p className="text-muted-foreground text-sm">No items in the plan yet.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </main>
+            </div>
+
+            {/* STICKY FOOTER - Absolute */}
+            <div className="absolute bottom-0 left-0 right-0 z-50 w-full px-6 pb-8 pt-12 pointer-events-none bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent">
                 <AnimatePresence>
                     {step === 2 && hasTemplateChanges && selectedTemplateId && (
                         <motion.div

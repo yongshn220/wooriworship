@@ -7,11 +7,10 @@ import { WorshipListSkeleton } from "@/app/board/[teamId]/(worship)/worship-boar
 export default function PlanPage({ params }: any) {
   const teamId = params.teamId
   console.log("_---------Plan Page")
+  console.log("_---------Plan Page")
   return (
-    <div className="w-full h-full flex flex-col">
-      <Suspense fallback={<WorshipListSkeleton />}>
-        <WorshipCardList teamId={teamId} />
-      </Suspense>
-    </div>
+    <Suspense fallback={<WorshipListSkeleton />}>
+      <WorshipCardList teamId={teamId} />
+    </Suspense>
   )
 }

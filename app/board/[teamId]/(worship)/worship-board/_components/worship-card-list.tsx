@@ -61,29 +61,31 @@ export function WorshipCardList({ teamId }: Props) {
     case 'hasError': throw worshipIdsLoadable.contents
     case 'hasValue':
       return (
-        <div className="w-full h-full">
-          {
-            (worshipIds.length > 0) ?
-              <>
-                <div className="grid grid-cols-1 gap-x-4 gap-y-4 grid-flow-row-dense grid-rows-[auto]">
-                  {
-                    visibleWorshipIds.map((worshipId: string, index: number) => (
-                      <Suspense key={worshipId} fallback={<WorshipCardSkeleton />}>
-                        <WorshipCard worshipId={worshipId} isFirst={index === 0} />
-                      </Suspense>
-                    ))
-                  }
-                </div>
-                {/* Load More Trigger */}
-                {visibleWorshipIds.length < worshipIds.length && (
-                  <div ref={loadMoreRef} className="h-20 w-full flex-center py-4 text-muted-foreground text-sm">
-                    Loading more...
+        <div className="flex flex-col h-full w-full bg-muted/30 relative">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 content-container-safe-area pb-24 space-y-6 overscroll-y-none">
+            {
+              (worshipIds.length > 0) ?
+                <>
+                  <div className="grid grid-cols-1 gap-6">
+                    {
+                      visibleWorshipIds.map((worshipId: string, index: number) => (
+                        <Suspense key={worshipId} fallback={<WorshipCardSkeleton />}>
+                          <WorshipCard worshipId={worshipId} isFirst={index === 0} />
+                        </Suspense>
+                      ))
+                    }
                   </div>
-                )}
-              </>
-              :
-              <EmptyWorshipBoardPage />
-          }
+                  {/* Load More Trigger */}
+                  {visibleWorshipIds.length < worshipIds.length && (
+                    <div ref={loadMoreRef} className="h-20 w-full flex-center py-4 text-muted-foreground text-sm">
+                      Loading more...
+                    </div>
+                  )}
+                </>
+                :
+                <EmptyWorshipBoardPage />
+            }
+          </div>
         </div>
       )
   }
