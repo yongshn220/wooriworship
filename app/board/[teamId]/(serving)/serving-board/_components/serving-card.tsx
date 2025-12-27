@@ -74,8 +74,8 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
     return (
         <Card
             className={cn(
-                "overflow-hidden transition-all duration-300 border shadow-sm hover:shadow-md cursor-pointer",
-                isExpanded ? "ring-2 ring-primary bg-card" : (isPast ? "bg-muted/30" : "bg-card")
+                "overflow-hidden transition-all duration-300 border shadow-sm hover:shadow-md cursor-pointer bg-card",
+                isExpanded ? "ring-2 ring-primary" : ""
             )}
             onClick={handleCardClick}
         >
