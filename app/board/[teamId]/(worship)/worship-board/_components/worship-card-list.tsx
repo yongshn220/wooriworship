@@ -134,11 +134,33 @@ export function WorshipCardList({ teamId }: Props) {
     case 'hasValue':
       const isEmpty = worshipIds.length === 0;
 
+      // Full screen empty state
+      if (isEmpty) {
+        return (
+          <div className="flex flex-col h-full w-full bg-background relative">
+            {/* Tabs (Only show if not searching) */}
+            {!searchInput && (
+              <div className="px-4 md:px-6 pt-4 md:pt-6 w-full z-10">
+                <SegmentedControl
+                  value={activeTab}
+                  onChange={(val) => setActiveTab(val)}
+                  options={[
+                    { label: "Upcoming", value: "upcoming" },
+                    { label: "History", value: "history" },
+                  ]}
+                />
+              </div>
+            )}
+
+            <div className="flex-1 flex items-center justify-center p-6">
+              <EmptyWorshipBoardPage />
+            </div>
+          </div>
+        )
+      }
+
       return (
-        <div className={cn(
-          "flex flex-col h-full w-full relative",
-          isEmpty ? "bg-background" : "bg-muted/30"
-        )}>
+        <div className="flex flex-col h-full w-full bg-muted/30 relative">
           <div className="flex-1 overflow-y-auto content-container-safe-area pb-24 overscroll-y-none flex flex-col">
 
             {/* Tabs (Only show if not searching) */}
@@ -155,30 +177,23 @@ export function WorshipCardList({ teamId }: Props) {
               </div>
             )}
 
-            {
-              !isEmpty ?
-                <div className="px-4 md:px-6 space-y-6">
-                  <div className="grid grid-cols-1 gap-6">
-                    {
-                      visibleWorshipIds.map((worshipId: string, index: number) => (
-                        <Suspense key={worshipId} fallback={<WorshipCardSkeleton />}>
-                          <WorshipCard worshipId={worshipId} isFirst={index === 0} />
-                        </Suspense>
-                      ))
-                    }
-                  </div>
-                  {/* Load More Trigger */}
-                  {visibleWorshipIds.length < worshipIds.length && (
-                    <div ref={loadMoreRef} className="h-20 w-full flex-center py-4 text-muted-foreground text-sm">
-                      Loading more...
-                    </div>
-                  )}
+            <div className="px-4 md:px-6 space-y-6">
+              <div className="grid grid-cols-1 gap-6">
+                {
+                  visibleWorshipIds.map((worshipId: string, index: number) => (
+                    <Suspense key={worshipId} fallback={<WorshipCardSkeleton />}>
+                      <WorshipCard worshipId={worshipId} isFirst={index === 0} />
+                    </Suspense>
+                  ))
+                }
+              </div>
+              {/* Load More Trigger */}
+              {visibleWorshipIds.length < worshipIds.length && (
+                <div ref={loadMoreRef} className="h-20 w-full flex-center py-4 text-muted-foreground text-sm">
+                  Loading more...
                 </div>
-                :
-                <div className="flex-1 flex flex-col items-center justify-center -mt-20">
-                  <EmptyWorshipBoardPage />
-                </div>
-            }
+              )}
+            </div>
           </div>
         </div>
       )
