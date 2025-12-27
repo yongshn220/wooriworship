@@ -117,7 +117,11 @@ export function SongList({ teamId }: Props) {
   };
 
   if (!songIds || songIds?.length <= 0) {
-    return (<EmptySongBoardPage />)
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-background p-6">
+        <EmptySongBoardPage />
+      </div>
+    )
   }
 
   return (
