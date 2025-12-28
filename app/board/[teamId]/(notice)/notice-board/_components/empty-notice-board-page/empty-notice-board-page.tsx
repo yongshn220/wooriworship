@@ -6,7 +6,7 @@ export function EmptyNoticeBoardPage() {
     <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 text-center">
       <Image
         alt="Empty notice board"
-        src="/illustration/empty-notice-plan-v5.png"
+        src="/illustration/empty-notice-plan-v6.png"
         width={300}
         height={300}
         className="mb-2"
