@@ -13,7 +13,7 @@ export function EmptyServingBoardPage() {
         <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 text-center">
             <Image
                 alt="Empty serving plan"
-                src="/illustration/empty-serving-plan-v4.png"
+                src="/illustration/empty-serving-plan-v5.png"
                 width={300}
                 height={300}
                 className="mb-2"
