@@ -55,6 +55,7 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid, fi
                                                         key={`${a.roleId}-${uid}`}
                                                         name={getMemberName(uid)}
                                                         className="bg-secondary/40 border-transparent"
+                                                        isMe={currentUserUid === uid}
                                                     />
                                                 ))
                                             )}
@@ -82,6 +83,7 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid, fi
                                                     memberIds={assign.memberIds}
                                                     getMemberName={getMemberName}
                                                     className="py-1 border-b border-border/30 last:border-0"
+                                                    currentUserUid={currentUserUid}
                                                 />
                                             );
                                         })}
@@ -141,11 +143,11 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid, fi
                                                 "flex items-center gap-1.5 px-2 py-1 rounded-full border text-sm transition-colors",
                                                 isMe
                                                     ? "bg-primary/10 border-primary/20 text-primary font-medium"
-                                                    : "bg-background border-border text-foreground"
+                                                    : "bg-background border-border text-muted-foreground"
                                             )}
                                         >
-                                            <Avatar className="h-5 w-5">
-                                                <AvatarFallback className="text-[9px]">{displayName[0]}</AvatarFallback>
+                                            <Avatar className={cn("h-5 w-5", isMe ? "" : "grayscale opacity-70")}>
+                                                <AvatarFallback className={cn("text-[9px]", isMe ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground")}>{displayName[0]}</AvatarFallback>
                                             </Avatar>
                                             <span>{displayName}</span>
                                         </div>
