@@ -7,7 +7,7 @@ export function EmptyWorshipBoardPage() {
     <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 bg-background p-6 text-center">
       <Image
         alt="Empty worship plan"
-        src="/illustration/empty-worship-plan.png"
+        src="/illustration/empty-worship-plan-v2.png"
         width={300}
         height={300}
         className="mb-2"
