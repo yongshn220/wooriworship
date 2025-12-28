@@ -8,7 +8,7 @@ export function EmptySongBoardPage() {
     <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 text-center">
       <Image
         alt="Empty song board"
-        src="/illustration/empty-song-plan.png"
+        src="/illustration/empty-song-plan-v2.png"
         width={300}
         height={300}
         className="mb-2"
