@@ -109,9 +109,10 @@ interface MemberBadgeProps {
     name: string;
     onRemove?: () => void;
     className?: string;
+    isMe?: boolean;
 }
 
-export function MemberBadge({ name, onRemove, className }: MemberBadgeProps) {
+export function MemberBadge({ name, onRemove, className, isMe = false }: MemberBadgeProps) {
     const isGroup = name.startsWith("group:");
     const displayName = name.replace(/^group:/, "");
 
@@ -119,11 +120,17 @@ export function MemberBadge({ name, onRemove, className }: MemberBadgeProps) {
         <Badge
             variant="secondary"
             className={cn(
-                "pl-1 pr-1.5 py-1 rounded-full bg-gray-50/50 text-gray-600 flex items-center gap-1.5 text-[13px] font-bold shadow-sm transition-all",
+                "pl-1 pr-1.5 py-1 rounded-full flex items-center gap-1.5 text-[13px] font-bold shadow-sm transition-all border",
+                isMe
+                    ? "bg-primary/10 border-primary/20 text-primary"
+                    : "bg-background border-border text-muted-foreground",
                 className
             )}
         >
-            <div className="w-6 h-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
+            <div className={cn(
+                "w-6 h-6 rounded-full flex items-center justify-center",
+                isMe ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+            )}>
                 {isGroup ? <Users className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
             </div>
             {displayName}
@@ -164,9 +171,10 @@ interface WorshipTeamRoleRowProps {
     memberIds: string[];
     getMemberName: (id: string) => string;
     className?: string;
+    currentUserUid?: string | null;
 }
 
-export function WorshipTeamRoleRow({ roleName, memberIds, getMemberName, className }: WorshipTeamRoleRowProps) {
+export function WorshipTeamRoleRow({ roleName, memberIds, getMemberName, className, currentUserUid }: WorshipTeamRoleRowProps) {
     if (memberIds.length === 0) return null;
 
     return (
@@ -191,6 +199,7 @@ export function WorshipTeamRoleRow({ roleName, memberIds, getMemberName, classNa
                         key={uid}
                         name={getMemberName(uid)}
                         className="bg-secondary/40 border-transparent h-7 text-xs px-2.5 max-w-[140px] truncate justify-between w-auto" // Adjusted for better visibility
+                        isMe={currentUserUid === uid}
                     />
                 ))}
             </div>
