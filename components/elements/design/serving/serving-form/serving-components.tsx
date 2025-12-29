@@ -127,16 +127,20 @@ export function MemberBadge({ name, onRemove, className, isMe = false }: MemberB
         <Badge
             variant="secondary"
             className={cn(
-                "h-8 pl-3 pr-1.5 gap-1.5 hover:bg-secondary/80 font-medium transition-all group flex items-center justify-between rounded-full",
+                "h-8 pl-3 pr-1.5 gap-1.5 font-medium transition-all group flex items-center justify-between rounded-full",
+                // Default (Theme Color)
+                "bg-primary/10 text-primary hover:bg-primary/20 border-primary/10",
+                // Me (Blue) overrides Default
                 isMe && "bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200",
-                onRemove && "cursor-pointer hover:bg-red-50 hover:text-red-600 hover:border-100",
+                // Remove (Red Hover) overrides all on hover
+                onRemove && "cursor-pointer hover:bg-red-50 hover:text-red-600 hover:border-red-100",
                 className
             )}
             onClick={handleBadgeClick}
         >
             <div className={cn(
                 "w-6 h-6 rounded-full flex items-center justify-center",
-                isMe ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                isMe ? "bg-primary/20 text-primary" : "bg-primary/20 text-primary"
             )}>
                 {isGroup ? <Users className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
             </div>
