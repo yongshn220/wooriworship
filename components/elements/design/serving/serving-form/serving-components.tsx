@@ -295,7 +295,7 @@ export function AssignmentControl({
                         <div className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center group-hover:border-blue-100 group-hover:bg-blue-50 transition-colors">
                             <Plus className="text-gray-300 w-4 h-4 group-hover:text-blue-500" />
                         </div>
-                        <span className="text-[13px] font-bold">{placeholder}</span>
+                        <span className="text-[13px] font-normal">{placeholder}</span>
                     </div>
                 )}
             </div>
