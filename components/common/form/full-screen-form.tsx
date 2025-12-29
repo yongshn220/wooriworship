@@ -34,13 +34,15 @@ export const FullScreenFormHeader = ({ steps, currentStep, onStepChange, onClose
                 {steps.map((label, idx) => (
                     <button
                         key={idx}
-                        onClick={() => onStepChange(idx)}
+                        onClick={() => onStepChange?.(idx)}
                         className={cn(
                             "px-3 py-1.5 rounded-full text-[10px] font-bold transition-all",
                             currentStep === idx
                                 ? "bg-primary text-white shadow-sm"
-                                : "text-gray-400 hover:text-gray-600"
+                                : "text-gray-400 hover:text-gray-600",
+                            !onStepChange && "cursor-not-allowed opacity-50"
                         )}
+                        disabled={!onStepChange}
                     >
                         {label}
                     </button>

@@ -315,6 +315,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                 onTagsChange={setTags}
                 date={date}
                 onDateChange={(d) => d && setDate(d)}
+                errorMessage={isDuplicate && date ? `"${format(date, 'yyyy-MM-dd')} ${tags[0]}" is already exists.` : undefined}
               />
 
               {/* Linked Serving Schedule */}
@@ -328,14 +329,6 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                 selectedId={linkedServingId}
                 onSelect={setLinkedServingId}
               />
-
-              {isDuplicate && step === 0 && (
-                <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 mt-2">
-                  <p className="text-destructive text-sm font-semibold text-center">
-                    A service with this tag already exists on this date.
-                  </p>
-                </div>
-              )}
             </motion.div>
           )}
 
