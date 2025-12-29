@@ -28,6 +28,7 @@ export interface ServingSchedule {
     title?: string; // Optional title for the service (e.g. "Christmas Service")
     items?: ServingItem[]; // New cue-sheet based structure
     templateId?: string; // Track which template was used
+    worshipId?: string; // Linked Worship Plan ID
     roles?: { // Keep for backward compatibility
         roleId: string;
         memberIds: string[];

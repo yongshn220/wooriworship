@@ -1,23 +1,25 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import { useRecoilValue, useSetRecoilState, useRecoilValueLoadable } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { servingRolesAtom, fetchServingRolesSelector, servingSchedulesAtom, servingRolesUpdaterAtom } from "@/global-states/servingState";
-import { ServingService } from "@/apis";
+import { ServingService, WorshipService } from "@/apis";
 import PushNotificationService from "@/apis/PushNotificationService";
 import { auth } from "@/firebase";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format, nextSunday, nextFriday, addDays, isSaturday, isSunday } from "date-fns";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus, User, Users, Pencil, X, Calendar as CalendarIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Check, FileText, MoreHorizontal, Info, Plus, Trash2, GripVertical, Save, ChevronUp, ChevronDown, UserPlus, User, Users, Pencil, X, Calendar as CalendarIcon, Link as LinkIcon, ExternalLink, Eye } from "lucide-react";
 import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { WorshipCard } from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-card";
+import { WorshipCardSkeleton } from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-list-skeleton";
 import { MemberSelector } from "./member-selector";
 import { usersAtom } from "@/global-states/userState";
 import { teamAtom } from "@/global-states/teamState";
@@ -66,7 +68,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [direction, setDirection] = useState(0);
     const totalSteps = 4;
 
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(nextSunday(new Date()));
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+    const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
     const [title, setTitle] = useState("");
     const [items, setItems] = useState<ServingItem[]>([]);
     const [templates, setTemplates] = useState<any[]>([]);
@@ -74,6 +77,11 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
     const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
     const [hasTemplateChanges, setHasTemplateChanges] = useState(false);
+
+    // Worship Plan Linking
+    const [availableWorships, setAvailableWorships] = useState<any[]>([]);
+    const [linkedWorshipId, setLinkedWorshipId] = useState<string | null>(null);
+    const [previewWorshipId, setPreviewWorshipId] = useState<string | null>(null);
 
     // For Member Selection Drawer
     const [activeSelection, setActiveSelection] = useState<{ itemId?: string; assignmentIndex?: number; roleId: string } | null>(null);
@@ -135,6 +143,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             const [y, m, d] = initialData.date.split('-').map(Number);
             const parsedDate = new Date(y, m - 1, d);
             setSelectedDate(parsedDate);
+            setCurrentMonth(parsedDate);
             setTitle(initialData.title || "");
 
             if (initialData.items && initialData.items.length > 0) {
@@ -202,6 +211,27 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         const isSame = JSON.stringify(currentItemsSimplifed) === JSON.stringify(templateItemsSimplified);
         setHasTemplateChanges(!isSame);
     }, [items, selectedTemplateId, templates]);
+
+    // Fetch available worship plans when date changes
+    useEffect(() => {
+        if (selectedDate && teamId) {
+            WorshipService.getWorshipsByDate(teamId, selectedDate).then(worships => {
+                setAvailableWorships(worships);
+                if (worships.length > 0 && mode === FormMode.CREATE) {
+                    // Default select the first one if creating new
+                    setLinkedWorshipId(worships[0].id);
+                } else if (mode === FormMode.EDIT && initialData?.worshipId) {
+                    // Keep existing link on edit
+                    setLinkedWorshipId(initialData.worshipId);
+                } else {
+                    setLinkedWorshipId(null);
+                }
+            });
+        } else {
+            setAvailableWorships([]);
+            setLinkedWorshipId(null);
+        }
+    }, [selectedDate, teamId, mode, initialData]);
 
     // Helpers
     const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || id; // Fallback to ID (name) for manual entries
@@ -271,6 +301,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 date: dateString,
                 title: title.trim(),
                 items: items,
+                worshipId: linkedWorshipId || undefined
             };
 
             if (mode === FormMode.CREATE) {
@@ -296,6 +327,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     title: title.trim(),
                     items: items,
                     templateId: selectedTemplateId || null,
+                    worshipId: linkedWorshipId || null,
                 };
                 await ServingService.updateSchedule(teamId, updatePayload);
                 toast({ title: "Schedule updated!" });
@@ -585,26 +617,23 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                         }
                                                         return d;
                                                     })(),
-                                                    title: "새벽예배",
-                                                    toast: "Applied Early Morning Prayer"
+                                                    title: "새벽예배"
                                                 },
                                                 {
                                                     date: nextFriday(new Date()),
-                                                    title: "금요예배",
-                                                    toast: "Applied Friday Service"
+                                                    title: "금요예배"
                                                 },
                                                 {
                                                     date: nextSunday(new Date()),
-                                                    title: "주일예배",
-                                                    toast: "Applied Weekly Sunday Service"
+                                                    title: "주일예배"
                                                 }
                                             ].sort((a, b) => a.date.getTime() - b.date.getTime()).map((option) => (
                                                 <button
                                                     key={option.title}
                                                     onClick={() => {
                                                         setSelectedDate(option.date);
+                                                        setCurrentMonth(option.date);
                                                         setTitle(option.title);
-                                                        toast({ title: option.toast });
                                                     }}
                                                     className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95"
                                                 >
@@ -626,6 +655,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                         </div>
                                         <Calendar
                                             mode="single"
+                                            month={currentMonth}
+                                            onMonthChange={setCurrentMonth}
                                             selected={selectedDate}
                                             onSelect={(date) => {
                                                 if (date) {
@@ -635,6 +666,64 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                             className="rounded-2xl border-0"
                                         />
                                     </div>
+
+                                    {/* Linked Worship Plan */}
+                                    {availableWorships.length > 0 && (
+                                        <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 flex flex-col gap-4">
+                                            <div className="flex items-center justify-between ml-1">
+                                                <Label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                                                    <LinkIcon className="w-4 h-4" />
+                                                    Linked Worship Plan
+                                                </Label>
+                                                {linkedWorshipId && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-6 text-xs text-muted-foreground hover:text-destructive"
+                                                        onClick={() => setLinkedWorshipId(null)}
+                                                    >
+                                                        Unlink
+                                                    </Button>
+                                                )}
+                                            </div>
+
+                                            <div className="flex flex-col gap-2">
+                                                {availableWorships.map(plan => (
+                                                    <div
+                                                        key={plan.id}
+                                                        onClick={() => setLinkedWorshipId(plan.id === linkedWorshipId ? null : plan.id)}
+                                                        className={cn(
+                                                            "flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer",
+                                                            linkedWorshipId === plan.id
+                                                                ? "bg-primary/5 border-primary shadow-sm"
+                                                                : "bg-white border-gray-100 hover:border-gray-200"
+                                                        )}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={cn(
+                                                                "w-4 h-4 rounded-full border-2 flex items-center justify-center",
+                                                                linkedWorshipId === plan.id ? "border-primary" : "border-gray-300"
+                                                            )}>
+                                                                {linkedWorshipId === plan.id && <div className="w-2 h-2 rounded-full bg-primary" />}
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className={cn("text-sm font-bold", linkedWorshipId === plan.id ? "text-primary" : "text-gray-700")}>
+                                                                    {plan.title || "Untitled Worship"}
+                                                                </span>
+                                                                <span className="text-xs text-muted-foreground">{format(plan.worship_date.toDate(), "HH:mm")}</span>
+                                                            </div>
+                                                        </div>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400" onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setPreviewWorshipId(plan.id);
+                                                        }}>
+                                                            <Eye className="w-4 h-4" />
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </motion.div>
                         )}
@@ -982,6 +1071,22 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     </Button>
                 </div>
             </div>
+
+            {/* Worship Preview Drawer */}
+            <Drawer open={!!previewWorshipId} onOpenChange={(open) => !open && setPreviewWorshipId(null)}>
+                <DrawerContent className="h-[85vh]">
+                    <DrawerHeader className="text-left border-b pb-4">
+                        <DrawerTitle>Worship Plan Preview</DrawerTitle>
+                    </DrawerHeader>
+                    <div className="p-4 overflow-y-auto no-scrollbar pb-10">
+                        {previewWorshipId && (
+                            <Suspense fallback={<WorshipCardSkeleton />}>
+                                <WorshipCard worshipId={previewWorshipId} isFirst={true} />
+                            </Suspense>
+                        )}
+                    </div>
+                </DrawerContent>
+            </Drawer>
 
             {/* Member Selection Drawer */}
             <Drawer open={!!activeSelection} onOpenChange={(open) => !open && setActiveSelection(null)}>

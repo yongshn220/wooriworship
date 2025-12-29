@@ -3,6 +3,7 @@ import { SongService } from ".";
 import { Timestamp } from "@firebase/firestore";
 import { Worship } from "@/models/worship";
 import { WorshipInput } from "@/components/constants/types";
+import { firestore } from "@/firebase";
 
 class WorshipService extends BaseService {
   constructor() {
@@ -18,6 +19,28 @@ class WorshipService extends BaseService {
       }
     ]);
     return worships
+  }
+
+  async getWorshipsByDate(teamId: string, date: Date) {
+    try {
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const nextDay = new Date(startOfDay);
+      nextDay.setDate(nextDay.getDate() + 1);
+
+      const snapshot = await firestore
+        .collection(this.collectionName)
+        .where('team_id', '==', teamId)
+        .where('worship_date', '>=', Timestamp.fromDate(startOfDay))
+        .where('worship_date', '<', Timestamp.fromDate(nextDay))
+        .get();
+
+      return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Worship));
+    } catch (e) {
+      console.error("Failed to fetch worships by date:", e);
+      return [];
+    }
   }
 
   async addNewWorship(userId: string, teamId: string, worshipInput: WorshipInput) {
