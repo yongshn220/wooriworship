@@ -117,14 +117,20 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [historySchedules, setHistorySchedules] = useState<ServingSchedule[]>([]);
 
     useEffect(() => {
-        if (!teamId || tags.length === 0) {
+        if (!teamId) {
             setHistorySchedules([]);
             return;
         }
         const fetchHistory = async () => {
-            // Use the first tag as the primary key for history context
-            const recent = await ServingService.getRecentSchedulesByTag(teamId, tags[0], 10);
-            setHistorySchedules(recent);
+            if (tags.length > 0) {
+                // Use the first tag as the primary key for history context
+                const recent = await ServingService.getRecentSchedulesByTag(teamId, tags[0], 10);
+                setHistorySchedules(recent);
+            } else {
+                // If no tag is selected, fetch recent schedules generally to provide suggestions based on title only
+                const recent = await ServingService.getRecentSchedules(teamId, 10);
+                setHistorySchedules(recent);
+            }
         };
         fetchHistory();
     }, [teamId, tags]);
