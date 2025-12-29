@@ -400,7 +400,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 tags,
                 title: tags.length > 0 ? tags.join(" ") : "Worship Service", // Fallback title
                 items: items,
-                worshipId: linkedWorshipId || undefined
+                worshipId: linkedWorshipId || null
             };
 
             if (mode === FormMode.CREATE) {
