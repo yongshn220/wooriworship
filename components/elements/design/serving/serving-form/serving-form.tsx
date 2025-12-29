@@ -1366,6 +1366,10 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                 {/* Bottom Row - Assignments & Suggestions */}
                 <div
                     className="px-5 pt-2 pb-4 cursor-pointer hover:bg-gray-50 active:bg-gray-100/70 transition-colors"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenAdd();
+                    }}
                 >
                     <AssignmentControl
                         assignedMembers={memberIds.map(uid => ({ id: uid, name: teamMembers.find(m => m.id === uid)?.name || uid }))}
@@ -1554,6 +1558,10 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                 {/* Bottom Row - Assignments (Full Width Padding) */}
                 <div
                     className="px-5 pt-2 pb-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 active:bg-gray-100/70 transition-colors"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenAdd(0);
+                    }}
                 >
                     <div className="w-full">
                         <AssignmentControl
