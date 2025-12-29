@@ -1556,7 +1556,7 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                 >
                     <div className="w-full">
                         <AssignmentControl
-                            assignedMembers={assignment.memberIds.map(uid => {
+                            assignedMembers={assignment.memberIds.map((uid: string) => {
                                 const name = getMemberName(uid);
                                 return { id: uid, name: name.replace(/^group:/, '') };
                             })}

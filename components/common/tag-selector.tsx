@@ -164,7 +164,7 @@ export function TagSelector({
                                 {inputValue && (
                                     <div className="p-2">
                                         <Button variant="ghost" className="w-full justify-start text-sm" onClick={createNewTag}>
-                                            Create "{inputValue}"
+                                            Create &quot;{inputValue}&quot;
                                         </Button>
                                     </div>
                                 )}

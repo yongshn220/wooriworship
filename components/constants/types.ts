@@ -1,4 +1,4 @@
-import {WorshipSongHeader} from "@/models/worship";
+import { WorshipSongHeader } from "@/models/worship";
 
 
 export interface ImageFileContainer {
@@ -24,4 +24,5 @@ export interface WorshipInput {
   worshipSongHeaders: Array<WorshipSongHeader>
   beginningSong: WorshipSongHeader
   endingSong: WorshipSongHeader
+  tags: string[]
 }
