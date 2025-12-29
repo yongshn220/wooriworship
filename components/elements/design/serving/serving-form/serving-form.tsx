@@ -613,7 +613,6 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                     onDateChange={(d) => d && setSelectedDate(d)}
                                     calendarMonth={currentMonth}
                                     onCalendarMonthChange={setCurrentMonth}
-                                    errorMessage={isDuplicate && selectedDate ? `"${format(selectedDate, 'yyyy-MM-dd')} ${tags[0]}" is already exists.` : undefined}
                                 />
 
                                 {/* Linked Worship Plan */}
@@ -927,7 +926,9 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 </FullScreenFormBody>
 
                 {/* STICKY FOOTER - Absolute */}
-                <FullScreenFormFooter>
+                <FullScreenFormFooter
+                    errorMessage={isDuplicate && selectedDate && step === 0 ? `"${format(selectedDate, 'yyyy-MM-dd')} ${tags[0]}" is already exists.` : undefined}
+                >
                     <AnimatePresence>
                         {step === 2 && hasTemplateChanges && selectedTemplateId && (
                             <motion.div
