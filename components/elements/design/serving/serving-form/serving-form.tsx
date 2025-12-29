@@ -44,6 +44,7 @@ import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFor
 import { LinkedResourceCard } from "@/components/common/form/linked-resource-card";
 import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
 
+import { useServiceDuplicateCheck } from "@/components/common/hooks/use-service-duplicate-check";
 
 interface Props {
     teamId: string;
@@ -96,7 +97,6 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [activeSelection, setActiveSelection] = useState<{ itemId?: string; assignmentIndex?: number; roleId: string } | null>(null);
 
     const [isLoading, setIsLoading] = useState(false);
-    const [isDuplicate, setIsDuplicate] = useState(false);
 
     // Modals & Drawers
     const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
@@ -311,26 +311,14 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     }, [selectedDate, teamId, mode, initialData, tags, linkedWorshipId]);
 
     // Real-time Duplicate Check
-    useEffect(() => {
-        const checkDuplicate = async () => {
-            if (!selectedDate || tags.length === 0) {
-                setIsDuplicate(false);
-                return;
-            }
-            try {
-                const dateStr = format(selectedDate, 'yyyy-MM-dd');
-                const existingSchedules = await ServingService.getSchedules(teamId, dateStr, dateStr);
-                const duplicate = existingSchedules.find(s =>
-                    tags.some(t => s.tags?.includes(t)) &&
-                    (mode === FormMode.CREATE || (mode === FormMode.EDIT && s.id !== initialData?.id))
-                );
-                setIsDuplicate(!!duplicate);
-            } catch (error) {
-                console.error("Failed to check for duplicates", error);
-            }
-        };
-        checkDuplicate();
-    }, [selectedDate, tags, teamId, mode, initialData?.id]);
+    const { isDuplicate, errorMessage: duplicateErrorMessage } = useServiceDuplicateCheck({
+        teamId,
+        date: selectedDate,
+        tags,
+        mode,
+        currentId: initialData?.id,
+        fetcher: ServingService.getSchedules
+    });
 
     // Helpers
     const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || id; // Fallback to ID (name) for manual entries
@@ -998,7 +986,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                 {/* STICKY FOOTER - Absolute */}
                 <FullScreenFormFooter
-                    errorMessage={isDuplicate && selectedDate && step === 0 ? `"${format(selectedDate, 'yyyy-MM-dd')} ${tags[0]}" is already exists.` : undefined}
+                    errorMessage={duplicateErrorMessage}
                 >
                     <AnimatePresence>
                         {step === 2 && hasTemplateChanges && selectedTemplateId && (

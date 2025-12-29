@@ -40,6 +40,7 @@ import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFor
 import { ServingService } from "@/apis";
 import { LinkedResourceCard } from "@/components/common/form/linked-resource-card";
 import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
+import { useServiceDuplicateCheck } from "@/components/common/hooks/use-service-duplicate-check";
 
 interface Props {
   mode: FormMode
@@ -74,7 +75,6 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
 
   const [availableServingSchedules, setAvailableServingSchedules] = useState<any[]>([]);
   const [linkedServingId, setLinkedServingId] = useState<string | null>(null);
-  const [isDuplicate, setIsDuplicate] = useState(false);
 
   // Date Helpers
   const upcomingFriday = nextFriday(new Date());
@@ -150,25 +150,19 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
   }, [date, teamId, tags, mode, worship?.id, linkedServingId]); // Added tags dependency to re-run when tags change
 
   // Real-time Duplicate Check
-  useEffect(() => {
-    const checkDuplicate = async () => {
-      if (!date || tags.length === 0) {
-        setIsDuplicate(false);
-        return;
-      }
-      try {
-        const existingWorships = await WorshipService.getWorshipsByDate(teamId, date);
-        const duplicate = existingWorships.find(w =>
-          tags.some(t => w.tags?.includes(t)) &&
-          (mode === FormMode.CREATE || (mode === FormMode.EDIT && w.id !== worship?.id))
-        );
-        setIsDuplicate(!!duplicate);
-      } catch (error) {
-        console.error("Failed to check for duplicates", error);
-      }
-    };
-    checkDuplicate();
-  }, [date, tags, teamId, mode, worship?.id]);
+  const { isDuplicate, errorMessage: duplicateErrorMessage } = useServiceDuplicateCheck({
+    teamId,
+    date,
+    tags,
+    mode,
+    currentId: worship?.id,
+    fetcher: async (tid, dateStr) => {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const dateObj = new Date(y, m - 1, d);
+      const worships = await WorshipService.getWorshipsByDate(tid, dateObj);
+      return worships.map(w => ({ ...w, id: w.id! }));
+    }
+  });
 
   // Validation Check
   const isSessionValid = () => {
@@ -420,7 +414,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       </FullScreenFormBody>
 
       <FullScreenFormFooter
-        errorMessage={isDuplicate && date && step === 0 ? `"${format(date, 'yyyy-MM-dd')} ${tags[0]}" is already exists.` : undefined}
+        errorMessage={duplicateErrorMessage}
       >
         <div className="w-12 h-12 flex-none">
           <Button
