@@ -14,8 +14,11 @@ export function MyServingIndicator({ teamId, date }: { teamId: string, date: str
         if (!teamId || !date || !authUser) return;
         ServingService.getScheduleByDate(teamId, date).then((schedule) => {
             if (schedule) {
-                const myRoles = schedule.roles.filter(r => r.memberIds.includes(authUser.uid));
-                setIsServing(myRoles.length > 0);
+                const inRoles = (schedule.roles || []).some(r => r.memberIds.includes(authUser.uid));
+                const inItems = (schedule.items || []).some(item =>
+                    (item.assignments || []).some(assign => assign.memberIds.includes(authUser.uid))
+                );
+                setIsServing(inRoles || inItems);
             }
         });
     }, [teamId, date, authUser]);

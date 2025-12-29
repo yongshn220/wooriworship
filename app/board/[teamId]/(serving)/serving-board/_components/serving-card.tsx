@@ -99,6 +99,11 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                                     {format(scheduleDate, "yyyy. MM. dd (EEE)")}
                                     <ChevronDown className="h-5 w-5 text-muted-foreground animate-in fade-in zoom-in" />
                                 </h3>
+                                {schedule.title && (
+                                    <p className="text-sm text-muted-foreground font-medium">
+                                        {schedule.title}
+                                    </p>
+                                )}
                             </div>
                             <div onClick={(e) => e.stopPropagation()}>
                                 <ServingHeaderMenu scheduleId={schedule.id} teamId={teamId} />
@@ -126,6 +131,11 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                                     <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide opacity-70">
                                         {format(scheduleDate, "EEEE, yyyy")}
                                     </p>
+                                    {schedule.title && (
+                                        <p className="text-lg font-semibold text-primary mt-2">
+                                            {schedule.title}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>
