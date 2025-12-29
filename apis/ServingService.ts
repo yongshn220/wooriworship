@@ -168,6 +168,23 @@ class ServingService extends BaseService {
         }
     }
 
+    async getRecentSchedulesByTag(teamId: string, tag: string, limit: number = 10): Promise<ServingSchedule[]> {
+        try {
+            const snapshot = await firestore
+                .collection("teams")
+                .doc(teamId)
+                .collection("serving_schedules")
+                .where("tags", "array-contains", tag)
+                .orderBy("date", "desc")
+                .limit(limit)
+                .get();
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServingSchedule));
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
+
     async getScheduleByDate(teamId: string, date: string): Promise<ServingSchedule | null> {
         try {
             const snapshot = await firestore

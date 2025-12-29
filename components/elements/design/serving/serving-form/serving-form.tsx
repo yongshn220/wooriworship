@@ -31,7 +31,12 @@ import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
-import { AddActionButton, ServingCard, MemberSuggestionList, MemberBadge, WorshipTeamRoleRow } from "./serving-components";
+import {
+    AddActionButton, ServingCard, MemberSuggestionList,
+    MemberBadge,
+    WorshipTeamRoleRow,
+    SuggestedMemberChips
+} from "./serving-components";
 import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
 import { TagSelector } from "@/components/common/tag-selector";
 import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFormFooter, FormSectionCard } from "@/components/common/form/full-screen-form";
@@ -107,6 +112,57 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [newGroupInput, setNewGroupInput] = useState("");
 
     const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'role' | 'template'; id: string; open: boolean }>({ type: 'role', id: '', open: false });
+
+    // History & Suggestions
+    const [historySchedules, setHistorySchedules] = useState<ServingSchedule[]>([]);
+
+    useEffect(() => {
+        if (!teamId || tags.length === 0) {
+            setHistorySchedules([]);
+            return;
+        }
+        const fetchHistory = async () => {
+            // Use the first tag as the primary key for history context
+            const recent = await ServingService.getRecentSchedulesByTag(teamId, tags[0], 10);
+            setHistorySchedules(recent);
+        };
+        fetchHistory();
+    }, [teamId, tags]);
+
+    const getSuggestionsForTitle = (title: string) => {
+        const normalizedTitle = title.trim();
+        if (!normalizedTitle || historySchedules.length === 0) return [];
+
+        const suggestions: { id: string, name: string }[] = [];
+        const seen = new Set<string>();
+
+        for (const schedule of historySchedules) {
+            const matchItems = schedule.items.filter(i => i.title.trim() === normalizedTitle && i.type !== 'WORSHIP_TEAM');
+
+            for (const item of matchItems) {
+                if (!item.assignments) continue;
+                for (const assignment of item.assignments) {
+                    for (const uid of assignment.memberIds) {
+                        if (seen.has(uid)) continue;
+
+                        // Check if it's a known member or group
+                        const member = teamMembers.find(m => m.id === uid);
+                        if (member) {
+                            seen.add(uid);
+                            suggestions.push({ id: uid, name: member.name });
+                        } else if (uid.startsWith("group:")) {
+                            seen.add(uid);
+                            suggestions.push({ id: uid, name: uid });
+                        }
+
+                        if (suggestions.length >= 3) return suggestions;
+                    }
+                }
+            }
+            if (suggestions.length >= 3) break;
+        }
+        return suggestions;
+    };
 
     // Initialize roles & data
     useEffect(() => {
@@ -861,6 +917,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                 onRemoveMember={(aIdx, uid) => {
                                                                     handleAddMember(item.id, aIdx, uid);
                                                                 }}
+                                                                suggestions={getSuggestionsForTitle(item.title)}
                                                             />
                                                         )
                                                     })}
@@ -1317,20 +1374,10 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                                 />
                             ))}
 
-                            {/* Suggested Chips with Dashed Border */}
-                            {suggestions.map(member => (
-                                <button
-                                    key={member.id}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onAddMember(role.id, member.id);
-                                    }}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-transparent border border-dashed border-gray-300 rounded-full text-[13px] font-bold text-gray-500 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all active:scale-95"
-                                >
-                                    <Plus className="w-3.5 h-3.5" />
-                                    {member.name.replace(/^group:/, "")}
-                                </button>
-                            ))}
+                            <SuggestedMemberChips
+                                suggestions={suggestions}
+                                onSelect={(id) => onAddMember(role.id, id)}
+                            />
 
                             {!isAssigned && suggestions.length === 0 && (
                                 <button
@@ -1463,9 +1510,10 @@ interface SortableTimelineItemProps {
     onDelete: () => void;
     onOpenAdd: (assignmentIndex: number) => void;
     onRemoveMember: (assignmentIndex: number, uid: string) => void;
+    suggestions: { id: string; name: string }[];
 }
 
-function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenAdd, onRemoveMember }: SortableTimelineItemProps) {
+function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenAdd, onRemoveMember, suggestions }: SortableTimelineItemProps) {
     const controls = useDragControls();
 
     const assignment = item.assignments[0] || { memberIds: [] };
@@ -1574,6 +1622,11 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                                 <span className="text-[13px] font-bold">Assign Member</span>
                             </button>
                         )}
+
+                        <SuggestedMemberChips
+                            suggestions={suggestions.filter(s => !assignment.memberIds.includes(s.id))}
+                            onSelect={(id) => onRemoveMember(0, id)}
+                        />
                     </div>
                     {isAssigned && (
                         <div className="w-8 h-8 rounded-full border border-blue-100 bg-blue-50 flex items-center justify-center transition-colors flex-shrink-0 ml-2">
