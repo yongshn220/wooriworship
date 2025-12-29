@@ -818,7 +818,11 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                     </div>
                                                 )}
                                                 <Reorder.Group axis="y" values={items} onReorder={(newOrdered) => {
-                                                    setItems(newOrdered);
+                                                    const updatedItems = newOrdered.map((item, index) => ({
+                                                        ...item,
+                                                        order: index
+                                                    }));
+                                                    setItems(updatedItems);
                                                 }} className="flex flex-col gap-4">
                                                     {items.map((item, index) => {
                                                         if (item.type === 'WORSHIP_TEAM') {
