@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRecoilValue, useSetRecoilState, useRecoilValueLoadable } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { servingRolesAtom, fetchServingRolesSelector, servingSchedulesAtom, servingRolesUpdaterAtom } from "@/global-states/servingState";
@@ -18,9 +18,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
-import { WorshipCard } from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-card";
-import { WorshipCardSkeleton } from "@/app/board/[teamId]/(worship)/worship-board/_components/worship-list-skeleton";
 import { MemberSelector } from "./member-selector";
+import { WorshipPlanPreviewDrawer } from "../../worship/worship-plan-preview-drawer";
 import { usersAtom } from "@/global-states/userState";
 import { teamAtom } from "@/global-states/teamState";
 import { useRouter } from "next/navigation";
@@ -34,6 +33,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { AddActionButton, ServingCard, MemberSuggestionList, MemberBadge, WorshipTeamRoleRow } from "./serving-components";
 import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
+import { TagSelector } from "@/components/common/tag-selector";
+import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFormFooter, FormSectionCard } from "@/components/common/form/full-screen-form";
+import { LinkedResourceCard } from "@/components/common/form/linked-resource-card";
 
 
 interface Props {
@@ -70,7 +72,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
     const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-    const [title, setTitle] = useState("");
+    const [tags, setTags] = useState<string[]>([]);
     const [items, setItems] = useState<ServingItem[]>([]);
     const [templates, setTemplates] = useState<any[]>([]);
     const [isTemplatesLoaded, setIsTemplatesLoaded] = useState(false);
@@ -144,7 +146,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             const parsedDate = new Date(y, m - 1, d);
             setSelectedDate(parsedDate);
             setCurrentMonth(parsedDate);
-            setTitle(initialData.title || "");
+            setTags(initialData.tags || []);
 
             if (initialData.items && initialData.items.length > 0) {
                 setItems(initialData.items);
@@ -299,7 +301,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             const payload: Omit<ServingSchedule, "id"> = {
                 teamId,
                 date: dateString,
-                title: title.trim(),
+                tags,
+                title: tags.join(" "), // Fallback/Derived title
                 items: items,
                 worshipId: linkedWorshipId || undefined
             };
@@ -324,7 +327,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 const updatePayload = {
                     ...initialData,
                     date: dateString,
-                    title: title.trim(),
+                    tags,
+                    title: tags.join(" "),
                     items: items,
                     templateId: selectedTemplateId || null,
                     worshipId: linkedWorshipId || null,
@@ -532,48 +536,22 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         })
     };
 
-    // Prevent flash: Show skeleton if fetching or if data is not ready
     if (rolesLoadable.state !== 'hasValue') {
-        return <ServingFormSkeleton />;
+        return (<ServingFormSkeleton />);
     }
 
     return (
-        <div className="fixed inset-0 z-[100] bg-gray-50 flex flex-col">
+        <>
+            <FullScreenForm>
+                <FullScreenFormHeader
+                    steps={["When", "Who", "What", "Review"]}
+                    currentStep={step}
+                    onStepChange={goToStep}
+                    onClose={() => router.back()}
+                />
 
-            {/* HEADER - Absolute */}
-            <div className="absolute top-0 left-0 right-0 z-50 w-full px-6 pt-8 pb-12 flex items-center justify-between pointer-events-none bg-gradient-to-b from-gray-50 via-gray-50/90 to-transparent">
-                {/* Exit Button - Left aligned */}
-                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/50 hover:bg-background shadow-sm pointer-events-auto backdrop-blur-sm" onClick={() => router.back()}>
-                    <X className="w-5 h-5 text-muted-foreground" />
-                </Button>
-
-                {/* Step Bar - Centered */}
-                <div className="flex gap-1 p-1 bg-white/50 backdrop-blur-md rounded-full shadow-sm pointer-events-auto absolute left-1/2 -translate-x-1/2">
-                    {["When", "Who", "What", "Review"].map((label, idx) => (
-                        <button
-                            key={idx}
-                            onClick={() => goToStep(idx)}
-                            className={cn(
-                                "px-3 py-1.5 rounded-full text-[10px] font-bold transition-all",
-                                step === idx
-                                    ? "bg-primary text-white shadow-sm"
-                                    : "text-gray-400 hover:text-gray-600"
-                            )}
-                        >
-                            {label}
-                        </button>
-                    ))}
-                </div>
-
-                <div className="w-10" /> {/* Spacer for centering */}
-            </div>
-
-            {/* SCROLLABLE CONTENT AREA */}
-            <div
-                ref={containerRef}
-                className="absolute inset-0 overflow-y-auto overflow-x-hidden no-scrollbar pt-24"
-            >
-                <main className="w-full max-w-2xl mx-auto px-6 pb-32 relative">
+                {/* SCROLLABLE CONTENT AREA */}
+                <FullScreenFormBody ref={containerRef}>
                     <AnimatePresence initial={false} custom={direction}>
                         {/* Step 1: When */}
                         {step === 0 && (
@@ -594,14 +572,15 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
                                 <div className="space-y-6">
                                     {/* Title Card */}
-                                    <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 space-y-4">
+                                    <FormSectionCard>
                                         <div className="space-y-2">
-                                            <Label className="text-sm font-semibold text-muted-foreground ml-1">Title</Label>
-                                            <Input
-                                                placeholder="e.g. Sunday Service"
-                                                value={title}
-                                                onChange={(e) => setTitle(e.target.value)}
-                                                className="h-14 text-lg bg-gray-50/50 border-gray-100 focus:bg-white transition-all rounded-2xl px-4 font-bold placeholder:font-normal placeholder:text-muted-foreground/50"
+                                            <Label className="text-sm font-semibold text-muted-foreground ml-1">Service</Label>
+                                            <TagSelector
+                                                teamId={teamId}
+                                                selectedTags={tags}
+                                                onTagsChange={setTags}
+                                                placeholder="Select service (e.g. 주일예배, 금요예배...)"
+                                                single={true}
                                             />
                                         </div>
 
@@ -633,7 +612,12 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                     onClick={() => {
                                                         setSelectedDate(option.date);
                                                         setCurrentMonth(option.date);
-                                                        setTitle(option.title);
+                                                        // Always replace tags for single selection
+                                                        setTags([option.title]);
+                                                        // Auto-create tag if it doesn't exist
+                                                        import("@/apis/TagService").then(mod => {
+                                                            mod.default.addNewTag(teamId, option.title).catch(console.error);
+                                                        });
                                                     }}
                                                     className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95"
                                                 >
@@ -641,90 +625,46 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                 </button>
                                             ))}
                                         </div>
-                                    </div>
-
-                                    {/* Calendar Card */}
-                                    <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 flex flex-col items-center gap-4">
-                                        <div className="w-full flex items-center justify-between ml-1">
-                                            <Label className="text-sm font-semibold text-muted-foreground">Date</Label>
-                                            {selectedDate && (
-                                                <span className="text-sm font-bold text-primary bg-primary/5 px-3 py-1 rounded-full">
-                                                    {format(selectedDate, "yyyy-MM-dd (eee)")}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <Calendar
-                                            mode="single"
-                                            month={currentMonth}
-                                            onMonthChange={setCurrentMonth}
-                                            selected={selectedDate}
-                                            onSelect={(date) => {
-                                                if (date) {
-                                                    setSelectedDate(date);
-                                                }
-                                            }}
-                                            className="rounded-2xl border-0"
-                                        />
-                                    </div>
-
-                                    {/* Linked Worship Plan */}
-                                    {availableWorships.length > 0 && (
-                                        <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 flex flex-col gap-4">
-                                            <div className="flex items-center justify-between ml-1">
-                                                <Label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-                                                    <LinkIcon className="w-4 h-4" />
-                                                    Linked Worship Plan
-                                                </Label>
-                                                {linkedWorshipId && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-6 text-xs text-muted-foreground hover:text-destructive"
-                                                        onClick={() => setLinkedWorshipId(null)}
-                                                    >
-                                                        Unlink
-                                                    </Button>
-                                                )}
-                                            </div>
-
-                                            <div className="flex flex-col gap-2">
-                                                {availableWorships.map(plan => (
-                                                    <div
-                                                        key={plan.id}
-                                                        onClick={() => setLinkedWorshipId(plan.id === linkedWorshipId ? null : plan.id)}
-                                                        className={cn(
-                                                            "flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer",
-                                                            linkedWorshipId === plan.id
-                                                                ? "bg-primary/5 border-primary shadow-sm"
-                                                                : "bg-white border-gray-100 hover:border-gray-200"
-                                                        )}
-                                                    >
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={cn(
-                                                                "w-4 h-4 rounded-full border-2 flex items-center justify-center",
-                                                                linkedWorshipId === plan.id ? "border-primary" : "border-gray-300"
-                                                            )}>
-                                                                {linkedWorshipId === plan.id && <div className="w-2 h-2 rounded-full bg-primary" />}
-                                                            </div>
-                                                            <div className="flex flex-col">
-                                                                <span className={cn("text-sm font-bold", linkedWorshipId === plan.id ? "text-primary" : "text-gray-700")}>
-                                                                    {plan.title || "Untitled Worship"}
-                                                                </span>
-                                                                <span className="text-xs text-muted-foreground">{format(plan.worship_date.toDate(), "HH:mm")}</span>
-                                                            </div>
-                                                        </div>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400" onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setPreviewWorshipId(plan.id);
-                                                        }}>
-                                                            <Eye className="w-4 h-4" />
-                                                        </Button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
+                                    </FormSectionCard>
                                 </div>
+
+                                {/* Calendar Card */}
+                                <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 flex flex-col items-center gap-4">
+                                    <div className="w-full flex items-center justify-between ml-1">
+                                        <Label className="text-sm font-semibold text-muted-foreground">Date</Label>
+                                        {selectedDate && (
+                                            <span className="text-sm font-bold text-primary bg-primary/5 px-3 py-1 rounded-full">
+                                                {format(selectedDate, "yyyy-MM-dd (eee)")}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <Calendar
+                                        mode="single"
+                                        month={currentMonth}
+                                        onMonthChange={setCurrentMonth}
+                                        selected={selectedDate}
+                                        onSelect={(date) => {
+                                            if (date) {
+                                                setSelectedDate(date);
+                                            }
+                                        }}
+                                        className="rounded-2xl border-0"
+                                    />
+                                </div>
+
+                                {/* Linked Worship Plan */}
+                                {/* Linked Worship Plan */}
+                                <LinkedResourceCard
+                                    label="Linked Worship Plan"
+                                    items={availableWorships.map(plan => ({
+                                        id: plan.id,
+                                        title: plan.title || "Untitled Worship",
+                                        description: format(plan.worship_date.toDate(), "HH:mm")
+                                    }))}
+                                    selectedId={linkedWorshipId}
+                                    onSelect={setLinkedWorshipId}
+                                    onPreview={setPreviewWorshipId}
+                                />
                             </motion.div>
                         )}
 
@@ -1021,31 +961,29 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </main>
-            </div>
+                </FullScreenFormBody>
 
-            {/* STICKY FOOTER - Absolute */}
-            <div className="absolute bottom-0 left-0 right-0 z-50 w-full px-6 pb-8 pt-12 pointer-events-none bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent">
-                <AnimatePresence>
-                    {step === 2 && hasTemplateChanges && selectedTemplateId && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                            className="w-full max-w-2xl mx-auto mb-4 pointer-events-auto flex justify-center"
-                        >
-                            <button
-                                onClick={handleUpdateTemplate}
-                                className="px-6 py-2 rounded-full bg-white/40 backdrop-blur-xl group active:scale-95 transition-all"
+                {/* STICKY FOOTER - Absolute */}
+                <FullScreenFormFooter>
+                    <AnimatePresence>
+                        {step === 2 && hasTemplateChanges && selectedTemplateId && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                className="w-full max-w-2xl mx-auto mb-4 pointer-events-auto flex justify-center"
                             >
-                                <span className="text-[13px] font-bold text-primary">
-                                    Save to &quot;{templates.find(t => t.id === selectedTemplateId)?.name}&quot;
-                                </span>
-                            </button>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-                <div className="flex gap-3 w-full max-w-2xl mx-auto pointer-events-auto">
+                                <button
+                                    onClick={handleUpdateTemplate}
+                                    className="px-6 py-2 rounded-full bg-white/40 backdrop-blur-xl group active:scale-95 transition-all"
+                                >
+                                    <span className="text-[13px] font-bold text-primary">
+                                        Save to &quot;{templates.find(t => t.id === selectedTemplateId)?.name}&quot;
+                                    </span>
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                     <div className="w-12 h-12 flex-none">
                         <Button
                             variant="outline"
@@ -1069,247 +1007,238 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             <>Next <ArrowRight className="w-5 h-5 ml-1" /></>
                         )}
                     </Button>
-                </div>
-            </div>
+                </FullScreenFormFooter>
 
-            {/* Worship Preview Drawer */}
-            <Drawer open={!!previewWorshipId} onOpenChange={(open) => !open && setPreviewWorshipId(null)}>
-                <DrawerContent className="h-[85vh]">
-                    <DrawerHeader className="text-left border-b pb-4">
-                        <DrawerTitle>Worship Plan Preview</DrawerTitle>
-                    </DrawerHeader>
-                    <div className="p-4 overflow-y-auto no-scrollbar pb-10">
-                        {previewWorshipId && (
-                            <Suspense fallback={<WorshipCardSkeleton />}>
-                                <WorshipCard worshipId={previewWorshipId} isFirst={true} />
-                            </Suspense>
-                        )}
-                    </div>
-                </DrawerContent>
-            </Drawer>
+                {/* Worship Preview Drawer */}
+                <WorshipPlanPreviewDrawer
+                    isOpen={!!previewWorshipId}
+                    onClose={() => setPreviewWorshipId(null)}
+                    worshipId={previewWorshipId}
+                />
 
-            {/* Member Selection Drawer */}
-            <Drawer open={!!activeSelection} onOpenChange={(open) => !open && setActiveSelection(null)}>
-                <DrawerContent className="h-[85vh] rounded-t-[2.5rem]">
-                    <div className="mx-auto w-full max-w-lg h-full flex flex-col pt-2 relative">
-                        {/* Header */}
-                        <div className="flex flex-col gap-1 px-8 pt-6 pb-2">
-                            <div className="flex items-center justify-between">
-                                <DrawerTitle className="text-2xl font-bold text-foreground tracking-tight">
-                                    Select Member
-                                </DrawerTitle>
+                {/* Member Selection Drawer */}
+                <Drawer open={!!activeSelection} onOpenChange={(open) => !open && setActiveSelection(null)}>
+                    <DrawerContent className="h-[85vh] rounded-t-[2.5rem]">
+                        <div className="mx-auto w-full max-w-lg h-full flex flex-col pt-2 relative">
+                            {/* Header */}
+                            <div className="flex flex-col gap-1 px-8 pt-6 pb-2">
+                                <div className="flex items-center justify-between">
+                                    <DrawerTitle className="text-2xl font-bold text-foreground tracking-tight">
+                                        Select Member
+                                    </DrawerTitle>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="rounded-full hover:bg-muted h-10 w-10"
+                                        onClick={() => setActiveSelection(null)}
+                                    >
+                                        <X className="h-5 w-5 text-muted-foreground" />
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* Unified Scroll Area */}
+                            <ScrollArea className="flex-1">
+                                <div className="flex flex-col gap-8 pb-32 pt-6 px-8">
+
+                                    <MemberSelector
+                                        selectedMemberIds={
+                                            activeSelection?.itemId && activeSelection.assignmentIndex !== undefined
+                                                ? items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds || []
+                                                : activeSelection?.roleId
+                                                    ? items.find(i => i.title === '찬양팀 구성')?.assignments.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
+                                                    : []
+                                        }
+                                        onSelect={(memberId) => {
+                                            if (activeSelection?.itemId && activeSelection.assignmentIndex !== undefined) {
+                                                handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, memberId);
+                                            } else if (activeSelection?.roleId) {
+                                                handleAddMemberByRole(activeSelection.roleId, memberId);
+                                            }
+                                        }}
+                                        multiple
+                                        groups={standardGroups}
+                                        onAddGroup={(name) => {
+                                            setStandardGroups(prev => [...prev, name]);
+                                            ServingService.addCustomGroup(teamId, name).catch(console.error);
+                                        }}
+                                        onRemoveGroup={(idx) => {
+                                            setStandardGroups(standardGroups.filter((_, i) => i !== idx));
+                                        }}
+                                        customMemberNames={customMemberNames}
+                                        onAddCustomMember={(name) => {
+                                            setCustomMemberNames(prev => [...prev, name]);
+                                            ServingService.addCustomMemberName(teamId, name).catch(console.error);
+                                        }}
+                                    />
+                                </div>
+                            </ScrollArea>
+
+                            {/* Sticky Bottom Action */}
+                            <div className="absolute bottom-0 left-0 right-0 p-8 pt-10 pb-10 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none">
                                 <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="rounded-full hover:bg-muted h-10 w-10"
+                                    className="w-full h-14 rounded-2xl bg-primary text-primary-foreground text-lg font-bold shadow-xl pointer-events-auto active:scale-95 transition-all"
                                     onClick={() => setActiveSelection(null)}
                                 >
-                                    <X className="h-5 w-5 text-muted-foreground" />
+                                    Done
                                 </Button>
                             </div>
                         </div>
+                    </DrawerContent>
+                </Drawer>
 
-                        {/* Unified Scroll Area */}
-                        <ScrollArea className="flex-1">
-                            <div className="flex flex-col gap-8 pb-32 pt-6 px-8">
-
-                                <MemberSelector
-                                    selectedMemberIds={
-                                        activeSelection?.itemId && activeSelection.assignmentIndex !== undefined
-                                            ? items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds || []
-                                            : activeSelection?.roleId
-                                                ? items.find(i => i.title === '찬양팀 구성')?.assignments.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
-                                                : []
-                                    }
-                                    onSelect={(memberId) => {
-                                        if (activeSelection?.itemId && activeSelection.assignmentIndex !== undefined) {
-                                            handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, memberId);
-                                        } else if (activeSelection?.roleId) {
-                                            handleAddMemberByRole(activeSelection.roleId, memberId);
-                                        }
-                                    }}
-                                    multiple
-                                    groups={standardGroups}
-                                    onAddGroup={(name) => {
-                                        setStandardGroups(prev => [...prev, name]);
-                                        ServingService.addCustomGroup(teamId, name).catch(console.error);
-                                    }}
-                                    onRemoveGroup={(idx) => {
-                                        setStandardGroups(standardGroups.filter((_, i) => i !== idx));
-                                    }}
-                                    customMemberNames={customMemberNames}
-                                    onAddCustomMember={(name) => {
-                                        setCustomMemberNames(prev => [...prev, name]);
-                                        ServingService.addCustomMemberName(teamId, name).catch(console.error);
-                                    }}
-                                />
-                            </div>
-                        </ScrollArea>
-
-                        {/* Sticky Bottom Action */}
-                        <div className="absolute bottom-0 left-0 right-0 p-8 pt-10 pb-10 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none">
-                            <Button
-                                className="w-full h-14 rounded-2xl bg-primary text-primary-foreground text-lg font-bold shadow-xl pointer-events-auto active:scale-95 transition-all"
-                                onClick={() => setActiveSelection(null)}
-                            >
-                                Done
-                            </Button>
-                        </div>
-                    </div>
-                </DrawerContent >
-            </Drawer >
-
-            {/* Role Creation Dialog */}
-            < Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen} >
-                <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
-                    <DialogHeader className="space-y-3">
-                        <DialogTitle className="text-2xl font-bold text-center">New Role</DialogTitle>
-                        <p className="text-sm text-center text-muted-foreground font-medium">
-                            Create a new role for your praise team.
-                        </p>
-                    </DialogHeader>
-                    <div className="py-6 space-y-4">
-                        <Input
-                            placeholder="e.g. Acoustic Guitar"
-                            value={newRoleName}
-                            onChange={(e) => setNewRoleName(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.nativeEvent.isComposing) return;
-                                if (e.key === "Enter" && newRoleName.trim()) {
-                                    handleCreateRole();
-                                }
-                            }}
-                            className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
-                            autoFocus
-                        />
-                    </div>
-                    <DialogFooter className="flex sm:flex-row gap-3">
-                        <Button
-                            variant="ghost"
-                            className="h-12 flex-1 rounded-2xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                            onClick={() => setIsRoleDialogOpen(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
-                            onClick={handleCreateRole}
-                            disabled={!newRoleName.trim()}
-                        >
-                            Create Role
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog >
-
-            {/* Template Saving Dialog */}
-            < Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen} >
-                <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
-                    <DialogHeader className="space-y-3">
-                        <div className="flex justify-center">
-                            <div className="p-3 bg-primary/10 rounded-full">
-                                {createEmptyMode ? <Plus className="w-8 h-8 text-primary" /> : <Save className="w-8 h-8 text-primary" />}
-                            </div>
-                        </div>
-                        <DialogTitle className="text-2xl font-bold text-center">
-                            {createEmptyMode ? "Create New Template" : "Save Template"}
-                        </DialogTitle>
-                        <p className="text-sm text-center text-muted-foreground font-medium leading-relaxed">
-                            {createEmptyMode
-                                ? "Create a new empty template to start designing a fresh timeline."
-                                : "Save this timeline as a template to reuse it for future worship services."}
-                        </p>
-                    </DialogHeader>
-                    <div className="py-6">
-                        <Input
-                            placeholder="e.g. Sunday Morning Worship"
-                            value={newTemplateName}
-                            onChange={(e) => setNewTemplateName(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.nativeEvent.isComposing) return;
-                                if (e.key === "Enter" && newTemplateName.trim()) {
-                                    handleSaveTemplate();
-                                }
-                            }}
-                            className="h-14 rounded-2xl border-gray-100 bg-secondary/30 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
-                            autoFocus
-                        />
-                    </div>
-                    <DialogFooter className="flex sm:flex-row gap-3">
-                        <Button
-                            variant="ghost"
-                            className="h-12 flex-1 rounded-2xl font-bold text-muted-foreground hover:text-foreground hover:bg-secondary"
-                            onClick={() => setIsTemplateDialogOpen(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
-                            onClick={handleSaveTemplate}
-                            disabled={!newTemplateName.trim()}
-                        >
-                            {createEmptyMode ? "Create" : "Save"}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog >
-
-            {/* Template Rename Dialog */}
-            <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
-                <DialogContent className="max-w-[calc(100%-40px)] w-[400px] rounded-3xl border-0 p-0 overflow-hidden shadow-2xl">
-                    <DialogHeader className="p-8 pb-4 text-left">
-                        <DialogTitle className="text-2xl font-bold tracking-tight">Rename Template</DialogTitle>
-                    </DialogHeader>
-                    <div className="px-8 pb-8 space-y-6">
-                        <div className="space-y-4">
-                            <Label className="text-[13px] font-bold text-primary uppercase tracking-wider ml-1">NEW NAME</Label>
+                {/* Role Creation Dialog */}
+                <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
+                    <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
+                        <DialogHeader className="space-y-3">
+                            <DialogTitle className="text-2xl font-bold text-center">New Role</DialogTitle>
+                            <p className="text-sm text-center text-muted-foreground font-medium">
+                                Create a new role for your praise team.
+                            </p>
+                        </DialogHeader>
+                        <div className="py-6 space-y-4">
                             <Input
-                                value={tempTemplateName}
-                                onChange={(e) => setTempTemplateName(e.target.value)}
-                                placeholder="Enter template name..."
-                                className="h-14 px-5 rounded-2xl bg-gray-50/50 border-gray-100 focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all text-lg font-medium"
+                                placeholder="e.g. Acoustic Guitar"
+                                value={newRoleName}
+                                onChange={(e) => setNewRoleName(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.nativeEvent.isComposing) return;
+                                    if (e.key === "Enter" && newRoleName.trim()) {
+                                        handleCreateRole();
+                                    }
+                                }}
+                                className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
                                 autoFocus
                             />
                         </div>
-                        <div className="flex gap-3 pt-2">
+                        <DialogFooter className="flex sm:flex-row gap-3">
                             <Button
-                                variant="outline"
-                                className="flex-1 h-14 rounded-2xl border-gray-100 text-gray-500 font-bold hover:bg-gray-50 transition-all"
-                                onClick={() => setIsRenameDialogOpen(false)}
+                                variant="ghost"
+                                className="h-12 flex-1 rounded-2xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                                onClick={() => setIsRoleDialogOpen(false)}
                             >
                                 Cancel
                             </Button>
                             <Button
-                                className="flex-1 h-14 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-bold shadow-lg shadow-gray-200 active:scale-[0.98] transition-all"
-                                onClick={() => {
-                                    handleUpdateTemplateName(tempTemplateName);
-                                    setIsRenameDialogOpen(false);
-                                }}
+                                className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
+                                onClick={handleCreateRole}
+                                disabled={!newRoleName.trim()}
                             >
-                                Save Changes
+                                Create Role
                             </Button>
-                        </div>
-                    </div>
-                </DialogContent>
-            </Dialog>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog >
 
-            <DeleteConfirmationDialog
-                isOpen={deleteConfirm.open}
-                setOpen={(open: boolean) => setDeleteConfirm(prev => ({ ...prev, open }))}
-                title={deleteConfirm.type === 'role' ? "Delete Role" : "Delete Template"}
-                description={deleteConfirm.type === 'role'
-                    ? "Are you sure you want to delete this role from the team? This action cannot be undone."
-                    : "Are you sure you want to delete this template? This action cannot be undone."
-                }
-                onDeleteHandler={() => {
-                    if (deleteConfirm.type === 'role') {
-                        return handleDeleteRole(deleteConfirm.id);
-                    } else {
-                        return handleDeleteTemplate();
+                {/* Template Saving Dialog */}
+                <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
+                    <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
+                        <DialogHeader className="space-y-3">
+                            <div className="flex justify-center">
+                                <div className="p-3 bg-primary/10 rounded-full">
+                                    {createEmptyMode ? <Plus className="w-8 h-8 text-primary" /> : <Save className="w-8 h-8 text-primary" />}
+                                </div>
+                            </div>
+                            <DialogTitle className="text-2xl font-bold text-center">
+                                {createEmptyMode ? "Create New Template" : "Save Template"}
+                            </DialogTitle>
+                            <p className="text-sm text-center text-muted-foreground font-medium leading-relaxed">
+                                {createEmptyMode
+                                    ? "Create a new empty template to start designing a fresh timeline."
+                                    : "Save this timeline as a template to reuse it for future worship services."}
+                            </p>
+                        </DialogHeader>
+                        <div className="py-6">
+                            <Input
+                                placeholder="e.g. Sunday Morning Worship"
+                                value={newTemplateName}
+                                onChange={(e) => setNewTemplateName(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.nativeEvent.isComposing) return;
+                                    if (e.key === "Enter" && newTemplateName.trim()) {
+                                        handleSaveTemplate();
+                                    }
+                                }}
+                                className="h-14 rounded-2xl border-gray-100 bg-secondary/30 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
+                                autoFocus
+                            />
+                        </div>
+                        <DialogFooter className="flex sm:flex-row gap-3">
+                            <Button
+                                variant="ghost"
+                                className="h-12 flex-1 rounded-2xl font-bold text-muted-foreground hover:text-foreground hover:bg-secondary"
+                                onClick={() => setIsTemplateDialogOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                className="h-12 flex-1 rounded-2xl font-bold shadow-lg"
+                                onClick={handleSaveTemplate}
+                                disabled={!newTemplateName.trim()}
+                            >
+                                {createEmptyMode ? "Create" : "Save"}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog >
+
+                {/* Template Rename Dialog */}
+                <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
+                    <DialogContent className="max-w-[calc(100%-40px)] w-[400px] rounded-3xl border-0 p-0 overflow-hidden shadow-2xl">
+                        <DialogHeader className="p-8 pb-4 text-left">
+                            <DialogTitle className="text-2xl font-bold tracking-tight">Rename Template</DialogTitle>
+                        </DialogHeader>
+                        <div className="px-8 pb-8 space-y-6">
+                            <div className="space-y-4">
+                                <Label className="text-[13px] font-bold text-primary uppercase tracking-wider ml-1">NEW NAME</Label>
+                                <Input
+                                    value={tempTemplateName}
+                                    onChange={(e) => setTempTemplateName(e.target.value)}
+                                    placeholder="Enter template name..."
+                                    className="h-14 px-5 rounded-2xl bg-gray-50/50 border-gray-100 focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all text-lg font-medium"
+                                    autoFocus
+                                />
+                            </div>
+                            <div className="flex gap-3 pt-2">
+                                <Button
+                                    variant="outline"
+                                    className="flex-1 h-14 rounded-2xl border-gray-100 text-gray-500 font-bold hover:bg-gray-50 transition-all"
+                                    onClick={() => setIsRenameDialogOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className="flex-1 h-14 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-bold shadow-lg shadow-gray-200 active:scale-[0.98] transition-all"
+                                    onClick={() => {
+                                        handleUpdateTemplateName(tempTemplateName);
+                                        setIsRenameDialogOpen(false);
+                                    }}
+                                >
+                                    Save Changes
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+                <DeleteConfirmationDialog
+                    isOpen={deleteConfirm.open}
+                    setOpen={(open: boolean) => setDeleteConfirm(prev => ({ ...prev, open }))}
+                    title={deleteConfirm.type === 'role' ? "Delete Role" : "Delete Template"}
+                    description={deleteConfirm.type === 'role'
+                        ? "Are you sure you want to delete this role from the team? This action cannot be undone."
+                        : "Are you sure you want to delete this template? This action cannot be undone."
                     }
-                }}
-            />
-        </div >
+                    onDeleteHandler={() => {
+                        if (deleteConfirm.type === 'role') {
+                            return handleDeleteRole(deleteConfirm.id);
+                        } else {
+                            return handleDeleteTemplate();
+                        }
+                    }}
+                />
+            </FullScreenForm >
+        </>
     );
 }
 

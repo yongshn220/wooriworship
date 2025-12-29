@@ -16,6 +16,7 @@ import { auth } from "@/firebase";
 import { ServingListSkeleton } from "./_components/serving-list-skeleton";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { EmptyServingBoardPage } from "./_components/empty-serving-board-page";
+import { WorshipPlanPreviewDrawer } from "@/components/elements/design/worship/worship-plan-preview-drawer";
 
 export default function ServingPage() {
     const teamId = useRecoilValue(currentTeamIdAtom);
@@ -23,6 +24,7 @@ export default function ServingPage() {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<"upcoming" | "history">("upcoming");
+    const [previewWorshipId, setPreviewWorshipId] = useState<string | null>(null);
 
     // Load schedules
     useEffect(() => {
@@ -125,12 +127,18 @@ export default function ServingPage() {
                                 teamId={teamId}
                                 currentUserUid={currentUserUid}
                                 defaultExpanded={false}
+                                onPreviewWorship={(worshipId) => setPreviewWorshipId(worshipId)}
                             />
                         ))}
                     </div>
                 </section>
             </div>
             {/* Floating Action Button - Removed as moved to top nav */}
+            <WorshipPlanPreviewDrawer
+                isOpen={!!previewWorshipId}
+                onClose={() => setPreviewWorshipId(null)}
+                worshipId={previewWorshipId}
+            />
         </div>
     );
 }

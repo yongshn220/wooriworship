@@ -34,7 +34,11 @@ import {
 import { LinkIcon, CalendarIcon, Music, ArrowRight, ChevronLeft, Check } from "lucide-react";
 import PushNotificationService from "@/apis/PushNotificationService";
 import { AnimatePresence, motion } from "framer-motion";
+import { TagSelector } from "@/components/common/tag-selector";
 import { cn } from "@/lib/utils";
+import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFormFooter, FormSectionCard } from "@/components/common/form/full-screen-form";
+import { ServingService } from "@/apis";
+import { LinkedResourceCard } from "@/components/common/form/linked-resource-card";
 
 interface Props {
   mode: FormMode
@@ -52,19 +56,23 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
   const [endingSongHeader, setEndingSongHeader] = useRecoilState(worshipEndingSongHeaderAtom)
 
   // Form State
-  const [step, setStep] = useState(0); // 0: Title, 1: Date, 2: Desc, 3: Setlist
+  const [step, setStep] = useState(0); // 0: Date/Service, 1: Desc, 2: Setlist
   const [direction, setDirection] = useState(0); // -1: Back, 1: Next
-  const totalSteps = 4;
+  const totalSteps = 3;
 
   const [basicInfo, setBasicInfo] = useState({
     title: (mode === FormMode.EDIT) ? worship?.title ?? "" : "",
     description: (mode === FormMode.EDIT) ? worship?.description ?? "" : "",
     link: (mode === FormMode.EDIT) ? worship?.link ?? "" : "",
   })
+  const [tags, setTags] = useState<string[]>((mode === FormMode.EDIT) ? worship?.tags ?? [] : [])
   const [date, setDate] = useState<Date>((mode === FormMode.EDIT) ? timestampToDate(worship?.worship_date) : new Date())
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
+
+  const [availableServingSchedules, setAvailableServingSchedules] = useState<any[]>([]);
+  const [linkedServingId, setLinkedServingId] = useState<string | null>(null);
 
   // Date Helpers
   const upcomingFriday = nextFriday(new Date());
@@ -90,6 +98,22 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
     }
   }, [mode, setSelectedWorshipSongHeaderList, worship?.songs])
 
+  // Fetch Linked Servings when date changes
+  useEffect(() => {
+    const fetchLinkedServings = async () => {
+      if (!date) return;
+      try {
+        // Assuming serving schedules use 'yyyy-MM-dd' format
+        const dateStr = format(date, 'yyyy-MM-dd');
+        const schedules = await ServingService.getSchedules(teamId, dateStr, dateStr);
+        setAvailableServingSchedules(schedules);
+      } catch (error) {
+        console.error("Failed to fetch serving schedules", error);
+      }
+    };
+    fetchLinkedServings();
+  }, [date, teamId]);
+
   // Validation Check
   const isSessionValid = () => {
     if (!authUser) {
@@ -102,13 +126,15 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
 
   const getWorshipInput = () => {
     return {
-      title: basicInfo.title,
+      title: tags.join(" "),
+      tags: tags,
       description: basicInfo.description,
       date: date,
       link: basicInfo.link,
       worshipSongHeaders: selectedWorshipSongHeaderList,
       beginningSong: beginningSongHeader,
       endingSong: endingSongHeader,
+      related_serving_id: linkedServingId // Save linked serving ID
     } as any
   }
 
@@ -198,33 +224,18 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
 
 
   return (
-    <div className="fixed inset-0 z-[40] bg-gray-50 flex flex-col items-center justify-center overflow-hidden">
+    <FullScreenForm>
+      <FullScreenFormHeader
+        steps={["Date & Service", "Context", "Setlist"]}
+        currentStep={step}
+        onStepChange={goToStep}
+        onClose={() => router.back()}
+      />
 
-      {/* 1. Interactive Header Progress (Mid-Top) */}
-      <div className="fixed top-8 left-0 right-0 z-50 px-6 flex flex-col items-center gap-4">
-        <div className="flex gap-2 p-1 bg-white/50 backdrop-blur-md rounded-full shadow-sm border border-white/20">
-          {["Title", "When", "Context", "Setlist"].map((label, idx) => (
-            <button
-              key={idx}
-              onClick={() => goToStep(idx)}
-              className={cn(
-                "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
-                step === idx
-                  ? "bg-black text-white shadow-md scale-105"
-                  : "text-gray-400 hover:text-gray-600 hover:bg-white/50"
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 2. Main Content Area */}
-      <div className="w-full max-w-xl h-full px-4 sm:px-6 pt-24 pb-20 grid grid-cols-1 grid-rows-1 relative perspective-1000">
+      <FullScreenFormBody>
         <AnimatePresence initial={false} custom={direction}>
 
-          {/* Step 1: Title */}
+          {/* Step 1: Date & Service */}
           {step === 0 && (
             <motion.div
               key="step0"
@@ -234,24 +245,27 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               animate="center"
               exit="exit"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="col-start-1 row-start-1 flex-1 flex flex-col justify-center space-y-8 w-full h-full"
+              className="flex flex-col gap-6 w-full"
             >
-              <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 1</Label>
-                <h2 className="text-2xl font-bold text-gray-900">What is the Title?</h2>
+              <div className="space-y-2 text-center">
+                <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 1</Label>
+                <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Date & Service</h2>
               </div>
 
-              {/* Card */}
-              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 flex flex-col gap-6">
-                <Input
-                  autoFocus
-                  placeholder="Service Title..."
-                  value={basicInfo.title}
-                  onChange={(e) => setBasicInfo(prev => ({ ...prev, title: e.target.value }))}
-                  className="text-3xl font-black bg-transparent border-none p-0 focus-visible:ring-0 placeholder:text-gray-200 text-center"
-                />
+              {/* Main Input Card */}
+              <FormSectionCard className="space-y-6">
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-muted-foreground ml-1">Service</Label>
+                  <TagSelector
+                    teamId={teamId}
+                    selectedTags={tags}
+                    onTagsChange={setTags}
+                    placeholder="Select service (e.g. 주일예배, 금요예배...)"
+                    single={true}
+                  />
+                </div>
 
-                <div className="flex flex-wrap gap-2 justify-center">
+                <div className="flex flex-wrap gap-2 justify-center pb-2">
                   {[
                     { label: "금요 예배", date: upcomingFriday },
                     { label: "주일 예배", date: upcomingSunday },
@@ -261,7 +275,8 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                     <button
                       key={idx}
                       onClick={() => {
-                        setBasicInfo(prev => ({ ...prev, title: chip.label }));
+                        const type = chip.label.includes("금요") ? "금요예배" : "주일예배";
+                        setTags([type]);
                         setDate(chip.date);
                       }}
                       className="px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100 text-xs font-medium text-gray-500 hover:border-primary/50 hover:text-primary hover:bg-primary/10 transition-colors"
@@ -270,20 +285,27 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                     </button>
                   ))}
                 </div>
-              </div>
 
-              {/* Action */}
-              <Button
-                className="h-14 w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shadow-xl mt-auto transition-transform active:scale-95"
-                onClick={nextStep}
-                disabled={!basicInfo.title}
-              >
-                Next Step <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
+                <div className="flex justify-center border-t border-gray-50 pt-6">
+                  <WorshipDatePicker date={date} setDate={setDate} />
+                </div>
+              </FormSectionCard>
+
+              {/* Linked Serving Schedule */}
+              <LinkedResourceCard
+                label="Linked Serving Schedule"
+                items={availableServingSchedules.map(sch => ({
+                  id: sch.id,
+                  title: sch.title || tags[0] || "Untitled Service",
+                  description: sch.date
+                }))}
+                selectedId={linkedServingId}
+                onSelect={setLinkedServingId}
+              />
             </motion.div>
           )}
 
-          {/* Step 2: Date */}
+          {/* Step 2: Context */}
           {step === 1 && (
             <motion.div
               key="step1"
@@ -293,56 +315,18 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               animate="center"
               exit="exit"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="col-start-1 row-start-1 flex-1 flex flex-col justify-center space-y-8 w-full h-full"
+              className="flex flex-col gap-8 w-full"
             >
-              <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 2</Label>
-                <h2 className="text-2xl font-bold text-gray-900">When is the Service?</h2>
-                <h3 className="text-xl font-medium text-primary break-keep">{basicInfo.title}</h3>
-              </div>
-
-              {/* Card */}
-              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 flex justify-center">
-                <WorshipDatePicker date={date} setDate={setDate} />
-              </div>
-
-              {/* Action */}
-              <div className="flex gap-4 mt-auto">
-                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
-                  <ChevronLeft className="w-6 h-6" />
-                </Button>
-                <Button
-                  className="h-14 flex-1 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shadow-xl active:scale-95 transition-all"
-                  onClick={nextStep}
-                >
-                  Confirm Date
-                </Button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Step 3: Context */}
-          {step === 2 && (
-            <motion.div
-              key="step2"
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="col-start-1 row-start-1 flex-1 flex flex-col justify-center space-y-8 w-full h-full"
-            >
-              <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 3</Label>
+              <div className="space-y-2 text-center">
+                <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 2</Label>
                 <div className="flex items-baseline justify-center gap-2">
-                  <h2 className="text-2xl font-bold text-gray-900">Add Context</h2>
-                  <span className="text-gray-400 font-normal text-sm lowercase">(optional)</span>
+                  <h2 className="text-2xl font-bold text-foreground tracking-tight">Add Context</h2>
+                  <span className="text-muted-foreground font-normal text-sm lowercase">(optional)</span>
                 </div>
               </div>
 
               {/* Card */}
-              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-4">
+              <FormSectionCard>
                 <Textarea
                   placeholder="Add sermon topic, announcements, or any notes..."
                   value={basicInfo.description}
@@ -358,42 +342,26 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                     className="border-none shadow-none focus-visible:ring-0 px-0 bg-transparent text-base"
                   />
                 </div>
-              </div>
-
-              {/* Action */}
-              <div className="flex gap-4 mt-auto">
-                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
-                  <ChevronLeft className="w-6 h-6" />
-                </Button>
-                <Button
-                  className={cn(
-                    "h-14 flex-1 rounded-full text-lg font-bold shadow-xl transition-all active:scale-95",
-                    "bg-primary hover:bg-primary/90 text-primary-foreground"
-                  )}
-                  onClick={nextStep}
-                >
-                  {!basicInfo.description && !basicInfo.link ? "Skip" : "Next Step"}
-                </Button>
-              </div>
+              </FormSectionCard>
             </motion.div>
           )}
 
-          {/* Step 4: Setlist */}
-          {step === 3 && (
+          {/* Step 3: Setlist */}
+          {step === 2 && (
             <motion.div
-              key="step3"
+              key="step2"
               custom={direction}
               variants={slideVariants}
               initial="enter"
               animate="center"
               exit="exit"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="col-start-1 row-start-1 flex-1 flex flex-col h-full space-y-3 w-full leading-relaxed" // Reduced space-y-6 to space-y-3
+              className="flex flex-col gap-6 w-full"
             >
-              <div className="flex items-end justify-between px-2 pb-1"> {/* Align bottom, added padding */}
+              <div className="flex items-end justify-between px-2 pb-1">
                 <div>
-                  <Label className="text-sm font-bold text-primary uppercase tracking-wider">Final Step</Label>
-                  <h2 className="text-2xl font-bold text-gray-900 leading-none">Setlist</h2>
+                  <Label className="text-xs font-bold text-primary uppercase tracking-wider">Final Step</Label>
+                  <h2 className="text-2xl font-bold text-foreground leading-none">Setlist</h2>
                 </div>
                 <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/20 mb-1">
                   {selectedWorshipSongHeaderList.length} Songs
@@ -401,7 +369,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               </div>
 
               {/* Card (Full Height) */}
-              <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col">
+              <FormSectionCard className="p-0 overflow-hidden space-y-0">
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
                   {beginningSongHeader?.id && <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songHeader={beginningSongHeader} />}
                   {selectedWorshipSongHeaderList.map((songHeader, i) => (
@@ -415,26 +383,41 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                     </AddWorshipSongDialogTrigger>
                   </div>
                 </div>
-              </div>
-
-              {/* Action */}
-              <div className="flex gap-4 mt-auto pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"> {/* Added extra 1.5rem padding */}
-                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
-                  <ChevronLeft className="w-6 h-6" />
-                </Button>
-                <Button
-                  onClick={mode === FormMode.CREATE ? handleCreate : handleEdit}
-                  disabled={isLoading}
-                  className="h-14 flex-1 rounded-full bg-primary text-primary-foreground text-lg font-bold shadow-xl hover:bg-primary/90 active:scale-95 transition-all"
-                >
-                  {isLoading ? "Saving..." : "Create Plan"} <Check className="ml-2 w-5 h-5" />
-                </Button>
-              </div>
+              </FormSectionCard>
             </motion.div>
           )}
 
         </AnimatePresence>
-      </div>
-    </div>
+      </FullScreenFormBody>
+
+      <FullScreenFormFooter>
+        <div className="w-12 h-12 flex-none">
+          <Button
+            variant="outline"
+            className="h-12 w-12 rounded-full border-border bg-background/80 backdrop-blur-sm hover:bg-background text-muted-foreground shadow-sm disabled:opacity-0 disabled:pointer-events-none transition-opacity duration-300"
+            onClick={prevStep}
+            disabled={step === 0}
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </Button>
+        </div>
+        <Button
+          className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
+          onClick={step === totalSteps - 1 ? (mode === FormMode.CREATE ? handleCreate : handleEdit) : nextStep}
+          disabled={isLoading || (step === 0 && tags.length === 0)}
+        >
+          {isLoading ? (
+            "Saving..."
+          ) : step === totalSteps - 1 ? (
+            <>Create Plan <Check className="w-5 h-5 ml-1" /></>
+          ) : (
+            <>
+              {step === 1 && !basicInfo.description && !basicInfo.link ? "Skip" : "Next"}
+              <ArrowRight className="w-5 h-5 ml-1" />
+            </>
+          )}
+        </Button>
+      </FullScreenFormFooter>
+    </FullScreenForm>
   )
 }
