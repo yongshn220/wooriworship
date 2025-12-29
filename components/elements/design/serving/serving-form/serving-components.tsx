@@ -116,16 +116,23 @@ export function MemberBadge({ name, onRemove, className, isMe = false }: MemberB
     const isGroup = name.startsWith("group:");
     const displayName = name.replace(/^group:/, "");
 
+    const handleBadgeClick = (e: React.MouseEvent) => {
+        if (onRemove) {
+            e.stopPropagation();
+            onRemove();
+        }
+    };
+
     return (
         <Badge
             variant="secondary"
             className={cn(
-                "pl-1 pr-1.5 py-1 rounded-full flex items-center gap-1.5 text-[13px] font-bold shadow-sm transition-all border",
-                isMe
-                    ? "bg-primary/10 border-primary/20 text-primary"
-                    : "bg-background border-border text-muted-foreground",
+                "h-8 pl-3 pr-1.5 gap-1.5 hover:bg-secondary/80 font-medium transition-all group flex items-center justify-between",
+                isMe && "bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200",
+                onRemove && "cursor-pointer hover:bg-red-50 hover:text-red-600 hover:border-100",
                 className
             )}
+            onClick={handleBadgeClick}
         >
             <div className={cn(
                 "w-6 h-6 rounded-full flex items-center justify-center",
