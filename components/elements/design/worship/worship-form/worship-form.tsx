@@ -261,6 +261,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       scale: 0.95,
       rotateY: direction > 0 ? 20 : -20,
       zIndex: 0,
+      position: 'absolute' as const
     }),
     center: {
       zIndex: 1,
@@ -268,6 +269,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       opacity: 1,
       scale: 1,
       rotateY: 0,
+      position: 'relative' as const
     },
     exit: (direction: number) => ({
       zIndex: 0,
@@ -275,6 +277,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       opacity: 0,
       scale: 0.95,
       rotateY: direction < 0 ? 20 : -20,
+      position: 'absolute' as const
     })
   };
 
