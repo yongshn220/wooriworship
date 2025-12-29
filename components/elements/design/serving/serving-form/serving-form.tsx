@@ -35,7 +35,8 @@ import {
     AddActionButton, ServingCard, MemberSuggestionList,
     MemberBadge,
     WorshipTeamRoleRow,
-    SuggestedMemberChips
+    SuggestedMemberChips,
+    AssignmentControl
 } from "./serving-components";
 import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
 import { TagSelector } from "@/components/common/tag-selector";
@@ -1365,47 +1366,15 @@ function SortableRoleItem({ role, memberIds, teamMembers, onAddMember, onDeleteR
                 {/* Bottom Row - Assignments & Suggestions */}
                 <div
                     className="px-5 pt-2 pb-4 cursor-pointer hover:bg-gray-50 active:bg-gray-100/70 transition-colors"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onOpenAdd();
-                    }}
                 >
-                    <div className="flex items-center justify-between pointer-events-none">
-                        <div className="flex flex-wrap gap-2.5 pointer-events-auto">
-                            {memberIds.map(uid => (
-                                <MemberBadge
-                                    key={uid}
-                                    name={teamMembers.find(m => m.id === uid)?.name || uid}
-                                    onRemove={() => onAddMember(role.id, uid)}
-                                />
-                            ))}
-
-                            <SuggestedMemberChips
-                                suggestions={suggestions}
-                                onSelect={(id) => onAddMember(role.id, id)}
-                            />
-
-                            {!isAssigned && suggestions.length === 0 && (
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onOpenAdd();
-                                    }}
-                                    className="flex items-center gap-3 text-gray-400 group-hover:text-blue-500 transition-colors py-1 pointer-events-auto"
-                                >
-                                    <div className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center group-hover:border-blue-100 group-hover:bg-blue-50 transition-colors">
-                                        <Plus className="text-gray-300 w-4 h-4 group-hover:text-blue-500" />
-                                    </div>
-                                    <span className="text-[13px] font-bold">Assign Member</span>
-                                </button>
-                            )}
-                        </div>
-                        {(isAssigned || suggestions.length > 0) && (
-                            <div className="w-8 h-8 rounded-full border border-blue-100 bg-blue-50 flex items-center justify-center transition-colors flex-shrink-0 ml-2">
-                                <Plus className="text-blue-500 w-4 h-4" />
-                            </div>
-                        )}
-                    </div>
+                    <AssignmentControl
+                        assignedMembers={memberIds.map(uid => ({ id: uid, name: teamMembers.find(m => m.id === uid)?.name || uid }))}
+                        suggestions={suggestions}
+                        onAddMember={(id) => onAddMember(role.id, id)}
+                        onRemoveMember={(id) => onAddMember(role.id, id)}
+                        onOpenAdd={onOpenAdd}
+                        placeholder="Assign Member"
+                    />
                 </div>
             </ServingCard>
         </Reorder.Item>
@@ -1585,60 +1554,20 @@ function SortableTimelineItem({ item, getMemberName, onUpdate, onDelete, onOpenA
                 {/* Bottom Row - Assignments (Full Width Padding) */}
                 <div
                     className="px-5 pt-2 pb-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 active:bg-gray-100/70 transition-colors"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onOpenAdd(0);
-                    }}
                 >
-                    <div className="flex flex-wrap gap-2.5 pointer-events-auto">
-                        {isAssigned ? (
-                            assignment.memberIds.map((uid: string) => {
+                    <div className="w-full">
+                        <AssignmentControl
+                            assignedMembers={assignment.memberIds.map(uid => {
                                 const name = getMemberName(uid);
-                                const isGroup = name.startsWith('group:') || uid.startsWith('group:');
-                                const displayName = name.replace(/^group:/, '');
-                                return (
-                                    <button
-                                        key={uid}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onRemoveMember(0, uid);
-                                        }}
-                                        className="inline-flex items-center gap-1.5 pl-1 pr-3 py-1 bg-gray-50/50 rounded-full shadow-sm hover:shadow-md transition-all active:scale-95 group/member"
-                                    >
-                                        <div className="w-6 h-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
-                                            {isGroup ? <Users className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
-                                        </div>
-                                        <span className="text-[13px] font-bold text-gray-600 group-hover/member:text-gray-900">
-                                            {displayName}
-                                        </span>
-                                    </button>
-                                );
-                            })
-                        ) : (
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onOpenAdd(0);
-                                }}
-                                className="flex items-center gap-3 text-gray-400 group-hover:text-blue-500 transition-colors py-1 pointer-events-auto"
-                            >
-                                <div className="w-6 h-6 rounded-full border border-dashed border-current flex items-center justify-center">
-                                    <Plus className="w-3.5 h-3.5" />
-                                </div>
-                                <span className="text-[13px] font-bold">Assign Member</span>
-                            </button>
-                        )}
-
-                        <SuggestedMemberChips
+                                return { id: uid, name: name.replace(/^group:/, '') };
+                            })}
                             suggestions={suggestions.filter(s => !assignment.memberIds.includes(s.id))}
-                            onSelect={(id) => onRemoveMember(0, id)}
+                            onAddMember={(id) => onRemoveMember(0, id)}
+                            onRemoveMember={(id) => onRemoveMember(0, id)}
+                            onOpenAdd={() => onOpenAdd(0)}
+                            placeholder="Assign Member"
                         />
                     </div>
-                    {isAssigned && (
-                        <div className="w-8 h-8 rounded-full border border-blue-100 bg-blue-50 flex items-center justify-center transition-colors flex-shrink-0 ml-2">
-                            <Plus className="text-blue-500 w-4 h-4" />
-                        </div>
-                    )}
                 </div>
             </ServingCard>
         </Reorder.Item>

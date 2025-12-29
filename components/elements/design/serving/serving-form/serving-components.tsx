@@ -233,3 +233,78 @@ export function SuggestedMemberChips({ suggestions, onSelect }: SuggestedMemberC
         </>
     );
 }
+
+interface AssignmentControlProps {
+    assignedMembers: { id: string; name: string }[];
+    suggestions: { id: string; name: string }[];
+    onAddMember: (id: string) => void;
+    onRemoveMember: (id: string, assignmentIndex?: number) => void;
+    onOpenAdd: () => void;
+    placeholder?: string;
+    isGroup?: (name: string) => boolean;
+}
+
+export function AssignmentControl({
+    assignedMembers,
+    suggestions,
+    onAddMember,
+    onRemoveMember,
+    onOpenAdd,
+    placeholder = "Assign Member",
+    isGroup = (name) => name.startsWith("group:")
+}: AssignmentControlProps) {
+    const isAssigned = assignedMembers.length > 0;
+    const hasSuggestions = suggestions.length > 0;
+
+    return (
+        <div
+            className="flex items-center justify-between pointer-events-none"
+        >
+            <div className="flex flex-wrap gap-2.5 pointer-events-auto">
+                {/* Assigned Members */}
+                {assignedMembers.map((member) => (
+                    <MemberBadge
+                        key={member.id}
+                        name={member.name}
+                        onRemove={() => onRemoveMember(member.id)}
+                    />
+                ))}
+
+                {/* Suggestions */}
+                <SuggestedMemberChips
+                    suggestions={suggestions.filter(s => !assignedMembers.some(m => m.id === s.id))}
+                    onSelect={onAddMember}
+                />
+
+                {/* Placeholder Button (Only if empty) */}
+                {!isAssigned && !hasSuggestions && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenAdd();
+                        }}
+                        className="flex items-center gap-3 text-gray-400 group-hover:text-blue-500 transition-colors py-1 pointer-events-auto"
+                    >
+                        <div className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center group-hover:border-blue-100 group-hover:bg-blue-50 transition-colors">
+                            <Plus className="text-gray-300 w-4 h-4 group-hover:text-blue-500" />
+                        </div>
+                        <span className="text-[13px] font-bold">{placeholder}</span>
+                    </button>
+                )}
+            </div>
+
+            {/* Right Side Add Button (If content exists) */}
+            {(isAssigned || hasSuggestions) && (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenAdd();
+                    }}
+                    className="w-8 h-8 rounded-full border border-blue-100 bg-blue-50 flex items-center justify-center transition-colors flex-shrink-0 ml-2 pointer-events-auto hover:bg-blue-100 active:scale-95"
+                >
+                    <Plus className="text-blue-500 w-4 h-4" />
+                </button>
+            )}
+        </div>
+    );
+}
