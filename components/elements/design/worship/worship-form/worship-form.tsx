@@ -74,6 +74,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
 
   const [availableServingSchedules, setAvailableServingSchedules] = useState<any[]>([]);
   const [linkedServingId, setLinkedServingId] = useState<string | null>(null);
+  const [isDuplicate, setIsDuplicate] = useState(false);
 
   // Date Helpers
   const upcomingFriday = nextFriday(new Date());
@@ -146,7 +147,28 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       }
     };
     fetchLinkedServings();
-  }, [date, teamId, tags]); // Added tags dependency to re-run when tags change
+  }, [date, teamId, tags, mode, worship?.id, linkedServingId]); // Added tags dependency to re-run when tags change
+
+  // Real-time Duplicate Check
+  useEffect(() => {
+    const checkDuplicate = async () => {
+      if (!date || tags.length === 0) {
+        setIsDuplicate(false);
+        return;
+      }
+      try {
+        const existingWorships = await WorshipService.getWorshipsByDate(teamId, date);
+        const duplicate = existingWorships.find(w =>
+          tags.some(t => w.tags?.includes(t)) &&
+          (mode === FormMode.CREATE || (mode === FormMode.EDIT && w.id !== worship?.id))
+        );
+        setIsDuplicate(!!duplicate);
+      } catch (error) {
+        console.error("Failed to check for duplicates", error);
+      }
+    };
+    checkDuplicate();
+  }, [date, tags, teamId, mode, worship?.id]);
 
   // Validation Check
   const isSessionValid = () => {
@@ -224,36 +246,6 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
   }
 
   const nextStep = async () => {
-    if (step === 0 && date && tags.length > 0) {
-      // Check for duplicates
-      try {
-        const dateStr = format(date, 'yyyy-MM-dd');
-        // We reuse the getWorshipsByDate service which fetches by date range or single date
-        // Assuming getWorshipsByDate returns array of worships on that day
-        const existingWorships = await WorshipService.getWorshipsByDate(teamId, date);
-        const duplicate = existingWorships.find(w =>
-          // In CREATE mode: any overlap with existing
-          // In EDIT mode: any overlap with existing EXCLUDING current self
-          tags.some(t => w.tags?.includes(t)) &&
-          (mode === FormMode.CREATE || (mode === FormMode.EDIT && w.id !== worship?.id))
-        );
-
-        if (duplicate) {
-          toast({
-            title: "Duplicate Service Found",
-            description: "A service with this tag already exists on this date.",
-            variant: "destructive"
-          });
-          return; // Block navigation
-        }
-      } catch (error) {
-        console.error("Failed to check for duplicates", error);
-        // Optional: Block or allow? Let's allow but log error, or maybe safe to block?
-        // Let's assume network error shouldn't block user flow strictly unless critical, 
-        // but duplicate check is critical. Let's allow if check fails to avoid blocking users on network blip?
-        // Or better: show error.
-      }
-    }
     if (step < totalSteps - 1) goToStep(step + 1);
   }
 
@@ -292,7 +284,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       <FullScreenFormHeader
         steps={["Date & Service", "Context", "Setlist"]}
         currentStep={step}
-        onStepChange={goToStep}
+        onStepChange={isDuplicate ? undefined : goToStep}
         onClose={() => router.back()}
       />
 
@@ -336,6 +328,14 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                 selectedId={linkedServingId}
                 onSelect={setLinkedServingId}
               />
+
+              {isDuplicate && step === 0 && (
+                <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 mt-2">
+                  <p className="text-destructive text-sm font-semibold text-center">
+                    A service with this tag already exists on this date.
+                  </p>
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -436,9 +436,9 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
           </Button>
         </div>
         <Button
-          className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
+          className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
           onClick={step === totalSteps - 1 ? (mode === FormMode.CREATE ? handleCreate : handleEdit) : nextStep}
-          disabled={isLoading || (step === 0 && tags.length === 0)}
+          disabled={isLoading || (step === 0 && (tags.length === 0 || isDuplicate))}
         >
           {isLoading ? (
             "Saving..."
