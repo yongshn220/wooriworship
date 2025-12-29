@@ -392,7 +392,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 teamId,
                 date: dateString,
                 tags,
-                title: tags.join(" "), // Fallback/Derived title
+                title: tags.length > 0 ? tags.join(" ") : "Worship Service", // Fallback title
                 items: items,
                 worshipId: linkedWorshipId || undefined
             };
@@ -1025,7 +1025,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     <Button
                         className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
                         onClick={step === totalSteps - 1 ? handleSubmit : nextStep}
-                        disabled={isLoading || (step === 0 && (!selectedDate || tags.length === 0 || isDuplicate))}
+                        disabled={isLoading || (step === 0 && (!selectedDate || isDuplicate))}
                     >
                         {isLoading ? (
                             "Saving..."
