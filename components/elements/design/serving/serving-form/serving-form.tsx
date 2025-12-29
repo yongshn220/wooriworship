@@ -1081,7 +1081,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                             activeSelection?.itemId && activeSelection.assignmentIndex !== undefined
                                                 ? items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds || []
                                                 : activeSelection?.roleId
-                                                    ? items.find(i => i.title === '찬양팀 구성')?.assignments.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
+                                                    ? items.find(i => i.type === 'WORSHIP_TEAM')?.assignments.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
                                                     : []
                                         }
                                         onSelect={(memberId) => {
