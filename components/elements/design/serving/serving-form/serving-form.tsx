@@ -845,7 +845,10 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                                                     const newItems = items.map(i => i.id === item.id ? newItem : i);
                                                                     setItems(newItems);
                                                                 }}
-                                                                onDelete={() => setItems(prev => prev.filter(i => i.id !== item.id))}
+                                                                onDelete={() => setItems(prev => {
+                                                                    const filtered = prev.filter(i => i.id !== item.id);
+                                                                    return filtered.map((it, idx) => ({ ...it, order: idx }));
+                                                                })}
                                                                 onOpenAdd={(aIdx) => setActiveSelection({
                                                                     itemId: item.id,
                                                                     assignmentIndex: aIdx,
