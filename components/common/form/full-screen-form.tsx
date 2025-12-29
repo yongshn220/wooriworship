@@ -79,7 +79,7 @@ export const FullScreenFormFooter = ({ children, className, errorMessage }: { ch
             <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto pointer-events-auto">
                 {errorMessage && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <p className="text-destructive text-[13px] font-bold text-center bg-destructive/5 py-2 px-4 rounded-full border border-destructive/10">
+                        <p className="text-destructive text-[13px] font-bold text-center bg-destructive/5 py-2 px-4 rounded-full">
                             {errorMessage}
                         </p>
                     </div>
