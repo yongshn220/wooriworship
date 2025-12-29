@@ -613,9 +613,9 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                     onDateChange={(d) => d && setSelectedDate(d)}
                                     calendarMonth={currentMonth}
                                     onCalendarMonthChange={setCurrentMonth}
+                                    errorMessage={isDuplicate && selectedDate ? `"${format(selectedDate, 'yyyy-MM-dd')} ${tags[0]}" is already exists.` : undefined}
                                 />
 
-                                {/* Linked Worship Plan */}
                                 {/* Linked Worship Plan */}
                                 <LinkedResourceCard
                                     label="Linked Worship Plan"
@@ -628,14 +628,6 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                     onSelect={setLinkedWorshipId}
                                     onPreview={setPreviewWorshipId}
                                 />
-
-                                {isDuplicate && step === 0 && (
-                                    <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 mt-2">
-                                        <p className="text-destructive text-sm font-semibold text-center">
-                                            A serving schedule with this tag already exists on this date.
-                                        </p>
-                                    </div>
-                                )}
                             </motion.div>
                         )}
 

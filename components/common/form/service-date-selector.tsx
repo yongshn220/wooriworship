@@ -16,6 +16,7 @@ interface ServiceDateSelectorProps {
     onDateChange: (date: Date | undefined) => void;
     calendarMonth?: Date;
     onCalendarMonthChange?: (date: Date) => void;
+    errorMessage?: string;
 }
 
 export function ServiceDateSelector({
@@ -26,6 +27,7 @@ export function ServiceDateSelector({
     onDateChange,
     calendarMonth,
     onCalendarMonthChange,
+    errorMessage,
 }: ServiceDateSelectorProps) {
 
     // Internal state for calendar month if not provided
@@ -109,6 +111,14 @@ export function ServiceDateSelector({
                     }}
                     className="rounded-2xl border-0"
                 />
+
+                {errorMessage && (
+                    <div className="w-full bg-destructive/5 border border-destructive/10 rounded-2xl p-4 mt-2">
+                        <p className="text-destructive text-sm font-bold text-center leading-relaxed">
+                            {errorMessage}
+                        </p>
+                    </div>
+                )}
             </FormSectionCard>
         </div>
     );
