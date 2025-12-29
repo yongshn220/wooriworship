@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import { MemberSelector } from "./member-selector";
 import { WorshipPlanPreviewDrawer } from "../../worship/worship-plan-preview-drawer";
 import { usersAtom } from "@/global-states/userState";
@@ -1061,6 +1061,9 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                     <DrawerTitle className="text-2xl font-bold text-foreground tracking-tight">
                                         Select Member
                                     </DrawerTitle>
+                                    <DrawerDescription className="sr-only">
+                                        Select a member to assign to this role.
+                                    </DrawerDescription>
                                     <Button
                                         variant="ghost"
                                         size="icon"
