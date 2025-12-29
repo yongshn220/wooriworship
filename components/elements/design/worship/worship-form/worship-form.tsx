@@ -39,6 +39,7 @@ import { cn } from "@/lib/utils";
 import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFormFooter, FormSectionCard } from "@/components/common/form/full-screen-form";
 import { ServingService } from "@/apis";
 import { LinkedResourceCard } from "@/components/common/form/linked-resource-card";
+import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
 
 interface Props {
   mode: FormMode
@@ -107,6 +108,11 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
         const dateStr = format(date, 'yyyy-MM-dd');
         const schedules = await ServingService.getSchedules(teamId, dateStr, dateStr);
         setAvailableServingSchedules(schedules);
+
+        // Auto-select first schedule if available and not already selected
+        if (schedules.length > 0 && !linkedServingId && mode === FormMode.CREATE) {
+          setLinkedServingId(schedules[0].id);
+        }
       } catch (error) {
         console.error("Failed to fetch serving schedules", error);
       }
@@ -253,43 +259,13 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               </div>
 
               {/* Main Input Card */}
-              <FormSectionCard className="space-y-6">
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-muted-foreground ml-1">Service</Label>
-                  <TagSelector
-                    teamId={teamId}
-                    selectedTags={tags}
-                    onTagsChange={setTags}
-                    placeholder="Select service (e.g. 주일예배, 금요예배...)"
-                    single={true}
-                  />
-                </div>
-
-                <div className="flex flex-wrap gap-2 justify-center pb-2">
-                  {[
-                    { label: "금요 예배", date: upcomingFriday },
-                    { label: "주일 예배", date: upcomingSunday },
-                    { label: `${formattedUpcomingFriday} 금요 예배`, date: upcomingFriday },
-                    { label: `${formattedUpcomingSunday} 주일 예배`, date: upcomingSunday }
-                  ].map((chip, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => {
-                        const type = chip.label.includes("금요") ? "금요예배" : "주일예배";
-                        setTags([type]);
-                        setDate(chip.date);
-                      }}
-                      className="px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100 text-xs font-medium text-gray-500 hover:border-primary/50 hover:text-primary hover:bg-primary/10 transition-colors"
-                    >
-                      {chip.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex justify-center border-t border-gray-50 pt-6">
-                  <WorshipDatePicker date={date} setDate={setDate} />
-                </div>
-              </FormSectionCard>
+              <ServiceDateSelector
+                teamId={teamId}
+                tags={tags}
+                onTagsChange={setTags}
+                date={date}
+                onDateChange={(d) => d && setDate(d)}
+              />
 
               {/* Linked Serving Schedule */}
               <LinkedResourceCard

@@ -36,6 +36,7 @@ import { ServingMemberList } from "@/components/elements/design/serving/serving-
 import { TagSelector } from "@/components/common/tag-selector";
 import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFormFooter, FormSectionCard } from "@/components/common/form/full-screen-form";
 import { LinkedResourceCard } from "@/components/common/form/linked-resource-card";
+import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
 
 
 interface Props {
@@ -570,87 +571,16 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                     <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Date & Title</h2>
                                 </div>
 
-                                <div className="space-y-6">
-                                    {/* Title Card */}
-                                    <FormSectionCard>
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-semibold text-muted-foreground ml-1">Service</Label>
-                                            <TagSelector
-                                                teamId={teamId}
-                                                selectedTags={tags}
-                                                onTagsChange={setTags}
-                                                placeholder="Select service (e.g. 주일예배, 금요예배...)"
-                                                single={true}
-                                            />
-                                        </div>
-
-                                        {/* Suggestions */}
-                                        {/* Suggestions */}
-                                        <div className="flex flex-wrap gap-2">
-                                            {[
-                                                {
-                                                    date: (() => {
-                                                        let d = addDays(new Date(), 1);
-                                                        while (isSaturday(d) || isSunday(d)) {
-                                                            d = addDays(d, 1);
-                                                        }
-                                                        return d;
-                                                    })(),
-                                                    title: "새벽예배"
-                                                },
-                                                {
-                                                    date: nextFriday(new Date()),
-                                                    title: "금요예배"
-                                                },
-                                                {
-                                                    date: nextSunday(new Date()),
-                                                    title: "주일예배"
-                                                }
-                                            ].sort((a, b) => a.date.getTime() - b.date.getTime()).map((option) => (
-                                                <button
-                                                    key={option.title}
-                                                    onClick={() => {
-                                                        setSelectedDate(option.date);
-                                                        setCurrentMonth(option.date);
-                                                        // Always replace tags for single selection
-                                                        setTags([option.title]);
-                                                        // Auto-create tag if it doesn't exist
-                                                        import("@/apis/TagService").then(mod => {
-                                                            mod.default.addNewTag(teamId, option.title).catch(console.error);
-                                                        });
-                                                    }}
-                                                    className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95"
-                                                >
-                                                    {format(option.date, "MM-dd")} {option.title}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </FormSectionCard>
-                                </div>
-
-                                {/* Calendar Card */}
-                                <div className="bg-card rounded-3xl shadow-xl shadow-foreground/5 border border-border/50 p-6 flex flex-col items-center gap-4">
-                                    <div className="w-full flex items-center justify-between ml-1">
-                                        <Label className="text-sm font-semibold text-muted-foreground">Date</Label>
-                                        {selectedDate && (
-                                            <span className="text-sm font-bold text-primary bg-primary/5 px-3 py-1 rounded-full">
-                                                {format(selectedDate, "yyyy-MM-dd (eee)")}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <Calendar
-                                        mode="single"
-                                        month={currentMonth}
-                                        onMonthChange={setCurrentMonth}
-                                        selected={selectedDate}
-                                        onSelect={(date) => {
-                                            if (date) {
-                                                setSelectedDate(date);
-                                            }
-                                        }}
-                                        className="rounded-2xl border-0"
-                                    />
-                                </div>
+                                {/* Service & Date Selection */}
+                                <ServiceDateSelector
+                                    teamId={teamId}
+                                    tags={tags}
+                                    onTagsChange={setTags}
+                                    date={selectedDate}
+                                    onDateChange={(d) => d && setSelectedDate(d)}
+                                    calendarMonth={currentMonth}
+                                    onCalendarMonthChange={setCurrentMonth}
+                                />
 
                                 {/* Linked Worship Plan */}
                                 {/* Linked Worship Plan */}
