@@ -127,7 +127,7 @@ export function MemberBadge({ name, onRemove, className, isMe = false }: MemberB
         <Badge
             variant="secondary"
             className={cn(
-                "h-8 pl-3 pr-1.5 gap-1.5 hover:bg-secondary/80 font-medium transition-all group flex items-center justify-between",
+                "h-8 pl-3 pr-1.5 gap-1.5 hover:bg-secondary/80 font-medium transition-all group flex items-center justify-between rounded-full",
                 isMe && "bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200",
                 onRemove && "cursor-pointer hover:bg-red-50 hover:text-red-600 hover:border-100",
                 className
