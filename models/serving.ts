@@ -26,6 +26,7 @@ export interface ServingSchedule {
     teamId: string;
     date: string; // YYYY-MM-DD
     title?: string; // Optional title for the service (e.g. "Christmas Service")
+    tags: string[]; // List of tag IDs or names
     items?: ServingItem[]; // New cue-sheet based structure
     templateId?: string; // Track which template was used
     worshipId?: string; // Linked Worship Plan ID

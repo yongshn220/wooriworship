@@ -9,7 +9,8 @@ export interface WorshipSongHeader {
 export interface Worship {
   id?: string
   team_id: string
-  title: string
+  title?: string
+  tags: string[]
   subtitle?: string
   worship_date: Timestamp
   description: string

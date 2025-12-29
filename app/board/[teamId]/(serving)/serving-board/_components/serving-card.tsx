@@ -4,7 +4,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { useRecoilValue } from "recoil";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, User } from "lucide-react";
+import { ChevronDown, ChevronUp, User, Eye, Link as LinkIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,10 +25,11 @@ interface Props {
     teamId: string;
     currentUserUid?: string;
     defaultExpanded?: boolean;
+    onPreviewWorship?: (worshipId: string) => void;
 }
 
 // Default expanded to true as requested
-export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded = true }: Props) {
+export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded = true, onPreviewWorship }: Props) {
     const [isExpanded, setIsExpanded] = useState(defaultExpanded);
     const roles = useRecoilValue(fetchServingRolesSelector(teamId));
 
@@ -81,65 +82,80 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
         >
             <CardContent className="p-4 sm:p-6">
                 {/* Header */}
-                {/* Header */}
-                <div className="group cursor-pointer" onClick={handleHeaderClick}>
-                    {/* Collapsed Header */}
-                    {!isExpanded && (
-                        <div className="flex justify-between items-start mb-4">
-                            <div className="space-y-1">
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <span className={cn(
-                                        "text-xs px-1.5 py-0.5 rounded-full",
-                                        isPast ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary font-bold"
-                                    )}>
-                                        {getDayPassedFromTimestampShorten({ seconds: scheduleDate.getTime() / 1000, nanoseconds: 0 } as any)}
-                                    </span>
-                                </div>
-                                <h3 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
-                                    {format(scheduleDate, "yyyy. MM. dd (EEE)")}
-                                    <ChevronDown className="h-5 w-5 text-muted-foreground animate-in fade-in zoom-in" />
-                                </h3>
-                                {schedule.title && (
-                                    <p className="text-sm text-muted-foreground font-medium">
-                                        {schedule.title}
-                                    </p>
-                                )}
-                            </div>
-                            <div onClick={(e) => e.stopPropagation()}>
-                                <ServingHeaderMenu scheduleId={schedule.id} teamId={teamId} />
-                            </div>
-                        </div>
-                    )}
+                <div className="group cursor-pointer select-none" onClick={handleHeaderClick}>
 
-                    {/* Expanded Header (Final Review Style) */}
-                    {isExpanded && (
-                        <div className="relative">
-                            <div className="absolute right-0 top-0" onClick={(e) => e.stopPropagation()}>
-                                <ServingHeaderMenu scheduleId={schedule.id} teamId={teamId} />
-                            </div>
-                            <div className="absolute left-0 top-0">
-                                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); toggleExpand(); }} className="h-8 w-8 -ml-2 text-muted-foreground">
+                    <div className="flex flex-col gap-1">
+                        {/* Top Row: Chevron (Left) -- Actions (Right) */}
+                        <div className="flex justify-between items-center">
+                            {/* Expand Toggle Chevron */}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:bg-transparent -ml-2"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleExpand();
+                                }}
+                            >
+                                {isExpanded ? (
                                     <ChevronUp className="h-5 w-5" />
-                                </Button>
-                            </div>
+                                ) : (
+                                    <ChevronDown className="h-5 w-5" />
+                                )}
+                            </Button>
 
-                            <div className="flex flex-col items-center justify-center py-4 border-b border-border/10 mb-0 mx-auto">
-                                <div className="text-center">
-                                    <h2 className="text-3xl font-bold text-foreground tracking-tight leading-none mb-1">
-                                        {format(scheduleDate, "MMM d")}
-                                    </h2>
-                                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide opacity-70">
-                                        {format(scheduleDate, "EEEE, yyyy")}
-                                    </p>
-                                    {schedule.title && (
-                                        <p className="text-lg font-semibold text-primary mt-2">
-                                            {schedule.title}
-                                        </p>
-                                    )}
+                            {/* Right Actions */}
+                            <div className="flex items-center gap-2">
+                                {/* Worship Plan Link Button */}
+                                {schedule.worshipId && onPreviewWorship && (
+                                    <div
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onPreviewWorship(schedule.worshipId!);
+                                        }}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors cursor-pointer"
+                                    >
+                                        <LinkIcon className="w-3.5 h-3.5" />
+                                        <span className="text-xs font-bold">See worship plan</span>
+                                    </div>
+                                )}
+
+                                {/* Menu */}
+                                <div onClick={(e) => e.stopPropagation()}>
+                                    <ServingHeaderMenu scheduleId={schedule.id} teamId={teamId} />
                                 </div>
                             </div>
                         </div>
-                    )}
+
+                        {/* Bottom Row: Title | Date */}
+                        <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-1">
+                            {/* Title (Blue) */}
+                            {schedule.title ? (
+                                <h3 className="text-xl sm:text-2xl font-bold text-blue-500 tracking-tight leading-none">
+                                    {schedule.title}
+                                </h3>
+                            ) : (
+                                <h3 className="text-xl sm:text-2xl font-bold text-muted-foreground tracking-tight leading-none">
+                                    Untitled
+                                </h3>
+                            )}
+
+                            {/* Vertical Divider */}
+                            <div className="hidden sm:block w-px h-6 bg-gray-300 transform rotate-12" />
+
+                            {/* Date Group */}
+                            <div className="flex items-baseline gap-2">
+                                {/* MMM d (Bold) */}
+                                <span className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+                                    {format(scheduleDate, "MMM d")}
+                                </span>
+                                {/* SUNDAY, yyyy (Muted, Uppercase) */}
+                                <span className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wide">
+                                    {format(scheduleDate, "EEEE, yyyy")}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Body */}
@@ -149,7 +165,7 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="space-y-4"
+                            className="space-y-4 mt-4 pt-4 border-t border-border"
                         >
                             <ServingMemberList
                                 schedule={schedule}

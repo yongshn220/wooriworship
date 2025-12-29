@@ -37,6 +37,9 @@ class TagService extends BaseService {
       return false
     }
   }
+  async deleteTag(teamId: string, tagName: string) {
+    return await this.delete(`${teamId}-스플릿-${tagName}`);
+  }
 }
 
 export default new TagService();
