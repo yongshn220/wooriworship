@@ -127,7 +127,7 @@ export function MemberBadge({ name, onRemove, className, isMe = false }: MemberB
         <Badge
             variant="secondary"
             className={cn(
-                "h-8 pl-3 pr-1.5 gap-1.5 font-medium transition-all group flex items-center justify-between rounded-full",
+                "h-8 pl-3 pr-1.5 gap-1.5 font-bold transition-all group flex items-center justify-between rounded-full",
                 // Default (Theme Color)
                 "bg-primary/10 text-primary hover:bg-primary/20 border-primary/10",
                 // Me (Blue) overrides Default
@@ -235,7 +235,7 @@ export function SuggestedMemberChips({ suggestions, onSelect }: SuggestedMemberC
                         e.stopPropagation();
                         onSelect(member.id);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-transparent border border-dashed border-gray-300 rounded-full text-[13px] font-bold text-gray-500 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all active:scale-95 whitespace-nowrap"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-transparent border border-dashed border-gray-300 rounded-full text-[13px] font-normal text-gray-500 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all active:scale-95 whitespace-nowrap"
                 >
                     <Plus className="w-3.5 h-3.5" />
                     {member.name.replace(/^group:/, "")}
