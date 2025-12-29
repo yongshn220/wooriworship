@@ -219,13 +219,23 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     useEffect(() => {
         if (selectedDate && teamId) {
             WorshipService.getWorshipsByDate(teamId, selectedDate).then(worships => {
-                setAvailableWorships(worships);
-                if (worships.length > 0 && mode === FormMode.CREATE) {
-                    // Default select the first one if creating new
-                    setLinkedWorshipId(worships[0].id);
-                } else if (mode === FormMode.EDIT && initialData?.worshipId) {
-                    // Keep existing link on edit
-                    setLinkedWorshipId(initialData.worshipId);
+                // strict match: only show worship plans that have matching tags
+                // also include the currently linked worship plan even if tags changed (to avoid hiding valid existing link)
+                const filteredWorships = worships.filter(w =>
+                    tags.some(t => w.tags?.includes(t)) ||
+                    (mode === FormMode.EDIT && w.id === initialData?.worshipId)
+                );
+
+                setAvailableWorships(filteredWorships);
+
+                // Unified Auto-select Logic
+                const currentSelectionExists = filteredWorships.some(w => w.id === linkedWorshipId);
+
+                if (currentSelectionExists) {
+                    // Keep current match
+                } else if (filteredWorships.length > 0) {
+                    // Select first match
+                    setLinkedWorshipId(filteredWorships[0].id);
                 } else {
                     setLinkedWorshipId(null);
                 }
@@ -234,7 +244,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             setAvailableWorships([]);
             setLinkedWorshipId(null);
         }
-    }, [selectedDate, teamId, mode, initialData]);
+    }, [selectedDate, teamId, mode, initialData, tags]); // Added tags dependency
 
     // Helpers
     const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || id; // Fallback to ID (name) for manual entries
@@ -501,7 +511,31 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         setStep(targetStep);
     };
 
-    const nextStep = () => {
+    const nextStep = async () => {
+        if (step === 0 && selectedDate && tags.length > 0) {
+            // Check for duplicates
+            try {
+                const dateStr = format(selectedDate, 'yyyy-MM-dd');
+                const existingSchedules = await ServingService.getSchedules(teamId, dateStr, dateStr);
+                const duplicate = existingSchedules.find(s =>
+                    // In CREATE mode: any overlap with existing
+                    // In EDIT mode: any overlap with existing EXCLUDING current self
+                    tags.some(t => s.tags?.includes(t)) &&
+                    (mode === FormMode.CREATE || (mode === FormMode.EDIT && s.id !== initialData?.id))
+                );
+
+                if (duplicate) {
+                    toast({
+                        title: "Duplicate Service Found",
+                        description: "A serving schedule with this tag already exists on this date.",
+                        variant: "destructive"
+                    });
+                    return; // Block navigation
+                }
+            } catch (error) {
+                console.error("Failed to check for duplicates", error);
+            }
+        }
         if (step < totalSteps - 1) goToStep(step + 1);
     };
 

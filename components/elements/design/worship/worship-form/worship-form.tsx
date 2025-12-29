@@ -92,12 +92,22 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
     return () => clearContents()
   }, [clearContents]);
 
-  /* Initialize selected songs */
+  /* Initialize selected songs and form data */
   useEffect(() => {
-    if (mode === FormMode.EDIT) {
-      setSelectedWorshipSongHeaderList(worship?.songs)
+    if (mode === FormMode.EDIT && worship) {
+      setSelectedWorshipSongHeaderList(worship.songs || []);
+      setTags(worship.tags || (worship.title ? [worship.title] : [])); // Fallback to title if tags are empty
+      setBasicInfo({
+        title: worship.title || "",
+        description: worship.description || "",
+        link: worship.link || ""
+      });
+      setDate(timestampToDate(worship.worship_date));
+      if (worship.related_serving_id) {
+        setLinkedServingId(worship.related_serving_id);
+      }
     }
-  }, [mode, setSelectedWorshipSongHeaderList, worship?.songs])
+  }, [mode, setSelectedWorshipSongHeaderList, worship]);
 
   // Fetch Linked Servings when date changes
   useEffect(() => {
@@ -107,18 +117,36 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
         // Assuming serving schedules use 'yyyy-MM-dd' format
         const dateStr = format(date, 'yyyy-MM-dd');
         const schedules = await ServingService.getSchedules(teamId, dateStr, dateStr);
-        setAvailableServingSchedules(schedules);
+        // Filter schedules to only show those that have matching tags
+        const filteredSchedules = schedules.filter(s =>
+          tags.some(t => s.tags?.includes(t)) ||
+          (mode === FormMode.EDIT && s.id === worship.related_serving_id) // Always include currently linked in Edit mode
+        );
 
-        // Auto-select first schedule if available and not already selected
-        if (schedules.length > 0 && !linkedServingId && mode === FormMode.CREATE) {
-          setLinkedServingId(schedules[0].id);
+        setAvailableServingSchedules(filteredSchedules);
+
+        // Unified Auto-select Logic for both CREATE and EDIT
+        // 1. If currently selected ID is still valid in the new filtered list, keep it.
+        // 2. If not, but there is a match in the filtered list, select the first one.
+        // 3. Otherwise, specific to EDIT mode: if the original saved ID is in the list, revert to it (though step 1 might cover this if state was init correctly).
+        // 4. Else, clear selection.
+
+        const currentSelectionExists = filteredSchedules.some(s => s.id === linkedServingId);
+
+        if (currentSelectionExists) {
+          // Keep current selection
+        } else if (filteredSchedules.length > 0) {
+          // Auto-select the first match (since strict filtering allows only valid tag+date matches)
+          setLinkedServingId(filteredSchedules[0].id);
+        } else {
+          setLinkedServingId(null);
         }
       } catch (error) {
         console.error("Failed to fetch serving schedules", error);
       }
     };
     fetchLinkedServings();
-  }, [date, teamId]);
+  }, [date, teamId, tags]); // Added tags dependency to re-run when tags change
 
   // Validation Check
   const isSessionValid = () => {
@@ -195,7 +223,37 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
     setStep(targetStep);
   }
 
-  const nextStep = () => {
+  const nextStep = async () => {
+    if (step === 0 && date && tags.length > 0) {
+      // Check for duplicates
+      try {
+        const dateStr = format(date, 'yyyy-MM-dd');
+        // We reuse the getWorshipsByDate service which fetches by date range or single date
+        // Assuming getWorshipsByDate returns array of worships on that day
+        const existingWorships = await WorshipService.getWorshipsByDate(teamId, date);
+        const duplicate = existingWorships.find(w =>
+          // In CREATE mode: any overlap with existing
+          // In EDIT mode: any overlap with existing EXCLUDING current self
+          tags.some(t => w.tags?.includes(t)) &&
+          (mode === FormMode.CREATE || (mode === FormMode.EDIT && w.id !== worship?.id))
+        );
+
+        if (duplicate) {
+          toast({
+            title: "Duplicate Service Found",
+            description: "A service with this tag already exists on this date.",
+            variant: "destructive"
+          });
+          return; // Block navigation
+        }
+      } catch (error) {
+        console.error("Failed to check for duplicates", error);
+        // Optional: Block or allow? Let's allow but log error, or maybe safe to block?
+        // Let's assume network error shouldn't block user flow strictly unless critical, 
+        // but duplicate check is critical. Let's allow if check fails to avoid blocking users on network blip?
+        // Or better: show error.
+      }
+    }
     if (step < totalSteps - 1) goToStep(step + 1);
   }
 

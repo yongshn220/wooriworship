@@ -15,6 +15,7 @@ export interface Worship {
   worship_date: Timestamp
   description: string
   link: string
+  related_serving_id?: string
   songs: Array<WorshipSongHeader>
   beginning_song: WorshipSongHeader
   ending_song: WorshipSongHeader
