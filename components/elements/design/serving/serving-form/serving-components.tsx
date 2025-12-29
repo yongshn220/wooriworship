@@ -206,3 +206,30 @@ export function WorshipTeamRoleRow({ roleName, memberIds, getMemberName, classNa
         </div>
     );
 }
+
+interface SuggestedMemberChipsProps {
+    suggestions: { id: string; name: string }[];
+    onSelect: (id: string) => void;
+}
+
+export function SuggestedMemberChips({ suggestions, onSelect }: SuggestedMemberChipsProps) {
+    if (suggestions.length === 0) return null;
+
+    return (
+        <>
+            {suggestions.map(member => (
+                <button
+                    key={member.id}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onSelect(member.id);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-transparent border border-dashed border-gray-300 rounded-full text-[13px] font-bold text-gray-500 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all active:scale-95 whitespace-nowrap"
+                >
+                    <Plus className="w-3.5 h-3.5" />
+                    {member.name.replace(/^group:/, "")}
+                </button>
+            ))}
+        </>
+    );
+}
