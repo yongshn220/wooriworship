@@ -73,11 +73,20 @@ export const FullScreenFormBody = forwardRef<HTMLDivElement, { children: React.R
 FullScreenFormBody.displayName = "FullScreenFormBody";
 
 // --- Footer ---
-export const FullScreenFormFooter = ({ children, className }: { children: React.ReactNode; className?: string }) => {
+export const FullScreenFormFooter = ({ children, className, errorMessage }: { children: React.ReactNode; className?: string; errorMessage?: string }) => {
     return (
         <div className={cn("absolute bottom-0 left-0 right-0 z-50 w-full px-6 pb-8 pt-12 pointer-events-none bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent", className)}>
-            <div className="flex gap-3 w-full max-w-2xl mx-auto pointer-events-auto">
-                {children}
+            <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto pointer-events-auto">
+                {errorMessage && (
+                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <p className="text-destructive text-[13px] font-bold text-center bg-destructive/5 py-2 px-4 rounded-full border border-destructive/10">
+                            {errorMessage}
+                        </p>
+                    </div>
+                )}
+                <div className="flex gap-3 w-full">
+                    {children}
+                </div>
             </div>
         </div>
     );

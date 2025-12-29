@@ -315,7 +315,6 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                 onTagsChange={setTags}
                 date={date}
                 onDateChange={(d) => d && setDate(d)}
-                errorMessage={isDuplicate && date ? `"${format(date, 'yyyy-MM-dd')} ${tags[0]}" is already exists.` : undefined}
               />
 
               {/* Linked Serving Schedule */}
@@ -417,7 +416,9 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
         </AnimatePresence>
       </FullScreenFormBody>
 
-      <FullScreenFormFooter>
+      <FullScreenFormFooter
+        errorMessage={isDuplicate && date && step === 0 ? `"${format(date, 'yyyy-MM-dd')} ${tags[0]}" is already exists.` : undefined}
+      >
         <div className="w-12 h-12 flex-none">
           <Button
             variant="outline"
