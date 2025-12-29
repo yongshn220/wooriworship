@@ -90,6 +90,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     const [activeSelection, setActiveSelection] = useState<{ itemId?: string; assignmentIndex?: number; roleId: string } | null>(null);
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isDuplicate, setIsDuplicate] = useState(false);
 
     // Modals & Drawers
     const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
@@ -244,7 +245,29 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             setAvailableWorships([]);
             setLinkedWorshipId(null);
         }
-    }, [selectedDate, teamId, mode, initialData, tags]); // Added tags dependency
+    }, [selectedDate, teamId, mode, initialData, tags, linkedWorshipId]);
+
+    // Real-time Duplicate Check
+    useEffect(() => {
+        const checkDuplicate = async () => {
+            if (!selectedDate || tags.length === 0) {
+                setIsDuplicate(false);
+                return;
+            }
+            try {
+                const dateStr = format(selectedDate, 'yyyy-MM-dd');
+                const existingSchedules = await ServingService.getSchedules(teamId, dateStr, dateStr);
+                const duplicate = existingSchedules.find(s =>
+                    tags.some(t => s.tags?.includes(t)) &&
+                    (mode === FormMode.CREATE || (mode === FormMode.EDIT && s.id !== initialData?.id))
+                );
+                setIsDuplicate(!!duplicate);
+            } catch (error) {
+                console.error("Failed to check for duplicates", error);
+            }
+        };
+        checkDuplicate();
+    }, [selectedDate, tags, teamId, mode, initialData?.id]);
 
     // Helpers
     const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || id; // Fallback to ID (name) for manual entries
@@ -512,30 +535,6 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
     };
 
     const nextStep = async () => {
-        if (step === 0 && selectedDate && tags.length > 0) {
-            // Check for duplicates
-            try {
-                const dateStr = format(selectedDate, 'yyyy-MM-dd');
-                const existingSchedules = await ServingService.getSchedules(teamId, dateStr, dateStr);
-                const duplicate = existingSchedules.find(s =>
-                    // In CREATE mode: any overlap with existing
-                    // In EDIT mode: any overlap with existing EXCLUDING current self
-                    tags.some(t => s.tags?.includes(t)) &&
-                    (mode === FormMode.CREATE || (mode === FormMode.EDIT && s.id !== initialData?.id))
-                );
-
-                if (duplicate) {
-                    toast({
-                        title: "Duplicate Service Found",
-                        description: "A serving schedule with this tag already exists on this date.",
-                        variant: "destructive"
-                    });
-                    return; // Block navigation
-                }
-            } catch (error) {
-                console.error("Failed to check for duplicates", error);
-            }
-        }
         if (step < totalSteps - 1) goToStep(step + 1);
     };
 
@@ -581,7 +580,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 <FullScreenFormHeader
                     steps={["When", "Who", "What", "Review"]}
                     currentStep={step}
-                    onStepChange={goToStep}
+                    onStepChange={isDuplicate ? undefined : goToStep}
                     onClose={() => router.back()}
                 />
 
@@ -629,6 +628,14 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                     onSelect={setLinkedWorshipId}
                                     onPreview={setPreviewWorshipId}
                                 />
+
+                                {isDuplicate && step === 0 && (
+                                    <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 mt-2">
+                                        <p className="text-destructive text-sm font-semibold text-center">
+                                            A serving schedule with this tag already exists on this date.
+                                        </p>
+                                    </div>
+                                )}
                             </motion.div>
                         )}
 
@@ -959,9 +966,9 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                         </Button>
                     </div>
                     <Button
-                        className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
+                        className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
                         onClick={step === totalSteps - 1 ? handleSubmit : nextStep}
-                        disabled={isLoading || (step === 0 && !selectedDate)}
+                        disabled={isLoading || (step === 0 && (!selectedDate || tags.length === 0 || isDuplicate))}
                     >
                         {isLoading ? (
                             "Saving..."
