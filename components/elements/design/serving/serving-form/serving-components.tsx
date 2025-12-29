@@ -258,11 +258,7 @@ export function AssignmentControl({
 
     return (
         <div
-            className="flex items-center justify-between cursor-pointer w-full group"
-            onClick={(e) => {
-                e.preventDefault();
-                onOpenAdd();
-            }}
+            className="flex items-center justify-between pointer-events-none"
         >
             <div className="flex flex-wrap gap-2.5 pointer-events-auto">
                 {/* Assigned Members */}
