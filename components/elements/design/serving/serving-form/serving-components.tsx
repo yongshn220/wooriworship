@@ -258,7 +258,11 @@ export function AssignmentControl({
 
     return (
         <div
-            className="flex items-center justify-between pointer-events-none"
+            className="flex items-center justify-between cursor-pointer w-full group"
+            onClick={(e) => {
+                e.preventDefault();
+                onOpenAdd();
+            }}
         >
             <div className="flex flex-wrap gap-2.5 pointer-events-auto">
                 {/* Assigned Members */}
@@ -273,37 +277,29 @@ export function AssignmentControl({
                 {/* Suggestions */}
                 <SuggestedMemberChips
                     suggestions={suggestions.filter(s => !assignedMembers.some(m => m.id === s.id))}
-                    onSelect={onAddMember}
+                    onSelect={(id) => onAddMember(id)}
                 />
 
                 {/* Placeholder Button (Only if empty) */}
                 {!isAssigned && !hasSuggestions && (
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onOpenAdd();
-                        }}
-                        className="flex items-center gap-3 text-gray-400 group-hover:text-blue-500 transition-colors py-1 pointer-events-auto"
+                    <div
+                        className="flex items-center gap-3 text-gray-400 group-hover:text-blue-500 transition-colors py-1 pointer-events-none"
                     >
                         <div className="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center group-hover:border-blue-100 group-hover:bg-blue-50 transition-colors">
                             <Plus className="text-gray-300 w-4 h-4 group-hover:text-blue-500" />
                         </div>
                         <span className="text-[13px] font-bold">{placeholder}</span>
-                    </button>
+                    </div>
                 )}
             </div>
 
             {/* Right Side Add Button (If content exists) */}
             {(isAssigned || hasSuggestions) && (
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onOpenAdd();
-                    }}
-                    className="w-8 h-8 rounded-full border border-blue-100 bg-blue-50 flex items-center justify-center transition-colors flex-shrink-0 ml-2 pointer-events-auto hover:bg-blue-100 active:scale-95"
+                <div
+                    className="w-8 h-8 rounded-full border border-blue-100 bg-blue-50 flex items-center justify-center transition-colors flex-shrink-0 ml-2 group-hover:bg-blue-100 active:scale-95"
                 >
                     <Plus className="text-blue-500 w-4 h-4" />
-                </button>
+                </div>
             )}
         </div>
     );
