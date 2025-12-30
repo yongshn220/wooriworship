@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown, X, Trash2 } from "lucide-react";
+import { Check, ChevronsUpDown, X, Trash2, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,15 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import TagService from "@/apis/TagService";
 import TeamService from "@/apis/TeamService";
@@ -50,7 +59,9 @@ export function TagSelector({
     const [inputValue, setInputValue] = React.useState("");
     const [availableTags, setAvailableTags] = React.useState<Tag[]>([]);
     const [loading, setLoading] = React.useState(false);
-    const [tagToDelete, setTagToDelete] = React.useState({ name: "", open: false });
+    const [tagToDelete, setTagToDelete] = React.useState<{ name: string, open: boolean }>({ name: "", open: false });
+    const [tagToRename, setTagToRename] = React.useState<{ id: string, name: string, open: boolean }>({ id: "", name: "", open: false });
+    const [newName, setNewName] = React.useState("");
 
     React.useEffect(() => {
         const fetchTags = async () => {
@@ -147,32 +158,37 @@ export function TagSelector({
                     >
                         <div className="flex flex-wrap gap-1 items-center">
                             {selectedTags.length > 0 ? (
-                                selectedTags.map((tagValue) => {
-                                    // Resolve name
-                                    const tagObj = availableTags.find(t => (mode === "service" ? t.id : t.name) === tagValue) ||
-                                        (mode === "service" ? knownTags.find(t => t.id === tagValue) : undefined);
-                                    const displayName = tagObj ? tagObj.name : tagValue;
+                                selectedTags
+                                    .filter(tagValue => {
+                                        if (mode !== "service") return true;
+                                        return availableTags.some(t => t.id === tagValue) || knownTags.some(t => t.id === tagValue);
+                                    })
+                                    .map((tagValue) => {
+                                        // Resolve name
+                                        const tagObj = availableTags.find(t => (mode === "service" ? t.id : t.name) === tagValue) ||
+                                            (mode === "service" ? knownTags.find(t => t.id === tagValue) : undefined);
+                                        const displayName = tagObj ? tagObj.name : tagValue;
 
-                                    return (
-                                        <Badge variant="secondary" key={tagValue} className="mr-1 mb-1">
-                                            {displayName}
-                                            <div
-                                                className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
-                                                onMouseDown={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                }}
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    handleUnselect(tagValue);
-                                                }}
-                                            >
-                                                <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
-                                            </div>
-                                        </Badge>
-                                    )
-                                })
+                                        return (
+                                            <Badge variant="secondary" key={tagValue} className="mr-1 mb-1">
+                                                {displayName}
+                                                <div
+                                                    className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
+                                                    onMouseDown={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                    }}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleUnselect(tagValue);
+                                                    }}
+                                                >
+                                                    <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                                                </div>
+                                            </Badge>
+                                        )
+                                    })
                             ) : (
                                 <span className="text-muted-foreground font-normal">{placeholder}</span>
                             )}
@@ -216,17 +232,33 @@ export function TagSelector({
                                             />
                                             {tag.name}
                                         </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-6 w-6 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setTagToDelete({ name: tag.name, open: true });
-                                            }}
-                                        >
-                                            <Trash2 className="h-3 w-3" />
-                                        </Button>
+                                        <div className="flex items-center gap-1">
+                                            {mode === "service" && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setTagToRename({ id: tag.id, name: tag.name, open: true });
+                                                        setNewName(tag.name);
+                                                    }}
+                                                >
+                                                    <Pencil className="h-3 w-3" />
+                                                </Button>
+                                            )}
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-6 w-6 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setTagToDelete({ name: tag.name, open: true });
+                                                }}
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </Button>
+                                        </div>
                                     </CommandItem>
                                 ))}
                             </CommandGroup>
@@ -266,6 +298,54 @@ export function TagSelector({
                     }
                 }}
             />
+
+            <Dialog open={tagToRename.open} onOpenChange={(open) => setTagToRename(prev => ({ ...prev, open }))}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Rename Tag</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="name">Tag Name</Label>
+                            <Input
+                                id="name"
+                                value={newName}
+                                onChange={(e) => setNewName(e.target.value)}
+                                placeholder="Enter new tag name"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setTagToRename(prev => ({ ...prev, open: false }))}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={async () => {
+                                if (!newName.trim() || newName === tagToRename.name) {
+                                    setTagToRename(prev => ({ ...prev, open: false }));
+                                    return;
+                                }
+                                try {
+                                    const team = await TeamService.getById(teamId);
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    const currentTags = (team as any)?.service_tags || [];
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    const updatedTags = currentTags.map((t: any) =>
+                                        t.id === tagToRename.id ? { ...t, name: newName.trim() } : t
+                                    );
+                                    await TeamService.updateServiceTags(teamId, updatedTags);
+                                    setAvailableTags(updatedTags);
+                                    setTagToRename(prev => ({ ...prev, open: false }));
+                                } catch (err) {
+                                    console.error("Failed to rename tag", err);
+                                }
+                            }}
+                        >
+                            Save Changes
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
