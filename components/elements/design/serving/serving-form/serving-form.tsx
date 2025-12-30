@@ -382,13 +382,12 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         setIsLoading(true);
         try {
             const dateString = format(selectedDate, "yyyy-MM-dd");
-            const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
 
             const payload: Omit<ServingSchedule, "id"> = {
                 teamId,
                 date: dateString,
                 service_tags: serviceTagIds,
-                title: serviceTagNames.length > 0 ? serviceTagNames.join(" ") : "Worship Service", // Fallback title
+                title: serviceTagIds.length > 0 ? serviceTagIds.join(" ") : "Worship Service", // Fallback title
                 items: items,
                 worship_id: linkedWorshipId || null
             };

@@ -18,10 +18,9 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { teamAtom, teamUpdaterAtom } from "@/global-states/teamState";
-import { TagService, TeamService } from "@/apis";
 import { cn } from "@/lib/utils";
+import TagService from "@/apis/TagService";
+import TeamService from "@/apis/TeamService";
 import { Tag } from "@/models/tag";
 
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
@@ -49,25 +48,18 @@ export function TagSelector({
     const [loading, setLoading] = React.useState(false);
     const [tagToDelete, setTagToDelete] = React.useState({ name: "", open: false });
 
-    // Recoil sync for service mode
-    const team = useRecoilValue(teamAtom(teamId));
-    const setTeamUpdater = useSetRecoilState(teamUpdaterAtom);
-
-    React.useEffect(() => {
-        if (mode === "service" && team?.service_tags) {
-            setAvailableTags(team.service_tags);
-        }
-    }, [team?.service_tags, mode]);
-
     React.useEffect(() => {
         const fetchTags = async () => {
-            // Only fetch for song mode. Service mode uses Recoil sync above.
-            if (mode === "service") return;
-
             setLoading(true);
             try {
-                const tags = await TagService.getTeamTags(teamId);
-                setAvailableTags(tags as Tag[]);
+                if (mode === "service") {
+                    const team = await TeamService.getById(teamId);
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    setAvailableTags((team as any)?.service_tags || []);
+                } else {
+                    const tags = await TagService.getTeamTags(teamId);
+                    setAvailableTags(tags as Tag[]);
+                }
             } catch (error) {
                 console.error("Failed to fetch tags", error);
             } finally {
@@ -78,7 +70,7 @@ export function TagSelector({
         if (teamId) {
             fetchTags();
         }
-    }, [teamId, mode]);
+    }, [teamId]);
 
     const handleUnselect = (tag: string) => {
         onTagsChange(selectedTags.filter((t) => t !== tag));
@@ -104,10 +96,22 @@ export function TagSelector({
         if (!inputValue.trim()) return;
         const newTagName = inputValue.trim();
 
+        // Optimistic update
+        if (!selectedTags.includes(newTagName)) {
+            if (single) {
+                onTagsChange([newTagName]);
+                setOpen(false);
+            } else {
+                onTagsChange([...selectedTags, newTagName]);
+            }
+        }
+
         try {
             if (mode === 'service') {
                 const newId = await TeamService.addServiceTag(teamId, newTagName);
-                setTeamUpdater(prev => prev + 1); // Trigger Recoil update
+                const team = await TeamService.getById(teamId);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                setAvailableTags((team as any)?.service_tags || []);
 
                 if (newId) {
                     if (single) onTagsChange([newId]);
