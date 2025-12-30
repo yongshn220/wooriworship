@@ -59,7 +59,7 @@ export function TagSelector({
     const [inputValue, setInputValue] = React.useState("");
     const [availableTags, setAvailableTags] = React.useState<Tag[]>([]);
     const [loading, setLoading] = React.useState(false);
-    const [tagToDelete, setTagToDelete] = React.useState<{ name: string, open: boolean }>({ name: "", open: false });
+    const [tagToDelete, setTagToDelete] = React.useState<{ id: string, name: string, open: boolean }>({ id: "", name: "", open: false });
     const [tagToRename, setTagToRename] = React.useState<{ id: string, name: string, open: boolean }>({ id: "", name: "", open: false });
     const [newName, setNewName] = React.useState("");
 
@@ -253,7 +253,7 @@ export function TagSelector({
                                                 className="h-11 w-11 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    setTagToDelete({ name: tag.name, open: true });
+                                                    setTagToDelete({ id: tag.id, name: tag.name, open: true });
                                                 }}
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -290,8 +290,9 @@ export function TagSelector({
                             setAvailableTags(newTags as Tag[]);
                         }
 
-                        if (selectedTags.includes(tagName)) {
-                            handleUnselect(tagName);
+                        const deleteTarget = mode === "service" ? tagToDelete.id : tagToDelete.name;
+                        if (selectedTags.includes(deleteTarget)) {
+                            handleUnselect(deleteTarget);
                         }
                     } catch (err) {
                         console.error("Failed to delete tag", err);
