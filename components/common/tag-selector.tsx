@@ -335,6 +335,5 @@ export function TagSelector({
                 </div>
             </ModernDialog>
         </div>
-        </div >
     );
 }
