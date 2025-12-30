@@ -80,7 +80,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
 
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
     const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-    const [tags, setTags] = useState<string[]>([]);
+    const [serviceTagIds, setServiceTagIds] = useState<string[]>([]);
     const [items, setItems] = useState<ServingItem[]>([]);
     const [templates, setTemplates] = useState<any[]>([]);
     const [isTemplatesLoaded, setIsTemplatesLoaded] = useState(false);
@@ -123,9 +123,9 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             return;
         }
         const fetchHistory = async () => {
-            if (tags.length > 0) {
+            if (serviceTagIds.length > 0) {
                 // Use the first tag as the primary key for history context
-                const recent = await ServingService.getRecentSchedulesByTag(teamId, tags[0], 10);
+                const recent = await ServingService.getRecentSchedulesByTag(teamId, serviceTagIds[0], 10);
                 setHistorySchedules(recent);
             } else {
                 // If no tag is selected, fetch recent schedules generally to provide suggestions based on title only
@@ -134,7 +134,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             }
         };
         fetchHistory();
-    }, [teamId, tags]);
+    }, [teamId, serviceTagIds]);
 
     const getSuggestionsForTitle = (title: string) => {
         const normalizedTitle = title.trim();
@@ -211,7 +211,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             const parsedDate = new Date(y, m - 1, d);
             setSelectedDate(parsedDate);
             setCurrentMonth(parsedDate);
-            setTags(initialData.tags || []);
+            setServiceTagIds(initialData.service_tags || []);
 
             if (initialData.items && initialData.items.length > 0) {
                 setItems(initialData.items);
@@ -286,8 +286,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 // strict match: only show worship plans that have matching tags
                 // also include the currently linked worship plan even if tags changed (to avoid hiding valid existing link)
                 const filteredWorships = worships.filter(w =>
-                    tags.some(t => w.tags?.includes(t)) ||
-                    (mode === FormMode.EDIT && w.id === initialData?.worshipId)
+                    serviceTagIds.some(t => w.service_tags?.includes(t)) ||
+                    (mode === FormMode.EDIT && w.id === initialData?.worship_id)
                 );
 
                 setAvailableWorships(filteredWorships);
@@ -308,13 +308,13 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
             setAvailableWorships([]);
             setLinkedWorshipId(null);
         }
-    }, [selectedDate, teamId, mode, initialData, tags, linkedWorshipId]);
+    }, [selectedDate, teamId, mode, initialData, serviceTagIds, linkedWorshipId]);
 
     // Real-time Duplicate Check
     const { isDuplicate, errorMessage: duplicateErrorMessage } = useServiceDuplicateCheck({
         teamId,
         date: selectedDate,
-        tags,
+        serviceTagIds,
         mode,
         currentId: initialData?.id,
         fetcher: ServingService.getSchedules
@@ -382,14 +382,15 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         setIsLoading(true);
         try {
             const dateString = format(selectedDate, "yyyy-MM-dd");
+            const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
 
             const payload: Omit<ServingSchedule, "id"> = {
                 teamId,
                 date: dateString,
-                tags,
-                title: tags.length > 0 ? tags.join(" ") : "Worship Service", // Fallback title
+                service_tags: serviceTagIds,
+                title: serviceTagNames.length > 0 ? serviceTagNames.join(" ") : "Worship Service", // Fallback title
                 items: items,
-                worshipId: linkedWorshipId || null
+                worship_id: linkedWorshipId || null
             };
 
             if (mode === FormMode.CREATE) {
@@ -412,11 +413,11 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                 const updatePayload = {
                     ...initialData,
                     date: dateString,
-                    tags,
-                    title: tags.join(" "),
+                    service_tags: serviceTagIds,
+                    title: serviceTagNames.join(" "),
                     items: items,
                     templateId: selectedTemplateId || null,
-                    worshipId: linkedWorshipId || null,
+                    worship_id: linkedWorshipId || null,
                 };
                 await ServingService.updateSchedule(teamId, updatePayload);
                 toast({ title: "Schedule updated!" });
@@ -658,8 +659,8 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                                 {/* Service & Date Selection */}
                                 <ServiceDateSelector
                                     teamId={teamId}
-                                    tags={tags}
-                                    onTagsChange={setTags}
+                                    serviceTagIds={serviceTagIds}
+                                    onServiceTagIdsChange={setServiceTagIds}
                                     date={selectedDate}
                                     onDateChange={(d) => d && setSelectedDate(d)}
                                     calendarMonth={currentMonth}

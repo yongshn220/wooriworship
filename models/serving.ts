@@ -26,10 +26,10 @@ export interface ServingSchedule {
     teamId: string;
     date: string; // YYYY-MM-DD
     title?: string; // Optional title for the service (e.g. "Christmas Service")
-    tags: string[]; // List of tag IDs or names
+    service_tags: string[]; // List of tag IDs
     items?: ServingItem[]; // New cue-sheet based structure
     templateId?: string; // Track which template was used
-    worshipId?: string; // Linked Worship Plan ID
+    worship_id?: string; // Linked Worship Plan ID
     roles?: { // Keep for backward compatibility
         roleId: string;
         memberIds: string[];

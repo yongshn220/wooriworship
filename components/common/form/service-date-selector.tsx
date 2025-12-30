@@ -6,12 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { TagSelector } from "@/components/common/tag-selector";
 import { FormSectionCard } from "@/components/common/form/full-screen-form";
-import TagService from "@/apis/TagService";
+import TeamService from "@/apis/TeamService";
+import { useSetRecoilState } from "recoil";
+import { teamUpdaterAtom } from "@/global-states/teamState";
 
 interface ServiceDateSelectorProps {
     teamId: string;
-    tags: string[];
-    onTagsChange: (tags: string[]) => void;
+    serviceTagIds: string[];
+    onServiceTagIdsChange: (serviceTagIds: string[]) => void;
     date: Date | undefined;
     onDateChange: (date: Date | undefined) => void;
     calendarMonth?: Date;
@@ -20,13 +22,14 @@ interface ServiceDateSelectorProps {
 
 export function ServiceDateSelector({
     teamId,
-    tags,
-    onTagsChange,
+    serviceTagIds,
+    onServiceTagIdsChange,
     date,
     onDateChange,
     calendarMonth,
     onCalendarMonthChange,
 }: ServiceDateSelectorProps) {
+    const setTeamUpdater = useSetRecoilState(teamUpdaterAtom);
 
     // Internal state for calendar month if not provided
     const [internalMonth, setInternalMonth] = React.useState<Date>(date || new Date());
@@ -41,10 +44,11 @@ export function ServiceDateSelector({
                     <Label className="text-sm font-semibold text-muted-foreground ml-1">Service</Label>
                     <TagSelector
                         teamId={teamId}
-                        selectedTags={tags}
-                        onTagsChange={onTagsChange}
+                        selectedTags={serviceTagIds}
+                        onTagsChange={onServiceTagIdsChange}
                         placeholder="Select service (e.g. 주일예배, 금요예배...)"
                         single={true}
+                        mode="service"
                     />
                 </div>
 
@@ -71,13 +75,15 @@ export function ServiceDateSelector({
                     ].sort((a, b) => a.date.getTime() - b.date.getTime()).map((option) => (
                         <button
                             key={option.title}
-                            onClick={() => {
+                            onClick={async () => {
                                 onDateChange(option.date);
                                 setCurrentMonth(option.date);
-                                // Always replace tags for single selection
-                                onTagsChange([option.title]);
-                                // Auto-create tag if it doesn't exist
-                                TagService.addNewTag(teamId, option.title).catch(console.error);
+                                // Auto-create tag if it doesn't exist and get ID
+                                const id = await TeamService.addServiceTag(teamId, option.title);
+                                setTeamUpdater(prev => prev + 1); // Trigger Recoil update
+                                if (id) {
+                                    onServiceTagIdsChange([id]);
+                                }
                             }}
                             className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 text-xs font-bold hover:bg-blue-100 hover:border-blue-200 transition-all active:scale-95"
                         >

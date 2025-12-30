@@ -24,5 +24,6 @@ export interface WorshipInput {
   worshipSongHeaders: Array<WorshipSongHeader>
   beginningSong: WorshipSongHeader
   endingSong: WorshipSongHeader
-  tags: string[]
+  service_tags: string[]
+  serving_schedule_id?: string
 }
