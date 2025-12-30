@@ -32,7 +32,6 @@ interface TagSelectorProps {
     placeholder?: string;
     single?: boolean;
     mode?: "song" | "service";
-    mode?: "song" | "service";
     refreshTrigger?: number;
     knownTags?: { id: string, name: string }[];
 }
