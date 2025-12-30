@@ -1,7 +1,7 @@
 import BaseService from "./BaseService";
 import { ServingRole, ServingSchedule } from "@/models/serving";
 import { firestore } from "@/firebase";
-import { arrayRemove, arrayUnion } from "@firebase/firestore";
+import { arrayRemove, arrayUnion, increment } from "firebase/firestore";
 import LinkingService from "./LinkingService";
 
 class ServingService extends BaseService {
@@ -228,26 +228,48 @@ class ServingService extends BaseService {
         if (schedule.worship_id) {
             await LinkingService.linkWorshipAndServing(teamId, schedule.worship_id, newSchedule.id);
         }
+
+        // Update Stats
+        if (schedule.service_tags && schedule.service_tags.length > 0 && schedule.date) {
+            await this.updateTagStats(teamId, schedule.service_tags, schedule.date, "add");
+        }
+
         return newSchedule;
     }
 
     async updateSchedule(teamId: string, schedule: ServingSchedule): Promise<void> {
-        await firestore
-            .collection("teams")
-            .doc(teamId)
-            .collection("serving_schedules")
-            .doc(schedule.id)
-            .set(schedule, { merge: true });
+        const docRef = firestore.collection("teams").doc(teamId).collection("serving_schedules").doc(schedule.id);
+        const oldDoc = await docRef.get();
+        const oldData = oldDoc.data() as ServingSchedule | undefined;
+
+        await docRef.set(schedule, { merge: true });
+
+        // Handle stats update if tags or date changed
+        if (oldData) {
+            // Remove old stats
+            if (oldData.service_tags && oldData.service_tags.length > 0 && oldData.date) {
+                await this.updateTagStats(teamId, oldData.service_tags, oldData.date, "remove");
+            }
+            // Add new stats
+            if (schedule.service_tags && schedule.service_tags.length > 0 && schedule.date) {
+                await this.updateTagStats(teamId, schedule.service_tags, schedule.date, "add");
+            }
+        }
     }
 
     async deleteSchedule(teamId: string, scheduleId: string): Promise<void> {
         await LinkingService.cleanupReferencesForServingDeletion(teamId, scheduleId);
-        await firestore
-            .collection("teams")
-            .doc(teamId)
-            .collection("serving_schedules")
-            .doc(scheduleId)
-            .delete();
+
+        const docRef = firestore.collection("teams").doc(teamId).collection("serving_schedules").doc(scheduleId);
+        const docSnapshot = await docRef.get();
+        const data = docSnapshot.data() as ServingSchedule | undefined;
+
+        // Remove stats before deletion
+        if (data && data.service_tags && data.service_tags.length > 0 && data.date) {
+            await this.updateTagStats(teamId, data.service_tags, data.date, "remove");
+        }
+
+        await docRef.delete();
     }
 
     // --- Templates ---
@@ -355,6 +377,61 @@ class ServingService extends BaseService {
             .collection("serving_config")
             .doc("general")
             .set({ custom_names: arrayUnion(name) }, { merge: true });
+    }
+
+    // --- Tag Stats (Advanced Smart Quick Select) ---
+
+    async getTagStats(teamId: string): Promise<Record<string, { count: number, weekdays: Record<string, number>, last_used_at: any }>> {
+        try {
+            const doc = await firestore
+                .collection("teams")
+                .doc(teamId)
+                .collection("config")
+                .doc("tag_stats")
+                .get();
+
+            if (!doc.exists) return {};
+            return doc.data()?.stats || {};
+        } catch (e) {
+            console.error("Failed to fetch tag stats", e);
+            return {};
+        }
+    }
+
+    async updateTagStats(teamId: string, tagIds: string[], dateString: string, mode: "add" | "remove"): Promise<void> {
+        try {
+            const statsRef = firestore.collection("teams").doc(teamId).collection("config").doc("tag_stats");
+            const date = new Date(dateString);
+            const weekday = date.getDay().toString(); // 0-6
+            const incrementValue = mode === "add" ? 1 : -1;
+
+            const statsUpdate: any = {};
+
+            for (const tagId of tagIds) {
+                // Construct nested object for deep merge
+                statsUpdate[tagId] = {
+                    count: increment(incrementValue),
+                    weekdays: {
+                        [weekday]: increment(incrementValue)
+                    }
+                };
+
+                if (mode === "add") {
+                    statsUpdate[tagId].last_used_at = new Date().toISOString();
+                }
+            }
+
+            // Using set with merge to ensure document exists
+            // Since we are updating specific keys in the 'stats' map, we need to be careful.
+            // set({ stats: statsUpdate }, { merge: true }) works for creating/merging top 'stats' field.
+            // However, it will REPLACE the 'stats' map's children if we are not careful? 
+            // NO, `set` with `merge:true` performs a deep merge on Maps.
+            // So `stats: { tagId: { count: ... } }` will merge into `stats`.
+
+            await statsRef.set({ stats: statsUpdate }, { merge: true });
+        } catch (e) {
+            console.error("Failed to update tag stats", e);
+        }
     }
 }
 
