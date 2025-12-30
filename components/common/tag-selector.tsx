@@ -232,31 +232,31 @@ export function TagSelector({
                                             />
                                             {tag.name}
                                         </div>
-                                        <div className="flex items-center gap-1">
+                                        <div className="flex items-center gap-2">
                                             {mode === "service" && (
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-6 w-6 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                                    className="h-11 w-11 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         setTagToRename({ id: tag.id, name: tag.name, open: true });
                                                         setNewName(tag.name);
                                                     }}
                                                 >
-                                                    <Pencil className="h-3 w-3" />
+                                                    <Pencil className="h-4 w-4" />
                                                 </Button>
                                             )}
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-6 w-6 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                                                className="h-11 w-11 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     setTagToDelete({ name: tag.name, open: true });
                                                 }}
                                             >
-                                                <Trash2 className="h-3 w-3" />
+                                                <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
                                     </CommandItem>
