@@ -32,7 +32,9 @@ interface TagSelectorProps {
     placeholder?: string;
     single?: boolean;
     mode?: "song" | "service";
+    mode?: "song" | "service";
     refreshTrigger?: number;
+    knownTags?: { id: string, name: string }[];
 }
 
 export function TagSelector({
@@ -43,6 +45,7 @@ export function TagSelector({
     single = false,
     mode = "song",
     refreshTrigger = 0,
+    knownTags = [],
 }: TagSelectorProps) {
     const [open, setOpen] = React.useState(false);
     const [inputValue, setInputValue] = React.useState("");
@@ -147,7 +150,8 @@ export function TagSelector({
                             {selectedTags.length > 0 ? (
                                 selectedTags.map((tagValue) => {
                                     // Resolve name
-                                    const tagObj = availableTags.find(t => (mode === "service" ? t.id : t.name) === tagValue);
+                                    const tagObj = availableTags.find(t => (mode === "service" ? t.id : t.name) === tagValue) ||
+                                        (mode === "service" ? knownTags.find(t => t.id === tagValue) : undefined);
                                     const displayName = tagObj ? tagObj.name : tagValue;
 
                                     return (

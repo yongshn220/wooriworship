@@ -33,6 +33,7 @@ export function ServiceDateSelector({
     const currentMonth = calendarMonth || internalMonth;
     const setCurrentMonth = onCalendarMonthChange || setInternalMonth;
     const [tagRefreshTrigger, setTagRefreshTrigger] = React.useState(0);
+    const [tempKnownTags, setTempKnownTags] = React.useState<{ id: string, name: string }[]>([]);
 
     return (
         <div className="space-y-6">
@@ -48,6 +49,7 @@ export function ServiceDateSelector({
                         single={true}
                         mode="service"
                         refreshTrigger={tagRefreshTrigger}
+                        knownTags={tempKnownTags}
                     />
                 </div>
 
@@ -80,6 +82,7 @@ export function ServiceDateSelector({
                                 // Auto-create tag if it doesn't exist and get ID
                                 const id = await TeamService.addServiceTag(teamId, option.title);
                                 if (id) {
+                                    setTempKnownTags(prev => [...prev, { id, name: option.title }]);
                                     setTagRefreshTrigger(prev => prev + 1); // Trigger refresh
                                     onServiceTagIdsChange([id]);
                                 }
