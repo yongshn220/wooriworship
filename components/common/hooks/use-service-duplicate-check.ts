@@ -5,17 +5,19 @@ import { FormMode } from "@/components/constants/enums";
 interface UseServiceDuplicateCheckProps<T> {
     teamId: string;
     date: Date | undefined;
-    tags: string[];
+    serviceTagIds: string[];
+    serviceTagNames?: string[];
     mode: FormMode;
     currentId?: string; // ID of the item being edited (to exclude from duplicate check)
     fetcher: (teamId: string, startDate: string, endDate?: string) => Promise<T[]>; // Generic fetcher
     itemDateFormatter?: (date: Date) => string; // Optional custom date formatter
 }
 
-export function useServiceDuplicateCheck<T extends { id: string; tags?: string[] }>({
+export function useServiceDuplicateCheck<T extends { id: string; service_tags?: string[] }>({
     teamId,
     date,
-    tags,
+    serviceTagIds,
+    serviceTagNames,
     mode,
     currentId,
     fetcher,
@@ -28,7 +30,7 @@ export function useServiceDuplicateCheck<T extends { id: string; tags?: string[]
     useEffect(() => {
         const checkDuplicate = async () => {
             // Clear status if partial info
-            if (!date || tags.length === 0) {
+            if (!date || serviceTagIds.length === 0) {
                 setIsDuplicate(false);
                 setErrorMessage(undefined);
                 return;
@@ -45,7 +47,7 @@ export function useServiceDuplicateCheck<T extends { id: string; tags?: string[]
                 const existingItems = await fetcher(teamId, dateStr, dateStr);
 
                 const duplicate = existingItems.find(item =>
-                    tags.some(t => item.tags?.includes(t)) &&
+                    serviceTagIds.some((t: string) => item.service_tags?.includes(t)) &&
                     (mode === FormMode.CREATE || (mode === FormMode.EDIT && item.id !== currentId))
                 );
 
@@ -53,7 +55,7 @@ export function useServiceDuplicateCheck<T extends { id: string; tags?: string[]
                 setIsDuplicate(isDup);
 
                 if (isDup) {
-                    setErrorMessage(`"${dateStr} ${tags[0]}" already exists.`);
+                    setErrorMessage(`"${dateStr} ${serviceTagIds[0]}" already exists.`);
                 } else {
                     setErrorMessage(undefined);
                 }
@@ -66,7 +68,7 @@ export function useServiceDuplicateCheck<T extends { id: string; tags?: string[]
         };
 
         checkDuplicate();
-    }, [date, tags, teamId, mode, currentId, fetcher, itemDateFormatter]);
+    }, [date, serviceTagIds, teamId, mode, currentId, fetcher, itemDateFormatter]);
 
     return { isDuplicate, isLoading, errorMessage };
 }

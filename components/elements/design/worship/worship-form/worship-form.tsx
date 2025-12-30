@@ -67,7 +67,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
     description: (mode === FormMode.EDIT) ? worship?.description ?? "" : "",
     link: (mode === FormMode.EDIT) ? worship?.link ?? "" : "",
   })
-  const [tags, setTags] = useState<string[]>((mode === FormMode.EDIT) ? worship?.tags ?? [] : [])
+  const [serviceTagIds, setServiceTagIds] = useState<string[]>((mode === FormMode.EDIT) ? worship?.service_tags ?? [] : [])
   const [date, setDate] = useState<Date>((mode === FormMode.EDIT) ? timestampToDate(worship?.worship_date) : new Date())
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
@@ -97,15 +97,15 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
   useEffect(() => {
     if (mode === FormMode.EDIT && worship) {
       setSelectedWorshipSongHeaderList(worship.songs || []);
-      setTags(worship.tags || (worship.title ? [worship.title] : [])); // Fallback to title if tags are empty
+      setServiceTagIds(worship.service_tags || []);
       setBasicInfo({
         title: worship.title || "",
         description: worship.description || "",
         link: worship.link || ""
       });
       setDate(timestampToDate(worship.worship_date));
-      if (worship.related_serving_id) {
-        setLinkedServingId(worship.related_serving_id);
+      if (worship.serving_schedule_id) {
+        setLinkedServingId(worship.serving_schedule_id);
       }
     }
   }, [mode, setSelectedWorshipSongHeaderList, worship]);
@@ -120,8 +120,8 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
         const schedules = await ServingService.getSchedules(teamId, dateStr, dateStr);
         // Filter schedules to only show those that have matching tags
         const filteredSchedules = schedules.filter(s =>
-          tags.some(t => s.tags?.includes(t)) ||
-          (mode === FormMode.EDIT && s.id === worship.related_serving_id) // Always include currently linked in Edit mode
+          serviceTagIds.some(t => s.service_tags?.includes(t)) ||
+          (mode === FormMode.EDIT && s.id === worship.serving_schedule_id) // Always include currently linked in Edit mode
         );
 
         setAvailableServingSchedules(filteredSchedules);
@@ -147,13 +147,15 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       }
     };
     fetchLinkedServings();
-  }, [date, teamId, tags, mode, worship?.id, linkedServingId]); // Added tags dependency to re-run when tags change
+  }, [date, teamId, serviceTagIds, mode, worship?.id, linkedServingId]); // Added tags dependency to re-run when tags change
 
   // Real-time Duplicate Check
+  const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
   const { isDuplicate, errorMessage: duplicateErrorMessage } = useServiceDuplicateCheck({
     teamId,
     date,
-    tags,
+    serviceTagIds,
+    serviceTagNames,
     mode,
     currentId: worship?.id,
     fetcher: async (tid, dateStr) => {
@@ -175,9 +177,10 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
   }
 
   const getWorshipInput = () => {
+    const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
     return {
-      title: tags.join(" "),
-      tags: tags,
+      title: serviceTagNames.join(" "),
+      service_tags: serviceTagIds,
       description: basicInfo.description,
       date: date,
       link: basicInfo.link,
@@ -308,8 +311,8 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               {/* Main Input Card */}
               <ServiceDateSelector
                 teamId={teamId}
-                tags={tags}
-                onTagsChange={setTags}
+                serviceTagIds={serviceTagIds}
+                onServiceTagIdsChange={setServiceTagIds}
                 date={date}
                 onDateChange={(d) => d && setDate(d)}
               />
@@ -319,7 +322,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                 label="Linked Serving Schedule"
                 items={availableServingSchedules.map(sch => ({
                   id: sch.id,
-                  title: sch.title || tags[0] || "Untitled Service",
+                  title: sch.title || "Untitled Service",
                   description: sch.date
                 }))}
                 selectedId={linkedServingId}
@@ -429,7 +432,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
         <Button
           className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
           onClick={step === totalSteps - 1 ? (mode === FormMode.CREATE ? handleCreate : handleEdit) : nextStep}
-          disabled={isLoading || (step === 0 && (tags.length === 0 || isDuplicate))}
+          disabled={isLoading || (step === 0 && (serviceTagIds.length === 0 || isDuplicate))}
         >
           {isLoading ? (
             "Saving..."

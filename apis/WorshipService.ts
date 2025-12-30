@@ -4,6 +4,7 @@ import { Timestamp } from "@firebase/firestore";
 import { Worship } from "@/models/worship";
 import { WorshipInput } from "@/components/constants/types";
 import { firestore } from "@/firebase";
+import LinkingService from "./LinkingService";
 
 class WorshipService extends BaseService {
   constructor() {
@@ -55,7 +56,7 @@ class WorshipService extends BaseService {
       title: worshipInput?.title,
       description: worshipInput?.description,
       link: worshipInput?.link,
-      tags: worshipInput?.tags || [],
+      service_tags: worshipInput?.service_tags || [],
       songs: worshipInput?.worshipSongHeaders,
       beginning_song: worshipInput.beginningSong,
       ending_song: worshipInput.endingSong,
@@ -67,9 +68,14 @@ class WorshipService extends BaseService {
         id: userId,
         time: Timestamp.fromDate(new Date())
       },
-      worship_date: Timestamp.fromDate(worshipInput.date)
+      worship_date: Timestamp.fromDate(worshipInput.date),
+      serving_schedule_id: worshipInput.serving_schedule_id
     }
-    return await this.create(newWorship);
+    const worshipId = await this.create(newWorship);
+    if (worshipId && worshipInput.serving_schedule_id) {
+      await LinkingService.linkWorshipAndServing(teamId, worshipId, worshipInput.serving_schedule_id);
+    }
+    return worshipId;
   }
 
   async updateWorship(userId: string, worshipId: string, worshipInput: WorshipInput) {
@@ -77,7 +83,7 @@ class WorshipService extends BaseService {
       title: worshipInput?.title,
       description: worshipInput?.description,
       link: worshipInput?.link,
-      tags: worshipInput?.tags || [],
+      service_tags: worshipInput?.service_tags || [],
       songs: worshipInput?.worshipSongHeaders,
       beginning_song: worshipInput.beginningSong,
       ending_song: worshipInput.endingSong,
@@ -92,6 +98,10 @@ class WorshipService extends BaseService {
 
   async deleteWorship(worshipId: string) {
     try {
+      const worship = (await this.getById(worshipId)) as Worship;
+      if (worship && worship.team_id) {
+        await LinkingService.cleanupReferencesForWorshipDeletion(worship.team_id, worshipId);
+      }
       await this.delete(worshipId);
       return true;
     }

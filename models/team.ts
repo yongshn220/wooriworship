@@ -9,6 +9,11 @@ export interface Team {
   admins: Array<string>
   users: Array<string>
   option: TeamOption
+  service_tags: Array<{
+    id: string
+    name: string
+    order: number
+  }>
 }
 
 export interface TeamOption {

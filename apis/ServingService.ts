@@ -2,6 +2,7 @@ import BaseService from "./BaseService";
 import { ServingRole, ServingSchedule } from "@/models/serving";
 import { firestore } from "@/firebase";
 import { arrayRemove, arrayUnion } from "@firebase/firestore";
+import LinkingService from "./LinkingService";
 
 class ServingService extends BaseService {
     private static instance: ServingService;
@@ -174,7 +175,7 @@ class ServingService extends BaseService {
                 .collection("teams")
                 .doc(teamId)
                 .collection("serving_schedules")
-                .where("tags", "array-contains", tag)
+                .where("service_tags", "array-contains", tag)
                 .orderBy("date", "desc")
                 .limit(limit)
                 .get();
@@ -224,6 +225,9 @@ class ServingService extends BaseService {
         const ref = firestore.collection("teams").doc(teamId).collection("serving_schedules").doc();
         const newSchedule = { ...schedule, id: ref.id };
         await ref.set(newSchedule);
+        if (schedule.worship_id) {
+            await LinkingService.linkWorshipAndServing(teamId, schedule.worship_id, newSchedule.id);
+        }
         return newSchedule;
     }
 
@@ -237,6 +241,7 @@ class ServingService extends BaseService {
     }
 
     async deleteSchedule(teamId: string, scheduleId: string): Promise<void> {
+        await LinkingService.cleanupReferencesForServingDeletion(teamId, scheduleId);
         await firestore
             .collection("teams")
             .doc(teamId)

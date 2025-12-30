@@ -29,7 +29,8 @@ class TeamService extends BaseService {
             selected_music_sheet_ids: []
           }
         }
-      }
+      },
+      service_tags: []
     }
     const teamId = await this.create(team);
     if (teamId) {
@@ -56,6 +57,29 @@ class TeamService extends BaseService {
 
   async addAdmin(teamId: string, userId: string) {
     return await this.update(teamId, { admins: arrayUnion(userId) });
+  }
+
+  async updateServiceTags(teamId: string, tags: Array<{ id: string, name: string, order: number }>) {
+    return await this.update(teamId, { service_tags: tags });
+  }
+
+  async addServiceTag(teamId: string, tagName: string) {
+    const team = (await this.getById(teamId)) as Team;
+    if (!team) return null;
+
+    const existingTag = team.service_tags?.find((t: any) => t.name === tagName);
+    if (existingTag) return existingTag.id;
+
+    const newTag = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: tagName,
+      order: (team.service_tags?.length || 0)
+    };
+
+    await this.update(teamId, {
+      service_tags: [...(team.service_tags || []), newTag]
+    });
+    return newTag.id;
   }
 
   async removeAdmin(teamId: string, userId: string) {
