@@ -32,6 +32,7 @@ interface TagSelectorProps {
     placeholder?: string;
     single?: boolean;
     mode?: "song" | "service";
+    refreshTrigger?: number;
 }
 
 export function TagSelector({
@@ -41,6 +42,7 @@ export function TagSelector({
     placeholder = "Select tags...",
     single = false,
     mode = "song",
+    refreshTrigger = 0,
 }: TagSelectorProps) {
     const [open, setOpen] = React.useState(false);
     const [inputValue, setInputValue] = React.useState("");
@@ -70,7 +72,7 @@ export function TagSelector({
         if (teamId) {
             fetchTags();
         }
-    }, [teamId]);
+    }, [teamId, refreshTrigger]);
 
     const handleUnselect = (tag: string) => {
         onTagsChange(selectedTags.filter((t) => t !== tag));

@@ -32,6 +32,7 @@ export function ServiceDateSelector({
     const [internalMonth, setInternalMonth] = React.useState<Date>(date || new Date());
     const currentMonth = calendarMonth || internalMonth;
     const setCurrentMonth = onCalendarMonthChange || setInternalMonth;
+    const [tagRefreshTrigger, setTagRefreshTrigger] = React.useState(0);
 
     return (
         <div className="space-y-6">
@@ -46,6 +47,7 @@ export function ServiceDateSelector({
                         placeholder="Select service (e.g. 주일예배, 금요예배...)"
                         single={true}
                         mode="service"
+                        refreshTrigger={tagRefreshTrigger}
                     />
                 </div>
 
@@ -78,6 +80,7 @@ export function ServiceDateSelector({
                                 // Auto-create tag if it doesn't exist and get ID
                                 const id = await TeamService.addServiceTag(teamId, option.title);
                                 if (id) {
+                                    setTagRefreshTrigger(prev => prev + 1); // Trigger refresh
                                     onServiceTagIdsChange([id]);
                                 }
                             }}
