@@ -19,12 +19,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from "@/components/ui/dialog";
+import { ModernDialog } from "@/components/ui/modern-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -300,53 +295,47 @@ export function TagSelector({
                 }}
             />
 
-            <Dialog open={tagToRename.open} onOpenChange={(open) => setTagToRename(prev => ({ ...prev, open }))}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Rename Tag</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Tag Name</Label>
-                            <Input
-                                id="name"
-                                value={newName}
-                                onChange={(e) => setNewName(e.target.value)}
-                                placeholder="Enter new tag name"
-                            />
-                        </div>
+            <ModernDialog
+                open={tagToRename.open}
+                onOpenChange={(open) => setTagToRename(prev => ({ ...prev, open }))}
+                title="Rename Tag"
+                icon={<Pencil className="w-6 h-6 fill-primary/20 text-primary" />}
+                actionText="Save Changes"
+                onAction={async () => {
+                    if (!newName.trim() || newName === tagToRename.name) {
+                        setTagToRename(prev => ({ ...prev, open: false }));
+                        return;
+                    }
+                    try {
+                        const team = await TeamService.getById(teamId);
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const currentTags = (team as any)?.service_tags || [];
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const updatedTags = currentTags.map((t: any) =>
+                            t.id === tagToRename.id ? { ...t, name: newName.trim() } : t
+                        );
+                        await TeamService.updateServiceTags(teamId, updatedTags);
+                        setAvailableTags(updatedTags);
+                        setTagToRename(prev => ({ ...prev, open: false }));
+                    } catch (err) {
+                        console.error("Failed to rename tag", err);
+                    }
+                }}
+            >
+                <div className="space-y-4 py-2">
+                    <div className="space-y-2">
+                        <Label htmlFor="name" className="text-sm font-semibold text-gray-700">Tag Name</Label>
+                        <Input
+                            id="name"
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                            placeholder="Enter new tag name"
+                            className="bg-gray-50 border-gray-200 focus:bg-white transition-all h-11"
+                        />
                     </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setTagToRename(prev => ({ ...prev, open: false }))}>
-                            Cancel
-                        </Button>
-                        <Button
-                            onClick={async () => {
-                                if (!newName.trim() || newName === tagToRename.name) {
-                                    setTagToRename(prev => ({ ...prev, open: false }));
-                                    return;
-                                }
-                                try {
-                                    const team = await TeamService.getById(teamId);
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    const currentTags = (team as any)?.service_tags || [];
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    const updatedTags = currentTags.map((t: any) =>
-                                        t.id === tagToRename.id ? { ...t, name: newName.trim() } : t
-                                    );
-                                    await TeamService.updateServiceTags(teamId, updatedTags);
-                                    setAvailableTags(updatedTags);
-                                    setTagToRename(prev => ({ ...prev, open: false }));
-                                } catch (err) {
-                                    console.error("Failed to rename tag", err);
-                                }
-                            }}
-                        >
-                            Save Changes
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                </div>
+            </ModernDialog>
         </div>
+        </div >
     );
 }
