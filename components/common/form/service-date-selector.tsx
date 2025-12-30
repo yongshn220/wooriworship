@@ -7,8 +7,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { TagSelector } from "@/components/common/tag-selector";
 import { FormSectionCard } from "@/components/common/form/full-screen-form";
 import TeamService from "@/apis/TeamService";
-import { useSetRecoilState } from "recoil";
-import { teamUpdaterAtom } from "@/global-states/teamState";
 
 interface ServiceDateSelectorProps {
     teamId: string;
@@ -29,7 +27,6 @@ export function ServiceDateSelector({
     calendarMonth,
     onCalendarMonthChange,
 }: ServiceDateSelectorProps) {
-    const setTeamUpdater = useSetRecoilState(teamUpdaterAtom);
 
     // Internal state for calendar month if not provided
     const [internalMonth, setInternalMonth] = React.useState<Date>(date || new Date());
@@ -80,7 +77,6 @@ export function ServiceDateSelector({
                                 setCurrentMonth(option.date);
                                 // Auto-create tag if it doesn't exist and get ID
                                 const id = await TeamService.addServiceTag(teamId, option.title);
-                                setTeamUpdater(prev => prev + 1); // Trigger Recoil update
                                 if (id) {
                                     onServiceTagIdsChange([id]);
                                 }
