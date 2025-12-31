@@ -143,8 +143,8 @@ export function ServingForm(props: ServingFormProps) {
 
                                 {isDuplicate && duplicateId && (
                                     <motion.div
-                                        initial={{ opacity: 0, height: 0 }}
-                                        animate={{ opacity: 1, height: "auto" }}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
                                         className="px-4 py-3 rounded-2xl bg-orange-50/80 border border-orange-100 flex items-center justify-between gap-3"
                                     >
                                         <div className="flex items-center gap-3 overflow-hidden">
@@ -533,7 +533,7 @@ export function ServingForm(props: ServingFormProps) {
                         </Button>
                     </div>
                     <Button
-                        className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
+                        className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:opacity-100 disabled:shadow-none"
                         onClick={step === totalSteps - 1 ? handleSubmit : nextStep}
                         disabled={isLoading || (step === 0 && (!selectedDate || isDuplicate))}
                     >
