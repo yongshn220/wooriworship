@@ -62,7 +62,6 @@ export function ServiceDateSelector({
             const now = new Date();
             const stats = await ServingService.getTagStats(teamId);
             const hasStats = Object.keys(stats).length > 0;
-            console.log("SmartQuickSelect: Stats loaded", stats);
 
             let options: { id: string | null, title: string, date: Date, score: number }[] = [];
 
