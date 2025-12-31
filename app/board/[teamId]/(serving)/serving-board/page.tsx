@@ -69,7 +69,10 @@ export default function ServingPage() {
             }
         });
 
-        // History should probably be distinct descending (newest past first)
+        // Upcoming: Date ASC
+        upcomingList.sort((a, b) => a.date.localeCompare(b.date));
+
+        // History: Date DESC (newest past first)
         historyList.sort((a, b) => b.date.localeCompare(a.date));
 
         return { upcoming: upcomingList, history: historyList };
@@ -126,7 +129,7 @@ export default function ServingPage() {
                                 schedule={schedule}
                                 teamId={teamId}
                                 currentUserUid={currentUserUid}
-                                defaultExpanded={false}
+                                defaultExpanded={activeTab === "upcoming"}
                                 onPreviewWorship={(worshipId) => setPreviewWorshipId(worshipId)}
                             />
                         ))}

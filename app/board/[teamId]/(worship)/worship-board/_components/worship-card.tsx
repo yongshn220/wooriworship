@@ -17,6 +17,7 @@ import {
   Star,
   User
 } from "lucide-react";
+import { highlightText } from "@/lib/string-utils";
 
 import {
   Popover,
@@ -52,49 +53,32 @@ import { auth } from "@/firebase";
 import { ServingSchedule } from "@/models/serving";
 import { MyServingIndicator } from "./my-serving-indicator";
 
+import { useCardExpansion } from "@/hooks/use-card-expansion";
+
 interface Props {
   worshipId: string;
   isFirst?: boolean;
+  defaultExpanded?: boolean;
 }
 
-// Helper to normalize text for search
-function normalizeText(text: string) {
-  return text?.replace(/[^a-zA-Z0-9가-힣]/g, '').toLowerCase() || "";
-}
+// Helper to highlight text has been moved to lib/string-utils.ts
 
-// Helper to highlight text
-function highlightText(text: string, highlight: string) {
-  if (!text || text === "") return "";
-  if (!highlight) return text;
-  const normalizedText = normalizeText(text);
-  const normalizedHighlight = normalizeText(highlight);
-
-  if (normalizedText.includes(normalizedHighlight)) {
-    return <span className="bg-yellow-200 rounded px-0.5">{text}</span>;
-  }
-  return text;
-}
-
-export function WorshipCard({ worshipId, isFirst }: Props) {
+export function WorshipCard({ worshipId, isFirst, defaultExpanded = false }: Props) {
   const router = useRouter();
   const teamId = useRecoilValue(currentTeamIdAtom);
-  const searchParams = useSearchParams();
   const cardRef = useRef<HTMLDivElement>(null);
 
   const worship = useRecoilValue(worshipAtom(worshipId));
 
-  const [isExpanded, setIsExpanded] = useState(() => {
-    if (searchParams.get("expanded") === worshipId) return true;
-    if (isFirst && worship && !isTimestampPast(worship.worship_date)) return true;
-    return false;
-  });
+  const { isExpanded, setIsExpanded, toggleExpand } = useCardExpansion(worshipId, defaultExpanded);
+
   const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
 
   // Auto-scroll to this card if it's the expanded one from URL
+  const searchParams = useSearchParams();
   useEffect(() => {
     if (searchParams.get("expanded") === worshipId) {
-      // Small delay to ensure layout is ready
       setTimeout(() => {
         cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 300);
@@ -116,6 +100,10 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
   const normalizedSearchInput = useMemo(() => normalizeText(searchInput), [searchInput]);
   const normalizedWorshipTitle = useMemo(() => normalizeText(worship?.title), [worship?.title]);
 
+  function normalizeText(text: string | null | undefined) {
+    return text?.replace(/[^a-zA-Z0-9가-힣]/g, '').toLowerCase() || "";
+  }
+
   const shouldRenderCard = useMemo(() => {
     if (!normalizedSearchInput) return true;
     if (normalizedWorshipTitle.includes(normalizedSearchInput)) return true;
@@ -131,7 +119,7 @@ export function WorshipCard({ worshipId, isFirst }: Props) {
   // Handlers
   const handleToggleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsExpanded(!isExpanded);
+    toggleExpand();
   };
 
   const handleStartWorship = (e: React.MouseEvent) => {
