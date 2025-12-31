@@ -13,6 +13,8 @@ interface UseServiceDuplicateCheckProps<T> {
     itemDateFormatter?: (date: Date) => string; // Optional custom date formatter
 }
 
+const defaultDateFormatter = (d: Date) => format(d, 'yyyy-MM-dd');
+
 export function useServiceDuplicateCheck<T extends { id: string; service_tags?: string[] }>({
     teamId,
     date,
@@ -21,9 +23,10 @@ export function useServiceDuplicateCheck<T extends { id: string; service_tags?: 
     mode,
     currentId,
     fetcher,
-    itemDateFormatter = (d) => format(d, 'yyyy-MM-dd')
+    itemDateFormatter = defaultDateFormatter
 }: UseServiceDuplicateCheckProps<T>) {
     const [isDuplicate, setIsDuplicate] = useState(false);
+    const [duplicateId, setDuplicateId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
 
@@ -36,14 +39,18 @@ export function useServiceDuplicateCheck<T extends { id: string; service_tags?: 
                 return;
             }
 
+            // Prevent check if we are already in duplicate state and inputs haven't changed?
+            // Actually, useEffect handles inputs.
+            // But we should verify if the "duplicate" found is strictly not the current one.
+
+            // Optimization: If mode is CREATE and we just submitted, do we need to check? 
+            // We can't know submission state here easily. 
+            // The unstable dependency fix (itemDateFormatter) should prevent re-runs during submission re-renders.
+
             setIsLoading(true);
             try {
                 const dateStr = itemDateFormatter(date);
 
-                // Fetch existing items for the date
-                // Note: fetcher signature might vary slightly between services, so we might need to adapt.
-                // But assumed standard is (teamId, dateStr, dateStr) or similar.
-                // If fetcher takes single date, we pass same for start/end or just start.
                 const existingItems = await fetcher(teamId, dateStr, dateStr);
 
                 const duplicate = existingItems.find(item =>
@@ -53,9 +60,11 @@ export function useServiceDuplicateCheck<T extends { id: string; service_tags?: 
 
                 const isDup = !!duplicate;
                 setIsDuplicate(isDup);
+                setDuplicateId(duplicate ? duplicate.id : null);
 
                 if (isDup) {
-                    setErrorMessage(`"${dateStr} ${serviceTagIds[0]}" already exists.`);
+                    const tagName = serviceTagNames?.[0] || serviceTagIds[0];
+                    setErrorMessage(`"${dateStr} ${tagName}" already exists.`);
                 } else {
                     setErrorMessage(undefined);
                 }
@@ -68,7 +77,6 @@ export function useServiceDuplicateCheck<T extends { id: string; service_tags?: 
         };
 
         checkDuplicate();
-    }, [date, serviceTagIds, teamId, mode, currentId, fetcher, itemDateFormatter]);
-
-    return { isDuplicate, isLoading, errorMessage };
+    }, [date, serviceTagIds, teamId, mode, currentId, fetcher, itemDateFormatter, serviceTagNames]);
+    return { isDuplicate, duplicateId: isDuplicate ? duplicateId : null, isLoading, errorMessage };
 }

@@ -229,10 +229,12 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
     }, [selectedDate, teamId, mode, initialData, serviceTagIds, linkedWorshipId]);
 
     // Duplicate Check
-    const { isDuplicate, errorMessage: duplicateErrorMessage } = useServiceDuplicateCheck({
+    const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
+    const { isDuplicate, duplicateId, errorMessage: duplicateErrorMessage } = useServiceDuplicateCheck({
         teamId,
         date: selectedDate,
         serviceTagIds,
+        serviceTagNames,
         mode,
         currentId: initialData?.id,
         fetcher: ServingService.getSchedules
@@ -497,7 +499,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         newTemplateName, tempTemplateName, createEmptyMode,
         standardGroups, customMemberNames, newGroupInput, deleteConfirm,
         roles, team, teamMembers, historySchedules,
-        isDuplicate, duplicateErrorMessage,
+        isDuplicate, duplicateId, duplicateErrorMessage,
 
         // Setters
         setStep, setDirection, setSelectedDate, setCurrentMonth, setServiceTagIds, setItems,
