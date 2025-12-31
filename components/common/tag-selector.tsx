@@ -214,7 +214,10 @@ export function TagSelector({
                                         key={tag.id}
                                         value={tag.name}
                                         onSelect={() => handleSelect(tag)}
-                                        className="flex items-center justify-between group"
+                                        className={cn(
+                                            "flex items-center justify-between group",
+                                            mode === "service" && "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground cursor-pointer"
+                                        )}
                                     >
                                         <div className="flex items-center">
                                             <Check

@@ -10,16 +10,7 @@ import { useState } from "react";
 import { noticeUpdaterAtom, noticeIdsUpdaterAtom } from "@/global-states/notice-state";
 import { NoticeService } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
 
@@ -31,6 +22,7 @@ interface Props {
 export function NoticeHeaderMenu({ noticeId, createdById }: Props) {
   const [user] = useAuthState(auth as any);
   const teamId = useRecoilValue(currentTeamIdAtom)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const noticeUpdater = useSetRecoilState(noticeUpdaterAtom)
   const setNoticeIdsUpdater = useSetRecoilState(noticeIdsUpdaterAtom)
   const router = useRouter()
@@ -47,6 +39,7 @@ export function NoticeHeaderMenu({ noticeId, createdById }: Props) {
       });
       setNoticeIdsUpdater((prev) => prev + 1);
     } catch (error) {
+      console.error(error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -81,20 +74,13 @@ export function NoticeHeaderMenu({ noticeId, createdById }: Props) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the notice and remove associated files from our servers.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        setOpen={setIsDeleteDialogOpen}
+        title="Delete Notice?"
+        description="This action cannot be undone. This will permanently delete the notice and remove associated files from our servers."
+        onDeleteHandler={handleDelete}
+      />
     </>
   )
 }

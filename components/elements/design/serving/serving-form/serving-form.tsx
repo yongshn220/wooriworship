@@ -383,11 +383,16 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         try {
             const dateString = format(selectedDate, "yyyy-MM-dd");
 
+            // Resolve tag names for title
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
+            const title = serviceTagNames.length > 0 ? serviceTagNames.join(" ") : "Worship Service";
+
             const payload: Omit<ServingSchedule, "id"> = {
                 teamId,
                 date: dateString,
                 service_tags: serviceTagIds,
-                title: serviceTagIds.length > 0 ? serviceTagIds.join(" ") : "Worship Service", // Fallback title
+                title: title,
                 items: items,
                 worship_id: linkedWorshipId || null
             };
@@ -413,7 +418,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                     ...initialData,
                     date: dateString,
                     service_tags: serviceTagIds,
-                    title: serviceTagNames.join(" "),
+                    title: title,
                     items: items,
                     templateId: selectedTemplateId || null,
                     worship_id: linkedWorshipId || null,
@@ -629,7 +634,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
         <>
             <FullScreenForm>
                 <FullScreenFormHeader
-                    steps={["When", "Who", "What", "Review"]}
+                    steps={["Date", "Team", "Order", "Review"]}
                     currentStep={step}
                     onStepChange={isDuplicate ? undefined : goToStep}
                     onClose={() => router.back()}
@@ -652,7 +657,7 @@ export function ServingForm({ teamId, mode = FormMode.CREATE, initialData }: Pro
                             >
                                 <div className="space-y-2 text-center">
                                     <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 1</Label>
-                                    <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Date & Title</h2>
+                                    <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Date & Service</h2>
                                 </div>
 
                                 {/* Service & Date Selection */}
