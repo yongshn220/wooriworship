@@ -69,7 +69,7 @@ class WorshipService extends BaseService {
         time: Timestamp.fromDate(new Date())
       },
       worship_date: Timestamp.fromDate(worshipInput.date),
-      serving_schedule_id: worshipInput.serving_schedule_id
+      serving_schedule_id: worshipInput.serving_schedule_id || null
     }
     const worshipId = await this.create(newWorship);
     if (worshipId && worshipInput.serving_schedule_id) {

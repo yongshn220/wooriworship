@@ -71,74 +71,91 @@ export function ServiceDateSelector({
                 const scoredTags = currentServiceTags.map(tag => {
                     const tagStat = stats[tag.id];
                     if (!tagStat) {
-                        return { tag, score: 0, date: now };
+                        return { tag, score: 0, maxWeekday: 0 };
                     }
 
                     // Score calculation: (0.4 * total_count) + (0.6 * recency_weight)
-                    // Simple implementation: prioritize tags used recently (within 7 days) significantly
                     const lastUsed = new Date(tagStat.last_used_at);
                     const daysDiff = (now.getTime() - lastUsed.getTime()) / (1000 * 3600 * 24);
                     const recencyScore = daysDiff <= 7 ? 50 : (daysDiff <= 30 ? 20 : 0);
 
                     const score = (tagStat.count * 1) + recencyScore;
 
-                    // Determine primary weekday
-                    let maxWeekday = 0; // Sunday default
+                    // Fallback weekday from stats (if no recent history fetched later)
+                    let maxWeekday = 0;
                     let maxCount = -1;
-                    let totalWeekdayCount = 0;
-
                     Object.entries(tagStat.weekdays || {}).forEach(([day, count]) => {
-                        totalWeekdayCount += count;
                         if (count > maxCount) {
                             maxCount = count;
                             maxWeekday = parseInt(day);
                         }
                     });
 
-                    // Multi-day detection (Range Tag): e.g., Dawn Prayer used Mon-Fri
-                    // If max usage day is less than 50% of total usage, consider as "next weekday" type
-                    const isRangeTag = (maxCount / totalWeekdayCount) < 0.5 && totalWeekdayCount > 5;
-
-                    let predictedDate: Date;
-
-                    if (isRangeTag) {
-                        // For likely "daily/range" services, find next available weekday (Mon-Fri)
-                        // Skipping today if already passed? For now just next valid weekday.
-                        let d = addDays(now, 1);
-                        // Skip Sat(6)/Sun(0)
-                        while (d.getDay() === 0 || d.getDay() === 6) {
-                            d = addDays(d, 1);
-                        }
-                        predictedDate = d;
-                    } else {
-                        // Fixed weekday prediction
-                        const targetDay = maxWeekday;
-                        const currentDay = now.getDay();
-
-                        let daysUntil = targetDay - currentDay;
-                        if (daysUntil <= 0) {
-                            // If target is today or past, look for next week OR today if it fits
-                            // Logic: if today is target day, propose TODAY.
-                            if (daysUntil === 0) daysUntil = 0;
-                            else daysUntil += 7;
-                        }
-                        predictedDate = addDays(now, daysUntil);
-                    }
-
-                    return { tag, score, date: predictedDate };
+                    return { tag, score, maxWeekday };
                 });
 
-                // Filter out score 0 and take top 3
-                options = scoredTags
+                // Take top 3 candidates
+                const topCandidates = scoredTags
                     .filter(item => item.score > 0)
                     .sort((a, b) => b.score - a.score)
-                    .slice(0, 3)
-                    .map(item => ({
+                    .slice(0, 3);
+
+                // Fetch real recent history for these candidates to get accurate weekday trend
+                // This overrides historical aggregate data which might be polluted or outdated
+                const resolvedOptions = await Promise.all(topCandidates.map(async (item) => {
+                    let targetWeekday = item.maxWeekday;
+
+                    try {
+                        // Fetch last 5 usages
+                        const recent = await ServingService.getRecentSchedulesByTag(teamId, item.tag.id, 5);
+                        if (recent.length > 0) {
+                            // Calculate mode weekday from recent schedules
+                            const dayCounts: Record<number, number> = {};
+                            recent.forEach(s => {
+                                const [y, m, d] = s.date.split('-').map(Number); // Safe local parsing
+                                const day = new Date(y, m - 1, d).getDay();
+                                dayCounts[day] = (dayCounts[day] || 0) + 1;
+                            });
+
+                            let bestDay = -1;
+                            let bestCount = -1;
+                            Object.entries(dayCounts).forEach(([day, count]) => {
+                                if (count > bestCount) {
+                                    bestCount = count;
+                                    bestDay = parseInt(day);
+                                }
+                            });
+
+                            if (bestDay !== -1) {
+                                targetWeekday = bestDay;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn("Failed to fetch recent history for tag", item.tag.name);
+                    }
+
+                    // Calculate predicted date based on targetWeekday
+                    // Logic: Find next occurrence of targetWeekday
+                    const currentDay = now.getDay();
+                    let daysUntil = targetWeekday - currentDay;
+
+                    // If target is today, we suggest today unless it's late? 
+                    // For simplicity, if today is the day, suggest today.
+                    if (daysUntil < 0) {
+                        daysUntil += 7;
+                    }
+
+                    const predictedDate = addDays(now, daysUntil);
+
+                    return {
                         id: item.tag.id,
                         title: item.tag.name,
-                        date: item.date,
+                        date: predictedDate,
                         score: item.score
-                    }));
+                    };
+                }));
+
+                options = resolvedOptions;
             }
 
             // 2. Fallback Mode (Heuristic Rule) - Fill empty slots
