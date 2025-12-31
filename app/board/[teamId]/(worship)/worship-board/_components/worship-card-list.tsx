@@ -35,12 +35,12 @@ export function WorshipCardList({ teamId }: Props) {
   const filteredWorshipList = useMemo(() => {
     // 1. Search Filter (Global)
     if (searchInput) {
-      return worshipList; // Search is handled within WorshipCard individually, or we can filter here.
-      // NOTE: The current implementation relies on WorshipCard to hide itself if it doesn't match search.
-      // However, for infinite scroll to work properly with search, we ideally should filter HERE.
-      // But keeping existing behavior: we pass all to render, and WorshipCard creates the "hiding" effect?
-      // Actually, standard behavior is filtering ID list.
-      // Let's filter IDs here to be safe and efficient.
+      // Sort by date DESC for search
+      return [...worshipList].sort((a, b) => {
+        const dateA = a.worship_date.toDate().getTime();
+        const dateB = b.worship_date.toDate().getTime();
+        return dateB - dateA;
+      });
     }
 
     // 2. Tab Filter
@@ -48,7 +48,7 @@ export function WorshipCardList({ teamId }: Props) {
     // Reset time part to ensure "Today" includes everything from today 00:00
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    return worshipList.filter(worship => {
+    const filtered = worshipList.filter(worship => {
       const worshipDate = worship.worship_date.toDate();
       const isPast = worshipDate < today; // strictly past. Today is "upcoming/active".
 
@@ -56,6 +56,18 @@ export function WorshipCardList({ teamId }: Props) {
         return !isPast;
       } else {
         return isPast;
+      }
+    });
+
+    // 3. Sorting
+    return filtered.sort((a, b) => {
+      const dateA = a.worship_date.toDate().getTime();
+      const dateB = b.worship_date.toDate().getTime();
+
+      if (activeTab === "upcoming") {
+        return dateA - dateB; // ASC for upcoming
+      } else {
+        return dateB - dateA; // DESC for history
       }
     });
 
@@ -182,7 +194,11 @@ export function WorshipCardList({ teamId }: Props) {
                 {
                   visibleWorshipIds.map((worshipId: string, index: number) => (
                     <Suspense key={worshipId} fallback={<WorshipCardSkeleton />}>
-                      <WorshipCard worshipId={worshipId} isFirst={index === 0} />
+                      <WorshipCard
+                        worshipId={worshipId}
+                        isFirst={index === 0}
+                        defaultExpanded={activeTab === 'upcoming'}
+                      />
                     </Suspense>
                   ))
                 }

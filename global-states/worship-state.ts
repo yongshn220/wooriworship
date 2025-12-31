@@ -125,6 +125,7 @@ export const worshipSongListAtom = (globalForRecoil.recoilAtoms['worshipSongList
         return songList
       }
       catch (e) {
+        if (e instanceof Promise) throw e;
         console.error(e)
         return []
       }

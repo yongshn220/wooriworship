@@ -29,8 +29,12 @@ interface Props {
 }
 
 // Default expanded to true as requested
+import { useCardExpansion } from "@/hooks/use-card-expansion";
+
+// ...
+
 export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded = true, onPreviewWorship }: Props) {
-    const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+    const { isExpanded, setIsExpanded, toggleExpand } = useCardExpansion(schedule.id, defaultExpanded);
     const roles = useRecoilValue(fetchServingRolesSelector(teamId));
 
     // Gather all member IDs involved in this schedule for batch fetching
@@ -59,7 +63,9 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
     const isPast = scheduleDate < today;
 
     // Toggle Handler
-    const toggleExpand = () => setIsExpanded(!isExpanded);
+    // const toggleExpand = () => setIsExpanded(!isExpanded); // Replaced by hook
+
+    // ...
 
     const handleHeaderClick = (e: React.MouseEvent) => {
         e.stopPropagation();
