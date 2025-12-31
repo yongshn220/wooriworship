@@ -224,7 +224,9 @@ export function ServiceDateSelector({
                         return (
                             <button
                                 key={option.title + option.date.toString()}
-                                onClick={async () => {
+                                onClick={async (e) => {
+                                    // Blur to prevent focus holding (which seems to block calendar nav in some cases)
+                                    e.currentTarget.blur();
                                     onDateChange(option.date);
                                     setCurrentMonth(option.date);
 
