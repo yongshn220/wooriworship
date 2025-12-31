@@ -9,16 +9,7 @@ import { MoreHorizontal, SquarePen, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getPathEditPlan } from "@/components/util/helper/routes";
 import { useState } from "react";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { WorshipService } from "@/apis";
 import { useToast } from "@/components/ui/use-toast";
 import { useSetRecoilState } from "recoil";
@@ -97,22 +88,13 @@ export function WorshipHeaderMenu({ worshipId, createdById, teamId }: Props) {
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the worship plan and remove it from our servers.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white">
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <DeleteConfirmationDialog
+                isOpen={isDeleteDialogOpen}
+                setOpen={setIsDeleteDialogOpen}
+                title="Delete Worship Plan?"
+                description="This action cannot be undone. This will permanently delete the worship plan and remove it from our servers."
+                onDeleteHandler={handleDelete}
+            />
         </>
     );
 }

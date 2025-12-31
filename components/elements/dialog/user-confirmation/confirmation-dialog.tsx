@@ -1,50 +1,44 @@
-"use client"
-import {AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle,} from "@/components/ui/alert-dialog"
-import {Button} from "@/components/ui/button";
-import {useState} from "react";
-
+import { ModernDialog } from "@/components/ui/modern-dialog";
+import { AlertCircle } from "lucide-react";
+import { useState } from "react";
 
 interface Props {
   isOpen: boolean
-  setOpen: any
+  setOpen: (open: boolean) => void
   title: string
   description: string
-  onDeleteHandler: Function
-  callback?: Function
+  onDeleteHandler: () => Promise<void> | void
+  callback?: () => void
 }
-export function ConfirmationDialog({isOpen, setOpen, title, description, onDeleteHandler, callback}: Props) {
-  const [isDeleting, setIsDeleting] = useState(false)
 
-  function handleSubmit(e: any) {
-    setIsDeleting(true)
-    e.preventDefault()
+export function ConfirmationDialog({ isOpen, setOpen, title, description, onDeleteHandler, callback }: Props) {
+  const [isProcessing, setIsProcessing] = useState(false);
 
-    onDeleteHandler().then(() => {
-      setOpen(false)
-      setIsDeleting(false)
-      if (callback) {
-        callback()
-      }
-    })
-  }
+  const handleConfirm = async () => {
+    setIsProcessing(true);
+    try {
+      await onDeleteHandler();
+      setOpen(false);
+      if (callback) callback();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
-    <AlertDialog open={isOpen} onOpenChange={setOpen}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-red-500">{title}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {description}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <div className="flex-end gap-4 mt-2">
-          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-          <form onSubmit={handleSubmit}>
-            <Button type="submit">
-              {isDeleting? "Continuing..." : "Continue"}
-            </Button>
-          </form>
-        </div>
-      </AlertDialogContent>
-    </AlertDialog>
-  )
+    <ModernDialog
+      open={isOpen}
+      onOpenChange={setOpen}
+      title={title}
+      description={description}
+      icon={<AlertCircle className="w-6 h-6 fill-amber-100/50 text-amber-600" strokeWidth={2} />}
+      variant="primary"
+      actionText="Confirm"
+      cancelText="Cancel"
+      onAction={handleConfirm}
+      isLoading={isProcessing}
+    />
+  );
 }
