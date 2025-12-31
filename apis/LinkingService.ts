@@ -17,6 +17,11 @@ class LinkingService {
      * Updates both documents to reference each other.
      */
     async linkWorshipAndServing(teamId: string, worshipId: string, servingId: string): Promise<boolean> {
+        if (!teamId || !worshipId || !servingId) {
+            console.error("linkWorshipAndServing: Missing required parameters", { teamId, worshipId, servingId });
+            return false;
+        }
+
         const worshipRef = firestore.collection("worships").doc(worshipId);
         const servingRef = firestore.collection("teams").doc(teamId).collection("serving_schedules").doc(servingId);
 

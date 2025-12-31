@@ -401,7 +401,9 @@ class ServingService extends BaseService {
     async updateTagStats(teamId: string, tagIds: string[], dateString: string, mode: "add" | "remove"): Promise<void> {
         try {
             const statsRef = firestore.collection("teams").doc(teamId).collection("config").doc("tag_stats");
-            const date = new Date(dateString);
+            // Parse date string (YYYY-MM-DD) as local date to avoid UTC shifts
+            const [y, m, d] = dateString.split('-').map(Number);
+            const date = new Date(y, m - 1, d);
             const weekday = date.getDay().toString(); // 0-6
             const incrementValue = mode === "add" ? 1 : -1;
 
