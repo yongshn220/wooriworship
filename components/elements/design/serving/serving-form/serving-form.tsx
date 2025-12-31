@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { ArrowRight, ChevronLeft, Check, FileText, MoreHorizontal, Plus, Trash2, Save, Pencil, X } from "lucide-react";
+import { ArrowRight, ChevronLeft, Check, FileText, MoreHorizontal, Plus, Trash2, Save, Pencil, X, AlertCircle } from "lucide-react";
 import { AnimatePresence, motion, Reorder } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -36,6 +37,8 @@ import { ServingService } from "@/apis";
 export function ServingForm(props: ServingFormProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
+    const router = useRouter();
+
     const {
         // State
         step, direction, totalSteps,
@@ -47,7 +50,7 @@ export function ServingForm(props: ServingFormProps) {
         newTemplateName, tempTemplateName, createEmptyMode,
         standardGroups, customMemberNames, deleteConfirm,
         roles, team, teamMembers,
-        isDuplicate, duplicateErrorMessage,
+        isDuplicate, duplicateId, duplicateErrorMessage,
 
         // Setters
         setStep, setDirection, setSelectedDate, setCurrentMonth, setServiceTagIds, setItems,
@@ -138,6 +141,35 @@ export function ServingForm(props: ServingFormProps) {
                                     <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Date & Service</h2>
                                 </div>
 
+                                {isDuplicate && duplicateId && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: "auto" }}
+                                        className="px-4 py-3 rounded-2xl bg-orange-50/80 border border-orange-100 flex items-center justify-between gap-3"
+                                    >
+                                        <div className="flex items-center gap-3 overflow-hidden">
+                                            <div className="w-8 h-8 rounded-full bg-orange-100 flex-shrink-0 flex items-center justify-center">
+                                                <AlertCircle className="w-5 h-5 text-orange-500" />
+                                            </div>
+                                            <div className="flex flex-col min-w-0">
+                                                <h3 className="text-sm font-bold text-orange-900 truncate">Plan already exists.</h3>
+                                                <p className="text-xs text-orange-800/80 truncate">
+                                                    <span className="font-semibold text-orange-900">
+                                                        {serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id).join(", ")}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Button
+                                            size="sm"
+                                            className="h-8 px-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-bold text-xs shadow-sm flex-shrink-0"
+                                            onClick={() => router.push(`/board/${props.teamId}/edit-serving/${duplicateId}`)}
+                                        >
+                                            Edit <ArrowRight className="ml-1 w-3 h-3" />
+                                        </Button>
+                                    </motion.div>
+                                )}
+
                                 {/* Service & Date Selection */}
                                 <ServiceDateSelector
                                     teamId={props.teamId}
@@ -149,7 +181,7 @@ export function ServingForm(props: ServingFormProps) {
                                     onCalendarMonthChange={setCurrentMonth}
                                 />
 
-                                {/* Linked Worship Plan */}
+                                {/* Linked Worship Plan */}{/* ... keeping existing code flow ... */}
                                 <LinkedResourceCard
                                     label="Linked Worship Plan"
                                     items={availableWorships.map(plan => ({
@@ -469,7 +501,7 @@ export function ServingForm(props: ServingFormProps) {
 
                 {/* STICKY FOOTER - Absolute */}
                 <FullScreenFormFooter
-                    errorMessage={duplicateErrorMessage}
+                    errorMessage={isDuplicate ? undefined : duplicateErrorMessage}
                 >
                     <AnimatePresence>
                         {step === 2 && hasTemplateChanges && selectedTemplateId && (
