@@ -149,34 +149,59 @@ export function MemberSelector({
                     </p>
 
                     <div className="space-y-1">
-                        {/* Custom Saved Members (Not currently selected but available) */}
-                        {searchQuery === "" && customMemberNames
-                            .filter(name => !selectedMemberIds.includes(name) && !members.find(m => m.name === name))
-                            .map(name => (
-                                <div
-                                    key={name}
-                                    className="flex items-center justify-between p-4 rounded-2xl hover:bg-muted/50 transition-all cursor-pointer group"
-                                    onClick={() => onSelect(name)}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <Avatar className="h-10 w-10">
-                                            <AvatarFallback className="bg-muted/50 text-muted-foreground/60">
-                                                <User className="h-5 w-5" />
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <div>
-                                            <p className="font-bold text-lg text-foreground">{name}</p>
-                                            <p className="text-sm text-muted-foreground font-medium">Guest</p>
+                        {/* Unified Guest List (Custom + Manual) */}
+                        {(() => {
+                            // Combine custom names and manual entries, deduplicate
+                            const allGuestNames = Array.from(new Set([...customMemberNames, ...manualEntries]));
+                            // Filter out any that might conflict with official members (safety)
+                            const validGuestNames = allGuestNames.filter(name => !members.find(m => m.name === name));
+                            // Filter by search
+                            const filteredGuests = validGuestNames.filter(name =>
+                                name.toLowerCase().includes(searchQuery.toLowerCase())
+                            );
+
+                            return filteredGuests.map(name => {
+                                const isSelected = selectedMemberIds.includes(name);
+                                return (
+                                    <div
+                                        key={name}
+                                        className={cn(
+                                            "flex items-center justify-between p-4 rounded-2xl transition-all cursor-pointer group",
+                                            isSelected
+                                                ? "bg-primary/5 shadow-sm"
+                                                : "hover:bg-muted/50"
+                                        )}
+                                        onClick={() => onSelect(name)}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <Avatar className="h-10 w-10">
+                                                <AvatarFallback className="bg-muted/50 text-muted-foreground/60">
+                                                    <User className="h-5 w-5" />
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div>
+                                                <p className="font-bold text-lg text-foreground">{name}</p>
+                                                <p className="text-sm text-muted-foreground font-medium">Guest</p>
+                                            </div>
+                                        </div>
+                                        <div className={cn(
+                                            "h-6 w-6 rounded-full flex items-center justify-center transition-all",
+                                            isSelected
+                                                ? "bg-primary shadow-sm"
+                                                : "border-2 border-muted"
+                                        )}>
+                                            {isSelected && <Check className="h-3.5 w-3.5 text-primary-foreground stroke-[4px]" />}
                                         </div>
                                     </div>
-                                    <div className="h-6 w-6 rounded-full border-2 border-muted flex items-center justify-center">
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            });
+                        })()}
+
                         {/* Add as Member Button */}
                         {searchQuery &&
                             !members.find(m => m.name.toLowerCase() === searchQuery.toLowerCase()) &&
-                            !manualEntries.includes(searchQuery) && (
+                            !manualEntries.includes(searchQuery) &&
+                            !customMemberNames.includes(searchQuery) && (
                                 <button
                                     className="w-full flex items-center gap-3 p-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left mb-2"
                                     onClick={handleAddAsMember}
@@ -185,30 +210,6 @@ export function MemberSelector({
                                     <span className="font-bold text-primary truncate flex-1">Add &quot;{searchQuery}&quot;</span>
                                 </button>
                             )}
-
-                        {/* Manual Entries List */}
-                        {displayedManualEntries.map((name) => (
-                            <div
-                                key={name}
-                                className="flex items-center justify-between p-4 rounded-2xl bg-primary/5 shadow-sm cursor-pointer transition-all"
-                                onClick={() => onSelect(name)}
-                            >
-                                <div className="flex items-center gap-4">
-                                    <Avatar className="h-10 w-10">
-                                        <AvatarFallback className="bg-muted/50 text-muted-foreground/60">
-                                            <User className="h-5 w-5" />
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <p className="font-bold text-foreground text-lg">{name}</p>
-                                        <p className="text-sm text-muted-foreground font-medium">Guest</p>
-                                    </div>
-                                </div>
-                                <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center">
-                                    <Check className="h-3.5 w-3.5 text-primary-foreground stroke-[4px]" />
-                                </div>
-                            </div>
-                        ))}
 
                         {/* Team Members List */}
                         {filteredMembers.map((member) => {

@@ -223,7 +223,7 @@ export function ServiceDateSelector({
                         teamId={teamId}
                         selectedTags={serviceTagIds}
                         onTagsChange={onServiceTagIdsChange}
-                        placeholder="Select service (e.g. 주일예배, 금요예배...)"
+                        placeholder="Select Service"
                         single={true}
                         mode="service"
                         refreshTrigger={tagRefreshTrigger}
