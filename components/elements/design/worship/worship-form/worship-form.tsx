@@ -31,7 +31,7 @@ import { AddSongButton } from "@/components/elements/design/worship/worship-form
 import {
   AddWorshipSongDialogTrigger
 } from "@/components/elements/design/song/song-list/worship-form/add-worship-song-dialog-trigger";
-import { LinkIcon, CalendarIcon, Music, ArrowRight, ChevronLeft, Check } from "lucide-react";
+import { LinkIcon, CalendarIcon, Music, ArrowRight, ChevronLeft, Check, AlertCircle } from "lucide-react";
 import PushNotificationService from "@/apis/PushNotificationService";
 import { AnimatePresence, motion } from "framer-motion";
 import { TagSelector } from "@/components/common/tag-selector";
@@ -151,7 +151,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
 
   // Real-time Duplicate Check
   const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
-  const { isDuplicate, errorMessage: duplicateErrorMessage } = useServiceDuplicateCheck({
+  const { isDuplicate, duplicateId, errorMessage: duplicateErrorMessage } = useServiceDuplicateCheck({
     teamId,
     date,
     serviceTagIds,
@@ -307,6 +307,36 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                 <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 1</Label>
                 <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Date & Service</h2>
               </div>
+
+              {isDuplicate && duplicateId && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="px-4 py-3 rounded-2xl bg-orange-50/80 border border-orange-100 flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <div className="w-8 h-8 rounded-full bg-orange-100 flex-shrink-0 flex items-center justify-center">
+                      <AlertCircle className="w-5 h-5 text-orange-500" />
+                    </div>
+                    <div className="flex flex-col min-w-0 text-left">
+                      <h3 className="text-sm font-bold text-orange-900 truncate">Plan already exists.</h3>
+                      <p className="text-xs text-orange-800/80 truncate">
+                        <span className="mr-1">{format(date, "yyyy-MM-dd")}</span>
+                        <span className="font-semibold text-orange-900">
+                          {serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id).join(", ")}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="h-8 px-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-bold text-xs shadow-sm flex-shrink-0"
+                    onClick={() => router.replace(`/board/${teamId}/edit-worship/${duplicateId}`)}
+                  >
+                    Edit <ArrowRight className="ml-1 w-3 h-3" />
+                  </Button>
+                </motion.div>
+              )}
 
               {/* Main Input Card */}
               <ServiceDateSelector
