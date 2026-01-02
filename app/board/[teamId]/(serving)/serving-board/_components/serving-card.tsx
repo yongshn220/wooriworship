@@ -80,7 +80,7 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
     };
 
     return (
-    return (
+
         <BoardCard
             isExpanded={isExpanded}
             onClick={handleCardClick}
