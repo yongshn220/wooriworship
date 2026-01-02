@@ -1,21 +1,14 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-
+import { ErrorState } from "@/components/common/feedback/error-state";
 
 export default function NotFound() {
-
-  const router = useRouter()
-
-  useEffect(() => {
-    router.push("/")
-  }, [])
-
   return (
-    <div className="w-full h-full flex-center flex-col gap-4 bg-white">
-      <p className="text-2xl font-semibold">404 Not Found</p>
-      <p className="text-gray-500">The page you are looking for does not exist</p>
-    </div>
+    <ErrorState
+      title="Page Not Found"
+      description="Sorry, we couldn't find the page you're looking for. It might have been removed or the link might be broken."
+      image="not-found"
+      fullScreen={true}
+    />
   )
 }
