@@ -144,7 +144,7 @@ export function WorshipCard({ worshipId, isFirst, defaultExpanded = false }: Pro
     >
       <BoardCard
         isExpanded={isExpanded}
-        className={cn(isExpanded ? "ring-2 ring-primary" : "")}
+
         onClick={() => !isExpanded && setIsExpanded(true)}
         onCollapse={handleToggleExpand}
       >
