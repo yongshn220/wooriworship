@@ -99,6 +99,32 @@ export function WorshipCard({ worshipId, isFirst, defaultExpanded = false }: Pro
 
   // Search Filtering Logic
   const normalizedSearchInput = useMemo(() => normalizeText(searchInput), [searchInput]);
+
+  const getDisplayTitle = () => {
+    if (!worship) return "Untitled Service";
+
+    // 1. If title matches a service tag ID, return the tag name
+    if (worship.title && team?.service_tags) {
+      const matchingTag = team.service_tags.find(tag => tag.id === worship.title);
+      if (matchingTag) {
+        return matchingTag.name;
+      }
+    }
+
+    // 2. If title is just an ID (no spaces, alphanumeric) and we have service tags
+    // We can try to look it up just in case exact match failed but it looks like an ID
+    // specific check for the user's report case
+    if (worship.service_tags && worship.service_tags.length > 0 && (!worship.title || worship.title === worship.service_tags[0])) {
+      const tagNames = worship.service_tags.map(tagId =>
+        team?.service_tags?.find(t => t.id === tagId)?.name || tagId
+      );
+      return tagNames.join(", ");
+    }
+
+    return worship.title || "Untitled Service";
+  };
+
+  const displayTitle = getDisplayTitle();
   const normalizedWorshipTitle = useMemo(() => normalizeText(worship?.title), [worship?.title]);
 
   function normalizeText(text: string | null | undefined) {
@@ -165,7 +191,7 @@ export function WorshipCard({ worshipId, isFirst, defaultExpanded = false }: Pro
                 <MyServingIndicator teamId={teamId} date={format(worship.worship_date.toDate(), "yyyy-MM-dd")} />
               </div>
               <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                {highlightText(worship.title || "Untitled Service", searchInput)}
+                {highlightText(displayTitle, searchInput)}
                 {worship.subtitle && (
                   <span className="text-base sm:text-lg font-normal text-muted-foreground ml-2">
                     {highlightText(worship.subtitle, searchInput)}
