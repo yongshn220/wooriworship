@@ -30,7 +30,8 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { BoardCard } from "@/components/common/board/board-card";
+import { CardContent } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import {
   getDayPassedFromTimestampShorten,
@@ -141,12 +142,11 @@ export function WorshipCard({ worshipId, isFirst, defaultExpanded = false }: Pro
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card
-        className={cn(
-          "overflow-hidden transition-all duration-300 border shadow-sm hover:shadow-md cursor-pointer bg-card",
-          isExpanded ? "ring-2 ring-primary" : ""
-        )}
+      <BoardCard
+        isExpanded={isExpanded}
+        className={cn(isExpanded ? "ring-2 ring-primary" : "")}
         onClick={() => !isExpanded && setIsExpanded(true)}
+        onCollapse={handleToggleExpand}
       >
         <CardContent className="p-4 sm:p-6">
           {/* Header Section */}
@@ -339,7 +339,7 @@ export function WorshipCard({ worshipId, isFirst, defaultExpanded = false }: Pro
             )}
           </AnimatePresence>
         </CardContent>
-      </Card>
+      </BoardCard>
 
       {/* Song Detail Drawer */}
       {selectedSongId && (
