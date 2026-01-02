@@ -15,6 +15,7 @@ import { useServiceDuplicateCheck } from "@/components/common/hooks/use-service-
 import { ServingFormProps } from "../types";
 import { ServingItem, ServingSchedule, ServingAssignment } from "@/models/serving";
 import { getSuggestionsForTitle } from "../utils/serving-domain-logic";
+import { getServiceTitleFromTags } from "@/components/util/helper/helper-functions";
 
 export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialData }: ServingFormProps) {
     const router = useRouter();
@@ -299,8 +300,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         setIsLoading(true);
         try {
             const dateString = format(selectedDate, "yyyy-MM-dd");
-            const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
-            const title = serviceTagNames.length > 0 ? serviceTagNames.join(" ") : "Worship Service";
+            const title = getServiceTitleFromTags(serviceTagIds, team?.service_tags);
 
             const payload: Omit<ServingSchedule, "id"> = {
                 teamId,
