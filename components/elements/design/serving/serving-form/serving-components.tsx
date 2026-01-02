@@ -201,7 +201,7 @@ export function WorshipTeamRoleRow({ roleName, memberIds, getMemberName, classNa
                 If the user wants "Left Role, Right Name" for the *Worship Team* item specifically, inside that content block?
                 Yes. "cuelist 에서 찬양팀 구성 member name list 는 특별하게 왼쪽에 role 오른쪽에 사람 이름 listup 하도록 바꿔."
             */}
-            <span className="text-[13px] font-bold text-gray-500 uppercase tracking-tight mt-1.5 min-w-fit text-left">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-tight mt-1.5 min-w-fit text-left">
                 {roleName}:
             </span>
             <div className="flex flex-col items-end gap-1 flex-1">

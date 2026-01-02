@@ -129,7 +129,7 @@ export default function ServingPage() {
                                 schedule={schedule}
                                 teamId={teamId}
                                 currentUserUid={currentUserUid}
-                                defaultExpanded={activeTab === "upcoming"}
+                                defaultExpanded={false}
                                 onPreviewWorship={(worshipId) => setPreviewWorshipId(worshipId)}
                             />
                         ))}
