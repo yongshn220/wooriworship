@@ -30,10 +30,10 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid, fi
                     if (filterMine && !isAssigned) return null;
 
                     return (
-                        <div key={item.id} className="group flex gap-4 py-3 border-b border-border/40 last:border-0 relative text-left">
+                        <div key={item.id} className="group flex gap-4 py-1.5 border-b border-border/40 last:border-0 relative text-left">
                             {/* Left: Index / Time Marker */}
                             <div className="flex-shrink-0 w-12 pt-1 flex flex-col items-center gap-1">
-                                <span className="text-xl font-bold text-muted-foreground/40 font-mono tracking-tighter">
+                                <span className="text-sm font-bold text-gray-400 font-mono tracking-tighter">
                                     {((item.order ?? index) + 1).toString().padStart(2, '0')}
                                 </span>
                             </div>
@@ -42,9 +42,21 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid, fi
                             <div className="flex-1 min-w-0 space-y-1.5">
                                 {/* Header Row: Title & Who */}
                                 <div className="flex flex-row justify-between items-start gap-4">
-                                    <h3 className="text-lg font-bold leading-tight break-keep text-foreground pt-1">
-                                        {item.title || "Untitled Sequence"}
-                                    </h3>
+                                    <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                                        <h3 className="text-sm font-bold leading-tight break-keep text-foreground pt-1">
+                                            {item.title || "Untitled Sequence"}
+                                        </h3>
+
+                                        {/* Notes / Remarks - Prominent Display */}
+                                        {item.remarks && (
+                                            <div className="relative pl-3">
+                                                <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-yellow-400/50 rounded-full" />
+                                                <p className="text-sm text-foreground/80 leading-relaxed font-medium whitespace-pre-wrap">
+                                                    {item.remarks}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
 
                                     {/* Standard Assignments (Right Aligned) - EXCEPT for Worship Team */}
                                     {item.type !== 'WORSHIP_TEAM' && item.assignments && (
@@ -87,16 +99,6 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid, fi
                                                 />
                                             );
                                         })}
-                                    </div>
-                                )}
-
-                                {/* Notes / Remarks - Prominent Display */}
-                                {item.remarks && (
-                                    <div className="relative pl-3 mt-1.5">
-                                        <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-yellow-400/50 rounded-full" />
-                                        <p className="text-sm text-foreground/80 leading-relaxed font-medium whitespace-pre-wrap">
-                                            {item.remarks}
-                                        </p>
                                     </div>
                                 )}
                             </div>

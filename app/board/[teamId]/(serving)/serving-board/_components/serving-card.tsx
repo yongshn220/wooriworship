@@ -81,12 +81,16 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
     return (
         <Card
             className={cn(
-                "overflow-hidden transition-all duration-300 border shadow-sm hover:shadow-md cursor-pointer bg-card",
-                isExpanded ? "ring-2 ring-primary" : ""
+                "overflow-hidden transition-all duration-300 border cursor-pointer bg-card",
+                // Collapsed: very subtle border to blend in, light shadow
+                // Expanded: subtle blue border, deeper shadow but clean
+                isExpanded ? "border-blue-200 shadow-xl" : "border-transparent shadow-sm hover:border-border/50",
+                // Hover: gentle lift
+                "hover:-translate-y-[2px]"
             )}
             onClick={handleCardClick}
         >
-            <CardContent className="p-4 sm:p-6">
+            <CardContent className="p-4 sm:p-6 pb-2 sm:pb-3">
                 {/* Header */}
                 <div className="group cursor-pointer select-none" onClick={handleHeaderClick}>
 
@@ -137,11 +141,11 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                         <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-1">
                             {/* Title (Blue) */}
                             {schedule.title ? (
-                                <h3 className="text-xl sm:text-2xl font-bold text-blue-500 tracking-tight leading-none">
+                                <h3 className="text-base sm:text-lg font-bold text-blue-500 tracking-tight leading-none">
                                     {schedule.title}
                                 </h3>
                             ) : (
-                                <h3 className="text-xl sm:text-2xl font-bold text-muted-foreground tracking-tight leading-none">
+                                <h3 className="text-base sm:text-lg font-bold text-muted-foreground tracking-tight leading-none">
                                     Untitled
                                 </h3>
                             )}
@@ -152,7 +156,7 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                             {/* Date Group */}
                             <div className="flex items-baseline gap-2">
                                 {/* MMM d (Bold) */}
-                                <span className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+                                <span className="text-base sm:text-lg font-bold text-gray-900 tracking-tight">
                                     {format(scheduleDate, "MMM d")}
                                 </span>
                                 {/* SUNDAY, yyyy (Muted, Uppercase) */}
@@ -208,6 +212,19 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                 )}
 
             </CardContent>
+
+            {/* Collapse Bar (Footer) */}
+            {isExpanded && (
+                <div
+                    className="flex items-center justify-center py-2 bg-muted/10 border-t border-border/60 hover:bg-muted/30 transition-colors cursor-pointer"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        toggleExpand();
+                    }}
+                >
+                    <ChevronUp className="h-5 w-5 text-muted-foreground/70" />
+                </div>
+            )}
         </Card >
     );
 }
