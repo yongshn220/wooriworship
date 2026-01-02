@@ -4,7 +4,7 @@ import { worshipIdsUpdaterAtom, worshipUpdaterAtom } from "@/global-states/worsh
 import { teamAtom } from "@/global-states/teamState";
 import React, { useCallback, useEffect, useState } from "react";
 import { FormMode, WorshipSpecialOrderType } from "@/components/constants/enums";
-import { timestampToDate } from "@/components/util/helper/helper-functions";
+import { timestampToDate, getServiceTitleFromTags } from "@/components/util/helper/helper-functions";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { WorshipService } from "@/apis";
@@ -177,9 +177,8 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
   }
 
   const getWorshipInput = () => {
-    const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
     return {
-      title: serviceTagNames.join(" "),
+      title: getServiceTitleFromTags(serviceTagIds, team?.service_tags),
       service_tags: serviceTagIds,
       description: basicInfo.description,
       date: date,

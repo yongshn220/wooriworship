@@ -437,3 +437,10 @@ export function getInitialChar(str: string): string {
 
   return '#';
 }
+
+export function getServiceTitleFromTags(serviceTagIds: string[], teamServiceTags?: { id: string, name: string }[]): string {
+  if (!serviceTagIds || serviceTagIds.length === 0) return "Worship Service";
+
+  const serviceTagNames = serviceTagIds.map(id => teamServiceTags?.find((t: any) => t.id === id)?.name || id);
+  return serviceTagNames.length > 0 ? serviceTagNames.join(" ") : "Worship Service";
+}
