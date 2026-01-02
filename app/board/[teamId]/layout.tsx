@@ -1,12 +1,13 @@
 "use client"
 
-import React, {Suspense, useEffect} from "react";
-import {TeamIdValidation} from "@/app/board/_components/auth/teamid-validation";
-import {FallbackText} from "@/components/util/text/fallback-text";
-import {usePathname} from "next/navigation";
-import {useSetRecoilState} from "recoil";
-import {currentPageAtom} from "@/global-states/page-state";
-import {Page} from "@/components/constants/enums";
+import React, { Suspense, useEffect } from "react";
+import { TeamIdValidation } from "@/app/board/_components/auth/teamid-validation";
+import { FallbackText } from "@/components/util/text/fallback-text";
+import { BoardSkeleton } from "@/app/board/_components/board-skeleton";
+import { usePathname } from "next/navigation";
+import { useSetRecoilState } from "recoil";
+import { currentPageAtom } from "@/global-states/page-state";
+import { Page } from "@/components/constants/enums";
 
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
   children: any
 }
 
-export default function BoardTeamLayout({params, children}: Props) {
+export default function BoardTeamLayout({ params, children }: Props) {
   const teamId = params.teamId
   const pathname = usePathname()
   const setPage = useSetRecoilState(currentPageAtom)
@@ -27,7 +28,7 @@ export default function BoardTeamLayout({params, children}: Props) {
 
   return (
     <div className="w-full h-full">
-      <Suspense fallback={<FallbackText text="Loading..."/>}>
+      <Suspense fallback={<BoardSkeleton />}>
         <TeamIdValidation teamId={teamId}>
           {children}
         </TeamIdValidation>

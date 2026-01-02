@@ -154,6 +154,7 @@ export function ServingForm(props: ServingFormProps) {
                                             <div className="flex flex-col min-w-0">
                                                 <h3 className="text-sm font-bold text-orange-900 truncate">Plan already exists.</h3>
                                                 <p className="text-xs text-orange-800/80 truncate">
+                                                    <span className="mr-1">{format(selectedDate!, "yyyy-MM-dd")}</span>
                                                     <span className="font-semibold text-orange-900">
                                                         {serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id).join(", ")}
                                                     </span>
@@ -163,7 +164,7 @@ export function ServingForm(props: ServingFormProps) {
                                         <Button
                                             size="sm"
                                             className="h-8 px-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-bold text-xs shadow-sm flex-shrink-0"
-                                            onClick={() => router.push(`/board/${props.teamId}/edit-serving/${duplicateId}`)}
+                                            onClick={() => router.replace(`/board/${props.teamId}/edit-serving/${duplicateId}`)}
                                         >
                                             Edit <ArrowRight className="ml-1 w-3 h-3" />
                                         </Button>
