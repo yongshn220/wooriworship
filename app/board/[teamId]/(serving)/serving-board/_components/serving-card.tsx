@@ -16,8 +16,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ServingSchedule } from "@/models/serving";
 import { fetchServingRolesSelector } from "@/global-states/servingState";
 import { usersAtom } from "@/global-states/userState";
+import { teamAtom } from "@/global-states/teamState";
 import { auth } from "@/firebase";
-import { getDayPassedFromTimestampShorten } from "@/components/util/helper/helper-functions";
+import { getDayPassedFromTimestampShorten, getDynamicDisplayTitle } from "@/components/util/helper/helper-functions";
 import { ServingHeaderMenu } from "./serving-header-menu";
 import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
 
@@ -37,6 +38,8 @@ import { useCardExpansion } from "@/hooks/use-card-expansion";
 export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded = true, onPreviewWorship }: Props) {
     const { isExpanded, setIsExpanded, toggleExpand } = useCardExpansion(schedule.id, defaultExpanded);
     const roles = useRecoilValue(fetchServingRolesSelector(teamId));
+    const team = useRecoilValue(teamAtom(teamId));
+    const displayTitle = getDynamicDisplayTitle(schedule.service_tags, team?.service_tags, schedule.title);
 
     // Gather all member IDs involved in this schedule for batch fetching
     const allMemberIds = schedule.items
@@ -139,9 +142,9 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                         {/* Bottom Row: Title | Date */}
                         <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-1">
                             {/* Title (Blue) */}
-                            {schedule.title ? (
+                            {displayTitle ? (
                                 <h3 className="text-base sm:text-lg font-bold text-blue-500 tracking-tight leading-none">
-                                    {schedule.title}
+                                    {displayTitle}
                                 </h3>
                             ) : (
                                 <h3 className="text-base sm:text-lg font-bold text-muted-foreground tracking-tight leading-none">

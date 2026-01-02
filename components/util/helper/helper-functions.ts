@@ -444,3 +444,40 @@ export function getServiceTitleFromTags(serviceTagIds: string[], teamServiceTags
   const serviceTagNames = serviceTagIds.map(id => teamServiceTags?.find((t: any) => t.id === id)?.name || id);
   return serviceTagNames.length > 0 ? serviceTagNames.join(" ") : "Worship Service";
 }
+
+export function getDynamicDisplayTitle(
+  serviceTagIds: string[] | undefined,
+  teamServiceTags: { id: string, name: string }[] | undefined,
+  fallbackTitle: string | undefined
+): string {
+  // If no tags, fallback
+  if (!serviceTagIds || serviceTagIds.length === 0) {
+    return fallbackTitle || "Untitled";
+  }
+
+  // Try to find names for all tags
+  const tagNames: string[] = [];
+  let allFound = true;
+
+  for (const id of serviceTagIds) {
+    const found = teamServiceTags?.find(t => t.id === id);
+    if (found) {
+      tagNames.push(found.name);
+    } else {
+      allFound = false;
+      // If we want to partial match, we could push ID? 
+      // User said: "fallback은 tag id 로 tag name 못찾았을 경우 title 을 보여주도록"
+      // This implies if even one is missing (or maybe all?), use title.
+      // Usually better to show partial names than partial IDs? 
+      // But adhering strictly: if we can't fully resolve, maybe fallback?
+      // Let's assume strict: if we can't find a tag, fallback to title (which presumably acts as the snapshot)
+      break;
+    }
+  }
+
+  if (allFound && tagNames.length > 0) {
+    return tagNames.join(" ");
+  }
+
+  return fallbackTitle || "Untitled";
+}
