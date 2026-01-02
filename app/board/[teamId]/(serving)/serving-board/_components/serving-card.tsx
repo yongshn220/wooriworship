@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, User, Eye, Link as LinkIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Card, CardContent } from "@/components/ui/card";
+import { BoardCard } from "@/components/common/board/board-card";
+import { CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -79,16 +80,14 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
     };
 
     return (
-        <Card
-            className={cn(
-                "overflow-hidden transition-all duration-300 border cursor-pointer bg-card",
-                // Collapsed: very subtle border to blend in, light shadow
-                // Expanded: subtle blue border, deeper shadow but clean
-                isExpanded ? "border-blue-200 shadow-xl" : "border-transparent shadow-sm hover:border-border/50",
-                // Hover: gentle lift
-                "hover:-translate-y-[2px]"
-            )}
+    return (
+        <BoardCard
+            isExpanded={isExpanded}
             onClick={handleCardClick}
+            onCollapse={(e) => {
+                e.stopPropagation();
+                toggleExpand();
+            }}
         >
             <CardContent className="p-4 sm:p-6 pb-2 sm:pb-3">
                 {/* Header */}
@@ -212,19 +211,6 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                 )}
 
             </CardContent>
-
-            {/* Collapse Bar (Footer) */}
-            {isExpanded && (
-                <div
-                    className="flex items-center justify-center py-2 bg-muted/10 border-t border-border/60 hover:bg-muted/30 transition-colors cursor-pointer"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        toggleExpand();
-                    }}
-                >
-                    <ChevronUp className="h-5 w-5 text-muted-foreground/70" />
-                </div>
-            )}
-        </Card >
+        </BoardCard >
     );
 }
