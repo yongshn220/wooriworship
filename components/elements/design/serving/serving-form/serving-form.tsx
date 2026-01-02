@@ -188,7 +188,7 @@ export function ServingForm(props: ServingFormProps) {
                                     items={availableWorships.map(plan => ({
                                         id: plan.id,
                                         title: plan.title || "Untitled Worship",
-                                        description: format(plan.worship_date.toDate(), "HH:mm")
+                                        description: format(plan.worship_date.toDate(), "yyyy-MM-dd")
                                     }))}
                                     selectedId={linkedWorshipId}
                                     onSelect={setLinkedWorshipId}
