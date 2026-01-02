@@ -36,9 +36,6 @@ import { toast } from "@/components/ui/use-toast";
 import {
   getDayPassedFromTimestampShorten,
   timestampToDateStringFormatted,
-  isTimestampPast
-  getDayPassedFromTimestampShorten,
-  timestampToDateStringFormatted,
   isTimestampPast,
   getDynamicDisplayTitle
 } from "@/components/util/helper/helper-functions";
