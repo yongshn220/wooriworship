@@ -37,6 +37,10 @@ import {
   getDayPassedFromTimestampShorten,
   timestampToDateStringFormatted,
   isTimestampPast
+  getDayPassedFromTimestampShorten,
+  timestampToDateStringFormatted,
+  isTimestampPast,
+  getDynamicDisplayTitle
 } from "@/components/util/helper/helper-functions";
 import { getPathSongDetail, getPathWorshipView } from "@/components/util/helper/routes";
 
@@ -99,6 +103,9 @@ export function WorshipCard({ worshipId, isFirst, defaultExpanded = false }: Pro
 
   // Search Filtering Logic
   const normalizedSearchInput = useMemo(() => normalizeText(searchInput), [searchInput]);
+
+  // Title Display Logic (Dynamic Resolution)
+  const displayTitle = getDynamicDisplayTitle(worship.service_tags, team?.service_tags, worship.title);
 
 
   const normalizedWorshipTitle = useMemo(() => normalizeText(worship?.title), [worship?.title]);
@@ -167,7 +174,7 @@ export function WorshipCard({ worshipId, isFirst, defaultExpanded = false }: Pro
                 <MyServingIndicator teamId={teamId} date={format(worship.worship_date.toDate(), "yyyy-MM-dd")} />
               </div>
               <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                {highlightText(worship.title || "Untitled Service", searchInput)}
+                {highlightText(displayTitle, searchInput)}
                 {worship.subtitle && (
                   <span className="text-base sm:text-lg font-normal text-muted-foreground ml-2">
                     {highlightText(worship.subtitle, searchInput)}
