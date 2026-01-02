@@ -447,7 +447,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
       </FullScreenFormBody>
 
       <FullScreenFormFooter
-        errorMessage={duplicateErrorMessage}
+        errorMessage={isDuplicate ? undefined : duplicateErrorMessage}
       >
         <div className="w-12 h-12 flex-none">
           <Button
@@ -460,7 +460,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
           </Button>
         </div>
         <Button
-          className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
+          className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:opacity-100 disabled:shadow-none"
           onClick={step === totalSteps - 1 ? (mode === FormMode.CREATE ? handleCreate : handleEdit) : nextStep}
           disabled={isLoading || (step === 0 && (serviceTagIds.length === 0 || isDuplicate))}
         >
