@@ -3,8 +3,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function WorshipListSkeleton() {
     return (
         <div className="flex flex-col h-full w-full bg-muted/30 relative">
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 content-container-safe-area pb-24 space-y-6 overscroll-y-none">
-                <div className="grid grid-cols-1 gap-6">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 content-container-safe-area pb-24 space-y-4 overscroll-y-none">
+                <div className="grid grid-cols-1 gap-4">
                     {[1, 2].map((i) => (
                         <div key={i} className="w-full border rounded-xl p-5 bg-card shadow-sm flex flex-col gap-5">
                             {/* Card Header: Date & Title */}
