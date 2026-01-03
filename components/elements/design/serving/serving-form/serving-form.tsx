@@ -27,6 +27,7 @@ import { ServingFormSkeleton } from "./serving-form-skeleton";
 import { SortableRoleItem } from "./items/sortable-role-item";
 import { SortableWorshipItem } from "./items/sortable-worship-item";
 import { SortableTimelineItem } from "./items/sortable-timeline-item";
+import { slideVariants } from "@/components/constants/animations";
 
 // Hook & Types
 import { useServingFormLogic } from "./hooks/use-serving-form-logic";
@@ -46,7 +47,7 @@ export function ServingForm(props: ServingFormProps) {
         templates, isTemplatesLoaded, selectedTemplateId, hasTemplateChanges,
         availableWorships, linkedWorshipId, previewWorshipId,
         activeSelection, isLoading,
-        isRoleDialogOpen, newRoleName, isTemplateDialogOpen, isRenameDialogOpen,
+        isRoleDialogOpen, newRoleName, isCreatingRole, isTemplateDialogOpen, isRenameDialogOpen,
         newTemplateName, tempTemplateName, createEmptyMode,
         standardGroups, customMemberNames, deleteConfirm,
         roles, team, teamMembers,
@@ -73,26 +74,6 @@ export function ServingForm(props: ServingFormProps) {
         }
     }, [step]);
 
-    // Animation Variants
-    const slideVariants = {
-        enter: (direction: number) => ({
-            x: direction > 0 ? "100%" : "-100%",
-            opacity: 0,
-            position: 'absolute' as const
-        }),
-        center: {
-            zIndex: 1,
-            x: 0,
-            opacity: 1,
-            position: 'relative' as const
-        },
-        exit: (direction: number) => ({
-            zIndex: 0,
-            x: direction < 0 ? "100%" : "-100%",
-            opacity: 0,
-            position: 'absolute' as const
-        })
-    };
 
     if (!isTemplatesLoaded && props.mode === "CREATE" && false) {
         // Note: The original logic had `rolesLoadable.state !== 'hasValue'` check. 
@@ -115,7 +96,7 @@ export function ServingForm(props: ServingFormProps) {
         <>
             <FullScreenForm>
                 <FullScreenFormHeader
-                    steps={["Date", "Team", "Order", "Review"]}
+                    steps={["Service", "Roles", "Flow", "Done"]}
                     currentStep={step}
                     onStepChange={isDuplicate ? undefined : goToStep}
                     onClose={() => window.history.back()} // Router back
@@ -510,7 +491,7 @@ export function ServingForm(props: ServingFormProps) {
                                 initial={{ opacity: 0, scale: 0.95, y: 10 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                className="w-full max-w-2xl mx-auto mb-4 pointer-events-auto flex justify-center"
+                                className="absolute bottom-28 left-0 right-0 mx-auto w-full max-w-2xl flex justify-center pointer-events-auto z-10"
                             >
                                 <button
                                     onClick={handleUpdateTemplate}
