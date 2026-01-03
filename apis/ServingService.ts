@@ -74,21 +74,35 @@ class ServingService extends BaseService {
         ];
 
         const rolesRef = firestore.collection("teams").doc(teamId).collection("serving_roles");
-        const initFlagRef = firestore.collection("teams").doc(teamId).collection("system").doc("serving_init");
 
         try {
             await firestore.runTransaction(async (transaction) => {
-                const initDoc = await transaction.get(initFlagRef);
-                if (initDoc.exists) return; // Already initialized
+                // Fetch all existing roles for this team
+                // Note: Transaction get queries must be done before writes.
+                // However, fetching collection inside transaction requires query.
+                // Firestore transactions require reads before writes.
+                // Simple get() on collection is not directly supported in all transaction SDKs as 'read'.
+                // But we can do a query.
+                const existingSnapshot = await transaction.get(rolesRef);
+                const existingNames = new Set(existingSnapshot.docs.map(doc => (doc.data().name as string).toLowerCase()));
 
-                // Create standard roles
-                standardRoles.forEach((name, index) => {
+                const rolesToAdd = standardRoles.filter(name => !existingNames.has(name.toLowerCase()));
+
+                if (rolesToAdd.length === 0) return; // All exist
+
+                // Add missing roles
+                rolesToAdd.forEach((name, index) => {
+                    // Order logic: append after existing? Or just use index?
+                    // Standard init is usually for empty teams. 
+                    // If merging, maybe set order to existing.length + index?
+                    // Let's keep it simple: just add them. Order might be mixed if we just add.
+                    // To be safe on order, we could fetch max order.
+                    // But for now, ensuring no duplicates is priority.
                     const newRoleRef = rolesRef.doc();
-                    transaction.set(newRoleRef, { id: newRoleRef.id, teamId, name, order: index });
+                    // We use standardRoles index for order preference, but it might conflict if we append.
+                    // A better way for initialization is:
+                    transaction.set(newRoleRef, { id: newRoleRef.id, teamId, name, order: 100 + index });
                 });
-
-                // Mark as initialized
-                transaction.set(initFlagRef, { initializedAt: new Date().toISOString() });
             });
         } catch (e) {
             console.error("Failed to initialize standard roles:", e);

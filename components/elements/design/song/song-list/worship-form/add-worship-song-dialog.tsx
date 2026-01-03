@@ -10,19 +10,21 @@ import { useRecoilValue } from "recoil";
 import { songSearchInputAtom } from "@/app/board/_states/board-states";
 import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { selectedWorshipSongHeaderListAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
 import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
 import { ActiveFilterList } from "@/app/board/_components/active-filter-list";
+import { WorshipSongHeader } from "@/models/worship";
 
 interface Props {
   teamId: string
   isOpen: boolean
   setIsOpen: Function
+  selectedSongs: WorshipSongHeader[]
+  onUpdateList: (newSongs: WorshipSongHeader[]) => void
 }
 
-export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
+export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen, selectedSongs, onUpdateList }: Props) {
   const input = useRecoilValue(songSearchInputAtom)
-  const selectedSongHeaderList = useRecoilValue(selectedWorshipSongHeaderListAtom)
+  // const selectedSongHeaderList = useRecoilValue(selectedWorshipSongHeaderListAtom) // REMOVED
 
   // State for "Cart" view
   const [showSelectedOnly, setShowSelectedOnly] = React.useState(false)
@@ -32,9 +34,7 @@ export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
     if (!isOpen) setShowSelectedOnly(false)
   }, [isOpen])
 
-
-
-  const selectedCount = selectedSongHeaderList.length
+  const selectedCount = selectedSongs.length
 
   return (
     <Drawer open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
@@ -71,7 +71,12 @@ export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen }: Props) {
           {/* Scrollable Song List */}
           <div className="flex-1 overflow-y-auto no-scrollbar pb-48">
             <Suspense fallback={<LoadingCircle />}>
-              <AddableSongHeaderList teamId={teamId} showSelectedOnly={showSelectedOnly} />
+              <AddableSongHeaderList
+                teamId={teamId}
+                showSelectedOnly={showSelectedOnly}
+                selectedSongs={selectedSongs}
+                onUpdateList={onUpdateList}
+              />
             </Suspense>
           </div>
 

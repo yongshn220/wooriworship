@@ -1,27 +1,24 @@
 "use client"
-import { useRecoilState, useRecoilValue, useRecoilValueLoadable } from "recoil";
-import { currentTeamSongIdsAtom, songAtom } from "@/global-states/song-state";
+import { useRecoilValueLoadable } from "recoil";
+import { currentTeamSongIdsAtom } from "@/global-states/song-state";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import * as React from "react";
 import { useState } from "react";
 import {
-  AddableSongDetailDialogTrigger
-} from "@/components/elements/design/song/song-detail-card/worship-form/addable-song-detail-dialog-trigger";
-import { SongHeaderDefault } from "@/components/elements/design/song/song-header/default/song-header-default";
-import { selectedWorshipSongHeaderListAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
-import {
   AddableSongHeaderDefault
 } from "@/components/elements/design/song/song-header/worship-form/addable-song-header-default";
+import { WorshipSongHeader } from "@/models/worship";
 
 interface Props {
   teamId: string
   showSelectedOnly?: boolean
+  selectedSongs: WorshipSongHeader[]
+  onUpdateList: (newSongs: WorshipSongHeader[]) => void
 }
 
-export function AddableSongHeaderList({ teamId, showSelectedOnly = false }: Props) {
+export function AddableSongHeaderList({ teamId, showSelectedOnly = false, selectedSongs, onUpdateList }: Props) {
   const songIdsLoadable = useRecoilValueLoadable(currentTeamSongIdsAtom(teamId))
-  const selectedSongHeaderList = useRecoilValue(selectedWorshipSongHeaderListAtom)
   const [displayedCount, setDisplayedCount] = useState(20)
   const loadMoreRef = React.useRef<HTMLDivElement>(null)
 
@@ -30,7 +27,7 @@ export function AddableSongHeaderList({ teamId, showSelectedOnly = false }: Prop
 
   let allSongIds = [...rawSongIds]
   if (showSelectedOnly) {
-    allSongIds = selectedSongHeaderList.map(h => h.id)
+    allSongIds = selectedSongs.map(h => h.id)
   }
 
   const visibleSongIds = allSongIds.slice(0, displayedCount)
@@ -75,7 +72,8 @@ export function AddableSongHeaderList({ teamId, showSelectedOnly = false }: Prop
   }
 
   if (songIdsLoadable.state === 'hasError') {
-    throw songIdsLoadable.contents
+    // Avoid throwing to not crash whole form, just show error
+    return <div className="p-4 text-red-500">Failed to load songs.</div>
   }
 
   return (
@@ -96,7 +94,12 @@ export function AddableSongHeaderList({ teamId, showSelectedOnly = false }: Prop
               visibleSongIds.map((songId) => (
                 <div key={songId} className="w-full">
                   <React.Suspense fallback={<div className="h-16 w-full animate-pulse bg-gray-50 mb-2 rounded" />}>
-                    <AddableSongHeaderDefault teamId={teamId} songId={songId} />
+                    <AddableSongHeaderDefault
+                      teamId={teamId}
+                      songId={songId}
+                      selectedSongs={selectedSongs}
+                      onUpdateList={onUpdateList}
+                    />
                   </React.Suspense>
                   <Separator />
                 </div>
@@ -133,4 +136,3 @@ export function AddableSongHeaderList({ teamId, showSelectedOnly = false }: Prop
     </div>
   )
 }
-

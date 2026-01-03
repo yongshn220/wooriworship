@@ -1,46 +1,32 @@
-import { auth } from "@/firebase";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { worshipIdsUpdaterAtom, worshipUpdaterAtom } from "@/global-states/worship-state";
-import { teamAtom } from "@/global-states/teamState";
-import React, { useCallback, useEffect, useState } from "react";
+"use client"
+
+import React from "react";
 import { FormMode, WorshipSpecialOrderType } from "@/components/constants/enums";
-import { timestampToDate, getServiceTitleFromTags } from "@/components/util/helper/helper-functions";
-import { useToast } from "@/components/ui/use-toast";
+import { Worship } from "@/models/worship";
+import { format } from 'date-fns';
+import { AnimatePresence, motion, Reorder } from "framer-motion";
+import { LinkIcon, ArrowRight, ChevronLeft, Check, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { WorshipService } from "@/apis";
-import { getPathPlan } from "@/components/util/helper/routes";
+
+// UI Components
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Worship } from "@/models/worship";
-import { format, nextFriday, nextSunday } from 'date-fns';
-import {
-  selectedWorshipSongHeaderListAtom,
-  worshipBeginningSongHeaderAtom,
-  worshipEndingSongHeaderAtom
-} from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
-import { WorshipDatePicker } from "@/components/elements/design/worship/worship-form/worship-date-picker";
-import {
-  AddedSongHeaderStatic
-} from "@/components/elements/design/song/song-header/worship-form/added-song-header-static";
-import {
-  AddedSongHeaderDefault
-} from "@/components/elements/design/song/song-header/worship-form/added-song-header-default";
-import { AddSongButton } from "@/components/elements/design/worship/worship-form/add-song-button";
-import {
-  AddWorshipSongDialogTrigger
-} from "@/components/elements/design/song/song-list/worship-form/add-worship-song-dialog-trigger";
-import { LinkIcon, CalendarIcon, Music, ArrowRight, ChevronLeft, Check, AlertCircle } from "lucide-react";
-import PushNotificationService from "@/apis/PushNotificationService";
-import { AnimatePresence, motion } from "framer-motion";
-import { TagSelector } from "@/components/common/tag-selector";
-import { cn } from "@/lib/utils";
 import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFormFooter, FormSectionCard } from "@/components/common/form/full-screen-form";
-import { ServingService } from "@/apis";
 import { LinkedResourceCard } from "@/components/common/form/linked-resource-card";
 import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
-import { useServiceDuplicateCheck } from "@/components/common/hooks/use-service-duplicate-check";
+
+// Custom Components
+import { AddedSongHeaderStatic } from "@/components/elements/design/song/song-header/worship-form/added-song-header-static";
+import { AddSongButton } from "@/components/elements/design/worship/worship-form/add-song-button";
+import { AddWorshipSongDialogTrigger } from "@/components/elements/design/song/song-list/worship-form/add-worship-song-dialog-trigger";
+import { SortableWorshipSongItem } from "./sortable-worship-song-item";
+import { AddedSongHeaderDefault } from "@/components/elements/design/song/song-header/worship-form/added-song-header-default";
+
+// Logic Hook
+import { useWorshipFormLogic } from "./hooks/use-worship-form-logic";
+import { slideVariants } from "@/components/constants/animations";
 
 interface Props {
   mode: FormMode
@@ -49,233 +35,25 @@ interface Props {
 }
 
 export function WorshipForm({ mode, teamId, worship }: Props) {
-  const authUser = auth.currentUser
-  const setWorshipUpdater = useSetRecoilState(worshipUpdaterAtom)
-  const setWorshipIdsUpdater = useSetRecoilState(worshipIdsUpdaterAtom)
-  const team = useRecoilValue(teamAtom(teamId))
-  const [selectedWorshipSongHeaderList, setSelectedWorshipSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
-  const [beginningSongHeader, setBeginningSongHeader] = useRecoilState(worshipBeginningSongHeaderAtom)
-  const [endingSongHeader, setEndingSongHeader] = useRecoilState(worshipEndingSongHeaderAtom)
-
-  // Form State
-  const [step, setStep] = useState(0); // 0: Date/Service, 1: Desc, 2: Setlist
-  const [direction, setDirection] = useState(0); // -1: Back, 1: Next
-  const totalSteps = 3;
-
-  const [basicInfo, setBasicInfo] = useState({
-    title: (mode === FormMode.EDIT) ? worship?.title ?? "" : "",
-    description: (mode === FormMode.EDIT) ? worship?.description ?? "" : "",
-    link: (mode === FormMode.EDIT) ? worship?.link ?? "" : "",
-  })
-  const [serviceTagIds, setServiceTagIds] = useState<string[]>((mode === FormMode.EDIT) ? worship?.service_tags ?? [] : [])
-  const [date, setDate] = useState<Date>((mode === FormMode.EDIT) ? timestampToDate(worship?.worship_date) : new Date())
-  const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
   const router = useRouter()
 
-  const [availableServingSchedules, setAvailableServingSchedules] = useState<any[]>([]);
-  const [linkedServingId, setLinkedServingId] = useState<string | null>(null);
+  const {
+    // State
+    step, direction, totalSteps,
+    basicInfo, setBasicInfo,
+    serviceTagIds, setServiceTagIds,
+    date, setDate,
+    songs, setSongs,
+    beginningSong, setBeginningSong,
+    endingSong, setEndingSong,
+    availableServingSchedules, linkedServingId, setLinkedServingId,
+    isLoading,
+    isDuplicate, duplicateId, duplicateErrorMessage,
 
-  // Date Helpers
-  const upcomingFriday = nextFriday(new Date());
-  const upcomingSunday = nextSunday(new Date());
-  const formattedUpcomingFriday = format(upcomingFriday, 'yyyy-MM-dd');
-  const formattedUpcomingSunday = format(upcomingSunday, 'yyyy-MM-dd');
-
-  const clearContents = useCallback(() => {
-    setIsLoading(false)
-    setSelectedWorshipSongHeaderList([])
-    setBeginningSongHeader({ id: "", note: "", selected_music_sheet_ids: [] })
-    setEndingSongHeader({ id: "", note: "", selected_music_sheet_ids: [] })
-  }, [setBeginningSongHeader, setEndingSongHeader, setSelectedWorshipSongHeaderList])
-
-  useEffect(() => {
-    return () => clearContents()
-  }, [clearContents]);
-
-  /* Initialize selected songs and form data */
-  useEffect(() => {
-    if (mode === FormMode.EDIT && worship) {
-      setSelectedWorshipSongHeaderList(worship.songs || []);
-      setServiceTagIds(worship.service_tags || []);
-      setBasicInfo({
-        title: worship.title || "",
-        description: worship.description || "",
-        link: worship.link || ""
-      });
-      setDate(timestampToDate(worship.worship_date));
-      if (worship.serving_schedule_id) {
-        setLinkedServingId(worship.serving_schedule_id);
-      }
-    }
-  }, [mode, setSelectedWorshipSongHeaderList, worship]);
-
-  // Fetch Linked Servings when date changes
-  useEffect(() => {
-    const fetchLinkedServings = async () => {
-      if (!date) return;
-      try {
-        // Assuming serving schedules use 'yyyy-MM-dd' format
-        const dateStr = format(date, 'yyyy-MM-dd');
-        const schedules = await ServingService.getSchedules(teamId, dateStr, dateStr);
-        // Filter schedules to only show those that have matching tags
-        const filteredSchedules = schedules.filter(s =>
-          serviceTagIds.some(t => s.service_tags?.includes(t)) ||
-          (mode === FormMode.EDIT && s.id === worship.serving_schedule_id) // Always include currently linked in Edit mode
-        );
-
-        setAvailableServingSchedules(filteredSchedules);
-
-        // Unified Auto-select Logic for both CREATE and EDIT
-        // 1. If currently selected ID is still valid in the new filtered list, keep it.
-        // 2. If not, but there is a match in the filtered list, select the first one.
-        // 3. Otherwise, specific to EDIT mode: if the original saved ID is in the list, revert to it (though step 1 might cover this if state was init correctly).
-        // 4. Else, clear selection.
-
-        const currentSelectionExists = filteredSchedules.some(s => s.id === linkedServingId);
-
-        if (currentSelectionExists) {
-          // Keep current selection
-        } else if (filteredSchedules.length > 0) {
-          // Auto-select the first match (since strict filtering allows only valid tag+date matches)
-          setLinkedServingId(filteredSchedules[0].id);
-        } else {
-          setLinkedServingId(null);
-        }
-      } catch (error) {
-        console.error("Failed to fetch serving schedules", error);
-      }
-    };
-    fetchLinkedServings();
-  }, [date, teamId, serviceTagIds, mode, worship?.id, linkedServingId]); // Added tags dependency to re-run when tags change
-
-  // Real-time Duplicate Check
-  const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
-  const { isDuplicate, duplicateId, errorMessage: duplicateErrorMessage } = useServiceDuplicateCheck({
-    teamId,
-    date,
-    serviceTagIds,
-    serviceTagNames,
-    mode,
-    currentId: worship?.id,
-    fetcher: async (tid, dateStr) => {
-      const [y, m, d] = dateStr.split('-').map(Number);
-      const dateObj = new Date(y, m - 1, d);
-      const worships = await WorshipService.getWorshipsByDate(tid, dateObj);
-      return worships.map(w => ({ ...w, id: w.id! }));
-    }
-  });
-
-  // Validation Check
-  const isSessionValid = () => {
-    if (!authUser) {
-      toast({ title: "Please login first", variant: "destructive" })
-      router.push("/login")
-      return false
-    }
-    return true
-  }
-
-  const getWorshipInput = () => {
-    return {
-      title: getServiceTitleFromTags(serviceTagIds, team?.service_tags),
-      service_tags: serviceTagIds,
-      description: basicInfo.description,
-      date: date,
-      link: basicInfo.link,
-      worshipSongHeaders: selectedWorshipSongHeaderList,
-      beginningSong: beginningSongHeader,
-      endingSong: endingSongHeader,
-      related_serving_id: linkedServingId // Save linked serving ID
-    } as any
-  }
-
-  async function handleCreate() {
-    setIsLoading(true)
-    if (!isSessionValid()) return
-
-    try {
-      const worshipInput = getWorshipInput()
-      const worshipId = await WorshipService.addNewWorship(authUser?.uid, teamId, worshipInput);
-      await PushNotificationService.notifyTeamNewWorship(teamId, authUser?.uid, worshipInput.date, worshipInput.title);
-
-      toast({ title: `New service created!` })
-      cleanupAndRedirect(worshipId)
-    } catch (e) {
-      handleError(e)
-    }
-  }
-
-  async function handleEdit() {
-    setIsLoading(true)
-    if (!isSessionValid()) return
-
-    try {
-      const worshipInput = getWorshipInput()
-      if (!worship?.id) throw new Error("No worship ID")
-
-      await WorshipService.updateWorship(authUser?.uid, worship?.id, worshipInput);
-      toast({ title: `Service updated` })
-      cleanupAndRedirect(worship?.id)
-    } catch (e) {
-      handleError(e)
-    }
-  }
-
-  const cleanupAndRedirect = (worshipId: string) => {
-    setIsLoading(false)
-    clearContents()
-    setWorshipUpdater(prev => prev + 1)
-    setWorshipIdsUpdater(prev => prev + 1)
-    router.push(getPathPlan(teamId) + "?expanded=" + worshipId)
-  }
-
-  const handleError = (e: any) => {
-    console.error("err", e)
-    toast({ title: "Something went wrong", variant: "destructive" })
-    setIsLoading(false)
-  }
-
-  const goToStep = (targetStep: number) => {
-    setDirection(targetStep > step ? 1 : -1);
-    setStep(targetStep);
-  }
-
-  const nextStep = async () => {
-    if (step < totalSteps - 1) goToStep(step + 1);
-  }
-
-  const prevStep = () => {
-    if (step > 0) goToStep(step - 1);
-  }
-
-  // Animation Variants
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? "100%" : "-100%",
-      opacity: 0,
-      scale: 0.95,
-      rotateY: direction > 0 ? 20 : -20,
-      zIndex: 0,
-      position: 'absolute' as const
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-      scale: 1,
-      rotateY: 0,
-      position: 'relative' as const
-    },
-    exit: (direction: number) => ({
-      zIndex: 0,
-      x: direction < 0 ? "100%" : "-100%",
-      opacity: 0,
-      scale: 0.95,
-      rotateY: direction < 0 ? 20 : -20,
-      position: 'absolute' as const
-    })
-  };
+    // Actions
+    handleCreate, handleEdit,
+    goToStep, nextStep, prevStep
+  } = useWorshipFormLogic({ mode, teamId, initialWorship: worship });
 
 
   return (
@@ -321,9 +99,6 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                       <h3 className="text-sm font-bold text-orange-900 truncate">Plan already exists.</h3>
                       <p className="text-xs text-orange-800/80 truncate">
                         <span className="mr-1">{format(date, "yyyy-MM-dd")}</span>
-                        <span className="font-semibold text-orange-900">
-                          {serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id).join(", ")}
-                        </span>
                       </p>
                     </div>
                   </div>
@@ -419,21 +194,56 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                   <h2 className="text-2xl font-bold text-foreground leading-none">Setlist</h2>
                 </div>
                 <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/20 mb-1">
-                  {selectedWorshipSongHeaderList.length} Songs
+                  {songs.length} Songs
                 </span>
               </div>
 
               {/* Card (Full Height) */}
               <FormSectionCard className="p-0 overflow-hidden space-y-0">
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                  {beginningSongHeader?.id && <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.BEGINNING} songHeader={beginningSongHeader} />}
-                  {selectedWorshipSongHeaderList.map((songHeader, i) => (
-                    <AddedSongHeaderDefault key={i} teamId={teamId} songOrder={i + 1} songHeader={songHeader} />
-                  ))}
-                  {endingSongHeader?.id && <AddedSongHeaderStatic teamId={teamId} specialOrderType={WorshipSpecialOrderType.ENDING} songHeader={endingSongHeader} />}
+
+                  {/* Beginning Song */}
+                  {beginningSong?.id && (
+                    <AddedSongHeaderStatic
+                      teamId={teamId}
+                      specialOrderType={WorshipSpecialOrderType.BEGINNING}
+                      songHeader={beginningSong}
+                      onUpdate={(updated) => setBeginningSong(updated)}
+                      onRemove={() => setBeginningSong(null)}
+                    />
+                  )}
+
+                  {/* Reorderable List */}
+                  <Reorder.Group axis="y" values={songs} onReorder={setSongs} className="space-y-3">
+                    {songs.map((songHeader, i) => (
+                      <SortableWorshipSongItem
+                        key={songHeader.id || i}
+                        item={songHeader}
+                        teamId={teamId}
+                        index={i}
+                        onUpdate={(updated) => setSongs(prev => prev.map(s => s.id === updated.id ? updated : s))}
+                        onRemove={() => setSongs(prev => prev.filter(s => s.id !== songHeader.id))}
+                      />
+                    ))}
+                  </Reorder.Group>
+
+                  {/* Ending Song */}
+                  {endingSong?.id && (
+                    <AddedSongHeaderStatic
+                      teamId={teamId}
+                      specialOrderType={WorshipSpecialOrderType.ENDING}
+                      songHeader={endingSong}
+                      onUpdate={(updated) => setEndingSong(updated)}
+                      onRemove={() => setEndingSong(null)}
+                    />
+                  )}
 
                   <div className="pt-2 flex justify-center">
-                    <AddWorshipSongDialogTrigger teamId={teamId}>
+                    <AddWorshipSongDialogTrigger
+                      teamId={teamId}
+                      selectedSongs={songs}
+                      onUpdateList={setSongs}
+                    >
                       <AddSongButton />
                     </AddWorshipSongDialogTrigger>
                   </div>

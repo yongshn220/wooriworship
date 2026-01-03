@@ -1,30 +1,32 @@
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { songAtom } from "@/global-states/song-state";
 import { musicSheetsBySongIdAtom } from "@/global-states/music-sheet-state";
-import { selectedWorshipSongHeaderListAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
 import * as React from "react";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
+import { WorshipSongHeader } from "@/models/worship";
+import { cn } from "@/lib/utils";
 
 interface Props {
   teamId: string
   songId: string
+  selectedSongs: WorshipSongHeader[]
+  onUpdateList: (newSongs: WorshipSongHeader[]) => void
 }
 
-export function AddableSongHeaderDefault({ teamId, songId }: Props) {
+export function AddableSongHeaderDefault({ teamId, songId, selectedSongs, onUpdateList }: Props) {
   const song = useRecoilValue(songAtom(songId))
   const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songId))
-  const [selectedWorshipSongHeaderList, setSelectedWorshipSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
   const [isDetailOpen, setIsDetailOpen] = React.useState(false)
 
   // Check if this song is already in the setlist
-  const existingSongIndex = selectedWorshipSongHeaderList.findIndex(header => header.id === songId)
+  const existingSongIndex = selectedSongs.findIndex(header => header.id === songId)
   const isSelected = existingSongIndex !== -1
-  const selectedSheetIds = isSelected ? selectedWorshipSongHeaderList[existingSongIndex].selected_music_sheet_ids : []
+  const selectedSheetIds = isSelected ? selectedSongs[existingSongIndex].selected_music_sheet_ids : []
 
   function handleToggleKey(sheetId: string) {
     if (isSelected) {
       // Song is already added, toggle the key
-      const currentSheets = selectedWorshipSongHeaderList[existingSongIndex].selected_music_sheet_ids || []
+      const currentSheets = selectedSongs[existingSongIndex].selected_music_sheet_ids || []
       let newSheets = []
       if (currentSheets.includes(sheetId)) {
         newSheets = currentSheets.filter(id => id !== sheetId)
@@ -32,7 +34,7 @@ export function AddableSongHeaderDefault({ teamId, songId }: Props) {
         newSheets = [...currentSheets, sheetId]
       }
 
-      const newList = [...selectedWorshipSongHeaderList]
+      const newList = [...selectedSongs]
       newList[existingSongIndex] = {
         ...newList[existingSongIndex],
         selected_music_sheet_ids: newSheets
@@ -41,17 +43,29 @@ export function AddableSongHeaderDefault({ teamId, songId }: Props) {
       // OPTIONAL: If newSheets is empty, remove the song?
       if (newSheets.length === 0) {
         const listAfterRemove = newList.filter(h => h.id !== songId)
-        setSelectedWorshipSongHeaderList(listAfterRemove)
+        onUpdateList(listAfterRemove)
       } else {
-        setSelectedWorshipSongHeaderList(newList)
+        onUpdateList(newList)
       }
 
     } else {
       // Song not added, add it with this key
-      setSelectedWorshipSongHeaderList(prev => [...prev, {
+      onUpdateList([...selectedSongs, {
         id: songId,
         note: song?.description || "",
         selected_music_sheet_ids: [sheetId]
+      }])
+    }
+  }
+
+  function handleAddWithNoKey() {
+    if (isSelected) {
+      onUpdateList(selectedSongs.filter(h => h.id !== songId));
+    } else {
+      onUpdateList([...selectedSongs, {
+        id: songId,
+        note: song?.description || "",
+        selected_music_sheet_ids: []
       }])
     }
   }
@@ -99,16 +113,11 @@ export function AddableSongHeaderDefault({ teamId, songId }: Props) {
             <div className="flex items-center flex-wrap gap-2 w-full">
               {musicSheets?.length === 0 && (
                 <button
-                  onClick={() => {
-                    if (isSelected) {
-                      setSelectedWorshipSongHeaderList(prev => prev.filter(h => h.id !== songId))
-                    } else {
-                      setSelectedWorshipSongHeaderList(prev => [...prev, {
-                        id: songId, note: song?.description || "", selected_music_sheet_ids: []
-                      }])
-                    }
-                  }}
-                  className={`h-8 px-4 rounded-full text-xs font-bold transition-all ${isSelected ? "bg-blue-600 text-white shadow-md ring-2 ring-blue-600 ring-offset-1" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
+                  onClick={handleAddWithNoKey}
+                  className={cn(
+                    "h-8 px-4 rounded-full text-xs font-bold transition-all",
+                    isSelected ? "bg-blue-600 text-white shadow-md ring-2 ring-blue-600 ring-offset-1" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                  )}
                 >
                   {isSelected ? "Added" : "Add Song"}
                 </button>
@@ -120,12 +129,12 @@ export function AddableSongHeaderDefault({ teamId, songId }: Props) {
                   <button
                     key={sheet.id}
                     onClick={() => handleToggleKey(sheet.id)}
-                    className={`
-                             h-9 min-w-[3rem] px-3 rounded-lg text-sm font-bold transition-all border
-                             ${isKeySelected
+                    className={cn(
+                      "h-9 min-w-[3rem] px-3 rounded-lg text-sm font-bold transition-all border",
+                      isKeySelected
                         ? "bg-blue-600 border-blue-600 text-white shadow-md scale-100 ring-2 ring-blue-600 ring-offset-1"
-                        : "bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"}
-                           `}
+                        : "bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                    )}
                   >
                     {sheet.key}
                   </button>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useRecoilState, useRecoilValueLoadable, useSetRecoilState } from "recoil";
+import { useRecoilValueLoadable, useSetRecoilState } from "recoil";
 import { WorshipSpecialOrderType } from "@/components/constants/enums";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
@@ -11,7 +11,6 @@ import { TeamService } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
 import { songAtom } from "@/global-states/song-state";
 import { WorshipSongHeader } from "@/models/worship";
-import { worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
 import { AddableSongDetailDialogTrigger } from "@/components/elements/design/song/song-detail-card/worship-form/addable-song-detail-dialog-trigger";
 import { AddedSongInnerHeader } from "@/components/elements/design/song/song-header/worship-form/parts/added-song-inner-header";
 
@@ -19,20 +18,18 @@ interface Props {
   teamId: string
   specialOrderType: WorshipSpecialOrderType
   songHeader: WorshipSongHeader
+  onUpdate: (header: WorshipSongHeader) => void
+  onRemove: () => void
 }
 
 type CheckState = boolean | "indeterminate"
 
-export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader }: Props) {
+export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader, onUpdate, onRemove }: Props) {
   const songLoadable = useRecoilValueLoadable(songAtom(songHeader?.id))
   // Utilize Loadable for teamAtom to prevent Suspense
   const teamLoadable = useRecoilValueLoadable(teamAtom(teamId))
   const setTeam = useSetRecoilState(teamAtom(teamId))
-  const setWorshipBeginningSongHeader = useSetRecoilState(worshipBeginningSongHeaderAtom)
-  const setWorshipEndingSongHeader = useSetRecoilState(worshipEndingSongHeaderAtom)
   const [isDefaultChecked, setDefaultChecked] = useState<CheckState>(false)
-
-
 
   useEffect(() => {
     const option = teamLoadable.state === 'hasValue' ? teamLoadable.contents?.option?.worship : null
@@ -65,16 +62,17 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader }: 
   if (songLoadable.state === 'loading' || teamLoadable.state === 'loading') {
     return <Skeleton className="w-full h-[100px] rounded-md" />
   }
+
+  // Handle error case
+  if (songLoadable.state === 'hasError' || !songLoadable.contents) {
+    return <div className="text-red-500 border p-2 rounded">Error loading static song.</div>
+  }
+
   const song = songLoadable.contents
   const team = teamLoadable.contents
 
   function handleRemoveSong() {
-    if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
-      setWorshipBeginningSongHeader(null); return
-    }
-    if (specialOrderType === WorshipSpecialOrderType.ENDING) {
-      setWorshipEndingSongHeader(null); return
-    }
+    onRemove();
   }
 
   function handleCheckStateChange(state: CheckState) {
@@ -136,12 +134,7 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader }: 
   }
 
   function setMusicSheetIds(ids: Array<string>) {
-    if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
-      setWorshipBeginningSongHeader((prev) => ({ ...prev, selected_music_sheet_ids: ids }))
-    }
-    else {
-      setWorshipEndingSongHeader((prev) => ({ ...prev, selected_music_sheet_ids: ids }))
-    }
+    onUpdate({ ...songHeader, selected_music_sheet_ids: ids });
   }
 
   return (

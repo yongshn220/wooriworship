@@ -1,13 +1,11 @@
 import { Textarea } from "@/components/ui/textarea";
-import { useRecoilState, useRecoilValueLoadable } from "recoil";
-import { toPlainObject } from "@/components/util/helper/helper-functions";
+import { useRecoilValueLoadable } from "recoil";
 import { WorshipSongHeader } from "@/models/worship";
 import { MusicSheet } from "@/models/music_sheet";
 import { songAtom } from "@/global-states/song-state";
-import { SwapOrderButton } from "@/components/elements/design/song/song-header/worship-form/parts/swap-order-button";
-import { selectedWorshipSongHeaderListAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
+// Removed SwapOrderButton import as we use drag and drop now
 import React from "react";
-import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog"; // Use read-only detail dialog
+import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
 import { musicSheetsBySongIdAtom } from "@/global-states/music-sheet-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -16,10 +14,11 @@ interface Props {
   teamId: string
   songOrder: number
   songHeader: WorshipSongHeader
+  onUpdate: (updatedHeader: WorshipSongHeader) => void
+  onRemove: () => void
 }
 
-export function AddedSongHeaderDefault({ teamId, songOrder, songHeader }: Props) {
-  const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
+export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate, onRemove }: Props) {
   const songLoadable = useRecoilValueLoadable(songAtom(songHeader?.id))
   // Fetch all available keys for this song to render toggle buttons
   const musicSheetsLoadable = useRecoilValueLoadable(musicSheetsBySongIdAtom(songHeader?.id))
@@ -30,24 +29,19 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader }: Props)
     return <Skeleton className="w-full h-[220px] rounded-2xl" />
   }
 
-  const song = songLoadable.contents
-  const musicSheets = musicSheetsLoadable.contents
+  // Handle errors gracefully? For now assume valid.
+  if (songLoadable.state === 'hasError' || !songLoadable.contents) {
+    return <div className="p-4 border border-red-200 rounded text-red-500">Error loading song</div>
+  }
+
+  const song = songLoadable.contents;
+  const musicSheets = musicSheetsLoadable.state === 'hasValue' ? musicSheetsLoadable.contents : [];
 
   // Current selected keys for this instance
   const selectedKeys = songHeader?.selected_music_sheet_ids || []
 
-  function handleRemoveSong() {
-    setSelectedSongHeaderList(selectedSongHeaderList.filter((_header) => _header.id !== songHeader?.id))
-  }
-
   function handleOnNoteChange(input: string) {
-    const newSongInfoList = toPlainObject(selectedSongHeaderList)
-    newSongInfoList.forEach((_songHeader: WorshipSongHeader) => {
-      if (_songHeader?.id === songHeader?.id) {
-        _songHeader.note = input
-      }
-    })
-    setSelectedSongHeaderList(newSongInfoList)
+    onUpdate({ ...songHeader, note: input });
   }
 
   function handleToggleKey(sheetId: string) {
@@ -62,20 +56,12 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader }: Props)
 
     // Auto-remove check
     if (newSelectedKeys.length === 0) {
-      handleRemoveSong()
-      return
+      onRemove();
+      return;
     }
 
     // Update State
-    setSelectedSongHeaderList((prev) => {
-      const newList = JSON.parse(JSON.stringify(prev)) as Array<WorshipSongHeader>
-      newList.forEach(_header => {
-        if (_header?.id === songHeader?.id) {
-          _header.selected_music_sheet_ids = newSelectedKeys
-        }
-      })
-      return newList
-    })
+    onUpdate({ ...songHeader, selected_music_sheet_ids: newSelectedKeys });
   }
 
   return (
@@ -130,12 +116,11 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader }: Props)
           })}
         </div>
 
-        {/* Swap Handle */}
-        <div className="absolute flex-center -translate-y-1/2 -right-4 top-1/2">
+        {/* Swap Handle - Removed in favor of parent Drag Handle */}
+        {/* <div className="absolute flex-center -translate-y-1/2 -right-4 top-1/2">
           <SwapOrderButton songHeader={songHeader} songOrder={songOrder} />
-        </div>
+        </div> */}
 
-        {/* Note Area */}
         {/* Note Area */}
         <div className="w-full flex-1 mt-2">
           <Textarea
@@ -150,7 +135,7 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader }: Props)
 
       {/* Footer Actions */}
       <div className="flex justify-end pt-2 pr-2">
-        <div className="text-gray-400 hover:text-red-500 cursor-pointer text-xs font-medium transition-colors" onClick={() => handleRemoveSong()}>
+        <div className="text-gray-400 hover:text-red-500 cursor-pointer text-xs font-medium transition-colors" onClick={() => onRemove()}>
           Remove from list
         </div>
       </div>

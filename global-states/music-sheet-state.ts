@@ -34,31 +34,13 @@ export const musicSheetsBySongIdAtom = atomFamily<Array<MusicSheet>, string>({
   key: "musicSheetsAtom",
   default: selectorFamily({
     key: "musicSheetsAtom/default",
-    get: (songId: string) => async ({ get }) => {
-      try {
-        if (!songId) return []
+    get: (songId: string) => ({ get }) => {
+      if (!songId) return []
 
-        const musicSheetIds = get(musicSheetIdsAtom(songId))
-        if (!musicSheetIds) {
-          console.error("err:musicSheetsBySongIdAtom. musicSheetIds not exists"); return []
-        }
+      const musicSheetIds = get(musicSheetIdsAtom(songId))
+      if (!musicSheetIds) return []
 
-        const musicSheetListPromise = musicSheetIds?.map(id => get(musicSheetAtom(id)))
-        if (!musicSheetListPromise) {
-          console.error("err:musicSheetsBySongIdAtom. musicSheetListPromise not exists"); return []
-        }
-
-        const songMusicSheetList = await Promise.all(musicSheetListPromise)
-        if (!songMusicSheetList) {
-          console.error("err:musicSheetsBySongIdAtom. songMusicSheetList not exists"); return []
-        }
-
-        return songMusicSheetList
-      }
-      catch (e) {
-        console.error(e)
-        return []
-      }
+      return musicSheetIds.map(id => get(musicSheetAtom(id)))
     }
   })
 })
@@ -67,28 +49,10 @@ export const musicSheetsByIdsAtom = atomFamily<Array<MusicSheet>, Array<string>>
   key: "musicSheetsByIdsAtom",
   default: selectorFamily({
     key: "musicSheetsByIdsAtom/default",
-    get: (musicSheetIds) => async ({ get }) => {
-      try {
-        if (!musicSheetIds) {
-          console.error("No music sheet ids exist."); return []
-        }
+    get: (musicSheetIds) => ({ get }) => {
+      if (!musicSheetIds || musicSheetIds.length === 0) return []
 
-        const promises = musicSheetIds.map(id => get(musicSheetAtom(id)))
-        if (!promises) {
-          console.error("Fail while loading music sheet promises."); return []
-        }
-
-        const musicSheetList = await Promise.all(promises)
-        if (!musicSheetList) {
-          console.error("Fail while loading music sheet list."); return []
-        }
-
-        return musicSheetList
-      }
-      catch (e) {
-        console.error(e)
-        return []
-      }
+      return musicSheetIds.map(id => get(musicSheetAtom(id)))
     }
   })
 })
