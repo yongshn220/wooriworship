@@ -192,7 +192,7 @@ export function ServingForm(props: ServingFormProps) {
                             >
                                 <div className="space-y-2 text-center">
                                     <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 2</Label>
-                                    <h2 className="text-2xl font-bold text-foreground tracking-tight">Select Worship Team</h2>
+                                    <h2 className="text-2xl font-bold text-foreground tracking-tight">Assign Serving Roles</h2>
                                 </div>
 
                                 <div className="flex flex-col gap-4">
@@ -241,7 +241,7 @@ export function ServingForm(props: ServingFormProps) {
                             >
                                 <div className="space-y-2 text-center">
                                     <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 3</Label>
-                                    <h2 className="text-2xl font-bold text-foreground tracking-tight">Set up Cuelist</h2>
+                                    <h2 className="text-2xl font-bold text-foreground tracking-tight">Set up Worship Flow</h2>
                                 </div>
 
                                 <div className="flex flex-col gap-6">
@@ -447,13 +447,13 @@ export function ServingForm(props: ServingFormProps) {
                                 {/* Minimal Header for Step 4 */}
                                 {selectedDate && (
                                     <div className="flex flex-col items-center justify-center py-4 border-b border-border/10 mb-0 mx-auto mb-2">
-                                        <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 opacity-80">Final Review</span>
+                                        <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 opacity-80">Step 4</span>
                                         <div className="text-center">
                                             <h2 className="text-3xl font-bold text-foreground tracking-tight leading-none mb-1">
-                                                {format(selectedDate, "MMM d")}
+                                                Review & Confirm
                                             </h2>
                                             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide opacity-70">
-                                                {format(selectedDate, "EEEE, yyyy")}
+                                                {format(selectedDate, "EEEE, MMM d, yyyy")}
                                             </p>
                                         </div>
                                     </div>
