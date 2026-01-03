@@ -177,7 +177,7 @@ export function WorshipCardList({ teamId }: Props) {
 
             {/* Tabs (Only show if not searching) */}
             {!searchInput && (
-              <div className="px-4 md:px-6 pt-4 md:pt-6 mb-6">
+              <div className="px-4 md:px-6 pt-4 md:pt-6 mb-4">
                 <SegmentedControl
                   value={activeTab}
                   onChange={(val) => setActiveTab(val)}
@@ -189,8 +189,8 @@ export function WorshipCardList({ teamId }: Props) {
               </div>
             )}
 
-            <div className="px-4 md:px-6 space-y-6">
-              <div className="grid grid-cols-1 gap-6">
+            <div className="px-4 md:px-6 space-y-4">
+              <div className="grid grid-cols-1 gap-4">
                 {
                   visibleWorshipIds.map((worshipId: string, index: number) => (
                     <Suspense key={worshipId} fallback={<WorshipCardSkeleton />}>
