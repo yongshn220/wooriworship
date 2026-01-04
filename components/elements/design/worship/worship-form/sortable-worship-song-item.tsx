@@ -1,9 +1,7 @@
 import React from "react";
-import { Reorder, useDragControls } from "framer-motion";
-import { GripVertical } from "lucide-react";
+import { SortableItem, SortableDragHandle } from "@/components/common/list/sortable-list";
 import { AddedSongHeaderDefault } from "@/components/elements/design/song/song-header/worship-form/added-song-header-default";
 import { WorshipSongHeader } from "@/models/worship";
-import { cn } from "@/lib/utils";
 
 interface SortableWorshipSongItemProps {
     item: WorshipSongHeader;
@@ -14,19 +12,9 @@ interface SortableWorshipSongItemProps {
 }
 
 export function SortableWorshipSongItem({ item, teamId, index, onUpdate, onRemove }: SortableWorshipSongItemProps) {
-    const controls = useDragControls();
-
     return (
-        <Reorder.Item value={item} dragListener={false} dragControls={controls} className="relative z-0 select-none">
-            <div className="flex items-start gap-2">
-                {/* Drag Handle */}
-                <div
-                    className="mt-6 p-2 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 hover:bg-gray-50 rounded-lg transition-colors touch-none"
-                    onPointerDown={(e) => controls.start(e)}
-                >
-                    <GripVertical className="h-5 w-5" />
-                </div>
-
+        <SortableItem value={item} className="z-0 select-none">
+            {(controls) => (
                 <div className="flex-1 min-w-0">
                     <AddedSongHeaderDefault
                         teamId={teamId}
@@ -34,9 +22,10 @@ export function SortableWorshipSongItem({ item, teamId, index, onUpdate, onRemov
                         songHeader={item}
                         onUpdate={onUpdate}
                         onRemove={onRemove}
+                        dragHandle={<SortableDragHandle controls={controls} />}
                     />
                 </div>
-            </div>
-        </Reorder.Item>
+            )}
+        </SortableItem>
     );
 }
