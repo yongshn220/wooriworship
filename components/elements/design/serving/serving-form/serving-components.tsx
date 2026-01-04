@@ -38,26 +38,9 @@ export function AddActionButton({ label, onClick, icon, className }: AddActionBu
 /**
  * Common Card container for roles and sequences.
  */
-interface ServingCardProps {
-    children: React.ReactNode;
-    className?: string;
-    onClick?: () => void;
-}
+import { PlanCard } from "@/components/common/card/plan-card";
 
-export function ServingCard({ children, className, onClick }: ServingCardProps) {
-    return (
-        <div
-            onClick={onClick}
-            className={cn(
-                "group flex flex-col gap-4 p-6 rounded-3xl border bg-white shadow-sm hover:shadow-md transition-all",
-                onClick && "active:scale-[0.98] cursor-pointer",
-                className
-            )}
-        >
-            {children}
-        </div>
-    );
-}
+export const ServingCard = PlanCard;
 
 /**
  * Suggestion list for members in Step 2.
@@ -138,12 +121,7 @@ export function MemberBadge({ name, onRemove, className, isMe = false }: MemberB
             )}
             onClick={handleBadgeClick}
         >
-            <div className={cn(
-                "w-6 h-6 rounded-full flex items-center justify-center",
-                isMe ? "bg-primary/20 text-primary" : "bg-primary/20 text-primary"
-            )}>
-                {isGroup ? <Users className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
-            </div>
+
             {displayName}
             {onRemove && (
                 <button

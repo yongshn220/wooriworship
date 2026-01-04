@@ -9,6 +9,8 @@ import { SongDetailDialog } from "@/components/elements/design/song/song-detail-
 import { musicSheetsBySongIdAtom } from "@/global-states/music-sheet-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 interface Props {
   teamId: string
@@ -16,9 +18,12 @@ interface Props {
   songHeader: WorshipSongHeader
   onUpdate: (updatedHeader: WorshipSongHeader) => void
   onRemove: () => void
+  dragHandle?: React.ReactNode
 }
 
-export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate, onRemove }: Props) {
+import { PlanCard } from "@/components/common/card/plan-card";
+
+export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate, onRemove, dragHandle }: Props) {
   const songLoadable = useRecoilValueLoadable(songAtom(songHeader?.id))
   // Fetch all available keys for this song to render toggle buttons
   const musicSheetsLoadable = useRecoilValueLoadable(musicSheetsBySongIdAtom(songHeader?.id))
@@ -75,10 +80,14 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
         readOnly={true}
       />
 
-      <div className="relative flex flex-col w-full min-h-[220px] border shadow-sm rounded-2xl p-5 gap-4 bg-white transition-all hover:border-blue-200">
-
+      <PlanCard
+        order={songOrder}
+        dragHandle={dragHandle}
+        onRemove={onRemove}
+        className="gap-4 min-h-[220px]"
+      >
         {/* Title Section: Click to Open Detail */}
-        <div className="cursor-pointer" onClick={() => setIsDetailOpen(true)}>
+        <div className={cn("cursor-pointer pr-12", dragHandle && "pl-16")} onClick={() => setIsDetailOpen(true)}>
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <h3 className="text-lg font-bold text-gray-900 leading-tight">
@@ -93,7 +102,7 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
         </div>
 
         {/* Inline Key Toggles */}
-        <div className="flex flex-wrap gap-2">
+        <div className={cn("flex flex-wrap gap-2", dragHandle && "pl-16")}>
           {musicSheets?.map((sheet: MusicSheet) => {
             const isSelected = selectedKeys.includes(sheet.id)
             return (
@@ -116,29 +125,16 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
           })}
         </div>
 
-        {/* Swap Handle - Removed in favor of parent Drag Handle */}
-        {/* <div className="absolute flex-center -translate-y-1/2 -right-4 top-1/2">
-          <SwapOrderButton songHeader={songHeader} songOrder={songOrder} />
-        </div> */}
-
         {/* Note Area */}
         <div className="w-full flex-1 mt-2">
           <Textarea
             className="w-full h-full min-h-[120px] bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-base text-gray-700 resize-none placeholder:text-gray-400 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-all"
-            placeholder="Write a note (e.g. key change, solo part...)"
+            placeholder="Write a note..."
             value={songHeader?.note}
             onChange={(e) => handleOnNoteChange(e.target.value)}
           />
         </div>
-
-      </div>
-
-      {/* Footer Actions */}
-      <div className="flex justify-end pt-2 pr-2">
-        <div className="text-gray-400 hover:text-red-500 cursor-pointer text-xs font-medium transition-colors" onClick={() => onRemove()}>
-          Remove from list
-        </div>
-      </div>
+      </PlanCard>
     </div>
   )
 }

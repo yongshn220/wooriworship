@@ -24,6 +24,7 @@ import { AddActionButton } from "./serving-components";
 
 // Extracted Components
 import { ServingFormSkeleton } from "./serving-form-skeleton";
+import { SortableList } from "@/components/common/list/sortable-list";
 import { SortableRoleItem } from "./items/sortable-role-item";
 import { SortableWorshipItem } from "./items/sortable-worship-item";
 import { SortableTimelineItem } from "./items/sortable-timeline-item";
@@ -196,10 +197,10 @@ export function ServingForm(props: ServingFormProps) {
                                 </div>
 
                                 <div className="flex flex-col gap-4">
-                                    <Reorder.Group axis="y" values={roles} onReorder={(newRoles) => {
+                                    <SortableList items={roles} onReorder={(newRoles) => {
                                         setRoles(newRoles);
                                         ServingService.updateRolesOrder(props.teamId, newRoles).catch(console.error);
-                                    }} className="flex flex-col gap-4">
+                                    }}>
                                         {roles.map((role) => {
                                             const ptItem = items.find(item => item.type === 'WORSHIP_TEAM');
                                             const assignment = ptItem?.assignments.find(a => a.roleId === role.id);
@@ -217,7 +218,7 @@ export function ServingForm(props: ServingFormProps) {
                                                 />
                                             );
                                         })}
-                                    </Reorder.Group>
+                                    </SortableList>
 
                                     <AddActionButton
                                         label="Add Role"
@@ -365,13 +366,13 @@ export function ServingForm(props: ServingFormProps) {
                                                         </p>
                                                     </div>
                                                 )}
-                                                <Reorder.Group axis="y" values={items} onReorder={(newOrdered) => {
+                                                <SortableList items={items} onReorder={(newOrdered) => {
                                                     const updatedItems = newOrdered.map((item, index) => ({
                                                         ...item,
                                                         order: index
                                                     }));
                                                     setItems(updatedItems);
-                                                }} className="flex flex-col gap-4">
+                                                }}>
                                                     {items.map((item, index) => {
                                                         if (item.type === 'WORSHIP_TEAM') {
                                                             return (
@@ -413,7 +414,7 @@ export function ServingForm(props: ServingFormProps) {
                                                             />
                                                         )
                                                     })}
-                                                </Reorder.Group>
+                                                </SortableList>
 
                                                 <AddActionButton
                                                     label="Add Sequence"
@@ -446,7 +447,7 @@ export function ServingForm(props: ServingFormProps) {
                             >
                                 {/* Minimal Header for Step 4 */}
                                 {selectedDate && (
-                                    <div className="flex flex-col items-center justify-center py-4 border-b border-border/10 mb-0 mx-auto mb-2">
+                                    <div className="flex flex-col items-center justify-center py-4 border-b border-border/10 mb-2 -mx-6 px-6">
                                         <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 opacity-80">Step 4</span>
                                         <div className="text-center">
                                             <h2 className="text-3xl font-bold text-foreground tracking-tight leading-none mb-1">

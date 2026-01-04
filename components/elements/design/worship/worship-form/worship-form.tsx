@@ -23,6 +23,7 @@ import { AddSongButton } from "@/components/elements/design/worship/worship-form
 import { AddWorshipSongDialogTrigger } from "@/components/elements/design/song/song-list/worship-form/add-worship-song-dialog-trigger";
 import { SortableWorshipSongItem } from "./sortable-worship-song-item";
 import { AddedSongHeaderDefault } from "@/components/elements/design/song/song-header/worship-form/added-song-header-default";
+import { SortableList } from "@/components/common/list/sortable-list";
 
 // Logic Hook
 import { useWorshipFormLogic } from "./hooks/use-worship-form-logic";
@@ -186,7 +187,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               animate="center"
               exit="exit"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex flex-col gap-6 w-full"
+              className="flex flex-col gap-8 w-full"
             >
               <div className="flex items-end justify-between px-2 pb-1">
                 <div>
@@ -198,57 +199,55 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                 </span>
               </div>
 
-              {/* Card (Full Height) */}
-              <FormSectionCard className="p-0 overflow-hidden space-y-0">
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {/* Flat List (No Card Wrapper) */}
+              <div className="flex flex-col space-y-4">
 
-                  {/* Beginning Song */}
-                  {beginningSong?.id && (
-                    <AddedSongHeaderStatic
+                {/* Beginning Song */}
+                {beginningSong?.id && (
+                  <AddedSongHeaderStatic
+                    teamId={teamId}
+                    specialOrderType={WorshipSpecialOrderType.BEGINNING}
+                    songHeader={beginningSong}
+                    onUpdate={(updated) => setBeginningSong(updated)}
+                    onRemove={() => setBeginningSong(null)}
+                  />
+                )}
+
+                {/* Reorderable List */}
+                <SortableList items={songs} onReorder={setSongs}>
+                  {songs.map((songHeader, i) => (
+                    <SortableWorshipSongItem
+                      key={songHeader.id || i}
+                      item={songHeader}
                       teamId={teamId}
-                      specialOrderType={WorshipSpecialOrderType.BEGINNING}
-                      songHeader={beginningSong}
-                      onUpdate={(updated) => setBeginningSong(updated)}
-                      onRemove={() => setBeginningSong(null)}
+                      index={i}
+                      onUpdate={(updated) => setSongs(prev => prev.map(s => s.id === updated.id ? updated : s))}
+                      onRemove={() => setSongs(prev => prev.filter(s => s.id !== songHeader.id))}
                     />
-                  )}
+                  ))}
+                </SortableList>
 
-                  {/* Reorderable List */}
-                  <Reorder.Group axis="y" values={songs} onReorder={setSongs} className="space-y-3">
-                    {songs.map((songHeader, i) => (
-                      <SortableWorshipSongItem
-                        key={songHeader.id || i}
-                        item={songHeader}
-                        teamId={teamId}
-                        index={i}
-                        onUpdate={(updated) => setSongs(prev => prev.map(s => s.id === updated.id ? updated : s))}
-                        onRemove={() => setSongs(prev => prev.filter(s => s.id !== songHeader.id))}
-                      />
-                    ))}
-                  </Reorder.Group>
+                {/* Ending Song */}
+                {endingSong?.id && (
+                  <AddedSongHeaderStatic
+                    teamId={teamId}
+                    specialOrderType={WorshipSpecialOrderType.ENDING}
+                    songHeader={endingSong}
+                    onUpdate={(updated) => setEndingSong(updated)}
+                    onRemove={() => setEndingSong(null)}
+                  />
+                )}
 
-                  {/* Ending Song */}
-                  {endingSong?.id && (
-                    <AddedSongHeaderStatic
-                      teamId={teamId}
-                      specialOrderType={WorshipSpecialOrderType.ENDING}
-                      songHeader={endingSong}
-                      onUpdate={(updated) => setEndingSong(updated)}
-                      onRemove={() => setEndingSong(null)}
-                    />
-                  )}
-
-                  <div className="pt-2 flex justify-center">
-                    <AddWorshipSongDialogTrigger
-                      teamId={teamId}
-                      selectedSongs={songs}
-                      onUpdateList={setSongs}
-                    >
-                      <AddSongButton />
-                    </AddWorshipSongDialogTrigger>
-                  </div>
+                <div className="pt-2 flex justify-center">
+                  <AddWorshipSongDialogTrigger
+                    teamId={teamId}
+                    selectedSongs={songs}
+                    onUpdateList={setSongs}
+                  >
+                    <AddSongButton />
+                  </AddWorshipSongDialogTrigger>
                 </div>
-              </FormSectionCard>
+              </div>
             </motion.div>
           )}
 
