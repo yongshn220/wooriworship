@@ -43,7 +43,7 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid, fi
                                 {/* Header Row: Title & Who */}
                                 <div className="flex flex-row justify-between items-start gap-4">
                                     <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-                                        <h3 className="text-sm font-bold leading-tight break-keep text-foreground pt-1">
+                                        <h3 className="text-base font-bold leading-tight break-keep text-foreground pt-1">
                                             {item.title || "Untitled Sequence"}
                                         </h3>
 
