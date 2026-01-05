@@ -313,32 +313,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
     if (step > 0) goToStep(step - 1);
   }
 
-  // Animation Variants
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? "100%" : "-100%",
-      opacity: 0,
-      scale: 0.95,
-      rotateY: direction > 0 ? 20 : -20,
-      position: 'absolute' as const
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-      scale: 1,
-      rotateY: 0,
-      position: 'relative' as const
-    },
-    exit: (direction: number) => ({
-      zIndex: 0,
-      x: direction < 0 ? "100%" : "-100%",
-      opacity: 0,
-      scale: 0.95,
-      rotateY: direction < 0 ? 20 : -20,
-      position: 'absolute' as const
-    })
-  };
+  import { slideVariants } from "@/components/constants/animations";
 
   return (
     <FullScreenForm>
