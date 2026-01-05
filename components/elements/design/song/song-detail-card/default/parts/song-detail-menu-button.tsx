@@ -29,8 +29,15 @@ export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = fal
   const router = useRouter()
 
   async function handleEditSong() {
-    if (onCloseDialog) onCloseDialog()
-    router.push(getPathSongEdit(teamId, songId))
+    if (onCloseDialog) {
+      onCloseDialog()
+      // Wait for drawer close animation/cleanup to release pointer-events on body
+      setTimeout(() => {
+        router.push(getPathSongEdit(teamId, songId))
+      }, 300)
+    } else {
+      router.push(getPathSongEdit(teamId, songId))
+    }
   }
 
   async function handleDeleteSong() {
