@@ -68,7 +68,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
 
           {/* Right: Menu Button */}
           <div className="relative z-10 flex items-center justify-end gap-1 w-[80px]">
-            <SongDetailMenuButton teamId={teamId} songId={songId} songTitle={song?.title} readOnly={readOnly} />
+            <SongDetailMenuButton teamId={teamId} songId={songId} songTitle={song?.title} readOnly={readOnly} onCloseDialog={() => setIsOpen(false)} />
           </div>
         </div>
 

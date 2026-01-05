@@ -19,15 +19,17 @@ interface Props {
   songTitle: string
   songId: string
   readOnly?: boolean
+  onCloseDialog?: () => void
 }
 
-export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = false }: Props) {
+export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = false, onCloseDialog }: Props) {
   const song = useRecoilValue(songAtom(songId))
   const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const router = useRouter()
 
   async function handleEditSong() {
+    if (onCloseDialog) onCloseDialog()
     router.push(getPathSongEdit(teamId, songId))
   }
 
