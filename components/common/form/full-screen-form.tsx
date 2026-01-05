@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 // --- Root Container ---
 export const FullScreenForm = ({ children, className }: { children: React.ReactNode; className?: string }) => {
     return (
-        <div className={cn("fixed inset-0 z-[100] bg-gray-50 flex flex-col", className)}>
+        <div className={cn("fixed inset-0 z-[100] bg-gray-50 flex flex-col pointer-events-auto", className)}>
             {children}
         </div>
     );
