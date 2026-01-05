@@ -1,8 +1,10 @@
 import BaseService from "./BaseService";
 import { ServingRole, ServingSchedule } from "@/models/serving";
 import { firestore } from "@/firebase";
+import { Timestamp } from "@firebase/firestore";
 import { arrayRemove, arrayUnion, increment } from "firebase/firestore";
 import LinkingService from "./LinkingService";
+import { parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";
 
 class ServingService extends BaseService {
     private static instance: ServingService;
@@ -156,14 +158,34 @@ class ServingService extends BaseService {
 
     async getSchedules(teamId: string, startDate: string, endDate: string): Promise<ServingSchedule[]> {
         try {
-            const snapshot = await firestore
-                .collection("teams")
-                .doc(teamId)
-                .collection("serving_schedules")
-                .where("date", ">=", startDate)
-                .where("date", "<=", endDate)
-                .get();
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServingSchedule));
+            const startD = parseLocalDate(startDate);
+            startD.setHours(0, 0, 0, 0);
+            const endD = parseLocalDate(endDate);
+            endD.setHours(23, 59, 59, 999);
+
+            // Fetch both Timestamp and String for transition period
+            const [tsSnapshot, strSnapshot] = await Promise.all([
+                firestore
+                    .collection("teams")
+                    .doc(teamId)
+                    .collection("serving_schedules")
+                    .where("date", ">=", Timestamp.fromDate(startD))
+                    .where("date", "<=", Timestamp.fromDate(endD))
+                    .get(),
+                firestore
+                    .collection("teams")
+                    .doc(teamId)
+                    .collection("serving_schedules")
+                    .where("date", ">=", startDate)
+                    .where("date", "<=", endDate)
+                    .get()
+            ]);
+
+            const results = new Map<string, ServingSchedule>();
+            tsSnapshot.docs.forEach(doc => results.set(doc.id, { id: doc.id, ...doc.data() } as ServingSchedule));
+            strSnapshot.docs.forEach(doc => results.set(doc.id, { id: doc.id, ...doc.data() } as ServingSchedule));
+
+            return Array.from(results.values());
         } catch (e) {
             console.error(e);
             return [];
@@ -202,15 +224,31 @@ class ServingService extends BaseService {
 
     async getScheduleByDate(teamId: string, date: string): Promise<ServingSchedule | null> {
         try {
-            const snapshot = await firestore
-                .collection("teams")
-                .doc(teamId)
-                .collection("serving_schedules")
-                .where("date", "==", date)
-                .get();
+            const startD = parseLocalDate(date);
+            startD.setHours(0, 0, 0, 0);
+            const nextD = new Date(startD);
+            nextD.setDate(startD.getDate() + 1);
 
-            if (snapshot.empty) return null;
-            const doc = snapshot.docs[0];
+            const [tsSnapshot, strSnapshot] = await Promise.all([
+                firestore
+                    .collection("teams")
+                    .doc(teamId)
+                    .collection("serving_schedules")
+                    .where("date", ">=", Timestamp.fromDate(startD))
+                    .where("date", "<", Timestamp.fromDate(nextD))
+                    .limit(1)
+                    .get(),
+                firestore
+                    .collection("teams")
+                    .doc(teamId)
+                    .collection("serving_schedules")
+                    .where("date", "==", date)
+                    .limit(1)
+                    .get()
+            ]);
+
+            const doc = tsSnapshot.docs[0] || strSnapshot.docs[0];
+            if (!doc) return null;
             return { id: doc.id, ...doc.data() } as ServingSchedule;
         } catch (e) {
             console.error(e);
@@ -237,7 +275,15 @@ class ServingService extends BaseService {
 
     async createSchedule(teamId: string, schedule: Omit<ServingSchedule, "id">): Promise<ServingSchedule> {
         const ref = firestore.collection("teams").doc(teamId).collection("serving_schedules").doc();
-        const newSchedule = { ...schedule, id: ref.id };
+
+        const normalizedDate = typeof schedule.date === 'string' ? parseLocalDate(schedule.date) : schedule.date.toDate();
+        normalizedDate.setHours(12, 0, 0, 0); // Normalize to local noon
+
+        const newSchedule = {
+            ...schedule,
+            id: ref.id,
+            date: Timestamp.fromDate(normalizedDate)
+        };
         await ref.set(newSchedule);
         if (schedule.worship_id) {
             await LinkingService.linkWorshipAndServing(teamId, schedule.worship_id, newSchedule.id);
@@ -245,7 +291,8 @@ class ServingService extends BaseService {
 
         // Update Stats
         if (schedule.service_tags && schedule.service_tags.length > 0 && schedule.date) {
-            await this.updateTagStats(teamId, schedule.service_tags, schedule.date, "add");
+            const dateStr = typeof schedule.date === 'string' ? schedule.date : timestampToDateString(schedule.date);
+            await this.updateTagStats(teamId, schedule.service_tags, dateStr, "add");
         }
 
         return newSchedule;
@@ -256,17 +303,27 @@ class ServingService extends BaseService {
         const oldDoc = await docRef.get();
         const oldData = oldDoc.data() as ServingSchedule | undefined;
 
-        await docRef.set(schedule, { merge: true });
+        const normalizedDate = typeof schedule.date === 'string' ? parseLocalDate(schedule.date) : (schedule.date as Timestamp).toDate();
+        normalizedDate.setHours(12, 0, 0, 0);
+
+        const updatedSchedule = {
+            ...schedule,
+            date: Timestamp.fromDate(normalizedDate)
+        };
+
+        await docRef.set(updatedSchedule, { merge: true });
 
         // Handle stats update if tags or date changed
         if (oldData) {
             // Remove old stats
             if (oldData.service_tags && oldData.service_tags.length > 0 && oldData.date) {
-                await this.updateTagStats(teamId, oldData.service_tags, oldData.date, "remove");
+                const oldDateStr = typeof oldData.date === 'string' ? oldData.date : timestampToDateString(oldData.date);
+                await this.updateTagStats(teamId, oldData.service_tags, oldDateStr, "remove");
             }
             // Add new stats
             if (schedule.service_tags && schedule.service_tags.length > 0 && schedule.date) {
-                await this.updateTagStats(teamId, schedule.service_tags, schedule.date, "add");
+                const newDateStr = typeof schedule.date === 'string' ? schedule.date : timestampToDateString(schedule.date as Timestamp);
+                await this.updateTagStats(teamId, schedule.service_tags, newDateStr, "add");
             }
         }
     }

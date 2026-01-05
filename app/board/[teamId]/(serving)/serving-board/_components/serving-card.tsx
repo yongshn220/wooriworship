@@ -18,7 +18,8 @@ import { fetchServingRolesSelector } from "@/global-states/servingState";
 import { usersAtom } from "@/global-states/userState";
 import { teamAtom } from "@/global-states/teamState";
 import { auth } from "@/firebase";
-import { getDayPassedFromTimestampShorten, getDynamicDisplayTitle } from "@/components/util/helper/helper-functions";
+import { getDayPassedFromTimestampShorten, getDynamicDisplayTitle, parseLocalDate } from "@/components/util/helper/helper-functions";
+import { Timestamp } from "@firebase/firestore";
 import { ServingHeaderMenu } from "./serving-header-menu";
 import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
 
@@ -60,8 +61,9 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
     ) : false;
 
     // Date Logic
-    const [year, month, day] = schedule.date.split("-").map(Number);
-    const scheduleDate = new Date(year, month - 1, day);
+    const scheduleDate = schedule.date instanceof Timestamp
+        ? schedule.date.toDate()
+        : parseLocalDate(schedule.date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const isPast = scheduleDate < today;

@@ -88,16 +88,15 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
       >
         {/* Title Section: Click to Open Detail */}
         <div className={cn("cursor-pointer pr-12", dragHandle && "pl-16")} onClick={() => setIsDetailOpen(true)}>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-bold text-gray-900 leading-tight">
-                {song?.title}
-              </h3>
-              <span className="text-sm text-gray-400 font-normal">
+          <div className="flex flex-col gap-1 w-full">
+            <h3 className="text-lg font-bold text-gray-900 leading-tight w-full break-words">
+              {song?.title}
+            </h3>
+            {song?.subtitle && (
+              <p className="text-sm text-gray-400 font-normal w-full break-words line-clamp-2">
                 {song?.subtitle}
-              </span>
-            </div>
-            <p className="text-xs text-gray-400">{song?.original?.author || "Unknown Artist"}</p>
+              </p>
+            )}
           </div>
         </div>
 

@@ -14,6 +14,8 @@ import { getPathCreateServing } from "@/components/util/helper/routes";
 import { ServingCard } from "./_components/serving-card";
 import { auth } from "@/firebase";
 import { ServingListSkeleton } from "./_components/serving-list-skeleton";
+import { parseLocalDate, formatToLongDate, timestampToDateString } from "@/components/util/helper/helper-functions";
+import { Timestamp } from "@firebase/firestore";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { EmptyServingBoardPage } from "./_components/empty-serving-board-page";
 import { WorshipPlanPreviewDrawer } from "@/components/elements/design/worship/worship-plan-preview-drawer";
@@ -43,8 +45,12 @@ export default function ServingPage() {
 
                 const data = await ServingService.getSchedules(teamId, startStr, endStr);
 
-                // Sort by date descending as requested
-                data.sort((a, b) => b.date.localeCompare(a.date));
+                // Sort by date descending
+                data.sort((a, b) => {
+                    const dateA = a.date instanceof Timestamp ? a.date.toDate().getTime() : new Date(a.date).getTime();
+                    const dateB = b.date instanceof Timestamp ? b.date.toDate().getTime() : new Date(b.date).getTime();
+                    return dateB - dateA;
+                });
                 setSchedules(data);
             } catch (e) {
                 console.error("Failed to load serving schedules", e);
@@ -62,7 +68,8 @@ export default function ServingPage() {
         const historyList: typeof schedules = [];
 
         schedules.forEach(s => {
-            if (s.date >= todayStr) {
+            const dateStr = s.date instanceof Timestamp ? timestampToDateString(s.date) : s.date;
+            if (dateStr >= todayStr) {
                 upcomingList.push(s);
             } else {
                 historyList.push(s);
@@ -70,10 +77,18 @@ export default function ServingPage() {
         });
 
         // Upcoming: Date ASC
-        upcomingList.sort((a, b) => a.date.localeCompare(b.date));
+        upcomingList.sort((a, b) => {
+            const dateA = a.date instanceof Timestamp ? a.date.toDate().getTime() : new Date(a.date).getTime();
+            const dateB = b.date instanceof Timestamp ? b.date.toDate().getTime() : new Date(b.date).getTime();
+            return dateA - dateB;
+        });
 
         // History: Date DESC (newest past first)
-        historyList.sort((a, b) => b.date.localeCompare(a.date));
+        historyList.sort((a, b) => {
+            const dateA = a.date instanceof Timestamp ? a.date.toDate().getTime() : new Date(a.date).getTime();
+            const dateB = b.date instanceof Timestamp ? b.date.toDate().getTime() : new Date(b.date).getTime();
+            return dateB - dateA;
+        });
 
         return { upcoming: upcomingList, history: historyList };
     }, [schedules]);
