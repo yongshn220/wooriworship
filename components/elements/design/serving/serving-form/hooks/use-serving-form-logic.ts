@@ -14,7 +14,8 @@ import { FormMode } from "@/components/constants/enums";
 import { useServiceDuplicateCheck } from "@/components/common/hooks/use-service-duplicate-check";
 import { ServingFormProps } from "../types";
 import { ServingSchedule, ServingItem, ServingAssignment } from "@/models/serving";
-import { getServiceTitleFromTags } from "@/components/util/helper/helper-functions";
+import { getServiceTitleFromTags, parseLocalDate } from "@/components/util/helper/helper-functions";
+import { Timestamp } from "@firebase/firestore";
 
 // Import Split Hooks
 import { useServingRoles } from "./use-serving-roles";
@@ -159,8 +160,12 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
     const isInitialDataLoaded = useRef(false);
     useEffect(() => {
         if (mode === FormMode.EDIT && initialData && !isInitialDataLoaded.current && roles.length > 0) {
-            const [y, m, d] = initialData.date.split('-').map(Number);
-            const parsedDate = new Date(y, m - 1, d);
+            let parsedDate: Date;
+            if (initialData.date instanceof Timestamp) {
+                parsedDate = initialData.date.toDate();
+            } else {
+                parsedDate = parseLocalDate(initialData.date);
+            }
             setSelectedDate(parsedDate);
             setCurrentMonth(parsedDate);
             setServiceTagIds(initialData.service_tags || []);
@@ -289,7 +294,11 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                     if (mode === FormMode.EDIT) {
                         return prev.map(s => s.id === newSchedule.id ? newSchedule : s);
                     } else {
-                        return [...prev, newSchedule].sort((a, b) => a.date.localeCompare(b.date));
+                        return [...prev, newSchedule].sort((a, b) => {
+                            const dateA = a.date instanceof Timestamp ? a.date.toDate().getTime() : new Date(a.date).getTime();
+                            const dateB = b.date instanceof Timestamp ? b.date.toDate().getTime() : new Date(b.date).getTime();
+                            return dateA - dateB;
+                        });
                     }
                 });
             }

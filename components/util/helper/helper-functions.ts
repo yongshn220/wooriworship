@@ -59,6 +59,40 @@ export function timestampToDateStringFormatted(timestamp: Timestamp) {
   return `${monthNames[monthIndex]} ${day}, ${year}`;
 }
 
+/**
+ * Safely converts a date string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss) 
+ * to a local Date object without time-zone shifting for date-only strings.
+ */
+export function parseLocalDate(dateStr: string): Date {
+  if (!dateStr) return new Date();
+  // If it's just YYYY-MM-DD, parse as local date
+  if (dateStr.length === 10) {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+  return new Date(dateStr);
+}
+
+/**
+ * Standard formatter for local display from multiple inputs
+ */
+export function formatToLongDate(date: Date | Timestamp | string | undefined | null): string {
+  if (!date) return "Undefined";
+  let d: Date;
+  if (date instanceof Timestamp) {
+    d = date.toDate();
+  } else if (typeof date === 'string') {
+    d = parseLocalDate(date);
+  } else {
+    d = date;
+  }
+
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  return `${monthNames[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}
+
 export function getTimePassedFromTimestamp(timestamp: Timestamp) {
   if (!timestamp) return ""
 

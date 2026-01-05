@@ -134,7 +134,7 @@ export function ServingForm(props: ServingFormProps) {
                                                 <AlertCircle className="w-5 h-5 text-orange-500" />
                                             </div>
                                             <div className="flex flex-col min-w-0">
-                                                <h3 className="text-sm font-bold text-orange-900 truncate">Plan already exists.</h3>
+                                                <h3 className="text-sm font-bold text-orange-900 truncate">Serving already exists.</h3>
                                                 <p className="text-xs text-orange-800/80 truncate">
                                                     <span className="mr-1">{format(selectedDate!, "yyyy-MM-dd")}</span>
                                                     <span className="font-semibold text-orange-900">

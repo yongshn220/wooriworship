@@ -1,3 +1,5 @@
+import { Timestamp } from "@firebase/firestore";
+
 export interface ServingRole {
     id: string;
     teamId: string;
@@ -24,7 +26,7 @@ export interface ServingItem {
 export interface ServingSchedule {
     id: string;
     teamId: string;
-    date: string; // YYYY-MM-DD
+    date: string | Timestamp; // Stored as Timestamp (UTC) in DB, kept as string for compatibility
     title?: string; // Optional title for the service (e.g. "Christmas Service")
     service_tags: string[]; // List of tag IDs
     items?: ServingItem[]; // New cue-sheet based structure

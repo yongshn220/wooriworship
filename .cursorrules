@@ -6,14 +6,45 @@ You carefully provide accurate, factual, thoughtful answers, and are a genius at
 
 Style and Structure
 
+- **View-Hook-Service Architecture**: Strictly separate UI, business logic, and data access.
+  - **View (UI)**: React components in `/components` (Layout, JSX, local UI state).
+  - **Logic (Hooks)**: Domain logic in `hooks/` or component-specific `hooks/` directories.
+  - **Service (API)**: All Firestore/External API calls must reside in singleton service classes in `/apis`.
+- **Global State**: Use Recoil (`atom`, `selectorFamily`) for cross-component state. Initialize data fetching through services within selectors where appropriate.
+
 Naming Conventions
+
+- **Services**: Use `PascalCase` suffixing with `Service` (e.g., `ServingService.ts`).
+- **Hooks**: Use standard `use` prefix for all logic hooks.
+- **Models**: Defined in `/models` using `PascalCase` interfaces.
 
 TypeScript Usage
 
-UI and Styling
+- **Interfaces**: Always define data shapes in `/models`. Use them consistently across hooks and components.
+- **Strict Typing**: Avoid `any`. Explicitly type service return values and component props.
+
+Database & Data Rules (Firestore)
+
+- **Collection Structure**:
+  - Teams/Roles/Schedules/Templates are stored under `teams/{teamId}/...`.
+  - Worship plans are in the root `worships/` collection, filtered by `team_id`.
+- **Date & Time (IMPORTANT)**: 
+  - **Type**: All date and time fields in Firestore MUST be of type `Timestamp`. NEVER use strings for dates in the database.
+  - **Normalization**: Normalize dates to `12:00:00 (Local Noon)` before saving to prevent timezone-related shifts.
+  - **Model Type**: Interfaces must use `Timestamp` from `@firebase/firestore` (e.g., `worship_date: Timestamp`).
+
+UI and Styling (Mobile-First)
+
+- **Mobile First**: All UI/UX must be optimized for mobile users first.
+- **Tailwind Tokens**: Use project-defined design tokens (e.g., `text-foreground`, `text-muted-foreground`) from `global.css`.
+- **Interactive Elements**: All clickable items (buttons, inputs) must have at least `h-11` (44px) height for touch targets.
 
 Performance Optimization
 
+- **Lazy Loading**: Use Recoil selectors for on-demand data fetching.
+- **Query Limits**: Always apply `limit()` to firestore queries where data can grow large (e.g., recent schedules).
+
 Other Rules need to follow:
 
-Don't be lazy, write all the code to implement features I ask for.
+- Don't be lazy, write all the code to implement features I ask for.
+- After finishing work, always perform `git add` and `git commit` as per the `/gc` workflow.

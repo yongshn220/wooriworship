@@ -7,6 +7,7 @@ import { teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
 import { ServingSchedule } from "@/models/serving";
 import { useEffect, useState } from "react";
+import { formatToLongDate } from "@/components/util/helper/helper-functions";
 import { ServingService } from "@/apis";
 import { Spinner } from "@/components/ui/spinner";
 import { ClipboardList } from "lucide-react";
@@ -53,7 +54,7 @@ export function ServingRosterDialog({ date, teamId, trigger }: Props) {
                 </div>
             )}
             title="Serving Members"
-            description={format(new Date(date), "MMMM d, yyyy")}
+            description={formatToLongDate(date)}
         >
             <div className="flex-1 space-y-1">
                 {loading ? (

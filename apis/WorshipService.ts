@@ -68,7 +68,11 @@ class WorshipService extends BaseService {
         id: userId,
         time: Timestamp.fromDate(new Date())
       },
-      worship_date: Timestamp.fromDate(worshipInput.date),
+      worship_date: (() => {
+        const d = new Date(worshipInput.date);
+        d.setHours(12, 0, 0, 0); // Normalize to local noon to avoid edge-shift
+        return Timestamp.fromDate(d);
+      })(),
       serving_schedule_id: worshipInput.serving_schedule_id || null
     }
     const worshipId = await this.create(newWorship);
@@ -91,7 +95,11 @@ class WorshipService extends BaseService {
         id: userId,
         time: new Date()
       },
-      worship_date: Timestamp.fromDate(worshipInput.date)
+      worship_date: (() => {
+        const d = new Date(worshipInput.date);
+        d.setHours(12, 0, 0, 0);
+        return Timestamp.fromDate(d);
+      })()
     }
     return await this.update(worshipId, worship);
   }
