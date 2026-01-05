@@ -25,6 +25,7 @@ import { ArrowRight, Check, ChevronLeft, LinkIcon, Music, PlusIcon } from "lucid
 import { MusicSheetUploaderBox } from "@/components/elements/design/song/song-form/music-sheet-uploader-box";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { FullScreenForm, FullScreenFormBody, FullScreenFormFooter, FullScreenFormHeader } from "@/components/common/form/full-screen-form";
 
 interface Props {
   mode: FormMode
@@ -340,30 +341,15 @@ export function SongForm({ mode, teamId, songId }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-[50] bg-gray-50 flex flex-col items-center justify-center overflow-hidden">
+    <FullScreenForm>
+      <FullScreenFormHeader
+        steps={["Identity", "Details", "Context", "Sheets"]}
+        currentStep={step}
+        onStepChange={goToStep}
+        onClose={() => router.back()}
+      />
 
-      {/* 1. Header Progress */}
-      <div className="fixed top-8 left-0 right-0 z-50 px-6 flex flex-col items-center gap-4">
-        <div className="flex gap-2 p-1 bg-white/50 backdrop-blur-md rounded-full shadow-sm border border-white/20">
-          {["Identity", "Details", "Context", "Sheets"].map((label, idx) => (
-            <button
-              key={idx}
-              onClick={() => goToStep(idx)}
-              className={cn(
-                "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
-                step === idx
-                  ? "bg-black text-white shadow-md scale-105"
-                  : "text-gray-400 hover:text-gray-600 hover:bg-white/50"
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 2. Main Content Area */}
-      <div className="w-full max-w-xl h-full px-4 sm:px-6 pt-24 pb-20 flex flex-col relative perspective-1000">
+      <FullScreenFormBody>
         <AnimatePresence initial={false} mode="popLayout" custom={direction}>
 
           {/* Step 1: Identity */}
@@ -404,14 +390,6 @@ export function SongForm({ mode, teamId, songId }: Props) {
                   />
                 </div>
               </div>
-
-              <Button
-                className="h-14 w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shadow-xl mt-auto transition-transform active:scale-95"
-                onClick={nextStep}
-                disabled={!songInput.title}
-              >
-                Next Step <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
             </motion.div>
           )}
 
@@ -479,18 +457,6 @@ export function SongForm({ mode, teamId, songId }: Props) {
                   </div>
                 </div>
               </div>
-
-              <div className="flex gap-4 mt-auto">
-                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
-                  <ChevronLeft className="w-6 h-6" />
-                </Button>
-                <Button
-                  className="h-14 flex-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl active:scale-95 transition-all"
-                  onClick={nextStep}
-                >
-                  Next Step
-                </Button>
-              </div>
             </motion.div>
           )}
 
@@ -526,18 +492,6 @@ export function SongForm({ mode, teamId, songId }: Props) {
                     className="min-h-[120px] text-base bg-gray-50 border-gray-100 rounded-xl resize-none p-3 focus-visible:ring-ring"
                   />
                 </div>
-              </div>
-
-              <div className="flex gap-4 mt-auto">
-                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
-                  <ChevronLeft className="w-6 h-6" />
-                </Button>
-                <Button
-                  className="h-14 flex-1 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shadow-xl active:scale-95 transition-all"
-                  onClick={nextStep}
-                >
-                  Next Step
-                </Button>
               </div>
             </motion.div>
           )}
@@ -592,24 +546,27 @@ export function SongForm({ mode, teamId, songId }: Props) {
                   </div>
                 )}
               </div>
-
-              <div className="flex gap-4 mt-auto pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
-                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
-                  <ChevronLeft className="w-6 h-6" />
-                </Button>
-                <Button
-                  onClick={mode === FormMode.CREATE ? handleCreate : handleEdit}
-                  disabled={isLoading}
-                  className="h-14 flex-1 rounded-full bg-primary text-primary-foreground text-lg font-bold shadow-xl hover:bg-primary/90 active:scale-95 transition-all"
-                >
-                  {isLoading ? "Saving..." : (mode === FormMode.CREATE ? "Create Song" : "Save Changes")} <Check className="ml-2 w-5 h-5" />
-                </Button>
-              </div>
             </motion.div>
           )}
 
         </AnimatePresence>
-      </div>
-    </div>
+      </FullScreenFormBody>
+
+      <FullScreenFormFooter>
+        <div className="w-12 h-12 flex-none">
+          <Button variant="outline" className="h-12 w-12 rounded-full border-border bg-background/80 backdrop-blur-sm hover:bg-background text-muted-foreground shadow-sm disabled:opacity-0 disabled:pointer-events-none transition-opacity duration-300" onClick={prevStep} disabled={step === 0}>
+            <ChevronLeft className="w-6 h-6" />
+          </Button>
+        </div>
+        <Button
+          onClick={step === totalSteps - 1 ? (mode === FormMode.CREATE ? handleCreate : handleEdit) : nextStep}
+          disabled={isLoading || (step === 0 && !songInput.title)}
+          className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
+        >
+          {isLoading ? "Saving..." : step === totalSteps - 1 ? (mode === FormMode.CREATE ? "Create Song" : "Save Changes") : "Next Step"}
+          {step === totalSteps - 1 ? <Check className="w-5 h-5 ml-1" /> : <ArrowRight className="w-5 h-5 ml-1" />}
+        </Button>
+      </FullScreenFormFooter>
+    </FullScreenForm>
   )
 }
