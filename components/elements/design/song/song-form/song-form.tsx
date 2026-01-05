@@ -68,15 +68,32 @@ export function SongForm({ mode, teamId, songId }: Props) {
     description: (mode === FormMode.EDIT) ? song?.description ?? "" : ""
   })
 
+  // Sync song data when it loads (Edit Mode)
+  useEffect(() => {
+    if (mode === FormMode.EDIT && song) {
+      setSongInput(prev => ({
+        ...prev,
+        title: song.title ?? "",
+        subtitle: song.subtitle ?? "",
+        author: song.original.author ?? "",
+        version: song.version ?? "",
+        link: song.original.url ?? "",
+        tags: song.tags ?? [],
+        bpm: song.bpm ?? null,
+        description: song.description ?? ""
+      }));
+    }
+  }, [mode, song]);
+
   const [musicSheetContainers, setMusicSheetContainers] = useState<Array<MusicSheetContainer>>([])
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
 
   useEffect(() => {
-    if (mode === FormMode.EDIT) {
+    if (mode === FormMode.EDIT && musicSheets && musicSheets.length > 0) {
       const _musicSheetContainers: MusicSheetContainer[] = []
-      musicSheets?.forEach((musicSheet) => {
+      musicSheets.forEach((musicSheet) => {
         const mContainer: MusicSheetContainer = {
           id: musicSheet?.id,
           tempId: uuid(),
@@ -88,7 +105,11 @@ export function SongForm({ mode, teamId, songId }: Props) {
         }
         _musicSheetContainers.push(mContainer)
       })
-      setMusicSheetContainers(_musicSheetContainers)
+      // Only update if length differs to avoid simple loops (basic check)
+      setMusicSheetContainers(prev => {
+        if (prev.length === 0 && _musicSheetContainers.length > 0) return _musicSheetContainers;
+        return prev;
+      })
     }
   }, [mode, musicSheets])
 
@@ -319,7 +340,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-[40] bg-gray-50 flex flex-col items-center justify-center overflow-hidden">
+    <div className="fixed inset-0 z-[50] bg-gray-50 flex flex-col items-center justify-center overflow-hidden">
 
       {/* 1. Header Progress */}
       <div className="fixed top-8 left-0 right-0 z-50 px-6 flex flex-col items-center gap-4">
