@@ -26,6 +26,7 @@ import { MusicSheetUploaderBox } from "@/components/elements/design/song/song-fo
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { FullScreenForm, FullScreenFormBody, FullScreenFormFooter, FullScreenFormHeader } from "@/components/common/form/full-screen-form";
+import { slideVariants } from "@/components/constants/animations";
 
 interface Props {
   mode: FormMode
@@ -313,7 +314,6 @@ export function SongForm({ mode, teamId, songId }: Props) {
     if (step > 0) goToStep(step - 1);
   }
 
-  import { slideVariants } from "@/components/constants/animations";
 
   return (
     <FullScreenForm>
