@@ -30,7 +30,7 @@ export const FullScreenFormHeader = ({ steps, currentStep, onStepChange, onClose
             </Button>
 
             {/* Step Bar */}
-            <div className="flex gap-1 p-1 bg-white/50 backdrop-blur-md rounded-full shadow-sm pointer-events-auto absolute left-1/2 -translate-x-1/2">
+            <div className="flex gap-1 p-1 bg-white/50 backdrop-blur-md rounded-full shadow-sm pointer-events-auto absolute top-8 left-1/2 -translate-x-1/2">
                 {steps.map((label, idx) => (
                     <button
                         key={idx}
