@@ -18,6 +18,13 @@ export default function BoardLayout({ children }: any) {
 
 
   useEffect(() => {
+    // Global Navigation Cleanup:
+    // When navigating between pages, ensure any lingering body locks (from closed/unmounted modals) are removed.
+    // This addresses issues where libraries like 'vaul' might leave pointer-events: none on the body if navigation happens rapidly.
+    if (document.body.style.pointerEvents === 'none') {
+      document.body.style.removeProperty('pointer-events');
+    }
+
     if (/^\/board$/.test(pathname)) {
       setPage(Page.BOARD)
     }
