@@ -92,16 +92,6 @@ export function SongForm({ mode, teamId, songId }: Props) {
   const { toast } = useToast()
   const router = useRouter()
 
-  useEffect(() => {
-    // Safety check: Ensure body is interactive when this form mounts.
-    // This fixes issues where previous modals (like SongDetail) might leave the body locked.
-    if (document.body.style.pointerEvents === 'none') {
-      document.body.style.removeProperty('pointer-events');
-    }
-    return () => {
-      document.body.style.removeProperty('pointer-events');
-    }
-  }, []);
 
   useEffect(() => {
     if (mode === FormMode.EDIT && musicSheets && musicSheets.length > 0) {
