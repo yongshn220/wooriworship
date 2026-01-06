@@ -19,25 +19,16 @@ interface Props {
   songTitle: string
   songId: string
   readOnly?: boolean
-  onCloseDialog?: () => void
 }
 
-export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = false, onCloseDialog }: Props) {
+export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = false }: Props) {
   const song = useRecoilValue(songAtom(songId))
   const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const router = useRouter()
 
   async function handleEditSong() {
-    if (onCloseDialog) {
-      onCloseDialog()
-      // Wait for drawer close animation/cleanup to release pointer-events on body
-      setTimeout(() => {
-        router.push(getPathSongEdit(teamId, songId))
-      }, 300)
-    } else {
-      router.push(getPathSongEdit(teamId, songId))
-    }
+    router.push(getPathSongEdit(teamId, songId))
   }
 
   async function handleDeleteSong() {
