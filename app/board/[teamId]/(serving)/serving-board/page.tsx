@@ -118,18 +118,7 @@ export default function ServingPage() {
         }
     };
 
-    // Update Global Header Actions
-    useEffect(() => {
-        if (selectedScheduleId && teamId) {
-            setHeaderActions(
-                <ServingHeaderMenu scheduleId={selectedScheduleId} teamId={teamId} />
-            );
-        } else {
-            setHeaderActions(null);
-        }
 
-        return () => setHeaderActions(null);
-    }, [selectedScheduleId, teamId, setHeaderActions]);
 
 
     if (loading) {

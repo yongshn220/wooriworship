@@ -5,7 +5,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, SquarePen, Trash2 } from "lucide-react";
+import { MoreHorizontal, MoreVertical, SquarePen, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getPathEditServing } from "@/components/util/helper/routes";
 import { useState } from "react";
@@ -20,9 +20,11 @@ import { auth } from "@/firebase";
 interface Props {
     scheduleId: string;
     teamId: string;
+    trigger?: React.ReactNode;
+    iconType?: "horizontal" | "vertical";
 }
 
-export function ServingHeaderMenu({ scheduleId, teamId }: Props) {
+export function ServingHeaderMenu({ scheduleId, teamId, trigger, iconType = "horizontal" }: Props) {
     const [user] = useAuthState(auth as any);
     const router = useRouter();
     const { toast } = useToast();
@@ -55,14 +57,22 @@ export function ServingHeaderMenu({ scheduleId, teamId }: Props) {
 
     if (!user) return null;
 
+    const defaultTrigger = (
+        <Button variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground data-[state=open]:bg-muted">
+            <span className="sr-only">Open menu</span>
+            {iconType === "horizontal" ? (
+                <MoreHorizontal className="h-5 w-5" />
+            ) : (
+                <MoreVertical className="h-5 w-5" />
+            )}
+        </Button>
+    );
+
     return (
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground data-[state=open]:bg-muted">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-5 w-5" />
-                    </Button>
+                    {trigger || defaultTrigger}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-[160px]">
                     <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
