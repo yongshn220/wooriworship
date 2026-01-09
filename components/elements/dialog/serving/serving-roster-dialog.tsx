@@ -12,7 +12,7 @@ import { ServingService } from "@/apis";
 import { Spinner } from "@/components/ui/spinner";
 import { ClipboardList } from "lucide-react";
 import { ResponsiveDrawer } from "@/components/ui/responsive-drawer";
-import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
+import { WorshipTeamCard } from "@/components/elements/design/serving/parts/worship-team-card";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
 
@@ -43,6 +43,14 @@ export function ServingRosterDialog({ date, teamId, trigger }: Props) {
 
     const getMemberName = (id: string) => teamMembers.find(m => m.id === id)?.name || id;
 
+    const getDialogTitle = () => {
+        if (!schedule || !team?.service_tags) return "Serving Members";
+        const tagIds = schedule.service_tags || [];
+        if (tagIds.length === 0) return "Serving Members";
+        const tagName = team.service_tags.find((t: any) => t.id === tagIds[0])?.name;
+        return tagName || "Serving Members";
+    };
+
     return (
         <ResponsiveDrawer
             open={isOpen}
@@ -53,7 +61,7 @@ export function ServingRosterDialog({ date, teamId, trigger }: Props) {
                     Serving Members
                 </div>
             )}
-            title="Serving Members"
+            title={getDialogTitle()}
             description={formatToLongDate(date)}
         >
             <div className="flex-1 space-y-1">
@@ -65,8 +73,8 @@ export function ServingRosterDialog({ date, teamId, trigger }: Props) {
                     </div>
                 ) : (
                     <div className="space-y-1">
-                        <ServingMemberList
-                            schedule={schedule}
+                        <WorshipTeamCard
+                            worshipRoles={schedule.worship_roles || schedule.roles || []}
                             roles={roles}
                             members={teamMembers}
                             currentUserUid={user?.uid}

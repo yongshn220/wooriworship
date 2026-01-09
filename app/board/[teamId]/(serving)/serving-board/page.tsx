@@ -2,7 +2,7 @@
 
 
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
 import { format } from "date-fns";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState";
@@ -14,8 +14,8 @@ import { Timestamp } from "@firebase/firestore";
 import { EmptyServingBoardPage } from "./_components/empty-serving-board-page";
 import { WorshipPlanPreviewDrawer } from "@/components/elements/design/worship/worship-plan-preview-drawer";
 import { CalendarStrip } from "@/components/elements/design/serving/calendar-strip";
-import { ServingDetailView } from "@/components/elements/design/serving/serving-detail-view";
-import { usersAtom } from "@/global-states/userState";
+import { ServingDetailContainer } from "@/components/elements/design/serving/serving-detail-container";
+
 import { getPathCreateServing } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
 import { auth } from "@/firebase";
@@ -39,17 +39,7 @@ export default function ServingPage() {
 
     const roles = useRecoilValue(fetchServingRolesSelector(teamId || ""));
 
-    // Fetch members only for the selected schedule
-    const allMemberIds = useMemo(() => {
-        if (!selectedSchedule) return [];
-        return [
-            ...(selectedSchedule.items?.flatMap(item => item.assignments.flatMap(a => a.memberIds)) || []),
-            ...(selectedSchedule.worship_roles?.flatMap(a => a.memberIds) || []),
-            ...(selectedSchedule.roles?.flatMap(r => r.memberIds) || [])
-        ];
-    }, [selectedSchedule]);
 
-    const members = useRecoilValue(usersAtom(allMemberIds));
     const currentUserUid = auth.currentUser?.uid;
 
     // Load schedules (Initial: Upcoming only)
@@ -163,13 +153,14 @@ export default function ServingPage() {
                     />
 
                     {selectedSchedule ? (
-                        <ServingDetailView
-                            schedule={selectedSchedule}
-                            roles={roles}
-                            members={members}
-                            currentUserUid={currentUserUid}
-                            teamId={teamId || ""}
-                        />
+                        <Suspense fallback={<ServingListSkeleton />}>
+                            <ServingDetailContainer
+                                schedule={selectedSchedule}
+                                roles={roles}
+                                currentUserUid={currentUserUid}
+                                teamId={teamId || ""}
+                            />
+                        </Suspense>
                     ) : (
                         <div className="py-10 text-center text-muted-foreground">
                             Select a schedule to view details

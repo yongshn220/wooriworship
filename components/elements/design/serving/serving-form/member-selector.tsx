@@ -57,7 +57,9 @@ export function MemberSelector({
 
     const handleAddAsGroup = () => {
         if (onAddGroup && searchQuery.trim()) {
-            onAddGroup(searchQuery.trim());
+            const groupName = searchQuery.trim();
+            onAddGroup(groupName);
+            onSelect(`group:${groupName}`);
             setSearchQuery("");
         }
     };
