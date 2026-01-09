@@ -2,12 +2,12 @@
 
 import { ServingRole, ServingSchedule } from "@/models/serving";
 import { User } from "@/models/user";
-import { cn } from "@/lib/utils";
-import { Music, List } from "lucide-react";
 import { teamAtom } from "@/global-states/teamState";
 import { useRecoilValue } from "recoil";
 import { getDynamicDisplayTitle } from "@/components/util/helper/helper-functions";
 import { ServingInfoCard } from "./parts/serving-info-card";
+import { WorshipTeamCard } from "./parts/worship-team-card";
+import { ServiceOrderCard } from "./parts/service-order-card";
 
 interface Props {
     schedule: ServingSchedule;
@@ -19,14 +19,6 @@ interface Props {
 
 export function ServingDetailView({ schedule, roles, members, currentUserUid, teamId }: Props) {
     const team = useRecoilValue(teamAtom(teamId));
-
-    const getMemberName = (uid: string) => {
-        if (uid.startsWith("group:")) {
-            return uid.replace(/^group:/, "");
-        }
-        const member = members.find(m => m.id === uid);
-        return member?.name || uid;
-    };
 
     const hasWorshipRoles = schedule.worship_roles && schedule.worship_roles.length > 0;
     const hasItems = schedule.items && schedule.items.length > 0;

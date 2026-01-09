@@ -4,6 +4,7 @@ import { ServingItem } from "@/models/serving";
 import { User } from "@/models/user";
 import { cn } from "@/lib/utils";
 import { List } from "lucide-react";
+import { getMemberName } from "@/components/util/helper/helper-functions";
 
 interface Props {
     items: ServingItem[];
@@ -13,14 +14,6 @@ interface Props {
 
 export function ServiceOrderCard({ items, members, currentUserUid }: Props) {
     if (!items || items.length === 0) return null;
-
-    const getMemberName = (uid: string) => {
-        if (uid.startsWith("group:")) {
-            return uid.replace(/^group:/, "");
-        }
-        const member = members.find(m => m.id === uid);
-        return member?.name || uid;
-    };
 
     return (
         <div className="space-y-2">
@@ -62,7 +55,7 @@ export function ServiceOrderCard({ items, members, currentUserUid }: Props) {
                                             ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400 font-bold"
                                             : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
                                     )}>
-                                        {getMemberName(uid)}
+                                        {getMemberName(uid, members)}
                                     </span>
                                 ))}
                             </div>
