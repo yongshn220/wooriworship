@@ -78,7 +78,7 @@ export function CalendarStrip({ schedules, selectedScheduleId, onSelect, onLoadP
                             <div className="flex flex-col items-center gap-1">
                                 <History className={cn("w-5 h-5", hasMorePast ? "text-slate-400" : "text-slate-300 dark:text-slate-600")} />
                                 <span className={cn("text-[10px] font-medium leading-tight text-center", hasMorePast ? "text-slate-500" : "text-slate-400 dark:text-slate-600")}>
-                                    {hasMorePast ? "Load\nPrev" : "No\nMore"}
+                                    {hasMorePast ? "Load\nHistory" : "No\nHistory"}
                                 </span>
                             </div>
                         )}
