@@ -38,6 +38,7 @@ export function ServingDetailView({ schedule, roles, members, currentUserUid, te
         <div className="space-y-5 pb-24">
             {/* Info Card Component */}
             <ServingInfoCard
+                scheduleId={schedule.id}
                 title={displayTitle}
                 date={schedule.date}
                 worshipId={schedule.worship_id}

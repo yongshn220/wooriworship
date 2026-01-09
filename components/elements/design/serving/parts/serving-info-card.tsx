@@ -7,15 +7,17 @@ import { useRouter } from "next/navigation";
 import { getPathWorshipView } from "@/components/util/helper/routes";
 import { Timestamp } from "@firebase/firestore";
 import { parseLocalDate } from "@/components/util/helper/helper-functions";
+import { ServingHeaderMenu } from "../serving-header-menu";
 
 interface Props {
+    scheduleId: string;
     title: string;
     date: Date | Timestamp | string;
     worshipId?: string;
     teamId: string;
 }
 
-export function ServingInfoCard({ title, date, worshipId, teamId }: Props) {
+export function ServingInfoCard({ scheduleId, title, date, worshipId, teamId }: Props) {
     const router = useRouter();
 
     const dateObj = date instanceof Timestamp ? date.toDate() : parseLocalDate(date);
@@ -34,9 +36,17 @@ export function ServingInfoCard({ title, date, worshipId, teamId }: Props) {
                             <span className="text-sm">{dateStr}</span>
                         </div>
                     </div>
-                    <button className="text-muted-foreground hover:text-foreground transition-colors p-1 -mr-2 -mt-2">
-                        <MoreVertical className="w-5 h-5" />
-                    </button>
+
+                    <ServingHeaderMenu
+                        scheduleId={scheduleId}
+                        teamId={teamId}
+                        iconType="vertical"
+                        trigger={
+                            <button className="text-muted-foreground hover:text-foreground transition-colors p-1 -mr-2 -mt-2">
+                                <MoreVertical className="w-5 h-5" />
+                            </button>
+                        }
+                    />
                 </div>
 
                 {worshipId && (
