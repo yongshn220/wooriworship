@@ -2,6 +2,8 @@
 description: Inspect the updated code by ai.
 ---
 
+방금 업데이트한 부분에 대해 아래를 검수해.
+
 1. 하드코딩 금지 (Standardize): 모든 수치(색상, 간격, 크기)는 정해진 디자인 토큰만 사용한다.
 2. 부품화 (Componentize): UI는 잘게 쪼개어 공통 컴포넌트로 만들고, 어디서든 조립할 수 있게 설계한다.
 3. 로직 분리 (Decouple): 화면(UI)과 기능(Logic)을 섞지 않는다. 데이터 처리는 전용 Hooks/Service에서만 수행한다.
