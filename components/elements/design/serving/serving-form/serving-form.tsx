@@ -21,6 +21,8 @@ import { MemberSelector } from "./member-selector";
 import { WorshipPlanPreviewDrawer } from "../../worship/worship-plan-preview-drawer";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { AddActionButton } from "./serving-components";
+import { WorshipTeamCard } from "../parts/worship-team-card";
+import { ServiceOrderCard } from "../parts/service-order-card";
 
 // Extracted Components
 import { ServingFormSkeleton } from "./serving-form-skeleton";
@@ -442,19 +444,26 @@ export function ServingForm(props: ServingFormProps) {
                                 )}
 
                                 {/* CUE SHEET / TIMELINE LIST */}
-                                <div className="flex flex-col w-full">
-                                    <ServingMemberList
-                                        schedule={{ items, worship_roles: worshipRoles, id: "", date: "", teamId: "" } as any}
+                                <div className="flex flex-col w-full px-4 space-y-5 pb-24">
+                                    <WorshipTeamCard
+                                        worshipRoles={worshipRoles}
                                         roles={roles}
                                         members={teamMembers}
                                         currentUserUid={auth.currentUser?.uid}
                                     />
-                                    {items.length === 0 && (
+
+                                    <ServiceOrderCard
+                                        items={items}
+                                        members={teamMembers}
+                                        currentUserUid={auth.currentUser?.uid}
+                                    />
+
+                                    {items.length === 0 && worshipRoles.length === 0 && (
                                         <div className="py-12 text-center space-y-3">
                                             <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center mx-auto">
                                                 <FileText className="w-5 h-5 text-muted-foreground/50" />
                                             </div>
-                                            <p className="text-muted-foreground text-sm">No items in the plan yet.</p>
+                                            <p className="text-muted-foreground text-sm">No details available for this plan yet.</p>
                                         </div>
                                     )}
                                 </div>
