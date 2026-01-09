@@ -118,6 +118,18 @@ export default function ServingPage() {
         }
     };
 
+    // Handle automatic re-selection if the currently selected schedule is deleted
+    useEffect(() => {
+        if (!selectedScheduleId || schedules.length === 0) return;
+
+        const exists = schedules.some(s => s.id === selectedScheduleId);
+        if (!exists) {
+            // Selected item was deleted. Select the first available one as a fallback.
+            setSelectedScheduleId(schedules[0].id);
+        }
+    }, [schedules, selectedScheduleId]);
+
+
 
 
 
