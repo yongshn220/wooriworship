@@ -4,6 +4,7 @@ import { saveAs } from "file-saver";
 import { Song } from "@/models/song";
 import { MusicSheetContainer } from "@/components/constants/types";
 import { MusicSheet } from "@/models/music_sheet";
+import { User } from "@/models/user";
 import MusicSheetService from "@/apis/MusicSheetService";
 
 export function getFirebaseTimestampNow() {
@@ -514,4 +515,12 @@ export function getDynamicDisplayTitle(
   }
 
   return fallbackTitle || "Untitled";
+}
+
+export function getMemberName(uid: string, members: User[]) {
+  if (uid.startsWith("group:")) {
+    return uid.replace(/^group:/, "");
+  }
+  const member = members.find(m => m.id === uid);
+  return member?.name || uid;
 }
