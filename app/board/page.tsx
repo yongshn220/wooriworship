@@ -30,7 +30,7 @@ export default function BoardPage() {
     if (teamId) {
       router.push(getPathPlan(teamId))
     }
-  }, [teamId])
+  }, [teamId, router])
 
   async function handleSignOut() {
     try {

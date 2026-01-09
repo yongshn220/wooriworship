@@ -24,7 +24,7 @@ export const getSuggestionsForTitle = (
         // Ensure items exist
         if (!schedule.items) continue;
 
-        const matchItems = schedule.items.filter(i => i.title.trim() === normalizedTitle && i.type !== 'WORSHIP_TEAM');
+        const matchItems = schedule.items.filter(i => i.title.trim() === normalizedTitle && (i as any).type !== 'WORSHIP_TEAM');
 
         for (const item of matchItems) {
             if (!item.assignments) continue;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { ServingService } from "@/apis";
 import { ServingItem, ServingAssignment } from "@/models/serving";
@@ -16,6 +16,10 @@ export function useServingTemplates(teamId: string, items: ServingItem[], setIte
     const [tempTemplateName, setTempTemplateName] = useState("");
     const [createEmptyMode, setCreateEmptyMode] = useState(false);
 
+    // Ref for items to access latest value in effect without adding to dependecy array
+    const itemsRef = React.useRef(items);
+    itemsRef.current = items;
+
     // Initial Load
     useEffect(() => {
         if (teamId) {
@@ -24,13 +28,13 @@ export function useServingTemplates(teamId: string, items: ServingItem[], setIte
                 setIsTemplatesLoaded(true);
 
                 // Inject Sample Flow if no templates exist
-                if (data.length === 0 && items.length <= 1) { // 1 because 'WORSHIP_TEAM' might be auto-added by useServingTimeline?
+                if (data.length === 0 && itemsRef.current.length <= 1) { // 1 because 'WORSHIP_TEAM' might be auto-added by useServingTimeline?
                     // Actually, useServingTimeline might add WORSHIP_TEAM if missing.
                     // But if we want a full sample flow:
                     const sampleItems: ServingItem[] = [
                         { id: Math.random().toString(36).substr(2, 9), type: 'FLOW', title: '묵상기도', order: 0, assignments: [{ memberIds: [] }] },
                         { id: Math.random().toString(36).substr(2, 9), type: 'FLOW', title: '신앙고백', order: 1, assignments: [{ memberIds: [] }] },
-                        { id: Math.random().toString(36).substr(2, 9), type: 'WORSHIP_TEAM', title: '찬양', order: 2, assignments: [] }, // Will be merged/managed by timeline hook?
+                        { id: Math.random().toString(36).substr(2, 9), type: 'FLOW', title: '찬양', order: 2, assignments: [{ memberIds: [] }] }, // Will be merged/managed by timeline hook?
                         { id: Math.random().toString(36).substr(2, 9), type: 'FLOW', title: '대표기도', order: 3, assignments: [{ memberIds: [] }] },
                         { id: Math.random().toString(36).substr(2, 9), type: 'FLOW', title: '성경봉독', order: 4, assignments: [{ memberIds: [] }] },
                         { id: Math.random().toString(36).substr(2, 9), type: 'FLOW', title: '말씀선포', order: 5, assignments: [{ memberIds: [] }] },
@@ -42,7 +46,7 @@ export function useServingTemplates(teamId: string, items: ServingItem[], setIte
                 }
             }).catch(console.error);
         }
-    }, [teamId]);
+    }, [teamId, setItems]);
 
     // Track changes
     useEffect(() => {
@@ -76,7 +80,7 @@ export function useServingTemplates(teamId: string, items: ServingItem[], setIte
         try {
             const defaultFixedItem = {
                 title: '찬양',
-                type: 'WORSHIP_TEAM',
+                type: 'FLOW',
                 remarks: "",
                 assignments: [] as ServingAssignment[]
             };

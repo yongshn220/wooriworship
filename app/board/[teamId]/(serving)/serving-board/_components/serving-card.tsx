@@ -123,11 +123,11 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                             {/* Right Actions */}
                             <div className="flex items-center gap-2">
                                 {/* Worship Plan Link Button */}
-                                {schedule.worshipId && onPreviewWorship && (
+                                {schedule.worship_id && onPreviewWorship && (
                                     <div
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            onPreviewWorship(schedule.worshipId!);
+                                            onPreviewWorship(schedule.worship_id!);
                                         }}
                                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors cursor-pointer"
                                     >

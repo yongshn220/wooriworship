@@ -27,8 +27,8 @@ export enum UserRole {
 }
 
 export enum FormMode {
-  EDIT,
-  CREATE
+  EDIT = "EDIT",
+  CREATE = "CREATE"
 }
 
 export enum InvitationStatus {

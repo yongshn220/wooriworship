@@ -2,6 +2,7 @@
 
 import React from "react";
 import { format, addDays, nextFriday, nextSunday, isSaturday, isSunday, isFriday, isSameDay } from "date-fns";
+import { timestampToDateString } from "@/components/util/helper/helper-functions";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
@@ -11,6 +12,7 @@ import TeamService from "@/apis/TeamService";
 import ServingService from "@/apis/ServingService";
 import { useRecoilValue } from "recoil";
 import { teamAtom } from "@/global-states/teamState";
+import { Team } from "@/models/team";
 
 interface ServiceDateSelectorProps {
     teamId: string;
@@ -40,8 +42,9 @@ export function ServiceDateSelector({
     const [tempKnownTags, setTempKnownTags] = React.useState<{ id: string, name: string }[]>([]);
 
     // Get team data for tags
+    // Get team data for tags
     const team = useRecoilValue(teamAtom(teamId));
-    const serviceTags = team?.service_tags || [];
+    const serviceTags = React.useMemo(() => team?.service_tags || [], [team?.service_tags]);
 
     // --- Advanced Smart Quick Select (Learning Model V2) --- 
     const [shortcuts, setShortcuts] = React.useState<{ id: string | null, title: string, date: Date }[]>([]);
@@ -51,7 +54,7 @@ export function ServiceDateSelector({
             // Fetch fresh tags to ensure we have the latest list (Recoil might be stale)
             let currentServiceTags = serviceTags;
             try {
-                const freshTeam = await TeamService.getById(teamId);
+                const freshTeam = (await TeamService.getById(teamId)) as Team;
                 if (freshTeam && freshTeam.service_tags) {
                     currentServiceTags = freshTeam.service_tags;
                 }
@@ -112,7 +115,8 @@ export function ServiceDateSelector({
                             // Calculate mode weekday from recent schedules
                             const dayCounts: Record<number, number> = {};
                             recent.forEach(s => {
-                                const [y, m, d] = s.date.split('-').map(Number); // Safe local parsing
+                                const dateStr = typeof s.date === 'string' ? s.date : timestampToDateString(s.date);
+                                const [y, m, d] = dateStr.split('-').map(Number); // Safe local parsing
                                 const day = new Date(y, m - 1, d).getDay();
                                 dayCounts[day] = (dayCounts[day] || 0) + 1;
                             });

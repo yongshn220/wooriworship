@@ -78,34 +78,22 @@ class ServingService extends BaseService {
         const rolesRef = firestore.collection("teams").doc(teamId).collection("serving_roles");
 
         try {
-            await firestore.runTransaction(async (transaction) => {
-                // Fetch all existing roles for this team
-                // Note: Transaction get queries must be done before writes.
-                // However, fetching collection inside transaction requires query.
-                // Firestore transactions require reads before writes.
-                // Simple get() on collection is not directly supported in all transaction SDKs as 'read'.
-                // But we can do a query.
-                const existingSnapshot = await transaction.get(rolesRef);
-                const existingNames = new Set(existingSnapshot.docs.map(doc => (doc.data().name as string).toLowerCase()));
+            // Refactored to use regular get() + batch write because transaction.get(CollectionReference) is not supported in client SDK.
+            const existingSnapshot = await rolesRef.get();
+            const existingNames = new Set(existingSnapshot.docs.map(doc => (doc.data().name as string).toLowerCase()));
 
-                const rolesToAdd = standardRoles.filter(name => !existingNames.has(name.toLowerCase()));
+            const rolesToAdd = standardRoles.filter(name => !existingNames.has(name.toLowerCase()));
 
-                if (rolesToAdd.length === 0) return; // All exist
+            if (rolesToAdd.length === 0) return; // All exist
 
-                // Add missing roles
-                rolesToAdd.forEach((name, index) => {
-                    // Order logic: append after existing? Or just use index?
-                    // Standard init is usually for empty teams. 
-                    // If merging, maybe set order to existing.length + index?
-                    // Let's keep it simple: just add them. Order might be mixed if we just add.
-                    // To be safe on order, we could fetch max order.
-                    // But for now, ensuring no duplicates is priority.
-                    const newRoleRef = rolesRef.doc();
-                    // We use standardRoles index for order preference, but it might conflict if we append.
-                    // A better way for initialization is:
-                    transaction.set(newRoleRef, { id: newRoleRef.id, teamId, name, order: 100 + index });
-                });
+            const batch = firestore.batch();
+
+            rolesToAdd.forEach((name, index) => {
+                const newRoleRef = rolesRef.doc();
+                batch.set(newRoleRef, { id: newRoleRef.id, teamId, name, order: 100 + index });
             });
+
+            await batch.commit();
         } catch (e) {
             console.error("Failed to initialize standard roles:", e);
         }
@@ -381,7 +369,8 @@ class ServingService extends BaseService {
 
         // Remove stats before deletion
         if (data && data.service_tags && data.service_tags.length > 0 && data.date) {
-            await this.updateTagStats(teamId, data.service_tags, data.date, "remove");
+            const dateStr = typeof data.date === 'string' ? data.date : timestampToDateString(data.date);
+            await this.updateTagStats(teamId, data.service_tags, dateStr, "remove");
         }
 
         await docRef.delete();

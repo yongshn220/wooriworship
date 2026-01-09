@@ -1,13 +1,13 @@
 "use client";
 
-import { ServingRole, ServingWorshipRole } from "@/models/serving";
+import { ServingRole, ServingAssignment } from "@/models/serving";
 import { User } from "@/models/user";
 import { cn } from "@/lib/utils";
 import { Music } from "lucide-react";
 import { getMemberName } from "@/components/util/helper/helper-functions";
 
 interface Props {
-    worshipRoles: ServingWorshipRole[];
+    worshipRoles: ServingAssignment[];
     roles: ServingRole[];
     members: User[];
     currentUserUid?: string | null;

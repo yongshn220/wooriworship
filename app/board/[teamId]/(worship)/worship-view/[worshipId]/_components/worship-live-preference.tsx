@@ -18,7 +18,7 @@ export function WorshipLivePreference() {
         })
         setMultipleSheetsView(preferences.worshipLive.multipleSheetsView)
         setPageMode(preferences.worshipLive.pageMode ?? WorshipViewPageMode.SINGLE_PAGE)
-    }, [preferences.worshipLive, setWorshipLiveOptions, setMultipleSheetsView]);
+    }, [preferences.worshipLive, setWorshipLiveOptions, setMultipleSheetsView, setPageMode]);
 
 
     return <></>

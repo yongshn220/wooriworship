@@ -22,8 +22,7 @@ interface Props {
 export function NoticeHeaderMenu({ noticeId, createdById }: Props) {
   const [user] = useAuthState(auth as any);
   const teamId = useRecoilValue(currentTeamIdAtom)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const noticeUpdater = useSetRecoilState(noticeUpdaterAtom)
+  useSetRecoilState(noticeUpdaterAtom)
   const setNoticeIdsUpdater = useSetRecoilState(noticeIdsUpdaterAtom)
   const router = useRouter()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
