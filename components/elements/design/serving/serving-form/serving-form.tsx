@@ -60,7 +60,7 @@ export function ServingForm(props: ServingFormProps) {
         setLinkedWorshipId, setPreviewWorshipId, setActiveSelection,
         setIsRoleDialogOpen, setNewRoleName, setIsTemplateDialogOpen, setIsRenameDialogOpen,
         setNewTemplateName, setTempTemplateName, setCreateEmptyMode, setStandardGroups, setCustomMemberNames,
-        setDeleteConfirm, setRoles,
+        setDeleteConfirm, setRoles, worshipRoles, handleAssignMemberToRole,
 
         // Actions
         handleAddMember, handleAddMemberByRole, handleSubmit, handleCreateRole, handleDeleteRole,
@@ -202,8 +202,7 @@ export function ServingForm(props: ServingFormProps) {
                                         ServingService.updateRolesOrder(props.teamId, newRoles).catch(console.error);
                                     }}>
                                         {roles.map((role) => {
-                                            const ptItem = items.find(item => item.type === 'WORSHIP_TEAM');
-                                            const assignment = ptItem?.assignments.find(a => a.roleId === role.id);
+                                            const assignment = worshipRoles.find(a => a.roleId === role.id);
                                             const memberIds = assignment?.memberIds || [];
 
                                             return (
@@ -212,7 +211,7 @@ export function ServingForm(props: ServingFormProps) {
                                                     role={role}
                                                     memberIds={memberIds}
                                                     teamMembers={teamMembers}
-                                                    onAddMember={handleAddMemberByRole}
+                                                    onAddMember={handleAssignMemberToRole}
                                                     onDeleteRole={() => setDeleteConfirm({ type: 'role', id: role.id, open: true })}
                                                     onOpenAdd={() => setActiveSelection({ roleId: role.id })}
                                                 />
@@ -258,9 +257,7 @@ export function ServingForm(props: ServingFormProps) {
                                                             ...it,
                                                             id: Math.random().toString(36).substr(2, 9),
                                                             order: idx,
-                                                            assignments: it.type === 'WORSHIP_TEAM'
-                                                                ? (items.find(i => i.type === 'WORSHIP_TEAM')?.assignments || [])
-                                                                : []
+                                                            assignments: []
                                                         })));
                                                     }}
                                                     className={cn(
@@ -367,28 +364,12 @@ export function ServingForm(props: ServingFormProps) {
                                                     </div>
                                                 )}
                                                 <SortableList items={items} onReorder={(newOrdered) => {
-                                                    const updatedItems = newOrdered.map((item, index) => ({
+                                                    setItems(newOrdered.map((item, index) => ({
                                                         ...item,
                                                         order: index
-                                                    }));
-                                                    setItems(updatedItems);
+                                                    })));
                                                 }}>
                                                     {items.map((item, index) => {
-                                                        if (item.type === 'WORSHIP_TEAM') {
-                                                            return (
-                                                                <SortableWorshipItem
-                                                                    key={item.id}
-                                                                    item={item}
-                                                                    getMemberName={(id: string) => teamMembers.find(m => m.id === id)?.name || id}
-                                                                    onGoToStep2={() => goToStep(1)}
-                                                                    onUpdate={(newItem) => {
-                                                                        const newItems = items.map(i => i.id === item.id ? newItem : i);
-                                                                        setItems(newItems);
-                                                                    }}
-                                                                    roles={roles}
-                                                                />
-                                                            );
-                                                        }
                                                         return (
                                                             <SortableTimelineItem
                                                                 key={item.id}
@@ -463,7 +444,7 @@ export function ServingForm(props: ServingFormProps) {
                                 {/* CUE SHEET / TIMELINE LIST */}
                                 <div className="flex flex-col w-full">
                                     <ServingMemberList
-                                        schedule={{ items, id: "", date: "", teamId: "" } as any} // Mocking minimal schedule object
+                                        schedule={{ items, worship_roles: worshipRoles, id: "", date: "", teamId: "" } as any}
                                         roles={roles}
                                         members={teamMembers}
                                         currentUserUid={auth.currentUser?.uid}
@@ -570,14 +551,14 @@ export function ServingForm(props: ServingFormProps) {
                                             activeSelection?.itemId && activeSelection.assignmentIndex !== undefined
                                                 ? items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds || []
                                                 : activeSelection?.roleId
-                                                    ? items.find(i => i.type === 'WORSHIP_TEAM')?.assignments.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
+                                                    ? worshipRoles.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
                                                     : []
                                         }
                                         onSelect={(memberId) => {
                                             if (activeSelection?.itemId && activeSelection.assignmentIndex !== undefined) {
                                                 handleAddMember(activeSelection.itemId, activeSelection.assignmentIndex, memberId);
                                             } else if (activeSelection?.roleId) {
-                                                handleAddMemberByRole(activeSelection.roleId, memberId);
+                                                handleAssignMemberToRole(activeSelection.roleId, memberId);
                                             }
                                         }}
                                         multiple

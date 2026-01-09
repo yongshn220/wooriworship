@@ -282,7 +282,8 @@ class ServingService extends BaseService {
         const newSchedule = {
             ...schedule,
             id: ref.id,
-            date: Timestamp.fromDate(normalizedDate)
+            date: Timestamp.fromDate(normalizedDate),
+            worship_roles: schedule.worship_roles || [], // Explicitly save roles
         };
         await ref.set(newSchedule);
         if (schedule.worship_id) {
@@ -308,7 +309,9 @@ class ServingService extends BaseService {
 
         const updatedSchedule = {
             ...schedule,
-            date: Timestamp.fromDate(normalizedDate)
+            date: Timestamp.fromDate(normalizedDate),
+            worship_roles: schedule.worship_roles || [], // Explicitly save roles
+            items: schedule.items || [] // Explicitly save items
         };
 
         await docRef.set(updatedSchedule, { merge: true });

@@ -53,6 +53,16 @@ const config = {
           DEFAULT: "var(--card)",
           foreground: "var(--card-foreground)",
         },
+        surface: {
+          DEFAULT: "#F8FAFC",
+          dark: "#000000",
+        },
+        panel: {
+          DEFAULT: "#FFFFFF",
+          dark: "#1C1C1E",
+        },
+        "border-light": "#E2E8F0",
+        "border-dark": "#27272A",
       },
       borderRadius: {
         lg: "var(--radius)",

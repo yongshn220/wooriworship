@@ -20,7 +20,7 @@ import { teamAtom } from "@/global-states/teamState";
 import { auth } from "@/firebase";
 import { getDayPassedFromTimestampShorten, getDynamicDisplayTitle, parseLocalDate } from "@/components/util/helper/helper-functions";
 import { Timestamp } from "@firebase/firestore";
-import { ServingHeaderMenu } from "./serving-header-menu";
+import { ServingHeaderMenu } from "@/components/elements/design/serving/serving-header-menu";
 import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
 
 interface Props {
@@ -43,9 +43,11 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
     const displayTitle = getDynamicDisplayTitle(schedule.service_tags, team?.service_tags, schedule.title);
 
     // Gather all member IDs involved in this schedule for batch fetching
-    const allMemberIds = schedule.items
-        ? schedule.items.flatMap(item => item.assignments.flatMap(a => a.memberIds))
-        : (schedule.roles?.flatMap(r => r.memberIds) || []);
+    const allMemberIds = [
+        ...(schedule.items?.flatMap(item => item.assignments.flatMap(a => a.memberIds)) || []),
+        ...(schedule.worship_roles?.flatMap(a => a.memberIds) || []),
+        ...(schedule.roles?.flatMap(r => r.memberIds) || []) // Fallback for really old data
+    ];
 
     const members = useRecoilValue(usersAtom(allMemberIds));
 
@@ -55,9 +57,9 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
 
     // Check if current user is serving in this schedule
     const isMeServing = currentUserUid ? (
-        schedule.items
-            ? schedule.items.some(item => item.assignments.some(a => a.memberIds.includes(currentUserUid)))
-            : (schedule.roles?.some(r => r.memberIds.includes(currentUserUid)) || false)
+        (schedule.items?.some(item => item.assignments.some(a => a.memberIds.includes(currentUserUid))) || false) ||
+        (schedule.worship_roles?.some(a => a.memberIds.includes(currentUserUid)) || false) ||
+        (schedule.roles?.some(r => r.memberIds.includes(currentUserUid)) || false)
     ) : false;
 
     // Date Logic
@@ -209,6 +211,7 @@ export function ServingCard({ schedule, teamId, currentUserUid, defaultExpanded 
                         ) : (
                             <p className="mt-2 text-sm text-muted-foreground line-clamp-1">
                                 {schedule.items ? `${schedule.items.length} items` : `${schedule.roles?.length || 0} roles`}
+                                {schedule.worship_roles && schedule.worship_roles.length > 0 && `, ${schedule.worship_roles.length} roles`}
                                 , {allMemberIds.length} members assigned
                             </p>
                         )}

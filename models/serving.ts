@@ -14,13 +14,14 @@ export interface ServingAssignment {
     memberIds: string[];
 }
 
+
 export interface ServingItem {
     id: string;
     order: number;
     title: string;
     assignments: ServingAssignment[];
     remarks?: string;
-    type: 'FLOW' | 'SUPPORT' | 'WORSHIP_TEAM';
+    type: 'FLOW' | 'SUPPORT';
 }
 
 export interface ServingSchedule {
@@ -29,10 +30,11 @@ export interface ServingSchedule {
     date: string | Timestamp; // Stored as Timestamp (UTC) in DB, kept as string for compatibility
     title?: string; // Optional title for the service (e.g. "Christmas Service")
     service_tags: string[]; // List of tag IDs
-    items?: ServingItem[]; // New cue-sheet based structure
+    worship_roles?: ServingAssignment[]; // New: Separated Worship Team Roles
+    items?: ServingItem[]; // New cue-sheet based structure (Strictly Flow)
     templateId?: string; // Track which template was used
     worship_id?: string; // Linked Worship Plan ID
-    roles?: { // Keep for backward compatibility
+    roles?: { // Keep for backward compatibility (Legacy V1)
         roleId: string;
         memberIds: string[];
     }[];
