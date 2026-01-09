@@ -66,19 +66,19 @@ export function CalendarStrip({ schedules, selectedScheduleId, onSelect, onLoadP
                         onClick={hasMorePast ? onLoadPrev : undefined}
                         disabled={isLoadingPrev || !hasMorePast}
                         className={cn(
-                            "snap-center shrink-0 w-[4.5rem] h-[5.5rem] rounded-xl flex flex-col items-center justify-center transition-all group relative border",
+                            "snap-center shrink-0 w-[4.5rem] h-[5.5rem] rounded-xl flex flex-col items-center justify-center transition-colors group relative border",
                             hasMorePast
-                                ? "bg-panel dark:bg-panel-dark border-border-light dark:border-border-dark hover:border-blue-300 dark:hover:border-blue-700 active:scale-95 opacity-90 cursor-pointer"
+                                ? "bg-panel dark:bg-panel-dark border-dashed border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 cursor-pointer"
                                 : "bg-slate-50 dark:bg-white/5 border-transparent opacity-50 cursor-default"
                         )}
                     >
                         {isLoadingPrev ? (
                             <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
                         ) : (
-                            <div className="flex flex-col items-center gap-1">
-                                <History className={cn("w-5 h-5", hasMorePast ? "text-slate-400" : "text-slate-300 dark:text-slate-600")} />
-                                <span className={cn("text-[10px] font-medium leading-tight text-center", hasMorePast ? "text-slate-500" : "text-slate-400 dark:text-slate-600")}>
-                                    {hasMorePast ? "Load\nHistory" : "No\nHistory"}
+                            <div className="flex flex-col items-center gap-1.5">
+                                <History className={cn("w-5 h-5", hasMorePast ? "text-slate-400 group-hover:text-slate-500" : "text-slate-300 dark:text-slate-600")} />
+                                <span className={cn("text-[10px] font-semibold leading-tight text-center uppercase tracking-wider", hasMorePast ? "text-slate-400 group-hover:text-slate-500" : "text-slate-300 dark:text-slate-600")}>
+                                    {hasMorePast ? "History" : "None"}
                                 </span>
                             </div>
                         )}
