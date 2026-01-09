@@ -165,6 +165,7 @@ export default function ServingPage() {
                             roles={roles}
                             members={members}
                             currentUserUid={currentUserUid}
+                            teamId={teamId || ""}
                         />
                     ) : (
                         <div className="py-10 text-center text-muted-foreground">

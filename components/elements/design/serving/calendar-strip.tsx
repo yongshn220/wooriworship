@@ -72,21 +72,13 @@ export function CalendarStrip({ schedules, selectedScheduleId, onSelect, onLoadP
                                 : "bg-slate-50 dark:bg-white/5 border-transparent opacity-50 cursor-default"
                         )}
                     >
-                        <div className={cn(
-                            "text-[9px] font-bold px-2 py-0.5 rounded-full absolute -top-2 border shadow-sm z-20 whitespace-nowrap",
-                            hasMorePast
-                                ? "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700"
-                                : "bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-600 border-slate-200 dark:border-slate-800"
-                        )}>
-                            {hasMorePast ? "Previous" : "Start"}
-                        </div>
                         {isLoadingPrev ? (
                             <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
                         ) : (
-                            <div className="flex flex-col items-center">
-                                <History className={cn("w-5 h-5 mb-1", hasMorePast ? "text-slate-400" : "text-slate-300 dark:text-slate-600")} />
-                                <span className={cn("text-[10px] font-medium", hasMorePast ? "text-slate-500" : "text-slate-400 dark:text-slate-600")}>
-                                    {hasMorePast ? "Load" : "No More"}
+                            <div className="flex flex-col items-center gap-1">
+                                <History className={cn("w-5 h-5", hasMorePast ? "text-slate-400" : "text-slate-300 dark:text-slate-600")} />
+                                <span className={cn("text-[10px] font-medium leading-tight text-center", hasMorePast ? "text-slate-500" : "text-slate-400 dark:text-slate-600")}>
+                                    {hasMorePast ? "Load\nPrev" : "No\nMore"}
                                 </span>
                             </div>
                         )}
