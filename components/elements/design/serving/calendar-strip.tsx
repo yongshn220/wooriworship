@@ -17,7 +17,14 @@ interface Props {
     hasMorePast?: boolean;
 }
 
-export function CalendarStrip({ schedules, selectedScheduleId, onSelect, onLoadPrev, isLoadingPrev, hasMorePast = true }: Props) {
+export function CalendarStrip({
+    schedules,
+    selectedScheduleId,
+    onSelect,
+    onLoadPrev,
+    isLoadingPrev,
+    hasMorePast = true
+}: Props) {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
@@ -26,7 +33,7 @@ export function CalendarStrip({ schedules, selectedScheduleId, onSelect, onLoadP
         if (selectedScheduleId && itemRefs.current.has(selectedScheduleId)) {
             const el = itemRefs.current.get(selectedScheduleId);
             if (el) {
-                el.scrollIntoView({ inline: 'start', behavior: 'smooth', block: 'nearest' });
+                el.scrollIntoView({ inline: "start", behavior: "smooth", block: "nearest" });
             }
         }
     }, [selectedScheduleId]);
