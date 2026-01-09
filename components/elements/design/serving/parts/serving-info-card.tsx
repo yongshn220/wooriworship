@@ -41,6 +41,8 @@ export function ServingInfoCard({ scheduleId, title, date, worshipId, teamId }: 
                         scheduleId={scheduleId}
                         teamId={teamId}
                         iconType="vertical"
+                        scheduleTitle={title}
+                        scheduleDate={dateStr}
                         trigger={
                             <button className="text-muted-foreground hover:text-foreground transition-colors p-1 -mr-2 -mt-2">
                                 <MoreVertical className="w-5 h-5" />
