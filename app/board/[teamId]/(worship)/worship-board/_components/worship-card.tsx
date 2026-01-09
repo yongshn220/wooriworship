@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useRef, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useRecoilValue, useRecoilValueLoadable } from "recoil";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -78,14 +78,9 @@ export function WorshipCard({ worshipId, isFirst, defaultExpanded = false }: Pro
   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
 
   // Auto-scroll to this card if it's the expanded one from URL
-  const searchParams = useSearchParams();
-  useEffect(() => {
-    if (searchParams.get("expanded") === worshipId) {
-      setTimeout(() => {
-        cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
-    }
-  }, [searchParams, worshipId]);
+  // Auto-scroll removed
+
+  // Auto-scroll removed
 
   // State Selectors
   const team = useRecoilValue(teamAtom(teamId));
