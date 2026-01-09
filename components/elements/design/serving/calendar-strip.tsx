@@ -144,6 +144,10 @@ interface DateCardProps {
     setRef: (el: HTMLButtonElement | null) => void;
 }
 
+import { differenceInCalendarDays } from "date-fns";
+
+// ... (DateCardProps interface remains same)
+
 function DateCard({ schedule, isSelected, onSelect, baseClasses, setRef }: DateCardProps) {
     const date = schedule.date instanceof Timestamp ? schedule.date.toDate() : parseLocalDate(schedule.date);
     const day = format(date, "d");
@@ -156,6 +160,18 @@ function DateCard({ schedule, isSelected, onSelect, baseClasses, setRef }: DateC
     }
     if (schedule.title) {
         topLabel = schedule.title.length > 4 ? schedule.title.substring(0, 4) : schedule.title;
+    }
+
+    // D-Day Calculation
+    const today = new Date();
+    const diffDays = differenceInCalendarDays(date, today);
+    const isUpcoming = diffDays >= 0;
+
+    // Format D-Day
+    let dDayLabel = null;
+    if (isUpcoming) {
+        if (diffDays === 0) dDayLabel = "D-Day";
+        else dDayLabel = `D-${diffDays}`;
     }
 
     return (
@@ -192,9 +208,20 @@ function DateCard({ schedule, isSelected, onSelect, baseClasses, setRef }: DateC
             )}>
                 {day}
             </span>
-            <span className="text-[9px] font-medium text-muted-foreground">
-                {weekDay}
-            </span>
+
+            <div className="flex flex-col items-center leading-none mt-0.5">
+                <span className="text-[9px] font-medium text-muted-foreground">
+                    {weekDay}
+                </span>
+                {dDayLabel && (
+                    <span className={cn(
+                        "text-[9px] font-bold mt-0.5",
+                        isSelected ? "text-blue-600 dark:text-blue-400" : "text-blue-500/80"
+                    )}>
+                        {dDayLabel}
+                    </span>
+                )}
+            </div>
         </button>
     );
 }
