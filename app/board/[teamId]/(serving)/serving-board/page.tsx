@@ -25,6 +25,8 @@ export default function ServingPage() {
     const [schedules, setSchedules] = useRecoilState(servingSchedulesAtom);
     const [loading, setLoading] = useState(true);
     const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
+    const [isLoadingPast, setIsLoadingPast] = useState(false);
+    const [hasMorePast, setHasMorePast] = useState(true);
     const router = useRouter();
     const setHeaderActions = useSetRecoilState(headerActionsAtom);
 
@@ -48,24 +50,22 @@ export default function ServingPage() {
     const members = useRecoilValue(usersAtom(allMemberIds));
     const currentUserUid = auth.currentUser?.uid;
 
-    // Load schedules
+    // Load schedules (Initial: Upcoming only)
     useEffect(() => {
         async function loadData() {
             if (!teamId) return;
             try {
-                // Fetch a wide range: 3 months past to 6 months future
-                const pastDate = new Date();
-                pastDate.setMonth(pastDate.getMonth() - 3);
-
+                // Fetch Future: Today to 6 months future
+                const today = new Date();
                 const futureDate = new Date();
                 futureDate.setMonth(futureDate.getMonth() + 6);
 
-                const startStr = format(pastDate, "yyyy-MM-dd");
+                const startStr = format(today, "yyyy-MM-dd");
                 const endStr = format(futureDate, "yyyy-MM-dd");
 
                 const data = await ServingService.getSchedules(teamId, startStr, endStr);
 
-                // Sort by date ASC (for calendar strip flow)
+                // Sort by date ASC
                 data.sort((a, b) => {
                     const dateA = a.date instanceof Timestamp ? a.date.toDate().getTime() : new Date(a.date).getTime();
                     const dateB = b.date instanceof Timestamp ? b.date.toDate().getTime() : new Date(b.date).getTime();
@@ -73,19 +73,9 @@ export default function ServingPage() {
                 });
                 setSchedules(data);
 
-                // Set default selection to nearest upcoming (or last if all past, first if all future)
+                // Select most recent upcoming (first item in sorted future list)
                 if (data.length > 0) {
-                    const todayStr = format(new Date(), "yyyy-MM-dd");
-                    const upcoming = data.find(s => {
-                        const sDate = s.date instanceof Timestamp ? timestampToDateString(s.date) : s.date;
-                        return sDate >= todayStr;
-                    });
-                    // specific request: "Nearest upcoming". If none, maybe the last one (most recent past).
-                    if (upcoming) {
-                        setSelectedScheduleId(upcoming.id);
-                    } else {
-                        setSelectedScheduleId(data[data.length - 1].id);
-                    }
+                    setSelectedScheduleId(data[0].id);
                 }
             } catch (e) {
                 console.error("Failed to load serving schedules", e);
@@ -95,6 +85,38 @@ export default function ServingPage() {
         }
         loadData();
     }, [teamId, setSchedules]);
+
+    const handleLoadPast = async () => {
+        if (!teamId || schedules.length === 0 || isLoadingPast || !hasMorePast) return;
+        setIsLoadingPast(true);
+        try {
+            const firstSchedule = schedules[0];
+            const firstDate = firstSchedule.date instanceof Timestamp ? firstSchedule.date.toDate() : new Date(firstSchedule.date);
+
+            // Limit 5
+            const LIMIT = 5;
+            const pastData = await ServingService.getPreviousSchedules(teamId, firstDate, LIMIT);
+
+            if (pastData.length < LIMIT) {
+                setHasMorePast(false);
+            }
+
+            if (pastData.length > 0) {
+                // Sort past data ASC to merge correctly (though getPrevious returns DESC usually)
+                pastData.sort((a, b) => {
+                    const dateA = a.date instanceof Timestamp ? a.date.toDate().getTime() : new Date(a.date).getTime();
+                    const dateB = b.date instanceof Timestamp ? b.date.toDate().getTime() : new Date(b.date).getTime();
+                    return dateA - dateB;
+                });
+
+                setSchedules(prev => [...pastData, ...prev]);
+            }
+        } catch (e) {
+            console.error("Failed to load past schedules", e);
+        } finally {
+            setIsLoadingPast(false);
+        }
+    };
 
     // Update Global Header Actions
     useEffect(() => {
@@ -132,6 +154,9 @@ export default function ServingPage() {
                         schedules={schedules}
                         selectedScheduleId={selectedScheduleId}
                         onSelect={setSelectedScheduleId}
+                        onLoadPrev={handleLoadPast}
+                        isLoadingPrev={isLoadingPast}
+                        hasMorePast={hasMorePast}
                     />
 
                     {selectedSchedule ? (
