@@ -21,7 +21,7 @@ export function WorshipPlanPreviewDrawer({ isOpen, onClose, worshipId }: Props) 
                 <div className="p-4 overflow-y-auto no-scrollbar pb-10">
                     {worshipId && (
                         <Suspense fallback={<WorshipCardSkeleton />}>
-                            <WorshipCard worshipId={worshipId} isFirst={true} />
+                            <WorshipCard worshipId={worshipId} isFirst={true} defaultExpanded={true} />
                         </Suspense>
                     )}
                 </div>
