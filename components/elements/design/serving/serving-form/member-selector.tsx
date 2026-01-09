@@ -85,7 +85,6 @@ export function MemberSelector({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-12 h-14 bg-muted/30 border-0 rounded-2xl text-[16px] ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 placeholder:text-muted-foreground/40"
-                    autoFocus
                 />
             </div>
 
