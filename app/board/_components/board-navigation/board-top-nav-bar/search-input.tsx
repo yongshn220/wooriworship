@@ -34,7 +34,6 @@ export function SearchInput() {
         placeholder="Search songs..."
         value={localInput}
         onChange={(e) => setLocalInput(e.target.value)}
-        autoFocus
       />
       <div className="absolute right-1.5 top-1/2 transform -translate-y-1/2">
         <SearchFilterPopover>
