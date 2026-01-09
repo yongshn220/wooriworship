@@ -3,16 +3,28 @@
 import { ServingRole, ServingSchedule } from "@/models/serving";
 import { User } from "@/models/user";
 import { cn } from "@/lib/utils";
-import { Music, List } from "lucide-react";
+import { Music, List, Calendar, ArrowRight } from "lucide-react";
+import { teamAtom } from "@/global-states/teamState";
+import { useRecoilValue } from "recoil";
+import { getDynamicDisplayTitle, parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";
+import { Timestamp } from "@firebase/firestore";
+import { format } from "date-fns";
+import { useRouter } from "next/navigation";
+import { getPathWorshipView } from "@/components/util/helper/routes";
+import { Button } from "@/components/ui/button";
 
 interface Props {
     schedule: ServingSchedule;
     roles: ServingRole[];
     members: User[];
     currentUserUid?: string | null;
+    teamId: string;
 }
 
-export function ServingDetailView({ schedule, roles, members, currentUserUid }: Props) {
+export function ServingDetailView({ schedule, roles, members, currentUserUid, teamId }: Props) {
+    const team = useRecoilValue(teamAtom(teamId));
+    const router = useRouter();
+
     const getMemberName = (uid: string) => {
         if (uid.startsWith("group:")) {
             return uid.replace(/^group:/, "");
@@ -24,8 +36,41 @@ export function ServingDetailView({ schedule, roles, members, currentUserUid }: 
     const hasWorshipRoles = schedule.worship_roles && schedule.worship_roles.length > 0;
     const hasItems = schedule.items && schedule.items.length > 0;
 
+    // Info Card Data
+    const displayTitle = getDynamicDisplayTitle(schedule.service_tags, team?.service_tags, schedule.title);
+    const dateObj = schedule.date instanceof Timestamp ? schedule.date.toDate() : parseLocalDate(schedule.date);
+    const dateStr = format(dateObj, "yyyy M d (EEE)");
+
     return (
         <div className="space-y-5 pb-24">
+            {/* Info Card */}
+            <div className="bg-slate-50 dark:bg-white/5 rounded-2xl p-5 relative overflow-hidden">
+                <div className="flex flex-col gap-3 relative z-10">
+                    <div>
+                        <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1">
+                            {displayTitle}
+                        </h1>
+                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium">
+                            <Calendar className="w-4 h-4" />
+                            <span className="text-sm">{dateStr}</span>
+                        </div>
+                    </div>
+
+                    {schedule.worship_id && (
+                        <div className="flex justify-end mt-2">
+                            <Button
+                                variant="ghost"
+                                onClick={() => router.push(getPathWorshipView(teamId, schedule.worship_id!))}
+                                className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-blue-600 dark:text-blue-400 text-sm font-semibold h-9 rounded-xl px-4 shadow-sm border border-slate-100 dark:border-slate-700 transition-all active:scale-95 flex items-center gap-1"
+                            >
+                                worship plan
+                                <ArrowRight className="w-4 h-4" />
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            </div>
+
             {/* Worship Team Section */}
             {hasWorshipRoles && (
                 <div className="space-y-2">
