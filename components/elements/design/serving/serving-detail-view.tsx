@@ -1,30 +1,14 @@
-"use client";
+import { useState } from "react";
+import { generateWorshipTitle } from "@/components/util/helper/helper-functions";
+import { WorshipPlanPreviewDrawer } from "../worship/worship-plan-preview-drawer";
 
-import { ServingRole, ServingSchedule } from "@/models/serving";
-import { User } from "@/models/user";
-import { teamAtom } from "@/global-states/teamState";
-import { useRecoilValue } from "recoil";
-import { getDynamicDisplayTitle } from "@/components/util/helper/helper-functions";
-import { ServingInfoCard } from "./parts/serving-info-card";
-import { WorshipTeamCard } from "./parts/worship-team-card";
-import { ServiceOrderCard } from "./parts/service-order-card";
-
-interface Props {
-    schedule: ServingSchedule;
-    roles: ServingRole[];
-    members: User[];
-    currentUserUid?: string | null;
-    teamId: string;
-}
+// ... imports
 
 export function ServingDetailView({ schedule, roles, members, currentUserUid, teamId }: Props) {
     const team = useRecoilValue(teamAtom(teamId));
+    const [previewWorshipId, setPreviewWorshipId] = useState<string | null>(null);
 
-    const hasWorshipRoles = schedule.worship_roles && schedule.worship_roles.length > 0;
-    const hasItems = schedule.items && schedule.items.length > 0;
-
-    // Resolve Display Title
-    const displayTitle = getDynamicDisplayTitle(schedule.service_tags, team?.service_tags, schedule.title);
+    // ... existing consts
 
     return (
         <div className="space-y-5 pb-24">
@@ -35,22 +19,10 @@ export function ServingDetailView({ schedule, roles, members, currentUserUid, te
                 date={schedule.date}
                 worshipId={schedule.worship_id}
                 teamId={teamId}
+                onPreview={setPreviewWorshipId}
             />
 
-            {/* Worship Team Section */}
-            <WorshipTeamCard
-                worshipRoles={schedule.worship_roles || []}
-                roles={roles}
-                members={members}
-                currentUserUid={currentUserUid}
-            />
-
-            {/* Service Order Section */}
-            <ServiceOrderCard
-                items={schedule.items || []}
-                members={members}
-                currentUserUid={currentUserUid}
-            />
+            {/* ... existing sections ... */}
 
             {/* Empty State / Fallback */}
             {!hasWorshipRoles && !hasItems && (
@@ -58,6 +30,13 @@ export function ServingDetailView({ schedule, roles, members, currentUserUid, te
                     <p className="text-sm text-slate-500">No details available for this schedule.</p>
                 </div>
             )}
+
+            {/* Preview Drawer */}
+            <WorshipPlanPreviewDrawer
+                isOpen={!!previewWorshipId}
+                onClose={() => setPreviewWorshipId(null)}
+                worshipId={previewWorshipId}
+            />
         </div>
     );
 }
