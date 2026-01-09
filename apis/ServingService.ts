@@ -192,6 +192,47 @@ class ServingService extends BaseService {
         }
     }
 
+    async getPreviousSchedules(teamId: string, beforeDate: Date, limit: number = 5): Promise<ServingSchedule[]> {
+        try {
+            const beforeDateStr = timestampToDateString(Timestamp.fromDate(beforeDate));
+
+            const [tsSnapshot, strSnapshot] = await Promise.all([
+                firestore
+                    .collection("teams")
+                    .doc(teamId)
+                    .collection("serving_schedules")
+                    .where("date", "<", Timestamp.fromDate(beforeDate))
+                    .orderBy("date", "desc")
+                    .limit(limit)
+                    .get(),
+                firestore
+                    .collection("teams")
+                    .doc(teamId)
+                    .collection("serving_schedules")
+                    .where("date", "<", beforeDateStr)
+                    .orderBy("date", "desc")
+                    .limit(limit)
+                    .get()
+            ]);
+
+            const results = new Map<string, ServingSchedule>();
+            tsSnapshot.docs.forEach(doc => results.set(doc.id, { id: doc.id, ...doc.data() } as ServingSchedule));
+            strSnapshot.docs.forEach(doc => results.set(doc.id, { id: doc.id, ...doc.data() } as ServingSchedule));
+
+            // Convert to array and sort DESC to respect the limit logic across both sources
+            const combined = Array.from(results.values()).sort((a, b) => {
+                const dateA = a.date instanceof Timestamp ? a.date.toDate().getTime() : new Date(a.date).getTime();
+                const dateB = b.date instanceof Timestamp ? b.date.toDate().getTime() : new Date(b.date).getTime();
+                return dateB - dateA; // DESC
+            });
+
+            return combined.slice(0, limit);
+        } catch (e) {
+            console.error("Failed to fetch previous schedules", e);
+            return [];
+        }
+    }
+
     async getRecentSchedules(teamId: string, limit: number = 5): Promise<ServingSchedule[]> {
         try {
             const snapshot = await firestore.collection("teams").doc(teamId).collection("serving_schedules")
