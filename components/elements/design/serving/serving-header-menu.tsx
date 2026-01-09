@@ -22,9 +22,18 @@ interface Props {
     teamId: string;
     trigger?: React.ReactNode;
     iconType?: "horizontal" | "vertical";
+    scheduleTitle?: string;
+    scheduleDate?: string;
 }
 
-export function ServingHeaderMenu({ scheduleId, teamId, trigger, iconType = "horizontal" }: Props) {
+export function ServingHeaderMenu({
+    scheduleId,
+    teamId,
+    trigger,
+    iconType = "horizontal",
+    scheduleTitle,
+    scheduleDate
+}: Props) {
     const [user] = useAuthState(auth as any);
     const router = useRouter();
     const { toast } = useToast();
@@ -68,6 +77,10 @@ export function ServingHeaderMenu({ scheduleId, teamId, trigger, iconType = "hor
         </Button>
     );
 
+    const deleteDescription = scheduleTitle && scheduleDate
+        ? `Are you sure you want to delete "${scheduleTitle}" on ${scheduleDate}? This action cannot be undone.`
+        : "This action cannot be undone. This will permanently delete the serving schedule.";
+
     return (
         <>
             <DropdownMenu>
@@ -91,7 +104,7 @@ export function ServingHeaderMenu({ scheduleId, teamId, trigger, iconType = "hor
                 isOpen={isDeleteDialogOpen}
                 setOpen={setIsDeleteDialogOpen}
                 title="Delete Schedule?"
-                description="This action cannot be undone. This will permanently delete the serving schedule."
+                description={deleteDescription}
                 onDeleteHandler={handleDelete}
             />
         </>
