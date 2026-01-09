@@ -144,7 +144,7 @@ export function WorshipCardList({ teamId }: Props) {
 
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-2 opacity-60">
               {searchInput ? (
-                <p>No results found for "{searchInput}"</p>
+                <p>No results found for &quot;{searchInput}&quot;</p>
               ) : activeTab === 'history' ? (
                 <>
                   <p className="font-semibold">No past worship plans</p>

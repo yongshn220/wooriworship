@@ -1,8 +1,9 @@
 import { ServingItem, ServingRole, ServingSchedule } from "@/models/serving";
+import { FormMode } from "@/components/constants/enums";
 
 export interface ServingFormProps {
     teamId: string;
-    mode?: "CREATE" | "EDIT";
+    mode?: FormMode;
     initialData?: ServingSchedule;
 }
 

@@ -16,30 +16,31 @@ export default function Initialization() {
 
   useEffect(() => {
     if (!utility.deviceId) return;
-    
+
     if (!isServiceWorkerSupported()) {
       console.log("Service Worker is not supported");
       return;
     }
 
-    const user = auth.currentUser;
-    if (!user) {
-      console.log("User not authenticated");
-      return;
-    }
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        console.log("User not authenticated");
+        return;
+      }
 
-    (async () => {
       try {
         await registerServiceWorker();
         console.log("Service Worker registered, refreshing subscription for user:", user.uid);
         await PushNotificationService.refreshSubscription(user.uid, utility.deviceId);
         console.log("Push notification subscription refreshed successfully");
-      } 
+      }
       catch (error) {
         console.error("Error in initialization:", error);
       }
-    })();
-  }, [utility.deviceId, auth.currentUser]);
+    });
+
+    return () => unsubscribe();
+  }, [utility.deviceId]);
 
   return (
     <>

@@ -65,7 +65,7 @@ export function ServingForm(props: ServingFormProps) {
         setDeleteConfirm, setRoles, worshipRoles, handleAssignMemberToRole,
 
         // Actions
-        handleAddMember, handleAddMemberByRole, handleSubmit, handleCreateRole, handleDeleteRole,
+        handleAddMember, handleSubmit, handleCreateRole, handleDeleteRole,
         handleSaveTemplate, handleUpdateTemplate, handleDeleteTemplate, handleUpdateTemplateName,
         goToStep, nextStep, prevStep, getSuggestionsForTitle
     } = useServingFormLogic(props);
@@ -214,7 +214,7 @@ export function ServingForm(props: ServingFormProps) {
                                                     memberIds={memberIds}
                                                     teamMembers={teamMembers}
                                                     onAddMember={handleAssignMemberToRole}
-                                                    onDeleteRole={() => setDeleteConfirm({ type: 'role', id: role.id, open: true })}
+                                                    onDeleteRole={() => setDeleteConfirm({ type: 'role' as const, id: role.id, open: true })}
                                                     onOpenAdd={() => setActiveSelection({ roleId: role.id })}
                                                 />
                                             );

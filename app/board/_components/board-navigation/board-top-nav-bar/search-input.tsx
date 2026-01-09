@@ -24,7 +24,7 @@ export function SearchInput() {
     if (globalInput !== debouncedInput) {
       setLocalInput(globalInput)
     }
-  }, [globalInput])
+  }, [globalInput, debouncedInput])
 
   return (
     <div className="relative w-full">

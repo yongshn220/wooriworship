@@ -63,7 +63,6 @@ export function TagSelector({
             try {
                 if (mode === "service") {
                     const team = await TeamService.getById(teamId);
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     setAvailableTags((team as any)?.service_tags || []);
                 } else {
                     const tags = await TagService.getTeamTags(teamId);
@@ -79,7 +78,7 @@ export function TagSelector({
         if (teamId) {
             fetchTags();
         }
-    }, [teamId, refreshTrigger]);
+    }, [teamId, refreshTrigger, mode]);
 
     const handleUnselect = (tag: string) => {
         onTagsChange(selectedTags.filter((t) => t !== tag));
@@ -119,7 +118,6 @@ export function TagSelector({
             if (mode === 'service') {
                 const newId = await TeamService.addServiceTag(teamId, newTagName);
                 const team = await TeamService.getById(teamId);
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 setAvailableTags((team as any)?.service_tags || []);
 
                 if (newId) {
@@ -275,9 +273,7 @@ export function TagSelector({
                         if (mode === "service") {
                             // Service tags are inside Team object. We need to filter and update.
                             const team = await TeamService.getById(teamId);
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             const currentTags = (team as any)?.service_tags || [];
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             const updatedTags = currentTags.filter((t: any) => t.name !== tagName);
                             await TeamService.updateServiceTags(teamId, updatedTags);
                             setAvailableTags(updatedTags);
@@ -310,9 +306,7 @@ export function TagSelector({
                     }
                     try {
                         const team = await TeamService.getById(teamId);
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const currentTags = (team as any)?.service_tags || [];
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const updatedTags = currentTags.map((t: any) =>
                             t.id === tagToRename.id ? { ...t, name: newName.trim() } : t
                         );

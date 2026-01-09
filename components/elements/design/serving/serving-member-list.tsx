@@ -113,7 +113,7 @@ export function ServingMemberList({ schedule, roles, members, currentUserUid, fi
                     {hasItems ? (
                         <div className="flex flex-col w-full">
                             {schedule.items
-                                ?.filter(i => i.type !== 'WORSHIP_TEAM')
+                                ?.filter(i => (i as any).type !== 'WORSHIP_TEAM')
                                 .slice()
                                 .sort((a, b) => a.order - b.order)
                                 .map((item, index) => {

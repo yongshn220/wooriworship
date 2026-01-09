@@ -110,6 +110,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
 
     // --- Initialization Logic ---
 
+
     // Auto-load Template (CREATE Mode)
     useEffect(() => {
         if (mode === FormMode.CREATE && items.length === 0 && templates.length > 0 && !selectedTemplateId) {
@@ -127,7 +128,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 else if (templates.length > 0) setSelectedTemplateId(templates[0].id);
             });
         }
-    }, [teamId, mode, templates.length]);
+    }, [teamId, mode, templates, selectedTemplateId, setSelectedTemplateId]);
 
     // Apply Template when ID changes (Create Mode only mainly)
     useEffect(() => {
@@ -144,7 +145,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 })));
             }
         }
-    }, [mode, selectedTemplateId, templates]);
+    }, [mode, selectedTemplateId, templates, items.length, setItems]);
 
 
     // Initialize Data (EDIT Mode)
@@ -172,7 +173,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 // If old data mixed types, filter only FLOW/SUPPORT. 
                 // But since user said NO backward compat needed, we assume strict new schema or just load what's there.
                 // However, let's filter just in case to avoid mixing in UI.
-                setItems(initialData.items.filter(i => i.type !== 'WORSHIP_TEAM'));
+                setItems(initialData.items.filter(i => (i as any).type !== 'WORSHIP_TEAM'));
             }
 
             // Load Roles (New separated field OR Migration logic if strictly needed but user said skip compat)
@@ -183,7 +184,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 setWorshipRoles(initialData.worship_roles);
             } else if (initialData.items) {
                 // Even if compat not needed, simple check doesn't hurt to prevent total dataloss on view
-                const oldRolesItem = initialData.items.find(i => i.type === 'WORSHIP_TEAM');
+                const oldRolesItem = initialData.items.find(i => (i as any).type === 'WORSHIP_TEAM');
                 if (oldRolesItem?.assignments) {
                     setWorshipRoles(oldRolesItem.assignments);
                 } else if (initialData.roles) {
@@ -195,7 +196,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
 
             isInitialDataLoaded.current = true;
         }
-    }, [mode, initialData, roles]);
+    }, [mode, initialData, roles, setItems, setWorshipRoles, setSelectedTemplateId]);
 
 
     // Fetch available worship plans
@@ -327,7 +328,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         templates, isTemplatesLoaded, selectedTemplateId, hasTemplateChanges,
         availableWorships, linkedWorshipId, previewWorshipId,
         activeSelection, isLoading,
-        isRoleDialogOpen, newRoleName, setNewRoleName, isCreatingRole, setIsTemplateDialogOpen, setIsRenameDialogOpen,
+        isRoleDialogOpen, newRoleName, isCreatingRole, isTemplateDialogOpen, isRenameDialogOpen,
         newTemplateName, tempTemplateName, createEmptyMode,
         standardGroups, customMemberNames, newGroupInput, deleteConfirm,
         roles, team, teamMembers, historySchedules,
@@ -339,7 +340,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         setTemplates, setIsTemplatesLoaded, setSelectedTemplateId, setHasTemplateChanges,
         setAvailableWorships, setLinkedWorshipId, setPreviewWorshipId, setActiveSelection, setIsLoading,
         setIsRoleDialogOpen, setNewRoleName, setIsTemplateDialogOpen, setIsRenameDialogOpen,
-        isRoleDialogOpen, newRoleName, isCreatingRole, isTemplateDialogOpen, isRenameDialogOpen,
+
         setNewTemplateName, setTempTemplateName, setCreateEmptyMode, setStandardGroups, setCustomMemberNames,
         setNewGroupInput, setDeleteConfirm, setRoles,
         setWorshipRoles, // Added setter
