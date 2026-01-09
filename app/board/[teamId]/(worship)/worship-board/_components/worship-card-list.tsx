@@ -26,8 +26,9 @@ export function WorshipCardList({ teamId }: Props) {
   // Infinite Scroll State
   const [displayedCount, setDisplayedCount] = useRecoilState(worshipListDisplayedCountAtom);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
   const searchParams = useSearchParams();
-  const expandedId = searchParams.get("expanded");
+  // const expandedId = searchParams.get("expanded"); // REMOVED
 
   const worshipList = useMemo(() => (worshipListLoadable.state === 'hasValue') ? worshipListLoadable.contents as Array<Worship> : [], [worshipListLoadable]);
 
@@ -73,24 +74,6 @@ export function WorshipCardList({ teamId }: Props) {
 
   }, [worshipList, activeTab, searchInput]);
 
-  // NOTE: If searchInput is present, `filteredWorshipList` currently returns ALL. 
-  // But wait, `WorshipCard` has internal logic `shouldRenderCard` based on searchInput.
-  // If we pass IDs that are filtered out by WorshipCard's internal logic, `visibleWorshipIds` will contain items that render as null.
-  // This breaks infinite scroll (we load 20 nulls). 
-  // We should NOT rely on WorshipCard for search filtering if we want proper list behavior.
-  // BUT refactoring search logic entirely is out of scope? 
-  // The user requirement said: "Search should include all".
-  // So if searchInput is active, we bypass Tab filter.
-  // The `WorshipCard` handles the search visibility. 
-  // **Risk**: If search matches item #100, and we only render top 20, it won't be seen.
-  // The previous implementation used `worshipIds` (all) and `visibleWorshipIds` (slice). 
-  // AND `WorshipCard` implemented `shouldRenderCard`. 
-  // This implies SEARCH WAS BROKEN for items beyond `displayedCount` unless it filtered IDs beforehand?
-  // Let's check `WorshipCard`. Yes it uses `shouldRenderCard`.
-  // So previously, if you searched for an item at the bottom, it wouldn't show up until you scrolled down? 
-  // That seems like a bug in existing code, but I should try to preserve existing behavior unless asked.
-  // However, for TABS, filtering IS required here.
-
   const worshipIds = useMemo(() => filteredWorshipList.map(w => w.id as string), [filteredWorshipList]);
   const visibleWorshipIds = worshipIds.slice(0, displayedCount);
 
@@ -116,41 +99,36 @@ export function WorshipCardList({ teamId }: Props) {
     };
   }, [worshipIds, setDisplayedCount]);
 
-  // Auto-expand
-  useEffect(() => {
-    if (worshipListLoadable.state === 'hasValue' && expandedId && worshipList.length > 0) {
-      // Find which tab this ID belongs to
-      const targetWorship = worshipList.find(w => w.id === expandedId);
-      if (targetWorship) {
-        // If we are NOT searching, we might need to switch tab
-        if (!searchInput) {
-          const now = new Date();
-          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-          const isPast = targetWorship.worship_date.toDate() < today;
+  // Auto-expand removed
 
-          if (isPast && activeTab !== 'history') setActiveTab('history');
-          if (!isPast && activeTab !== 'upcoming') setActiveTab('upcoming');
-        }
-      }
-
-      const index = worshipIds.findIndex((id: string) => id === expandedId);
-      if (index >= 0 && index >= displayedCount) {
-        setDisplayedCount(prev => Math.max(prev, index + 3));
-      }
-    }
-  }, [worshipListLoadable.state, expandedId, worshipIds, setDisplayedCount, displayedCount, worshipList, searchInput, activeTab]);
 
   switch (worshipListLoadable.state) {
     case 'loading': return <WorshipListSkeleton />
     case 'hasError': throw worshipListLoadable.contents
     case 'hasValue':
+      const isGlobalEmpty = worshipList.length === 0;
       const isEmpty = worshipIds.length === 0;
 
-      // Full screen empty state
-      if (isEmpty) {
+      // 1. Global Empty State (No plans at all)
+      if (isGlobalEmpty) {
         return (
           <div className="flex flex-col h-full w-full bg-background relative">
-            {/* Tabs (Only show if not searching) */}
+            {/* Hide tabs on global empty to avoid confusion, or show them? 
+                User said: "worship board 에서 history 가 없으면 history 가 없다고 나와야하는데"
+                If global is empty, there is no history AND no upcoming.
+                So Global Empty Page is correct here.
+             */}
+            <div className="flex-1 flex items-center justify-center p-6">
+              <EmptyWorshipBoardPage />
+            </div>
+          </div>
+        )
+      }
+
+      // 2. Filtered Empty State (Has plans, but none match filter)
+      if (isEmpty) {
+        return (
+          <div className="flex flex-col h-full w-full bg-muted/30 relative">
             {!searchInput && (
               <div className="px-4 md:px-6 pt-4 md:pt-6 w-full z-10">
                 <SegmentedControl
@@ -164,8 +142,20 @@ export function WorshipCardList({ teamId }: Props) {
               </div>
             )}
 
-            <div className="flex-1 flex items-center justify-center p-6">
-              <EmptyWorshipBoardPage />
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-2 opacity-60">
+              {searchInput ? (
+                <p>No results found for "{searchInput}"</p>
+              ) : activeTab === 'history' ? (
+                <>
+                  <p className="font-semibold">No past worship plans</p>
+                  <p className="text-sm">Past services will appear here.</p>
+                </>
+              ) : (
+                <>
+                  <p className="font-semibold">No upcoming worship plans</p>
+                  <p className="text-sm">Create a new plan to get started.</p>
+                </>
+              )}
             </div>
           </div>
         )

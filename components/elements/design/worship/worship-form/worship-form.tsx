@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFormFooter, FormSectionCard } from "@/components/common/form/full-screen-form";
 import { LinkedResourceCard } from "@/components/common/form/linked-resource-card";
 import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
+import { formatToLongDate } from "@/components/util/helper/helper-functions";
 
 // Custom Components
 import { AddedSongHeaderStatic } from "@/components/elements/design/song/song-header/worship-form/added-song-header-static";
@@ -128,7 +129,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                 items={availableServingSchedules.map(sch => ({
                   id: sch.id,
                   title: sch.title || "Untitled Service",
-                  description: sch.date
+                  description: formatToLongDate(sch.date)
                 }))}
                 selectedId={linkedServingId}
                 onSelect={setLinkedServingId}

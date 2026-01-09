@@ -1,26 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 
 export function useCardExpansion(itemId: string, defaultExpanded: boolean = false) {
-    const searchParams = useSearchParams();
-    const expandedId = searchParams.get("expanded");
+    // URL param logic removed
 
-    // If URL has expanded=itemId, force true initially.
-    const [isExpanded, setIsExpanded] = useState(() => {
-        if (expandedId === itemId) return true;
-        return defaultExpanded;
-    });
+    // Initialize with default expanded state
+    const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
-    // Auto-expand if URL param changes to match this ID (e.g. navigation)
-    useEffect(() => {
-        if (expandedId === itemId) {
-            setIsExpanded(true);
-        }
-    }, [expandedId, itemId]);
-
-    // Sync state with defaultExpanded prop
+    // Sync state with defaultExpanded prop (still useful for lists controlling children)
     useEffect(() => {
         setIsExpanded(defaultExpanded);
     }, [defaultExpanded]);
