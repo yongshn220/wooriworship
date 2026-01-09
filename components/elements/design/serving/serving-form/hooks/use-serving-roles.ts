@@ -16,10 +16,12 @@ export function useServingRoles(teamId: string) {
         }
     }, [rolesLoadable.state, rolesLoadable.contents]);
 
+    const [worshipRoles, setWorshipRoles] = useState<{ roleId?: string; memberIds: string[] }[]>([]);
+
     const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
-    const [isCreatingRole, setIsCreatingRole] = useState(false);
     const [newRoleName, setNewRoleName] = useState("");
-    const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'role' | 'template'; id: string; open: boolean }>({ type: 'role', id: '', open: false });
+    const [isCreatingRole, setIsCreatingRole] = useState(false);
+    const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; roleId: string | null }>({ open: false, roleId: null });
 
     const handleCreateRole = async () => {
         if (!newRoleName.trim() || !teamId) return;
@@ -50,8 +52,10 @@ export function useServingRoles(teamId: string) {
         try {
             await ServingService.deleteRole(teamId, roleId);
             setRolesUpdater(prev => prev + 1);
-            // Callback to update items in parent
-            onItemUpdate(roleId);
+            // Callback to update items in parent (if needed, but now strict separation)
+            // Actually, we should clean up worshipRoles state here too
+            setWorshipRoles(prev => prev.filter(r => r.roleId !== roleId));
+
             toast({ title: "Role deleted" });
             setDeleteConfirm(prev => ({ ...prev, open: false }));
         } catch (e) {
@@ -60,9 +64,30 @@ export function useServingRoles(teamId: string) {
         }
     };
 
+    const handleAssignMemberToRole = (roleId: string, uid: string) => {
+        setWorshipRoles(prev => {
+            const existingIndex = prev.findIndex(r => r.roleId === roleId);
+            if (existingIndex >= 0) {
+                const existingRole = prev[existingIndex];
+                const isMemberPresent = existingRole.memberIds.includes(uid);
+                const newMemberIds = isMemberPresent
+                    ? existingRole.memberIds.filter(id => id !== uid)
+                    : [...existingRole.memberIds, uid];
+
+                const newRoles = [...prev];
+                newRoles[existingIndex] = { ...existingRole, memberIds: newMemberIds };
+                return newRoles;
+            } else {
+                return [...prev, { roleId, memberIds: [uid] }];
+            }
+        });
+    };
+
     return {
         roles,
         setRoles,
+        worshipRoles,
+        setWorshipRoles,
         isRoleDialogOpen,
         setIsRoleDialogOpen,
         newRoleName,
@@ -71,6 +96,7 @@ export function useServingRoles(teamId: string) {
         deleteConfirm,
         setDeleteConfirm, // Shared confirm dialog state, might need to be lifted if used for templates too? Yes, original code shared it.
         handleCreateRole,
-        handleDeleteRole
+        handleDeleteRole,
+        handleAssignMemberToRole
     };
 }

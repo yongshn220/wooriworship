@@ -23,6 +23,8 @@ import { ImageIcon, FileText, ArrowRight, ChevronLeft, Check, UploadCloud } from
 import { getPathNotice } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import { FullScreenForm, FullScreenFormBody, FullScreenFormFooter, FullScreenFormHeader, FormSectionCard } from "@/components/common/form/full-screen-form";
+import { slideVariants } from "@/components/constants/animations";
 
 interface Props {
   mode: FormMode
@@ -172,57 +174,17 @@ export function NoticeForm({ mode, noticeId }: Props) {
   }
 
   // Animation Variants
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? "100%" : "-100%",
-      opacity: 0,
-      scale: 0.95,
-      rotateY: direction > 0 ? 20 : -20,
-      position: 'absolute' as const
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-      scale: 1,
-      rotateY: 0,
-      position: 'relative' as const
-    },
-    exit: (direction: number) => ({
-      zIndex: 0,
-      x: direction < 0 ? "100%" : "-100%",
-      opacity: 0,
-      scale: 0.95,
-      rotateY: direction < 0 ? 20 : -20,
-      position: 'absolute' as const
-    })
-  };
 
   return (
-    <div className="fixed inset-0 z-[40] bg-gray-50 flex flex-col items-center justify-center overflow-hidden">
+    <FullScreenForm>
+      <FullScreenFormHeader
+        steps={["Title", "Content", "Attachments"]}
+        currentStep={step}
+        onStepChange={goToStep}
+        onClose={() => router.back()}
+      />
 
-      {/* 1. Header Progress */}
-      <div className="fixed top-8 left-0 right-0 z-50 px-6 flex flex-col items-center gap-4">
-        <div className="flex gap-2 p-1 bg-white/50 backdrop-blur-md rounded-full shadow-sm border border-white/20">
-          {["Title", "Content", "Attachments"].map((label, idx) => (
-            <button
-              key={idx}
-              onClick={() => goToStep(idx)}
-              className={cn(
-                "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
-                step === idx
-                  ? "bg-black text-white shadow-md scale-105"
-                  : "text-gray-400 hover:text-gray-600 hover:bg-white/50"
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 2. Main Content Area */}
-      <div className="w-full max-w-xl h-full px-4 sm:px-6 pt-24 pb-20 flex flex-col relative perspective-1000">
+      <FullScreenFormBody>
         <AnimatePresence initial={false} mode="popLayout" custom={direction}>
 
           {/* Step 0: Title */}
@@ -242,9 +204,9 @@ export function NoticeForm({ mode, noticeId }: Props) {
                 <h2 className="text-2xl font-bold text-gray-900">What is this notice about?</h2>
               </div>
 
-              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 flex flex-col gap-6">
+              <FormSectionCard className="flex flex-col gap-6">
                 <div className="space-y-2">
-                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Title</Label>
+                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Title</Label>
                   <Input
                     autoFocus
                     placeholder="Notice Title..."
@@ -253,15 +215,8 @@ export function NoticeForm({ mode, noticeId }: Props) {
                     className="text-2xl font-black bg-gray-50 border-gray-100 h-16 rounded-2xl focus-visible:ring-ring placeholder:text-gray-300"
                   />
                 </div>
-              </div>
+              </FormSectionCard>
 
-              <Button
-                className="h-14 w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shadow-xl mt-auto transition-transform active:scale-95 mb-24"
-                onClick={nextStep}
-                disabled={!input.title}
-              >
-                Next Step <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
             </motion.div>
           )}
 
@@ -283,26 +238,15 @@ export function NoticeForm({ mode, noticeId }: Props) {
                 {input.title && <h3 className="text-xl font-medium text-primary break-words mt-2 px-4">{input.title}</h3>}
               </div>
 
-              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 flex flex-col min-h-[300px]">
+              <FormSectionCard className="flex flex-col min-h-[300px]">
                 <Textarea
-                  className="w-full text-lg resize-none border-none px-0 shadow-none focus-visible:ring-0 leading-loose text-gray-700 placeholder:text-gray-300 bg-transparent p-0 min-h-[250px]"
-                  placeholder="Type '/' for commands or start writing..."
+                  className="w-full text-lg resize-none border-none px-0 shadow-none focus-visible:ring-0 leading-loose text-foreground placeholder:text-gray-300 bg-transparent p-0 min-h-[250px]"
+                  placeholder="Start writing..."
                   value={input.body}
                   onChange={(e) => setInput((prev => ({ ...prev, body: e.target.value })))}
                 />
-              </div>
+              </FormSectionCard>
 
-              <div className="flex gap-4 mt-auto pb-32">
-                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
-                  <ChevronLeft className="w-6 h-6" />
-                </Button>
-                <Button
-                  className="h-14 flex-1 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shadow-xl active:scale-95 transition-all"
-                  onClick={nextStep}
-                >
-                  Next Step
-                </Button>
-              </div>
             </motion.div>
           )}
 
@@ -323,7 +267,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
                 <h2 className="text-2xl font-bold text-gray-900">Attachments</h2>
               </div>
 
-              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-6 flex flex-col overflow-hidden min-h-0 flex-1">
+              <FormSectionCard className="space-y-6 flex flex-col overflow-hidden min-h-0 flex-1">
 
                 {/* Upload Buttons */}
                 <div className="flex items-center gap-4 justify-center p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
@@ -361,25 +305,29 @@ export function NoticeForm({ mode, noticeId }: Props) {
                   )}
                 </div>
 
-              </div>
+              </FormSectionCard>
 
-              <div className="flex gap-4 mt-auto pb-32">
-                <Button variant="outline" className="h-14 w-14 rounded-full border-gray-200 hover:bg-gray-50 text-gray-600" onClick={prevStep}>
-                  <ChevronLeft className="w-6 h-6" />
-                </Button>
-                <Button
-                  onClick={mode === FormMode.CREATE ? handleCreate : handleEdit}
-                  disabled={isLoading}
-                  className="h-14 flex-1 rounded-full bg-primary text-primary-foreground text-lg font-bold shadow-xl hover:bg-primary/90 active:scale-95 transition-all"
-                >
-                  {isLoading ? "Saving..." : (mode === FormMode.CREATE ? "Publish Notice" : "Save Changes")} <Check className="ml-2 w-5 h-5" />
-                </Button>
-              </div>
             </motion.div>
           )}
 
         </AnimatePresence>
-      </div>
-    </div>
+      </FullScreenFormBody>
+
+      <FullScreenFormFooter>
+        <div className="w-12 h-12 flex-none">
+          <Button variant="outline" className="h-12 w-12 rounded-full border-border bg-background/80 backdrop-blur-sm hover:bg-background text-muted-foreground shadow-sm disabled:opacity-0 disabled:pointer-events-none transition-opacity duration-300" onClick={prevStep} disabled={step === 0}>
+            <ChevronLeft className="w-6 h-6" />
+          </Button>
+        </div>
+        <Button
+          onClick={step === totalSteps - 1 ? (mode === FormMode.CREATE ? handleCreate : handleEdit) : nextStep}
+          disabled={isLoading || (step === 0 && !input.title)}
+          className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
+        >
+          {isLoading ? "Saving..." : step === totalSteps - 1 ? (mode === FormMode.CREATE ? "Publish Notice" : "Save Changes") : "Next Step"}
+          {step === totalSteps - 1 ? <Check className="w-5 h-5 ml-1" /> : <ArrowRight className="w-5 h-5 ml-1" />}
+        </Button>
+      </FullScreenFormFooter>
+    </FullScreenForm>
   )
 }

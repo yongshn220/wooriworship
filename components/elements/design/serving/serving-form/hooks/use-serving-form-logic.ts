@@ -33,6 +33,8 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
     const {
         roles,
         setRoles,
+        worshipRoles,
+        setWorshipRoles,
         isRoleDialogOpen,
         setIsRoleDialogOpen,
         newRoleName,
@@ -41,7 +43,8 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         deleteConfirm,
         setDeleteConfirm,
         handleCreateRole,
-        handleDeleteRole: baseHandleDeleteRole
+        handleDeleteRole: baseHandleDeleteRole,
+        handleAssignMemberToRole
     } = useServingRoles(teamId);
 
     // --- 2. Timeline items Logic ---
@@ -56,8 +59,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         setCustomMemberNames,
         newGroupInput,
         setNewGroupInput,
-        handleAddMember,
-        handleAddMemberByRole
+        handleAddMember
     } = useServingTimeline(teamId);
 
     // --- 3. Templates Logic ---
@@ -112,18 +114,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
     useEffect(() => {
         if (mode === FormMode.CREATE && items.length === 0 && templates.length > 0 && !selectedTemplateId) {
             // Logic to find last used is now inside useServingTemplates initialization? 
-            // Actually useServingTemplates loads templates.
-            // We need to pick one.
-            // Let's migrate the "Last Used" logic here or keep it.
-            // The original code did: 
-            // 1. fetch templates & config
-            // 2. fetch recent schedules -> find last used template -> setSelectedTemplateId
-
-            // Since getting templates is async in hook, strictly we should wait.
-            // But let's check if we can do it here.
-
-            // Simplification: Just pick first if nothing selected.
-            // Or rely on the fact that useEffect below handles it if selectedTemplateId is set.
+            // We'll skip complex logic, rely on 'Last Used' below
         }
     }, [mode, items.length, templates, selectedTemplateId]);
 
@@ -136,7 +127,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 else if (templates.length > 0) setSelectedTemplateId(templates[0].id);
             });
         }
-    }, [teamId, mode, templates.length]); // Dependency on templates.length ensures we have loaded them
+    }, [teamId, mode, templates.length]);
 
     // Apply Template when ID changes (Create Mode only mainly)
     useEffect(() => {
@@ -153,7 +144,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 })));
             }
         }
-    }, [mode, selectedTemplateId, templates]); // Reduced dependencies
+    }, [mode, selectedTemplateId, templates]);
 
 
     // Initialize Data (EDIT Mode)
@@ -176,24 +167,33 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
             // Set Template ID if exists
             if (initialData.templateId) setSelectedTemplateId(initialData.templateId);
 
+            // Load Flow Items (Strict separation)
             if (initialData.items && initialData.items.length > 0) {
-                setItems(initialData.items);
-                isInitialDataLoaded.current = true;
-            } else if (initialData.roles && roles.length > 0) {
-                // Migration
-                const migratedItems: ServingItem[] = initialData.roles.map((r, idx) => ({
-                    id: Math.random().toString(36).substr(2, 9),
-                    order: idx,
-                    title: roles.find(role => role.id === r.roleId)?.name || 'Role',
-                    assignments: [{
-                        roleId: r.roleId,
-                        memberIds: r.memberIds
-                    }],
-                    type: 'FLOW'
-                }));
-                setItems(migratedItems);
-                isInitialDataLoaded.current = true;
+                // If old data mixed types, filter only FLOW/SUPPORT. 
+                // But since user said NO backward compat needed, we assume strict new schema or just load what's there.
+                // However, let's filter just in case to avoid mixing in UI.
+                setItems(initialData.items.filter(i => i.type !== 'WORSHIP_TEAM'));
             }
+
+            // Load Roles (New separated field OR Migration logic if strictly needed but user said skip compat)
+            // But realistically, if we open old data, it won't have worship_roles. 
+            // User said "compat not needed", implying create new data mostly or old data can display empty.
+            // But let's check current schema.
+            if (initialData.worship_roles && initialData.worship_roles.length > 0) {
+                setWorshipRoles(initialData.worship_roles);
+            } else if (initialData.items) {
+                // Even if compat not needed, simple check doesn't hurt to prevent total dataloss on view
+                const oldRolesItem = initialData.items.find(i => i.type === 'WORSHIP_TEAM');
+                if (oldRolesItem?.assignments) {
+                    setWorshipRoles(oldRolesItem.assignments);
+                } else if (initialData.roles) {
+                    // Very old compat
+                    const migratedRoles = initialData.roles.map(r => ({ roleId: r.roleId, memberIds: r.memberIds }));
+                    setWorshipRoles(migratedRoles);
+                }
+            }
+
+            isInitialDataLoaded.current = true;
         }
     }, [mode, initialData, roles]);
 
@@ -223,7 +223,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
             setAvailableWorships([]);
             setLinkedWorshipId(null);
         }
-    }, [selectedDate, teamId, mode, initialData, serviceTagIds, linkedWorshipId]); // removed strict deps slightly
+    }, [selectedDate, teamId, mode, initialData, serviceTagIds, linkedWorshipId]);
 
     // Duplicate Check
     const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
@@ -241,10 +241,8 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
     // Wrapped Actions
     const handleDeleteRole = (roleId: string) => {
         baseHandleDeleteRole(roleId, (deletedId) => {
-            setItems(prevItems => prevItems.map(item => ({
-                ...item,
-                assignments: item.assignments.filter(a => a.roleId !== deletedId)
-            })));
+            // Clean up from worshipRoles
+            setWorshipRoles(prev => prev.filter(a => a.roleId !== deletedId));
         });
     };
 
@@ -260,16 +258,18 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 date: dateString,
                 service_tags: serviceTagIds,
                 title: title,
-                items: items,
+                items: items, // Strictly Flow items
+                worship_roles: worshipRoles, // Separated Roles
                 worship_id: linkedWorshipId || null,
                 templateId: selectedTemplateId || undefined
             };
 
             if (mode === FormMode.CREATE) {
                 await ServingService.createSchedule(teamId, payload);
-                const allAssignedMembers = Array.from(new Set(
-                    items.flatMap(item => item.assignments.flatMap(a => a.memberIds))
-                ));
+                const allAssignedMembers = Array.from(new Set([
+                    ...items.flatMap(item => item.assignments.flatMap(a => a.memberIds)),
+                    ...worshipRoles.flatMap(r => r.memberIds)
+                ]));
                 await PushNotificationService.notifyMembersServingAssignment(
                     teamId,
                     auth.currentUser?.uid || "",
@@ -282,7 +282,6 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 const updatePayload = {
                     ...initialData,
                     ...payload,
-                    // templateId: selectedTemplateId || null, // handled in payload
                 };
                 await ServingService.updateSchedule(teamId, updatePayload);
                 toast({ title: "Schedule updated!" });
@@ -333,6 +332,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         standardGroups, customMemberNames, newGroupInput, deleteConfirm,
         roles, team, teamMembers, historySchedules,
         isDuplicate, duplicateId, duplicateErrorMessage,
+        worshipRoles, // Added worshipRoles to return
 
         // Setters
         setStep, setDirection, setSelectedDate, setCurrentMonth, setServiceTagIds, setItems,
@@ -342,9 +342,10 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         isRoleDialogOpen, newRoleName, isCreatingRole, isTemplateDialogOpen, isRenameDialogOpen,
         setNewTemplateName, setTempTemplateName, setCreateEmptyMode, setStandardGroups, setCustomMemberNames,
         setNewGroupInput, setDeleteConfirm, setRoles,
+        setWorshipRoles, // Added setter
 
         // Actions
-        handleAddMember, handleAddMemberByRole, handleSubmit, handleCreateRole, handleDeleteRole,
+        handleAddMember, handleAssignMemberToRole, handleSubmit, handleCreateRole, handleDeleteRole,
         handleSaveTemplate, handleUpdateTemplate, handleDeleteTemplate, handleUpdateTemplateName,
         goToStep, nextStep: () => {
             if (step < totalSteps - 1) goToStep(step + 1);

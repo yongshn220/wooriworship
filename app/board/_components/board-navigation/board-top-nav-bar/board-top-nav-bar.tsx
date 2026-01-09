@@ -12,7 +12,7 @@ import { BaseTopNavBar } from "@/components/elements/util/navigation/base-top-na
 import { MainLogoSmall } from "@/components/elements/util/logo/main-logo";
 import { currentPageAtom } from "@/global-states/page-state";
 import { motion, AnimatePresence } from "framer-motion";
-import { planSearchInputAtom, songSearchInputAtom } from "@/app/board/_states/board-states";
+import { headerActionsAtom, planSearchInputAtom, songSearchInputAtom } from "@/app/board/_states/board-states";
 
 interface HeaderConfig {
   title?: string;
@@ -64,6 +64,7 @@ export function BoardTopNavBar() {
 
   const setSongSearch = useSetRecoilState(songSearchInputAtom);
   const setPlanSearch = useSetRecoilState(planSearchInputAtom);
+  const headerActions = useRecoilValue(headerActionsAtom);
 
   useEffect(() => {
     setIsSearchOpen(false);
@@ -188,6 +189,7 @@ export function BoardTopNavBar() {
                   />
                 )}
                 {currentConfig.actions}
+                {headerActions}
               </div>
             </motion.div>
           )}

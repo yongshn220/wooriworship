@@ -2,10 +2,20 @@ import { atom } from "recoil";
 import { SongBoardSortOption } from "@/components/constants/enums";
 
 
-export const songSearchInputAtom = atom({
-  key: "songSearchInputAtom",
-  default: ""
-})
+export const songSearchInputAtom = atom<string>({
+  key: 'songSearchInputAtom',
+  default: '',
+});
+
+export const planSearchInputAtom = atom<string>({
+  key: 'planSearchInputAtom',
+  default: '',
+});
+
+export const headerActionsAtom = atom<React.ReactNode | null>({
+  key: 'headerActionsAtom',
+  default: null,
+});
 
 export const searchSelectedTagsAtom = atom<Array<string>>({
   key: "searchSelectedTagsAtom",
@@ -20,9 +30,4 @@ export const searchSelectedKeysAtom = atom<Array<string>>({
 export const songBoardSelectedSortOptionAtom = atom<SongBoardSortOption>({
   key: "songBoardSelectedSortOptionAtom",
   default: SongBoardSortOption.TITLE_ASCENDING,
-})
-
-export const planSearchInputAtom = atom({
-  key: "planSearchInputAtom",
-  default: ""
 })
