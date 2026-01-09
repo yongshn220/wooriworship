@@ -21,7 +21,7 @@ interface Props {
 export function ServingInfoCard({ scheduleId, title, date, worshipId, teamId, onPreview }: Props) {
     const router = useRouter();
 
-    const dateObj = date instanceof Timestamp ? date.toDate() : parseLocalDate(date);
+    const dateObj = date instanceof Timestamp ? date.toDate() : (date instanceof Date ? date : parseLocalDate(date));
     const dateStr = format(dateObj, "yyyy M d (EEE)");
 
     return (
