@@ -58,16 +58,24 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
   } = useWorshipFormLogic({ mode, teamId, initialWorship: worship });
 
 
+  // Scroll Reset Logic
+  const bodyRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (bodyRef.current) {
+      bodyRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [step]);
+
   return (
     <FullScreenForm>
       <FullScreenFormHeader
-        steps={["Date & Service", "Context", "Setlist"]}
+        steps={["Service", "Context", "Setlist"]}
         currentStep={step}
         onStepChange={isDuplicate ? undefined : goToStep}
         onClose={() => router.back()}
       />
 
-      <FullScreenFormBody>
+      <FullScreenFormBody ref={bodyRef}>
         <AnimatePresence initial={false} custom={direction}>
 
           {/* Step 1: Date & Service */}
@@ -160,12 +168,12 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
               {/* Card */}
               <FormSectionCard>
                 <Textarea
-                  placeholder="Add sermon topic, announcements, or any notes..."
+                  placeholder="Write a description..."
                   value={basicInfo.description}
                   onChange={(e) => setBasicInfo(prev => ({ ...prev, description: e.target.value }))}
                   className="min-h-[150px] text-lg bg-transparent border-none p-0 focus-visible:ring-0 placeholder:text-gray-300 resize-none leading-relaxed"
                 />
-                <div className="flex items-center gap-2 border-t border-gray-100 pt-4">
+                <div className="flex items-center gap-2">
                   <LinkIcon className="w-5 h-5 text-gray-400" />
                   <Input
                     placeholder="Add a link..."

@@ -38,7 +38,7 @@ export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen, selectedSongs,
 
   return (
     <Drawer open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
-      <DrawerContent className="h-[90%]">
+      <DrawerContent className="h-[96vh] rounded-t-[2.5rem]">
         <div className="w-full h-full flex flex-col overflow-hidden">
           <DrawerHeader className="shrink-0 p-0">
           </DrawerHeader>

@@ -29,12 +29,12 @@ export function MemberSelector({
     onAddGroup,
     onRemoveGroup,
     customMemberNames = [],
-    onAddCustomMember
-}: Props) {
+    onAddCustomMember,
+    searchQuery = ""
+}: Props & { searchQuery?: string }) {
     const teamId = useRecoilValue(currentTeamIdAtom);
     const team = useRecoilValue(teamAtom(teamId));
     const members = useRecoilValue(usersAtom(team?.users));
-    const [searchQuery, setSearchQuery] = useState("");
 
     const filteredMembers = members.filter(member =>
         member.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -60,7 +60,6 @@ export function MemberSelector({
             const groupName = searchQuery.trim();
             onAddGroup(groupName);
             onSelect(`group:${groupName}`);
-            setSearchQuery("");
         }
     };
 
@@ -70,32 +69,18 @@ export function MemberSelector({
         if (onAddCustomMember) {
             onAddCustomMember(name);
         }
-        setSearchQuery("");
     };
 
     return (
         <div className="flex flex-col">
-            {/* Search Bar at the Top */}
-            <div className="relative mb-6">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50" />
-                <Input
-                    id="member-search"
-                    name="member-search"
-                    placeholder="Search name or email..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 h-14 bg-muted/30 border-0 rounded-2xl text-[16px] ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 placeholder:text-muted-foreground/40"
-                />
-            </div>
-
-            <div className="space-y-8">
+            <div className="space-y-6">
                 {/* Groups Section */}
                 {(filteredGroups.length > 0 || (searchQuery && onAddGroup)) && (
-                    <div className="space-y-4">
-                        <p className="text-xs font-bold tracking-wider text-muted-foreground/60 uppercase px-1">
+                    <div className="space-y-2">
+                        <p className="text-[10px] font-bold tracking-wider text-muted-foreground/50 uppercase px-4">
                             Groups
                         </p>
-                        <div className="space-y-1">
+                        <div className="space-y-0.5">
                             {filteredGroups.map((group, idx) => {
                                 const groupId = `group:${group}`;
                                 const isSelected = selectedMemberIds.includes(groupId);
@@ -103,26 +88,23 @@ export function MemberSelector({
                                     <div
                                         key={`group-item-${idx}`}
                                         className={cn(
-                                            "flex items-center justify-between p-4 rounded-2xl transition-all cursor-pointer group",
+                                            "flex items-center justify-between py-2.5 px-4 rounded-xl transition-all cursor-pointer group",
                                             isSelected
-                                                ? "bg-primary/5 shadow-sm"
+                                                ? "bg-primary/5"
                                                 : "hover:bg-muted/50"
                                         )}
                                         onClick={() => onSelect(groupId)}
                                     >
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-10 w-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground/60">
-                                                <Users className="h-5 w-5" />
-                                            </div>
-                                            <p className="font-bold text-lg text-foreground">{group}</p>
+                                        <div className="flex items-center gap-3">
+                                            <p className="font-semibold text-[15px] text-foreground">{group}</p>
                                         </div>
                                         <div className={cn(
-                                            "h-6 w-6 rounded-full flex items-center justify-center transition-all",
+                                            "h-5 w-5 rounded-full flex items-center justify-center transition-all",
                                             isSelected
                                                 ? "bg-primary shadow-sm"
-                                                : "border-2 border-muted"
+                                                : "border-[1.5px] border-muted-foreground/30"
                                         )}>
-                                            {isSelected && <Check className="h-3.5 w-3.5 text-primary-foreground stroke-[4px]" />}
+                                            {isSelected && <Check className="h-3 w-3 text-primary-foreground stroke-[3px]" />}
                                         </div>
                                     </div>
                                 );
@@ -131,25 +113,24 @@ export function MemberSelector({
                             {/* Add as Group Button */}
                             {searchQuery && onAddGroup && !groups.find(g => g.toLowerCase() === searchQuery.toLowerCase()) && (
                                 <button
-                                    className="w-full flex items-center gap-3 p-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left"
+                                    className="w-full flex items-center gap-3 py-2.5 px-4 rounded-xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left"
                                     onClick={handleAddAsGroup}
                                 >
-                                    <Plus className="h-5 w-5 text-primary" />
-                                    <span className="font-bold text-primary truncate flex-1">Add &quot;{searchQuery}&quot;</span>
+                                    <Plus className="h-4 w-4 text-primary" />
+                                    <span className="font-semibold text-[15px] text-primary truncate flex-1">Add &quot;{searchQuery}&quot;</span>
                                 </button>
                             )}
                         </div>
-                        <div className="h-px bg-border/50 mx-1" />
                     </div>
                 )}
 
                 {/* Members Section */}
-                <div className="space-y-4">
-                    <p className="text-xs font-bold tracking-wider text-muted-foreground/60 uppercase px-1">
+                <div className="space-y-2">
+                    <p className="text-[10px] font-bold tracking-wider text-muted-foreground/50 uppercase px-4">
                         Members
                     </p>
 
-                    <div className="space-y-1">
+                    <div className="space-y-0.5">
                         {/* Unified Guest List (Custom + Manual) */}
                         {(() => {
                             // Combine custom names and manual entries, deduplicate
@@ -167,31 +148,26 @@ export function MemberSelector({
                                     <div
                                         key={name}
                                         className={cn(
-                                            "flex items-center justify-between p-4 rounded-2xl transition-all cursor-pointer group",
+                                            "flex items-center justify-between py-2.5 px-4 rounded-xl transition-all cursor-pointer group",
                                             isSelected
-                                                ? "bg-primary/5 shadow-sm"
+                                                ? "bg-primary/5"
                                                 : "hover:bg-muted/50"
                                         )}
                                         onClick={() => onSelect(name)}
                                     >
-                                        <div className="flex items-center gap-4">
-                                            <Avatar className="h-10 w-10">
-                                                <AvatarFallback className="bg-muted/50 text-muted-foreground/60">
-                                                    <User className="h-5 w-5" />
-                                                </AvatarFallback>
-                                            </Avatar>
+                                        <div className="flex items-center gap-3">
                                             <div>
-                                                <p className="font-bold text-lg text-foreground">{name}</p>
-                                                <p className="text-sm text-muted-foreground font-medium">Guest</p>
+                                                <p className="font-semibold text-[15px] text-foreground">{name}</p>
+                                                <p className="text-[11px] text-muted-foreground font-medium">Guest</p>
                                             </div>
                                         </div>
                                         <div className={cn(
-                                            "h-6 w-6 rounded-full flex items-center justify-center transition-all",
+                                            "h-5 w-5 rounded-full flex items-center justify-center transition-all",
                                             isSelected
                                                 ? "bg-primary shadow-sm"
-                                                : "border-2 border-muted"
+                                                : "border-[1.5px] border-muted-foreground/30"
                                         )}>
-                                            {isSelected && <Check className="h-3.5 w-3.5 text-primary-foreground stroke-[4px]" />}
+                                            {isSelected && <Check className="h-3 w-3 text-primary-foreground stroke-[3px]" />}
                                         </div>
                                     </div>
                                 );
@@ -204,11 +180,11 @@ export function MemberSelector({
                             !manualEntries.includes(searchQuery) &&
                             !customMemberNames.includes(searchQuery) && (
                                 <button
-                                    className="w-full flex items-center gap-3 p-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left mb-2"
+                                    className="w-full flex items-center gap-3 py-2.5 px-4 rounded-xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left mb-1"
                                     onClick={handleAddAsMember}
                                 >
-                                    <Plus className="h-5 w-5 text-primary" />
-                                    <span className="font-bold text-primary truncate flex-1">Add &quot;{searchQuery}&quot;</span>
+                                    <Plus className="h-4 w-4 text-primary" />
+                                    <span className="font-semibold text-[15px] text-primary truncate flex-1">Add &quot;{searchQuery}&quot;</span>
                                 </button>
                             )}
 
@@ -219,38 +195,33 @@ export function MemberSelector({
                                 <div
                                     key={member.id}
                                     className={cn(
-                                        "flex items-center justify-between p-4 rounded-2xl transition-all cursor-pointer group",
+                                        "flex items-center justify-between py-2.5 px-4 rounded-xl transition-all cursor-pointer group",
                                         isSelected
-                                            ? "bg-primary/5 shadow-sm"
+                                            ? "bg-primary/5"
                                             : "hover:bg-muted/50"
                                     )}
                                     onClick={() => onSelect(member.id)}
                                 >
-                                    <div className="flex items-center gap-4 min-w-0">
-                                        <Avatar className="h-10 w-10 flex-shrink-0">
-                                            <AvatarFallback className="bg-muted/50 text-muted-foreground/60">
-                                                <User className="h-5 w-5" />
-                                            </AvatarFallback>
-                                        </Avatar>
+                                    <div className="flex items-center gap-3 min-w-0">
                                         <div className="min-w-0">
-                                            <p className="font-bold text-lg truncate text-foreground">{member.name}</p>
-                                            <p className="text-sm truncate font-medium text-muted-foreground">{member.email}</p>
+                                            <p className="font-semibold text-[15px] truncate text-foreground leading-tight">{member.name}</p>
+                                            <p className="text-[11px] truncate font-normal text-muted-foreground">{member.email}</p>
                                         </div>
                                     </div>
                                     <div className={cn(
-                                        "h-6 w-6 rounded-full flex items-center justify-center transition-all",
+                                        "h-5 w-5 rounded-full flex items-center justify-center transition-all",
                                         isSelected
                                             ? "bg-primary shadow-sm"
-                                            : "border-2 border-muted"
+                                            : "border-[1.5px] border-muted-foreground/30"
                                     )}>
-                                        {isSelected && <Check className="h-3.5 w-3.5 text-primary-foreground stroke-[4px]" />}
+                                        {isSelected && <Check className="h-3 w-3 text-primary-foreground stroke-[3px]" />}
                                     </div>
                                 </div>
                             );
                         })}
 
                         {(filteredMembers.length === 0 && displayedManualEntries.length === 0 && filteredGroups.length === 0 && !searchQuery) && (
-                            <div className="text-center py-12 text-muted-foreground/60 text-sm italic">
+                            <div className="text-center py-12 text-muted-foreground/40 text-xs italic">
                                 Search names, emails or groups...
                             </div>
                         )}

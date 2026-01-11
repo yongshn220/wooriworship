@@ -40,6 +40,7 @@ import { ServingService } from "@/apis";
 
 export function ServingForm(props: ServingFormProps) {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [memberSearchQuery, setMemberSearchQuery] = React.useState(""); // New state for search
 
     const router = useRouter();
 
@@ -528,34 +529,53 @@ export function ServingForm(props: ServingFormProps) {
                 />
 
                 {/* Member Selection Drawer */}
-                <Drawer open={!!activeSelection} onOpenChange={(open) => !open && setActiveSelection(null)}>
-                    <DrawerContent className="h-[85vh] rounded-t-[2.5rem]">
+                <Drawer open={!!activeSelection} onOpenChange={(open) => {
+                    if (!open) {
+                        setActiveSelection(null);
+                        setMemberSearchQuery(""); // Reset search on close
+                    }
+                }}>
+                    <DrawerContent className="h-[96vh] rounded-t-[2.5rem]">
                         <div className="mx-auto w-full max-w-lg h-full flex flex-col pt-2 relative">
-                            {/* Header */}
-                            <div className="flex flex-col gap-1 px-8 pt-6 pb-2">
-                                <div className="flex items-center justify-between">
-                                    <DrawerTitle className="text-2xl font-bold text-foreground tracking-tight">
-                                        Select Member
-                                    </DrawerTitle>
-                                    <DrawerDescription className="sr-only">
-                                        Select a member to assign to this role.
-                                    </DrawerDescription>
+                            {/* Header with Search Bar */}
+                            <div className="flex flex-col gap-1 px-6 pt-6 pb-2">
+                                <div className="flex items-center gap-3">
+                                    <div className="relative flex-1">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search h-4 w-4"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                                        </div>
+                                        <Input
+                                            value={memberSearchQuery}
+                                            onChange={(e) => setMemberSearchQuery(e.target.value)}
+                                            placeholder="Search name or email..."
+                                            className="pl-10 h-12 bg-muted/30 border-0 rounded-2xl text-[16px] ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 placeholder:text-muted-foreground/40 font-medium"
+                                        // No autoFocus as per previous instruction
+                                        />
+                                    </div>
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="rounded-full hover:bg-muted h-10 w-10"
+                                        className="rounded-full hover:bg-muted h-10 w-10 flex-shrink-0"
                                         onClick={() => setActiveSelection(null)}
                                     >
                                         <X className="h-5 w-5 text-muted-foreground" />
                                     </Button>
                                 </div>
+                                <DrawerDescription className="sr-only">
+                                    Select a member to assign to this role.
+                                </DrawerDescription>
                             </div>
 
                             {/* Unified Scroll Area */}
                             <ScrollArea className="flex-1">
-                                <div className="flex flex-col gap-8 pb-32 pt-6 px-8">
+                                <div className="flex flex-col gap-6 pb-32 pt-2 px-6">
+
+                                    <DrawerTitle className="text-xl font-bold text-foreground tracking-tight px-1">
+                                        Select Member
+                                    </DrawerTitle>
 
                                     <MemberSelector
+                                        searchQuery={memberSearchQuery} // Pass search query
                                         selectedMemberIds={
                                             activeSelection?.itemId && activeSelection.assignmentIndex !== undefined
                                                 ? items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds || []

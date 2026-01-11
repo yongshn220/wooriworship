@@ -19,12 +19,6 @@ export function SearchInput() {
     setGlobalInput(debouncedInput)
   }, [debouncedInput, setGlobalInput])
 
-  // Sync local input if global changes externally (optional but good for consistency)
-  useEffect(() => {
-    if (globalInput !== debouncedInput) {
-      setLocalInput(globalInput)
-    }
-  }, [globalInput, debouncedInput])
 
   return (
     <div className="relative w-full">

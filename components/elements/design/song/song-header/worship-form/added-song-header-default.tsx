@@ -59,15 +59,19 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
       newSelectedKeys = [...selectedKeys, sheetId]
     }
 
-    // Auto-remove check
-    if (newSelectedKeys.length === 0) {
-      onRemove();
-      return;
-    }
-
-    // Update State
+    // Update State (Allow empty keys)
     onUpdate({ ...songHeader, selected_music_sheet_ids: newSelectedKeys });
   }
+
+  // Note Visibility State
+  const [showNote, setShowNote] = React.useState(!!songHeader?.note);
+
+  // Auto-show if note exists
+  React.useEffect(() => {
+    if (songHeader?.note && !showNote) {
+      setShowNote(true);
+    }
+  }, [songHeader?.note]);
 
   return (
     <div className="w-full">
@@ -84,11 +88,11 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
         order={songOrder}
         dragHandle={dragHandle}
         onRemove={onRemove}
-        className="gap-4 min-h-[220px]"
+        className={cn("gap-2", showNote ? "min-h-[160px]" : "min-h-[100px] pb-3")}
       >
         {/* Title Section: Click to Open Detail */}
         <div className={cn("cursor-pointer pr-12", dragHandle && "pl-16")} onClick={() => setIsDetailOpen(true)}>
-          <div className="flex flex-col gap-1 w-full">
+          <div className="flex flex-col gap-0.5 w-full">
             <h3 className="text-lg font-bold text-gray-900 leading-tight w-full break-words">
               {song?.title}
             </h3>
@@ -112,7 +116,7 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
                   handleToggleKey(sheet.id)
                 }}
                 className={cn(
-                  "h-9 px-3 min-w-[3rem] rounded-lg text-sm font-bold border transition-all active:scale-95",
+                  "h-8 px-2.5 min-w-[2.5rem] rounded-[0.5rem] text-xs font-bold border transition-all active:scale-95",
                   isSelected
                     ? "bg-blue-600 border-blue-600 text-white shadow-md hover:bg-blue-700"
                     : "bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50"
@@ -125,13 +129,27 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
         </div>
 
         {/* Note Area */}
-        <div className="w-full flex-1 mt-2">
-          <Textarea
-            className="w-full h-full min-h-[120px] bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-base text-gray-700 resize-none placeholder:text-gray-400 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-all"
-            placeholder="Write a note..."
-            value={songHeader?.note}
-            onChange={(e) => handleOnNoteChange(e.target.value)}
-          />
+        <div className={cn("w-full flex-1", showNote ? "mt-2" : "mt-0")}>
+          {showNote ? (
+            <Textarea
+              className="w-full h-full min-h-[120px] bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-base text-gray-700 resize-none placeholder:text-gray-400 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-all"
+              placeholder="Write a note..."
+              value={songHeader?.note}
+              onChange={(e) => handleOnNoteChange(e.target.value)}
+              autoFocus
+            />
+          ) : (
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full h-8 justify-start text-gray-400 hover:text-gray-600 hover:bg-gray-50 font-medium p-0 bg-transparent hover:bg-transparent",
+                dragHandle ? "pl-16" : "pl-0"
+              )}
+              onClick={() => setShowNote(true)}
+            >
+              <span className="text-xs">+ Write a note</span>
+            </Button>
+          )}
         </div>
       </PlanCard>
     </div>
