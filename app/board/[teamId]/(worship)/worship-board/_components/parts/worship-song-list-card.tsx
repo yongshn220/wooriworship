@@ -6,12 +6,7 @@ import { Music } from "lucide-react";
 import { useState } from "react";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
 
-interface Song {
-    id: string;
-    title: string;
-    keys?: string[];
-    [key: string]: any;
-}
+import { Song } from "@/models/song";
 
 interface Props {
     songs: Song[];

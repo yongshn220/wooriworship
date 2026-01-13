@@ -30,6 +30,16 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
 
   const [isDetailOpen, setIsDetailOpen] = React.useState(false)
 
+  // Note Visibility State
+  const [showNote, setShowNote] = React.useState(!!songHeader?.note);
+
+  // Auto-show if note exists
+  React.useEffect(() => {
+    if (songHeader?.note && !showNote) {
+      setShowNote(true);
+    }
+  }, [songHeader?.note, showNote]);
+
   if (songLoadable.state === 'loading' || musicSheetsLoadable.state === 'loading') {
     return <Skeleton className="w-full h-[220px] rounded-2xl" />
   }
@@ -63,15 +73,7 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
     onUpdate({ ...songHeader, selected_music_sheet_ids: newSelectedKeys });
   }
 
-  // Note Visibility State
-  const [showNote, setShowNote] = React.useState(!!songHeader?.note);
 
-  // Auto-show if note exists
-  React.useEffect(() => {
-    if (songHeader?.note && !showNote) {
-      setShowNote(true);
-    }
-  }, [songHeader?.note]);
 
   return (
     <div className="w-full">

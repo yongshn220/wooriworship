@@ -8,10 +8,8 @@ interface Props {
     worship: Worship;
 }
 
-export function WorshipDataPrefetcher({ worship }: Props) {
+export function WorshipDataPrefetcher({ worship }: Props): null {
     // Prefetch song list
-    if (worship.id) {
-        useRecoilValue(worshipSongListAtom(worship.id));
-    }
+    useRecoilValue(worshipSongListAtom(worship.id || ""));
     return null;
 }

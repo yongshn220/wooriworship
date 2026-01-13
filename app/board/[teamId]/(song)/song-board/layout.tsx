@@ -13,11 +13,9 @@ export default function SongLayout({ children }: any) {
   }, [setPage]);
 
   return (
-  return (
     <div className="bg-background w-full h-full">
       {children}
     </div>
-  )
   )
 }
 

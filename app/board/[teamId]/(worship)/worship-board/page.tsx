@@ -110,7 +110,7 @@ export default function PlanPage({ params }: any) {
       }
     }
     loadData();
-  }, [teamId, worshipIdsUpdater, selectedWorshipId]);
+  }, [teamId, worshipIdsUpdater, selectedWorshipId, setSelectedWorshipId]);
 
   const handleLoadPast = async () => {
     if (!teamId || worships.length === 0 || isLoadingPast || !hasMorePast) return;
@@ -148,7 +148,7 @@ export default function PlanPage({ params }: any) {
     if (!worships.some(w => w.id === selectedWorshipId)) {
       setSelectedWorshipId(worships[0].id || null);
     }
-  }, [worships, selectedWorshipId, loading]);
+  }, [worships, selectedWorshipId, loading, setSelectedWorshipId]);
 
   if (loading) return <WorshipListSkeleton />;
 

@@ -48,7 +48,7 @@ export function CalendarDrawer({
             setPreviewDate(now);
             setCurrentMonth(startOfMonth(now));
         }
-    }, [open, selectedScheduleId, schedules]);
+    }, [open, selectedScheduleId, schedules, previewDate]);
 
     // Helpers
     const parseDate = (d: string | Timestamp) => d instanceof Timestamp ? d.toDate() : parseLocalDate(d);

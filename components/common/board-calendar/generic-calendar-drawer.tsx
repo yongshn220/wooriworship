@@ -46,7 +46,7 @@ export function GenericCalendarDrawer({
             setPreviewDate(now);
             setCurrentMonth(startOfMonth(now));
         }
-    }, [open, selectedId, items]);
+    }, [open, selectedId, items, previewDate]);
 
     // Derived Data
     const datesWithItem = useMemo(() => items.map(s => s.date), [items]);

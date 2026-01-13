@@ -21,9 +21,10 @@ interface Props {
     worshipId: string;
     createdById: string;
     teamId: string;
+    trigger?: React.ReactNode;
 }
 
-export function WorshipHeaderMenu({ worshipId, createdById, teamId }: Props) {
+export function WorshipHeaderMenu({ worshipId, createdById, teamId, trigger }: Props) {
     const [user] = useAuthState(auth as any);
     const router = useRouter();
     const { toast } = useToast();
@@ -68,10 +69,12 @@ export function WorshipHeaderMenu({ worshipId, createdById, teamId }: Props) {
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground data-[state=open]:bg-muted">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-5 w-5" />
-                    </Button>
+                    {trigger || (
+                        <Button variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground data-[state=open]:bg-muted">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-5 w-5" />
+                        </Button>
+                    )}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-[160px]">
                     <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">

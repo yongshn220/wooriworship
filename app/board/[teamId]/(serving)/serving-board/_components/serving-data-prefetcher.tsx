@@ -9,7 +9,7 @@ interface Props {
     schedule: ServingSchedule;
 }
 
-export function ServingDataPrefetcher({ schedule }: Props) {
+export function ServingDataPrefetcher({ schedule }: Props): null {
     const allMemberIds = useServingMemberIds(schedule);
 
     // access Recoil atom to trigger suspense/fetch
