@@ -5,6 +5,7 @@ import { usersAtom } from "@/global-states/userState";
 import { ServingSchedule, ServingRole } from "@/models/serving";
 import { ServingDetailView } from "./serving-detail-view";
 import { useMemo } from "react";
+import { useServingMemberIds } from "@/app/board/[teamId]/(serving)/serving-board/_hooks/use-serving-member-ids";
 
 interface Props {
     schedule: ServingSchedule;
@@ -15,14 +16,7 @@ interface Props {
 
 export function ServingDetailContainer({ schedule, roles, teamId, currentUserUid }: Props) {
     // Fetch members only for the selected schedule
-    const allMemberIds = useMemo(() => {
-        if (!schedule) return [];
-        return [
-            ...(schedule.items?.flatMap(item => item.assignments.flatMap(a => a.memberIds)) || []),
-            ...(schedule.worship_roles?.flatMap(a => a.memberIds) || []),
-            ...(schedule.roles?.flatMap(r => r.memberIds) || [])
-        ];
-    }, [schedule]);
+    const allMemberIds = useServingMemberIds(schedule);
 
     //Suspense will trigger here if data is not ready
     const members = useRecoilValue(usersAtom(allMemberIds));

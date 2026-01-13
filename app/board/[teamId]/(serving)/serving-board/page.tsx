@@ -22,6 +22,10 @@ import { auth } from "@/firebase";
 import { headerActionsAtom } from "@/app/board/_states/board-states";
 import { ServingHeaderMenu } from "@/components/elements/design/serving/serving-header-menu";
 
+import { SwipeableView } from "@/components/elements/design/serving/swipeable-view";
+import { useServingNavigation } from "./_hooks/use-serving-navigation";
+import { ServingDataPrefetcher } from "./_components/serving-data-prefetcher";
+
 export default function ServingPage() {
     const teamId = useRecoilValue(currentTeamIdAtom);
     const [schedules, setSchedules] = useRecoilState(servingSchedulesAtom);
@@ -31,6 +35,13 @@ export default function ServingPage() {
     const [hasMorePast, setHasMorePast] = useState(true);
     const router = useRouter();
     const setHeaderActions = useSetRecoilState(headerActionsAtom);
+
+    // Navigation Hook
+    const { navigateNext, navigatePrev } = useServingNavigation(
+        schedules,
+        selectedScheduleId,
+        setSelectedScheduleId
+    );
 
     // Data for selected schedule
     const selectedSchedule = useMemo(() =>
@@ -150,22 +161,46 @@ export default function ServingPage() {
                         onLoadPrev={handleLoadPast}
                         isLoadingPrev={isLoadingPast}
                         hasMorePast={hasMorePast}
+                        currentUserUid={currentUserUid}
                     />
 
                     {selectedSchedule ? (
-                        <Suspense fallback={<ServingListSkeleton />}>
-                            <ServingDetailContainer
-                                schedule={selectedSchedule}
-                                roles={roles}
-                                currentUserUid={currentUserUid}
-                                teamId={teamId || ""}
-                            />
-                        </Suspense>
+                        <SwipeableView
+                            viewId={selectedSchedule.id}
+                            onSwipeLeft={navigateNext}
+                            onSwipeRight={navigatePrev}
+                        >
+                            <Suspense fallback={<ServingListSkeleton />}>
+                                <ServingDetailContainer
+                                    schedule={selectedSchedule}
+                                    roles={roles}
+                                    currentUserUid={currentUserUid}
+                                    teamId={teamId || ""}
+                                />
+                            </Suspense>
+                        </SwipeableView>
                     ) : (
                         <div className="py-10 text-center text-muted-foreground">
                             Select a schedule to view details
                         </div>
                     )}
+
+                    {/* Zero-Latency Prefetching */}
+                    {schedules.map((schedule, index) => {
+                        // Prefetch conditions:
+                        // 1. Next item relative to current selection
+                        // 2. Previous item relative to current selection
+                        // Simple approach: Prefetch neighbours of the selected ID
+                        const currentIndex = schedules.findIndex(s => s.id === selectedScheduleId);
+                        if (index === currentIndex + 1 || index === currentIndex - 1) {
+                            return (
+                                <Suspense key={`prefetch-${schedule.id}`} fallback={null}>
+                                    <ServingDataPrefetcher schedule={schedule} />
+                                </Suspense>
+                            );
+                        }
+                        return null;
+                    })}
                 </main>
             </div>
         </div>

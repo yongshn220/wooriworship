@@ -1,7 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import MenuIcon from "@/public/icons/menuIcon.svg";
 import { Button } from "@/components/ui/button";
-import { SquarePen, Trash2Icon } from "lucide-react";
+import { SquarePen, Trash2Icon, MoreHorizontal } from "lucide-react";
 import { getPathEditNotice } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -52,8 +51,10 @@ export function NoticeHeaderMenu({ noticeId, createdById }: Props) {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <MenuIcon />
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/20">
+            <MoreHorizontal className="h-5 w-5" />
+          </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuGroup>

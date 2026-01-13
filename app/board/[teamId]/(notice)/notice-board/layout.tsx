@@ -1,6 +1,6 @@
 "use client"
 
-import { PullToRefresh } from "@/components/elements/util/page/pull-to-refresh";
+
 import { useSetRecoilState } from "recoil";
 import { currentPageAtom } from "@/global-states/page-state";
 import { useEffect } from "react";
@@ -14,10 +14,8 @@ export default function NoticeLayout({ children }: any) {
   }, [setPage]);
 
   return (
-    <PullToRefresh>
-      <div className="w-full h-full">
-        {children}
-      </div>
-    </PullToRefresh>
+    <div className="w-full h-full">
+      {children}
+    </div>
   )
 }

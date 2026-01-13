@@ -6,7 +6,8 @@ import { Timestamp } from "@firebase/firestore";
 import { format } from "date-fns";
 import { Calendar, Loader2, History } from "lucide-react";
 import { parseLocalDate } from "@/components/util/helper/helper-functions";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { CalendarDrawer } from "./calendar-drawer";
 
 interface Props {
     schedules: ServingSchedule[];
@@ -15,6 +16,7 @@ interface Props {
     onLoadPrev?: () => void;
     isLoadingPrev?: boolean;
     hasMorePast?: boolean;
+    currentUserUid?: string | null;
 }
 
 export function CalendarStrip({
@@ -23,10 +25,12 @@ export function CalendarStrip({
     onSelect,
     onLoadPrev,
     isLoadingPrev,
-    hasMorePast = true
+    hasMorePast = true,
+    currentUserUid
 }: Props) {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     // Effect to scroll selected item to start
     useEffect(() => {
@@ -59,7 +63,10 @@ export function CalendarStrip({
                 <span className="text-xs font-semibold text-muted-foreground">
                     {getMonthLabel()}
                 </span>
-                <button className="text-primary text-[11px] font-bold uppercase hover:bg-muted px-2 py-1 rounded transition-colors tracking-wide flex items-center gap-1">
+                <button
+                    onClick={() => setIsCalendarOpen(true)}
+                    className="text-primary text-[11px] font-bold uppercase hover:bg-muted px-2 py-1 rounded transition-colors tracking-wide flex items-center gap-1"
+                >
                     CALENDAR
                     <Calendar className="w-3.5 h-3.5" />
                 </button>
@@ -96,7 +103,16 @@ export function CalendarStrip({
                 ))}
                 <div className="w-1 shrink-0"></div>
             </div>
-        </div>
+
+            <CalendarDrawer
+                open={isCalendarOpen}
+                onOpenChange={setIsCalendarOpen}
+                schedules={schedules}
+                selectedScheduleId={selectedScheduleId}
+                onSelect={onSelect}
+                currentUserUid={currentUserUid}
+            />
+        </div >
     );
 }
 

@@ -22,7 +22,7 @@ export function ServingInfoCard({ scheduleId, title, date, worshipId, teamId, on
     const router = useRouter();
 
     const dateObj = date instanceof Timestamp ? date.toDate() : (date instanceof Date ? date : parseLocalDate(date));
-    const dateStr = format(dateObj, "yyyy M d (EEE)");
+    const dateStr = format(dateObj, "yyyy. M. d (EEE)");
 
     return (
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-5 relative overflow-hidden border border-blue-100 dark:border-blue-800/50">
