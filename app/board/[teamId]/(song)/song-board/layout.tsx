@@ -1,6 +1,5 @@
 "use client"
 
-import { PullToRefresh } from "@/components/elements/util/page/pull-to-refresh";
 import { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { currentPageAtom } from "@/global-states/page-state";
@@ -14,11 +13,11 @@ export default function SongLayout({ children }: any) {
   }, [setPage]);
 
   return (
-    <PullToRefresh>
-      <div className="bg-background w-full h-full">
-        {children}
-      </div>
-    </PullToRefresh>
+  return (
+    <div className="bg-background w-full h-full">
+      {children}
+    </div>
+  )
   )
 }
 

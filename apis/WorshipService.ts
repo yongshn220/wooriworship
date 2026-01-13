@@ -5,6 +5,7 @@ import { Worship } from "@/models/worship";
 import { WorshipInput } from "@/components/constants/types";
 import { firestore } from "@/firebase";
 import LinkingService from "./LinkingService";
+import { parseLocalDate } from "@/components/util/helper/helper-functions";
 
 class WorshipService extends BaseService {
   constructor() {
@@ -40,6 +41,60 @@ class WorshipService extends BaseService {
       return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Worship));
     } catch (e) {
       console.error("Failed to fetch worships by date:", e);
+      return [];
+    }
+  }
+
+  async getWorships(teamId: string, startDate: string, endDate: string): Promise<Worship[]> {
+    try {
+      const startD = parseLocalDate(startDate);
+      startD.setHours(0, 0, 0, 0);
+      const endD = parseLocalDate(endDate);
+      endD.setHours(23, 59, 59, 999);
+
+      // Fetch all for team (Temporary fix for missing Composite Index)
+      const snapshot = await firestore
+        .collection(this.collectionName)
+        .where('team_id', '==', teamId)
+        .get();
+
+      const allDocs = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Worship));
+
+      // Filter in memory
+      const filtered = allDocs.filter(w => {
+        if (!w.worship_date) return false;
+        // Handle Timestamp or Date (though usually Timestamp in new schema)
+        const wDate = w.worship_date instanceof Timestamp ? w.worship_date.toDate() : new Date(w.worship_date as any);
+        return wDate >= startD && wDate <= endD;
+      });
+
+      return filtered;
+    } catch (e) {
+      console.error("Failed to fetch worships:", e);
+      return [];
+    }
+  }
+
+  async getPreviousWorships(teamId: string, beforeDate: Date, limit: number = 5): Promise<Worship[]> {
+    try {
+      const snapshot = await firestore
+        .collection(this.collectionName)
+        .where('team_id', '==', teamId)
+        .where('worship_date', '<', Timestamp.fromDate(beforeDate))
+        .orderBy('worship_date', 'desc')
+        .limit(limit)
+        .get();
+
+      const results = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Worship));
+      // Sort ASC (oldest first) so they can be prepended correctly?
+      // ServingPage does: sort date ASC.
+      // API returns DESC (newest past item first).
+      // So [Yesterday, 2 Days Ago, 3 Days Ago]
+      // We want to prepend them: [3 Days Ago, 2 Days Ago, Yesterday, TODAY]
+      // So result should be reversed or sorted ASC.
+      return results.sort((a, b) => a.worship_date.toMillis() - b.worship_date.toMillis());
+    } catch (e) {
+      console.error("Failed to fetch previous worships:", e);
       return [];
     }
   }

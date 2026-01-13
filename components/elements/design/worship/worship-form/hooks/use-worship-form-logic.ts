@@ -7,7 +7,7 @@ import { toast } from "@/components/ui/use-toast";
 // State & Models
 import { auth } from "@/firebase";
 import { teamAtom } from "@/global-states/teamState";
-import { worshipUpdaterAtom, worshipIdsUpdaterAtom } from "@/global-states/worship-state";
+import { worshipUpdaterAtom, worshipIdsUpdaterAtom, currentWorshipIdAtom } from "@/global-states/worship-state";
 import { FormMode } from "@/components/constants/enums";
 import { Worship, WorshipSongHeader } from "@/models/worship";
 import { timestampToDate, getServiceTitleFromTags } from "@/components/util/helper/helper-functions";
@@ -34,6 +34,7 @@ export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorship
     // Global updaters (to refresh boards after save)
     const setWorshipUpdater = useSetRecoilState(worshipUpdaterAtom);
     const setWorshipIdsUpdater = useSetRecoilState(worshipIdsUpdaterAtom);
+    const setCurrentWorshipId = useSetRecoilState(currentWorshipIdAtom);
 
     // --- Form State ---
     const [step, setStep] = useState(0);
@@ -177,7 +178,8 @@ export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorship
         // Just trigger updaters
         setWorshipUpdater(prev => prev + 1);
         setWorshipIdsUpdater(prev => prev + 1);
-        router.push(getPathPlan(teamId) + "?expanded=" + id);
+        setCurrentWorshipId(id);
+        router.push(getPathPlan(teamId));
     };
 
     const goToStep = (targetStep: number) => {

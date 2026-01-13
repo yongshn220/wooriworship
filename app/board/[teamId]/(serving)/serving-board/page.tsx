@@ -9,11 +9,14 @@ import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState";
 import { fetchServingRolesSelector, servingSchedulesAtom } from "@/global-states/servingState";
 import { ServingService } from "@/apis";
 import { ServingListSkeleton } from "./_components/serving-list-skeleton";
-import { timestampToDateString } from "@/components/util/helper/helper-functions";
+import { parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";
 import { Timestamp } from "@firebase/firestore";
 import { EmptyServingBoardPage } from "./_components/empty-serving-board-page";
 import { WorshipPlanPreviewDrawer } from "@/components/elements/design/worship/worship-plan-preview-drawer";
-import { CalendarStrip } from "@/components/elements/design/serving/calendar-strip";
+// import { CalendarStrip } from "@/components/elements/design/serving/calendar-strip"; // REMOVED
+import { CalendarStrip } from "@/components/common/board-calendar/calendar-strip"; // NEW
+import { CalendarItem } from "@/components/common/board-calendar/types"; // NEW
+import { useCalendarNavigation } from "@/components/common/hooks/use-calendar-navigation"; // NEW
 import { ServingDetailContainer } from "@/components/elements/design/serving/serving-detail-container";
 
 import { getPathCreateServing } from "@/components/util/helper/routes";
@@ -23,7 +26,7 @@ import { headerActionsAtom } from "@/app/board/_states/board-states";
 import { ServingHeaderMenu } from "@/components/elements/design/serving/serving-header-menu";
 
 import { SwipeableView } from "@/components/elements/design/serving/swipeable-view";
-import { useServingNavigation } from "./_hooks/use-serving-navigation";
+// import { useServingNavigation } from "./_hooks/use-serving-navigation"; // REMOVED
 import { ServingDataPrefetcher } from "./_components/serving-data-prefetcher";
 
 export default function ServingPage() {
@@ -36,9 +39,37 @@ export default function ServingPage() {
     const router = useRouter();
     const setHeaderActions = useSetRecoilState(headerActionsAtom);
 
+    // Map schedules to CalendarItem
+    const calendarItems: CalendarItem[] = useMemo(() => {
+        return schedules.map(s => {
+            const date = s.date instanceof Timestamp ? s.date.toDate() : parseLocalDate(s.date);
+            let badgeLabel = "Event";
+            if (s.service_tags && s.service_tags.length > 0) {
+                badgeLabel = "Worship";
+            }
+            // Logic moved from old CalendarStrip:
+            if (s.title) {
+                // If title is short enough, use it as badge? Original code did this.
+                // Original: if (schedule.title) topLabel = schedule.title.length > 4 ? schedule.title.substring(0, 4) : schedule.title;
+                // Let's stick to simple "Worship" or "Event" for badgeLabel mostly, unless title is short?
+                // Actually the generic component truncates badgeLabel to 8 chars.
+                if (s.title.length <= 4) badgeLabel = s.title;
+            }
+
+            return {
+                id: s.id,
+                date: date,
+                title: s.title,
+                badgeLabel: badgeLabel,
+                description: `${s.worship_roles?.length || 0} worship roles`, // Example description
+                originalData: s
+            };
+        });
+    }, [schedules]);
+
     // Navigation Hook
-    const { navigateNext, navigatePrev } = useServingNavigation(
-        schedules,
+    const { navigateNext, navigatePrev } = useCalendarNavigation(
+        calendarItems,
         selectedScheduleId,
         setSelectedScheduleId
     );
@@ -155,13 +186,12 @@ export default function ServingPage() {
             <div className="flex-1 overflow-y-auto pb-safe">
                 <main className="max-w-lg mx-auto px-4 pt-2 space-y-5 pb-24">
                     <CalendarStrip
-                        schedules={schedules}
-                        selectedScheduleId={selectedScheduleId}
+                        items={calendarItems}
+                        selectedId={selectedScheduleId}
                         onSelect={setSelectedScheduleId}
                         onLoadPrev={handleLoadPast}
                         isLoadingPrev={isLoadingPast}
                         hasMorePast={hasMorePast}
-                        currentUserUid={currentUserUid}
                     />
 
                     {selectedSchedule ? (
