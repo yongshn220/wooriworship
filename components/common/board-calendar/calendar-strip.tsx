@@ -153,7 +153,6 @@ function DateCard({ item, isSelected, onSelect, baseClasses, setRef }: DateCardP
     const weekDay = format(item.date, "EEE");
 
     let topLabel = item.badgeLabel || "Event";
-    if (topLabel.length > 8) topLabel = topLabel.substring(0, 8); // Truncate
 
     const today = new Date();
     const diffDays = differenceInCalendarDays(item.date, today);
@@ -178,7 +177,7 @@ function DateCard({ item, isSelected, onSelect, baseClasses, setRef }: DateCardP
             )}
         >
             <div className={cn(
-                "text-[9px] font-bold px-2 py-0.5 rounded-full absolute -top-2.5 border shadow-sm z-20 whitespace-nowrap",
+                "text-[9px] font-bold px-2 py-0.5 rounded-full absolute -top-2.5 border shadow-sm z-20 whitespace-nowrap max-w-[52px] overflow-hidden",
                 isSelected
                     ? "text-primary bg-blue-50 dark:bg-blue-900/40 border-blue-100 dark:border-blue-800"
                     : "text-muted-foreground bg-muted dark:bg-white/10 border-border-light dark:border-border-dark -top-2"

@@ -31,6 +31,7 @@ import { ServingDataPrefetcher } from "./_components/serving-data-prefetcher";
 
 export default function ServingPage() {
     const teamId = useRecoilValue(currentTeamIdAtom);
+    const team = useRecoilValue(teamAtom(teamId));
     const [schedules, setSchedules] = useRecoilState(servingSchedulesAtom);
     const [loading, setLoading] = useState(true);
     const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
@@ -45,7 +46,10 @@ export default function ServingPage() {
             const date = s.date instanceof Timestamp ? s.date.toDate() : parseLocalDate(s.date);
             let badgeLabel = "Event";
             if (s.service_tags && s.service_tags.length > 0) {
-                badgeLabel = "Worship";
+                // Resolve tag name
+                const tagId = s.service_tags[0];
+                const tagName = team?.service_tags?.find((t: any) => t.id === tagId)?.name;
+                badgeLabel = tagName || "Worship";
             }
             // Logic moved from old CalendarStrip:
             if (s.title) {
@@ -65,7 +69,7 @@ export default function ServingPage() {
                 originalData: s
             };
         });
-    }, [schedules]);
+    }, [schedules, team]);
 
     // Navigation Hook
     const { navigateNext, navigatePrev } = useCalendarNavigation(
