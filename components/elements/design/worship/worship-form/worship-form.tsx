@@ -284,7 +284,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
           {isLoading ? (
             "Saving..."
           ) : step === totalSteps - 1 ? (
-            <>Create Plan <Check className="w-5 h-5 ml-1" /></>
+            <>{mode === FormMode.EDIT ? "Update Plan" : "Create Plan"} <Check className="w-5 h-5 ml-1" /></>
           ) : (
             <>
               {step === 1 && !basicInfo.description && !basicInfo.link ? "Skip" : "Next"}
