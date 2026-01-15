@@ -1,8 +1,17 @@
 
-import { auth, firebaseApp } from "@/firebase";
+import { auth } from "@/firebase";
 import BaseService from './BaseService';
 import { UserService } from './';
 import { User } from "@/models/user";
+import {
+    signInWithEmailAndPassword,
+    signInWithCustomToken,
+    signOut,
+    createUserWithEmailAndPassword,
+    sendPasswordResetEmail,
+    sendEmailVerification,
+    User as FirebaseUser
+} from "firebase/auth";
 
 class AuthService extends BaseService {
     constructor() {
@@ -10,52 +19,52 @@ class AuthService extends BaseService {
     }
 
     async login(email: string, password: string) {
-        const user = await auth.signInWithEmailAndPassword(email, password);
-        if (user.user) {
-            const serverUserInfo = await UserService.getById(user.user.uid) as User;
-            await UserService.update(user.user.uid, { last_logged_in_time: new Date() });
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        if (userCredential.user) {
+            const serverUserInfo = await UserService.getById(userCredential.user.uid) as User;
+            await UserService.update(userCredential.user.uid, { last_logged_in_time: new Date() });
             return serverUserInfo;
         }
         return null;
     }
 
     async loginTemp(email: string, password: string) {
-        const user = await auth.signInWithEmailAndPassword(email, password);
-        if (user.user) {
-            await UserService.update(user.user.uid, { last_logged_in_time: new Date() });
-            return { uid: user.user.uid }
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        if (userCredential.user) {
+            await UserService.update(userCredential.user.uid, { last_logged_in_time: new Date() });
+            return { uid: userCredential.user.uid }
         }
         return null;
     }
 
     async loginWithCustomToken(token: string) {
-        const user = await auth.signInWithCustomToken(token);
-        if (user.user) {
-            await UserService.update(user.user.uid, { last_logged_in_time: new Date() });
+        const userCredential = await signInWithCustomToken(auth, token);
+        if (userCredential.user) {
+            await UserService.update(userCredential.user.uid, { last_logged_in_time: new Date() });
             return true
         }
         return null;
     }
 
     async logout() {
-        await auth.signOut();
+        await signOut(auth);
     }
 
     async register(email: string, password: string) {
         if (auth.currentUser) {
             await this.logout();
         }
-        return await firebaseApp.auth().createUserWithEmailAndPassword(email, password);
+        return await createUserWithEmailAndPassword(auth, email, password);
     }
 
-    async sendEmailVerification(user: any) {
+    async sendEmailVerification(user: FirebaseUser) {
         if (user && !user.emailVerified) {
-            await user.sendEmailVerification();
+            await sendEmailVerification(user);
         }
     }
 
     async resetPassword(email: string) {
-        await auth.sendPasswordResetEmail(email);
+        await sendPasswordResetEmail(auth, email);
     }
 
 }

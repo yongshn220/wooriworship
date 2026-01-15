@@ -1,5 +1,5 @@
 import { storage } from "@/firebase"
-import { deleteObject, ref } from "firebase/storage";
+import { deleteObject, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { ImageFileContainer, MusicSheetContainer } from "@/components/constants/types";
 
 class StorageService {
@@ -11,25 +11,14 @@ class StorageService {
     return refer.fullPath;
   }
 
-  // async uploadFile(teamId: string, filename: string, file: File) {
-  //     const fileRef = storage.ref().child(teamId+"/"+filename);
-  //     try {
-  //         const result = await fileRef.put(file);
-  //         console.log("file "+filename+" has been put in the directory: "+result.metadata.fullPath);
-  //         return await result.ref.getDownloadURL();
-  //     } catch (err) {
-  //         console.error("Error uploading file:", err);
-  //     }
-  // }
-
   async uploadFile(folder_name: string, file: File, prefix: string = "") {
     if (!file) return null
 
     try {
       const fileName = (prefix) ? `${prefix}-스플릿-${file?.name}` : file?.name
-      const fileRef = storage.ref(`${folder_name}/${fileName}`);
-      await fileRef.put(file)
-      return await fileRef.getDownloadURL()
+      const fileRef = ref(storage, `${folder_name}/${fileName}`);
+      await uploadBytes(fileRef, file);
+      return await getDownloadURL(fileRef)
     }
     catch (e) {
       console.error(e)
@@ -38,22 +27,24 @@ class StorageService {
   }
 
   async uploadFiles(folder_name: string, files: Array<File>, prefixes?: Array<String> | null) {
-    let uploads: Array<any> = [];
+    let uploads: Array<Promise<string>> = [];
     try {
       for (const i in files) {
         if (files[i] == null) {
-          return
+          continue; // Changed to continue to not break loop entirely if one is null but handle generally
         }
         let fileName = files[i]?.name;
         if (prefixes) {
           fileName = `${prefixes[i]}-스플릿-${fileName}`
         }
-        const fileRef = storage.ref().child(`${folder_name}/${fileName}`);
-        uploads.push(fileRef.put(files[i]));
+        const fileRef = ref(storage, `${folder_name}/${fileName}`);
+        uploads.push(
+          uploadBytes(fileRef, files[i]).then(snapshot => getDownloadURL(snapshot.ref))
+        );
       }
-      uploads = await Promise.all(uploads);
-      console.error("multiple files have been uploaded");
-      return await Promise.all(uploads.map((x: any) => x.ref.getDownloadURL()));
+      const urls = await Promise.all(uploads);
+      console.log("multiple files have been uploaded");
+      return urls;
     } catch (err) {
       console.error("Error uploading file:", err);
       return [];
@@ -61,9 +52,9 @@ class StorageService {
   }
 
   async downloadFile(fileUrl: string) {
-    const fileRef = storage.ref().child(fileUrl)
+    const fileRef = ref(storage, fileUrl);
     try {
-      const downloadUrl = await fileRef.getDownloadURL();
+      const downloadUrl = await getDownloadURL(fileRef);
       return downloadUrl;
     } catch (err) {
       console.error("Error getting download url: " + err);
@@ -71,7 +62,7 @@ class StorageService {
   }
 
   async deleteFile(fileUrl: string) {
-    const fileRef = storage.ref().child(fileUrl)
+    const fileRef = ref(storage, fileUrl);
     try {
       await deleteObject(fileRef);
       return true;
@@ -84,19 +75,6 @@ class StorageService {
   async downloadMusicSheet(team_id: string, song_id: string, sheet_name: string) {
     return await this.downloadFile(`${team_id}/${song_id}-스플릿-${sheet_name}`);
   }
-
-  // async deleteMusicSheets(sheet_directories: Array<string>) {
-  //     const promises = [];
-  //     try {
-  //         for(let directory of sheet_directories) {
-  //             promises.push(this.deleteFile(directory));
-  //         }
-  //         await Promise.all(promises);
-  //         return sheet_directories;
-  //     } catch (err) {
-  //         return [];
-  //     }
-  // }
 
   async uploadNoticeFiles(team_id: string, files: Array<ImageFileContainer>) {
     return await this.uploadMusicSheets(team_id, files);

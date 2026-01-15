@@ -1,5 +1,5 @@
 import BaseService from "./BaseService"
-import { arrayUnion, arrayRemove } from "@firebase/firestore";
+import { arrayUnion, arrayRemove } from "firebase/firestore";
 import TeamService from "./TeamService";
 
 class UserService extends BaseService {
