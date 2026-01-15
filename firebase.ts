@@ -27,5 +27,7 @@ export const firestore = (dbId && dbId !== "(default)")
   : firebase.firestore();
 
 console.log("🔥 Actual Firestore DB ID (internal):", (firestore as any)._databaseId?.database);
+console.log("🔥 Delegate DB ID:", (firestore as any)._delegate?._databaseId?.database);
+console.log("🔥 Delegate Settings:", (firestore as any)._delegate?._settings);
 export const storage = firebase.storage();
 export const auth = firebase.auth();
