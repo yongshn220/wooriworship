@@ -1,8 +1,25 @@
 import BaseService from "./BaseService";
 import { ServingRole, ServingSchedule } from "@/models/serving";
-import { firestore } from "@/firebase";
-import { Timestamp } from "@firebase/firestore";
-import { arrayRemove, arrayUnion, increment } from "firebase/firestore";
+import { db } from "@/firebase";
+import {
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    addDoc,
+    setDoc,
+    deleteDoc,
+    updateDoc,
+    query,
+    where,
+    orderBy,
+    limit,
+    writeBatch,
+    increment,
+    arrayUnion,
+    arrayRemove,
+    Timestamp
+} from "firebase/firestore";
 import LinkingService from "./LinkingService";
 import { parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";
 
@@ -24,12 +41,11 @@ class ServingService extends BaseService {
 
     async getRoles(teamId: string): Promise<ServingRole[]> {
         try {
-            const snapshot = await firestore
-                .collection("teams")
-                .doc(teamId)
-                .collection("serving_roles")
-                .orderBy("order", "asc")
-                .get();
+            const q = query(
+                collection(db, "teams", teamId, "serving_roles"),
+                orderBy("order", "asc")
+            );
+            const snapshot = await getDocs(q);
             return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServingRole));
         } catch (e) {
             console.error(e);
@@ -38,31 +54,27 @@ class ServingService extends BaseService {
     }
 
     async createRole(teamId: string, role: Omit<ServingRole, "id">): Promise<ServingRole> {
-        const ref = firestore.collection("teams").doc(teamId).collection("serving_roles").doc();
+        const ref = doc(collection(db, "teams", teamId, "serving_roles"));
         const newRole = { ...role, id: ref.id };
-        await ref.set(newRole);
+        await setDoc(ref, newRole);
         return newRole;
     }
 
     async updateRole(teamId: string, role: ServingRole): Promise<void> {
-        await firestore
-            .collection("teams")
-            .doc(teamId)
-            .collection("serving_roles")
-            .doc(role.id)
-            .set(role, { merge: true });
+        const ref = doc(db, "teams", teamId, "serving_roles", role.id);
+        await setDoc(ref, role, { merge: true });
     }
 
     async deleteRole(teamId: string, roleId: string): Promise<void> {
-        await firestore.collection("teams").doc(teamId).collection("serving_roles").doc(roleId).delete();
+        const ref = doc(db, "teams", teamId, "serving_roles", roleId);
+        await deleteDoc(ref);
     }
 
     async updateRolesOrder(teamId: string, roles: ServingRole[]): Promise<void> {
-        const batch = firestore.batch();
-        const collectionRef = firestore.collection("teams").doc(teamId).collection("serving_roles");
+        const batch = writeBatch(db);
 
         roles.forEach((role, index) => {
-            const docRef = collectionRef.doc(role.id);
+            const docRef = doc(db, "teams", teamId, "serving_roles", role.id);
             batch.update(docRef, { order: index });
         });
 
@@ -75,21 +87,20 @@ class ServingService extends BaseService {
             "Bass Guitar", "Acoustic Guitar", "Electric Guitar", "Media Team", "PPT"
         ];
 
-        const rolesRef = firestore.collection("teams").doc(teamId).collection("serving_roles");
+        const rolesRef = collection(db, "teams", teamId, "serving_roles");
 
         try {
-            // Refactored to use regular get() + batch write because transaction.get(CollectionReference) is not supported in client SDK.
-            const existingSnapshot = await rolesRef.get();
+            const existingSnapshot = await getDocs(rolesRef);
             const existingNames = new Set(existingSnapshot.docs.map(doc => (doc.data().name as string).toLowerCase()));
 
             const rolesToAdd = standardRoles.filter(name => !existingNames.has(name.toLowerCase()));
 
             if (rolesToAdd.length === 0) return; // All exist
 
-            const batch = firestore.batch();
+            const batch = writeBatch(db);
 
             rolesToAdd.forEach((name, index) => {
-                const newRoleRef = rolesRef.doc();
+                const newRoleRef = doc(rolesRef);
                 batch.set(newRoleRef, { id: newRoleRef.id, teamId, name, order: 100 + index });
             });
 
@@ -100,37 +111,28 @@ class ServingService extends BaseService {
     }
 
     async addDefaultMember(teamId: string, roleId: string, memberId: string): Promise<void> {
-        await firestore
-            .collection("teams")
-            .doc(teamId)
-            .collection("serving_roles")
-            .doc(roleId)
-            .update({
-                default_members: arrayUnion(memberId)
-            });
+        const ref = doc(db, "teams", teamId, "serving_roles", roleId);
+        await updateDoc(ref, {
+            default_members: arrayUnion(memberId)
+        });
     }
 
     async removeDefaultMember(teamId: string, roleId: string, memberId: string): Promise<void> {
-        await firestore
-            .collection("teams")
-            .doc(teamId)
-            .collection("serving_roles")
-            .doc(roleId)
-            .update({
-                default_members: arrayRemove(memberId)
-            });
+        const ref = doc(db, "teams", teamId, "serving_roles", roleId);
+        await updateDoc(ref, {
+            default_members: arrayRemove(memberId)
+        });
     }
 
     async cleanupMember(teamId: string, memberId: string): Promise<void> {
         try {
-            const rolesSnapshot = await firestore
-                .collection("teams")
-                .doc(teamId)
-                .collection("serving_roles")
-                .where("default_members", "array-contains", memberId)
-                .get();
+            const q = query(
+                collection(db, "teams", teamId, "serving_roles"),
+                where("default_members", "array-contains", memberId)
+            );
+            const rolesSnapshot = await getDocs(q);
 
-            const batch = firestore.batch();
+            const batch = writeBatch(db);
             rolesSnapshot.docs.forEach((doc) => {
                 batch.update(doc.ref, {
                     default_members: arrayRemove(memberId)
@@ -151,22 +153,20 @@ class ServingService extends BaseService {
             const endD = parseLocalDate(endDate);
             endD.setHours(23, 59, 59, 999);
 
+            const colRef = collection(db, "teams", teamId, "serving_schedules");
+
             // Fetch both Timestamp and String for transition period
             const [tsSnapshot, strSnapshot] = await Promise.all([
-                firestore
-                    .collection("teams")
-                    .doc(teamId)
-                    .collection("serving_schedules")
-                    .where("date", ">=", Timestamp.fromDate(startD))
-                    .where("date", "<=", Timestamp.fromDate(endD))
-                    .get(),
-                firestore
-                    .collection("teams")
-                    .doc(teamId)
-                    .collection("serving_schedules")
-                    .where("date", ">=", startDate)
-                    .where("date", "<=", endDate)
-                    .get()
+                getDocs(query(
+                    colRef,
+                    where("date", ">=", Timestamp.fromDate(startD)),
+                    where("date", "<=", Timestamp.fromDate(endD))
+                )),
+                getDocs(query(
+                    colRef,
+                    where("date", ">=", startDate),
+                    where("date", "<=", endDate)
+                ))
             ]);
 
             const results = new Map<string, ServingSchedule>();
@@ -180,27 +180,24 @@ class ServingService extends BaseService {
         }
     }
 
-    async getPreviousSchedules(teamId: string, beforeDate: Date, limit: number = 5): Promise<ServingSchedule[]> {
+    async getPreviousSchedules(teamId: string, beforeDate: Date, limitCount: number = 5): Promise<ServingSchedule[]> {
         try {
             const beforeDateStr = timestampToDateString(Timestamp.fromDate(beforeDate));
+            const colRef = collection(db, "teams", teamId, "serving_schedules");
 
             const [tsSnapshot, strSnapshot] = await Promise.all([
-                firestore
-                    .collection("teams")
-                    .doc(teamId)
-                    .collection("serving_schedules")
-                    .where("date", "<", Timestamp.fromDate(beforeDate))
-                    .orderBy("date", "desc")
-                    .limit(limit)
-                    .get(),
-                firestore
-                    .collection("teams")
-                    .doc(teamId)
-                    .collection("serving_schedules")
-                    .where("date", "<", beforeDateStr)
-                    .orderBy("date", "desc")
-                    .limit(limit)
-                    .get()
+                getDocs(query(
+                    colRef,
+                    where("date", "<", Timestamp.fromDate(beforeDate)),
+                    orderBy("date", "desc"),
+                    limit(limitCount)
+                )),
+                getDocs(query(
+                    colRef,
+                    where("date", "<", beforeDateStr),
+                    orderBy("date", "desc"),
+                    limit(limitCount)
+                ))
             ]);
 
             const results = new Map<string, ServingSchedule>();
@@ -214,19 +211,21 @@ class ServingService extends BaseService {
                 return dateB - dateA; // DESC
             });
 
-            return combined.slice(0, limit);
+            return combined.slice(0, limitCount);
         } catch (e) {
             console.error("Failed to fetch previous schedules", e);
             return [];
         }
     }
 
-    async getRecentSchedules(teamId: string, limit: number = 5): Promise<ServingSchedule[]> {
+    async getRecentSchedules(teamId: string, limitCount: number = 5): Promise<ServingSchedule[]> {
         try {
-            const snapshot = await firestore.collection("teams").doc(teamId).collection("serving_schedules")
-                .orderBy("date", "desc")
-                .limit(limit)
-                .get();
+            const q = query(
+                collection(db, "teams", teamId, "serving_schedules"),
+                orderBy("date", "desc"),
+                limit(limitCount)
+            );
+            const snapshot = await getDocs(q);
             return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServingSchedule));
         } catch (e) {
             console.error(e);
@@ -234,16 +233,15 @@ class ServingService extends BaseService {
         }
     }
 
-    async getRecentSchedulesByTag(teamId: string, tag: string, limit: number = 10): Promise<ServingSchedule[]> {
+    async getRecentSchedulesByTag(teamId: string, tag: string, limitCount: number = 10): Promise<ServingSchedule[]> {
         try {
-            const snapshot = await firestore
-                .collection("teams")
-                .doc(teamId)
-                .collection("serving_schedules")
-                .where("service_tags", "array-contains", tag)
-                .orderBy("date", "desc")
-                .limit(limit)
-                .get();
+            const q = query(
+                collection(db, "teams", teamId, "serving_schedules"),
+                where("service_tags", "array-contains", tag),
+                orderBy("date", "desc"),
+                limit(limitCount)
+            );
+            const snapshot = await getDocs(q);
             return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServingSchedule));
         } catch (e) {
             console.error(e);
@@ -258,22 +256,20 @@ class ServingService extends BaseService {
             const nextD = new Date(startD);
             nextD.setDate(startD.getDate() + 1);
 
+            const colRef = collection(db, "teams", teamId, "serving_schedules");
+
             const [tsSnapshot, strSnapshot] = await Promise.all([
-                firestore
-                    .collection("teams")
-                    .doc(teamId)
-                    .collection("serving_schedules")
-                    .where("date", ">=", Timestamp.fromDate(startD))
-                    .where("date", "<", Timestamp.fromDate(nextD))
-                    .limit(1)
-                    .get(),
-                firestore
-                    .collection("teams")
-                    .doc(teamId)
-                    .collection("serving_schedules")
-                    .where("date", "==", date)
-                    .limit(1)
-                    .get()
+                getDocs(query(
+                    colRef,
+                    where("date", ">=", Timestamp.fromDate(startD)),
+                    where("date", "<", Timestamp.fromDate(nextD)),
+                    limit(1)
+                )),
+                getDocs(query(
+                    colRef,
+                    where("date", "==", date),
+                    limit(1)
+                ))
             ]);
 
             const doc = tsSnapshot.docs[0] || strSnapshot.docs[0];
@@ -287,15 +283,11 @@ class ServingService extends BaseService {
 
     async getScheduleById(teamId: string, scheduleId: string): Promise<ServingSchedule | null> {
         try {
-            const doc = await firestore
-                .collection("teams")
-                .doc(teamId)
-                .collection("serving_schedules")
-                .doc(scheduleId)
-                .get();
+            const docRef = doc(db, "teams", teamId, "serving_schedules", scheduleId);
+            const docSnap = await getDoc(docRef);
 
-            if (!doc.exists) return null;
-            return { id: doc.id, ...doc.data() } as ServingSchedule;
+            if (!docSnap.exists()) return null;
+            return { id: docSnap.id, ...docSnap.data() } as ServingSchedule;
         } catch (e) {
             console.error(e);
             return null;
@@ -303,7 +295,7 @@ class ServingService extends BaseService {
     }
 
     async createSchedule(teamId: string, schedule: Omit<ServingSchedule, "id">): Promise<ServingSchedule> {
-        const ref = firestore.collection("teams").doc(teamId).collection("serving_schedules").doc();
+        const ref = doc(collection(db, "teams", teamId, "serving_schedules"));
 
         const normalizedDate = typeof schedule.date === 'string' ? parseLocalDate(schedule.date) : schedule.date.toDate();
         normalizedDate.setHours(12, 0, 0, 0); // Normalize to local noon
@@ -314,7 +306,7 @@ class ServingService extends BaseService {
             date: Timestamp.fromDate(normalizedDate),
             worship_roles: schedule.worship_roles || [], // Explicitly save roles
         };
-        await ref.set(newSchedule);
+        await setDoc(ref, newSchedule);
         if (schedule.worship_id) {
             await LinkingService.linkWorshipAndServing(teamId, schedule.worship_id, newSchedule.id);
         }
@@ -329,8 +321,8 @@ class ServingService extends BaseService {
     }
 
     async updateSchedule(teamId: string, schedule: ServingSchedule): Promise<void> {
-        const docRef = firestore.collection("teams").doc(teamId).collection("serving_schedules").doc(schedule.id);
-        const oldDoc = await docRef.get();
+        const docRef = doc(db, "teams", teamId, "serving_schedules", schedule.id);
+        const oldDoc = await getDoc(docRef);
         const oldData = oldDoc.data() as ServingSchedule | undefined;
 
         const normalizedDate = typeof schedule.date === 'string' ? parseLocalDate(schedule.date) : (schedule.date as Timestamp).toDate();
@@ -343,7 +335,7 @@ class ServingService extends BaseService {
             items: schedule.items || [] // Explicitly save items
         };
 
-        await docRef.set(updatedSchedule, { merge: true });
+        await setDoc(docRef, updatedSchedule, { merge: true });
 
         // Handle stats update if tags or date changed
         if (oldData) {
@@ -363,8 +355,8 @@ class ServingService extends BaseService {
     async deleteSchedule(teamId: string, scheduleId: string): Promise<void> {
         await LinkingService.cleanupReferencesForServingDeletion(teamId, scheduleId);
 
-        const docRef = firestore.collection("teams").doc(teamId).collection("serving_schedules").doc(scheduleId);
-        const docSnapshot = await docRef.get();
+        const docRef = doc(db, "teams", teamId, "serving_schedules", scheduleId);
+        const docSnapshot = await getDoc(docRef);
         const data = docSnapshot.data() as ServingSchedule | undefined;
 
         // Remove stats before deletion
@@ -373,18 +365,14 @@ class ServingService extends BaseService {
             await this.updateTagStats(teamId, data.service_tags, dateStr, "remove");
         }
 
-        await docRef.delete();
+        await deleteDoc(docRef);
     }
 
     // --- Templates ---
 
     async getTemplates(teamId: string): Promise<any[]> {
         try {
-            const snapshot = await firestore
-                .collection("teams")
-                .doc(teamId)
-                .collection("serving_templates")
-                .get();
+            const snapshot = await getDocs(collection(db, "teams", teamId, "serving_templates"));
             return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (e) {
             console.error(e);
@@ -393,16 +381,18 @@ class ServingService extends BaseService {
     }
 
     async createTemplate(teamId: string, template: any): Promise<void> {
-        const ref = firestore.collection("teams").doc(teamId).collection("serving_templates").doc();
-        await ref.set({ ...template, id: ref.id });
+        const ref = doc(collection(db, "teams", teamId, "serving_templates"));
+        await setDoc(ref, { ...template, id: ref.id });
     }
 
     async updateTemplate(teamId: string, templateId: string, template: any): Promise<void> {
-        await firestore.collection("teams").doc(teamId).collection("serving_templates").doc(templateId).update(template);
+        const ref = doc(db, "teams", teamId, "serving_templates", templateId);
+        await updateDoc(ref, template);
     }
 
     async deleteTemplate(teamId: string, templateId: string): Promise<void> {
-        await firestore.collection("teams").doc(teamId).collection("serving_templates").doc(templateId).delete();
+        const ref = doc(db, "teams", teamId, "serving_templates", templateId);
+        await deleteDoc(ref);
     }
 
     async initDefaultTemplate(teamId: string): Promise<void> {
@@ -432,13 +422,12 @@ class ServingService extends BaseService {
     // --- Helpers ---
 
     async findRoleByName(teamId: string, name: string): Promise<ServingRole | null> {
-        const snapshot = await firestore
-            .collection("teams")
-            .doc(teamId)
-            .collection("serving_roles")
-            .where("name", "==", name)
-            .limit(1)
-            .get();
+        const q = query(
+            collection(db, "teams", teamId, "serving_roles"),
+            where("name", "==", name),
+            limit(1)
+        );
+        const snapshot = await getDocs(q);
         if (snapshot.empty) return null;
         return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as ServingRole;
     }
@@ -447,14 +436,10 @@ class ServingService extends BaseService {
 
     async getServingConfig(teamId: string): Promise<{ customGroups: string[], customNames: string[] }> {
         try {
-            const doc = await firestore
-                .collection("teams")
-                .doc(teamId)
-                .collection("serving_config")
-                .doc("general")
-                .get();
-            if (!doc.exists) return { customGroups: [], customNames: [] };
-            const data = doc.data();
+            const docRef = doc(db, "teams", teamId, "serving_config", "general");
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) return { customGroups: [], customNames: [] };
+            const data = docSnap.data();
             return {
                 customGroups: data?.custom_groups || [],
                 customNames: data?.custom_names || []
@@ -466,36 +451,24 @@ class ServingService extends BaseService {
     }
 
     async addCustomGroup(teamId: string, groupName: string): Promise<void> {
-        await firestore
-            .collection("teams")
-            .doc(teamId)
-            .collection("serving_config")
-            .doc("general")
-            .set({ custom_groups: arrayUnion(groupName) }, { merge: true });
+        const ref = doc(db, "teams", teamId, "serving_config", "general");
+        await setDoc(ref, { custom_groups: arrayUnion(groupName) }, { merge: true });
     }
 
     async addCustomMemberName(teamId: string, name: string): Promise<void> {
-        await firestore
-            .collection("teams")
-            .doc(teamId)
-            .collection("serving_config")
-            .doc("general")
-            .set({ custom_names: arrayUnion(name) }, { merge: true });
+        const ref = doc(db, "teams", teamId, "serving_config", "general");
+        await setDoc(ref, { custom_names: arrayUnion(name) }, { merge: true });
     }
 
     // --- Tag Stats (Advanced Smart Quick Select) ---
 
     async getTagStats(teamId: string): Promise<Record<string, { count: number, weekdays: Record<string, number>, last_used_at: any }>> {
         try {
-            const doc = await firestore
-                .collection("teams")
-                .doc(teamId)
-                .collection("config")
-                .doc("tag_stats")
-                .get();
+            const docRef = doc(db, "teams", teamId, "config", "tag_stats");
+            const docSnap = await getDoc(docRef);
 
-            if (!doc.exists) return {};
-            return doc.data()?.stats || {};
+            if (!docSnap.exists()) return {};
+            return docSnap.data()?.stats || {};
         } catch (e) {
             console.error("Failed to fetch tag stats", e);
             return {};
@@ -504,7 +477,7 @@ class ServingService extends BaseService {
 
     async updateTagStats(teamId: string, tagIds: string[], dateString: string, mode: "add" | "remove"): Promise<void> {
         try {
-            const statsRef = firestore.collection("teams").doc(teamId).collection("config").doc("tag_stats");
+            const statsRef = doc(db, "teams", teamId, "config", "tag_stats");
             // Parse date string (YYYY-MM-DD) as local date to avoid UTC shifts
             const [y, m, d] = dateString.split('-').map(Number);
             const date = new Date(y, m - 1, d);
@@ -528,13 +501,7 @@ class ServingService extends BaseService {
             }
 
             // Using set with merge to ensure document exists
-            // Since we are updating specific keys in the 'stats' map, we need to be careful.
-            // set({ stats: statsUpdate }, { merge: true }) works for creating/merging top 'stats' field.
-            // However, it will REPLACE the 'stats' map's children if we are not careful? 
-            // NO, `set` with `merge:true` performs a deep merge on Maps.
-            // So `stats: { tagId: { count: ... } }` will merge into `stats`.
-
-            await statsRef.set({ stats: statsUpdate }, { merge: true });
+            await setDoc(statsRef, { stats: statsUpdate }, { merge: true });
         } catch (e) {
             console.error("Failed to update tag stats", e);
         }
