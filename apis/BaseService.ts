@@ -1,4 +1,19 @@
-import { firestore } from "@/firebase";
+import { db } from "@/firebase";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  addDoc,
+  setDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  startAfter,
+  limit,
+  documentId
+} from "firebase/firestore";
 
 export default class BaseService {
   collectionName: string;
@@ -10,17 +25,16 @@ export default class BaseService {
   async getDocIds(filters: Array<any>) {
     try {
       const result: Array<string> = [];
-      let ref: any = firestore.collection(this.collectionName);
+      let q: any = collection(db, this.collectionName);
 
       if (filters) {
-        for (let i in filters) {
-          ref = ref.where(filters[i].a, filters[i].b, filters[i].c);
-        }
+        const constraints = filters.map(f => where(f.a, f.b, f.c));
+        q = query(q, ...constraints);
       }
 
-      const snapshot = await ref.get();
+      const snapshot = await getDocs(q);
       snapshot.forEach((doc: any) => {
-        result.push(doc.id); // Push only the document ID
+        result.push(doc.id);
       });
 
       return result;
@@ -33,9 +47,9 @@ export default class BaseService {
 
   async getById(id: any) {
     try {
-      const ref = firestore.collection(this.collectionName).doc(id);
-      const res = await ref.get();
-      if (res.exists) {
+      const docRef = doc(db, this.collectionName, id);
+      const res = await getDoc(docRef);
+      if (res.exists()) {
         return { id: id, ...res.data() };
       }
       else {
@@ -52,7 +66,7 @@ export default class BaseService {
       return [];
     }
     return await this.queryByArray({
-      a: '__name__',
+      a: documentId(),
       b: 'in',
       c: ids
     });
@@ -61,16 +75,15 @@ export default class BaseService {
   async getByFilters(filters: Array<any>) {
     try {
       const result: Array<any> = [];
-      let ref: any = firestore.collection(this.collectionName);
+      let q: any = collection(db, this.collectionName);
+
       if (filters) {
-        for (let i in filters) {
-          ref = ref.where(filters[i].a, filters[i].b, filters[i].c);
-        }
-        ref = await ref.get();
-      } else {
-        ref = await ref.get();
+        const constraints = filters.map(f => where(f.a, f.b, f.c));
+        q = query(q, ...constraints);
       }
-      ref.forEach((element: any) => {
+
+      const snapshot = await getDocs(q);
+      snapshot.forEach((element: any) => {
         result.push({ id: element.id, ...element.data() });
       })
       return result;
@@ -81,24 +94,31 @@ export default class BaseService {
   }
 
   async getByFiltersAndFields(filters: Array<any>, fields: Array<string>) {
+    // Note: Client-side field selection is not directly supported in Modular SDK 
+    // in the same way 'select()' worked in some contexts, but data() returns the full object.
+    // We will fetch full docs and filter fields in memory if strictly necessary, 
+    // or just return full objects as typical in Client SDK usage.
     try {
       const result: Array<any> = [];
-      let ref: any = firestore.collection(this.collectionName);
+      let q: any = collection(db, this.collectionName);
 
       if (filters) {
-        for (let i in filters) {
-          ref = ref.where(filters[i].a, filters[i].b, filters[i].c);
+        const constraints = filters.map(f => where(f.a, f.b, f.c));
+        q = query(q, ...constraints);
+      }
+
+      const snapshot = await getDocs(q);
+      snapshot.forEach((element: any) => {
+        const data = element.data();
+        if (fields && fields.length > 0) {
+          const filteredData: any = { id: element.id };
+          fields.forEach(field => {
+            if (data[field] !== undefined) filteredData[field] = data[field];
+          });
+          result.push(filteredData);
+        } else {
+          result.push({ id: element.id, ...data });
         }
-      }
-
-      // Apply field selection if fields are provided
-      if (fields && fields.length > 0) {
-        ref = ref.select(...fields);
-      }
-
-      ref = await ref.get();
-      ref.forEach((element: any) => {
-        result.push({ id: element.id, ...element.data() });
       });
 
       return result;
@@ -111,30 +131,28 @@ export default class BaseService {
   async getByFiltersWithPagination(filters: Array<any> | null, lastDoc: any = null, pageSize: number = 10) {
     try {
       const result: Array<any> = [];
-      let cRef: any = firestore.collection(this.collectionName);
+      let constraints: any[] = [];
 
       if (filters) {
-        for (let i in filters) {
-          cRef = cRef.where(filters[i].a, filters[i].b, filters[i].c);
-        }
+        filters.forEach(f => constraints.push(where(f.a, f.b, f.c)));
       }
 
-      // 정렬 기준 추가 (예: 생성 시간순)
-      cRef = cRef.orderBy('createdAt', 'desc');
+      // Default sorting by createdAt desc
+      constraints.push(orderBy('createdAt', 'desc'));
 
-      // 페이지네이션 적용
       if (lastDoc) {
-        cRef = cRef.startAfter(lastDoc);
+        constraints.push(startAfter(lastDoc));
       }
-      cRef = cRef.limit(pageSize);
 
-      const snapshot = await cRef.get();
+      constraints.push(limit(pageSize));
+
+      const q = query(collection(db, this.collectionName), ...constraints);
+      const snapshot = await getDocs(q);
 
       snapshot.forEach((doc: any) => {
         result.push({ id: doc.id, ...doc.data() });
       });
 
-      // 마지막 문서 반환
       const lastVisible = snapshot.docs[snapshot.docs.length - 1];
 
       return { songs: result, lastDoc: lastVisible };
@@ -149,10 +167,12 @@ export default class BaseService {
     try {
       const refs = await this.getByFilters(filters);
       const promises = [];
-      for (const ref of refs) {
-        promises.push(this.delete(ref.id))
+      if (refs) {
+        for (const ref of refs) {
+          promises.push(this.delete(ref.id))
+        }
+        await Promise.all(promises);
       }
-      await Promise.all(promises);
       return true;
     } catch (e) {
       console.error(e)
@@ -165,19 +185,24 @@ export default class BaseService {
       if (filter) {
         const promises = [];
         const result: any = [];
-        while (filter.c.length) {
-          const subFilters = filter.c.splice(0, 10);
+        // Clone array to avoid modifying original reference if passed
+        const itemsToQuery = [...filter.c];
+
+        while (itemsToQuery.length) {
+          const subFilters = itemsToQuery.splice(0, 10);
+
+          const q = query(
+            collection(db, this.collectionName),
+            where(filter.a, filter.b, subFilters)
+          );
+
           promises.push(
-            firestore.collection(this.collectionName).where(
-              filter.a,
-              filter.b,
-              subFilters
-            ).get().then((x: any) => {
-              x.forEach((element: any) => {
+            getDocs(q).then((snapshot) => {
+              snapshot.forEach((element) => {
                 result.push({ id: element.id, ...element.data() });
               })
             })
-          )
+          );
         }
         await Promise.all(promises);
         return result;
@@ -191,8 +216,8 @@ export default class BaseService {
 
   async create(data: any) {
     try {
-      const ref = await firestore.collection(this.collectionName).add(data);
-      return ref.id;
+      const docRef = await addDoc(collection(db, this.collectionName), data);
+      return docRef.id;
     } catch (e) {
       console.error(e)
       return null
@@ -201,8 +226,8 @@ export default class BaseService {
 
   async createWithId(id: string, data: any) {
     try {
-      const docRef = firestore.collection(this.collectionName).doc(id);
-      await docRef.set(data);
+      const docRef = doc(db, this.collectionName, id);
+      await setDoc(docRef, data);
       return id;
     }
     catch (e) {
@@ -214,7 +239,8 @@ export default class BaseService {
 
   async update(id: string, data: any) {
     try {
-      await firestore.collection(this.collectionName).doc(id).set(data, { merge: true });
+      const docRef = doc(db, this.collectionName, id);
+      await setDoc(docRef, data, { merge: true });
       return true
     }
     catch (e) {
@@ -225,7 +251,8 @@ export default class BaseService {
 
   async delete(id: string) {
     try {
-      await firestore.collection(this.collectionName).doc(id).delete();
+      const docRef = doc(db, this.collectionName, id);
+      await deleteDoc(docRef);
       return true
     } catch (e) {
       console.error(e)

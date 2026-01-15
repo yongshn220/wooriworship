@@ -1,4 +1,5 @@
-import { firestore } from "@/firebase";
+import { db } from "@/firebase";
+import { doc, collection, runTransaction } from "firebase/firestore";
 
 class LinkingService {
     private static instance: LinkingService;
@@ -22,15 +23,15 @@ class LinkingService {
             return false;
         }
 
-        const worshipRef = firestore.collection("worships").doc(worshipId);
-        const servingRef = firestore.collection("teams").doc(teamId).collection("serving_schedules").doc(servingId);
+        const worshipRef = doc(db, "worships", worshipId);
+        const servingRef = doc(db, "teams", teamId, "serving_schedules", servingId);
 
         try {
-            await firestore.runTransaction(async (transaction) => {
+            await runTransaction(db, async (transaction) => {
                 const worshipDoc = await transaction.get(worshipRef);
                 const servingDoc = await transaction.get(servingRef);
 
-                if (!worshipDoc.exists || !servingDoc.exists) {
+                if (!worshipDoc.exists() || !servingDoc.exists()) {
                     throw new Error("One or both documents do not exist.");
                 }
 
@@ -53,20 +54,20 @@ class LinkingService {
      * Finds the related Serving Schedule and removes the reference to this Worship Plan.
      */
     async unlinkWorship(teamId: string, worshipId: string): Promise<boolean> {
-        const worshipRef = firestore.collection("worships").doc(worshipId);
+        const worshipRef = doc(db, "worships", worshipId);
 
         try {
-            await firestore.runTransaction(async (transaction) => {
+            await runTransaction(db, async (transaction) => {
                 const worshipDoc = await transaction.get(worshipRef);
-                if (!worshipDoc.exists) return;
+                if (!worshipDoc.exists()) return;
 
                 const data = worshipDoc.data();
                 const servingId = data?.serving_schedule_id;
 
                 if (servingId) {
-                    const servingRef = firestore.collection("teams").doc(teamId).collection("serving_schedules").doc(servingId);
+                    const servingRef = doc(db, "teams", teamId, "serving_schedules", servingId);
                     const servingDoc = await transaction.get(servingRef);
-                    if (servingDoc.exists && servingDoc.data()?.worship_id === worshipId) {
+                    if (servingDoc.exists() && servingDoc.data()?.worship_id === worshipId) {
                         transaction.update(servingRef, { worship_id: null });
                     }
                 }
@@ -84,20 +85,20 @@ class LinkingService {
      * Atomically unlinks a Serving Schedule from its Worship Plan.
      */
     async unlinkServing(teamId: string, servingId: string): Promise<boolean> {
-        const servingRef = firestore.collection("teams").doc(teamId).collection("serving_schedules").doc(servingId);
+        const servingRef = doc(db, "teams", teamId, "serving_schedules", servingId);
 
         try {
-            await firestore.runTransaction(async (transaction) => {
+            await runTransaction(db, async (transaction) => {
                 const servingDoc = await transaction.get(servingRef);
-                if (!servingDoc.exists) return;
+                if (!servingDoc.exists()) return;
 
                 const data = servingDoc.data();
                 const worshipId = data?.worship_id;
 
                 if (worshipId) {
-                    const worshipRef = firestore.collection("worships").doc(worshipId);
+                    const worshipRef = doc(db, "worships", worshipId);
                     const worshipDoc = await transaction.get(worshipRef);
-                    if (worshipDoc.exists && worshipDoc.data()?.serving_schedule_id === servingId) {
+                    if (worshipDoc.exists() && worshipDoc.data()?.serving_schedule_id === servingId) {
                         transaction.update(worshipRef, { serving_schedule_id: null });
                     }
                 }

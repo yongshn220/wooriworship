@@ -1,13 +1,7 @@
-import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
-import "firebase/compat/firestore";
-import "firebase/compat/storage";
-import { getApp } from "firebase/app";
-import { initializeFirestore } from "firebase/firestore";
-
-
-// https://firebase.google.com/docs/web/setup#available-libraries
-
+import { getApp, getApps, initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore, initializeFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -17,26 +11,25 @@ const firebaseConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-  databaseId: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID, // Experimental: Try passing it in config
 };
 
-export const firebaseApp = firebase.initializeApp(firebaseConfig);
+// Initialize App (Singleton Pattern)
+export const firebaseApp = !getApps().length
+  ? initializeApp(firebaseConfig)
+  : getApp();
+
+// Database Selection Logic
 const dbId = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID;
 console.log("🔥 Configured DB ID:", dbId);
 
-// Standard Modular Initialization for Named DB
-if (dbId && dbId !== "(default)") {
-  try {
-    const modularApp = getApp(); // Get the modular app instance corresponding to the default app
-    initializeFirestore(modularApp, {}, dbId);
-    console.log(`🔥 Initialized Modular Firestore with DB ID: ${dbId}`);
-  } catch (e) {
-    console.error("🔥 Failed to initialize Modular Firestore:", e);
-  }
-}
+// Initialize Modular Firestore
+export const db = (dbId && dbId !== "(default)")
+  ? initializeFirestore(firebaseApp, {}, dbId)
+  : getFirestore(firebaseApp);
 
-export const firestore = firebaseApp.firestore();
-// Diagnostic Log
-console.log("🔥 Actual Firestore DB ID (internal):", (firestore as any)._databaseId?.database);
-export const storage = firebase.storage();
-export const auth = firebase.auth();
+console.log(`🔥 Initialized Modular Firestore with DB ID: ${dbId || "(default)"}`);
+// Check internal ID if accessible (for debugging, though properties are private in Modular SDK)
+// console.log("🔥 Actual DB ID:", (db as any)._databaseId);
+
+export const storage = getStorage(firebaseApp);
+export const auth = getAuth(firebaseApp);

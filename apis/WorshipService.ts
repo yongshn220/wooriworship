@@ -1,9 +1,9 @@
 import BaseService from "./BaseService";
 import { SongService } from ".";
-import { Timestamp } from "@firebase/firestore";
+import { Timestamp, collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
 import { Worship } from "@/models/worship";
 import { WorshipInput } from "@/components/constants/types";
-import { firestore } from "@/firebase";
+import { db } from "@/firebase";
 import LinkingService from "./LinkingService";
 import { parseLocalDate } from "@/components/util/helper/helper-functions";
 
@@ -31,12 +31,14 @@ class WorshipService extends BaseService {
       const nextDay = new Date(startOfDay);
       nextDay.setDate(nextDay.getDate() + 1);
 
-      const snapshot = await firestore
-        .collection(this.collectionName)
-        .where('team_id', '==', teamId)
-        .where('worship_date', '>=', Timestamp.fromDate(startOfDay))
-        .where('worship_date', '<', Timestamp.fromDate(nextDay))
-        .get();
+      const q = query(
+        collection(db, this.collectionName),
+        where('team_id', '==', teamId),
+        where('worship_date', '>=', Timestamp.fromDate(startOfDay)),
+        where('worship_date', '<', Timestamp.fromDate(nextDay))
+      );
+
+      const snapshot = await getDocs(q);
 
       return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Worship));
     } catch (e) {
@@ -53,10 +55,11 @@ class WorshipService extends BaseService {
       endD.setHours(23, 59, 59, 999);
 
       // Fetch all for team (Temporary fix for missing Composite Index)
-      const snapshot = await firestore
-        .collection(this.collectionName)
-        .where('team_id', '==', teamId)
-        .get();
+      const q = query(
+        collection(db, this.collectionName),
+        where('team_id', '==', teamId)
+      );
+      const snapshot = await getDocs(q);
 
       const allDocs = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Worship));
 
@@ -75,23 +78,21 @@ class WorshipService extends BaseService {
     }
   }
 
-  async getPreviousWorships(teamId: string, beforeDate: Date, limit: number = 5): Promise<Worship[]> {
+  async getPreviousWorships(teamId: string, beforeDate: Date, limitCount: number = 5): Promise<Worship[]> {
     try {
-      const snapshot = await firestore
-        .collection(this.collectionName)
-        .where('team_id', '==', teamId)
-        .where('worship_date', '<', Timestamp.fromDate(beforeDate))
-        .orderBy('worship_date', 'desc')
-        .limit(limit)
-        .get();
+      const q = query(
+        collection(db, this.collectionName),
+        where('team_id', '==', teamId),
+        where('worship_date', '<', Timestamp.fromDate(beforeDate)),
+        orderBy('worship_date', 'desc'),
+        limit(limitCount)
+      );
+
+      const snapshot = await getDocs(q);
 
       const results = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Worship));
+
       // Sort ASC (oldest first) so they can be prepended correctly?
-      // ServingPage does: sort date ASC.
-      // API returns DESC (newest past item first).
-      // So [Yesterday, 2 Days Ago, 3 Days Ago]
-      // We want to prepend them: [3 Days Ago, 2 Days Ago, Yesterday, TODAY]
-      // So result should be reversed or sorted ASC.
       return results.sort((a, b) => a.worship_date.toMillis() - b.worship_date.toMillis());
     } catch (e) {
       console.error("Failed to fetch previous worships:", e);
