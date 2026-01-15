@@ -15,6 +15,7 @@ const firebaseConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  databaseId: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID, // Experimental: Try passing it in config
 };
 
 export const firebaseApp = firebase.initializeApp(firebaseConfig);
