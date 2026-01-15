@@ -18,6 +18,9 @@ const firebaseConfig = {
 };
 
 export const firebaseApp = firebase.initializeApp(firebaseConfig);
-export const firestore = firebase.firestore();
+const dbId = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID;
+export const firestore = (dbId && dbId !== "(default)")
+  ? firebase.app().firestore(dbId)
+  : firebase.firestore();
 export const storage = firebase.storage();
 export const auth = firebase.auth();
