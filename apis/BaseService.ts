@@ -172,8 +172,8 @@ export default class BaseService {
               filter.a,
               filter.b,
               subFilters
-            ).get().then(x => {
-              x.forEach(element => {
+            ).get().then((x: any) => {
+              x.forEach((element: any) => {
                 result.push({ id: element.id, ...element.data() });
               })
             })
