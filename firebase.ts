@@ -22,9 +22,19 @@ export const firebaseApp = firebase.initializeApp(firebaseConfig);
 const dbId = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID;
 console.log("🔥 Configured DB ID:", dbId);
 
+// Standard Modular Initialization for Named DB
+if (dbId && dbId !== "(default)") {
+  try {
+    const modularApp = getApp(); // Get the modular app instance corresponding to the default app
+    initializeFirestore(modularApp, {}, dbId);
+    console.log(`🔥 Initialized Modular Firestore with DB ID: ${dbId}`);
+  } catch (e) {
+    console.error("🔥 Failed to initialize Modular Firestore:", e);
+  }
+}
+
 export const firestore = firebaseApp.firestore();
-// Named DB logic to be re-implemented correctly after research
-console.log("🔥 Configured DB ID:", dbId);
+// Diagnostic Log
 console.log("🔥 Actual Firestore DB ID (internal):", (firestore as any)._databaseId?.database);
 export const storage = firebase.storage();
 export const auth = firebase.auth();
