@@ -23,33 +23,8 @@ const dbId = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID;
 console.log("🔥 Configured DB ID:", dbId);
 
 export const firestore = firebaseApp.firestore();
-
-if (dbId && dbId !== "(default)") {
-  console.log(`🔥 Switching to named DB: ${dbId}`);
-  // Workaround: Compat SDK might not support named DBs natively.
-  // Force-overwrite internal properties to point to the correct DB.
-  try {
-    const databaseIdObj = { projectId: firebaseConfig.projectId, database: dbId };
-
-    // 1. Compat instance
-    (firestore as any)._databaseId = databaseIdObj;
-
-    // 2. Delegate (Modular instance)
-    if ((firestore as any)._delegate) {
-      (firestore as any)._delegate._databaseId = databaseIdObj;
-      (firestore as any)._delegate._settings = {
-        ...(firestore as any)._delegate._settings,
-        host: "firestore.googleapis.com",
-        ssl: true
-      };
-      // Force update the component container if possible? (Hard to do)
-    }
-  } catch (e) {
-    console.error("🔥 Failed to switch DB:", e);
-  }
-}
-
+// Named DB logic to be re-implemented correctly after research
+console.log("🔥 Configured DB ID:", dbId);
 console.log("🔥 Actual Firestore DB ID (internal):", (firestore as any)._databaseId?.database);
-console.log("🔥 Delegate DB ID:", (firestore as any)._delegate?._databaseId?.database);
 export const storage = firebase.storage();
 export const auth = firebase.auth();
