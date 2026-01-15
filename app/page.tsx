@@ -7,6 +7,7 @@ import { getPathBoard, getPathPlan } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
 import { UserService } from "@/apis";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
+import { sendEmailVerification, onAuthStateChanged, signOut } from "firebase/auth";
 
 
 enum AuthStatus {
@@ -26,7 +27,7 @@ export default function RoutePage() {
     if (auth.currentUser) {
       setIsResending(true);
       try {
-        await auth.currentUser.sendEmailVerification();
+        await sendEmailVerification(auth.currentUser);
         alert("Verification email resent! Please check your inbox."); // Using alert for simplicity as toast might not be available here easily without hook setup
       } catch (error) {
         console.error(error);
@@ -38,7 +39,7 @@ export default function RoutePage() {
   };
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       if (authUser) {
         // if (!authUser.emailVerified) {
         //   setAuthStatus(AuthStatus.EMAIL_NOT_VERIFIED);
@@ -95,7 +96,7 @@ export default function RoutePage() {
                   </button>
                 </div>
                 <button
-                  onClick={() => auth.signOut()}
+                  onClick={() => signOut(auth)}
                   className="text-sm text-slate-400 hover:text-slate-600 underline"
                 >
                   Sign out
