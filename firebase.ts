@@ -2,6 +2,8 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import "firebase/compat/storage";
+import { getApp } from "firebase/app";
+import { initializeFirestore } from "firebase/firestore";
 
 
 // https://firebase.google.com/docs/web/setup#available-libraries
