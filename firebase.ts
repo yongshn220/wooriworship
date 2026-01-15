@@ -19,8 +19,12 @@ const firebaseConfig = {
 
 export const firebaseApp = firebase.initializeApp(firebaseConfig);
 const dbId = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID;
+console.log("🔥 Configured DB ID:", dbId);
+
 export const firestore = (dbId && dbId !== "(default)")
-  ? (firebase.app() as any).firestore(dbId)
+  ? (firebaseApp as any).firestore(dbId)
   : firebase.firestore();
+
+console.log("🔥 Actual Firestore DB ID (internal):", (firestore as any)._databaseId?.database);
 export const storage = firebase.storage();
 export const auth = firebase.auth();
