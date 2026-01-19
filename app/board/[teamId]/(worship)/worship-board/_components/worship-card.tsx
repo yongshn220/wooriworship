@@ -58,15 +58,16 @@ import { useCardExpansion } from "@/hooks/use-card-expansion";
 
 interface Props {
   worshipId: string;
+  teamId: string;
   isFirst?: boolean;
   defaultExpanded?: boolean;
 }
 
 // Helper to highlight text has been moved to lib/string-utils.ts
 
-export function WorshipCard({ worshipId, isFirst, defaultExpanded = false }: Props) {
+export function WorshipCard({ worshipId, teamId, isFirst, defaultExpanded = false }: Props) {
   const router = useRouter();
-  const teamId = useRecoilValue(currentTeamIdAtom);
+  // const teamId = useRecoilValue(currentTeamIdAtom); // REMOVED: Prop drilled
   const cardRef = useRef<HTMLDivElement>(null);
 
   const worship = useRecoilValue(worshipAtom({ teamId, worshipId }));

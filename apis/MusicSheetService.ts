@@ -3,7 +3,9 @@ import { MusicSheetContainer } from "@/components/constants/types";
 import { MusicSheet } from "@/models/music_sheet";
 import { getFirebaseTimestampNow } from "@/components/util/helper/helper-functions";
 import { db } from "@/firebase";
-import { collection, getDocs, addDoc, doc, setDoc, deleteDoc } from "firebase/firestore"; class MusicSheetService extends BaseService {
+import { collection, getDocs, getDoc, addDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
+
+class MusicSheetService extends BaseService {
   constructor() {
     super("music_sheets"); // Placeholder
   }

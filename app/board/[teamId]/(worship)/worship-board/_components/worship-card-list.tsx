@@ -186,6 +186,7 @@ export function WorshipCardList({ teamId }: Props) {
                     <Suspense key={worshipId} fallback={<WorshipCardSkeleton />}>
                       <WorshipCard
                         worshipId={worshipId}
+                        teamId={teamId}
                         isFirst={index === 0}
                         defaultExpanded={activeTab === 'upcoming'}
                       />

@@ -1,7 +1,7 @@
 "use client";
 
-import { useRecoilValueLoadable } from "recoil";
-import { worshipSongListAtom } from "@/global-states/worship-state";
+import { useRecoilValueLoadable, waitForAll } from "recoil";
+import { songAtom } from "@/global-states/song-state";
 import { Worship } from "@/models/worship";
 import { WorshipDetailView } from "./worship-detail-view";
 import { useMemo } from "react";
@@ -13,11 +13,17 @@ interface Props {
 }
 
 export function WorshipDetailContainer({ worship, teamId }: Props) {
-    // Fetch songs for the worship plan
-    const songsLoadable = useRecoilValueLoadable(worshipSongListAtom(worship.id || ""));
+    // Fetch songs directly using existing headers
+    const songIdList = useMemo(() => worship.songs?.map(s => s.id) || [], [worship.songs]);
+
+    // Create an array of songAtoms to wait for
+    const songsLoadable = useRecoilValueLoadable(
+        waitForAll(songIdList.map(songId => songAtom({ teamId, songId })))
+    );
 
     const songs = useMemo(() => {
-        return songsLoadable.state === 'hasValue' ? songsLoadable.contents : [];
+        const list = songsLoadable.state === 'hasValue' ? songsLoadable.contents : [];
+        return list.filter((s: any) => !!s);
     }, [songsLoadable]);
 
     // Note: We might want better loading state for songs, but skeleton is handled by parent for the whole container usually?

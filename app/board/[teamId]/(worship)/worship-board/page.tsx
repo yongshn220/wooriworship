@@ -110,14 +110,18 @@ export default function PlanPage({ params }: any) {
       }
     }
     loadData();
-  }, [teamId, worshipIdsUpdater, selectedWorshipId, setSelectedWorshipId]);
+  }, [teamId, worshipIdsUpdater]);
 
   const handleLoadPast = async () => {
-    if (!teamId || worships.length === 0 || isLoadingPast || !hasMorePast) return;
+    if (!teamId || isLoadingPast || !hasMorePast) return;
     setIsLoadingPast(true);
     try {
-      const first = worships[0];
-      const firstDate = first.worship_date instanceof Timestamp ? first.worship_date.toDate() : new Date(first.worship_date as any);
+      let firstDate = new Date(); // Default to today if list is empty
+      if (worships.length > 0) {
+        const first = worships[0];
+        firstDate = first.worship_date instanceof Timestamp ? first.worship_date.toDate() : new Date(first.worship_date as any);
+      }
+
       const LIMIT = 5;
 
       // Fetch previous schedules
@@ -127,7 +131,7 @@ export default function PlanPage({ params }: any) {
 
       if (pastData.length > 0) {
         // pastData is sorted ASC by service
-        // Filter out any duplicates (in case expandedId was one of them?)
+        // Filter out any duplicates
         const newItems = pastData.filter(p => !worships.some(existing => existing.id === p.id));
 
         if (newItems.length > 0) {
@@ -144,29 +148,19 @@ export default function PlanPage({ params }: any) {
   // Re-select if deleted
   useEffect(() => {
     if (loading) return; // Wait for loading
-    if (!selectedWorshipId || worships.length === 0) return;
-    if (!worships.some(w => w.id === selectedWorshipId)) {
+    if (!selectedWorshipId && worships.length > 0) {
+      setSelectedWorshipId(worships[0].id || null);
+      return;
+    }
+    if (selectedWorshipId && worships.length > 0 && !worships.some(w => w.id === selectedWorshipId)) {
       setSelectedWorshipId(worships[0].id || null);
     }
   }, [worships, selectedWorshipId, loading, setSelectedWorshipId]);
 
   if (loading) return <WorshipListSkeleton />;
 
-  if (worships.length === 0) {
-    // If truly empty (and no past loaded), check if we should try loading past? 
-    // User might have ONLY past schedules.
-    // But standard behavior is show empty -> user can create.
-    // Wait, if no upcoming, we might miss past plans if we only fetch future initially.
-    // ServingPage solves this by "EmptyServingBoardPage". 
-    // Ideally we would check if *any* exist, but for now allow empty.
-    return (
-      <div className="flex flex-col h-full w-full bg-surface dark:bg-surface-dark relative">
-        <div className="flex-1">
-          <EmptyWorshipBoardPage />
-        </div>
-      </div>
-    );
-  }
+  // Render main layout even if empty, to show CalendarStrip (and "Prev" button)
+  const isListEmpty = worships.length === 0;
 
   return (
     <div className="flex flex-col h-full bg-surface dark:bg-surface-dark relative font-sans text-slate-800 dark:text-slate-100 overflow-hidden">
@@ -181,7 +175,12 @@ export default function PlanPage({ params }: any) {
             hasMorePast={hasMorePast}
           />
 
-          {selectedWorship ? (
+          {isListEmpty ? (
+            <div className="min-h-[50vh] flex flex-col items-center justify-center">
+              <EmptyWorshipBoardPage />
+              {/* Optional: Add a subtle text saying "Click 'Load Previous' to view past plans" if hasMorePast is true? */}
+            </div>
+          ) : selectedWorship ? (
             <SwipeableView
               viewId={selectedWorship.id || ""}
               onSwipeLeft={navigateNext}
@@ -195,8 +194,9 @@ export default function PlanPage({ params }: any) {
               </Suspense>
             </SwipeableView>
           ) : (
-            <div className="py-10 text-center text-muted-foreground">
-              Select a plan to view details
+            <div className="flex flex-col items-center justify-center py-20 bg-muted/20 rounded-2xl border border-dashed border-muted-foreground/20">
+              <p className="text-muted-foreground font-medium mb-1">No upcoming plans</p>
+              <p className="text-sm text-muted-foreground/70">Check history above or create a new plan.</p>
             </div>
           )}
 

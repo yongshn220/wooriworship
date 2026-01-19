@@ -247,7 +247,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                   />
                 )}
 
-                <div className="pt-2 flex justify-center">
+                <div className="pt-2">
                   <AddWorshipSongDialogTrigger
                     teamId={teamId}
                     selectedSongs={songs}

@@ -1,6 +1,6 @@
 import BaseService from "./BaseService";
 import { SongService } from ".";
-import { Timestamp, collection, getDocs, query, where, orderBy, limit, addDoc, doc, setDoc, deleteDoc, collectionGroup, documentId } from "firebase/firestore";
+import { Timestamp, collection, getDocs, getDoc, query, where, orderBy, limit, addDoc, doc, setDoc, deleteDoc, collectionGroup, documentId } from "firebase/firestore";
 import { Worship } from "@/models/worship";
 import { WorshipInput } from "@/components/constants/types";
 import { db } from "@/firebase";
@@ -14,6 +14,7 @@ class WorshipService extends BaseService {
 
   // Override getById to find doc in sub-collections
   async getById(teamId: string, id: string) {
+    if (!teamId || !id) return null;
     try {
       const docRef = doc(db, "teams", teamId, "worships", id);
       const docSnap = await getDoc(docRef);
