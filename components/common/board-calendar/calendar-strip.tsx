@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { format, differenceInCalendarDays } from "date-fns";
-import { Calendar, Loader2, History } from "lucide-react";
+import { Calendar, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CalendarItem } from "./types";
 import { GenericCalendarDrawer } from "./generic-calendar-drawer";
@@ -34,10 +34,24 @@ export function CalendarStrip({
         if (selectedId && itemRefs.current.has(selectedId)) {
             const el = itemRefs.current.get(selectedId);
             if (el) {
+                // Determine if we need to scroll? 
+                // Don't auto-scroll if user is interacting? 
+                // For now keep existing behavior but maybe 'center' or 'nearest' instead of 'start' to avoid jumpiness?
                 el.scrollIntoView({ inline: "start", behavior: "smooth", block: "nearest" });
             }
         }
     }, [selectedId]);
+
+    // Threshold for triggering lazy load (pixels from left)
+    const LAZY_LOAD_SCROLL_THRESHOLD = 50;
+
+    const handleScroll = () => {
+        if (!scrollContainerRef.current || !onLoadPrev || isLoadingPrev || !hasMorePast) return;
+        const { scrollLeft } = scrollContainerRef.current;
+        if (scrollLeft < LAZY_LOAD_SCROLL_THRESHOLD) {
+            onLoadPrev();
+        }
+    };
 
     const getMonthLabel = () => {
         if (selectedId) {
@@ -70,16 +84,14 @@ export function CalendarStrip({
             {/* Horizontal Scroll Container */}
             <div
                 ref={scrollContainerRef}
+                onScroll={handleScroll}
                 className="flex overflow-x-auto gap-3 pb-2 -mx-4 px-4 pt-4 snap-x snap-mandatory items-center scroll-smooth no-scrollbar"
             >
-                {/* History Button */}
-                {onLoadPrev && (
-                    <HistoryButton
-                        onLoadPrev={onLoadPrev}
-                        isLoadingPrev={isLoadingPrev}
-                        hasMorePast={hasMorePast}
-                        baseClasses={CARD_SIZE_CLASSES}
-                    />
+                {/* Loader when fetching history */}
+                {isLoadingPrev && (
+                    <div className={cn(CARD_SIZE_CLASSES, "bg-transparent border-transparent cursor-default")}>
+                        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                    </div>
                 )}
 
                 {/* Date Cards */}
@@ -96,6 +108,8 @@ export function CalendarStrip({
                         }}
                     />
                 ))}
+
+                {/* Spacer / End Padding */}
                 <div className="w-1 shrink-0"></div>
             </div>
 
@@ -112,32 +126,7 @@ export function CalendarStrip({
 
 // --- Sub-components ---
 
-function HistoryButton({ onLoadPrev, isLoadingPrev, hasMorePast = true, baseClasses }: any) {
-    return (
-        <button
-            onClick={hasMorePast ? onLoadPrev : undefined}
-            disabled={isLoadingPrev || !hasMorePast}
-            className={cn(
-                baseClasses,
-                "group border",
-                hasMorePast
-                    ? "bg-panel dark:bg-panel-dark border-dashed border-border-light dark:border-border-dark hover:border-slate-400 dark:hover:border-slate-500 cursor-pointer"
-                    : "bg-muted/30 border-transparent opacity-50 cursor-default"
-            )}
-        >
-            {isLoadingPrev ? (
-                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-            ) : (
-                <div className="flex flex-col items-center gap-1.5 pt-1">
-                    <History className={cn("w-5 h-5", hasMorePast ? "text-muted-foreground group-hover:text-foreground" : "text-muted-foreground/50")} />
-                    <span className={cn("text-[10px] font-bold leading-tight text-center uppercase tracking-wider", hasMorePast ? "text-muted-foreground group-hover:text-foreground" : "text-muted-foreground/50")}>
-                        {hasMorePast ? "History" : "None"}
-                    </span>
-                </div>
-            )}
-        </button>
-    );
-}
+
 
 interface DateCardProps {
     item: CalendarItem;

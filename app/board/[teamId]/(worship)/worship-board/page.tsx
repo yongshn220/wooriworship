@@ -61,31 +61,43 @@ export default function PlanPage({ params }: any) {
     worships.find(w => w.id === selectedWorshipId),
     [worships, selectedWorshipId]);
 
-  // Load Initial Data (Future: Today + 6 months)
+  // Load Initial Data (History + Future)
   useEffect(() => {
     async function loadData() {
       if (!teamId) return;
       try {
         const today = new Date();
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+
         const futureDate = new Date();
         futureDate.setMonth(futureDate.getMonth() + 6);
 
         const startStr = format(today, "yyyy-MM-dd");
         const endStr = format(futureDate, "yyyy-MM-dd");
 
-        let data = await WorshipService.getWorships(teamId, startStr, endStr);
+        // Concurrent Fetch: Future (6 months) + Past (5 items)
+        const [futureData, pastData] = await Promise.all([
+          WorshipService.getWorships(teamId, startStr, endStr),
+          WorshipService.getPreviousWorships(teamId, todayStart, 5)
+        ]);
 
-        // Handle pre-selected ID (e.g. from creation) if not in range
-        if (selectedWorshipId) {
-          const alreadyExists = data.find(w => w.id === selectedWorshipId);
-          if (!alreadyExists) {
-            // If it's not in the default range (e.g. past plan), fetch it specifically
-            const specificWorship = await WorshipService.getById(selectedWorshipId) as Worship;
-            if (specificWorship && specificWorship.team_id === teamId) {
-              data.push(specificWorship);
-            }
-          }
+        // Merge and Deduplicate
+        const combined = [...pastData, ...futureData];
+        const uniqueMap = new Map();
+        combined.forEach(w => {
+          if (w.id) uniqueMap.set(w.id, w);
+        });
+
+        // Check for specific selected ID (deep link case)
+        if (selectedWorshipId && !uniqueMap.has(selectedWorshipId)) {
+          try {
+            const specificWorship = await WorshipService.getById(teamId, selectedWorshipId) as Worship;
+            if (specificWorship) uniqueMap.set(specificWorship.id, specificWorship);
+          } catch (ignore) { }
         }
+
+        const data = Array.from(uniqueMap.values()) as Worship[];
 
         // Sort ASC by date
         data.sort((a, b) => {
@@ -97,11 +109,21 @@ export default function PlanPage({ params }: any) {
         setWorships(data);
 
         // Selection Logic
-        if (selectedWorshipId && data.some(w => w.id === selectedWorshipId)) {
-          // Already selected via Atom, ensure it stays selected (no-op)
-        } else if (data.length > 0) {
-          // Default: First upcoming
-          setSelectedWorshipId(data[0].id || null);
+        if (selectedWorshipId && uniqueMap.has(selectedWorshipId)) {
+          // Keep selection
+        } else {
+          // Find first upcoming (>= Today Midnight)
+          const firstUpcoming = data.find(w => {
+            const d = w.worship_date instanceof Timestamp ? w.worship_date.toDate() : new Date(w.worship_date as any);
+            return d >= todayStart;
+          });
+
+          if (firstUpcoming) {
+            setSelectedWorshipId(firstUpcoming.id || null);
+          } else {
+            // Only History exists -> Select NULL
+            setSelectedWorshipId(null);
+          }
         }
       } catch (e) {
         console.error("Failed to load worships", e);
@@ -194,10 +216,7 @@ export default function PlanPage({ params }: any) {
               </Suspense>
             </SwipeableView>
           ) : (
-            <div className="flex flex-col items-center justify-center py-20 bg-muted/20 rounded-2xl border border-dashed border-muted-foreground/20">
-              <p className="text-muted-foreground font-medium mb-1">No upcoming plans</p>
-              <p className="text-sm text-muted-foreground/70">Check history above or create a new plan.</p>
-            </div>
+            <NoUpcomingPlaceholder />
           )}
 
           {/* Zero-Latency Prefetching */}
@@ -214,6 +233,15 @@ export default function PlanPage({ params }: any) {
           })}
         </main>
       </div>
+    </div>
+  );
+}
+
+function NoUpcomingPlaceholder() {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 bg-muted/20 rounded-2xl border border-dashed border-muted-foreground/20">
+      <p className="text-muted-foreground font-medium mb-1">No upcoming plans</p>
+      <p className="text-sm text-muted-foreground/70">Check history above or create a new plan.</p>
     </div>
   );
 }
