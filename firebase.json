@@ -1,0 +1,8 @@
+{
+    "firestore": [
+        {
+            "database": "stg-env",
+            "rules": "firestore.rules"
+        }
+    ]
+}

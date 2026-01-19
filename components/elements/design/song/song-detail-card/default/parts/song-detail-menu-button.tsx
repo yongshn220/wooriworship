@@ -22,7 +22,7 @@ interface Props {
 }
 
 export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = false }: Props) {
-  const song = useRecoilValue(songAtom(songId))
+  const song = useRecoilValue(songAtom({ teamId, songId }))
   const setSongUpdater = useSetRecoilState(songUpdaterAtom)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const router = useRouter()
@@ -33,7 +33,7 @@ export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = fal
 
   async function handleDeleteSong() {
     try {
-      SongService.deleteSong(songId).then((isSuccess) => {
+      SongService.deleteSong(teamId, songId).then((isSuccess) => {
         if (isSuccess) {
           setSongUpdater((prev) => prev + 1)
           toast({ title: "Song deleted successfully", description: "" })

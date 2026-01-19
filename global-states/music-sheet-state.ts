@@ -3,16 +3,16 @@ import { MusicSheet } from "@/models/music_sheet";
 import MusicSheetService from "@/apis/MusicSheetService";
 
 
-export const musicSheetIdsAtom = atomFamily<Array<string>, string>({
+export const musicSheetIdsAtom = atomFamily<Array<string>, { teamId: string, songId: string }>({
   key: "musicSheetIdsAtom",
   default: selectorFamily({
     key: "musicSheetIdsAtom/default",
-    get: (songId: string) => async ({ get }) => {
-      if (!songId) return []
+    get: ({ teamId, songId }) => async ({ get }) => {
+      if (!songId || !teamId) return []
       try {
         get(musicSheetIdsUpdaterAtom)
 
-        const musicSheetList = await MusicSheetService.getByFilters([{ a: 'song_id', b: '==', c: songId }]) as Array<MusicSheet>
+        const musicSheetList = await MusicSheetService.getSongMusicSheets(teamId, songId)
         if (!musicSheetList) return []
 
         return musicSheetList?.map(sheet => sheet.id)
@@ -30,42 +30,42 @@ export const musicSheetIdsUpdaterAtom = atom({
   default: 0
 })
 
-export const musicSheetsBySongIdAtom = atomFamily<Array<MusicSheet>, string>({
+export const musicSheetsBySongIdAtom = atomFamily<Array<MusicSheet>, { teamId: string, songId: string }>({
   key: "musicSheetsAtom",
   default: selectorFamily({
     key: "musicSheetsAtom/default",
-    get: (songId: string) => ({ get }) => {
-      if (!songId) return []
+    get: ({ teamId, songId }) => ({ get }) => {
+      if (!songId || !teamId) return []
 
-      const musicSheetIds = get(musicSheetIdsAtom(songId))
+      const musicSheetIds = get(musicSheetIdsAtom({ teamId, songId }))
       if (!musicSheetIds) return []
 
-      return musicSheetIds.map(id => get(musicSheetAtom(id)))
+      return musicSheetIds.map(id => get(musicSheetAtom({ teamId, songId, sheetId: id })))
     }
   })
 })
 
-export const musicSheetsByIdsAtom = atomFamily<Array<MusicSheet>, Array<string>>({
+export const musicSheetsByIdsAtom = atomFamily<Array<MusicSheet>, { teamId: string, songId: string, ids: Array<string> }>({
   key: "musicSheetsByIdsAtom",
   default: selectorFamily({
     key: "musicSheetsByIdsAtom/default",
-    get: (musicSheetIds) => ({ get }) => {
-      if (!musicSheetIds || musicSheetIds.length === 0) return []
+    get: ({ teamId, songId, ids }) => ({ get }) => {
+      if (!ids || ids.length === 0) return []
 
-      return musicSheetIds.map(id => get(musicSheetAtom(id)))
+      return ids.map(id => get(musicSheetAtom({ teamId, songId, sheetId: id })))
     }
   })
 })
 
 
-export const musicSheetAtom = atomFamily<MusicSheet, string>({
+export const musicSheetAtom = atomFamily<MusicSheet, { teamId: string, songId: string, sheetId: string }>({
   key: "musicSheetAtom",
   default: selectorFamily({
     key: "musicSheetAtom/default",
-    get: (musicSheetId) => async ({ get }) => {
+    get: ({ teamId, songId, sheetId }) => async ({ get }) => {
       get(musicSheetUpdaterAtom)
       try {
-        const musicSheet = await MusicSheetService.getById(musicSheetId) as MusicSheet
+        const musicSheet = await MusicSheetService.getById(teamId, songId, sheetId) as MusicSheet
         if (!musicSheet) return null
 
         return musicSheet

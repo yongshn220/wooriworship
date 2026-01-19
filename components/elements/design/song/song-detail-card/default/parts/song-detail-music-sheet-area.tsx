@@ -12,11 +12,13 @@ import {
 } from "@/components/ui/carousel";
 
 interface Props {
+  teamId: string
+  songId: string
   musicSheetId: string
 }
 
-export function SongDetailMusicSheetArea({ musicSheetId }: Props) {
-  const musicSheet = useRecoilValue(musicSheetAtom(musicSheetId))
+export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId }: Props) {
+  const musicSheet = useRecoilValue(musicSheetAtom({ teamId, songId, sheetId: musicSheetId }))
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
   const [count, setCount] = useState(0)

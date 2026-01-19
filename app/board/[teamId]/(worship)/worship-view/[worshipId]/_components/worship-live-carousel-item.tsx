@@ -16,12 +16,13 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 
 interface Props {
+    teamId: string
     songHeader: WorshipSongHeader
     setMusicSheetCounts: React.Dispatch<React.SetStateAction<Array<MusicSheetCounts>>>
 }
 
-export function WorshipLiveCarouselItemWrapper({ songHeader, setMusicSheetCounts }: Props) {
-    const musicSheets = useRecoilValue(musicSheetsByIdsAtom(songHeader?.selected_music_sheet_ids))
+export function WorshipLiveCarouselItemWrapper({ teamId, songHeader, setMusicSheetCounts }: Props) {
+    const musicSheets = useRecoilValue(musicSheetsByIdsAtom({ teamId, songId: songHeader?.id, ids: songHeader?.selected_music_sheet_ids }))
 
     const multipleSheetsViewMode = useRecoilValue(worshipMultipleSheetsViewModeAtom)
 

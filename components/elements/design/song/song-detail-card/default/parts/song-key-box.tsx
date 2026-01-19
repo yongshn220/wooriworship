@@ -1,8 +1,8 @@
-import {useRecoilValue} from "recoil";
-import {musicSheetAtom} from "@/global-states/music-sheet-state";
+import { useRecoilValue } from "recoil";
+import { musicSheetAtom } from "@/global-states/music-sheet-state";
 
-export function SongKeyBox({musicSheetId}: {musicSheetId: string}) {
-  const musicSheet = useRecoilValue(musicSheetAtom(musicSheetId))
+export function SongKeyBox({ teamId, songId, musicSheetId }: { teamId: string, songId: string, musicSheetId: string }) {
+  const musicSheet = useRecoilValue(musicSheetAtom({ teamId, songId, sheetId: musicSheetId }))
 
   return (
     <>

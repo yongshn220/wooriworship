@@ -26,8 +26,8 @@ interface Props {
 }
 
 export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly = false }: Props) {
-  const songLoadable = useRecoilValueLoadable(songAtom(songId));
-  const musicSheetIdsLoadable = useRecoilValueLoadable(musicSheetIdsAtom(songId));
+  const songLoadable = useRecoilValueLoadable(songAtom({ teamId, songId }));
+  const musicSheetIdsLoadable = useRecoilValueLoadable(musicSheetIdsAtom({ teamId, songId }));
 
   const song = songLoadable.state === 'hasValue' ? songLoadable.contents : null;
   const musicSheetIds = useMemo(() =>
@@ -85,7 +85,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="h-9 px-3 text-sm font-semibold bg-white/90 backdrop-blur shadow-sm border-gray-200 hover:bg-white gap-2">
                     <Suspense fallback={<span>-</span>}>
-                      {selectedMusicSheetId ? <SelectedKeyTrigger musicSheetId={selectedMusicSheetId} /> : <span>Key</span>}
+                      {selectedMusicSheetId ? <SelectedKeyTrigger teamId={teamId} songId={songId} musicSheetId={selectedMusicSheetId} /> : <span>Key</span>}
                     </Suspense>
                     <ChevronDown className="h-4 w-4 opacity-50" />
                   </Button>
@@ -95,6 +95,8 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
                     {musicSheetIds?.map((id) => (
                       <KeyDropdownItem
                         key={id}
+                        teamId={teamId}
+                        songId={songId}
                         musicSheetId={id}
                         onSelect={() => setSelectedMusicSheetId(id)}
                       />
@@ -107,14 +109,14 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
             {/* Full Screen Sheet Area */}
             <div className="w-full min-h-[calc(100vh-70px)] flex flex-col pb-12">
               {selectedMusicSheetId && (
-                <SongDetailMusicSheetArea musicSheetId={selectedMusicSheetId} />
+                <SongDetailMusicSheetArea teamId={teamId} songId={songId} musicSheetId={selectedMusicSheetId} />
               )}
             </div>
 
             {/* Info Section (Below) */}
             <div className="bg-white p-4 pb-10 rounded-t-xl -mt-4 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-20">
               <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-6" />
-              <SongDetailContent songId={songId} />
+              <SongDetailContent teamId={teamId} songId={songId} />
             </div>
 
           </Suspense>
@@ -124,13 +126,13 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
   )
 }
 
-function SelectedKeyTrigger({ musicSheetId }: { musicSheetId: string }) {
-  const musicSheet = useRecoilValue(musicSheetAtom(musicSheetId));
+function SelectedKeyTrigger({ teamId, songId, musicSheetId }: { teamId: string, songId: string, musicSheetId: string }) {
+  const musicSheet = useRecoilValue(musicSheetAtom({ teamId, songId, sheetId: musicSheetId }));
   return <span className="truncate max-w-[12ch] inline-block align-bottom">{musicSheet?.key || "?"}</span>;
 }
 
-function KeyDropdownItem({ musicSheetId, onSelect }: { musicSheetId: string, onSelect: () => void }) {
-  const musicSheet = useRecoilValue(musicSheetAtom(musicSheetId));
+function KeyDropdownItem({ teamId, songId, musicSheetId, onSelect }: { teamId: string, songId: string, musicSheetId: string, onSelect: () => void }) {
+  const musicSheet = useRecoilValue(musicSheetAtom({ teamId, songId, sheetId: musicSheetId }));
   return (
     <DropdownMenuItem onClick={(e) => {
       e.stopPropagation();

@@ -1,15 +1,16 @@
-import {useRecoilValue} from "recoil";
-import {songAtom} from "@/global-states/song-state";
-import {SongKeyBox} from "@/components/elements/design/song/song-detail-card/default/parts/song-key-box";
+import { useRecoilValue } from "recoil";
+import { songAtom } from "@/global-states/song-state";
+import { SongKeyBox } from "@/components/elements/design/song/song-detail-card/default/parts/song-key-box";
 
 interface Props {
+  teamId: string
   songId: string
   selectedMusicSheetIds: Array<string>
   customTags?: string[]
 }
 
-export function AddedSongInnerHeader({songId, selectedMusicSheetIds, customTags=[]}: Props) {
-  const song = useRecoilValue(songAtom(songId))
+export function AddedSongInnerHeader({ teamId, songId, selectedMusicSheetIds, customTags = [] }: Props) {
+  const song = useRecoilValue(songAtom({ teamId, songId }))
 
   return (
     <div className="flex w-full px-4 rounded-lg cursor-pointer py-2 my-2 hover:bg-gray-100">
@@ -24,7 +25,7 @@ export function AddedSongInnerHeader({songId, selectedMusicSheetIds, customTags=
             </p>
             {
               selectedMusicSheetIds?.map((id, index) => (
-                <SongKeyBox key={index} musicSheetId={id}/>
+                <SongKeyBox key={index} teamId={teamId} songId={songId} musicSheetId={id} />
               ))
             }
           </div>

@@ -23,7 +23,7 @@ class LinkingService {
             return false;
         }
 
-        const worshipRef = doc(db, "worships", worshipId);
+        const worshipRef = doc(db, "teams", teamId, "worships", worshipId);
         const servingRef = doc(db, "teams", teamId, "serving_schedules", servingId);
 
         try {
@@ -34,10 +34,6 @@ class LinkingService {
                 if (!worshipDoc.exists() || !servingDoc.exists()) {
                     throw new Error("One or both documents do not exist.");
                 }
-
-                // Check if they are already linked to others?
-                // For now, we overwrite any existing link, or we could strict check.
-                // Overwriting is usually preferred in UI unless we want to warn.
 
                 transaction.update(worshipRef, { serving_schedule_id: servingId });
                 transaction.update(servingRef, { worship_id: worshipId });
@@ -54,7 +50,7 @@ class LinkingService {
      * Finds the related Serving Schedule and removes the reference to this Worship Plan.
      */
     async unlinkWorship(teamId: string, worshipId: string): Promise<boolean> {
-        const worshipRef = doc(db, "worships", worshipId);
+        const worshipRef = doc(db, "teams", teamId, "worships", worshipId);
 
         try {
             await runTransaction(db, async (transaction) => {
@@ -96,7 +92,7 @@ class LinkingService {
                 const worshipId = data?.worship_id;
 
                 if (worshipId) {
-                    const worshipRef = doc(db, "worships", worshipId);
+                    const worshipRef = doc(db, "teams", teamId, "worships", worshipId);
                     const worshipDoc = await transaction.get(worshipRef);
                     if (worshipDoc.exists() && worshipDoc.data()?.serving_schedule_id === servingId) {
                         transaction.update(worshipRef, { serving_schedule_id: null });

@@ -1,6 +1,6 @@
 import BaseService from "./BaseService";
 import { SongService } from ".";
-import { Timestamp, collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
+import { Timestamp, collection, getDocs, query, where, orderBy, limit, addDoc, doc, setDoc, deleteDoc, collectionGroup, documentId } from "firebase/firestore";
 import { Worship } from "@/models/worship";
 import { WorshipInput } from "@/components/constants/types";
 import { db } from "@/firebase";
@@ -9,18 +9,34 @@ import { parseLocalDate } from "@/components/util/helper/helper-functions";
 
 class WorshipService extends BaseService {
   constructor() {
-    super("worships");
+    super("worships"); // Placeholder
+  }
+
+  // Override getById to find doc in sub-collections
+  async getById(teamId: string, id: string) {
+    try {
+      const docRef = doc(db, "teams", teamId, "worships", id);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        return null;
+      }
+
+      return { id: docSnap.id, ...docSnap.data() };
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   async getTeamWorship(teamId: string) {
-    const worships = await this.getByFilters([
-      {
-        a: 'team_id',
-        b: '==',
-        c: teamId
-      }
-    ]);
-    return worships
+    try {
+      const snapshot = await getDocs(collection(db, "teams", teamId, "worships"));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   }
 
   async getWorshipsByDate(teamId: string, date: Date) {
@@ -32,8 +48,7 @@ class WorshipService extends BaseService {
       nextDay.setDate(nextDay.getDate() + 1);
 
       const q = query(
-        collection(db, this.collectionName),
-        where('team_id', '==', teamId),
+        collection(db, "teams", teamId, "worships"),
         where('worship_date', '>=', Timestamp.fromDate(startOfDay)),
         where('worship_date', '<', Timestamp.fromDate(nextDay))
       );
@@ -54,24 +69,14 @@ class WorshipService extends BaseService {
       const endD = parseLocalDate(endDate);
       endD.setHours(23, 59, 59, 999);
 
-      // Fetch all for team (Temporary fix for missing Composite Index)
       const q = query(
-        collection(db, this.collectionName),
-        where('team_id', '==', teamId)
+        collection(db, "teams", teamId, "worships"),
+        where('worship_date', '>=', Timestamp.fromDate(startD)),
+        where('worship_date', '<=', Timestamp.fromDate(endD))
       );
+
       const snapshot = await getDocs(q);
-
-      const allDocs = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Worship));
-
-      // Filter in memory
-      const filtered = allDocs.filter(w => {
-        if (!w.worship_date) return false;
-        // Handle Timestamp or Date (though usually Timestamp in new schema)
-        const wDate = w.worship_date instanceof Timestamp ? w.worship_date.toDate() : new Date(w.worship_date as any);
-        return wDate >= startD && wDate <= endD;
-      });
-
-      return filtered;
+      return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Worship));
     } catch (e) {
       console.error("Failed to fetch worships:", e);
       return [];
@@ -81,8 +86,7 @@ class WorshipService extends BaseService {
   async getPreviousWorships(teamId: string, beforeDate: Date, limitCount: number = 5): Promise<Worship[]> {
     try {
       const q = query(
-        collection(db, this.collectionName),
-        where('team_id', '==', teamId),
+        collection(db, "teams", teamId, "worships"),
         where('worship_date', '<', Timestamp.fromDate(beforeDate)),
         orderBy('worship_date', 'desc'),
         limit(limitCount)
@@ -104,7 +108,7 @@ class WorshipService extends BaseService {
     const songIds = worshipInput?.worshipSongHeaders.map((header) => header?.id);
     const promises = [];
     for (const songId of songIds) {
-      promises.push(SongService.utilizeSong(songId));
+      promises.push(SongService.utilizeSong(teamId, songId)); // Updated signature
     }
     await Promise.all(promises);
     const newWorship: Worship = {
@@ -126,19 +130,28 @@ class WorshipService extends BaseService {
       },
       worship_date: (() => {
         const d = new Date(worshipInput.date);
-        d.setHours(12, 0, 0, 0); // Normalize to local noon to avoid edge-shift
+        d.setHours(12, 0, 0, 0); // Normalize to local noon
         return Timestamp.fromDate(d);
       })(),
       serving_schedule_id: worshipInput.serving_schedule_id || null
     }
-    const worshipId = await this.create(newWorship);
-    if (worshipId && worshipInput.serving_schedule_id) {
-      await LinkingService.linkWorshipAndServing(teamId, worshipId, worshipInput.serving_schedule_id);
+
+    // Sub-collection creation
+    try {
+      const ref = await addDoc(collection(db, "teams", teamId, "worships"), newWorship);
+      const worshipId = ref.id;
+
+      if (worshipId && worshipInput.serving_schedule_id) {
+        await LinkingService.linkWorshipAndServing(teamId, worshipId, worshipInput.serving_schedule_id);
+      }
+      return worshipId;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    return worshipId;
   }
 
-  async updateWorship(userId: string, worshipId: string, worshipInput: WorshipInput) {
+  async updateWorship(userId: string, teamId: string, worshipId: string, worshipInput: WorshipInput) {
     const worship = {
       title: worshipInput?.title,
       description: worshipInput?.description,
@@ -157,16 +170,27 @@ class WorshipService extends BaseService {
         return Timestamp.fromDate(d);
       })()
     }
-    return await this.update(worshipId, worship);
+
+    try {
+      const ref = doc(db, "teams", teamId, "worships", worshipId);
+      await setDoc(ref, worship, { merge: true });
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
   }
 
-  async deleteWorship(worshipId: string) {
+  async deleteWorship(teamId: string, worshipId: string) {
     try {
-      const worship = (await this.getById(worshipId)) as Worship;
-      if (worship && worship.team_id) {
-        await LinkingService.cleanupReferencesForWorshipDeletion(worship.team_id, worshipId);
-      }
-      await this.delete(worshipId);
+      // Fetch logic usually needed to confirm existence or get data for cleanup, 
+      // but LinkingService cleanup uses ID. 
+      // We can fetch to get team_id but we have strict teamId param now.
+
+      await LinkingService.cleanupReferencesForWorshipDeletion(teamId, worshipId);
+
+      const ref = doc(db, "teams", teamId, "worships", worshipId);
+      await deleteDoc(ref);
       return true;
     }
     catch (err) {

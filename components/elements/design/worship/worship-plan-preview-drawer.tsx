@@ -5,14 +5,15 @@ import { worshipAtom, worshipSongListAtom } from "@/global-states/worship-state"
 import { WorshipSongListCard } from "@/app/board/[teamId]/(worship)/worship-board/_components/parts/worship-song-list-card";
 
 interface Props {
+    teamId: string;
     isOpen: boolean;
     onClose: () => void;
     worshipId: string | null;
 }
 
-function PreviewContent({ worshipId }: { worshipId: string }) {
-    const worship = useRecoilValue(worshipAtom(worshipId));
-    const songsLoadable = useRecoilValueLoadable(worshipSongListAtom(worshipId));
+function PreviewContent({ teamId, worshipId }: { teamId: string, worshipId: string }) {
+    const worship = useRecoilValue(worshipAtom({ teamId, worshipId }));
+    const songsLoadable = useRecoilValueLoadable(worshipSongListAtom({ teamId, worshipId }));
 
     const songs = useMemo(() => {
         return songsLoadable.state === 'hasValue' ? songsLoadable.contents : [];
@@ -28,7 +29,7 @@ function PreviewContent({ worshipId }: { worshipId: string }) {
     );
 }
 
-export function WorshipPlanPreviewDrawer({ isOpen, onClose, worshipId }: Props) {
+export function WorshipPlanPreviewDrawer({ teamId, isOpen, onClose, worshipId }: Props) {
     return (
         <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DrawerContent className="h-[85vh]">
@@ -37,7 +38,7 @@ export function WorshipPlanPreviewDrawer({ isOpen, onClose, worshipId }: Props) 
                 </DrawerHeader>
                 <div className="p-4 overflow-y-auto no-scrollbar pb-10">
                     {worshipId && (
-                        <PreviewContent worshipId={worshipId} />
+                        <PreviewContent teamId={teamId} worshipId={worshipId} />
                     )}
                 </div>
             </DrawerContent>

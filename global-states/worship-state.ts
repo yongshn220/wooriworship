@@ -69,14 +69,14 @@ export const worshipIdsUpdaterAtom = atom({
 // Helper type for typescript
 const worshipAtomType = atomFamily<Worship, string>({} as any);
 
-export const worshipAtom = (globalForRecoil.recoilAtoms['worshipAtom'] || atomFamily<Worship, string>({
+export const worshipAtom = (globalForRecoil.recoilAtoms['worshipAtom'] || atomFamily<Worship, { teamId: string, worshipId: string }>({
   key: "worshipAtom",
   default: selectorFamily({
     key: "worshipAtom/default",
-    get: (worshipId) => async ({ get }) => {
+    get: ({ teamId, worshipId }) => async ({ get }) => {
       get(worshipUpdaterAtom)
       try {
-        const worship = await WorshipService.getById(worshipId) as Worship
+        const worship = await WorshipService.getById(teamId, worshipId) as Worship
         if (!worship) return null
 
         return worship
@@ -87,7 +87,7 @@ export const worshipAtom = (globalForRecoil.recoilAtoms['worshipAtom'] || atomFa
       }
     }
   })
-})) as typeof worshipAtomType;
+})) as unknown as (param: { teamId: string, worshipId: string }) => RecoilState<Worship>;
 
 if (process.env.NODE_ENV !== 'production') globalForRecoil.recoilAtoms['worshipAtom'] = worshipAtom
 
@@ -100,19 +100,19 @@ export const worshipUpdaterAtom = atom({
 // Helper type for typescript
 const worshipSongListAtomType = atomFamily<Array<Song>, string>({} as any);
 
-export const worshipSongListAtom = (globalForRecoil.recoilAtoms['worshipSongListAtom'] || atomFamily<Array<Song>, string>({
+export const worshipSongListAtom = (globalForRecoil.recoilAtoms['worshipSongListAtom'] || atomFamily<Array<Song>, { teamId: string, worshipId: string }>({
   key: "worshipSongListAtom",
   default: selectorFamily({
     key: "worshipSongListAtom/default",
-    get: (worshipId: string) => async ({ get }) => {
+    get: ({ teamId, worshipId }) => async ({ get }) => {
       get(worshipSongUpdaterAtom)
       try {
-        const worship = get(worshipAtom(worshipId))
+        const worship = get(worshipAtom({ teamId, worshipId }))
         if (!worship) {
           console.error("Worship is not exists."); return []
         }
 
-        const songListPromise = worship.songs?.map(song => get(songAtom(song.id)))
+        const songListPromise = worship.songs?.map(song => get(songAtom({ teamId, songId: song.id })))
         if (!songListPromise) {
           console.error("Fail while loading song-board list promises."); return []
         }
@@ -131,7 +131,7 @@ export const worshipSongListAtom = (globalForRecoil.recoilAtoms['worshipSongList
       }
     }
   })
-})) as typeof worshipSongListAtomType;
+})) as unknown as (param: { teamId: string, worshipId: string }) => RecoilState<Array<Song>>;
 
 if (process.env.NODE_ENV !== 'production') globalForRecoil.recoilAtoms['worshipSongListAtom'] = worshipSongListAtom
 

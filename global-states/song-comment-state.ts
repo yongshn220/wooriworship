@@ -30,17 +30,17 @@ export const songCommentIdsUpdaterAtom = atom({
 })
 
 
-export const songCommentAtom = atomFamily<SongComment, string>({
+export const songCommentAtom = atomFamily<SongComment, { teamId: string, songId: string, commentId: string }>({
   key: "songCommentAtom",
   default: selectorFamily({
     key: "songCommentAtom/default",
-    get: (commentId) => async ({ get }) => {
+    get: ({ teamId, songId, commentId }) => async ({ get }) => {
       try {
         get(songCommentUpdater)
 
         if (!commentId) return null
 
-        const comment = await SongCommentService.getById(commentId) as SongComment
+        const comment = await SongCommentService.getById(teamId, songId, commentId) as SongComment
         if (!comment) return null
 
         return comment

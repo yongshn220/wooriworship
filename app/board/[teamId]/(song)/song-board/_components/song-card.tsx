@@ -16,7 +16,7 @@ interface Props {
 }
 
 export function SongCard({ teamId, songId, index }: Props) {
-    const song = useRecoilValue(songAtom(songId));
+    const song = useRecoilValue(songAtom({ teamId, songId }));
 
     if (!song) return null;
 

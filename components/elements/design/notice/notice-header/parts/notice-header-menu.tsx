@@ -30,7 +30,7 @@ export function NoticeHeaderMenu({ noticeId, createdById }: Props) {
 
   const handleDelete = async () => {
     try {
-      await NoticeService.deleteNotice(noticeId);
+      await NoticeService.deleteNotice(teamId, noticeId);
       toast({
         title: "Notice deleted",
         description: "The notice has been successfully deleted.",

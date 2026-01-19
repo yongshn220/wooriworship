@@ -10,6 +10,7 @@ import { worshipIndexAtom, worshipIndexChangeEventAtom, worshipNoteAtom, worship
 import { WorshipLiveCarouselItemWrapper } from "./worship-live-carousel-item";
 
 interface Props {
+    teamId: string
     worshipId: string
 }
 
@@ -19,8 +20,8 @@ export interface MusicSheetCounts {
     note?: string
 }
 
-export function WorshipLiveCarousel({ worshipId }: Props) {
-    const worship = useRecoilValue(worshipAtom(worshipId))
+export function WorshipLiveCarousel({ teamId, worshipId }: Props) {
+    const worship = useRecoilValue(worshipAtom({ teamId, worshipId }))
     const setWorshipIndex = useSetRecoilState(worshipIndexAtom)
     const setWorshipNote = useSetRecoilState(worshipNoteAtom)
     const worshipIndexChangeEvent = useRecoilValue(worshipIndexChangeEventAtom)
@@ -112,7 +113,7 @@ export function WorshipLiveCarousel({ worshipId }: Props) {
                 <CarouselContent className="h-full">
                     {
                         aggregatedSongHeaders?.map((songHeader, index) => (
-                            <WorshipLiveCarouselItemWrapper key={index} songHeader={songHeader} setMusicSheetCounts={setMusicSheetCounts} />
+                            <WorshipLiveCarouselItemWrapper key={index} teamId={teamId} songHeader={songHeader} setMusicSheetCounts={setMusicSheetCounts} />
                         ))
                     }
                 </CarouselContent>

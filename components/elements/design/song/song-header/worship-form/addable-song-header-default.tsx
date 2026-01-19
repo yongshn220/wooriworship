@@ -14,8 +14,8 @@ interface Props {
 }
 
 export function AddableSongHeaderDefault({ teamId, songId, selectedSongs, onUpdateList }: Props) {
-  const song = useRecoilValue(songAtom(songId))
-  const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songId))
+  const song = useRecoilValue(songAtom({ teamId, songId }))
+  const musicSheets = useRecoilValue(musicSheetsBySongIdAtom({ teamId, songId }))
   const [isDetailOpen, setIsDetailOpen] = React.useState(false)
 
   // Check if this song is already in the setlist

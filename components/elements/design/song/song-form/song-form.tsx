@@ -45,11 +45,11 @@ export interface SongInput {
 }
 
 export function SongForm({ mode, teamId, songId }: Props) {
-  const song = useRecoilValue(songAtom(songId))
+  const song = useRecoilValue(songAtom({ teamId, songId: songId ?? "" }))
   const songUpdater = useSetRecoilState(songUpdaterAtom)
   const musicSheetIdsUpdater = useSetRecoilState(musicSheetIdsUpdaterAtom)
   const musicSheetUpdater = useSetRecoilState(musicSheetUpdaterAtom)
-  const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songId))
+  const musicSheets = useRecoilValue(musicSheetsBySongIdAtom({ teamId, songId: songId ?? "" }))
   const authUser = auth.currentUser
   const team = useRecoilValue(teamAtom(teamId))
 
@@ -143,7 +143,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
       }
 
       const uploadedMusicSheetContainers = await uploadMusicSheetContainers(musicSheetContainers)
-      if (await MusicSheetService.addNewMusicSheets(authUser?.uid, newSongId, uploadedMusicSheetContainers) === false) {
+      if (await MusicSheetService.addNewMusicSheets(authUser?.uid, teamId, newSongId, uploadedMusicSheetContainers) === false) {
         console.log("err:song-board-form:handleCreate. Fail to create music sheets."); return
       }
 
@@ -199,15 +199,15 @@ export function SongForm({ mode, teamId, songId }: Props) {
       // Delete music sheet document if removed.
       const musicSheetIdsToDelete = getRemovedMusicSheetIds(musicSheets, newMusicSheetContainers)
       musicSheetIdsToDelete.forEach(id => {
-        promises.push(MusicSheetService.delete(id))
+        promises.push(MusicSheetService.deleteMusicSheet(teamId, song!.id, id))
       })
 
       // Update music sheet
       newMusicSheetContainers.forEach(mContainer => {
-        promises.push(MusicSheetService.updateMusicSheet(authUser?.uid, song?.id, mContainer))
+        promises.push(MusicSheetService.updateMusicSheet(authUser?.uid, teamId, song!.id, mContainer))
       })
       // Update Song and tags
-      promises.push(SongService.updateSong(authUser?.uid, song?.id, songInput, musicSheetContainers));
+      promises.push(SongService.updateSong(authUser?.uid, teamId, song!.id, songInput, musicSheetContainers));
       promises.push(TagService.addNewTags(teamId, songInput?.tags));
 
       await Promise.all(promises)

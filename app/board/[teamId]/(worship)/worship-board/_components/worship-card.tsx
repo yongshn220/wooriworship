@@ -69,7 +69,7 @@ export function WorshipCard({ worshipId, isFirst, defaultExpanded = false }: Pro
   const teamId = useRecoilValue(currentTeamIdAtom);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const worship = useRecoilValue(worshipAtom(worshipId));
+  const worship = useRecoilValue(worshipAtom({ teamId, worshipId }));
 
   const { isExpanded, setIsExpanded, toggleExpand } = useCardExpansion(worshipId, defaultExpanded);
 
@@ -86,7 +86,7 @@ export function WorshipCard({ worshipId, isFirst, defaultExpanded = false }: Pro
   // Safe access to created_by info
   const creatorId = worship?.created_by?.id || "";
   const creator = useRecoilValue(userAtom(creatorId));
-  const worshipSongListLoadable = useRecoilValueLoadable(worshipSongListAtom(worshipId));
+  const worshipSongListLoadable = useRecoilValueLoadable(worshipSongListAtom({ teamId, worshipId }));
   const searchInput = useRecoilValue(planSearchInputAtom);
 
   // Derived Values

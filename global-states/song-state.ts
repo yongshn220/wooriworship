@@ -122,14 +122,15 @@ export const songAlphabetMapAtom = selectorFamily<Record<string, number>, string
   }
 })
 
-export const songAtom = atomFamily<Song, string>({
+export const songAtom = atomFamily<Song, { teamId: string, songId: string }>({
   key: "songAtom",
   default: selectorFamily({
     key: "songAtom/default",
-    get: (songId) => async ({ get }) => {
+    get: ({ teamId, songId }) => async ({ get }) => {
       get(songUpdaterAtom)
+      if (!teamId || !songId) return null
       try {
-        const song = await SongService.getById(songId) as Song
+        const song = await SongService.getById(teamId, songId) as Song
         if (!song) return null
 
         return song

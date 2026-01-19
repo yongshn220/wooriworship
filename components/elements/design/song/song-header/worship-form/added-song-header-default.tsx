@@ -24,9 +24,9 @@ interface Props {
 import { PlanCard } from "@/components/common/card/plan-card";
 
 export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate, onRemove, dragHandle }: Props) {
-  const songLoadable = useRecoilValueLoadable(songAtom(songHeader?.id))
+  const songLoadable = useRecoilValueLoadable(songAtom({ teamId, songId: songHeader?.id }))
   // Fetch all available keys for this song to render toggle buttons
-  const musicSheetsLoadable = useRecoilValueLoadable(musicSheetsBySongIdAtom(songHeader?.id))
+  const musicSheetsLoadable = useRecoilValueLoadable(musicSheetsBySongIdAtom({ teamId, songId: songHeader?.id }))
 
   const [isDetailOpen, setIsDetailOpen] = React.useState(false)
 

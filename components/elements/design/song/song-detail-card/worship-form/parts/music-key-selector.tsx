@@ -6,6 +6,7 @@ import { musicSheetAtom, musicSheetsBySongIdAtom } from "@/global-states/music-s
 import { selectedWorshipSongHeaderListAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
 
 interface Props {
+  teamId: string
   songId: string,
   isStatic?: boolean
   onSelectHandler: () => void
@@ -13,9 +14,9 @@ interface Props {
   setMusicSheetIds: (musicSheetIds: string[]) => void
 }
 
-export function MusicKeySelector({ songId, isStatic = false, onSelectHandler, selectedMusicSheetIds, setMusicSheetIds }: Props) {
+export function MusicKeySelector({ teamId, songId, isStatic = false, onSelectHandler, selectedMusicSheetIds, setMusicSheetIds }: Props) {
 
-  const musicSheets = useRecoilValue(musicSheetsBySongIdAtom(songId))
+  const musicSheets = useRecoilValue(musicSheetsBySongIdAtom({ teamId, songId }))
   const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
 
   function handleSelectSong() {
@@ -83,7 +84,7 @@ export function MusicKeySelector({ songId, isStatic = false, onSelectHandler, se
               <div className="flex gap-2">
                 {
                   selectedMusicSheetIds?.map((id, index) => (
-                    <MusicSheetKeyString key={index} musicSheetId={id} />
+                    <MusicSheetKeyString key={index} teamId={teamId} songId={songId} musicSheetId={id} />
                   ))
                 }
               </div>
@@ -103,10 +104,12 @@ export function MusicKeySelector({ songId, isStatic = false, onSelectHandler, se
 
 
 interface MusicSheetKeysToStringProps {
+  teamId: string
+  songId: string
   musicSheetId: string
 }
-function MusicSheetKeyString({ musicSheetId }: MusicSheetKeysToStringProps) {
-  const musicSheet = useRecoilValue(musicSheetAtom(musicSheetId))
+function MusicSheetKeyString({ teamId, songId, musicSheetId }: MusicSheetKeysToStringProps) {
+  const musicSheet = useRecoilValue(musicSheetAtom({ teamId, songId, sheetId: musicSheetId }))
 
   return (
     <p>{musicSheet?.key}</p>

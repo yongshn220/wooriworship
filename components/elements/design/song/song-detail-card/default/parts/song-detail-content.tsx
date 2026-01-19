@@ -9,11 +9,12 @@ import { songAtom } from "@/global-states/song-state";
 
 
 interface Props {
+  teamId: string
   songId: string
 }
 
-export function SongDetailContent({ songId }: Props) {
-  const song = useRecoilValue(songAtom(songId))
+export function SongDetailContent({ teamId, songId }: Props) {
+  const song = useRecoilValue(songAtom({ teamId, songId }))
 
   function handleLinkButtonClick() {
     if (song?.original?.url) {

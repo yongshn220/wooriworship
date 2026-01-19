@@ -1,27 +1,38 @@
 import BaseService from "./BaseService";
 import { SongComment } from "@/models/song_comments";
-import { Timestamp } from "@firebase/firestore";
+import { db } from "@/firebase";
+import { Timestamp, collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
 
 
 class SongCommentService extends BaseService {
   constructor() {
-    super("song_comments");
+    super("song_comments"); // Placeholder
   }
 
   async getSongComments(songId: string, teamId: string) {
-    const songComments = await this.getByFilters([
-      {
-        a: 'song_id',
-        b: '==',
-        c: songId
-      },
-      {
-        a: 'team_id',
-        b: '==',
-        c: teamId
-      }
-    ]);
-    return songComments
+    try {
+      const q = query(
+        collection(db, "teams", teamId, "songs", songId, "comments"),
+        orderBy("created_by.timestamp", "desc")
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  }
+
+  async getById(teamId: string, songId: string, commentId: string) {
+    try {
+      const ref = doc(db, "teams", teamId, "songs", songId, "comments", commentId);
+      const docSnap = await getDoc(ref);
+      if (!docSnap.exists()) return null;
+      return { id: docSnap.id, ...docSnap.data() } as SongComment;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   async addNewSongComment(userId: string, teamId: string, songId: string, comment: any) {
@@ -35,20 +46,24 @@ class SongCommentService extends BaseService {
       last_updated_time: Timestamp.fromDate(new Date()),
       comment: comment
     }
-    return await this.create(newSongComment);
+    const ref = await addDoc(collection(db, "teams", teamId, "songs", songId, "comments"), newSongComment);
+    return ref.id;
   }
 
-  async updateSongComment(commentId: string, comment: any) {
+  async updateSongComment(teamId: string, songId: string, commentId: string, comment: any) {
     const songComment: any = {
       last_updated_time: Timestamp.fromDate(new Date()),
       comment: comment
     }
-    return await this.update(commentId, songComment);
+    const ref = doc(db, "teams", teamId, "songs", songId, "comments", commentId);
+    await setDoc(ref, songComment, { merge: true });
+    return true;
   }
 
-  async deleteSongComment(commentId: string) {
+  async deleteSongComment(teamId: string, songId: string, commentId: string) {
     try {
-      await this.delete(commentId);
+      const ref = doc(db, "teams", teamId, "songs", songId, "comments", commentId);
+      await deleteDoc(ref);
       return true;
     } catch (err) {
       console.error("error occured: " + err);

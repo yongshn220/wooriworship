@@ -1,19 +1,20 @@
-import {useRecoilValue} from "recoil";
-import {songAtom} from "@/global-states/song-state";
-import {musicSheetIdsAtom} from "@/global-states/music-sheet-state";
-import {SongKeyBox} from "@/components/elements/design/song/song-detail-card/default/parts/song-key-box";
-import {Badge} from "@/components/ui/badge";
+import { useRecoilValue } from "recoil";
+import { songAtom } from "@/global-states/song-state";
+import { musicSheetIdsAtom } from "@/global-states/music-sheet-state";
+import { SongKeyBox } from "@/components/elements/design/song/song-detail-card/default/parts/song-key-box";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
+  teamId: string
   songId: string
   customTags?: string[]
   selectedMusicSheetIds?: string[]
 }
 
 
-export function WorshipSongHeaderDefault({songId, customTags=[], selectedMusicSheetIds=null}: Props) {
-  const song = useRecoilValue(songAtom(songId))
-  const musicSheetIds = useRecoilValue(musicSheetIdsAtom(songId))
+export function WorshipSongHeaderDefault({ teamId, songId, customTags = [], selectedMusicSheetIds = null }: Props) {
+  const song = useRecoilValue(songAtom({ teamId, songId }))
+  const musicSheetIds = useRecoilValue(musicSheetIdsAtom({ teamId, songId }))
 
   if (songId && song === null) {
     return (
@@ -38,12 +39,12 @@ export function WorshipSongHeaderDefault({songId, customTags=[], selectedMusicSh
             {
               selectedMusicSheetIds === null ?
                 musicSheetIds?.map(((musicSheetId, index) => (
-                  <SongKeyBox key={index} musicSheetId={musicSheetId}/>
+                  <SongKeyBox key={index} teamId={teamId} songId={songId} musicSheetId={musicSheetId} />
                 )))
                 :
                 selectedMusicSheetIds?.map(((musicSheetId, index) => (
-                <SongKeyBox key={index} musicSheetId={musicSheetId}/>
-              )))
+                  <SongKeyBox key={index} teamId={teamId} songId={songId} musicSheetId={musicSheetId} />
+                )))
             }
           </div>
           <div className="flex flex-shrink-0 items-center gap-2">

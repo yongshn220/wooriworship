@@ -64,7 +64,9 @@ export function ServingDetailView({ schedule, roles, members, currentUserUid, te
             )}
 
             {/* Preview Drawer */}
+            {/* Preview Drawer */}
             <WorshipPlanPreviewDrawer
+                teamId={teamId}
                 isOpen={!!previewWorshipId}
                 onClose={() => setPreviewWorshipId(null)}
                 worshipId={previewWorshipId}

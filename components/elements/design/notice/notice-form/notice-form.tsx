@@ -99,7 +99,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
         body: input?.body,
         file_urls: urlsToKeep
       }
-      if (await NoticeService.updateNotice(noticeId, noticeInput) === false) {
+      if (await NoticeService.updateNotice(teamId, noticeId, noticeInput) === false) {
         toast({ description: "Fail to edit notice-board. Please try again." }); return
       }
 

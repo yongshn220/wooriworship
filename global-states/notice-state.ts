@@ -41,14 +41,14 @@ export const noticeIdsUpdaterAtom = atom({
   default: 0
 })
 
-export const noticeAtom = atomFamily<Notice, string>({
+export const noticeAtom = atomFamily<Notice, { teamId: string, noticeId: string }>({
   key: "noticeAtom",
   default: selectorFamily({
     key: "noticeAtom/default",
-    get: (noticeId) => async ({ get }) => {
+    get: ({ teamId, noticeId }) => async ({ get }) => {
       get(noticeUpdaterAtom)
       try {
-        const notice = await NoticeService.getById(noticeId) as Notice
+        const notice = await NoticeService.getById(teamId, noticeId) as Notice
         if (!notice) return null
 
         return notice

@@ -162,7 +162,7 @@ export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorship
                 related_serving_id: linkedServingId
             };
 
-            await WorshipService.updateWorship(auth.currentUser.uid, initialWorship.id, worshipInput);
+            await WorshipService.updateWorship(auth.currentUser.uid, teamId, initialWorship.id, worshipInput);
             toast({ title: "Service updated" });
             cleanupAndRedirect(initialWorship.id);
         } catch (e) {

@@ -46,7 +46,7 @@ export function WorshipHeaderMenu({ worshipId, createdById, teamId, trigger }: P
                 return;
             }
 
-            await WorshipService.deleteWorship(worshipId);
+            await WorshipService.deleteWorship(teamId, worshipId);
             toast({
                 title: "Worship plan deleted",
                 description: "The worship plan has been successfully removed.",

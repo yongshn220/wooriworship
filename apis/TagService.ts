@@ -6,14 +6,14 @@ class TagService extends BaseService {
   }
 
   async getTeamTags(teamId: string) {
-    const songs = await this.getByFilters([
-      {
-        a: 'team_id',
-        b: '==',
-        c: teamId
-      }
-    ]);
-    return songs
+    try {
+      const q = query(collection(db, "teams", teamId, "tags"));
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   }
 
   async addNewTag(teamId: string, tagName: string) {
@@ -21,7 +21,10 @@ class TagService extends BaseService {
       team_id: teamId,
       name: tagName
     }
-    return await this.update(`${teamId}-스플릿-${tagName}`, newTag);
+    // Use tagName as ID for uniqueness within team
+    const ref = doc(db, "teams", teamId, "tags", tagName);
+    await setDoc(ref, newTag);
+    return tagName;
   }
 
   async addNewTags(teamId: string, tagNames: Array<string>) {
@@ -37,8 +40,28 @@ class TagService extends BaseService {
       return false
     }
   }
+
   async deleteTag(teamId: string, tagName: string) {
-    return await this.delete(`${teamId}-스플릿-${tagName}`);
+    try {
+      const ref = doc(db, "teams", teamId, "tags", tagName);
+      await deleteDoc(ref);
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  }
+
+  async getById(teamId: string, tagId: string) {
+    try {
+      const ref = doc(db, "teams", teamId, "tags", tagId);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) return null;
+      return { id: snap.id, ...snap.data() };
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 }
 

@@ -25,7 +25,7 @@ interface Props {
 type CheckState = boolean | "indeterminate"
 
 export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader, onUpdate, onRemove }: Props) {
-  const songLoadable = useRecoilValueLoadable(songAtom(songHeader?.id))
+  const songLoadable = useRecoilValueLoadable(songAtom({ teamId, songId: songHeader?.id }))
   // Utilize Loadable for teamAtom to prevent Suspense
   const teamLoadable = useRecoilValueLoadable(teamAtom(teamId))
   const setTeam = useSetRecoilState(teamAtom(teamId))
@@ -150,7 +150,7 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader, on
           setMusicSheetIds={(musicSheetIds) => setMusicSheetIds(musicSheetIds)}
           isStatic={true}
         >
-          <AddedSongInnerHeader songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids} />
+          <AddedSongInnerHeader teamId={teamId} songId={songHeader?.id} selectedMusicSheetIds={songHeader?.selected_music_sheet_ids} />
         </AddableSongDetailDialogTrigger>
       </div>
       <div className="flex-between px-2 pt-1">

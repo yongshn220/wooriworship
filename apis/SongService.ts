@@ -6,33 +6,74 @@ import { getAllUrlsFromSongMusicSheets, getFirebaseTimestampNow } from "@/compon
 import MusicSheetService from "@/apis/MusicSheetService";
 import { MusicSheetContainer } from "@/components/constants/types";
 import { SongInput } from "@/components/elements/design/song/song-form/song-form";
-
-
-class SongService extends BaseService {
+import { db } from "@/firebase";
+import { collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, getDoc, collectionGroup, where, limit, documentId } from "firebase/firestore"; class SongService extends BaseService {
   constructor() {
-    super("songs");
+    super("songs"); // Placeholder
+  }
+
+  // Override getById
+  async getById(teamId: string, id: string) {
+    try {
+      const docRef = doc(db, "teams", teamId, "songs", id);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        return null;
+      }
+
+      return { id: docSnap.id, ...docSnap.data() };
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   async getSong(teamId: string) {
-    const songs: any = await this.getByFilters(
-      [{ a: 'team_id', b: '==', c: teamId }]
-    );
-    return songs
+    try {
+      const snapshot = await getDocs(collection(db, "teams", teamId, "songs"));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   }
 
   async getSongIds(teamId: string) {
-    const songs: any = await this.getDocIds(
-      [{ a: 'team_id', b: "==", c: teamId }]
-    )
-    return songs
+    try {
+      const snapshot = await getDocs(collection(db, "teams", teamId, "songs"));
+      return snapshot.docs.map(doc => doc.id);
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   }
 
   async getSongHeader(teamId: string) {
-    const songHeaders = await this.getByFiltersAndFields(
-      [{ a: 'team_id', b: "==", c: teamId }],
-      ["team_id", "title", "subtitle", "keys", "original", "tags", "version", "last_used_time"]
-    )
-    return songHeaders
+    // Optimization: In client SDK we can't select fields easily without fetching full docs,
+    // unless we use specific indexes or just fetch all.
+    // For now, fetch all.
+    try {
+      const q = query(collection(db, "teams", teamId, "songs"), orderBy("title"));
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          team_id: data.team_id,
+          title: data.title,
+          subtitle: data.subtitle,
+          keys: data.keys,
+          original: data.original,
+          tags: data.tags,
+          version: data.version,
+          last_used_time: data.last_used_time
+        };
+      });
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   }
 
   async addNewSong(userId: string, teamId: string, songInput: SongInput, musicSheetContainers: Array<MusicSheetContainer>) {
@@ -61,7 +102,9 @@ class SongService extends BaseService {
         },
         last_used_time: getFirebaseTimestampNow(),
       }
-      return await this.create(newSong);
+
+      const ref = await addDoc(collection(db, "teams", teamId, "songs"), newSong);
+      return ref.id;
     }
     catch (e) {
       console.error("err:addNewSong", e)
@@ -69,11 +112,18 @@ class SongService extends BaseService {
     }
   }
 
-  async utilizeSong(songId: string) {
-    return await this.update(songId, { last_used_time: new Date() });
+  async utilizeSong(teamId: string, songId: string) {
+    try {
+      const ref = doc(db, "teams", teamId, "songs", songId);
+      await setDoc(ref, { last_used_time: new Date() }, { merge: true });
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
   }
 
-  async updateSong(userId: string, songId: string, songInput: SongInput, musicSheetContainers: Array<MusicSheetContainer>) {
+  async updateSong(userId: string, teamId: string, songId: string, songInput: SongInput, musicSheetContainers: Array<MusicSheetContainer>) {
     try {
       const song = {
         title: songInput.title,
@@ -93,34 +143,43 @@ class SongService extends BaseService {
           time: getFirebaseTimestampNow()
         },
       }
-      return await this.update(songId, song);
+      const ref = doc(db, "teams", teamId, "songs", songId);
+      await setDoc(ref, song, { merge: true });
+      return true;
     }
     catch (e) {
       console.error(e)
+      return false;
     }
   }
 
-  async deleteSong(songId: string) {
+  async deleteSong(teamId: string, songId: string) {
     try {
-      const song: Song = await this.getById(songId) as Song;
-      if (!song) {
-        return true;
-      }
+      // Need to fetch full song first to get sub-items logic?
+      // Actually we know the IDs of subitems usually by iterating.
+
+      const songRef = doc(db, "teams", teamId, "songs", songId);
+      const songSnap = await getDoc(songRef);
+      if (!songSnap.exists()) return true;
+
+      const song = { id: songSnap.id, ...songSnap.data() } as Song;
+
       const promises = [];
-      const comments = await SongCommentService.getSongComments(song.id, song.team_id);
+      const comments = await SongCommentService.getSongComments(song.id, teamId);
       for (const comment of comments) {
-        promises.push(SongCommentService.delete(comment?.id));
+        promises.push(SongCommentService.deleteSongComment(teamId, song.id, comment?.id));
       }
 
-      const musicSheets = await MusicSheetService.getSongMusicSheets(song.id)
+      const musicSheets = await MusicSheetService.getSongMusicSheets(teamId, song.id)
       for (const musicSheet of musicSheets) {
-        promises.push(MusicSheetService.delete(musicSheet?.id))
+        promises.push(MusicSheetService.deleteMusicSheet(teamId, song.id, musicSheet?.id))
       }
 
       const musicSheetUrls = getAllUrlsFromSongMusicSheets(musicSheets)
       promises.push(StorageService.deleteFileByUrls(musicSheetUrls ?? []))
       await Promise.all(promises);
-      await this.delete(songId);
+
+      await deleteDoc(songRef);
       return true;
     } catch (err) {
       console.error("error occured: " + err);

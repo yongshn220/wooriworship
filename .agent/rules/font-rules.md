@@ -2,7 +2,7 @@
 trigger: always_on
 ---
 
-# UI Typography Rules (Tailwind + Project Vars)
+UI Typography Rules (Tailwind + Project Vars)
 
 당신은 프로젝트의 `global.css`에 정의된 디자인 토큰을 활용하여 UI를 구현합니다. 다음 위계와 스타일 규칙을 엄격히 준수하세요.
 

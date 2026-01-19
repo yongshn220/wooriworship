@@ -23,13 +23,14 @@ interface Props {
 }
 
 export function AddableSongDetailDialog({ teamId, isOpen, setIsOpen, songId, selectedMusicSheetIds, setMusicSheetIds, readOnly = false, isStatic = false, onSelectHandler }: Props) {
-  const song = useRecoilValue(songAtom(songId))
+  const song = useRecoilValue(songAtom({ teamId, songId }))
 
   return (
     <Drawer open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
       <DrawerContent className="h-5/6 p-0 border-0 ">
         <div className="w-full h-full overflow-y-scroll scrollbar-hide rounded-lg bg-blue-500">
           <MusicKeySelector
+            teamId={teamId}
             songId={songId}
             isStatic={isStatic}
             onSelectHandler={onSelectHandler}

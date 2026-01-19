@@ -1,16 +1,17 @@
-import {useRecoilValue} from "recoil";
-import {songAtom} from "@/global-states/song-state";
-import {getTimePassedFromTimestamp, getTimePassedFromTimestampShorten} from "@/components/util/helper/helper-functions";
-import {Badge} from "@/components/ui/badge";
-import {SongKeyBoxByText} from "@/components/elements/design/song/song-detail-card/default/parts/song-key-box-by-text";
+import { useRecoilValue } from "recoil";
+import { songAtom } from "@/global-states/song-state";
+import { getTimePassedFromTimestamp, getTimePassedFromTimestampShorten } from "@/components/util/helper/helper-functions";
+import { Badge } from "@/components/ui/badge";
+import { SongKeyBoxByText } from "@/components/elements/design/song/song-detail-card/default/parts/song-key-box-by-text";
 
 interface Props {
+  teamId: string
   songId: string
 }
 
 
-export function SongHeaderDefault({songId}: Props) {
-  const song = useRecoilValue(songAtom(songId))
+export function SongHeaderDefault({ teamId, songId }: Props) {
+  const song = useRecoilValue(songAtom({ teamId, songId }))
 
   return (
     <div className="flex w-full px-4 rounded-lg cursor-pointer py-2 my-2 hover:bg-gray-100">
@@ -19,7 +20,7 @@ export function SongHeaderDefault({songId}: Props) {
           <p className="font-semibold text-md">{song?.title} <span className="text-sm text-gray-700">{song?.subtitle ? `(${song?.subtitle})` : ""}</span> </p>
           {
             song?.keys?.map((songKey, index) => (
-              <SongKeyBoxByText key={index} songKey={songKey}/>
+              <SongKeyBoxByText key={index} songKey={songKey} />
             ))
           }
         </div>

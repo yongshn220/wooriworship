@@ -50,7 +50,7 @@ export default function WorshipLivePage({ params }: any) {
                     ref={containerRef}
                     className="relative w-full h-full bg-background overflow-hidden touch-none" // touch-none to prevent browser zooming/scrolling interfering
                 >
-                    <WorshipLiveCarousel worshipId={worshipId} />
+                    <WorshipLiveCarousel teamId={teamId} worshipId={worshipId} />
 
                     <WorshipNote constraintsRef={containerRef} />
 
