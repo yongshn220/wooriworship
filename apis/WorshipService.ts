@@ -3,20 +3,31 @@ import { SongService } from ".";
 import { Timestamp, collection, getDocs, getDoc, query, where, orderBy, limit, addDoc, doc, setDoc, deleteDoc, collectionGroup, documentId } from "firebase/firestore";
 import { Worship } from "@/models/worship";
 import { WorshipInput } from "@/components/constants/types";
-import { db } from "@/firebase";
+import { db as defaultDb } from "@/firebase";
 import LinkingService from "./LinkingService";
 import { parseLocalDate } from "@/components/util/helper/helper-functions";
 
 class WorshipService extends BaseService {
-  constructor() {
+  private static instance: WorshipService;
+  protected db: Firestore;
+
+  private constructor(db?: Firestore) {
     super("worships"); // Placeholder
+    this.db = db || defaultDb;
+  }
+
+  public static getInstance(db?: Firestore): WorshipService {
+    if (!WorshipService.instance) {
+      WorshipService.instance = new WorshipService(db);
+    }
+    return WorshipService.instance;
   }
 
   // Override getById to find doc in sub-collections
   async getById(teamId: string, id: string) {
     if (!teamId || !id) return null;
     try {
-      const docRef = doc(db, "teams", teamId, "worships", id);
+      const docRef = doc(this.db, "teams", teamId, "worships", id);
       const docSnap = await getDoc(docRef);
 
       if (!docSnap.exists()) {
@@ -32,7 +43,7 @@ class WorshipService extends BaseService {
 
   async getTeamWorship(teamId: string) {
     try {
-      const snapshot = await getDocs(collection(db, "teams", teamId, "worships"));
+      const snapshot = await getDocs(collection(this.db, "teams", teamId, "worships"));
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (e) {
       console.error(e);
@@ -49,7 +60,7 @@ class WorshipService extends BaseService {
       nextDay.setDate(nextDay.getDate() + 1);
 
       const q = query(
-        collection(db, "teams", teamId, "worships"),
+        collection(this.db, "teams", teamId, "worships"),
         where('worship_date', '>=', Timestamp.fromDate(startOfDay)),
         where('worship_date', '<', Timestamp.fromDate(nextDay))
       );
@@ -71,7 +82,7 @@ class WorshipService extends BaseService {
       endD.setHours(23, 59, 59, 999);
 
       const q = query(
-        collection(db, "teams", teamId, "worships"),
+        collection(this.db, "teams", teamId, "worships"),
         where('worship_date', '>=', Timestamp.fromDate(startD)),
         where('worship_date', '<=', Timestamp.fromDate(endD))
       );
@@ -87,7 +98,7 @@ class WorshipService extends BaseService {
   async getPreviousWorships(teamId: string, beforeDate: Date, limitCount: number = 5): Promise<Worship[]> {
     try {
       const q = query(
-        collection(db, "teams", teamId, "worships"),
+        collection(this.db, "teams", teamId, "worships"),
         where('worship_date', '<', Timestamp.fromDate(beforeDate)),
         orderBy('worship_date', 'desc'),
         limit(limitCount)
@@ -139,7 +150,7 @@ class WorshipService extends BaseService {
 
     // Sub-collection creation
     try {
-      const ref = await addDoc(collection(db, "teams", teamId, "worships"), newWorship);
+      const ref = await addDoc(collection(this.db, "teams", teamId, "worships"), newWorship);
       const worshipId = ref.id;
 
       if (worshipId && worshipInput.serving_schedule_id) {
@@ -173,7 +184,7 @@ class WorshipService extends BaseService {
     }
 
     try {
-      const ref = doc(db, "teams", teamId, "worships", worshipId);
+      const ref = doc(this.db, "teams", teamId, "worships", worshipId);
       await setDoc(ref, worship, { merge: true });
       return true;
     } catch (e) {
@@ -190,7 +201,7 @@ class WorshipService extends BaseService {
 
       await LinkingService.cleanupReferencesForWorshipDeletion(teamId, worshipId);
 
-      const ref = doc(db, "teams", teamId, "worships", worshipId);
+      const ref = doc(this.db, "teams", teamId, "worships", worshipId);
       await deleteDoc(ref);
       return true;
     }
@@ -201,4 +212,4 @@ class WorshipService extends BaseService {
   }
 }
 
-export default new WorshipService();
+export default WorshipService.getInstance();

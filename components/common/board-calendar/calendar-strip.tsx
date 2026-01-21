@@ -29,84 +29,60 @@ export function CalendarStrip({
     const itemRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-    // --- 1. Scroll Anchoring Logic (Standard LTR Prepend) ---
+    // --- 1. Scroll Anchoring Logic (Robust Snapshot & Restore) ---
     const prevScrollWidth = useRef(0);
     const prevItemsLength = useRef(items.length);
-    const isPrepend = useRef(false);
 
-    // Capture state BEFORE render
     useLayoutEffect(() => {
-        // If items length increased, we suspect prepend
-        if (items.length > prevItemsLength.current) {
-            isPrepend.current = true;
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        const currentScrollWidth = container.scrollWidth;
+        const currentItemsLength = items.length;
+
+        // Detect if items were added (length increased)
+        // We assume length increase + width increase means items were prepended.
+        const hasNewItems = currentItemsLength > prevItemsLength.current;
+        const widthDiff = currentScrollWidth - prevScrollWidth.current;
+
+        if (hasNewItems && widthDiff > 0) {
+            // 1. Disable snap & smooth scroll to prevent "fighting"
+            container.style.scrollSnapType = "none";
+            container.style.scrollBehavior = "auto";
+
+            // 2. Adjust scroll position instantly to maintain relative view
+            container.scrollLeft += widthDiff;
+
+            // 3. Restore snap after the browser paints the new position
+            // Using requestAnimationFrame ensures we wait for the layout to settle
+            requestAnimationFrame(() => {
+                container.style.scrollSnapType = "x mandatory";
+                container.style.scrollBehavior = ""; // Reset to default
+            });
         }
-        prevItemsLength.current = items.length;
+
+        // Update snapshots for the next render
+        prevScrollWidth.current = currentScrollWidth;
+        prevItemsLength.current = currentItemsLength;
     }, [items]);
 
-    // Adjust Scroll AFTER render
-    useLayoutEffect(() => {
-        if (isPrepend.current && scrollContainerRef.current) {
-            const container = scrollContainerRef.current;
-            const newScrollWidth = container.scrollWidth;
-            const diff = newScrollWidth - prevScrollWidth.current;
-
-            // If width grew, anchor the scroll position
-            if (diff > 0) {
-                // 1. Temporarily disable snapping to prevent "fighting"
-                container.style.scrollSnapType = "none";
-
-                // 2. Adjust position instantly
-                const newLeft = container.scrollLeft + diff;
-                container.scrollTo({ left: newLeft, behavior: "instant" });
-
-                // 3. Restore snapping after a short delay (longer than a frame)
-                // This ensures the browser accepts the new position as the "resting point"
-                const timer = setTimeout(() => {
-                    container.style.scrollSnapType = "x mandatory";
-                }, 50);
-
-                isPrepend.current = false;
-                return () => clearTimeout(timer);
-            }
-            isPrepend.current = false;
-        }
-        // Always update width for next turn
-        if (scrollContainerRef.current) {
-            prevScrollWidth.current = scrollContainerRef.current.scrollWidth;
-        }
-    }, [items]); // Run exactly when DOM updates
-
-    // --- 2. Sentinel Observation (Trigger Load) ---
-
-    // Anti-bounce / Cooldown logic
-    const isCoolingDown = useRef(false);
-
-    // When loading finishes, enforce a small "settle" period before allowing next load
-    useEffect(() => {
-        if (!isLoadingPrev) {
-            isCoolingDown.current = true;
-            const timer = setTimeout(() => {
-                isCoolingDown.current = false;
-            }, 1000); // 1s buffer to ensure user has stopped scrolling or processed new items
-            return () => clearTimeout(timer);
-        }
-    }, [isLoadingPrev]);
-
+    // --- 2. Sentinel Observation (Simplified) ---
     const observerRef = useRef<IntersectionObserver | null>(null);
     const sentinelRef = (node: HTMLDivElement | null) => {
-        if (isLoadingPrev || !hasMorePast) return;
+        // Always disconnect previous observer to prevent duplicates
         if (observerRef.current) observerRef.current.disconnect();
 
-        if (node) {
+        // Only observe if we can load more and the node exists
+        if (node && onLoadPrev && !isLoadingPrev && hasMorePast) {
             observerRef.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting && onLoadPrev && !isLoadingPrev && !isCoolingDown.current) {
-                    isCoolingDown.current = true; // Lock immediately
+                if (entries[0].isIntersecting) {
                     onLoadPrev();
                 }
             }, {
                 root: scrollContainerRef.current,
                 threshold: 0.1,
-                rootMargin: "0px 0px 0px 500px" // Trigger loading when sentinel is within 500px of visible area
+                // Trigger loading when sentinel is within 300px of entering the viewport
+                rootMargin: "0px 0px 0px 300px"
             });
             observerRef.current.observe(node);
         }
