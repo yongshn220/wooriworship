@@ -6,16 +6,31 @@ import { getAllUrlsFromSongMusicSheets, getFirebaseTimestampNow } from "@/compon
 import MusicSheetService from "@/apis/MusicSheetService";
 import { MusicSheetContainer } from "@/components/constants/types";
 import { SongInput } from "@/components/elements/design/song/song-form/song-form";
-import { db } from "@/firebase";
-import { collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, getDoc, collectionGroup, where, limit, documentId } from "firebase/firestore"; class SongService extends BaseService {
-  constructor() {
+import { db as defaultDb } from "@/firebase";
+import { Firestore, collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, getDoc, collectionGroup, where, limit, documentId } from "firebase/firestore";
+
+export class SongService extends BaseService {
+  private static instance: SongService;
+  protected db: Firestore;
+  protected musicSheetService: typeof MusicSheetService;
+
+  private constructor(db?: Firestore, musicSheetService?: typeof MusicSheetService) {
     super("songs"); // Placeholder
+    this.db = db || defaultDb;
+    this.musicSheetService = musicSheetService || MusicSheetService;
+  }
+
+  public static getInstance(db?: Firestore, musicSheetService?: typeof MusicSheetService): SongService {
+    if (!SongService.instance) {
+      SongService.instance = new SongService(db, musicSheetService);
+    }
+    return SongService.instance;
   }
 
   // Override getById
   async getById(teamId: string, id: string) {
     try {
-      const docRef = doc(db, "teams", teamId, "songs", id);
+      const docRef = doc(this.db, "teams", teamId, "songs", id);
       const docSnap = await getDoc(docRef);
 
       if (!docSnap.exists()) {
@@ -31,7 +46,7 @@ import { collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, ge
 
   async getSong(teamId: string) {
     try {
-      const snapshot = await getDocs(collection(db, "teams", teamId, "songs"));
+      const snapshot = await getDocs(collection(this.db, "teams", teamId, "songs"));
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (e) {
       console.error(e);
@@ -41,7 +56,7 @@ import { collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, ge
 
   async getSongIds(teamId: string) {
     try {
-      const snapshot = await getDocs(collection(db, "teams", teamId, "songs"));
+      const snapshot = await getDocs(collection(this.db, "teams", teamId, "songs"));
       return snapshot.docs.map(doc => doc.id);
     } catch (e) {
       console.error(e);
@@ -54,7 +69,7 @@ import { collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, ge
     // unless we use specific indexes or just fetch all.
     // For now, fetch all.
     try {
-      const q = query(collection(db, "teams", teamId, "songs"), orderBy("title"));
+      const q = query(collection(this.db, "teams", teamId, "songs"), orderBy("title"));
       const snapshot = await getDocs(q);
       return snapshot.docs.map(doc => {
         const data = doc.data();
@@ -103,7 +118,14 @@ import { collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, ge
         last_used_time: getFirebaseTimestampNow(),
       }
 
-      const ref = await addDoc(collection(db, "teams", teamId, "songs"), newSong);
+      const ref = await addDoc(collection(this.db, "teams", teamId, "songs"), newSong);
+
+      if (musicSheetContainers && musicSheetContainers.length > 0) {
+        for (const container of musicSheetContainers) {
+          await this.musicSheetService.addNewMusicSheet(userId, teamId, ref.id, container);
+        }
+      }
+
       return ref.id;
     }
     catch (e) {
@@ -114,7 +136,7 @@ import { collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, ge
 
   async utilizeSong(teamId: string, songId: string) {
     try {
-      const ref = doc(db, "teams", teamId, "songs", songId);
+      const ref = doc(this.db, "teams", teamId, "songs", songId);
       await setDoc(ref, { last_used_time: new Date() }, { merge: true });
       return true;
     } catch (e) {
@@ -143,7 +165,7 @@ import { collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, ge
           time: getFirebaseTimestampNow()
         },
       }
-      const ref = doc(db, "teams", teamId, "songs", songId);
+      const ref = doc(this.db, "teams", teamId, "songs", songId);
       await setDoc(ref, song, { merge: true });
       return true;
     }
@@ -158,7 +180,7 @@ import { collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, ge
       // Need to fetch full song first to get sub-items logic?
       // Actually we know the IDs of subitems usually by iterating.
 
-      const songRef = doc(db, "teams", teamId, "songs", songId);
+      const songRef = doc(this.db, "teams", teamId, "songs", songId);
       const songSnap = await getDoc(songRef);
       if (!songSnap.exists()) return true;
 
@@ -170,9 +192,9 @@ import { collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, ge
         promises.push(SongCommentService.deleteSongComment(teamId, song.id, comment?.id));
       }
 
-      const musicSheets = await MusicSheetService.getSongMusicSheets(teamId, song.id)
+      const musicSheets = await this.musicSheetService.getSongMusicSheets(teamId, song.id)
       for (const musicSheet of musicSheets) {
-        promises.push(MusicSheetService.deleteMusicSheet(teamId, song.id, musicSheet?.id))
+        promises.push(this.musicSheetService.deleteMusicSheet(teamId, song.id, musicSheet?.id))
       }
 
       const musicSheetUrls = getAllUrlsFromSongMusicSheets(musicSheets)
@@ -188,4 +210,4 @@ import { collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, ge
   }
 }
 
-export default new SongService();
+export default SongService.getInstance();

@@ -3,9 +3,10 @@
 import { cn } from "@/lib/utils";
 import { format, differenceInCalendarDays } from "date-fns";
 import { Calendar, Loader2 } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CalendarItem } from "./types";
 import { GenericCalendarDrawer } from "./generic-calendar-drawer";
+import { useAnchorScroll } from "./use-anchor-scroll";
 
 interface Props {
     items: CalendarItem[];
@@ -29,59 +30,32 @@ export function CalendarStrip({
     const itemRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-    // --- 1. Scroll Anchoring Logic (Robust Snapshot & Restore) ---
-    const prevScrollWidth = useRef(0);
-    const prevItemsLength = useRef(items.length);
+    // --- Anchor Scroll Logic ---
+    const { captureAnchor } = useAnchorScroll({
+        scrollContainerRef,
+        itemsLength: items.length,
+        itemRefs,
+        isLoading: !!isLoadingPrev
+    });
 
-    useLayoutEffect(() => {
-        const container = scrollContainerRef.current;
-        if (!container) return;
-
-        const currentScrollWidth = container.scrollWidth;
-        const currentItemsLength = items.length;
-
-        // Detect if items were added (length increased)
-        // We assume length increase + width increase means items were prepended.
-        const hasNewItems = currentItemsLength > prevItemsLength.current;
-        const widthDiff = currentScrollWidth - prevScrollWidth.current;
-
-        if (hasNewItems && widthDiff > 0) {
-            // 1. Disable snap & smooth scroll to prevent "fighting"
-            container.style.scrollSnapType = "none";
-            container.style.scrollBehavior = "auto";
-
-            // 2. Adjust scroll position instantly to maintain relative view
-            container.scrollLeft += widthDiff;
-
-            // 3. Restore snap after the browser paints the new position
-            // Using requestAnimationFrame ensures we wait for the layout to settle
-            requestAnimationFrame(() => {
-                container.style.scrollSnapType = "x mandatory";
-                container.style.scrollBehavior = ""; // Reset to default
-            });
-        }
-
-        // Update snapshots for the next render
-        prevScrollWidth.current = currentScrollWidth;
-        prevItemsLength.current = currentItemsLength;
-    }, [items]);
-
-    // --- 2. Sentinel Observation (Simplified) ---
+    // --- Sentinel Observation ---
     const observerRef = useRef<IntersectionObserver | null>(null);
     const sentinelRef = (node: HTMLDivElement | null) => {
-        // Always disconnect previous observer to prevent duplicates
         if (observerRef.current) observerRef.current.disconnect();
 
-        // Only observe if we can load more and the node exists
-        if (node && onLoadPrev && !isLoadingPrev && hasMorePast) {
+        // Only observe if we can load more
+        if (node && onLoadPrev && hasMorePast) {
             observerRef.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
+                if (entries[0].isIntersecting && !isLoadingPrev) {
+                    // 1. Capture the current visual anchor before loading starts
+                    captureAnchor();
+                    // 2. Trigger Load
                     onLoadPrev();
                 }
             }, {
                 root: scrollContainerRef.current,
                 threshold: 0.1,
-                // Trigger loading when sentinel is within 300px of entering the viewport
+                // Trigger when sentinel is close (e.g., 300px)
                 rootMargin: "0px 0px 0px 300px"
             });
             observerRef.current.observe(node);
@@ -99,6 +73,7 @@ export function CalendarStrip({
     };
 
     const CARD_SIZE_CLASSES = "snap-start scroll-mx-4 shrink-0 w-[4.5rem] h-[5.5rem] rounded-xl flex flex-col items-center justify-center transition-colors relative";
+
     return (
         <div className="relative">
             {/* Header */}
@@ -115,13 +90,13 @@ export function CalendarStrip({
                 </button>
             </div>
 
-            {/* Horizontal Scroll Container (Standard LTR) */}
+            {/* Horizontal Scroll Container */}
             <div
                 ref={scrollContainerRef}
-                style={{ overflowAnchor: "none" }} // Prevent browser's native scroll anchoring from interfering
+                style={{ overflowAnchor: "none" }}
                 className="flex overflow-x-auto gap-3 pb-2 -mx-4 px-4 pt-4 snap-x snap-mandatory items-center no-scrollbar"
             >
-                {/* 1. Sentinel / Loader (At Start) */}
+                {/* Sentinel / Loader */}
                 {hasMorePast && (
                     <div
                         ref={sentinelRef}
@@ -130,13 +105,12 @@ export function CalendarStrip({
                         {isLoadingPrev ? (
                             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
                         ) : (
-                            // Invisible trigger zone, or minimal icon
                             <div className="w-full h-full" />
                         )}
                     </div>
                 )}
 
-                {/* 2. Items (Past -> Future) */}
+                {/* Items */}
                 {items.map((item) => (
                     <DateCard
                         key={item.id}
@@ -151,7 +125,6 @@ export function CalendarStrip({
                     />
                 ))}
 
-                {/* Spacer / End Padding */}
                 <div className="w-1 shrink-0"></div>
             </div>
 
@@ -165,10 +138,6 @@ export function CalendarStrip({
         </div >
     );
 }
-
-// --- Sub-components ---
-
-
 
 interface DateCardProps {
     item: CalendarItem;

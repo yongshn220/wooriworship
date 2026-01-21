@@ -2,34 +2,45 @@ import BaseService from "./BaseService";
 import { MusicSheetContainer } from "@/components/constants/types";
 import { MusicSheet } from "@/models/music_sheet";
 import { getFirebaseTimestampNow } from "@/components/util/helper/helper-functions";
-import { db } from "@/firebase";
-import { collection, getDocs, getDoc, addDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
+import { db as defaultDb } from "@/firebase";
+import { collection, getDocs, getDoc, addDoc, doc, setDoc, deleteDoc, Firestore } from "firebase/firestore";
 
 class MusicSheetService extends BaseService {
-  constructor() {
+  private static instance: MusicSheetService;
+  protected db: Firestore;
+
+  private constructor(db?: Firestore) {
     super("music_sheets"); // Placeholder
+    this.db = db || defaultDb;
+  }
+
+  public static getInstance(db?: Firestore): MusicSheetService {
+    if (!MusicSheetService.instance) {
+      MusicSheetService.instance = new MusicSheetService(db);
+    }
+    return MusicSheetService.instance;
   }
 
   async getSongMusicSheets(teamId: string, songId: string) {
     try {
-      const sheetsRef = collection(db, "teams", teamId, "songs", songId, "sheets");
+      const sheetsRef = collection(this.db, "teams", teamId, "songs", songId, "sheets");
       const snapshot = await getDocs(sheetsRef);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MusicSheet));
     }
     catch (e) {
-      console.error(e)
+      console.error("DEBUG_ERROR:", e)
       return []
     }
   }
 
   async getById(teamId: string, songId: string, sheetId: string) {
     try {
-      const ref = doc(db, "teams", teamId, "songs", songId, "sheets", sheetId);
+      const ref = doc(this.db, "teams", teamId, "songs", songId, "sheets", sheetId);
       const docSnap = await getDoc(ref);
       if (!docSnap.exists()) return null;
       return { id: docSnap.id, ...docSnap.data() } as MusicSheet;
     } catch (e) {
-      console.error(e);
+      console.error("DEBUG_ERROR:", e);
       return null;
     }
   }
@@ -54,11 +65,11 @@ class MusicSheetService extends BaseService {
         }
       }
 
-      const ref = await addDoc(collection(db, "teams", teamId, "songs", songId, "sheets"), newMusicSheet);
+      const ref = await addDoc(collection(this.db, "teams", teamId, "songs", songId, "sheets"), newMusicSheet);
       return ref.id;
     }
     catch (e) {
-      console.error(e)
+      console.error("DEBUG_ERROR:", e)
       return null
     }
   }
@@ -77,23 +88,23 @@ class MusicSheetService extends BaseService {
           timestamp: getFirebaseTimestampNow()
         }
       }
-      const ref = doc(db, "teams", teamId, "songs", songId, "sheets", musicSheetContainer.id);
+      const ref = doc(this.db, "teams", teamId, "songs", songId, "sheets", musicSheetContainer.id);
       await setDoc(ref, data, { merge: true });
       return true;
     }
     catch (e) {
-      console.error(e)
+      console.error("DEBUG_ERROR:", e)
       return null
     }
   }
 
   async deleteMusicSheet(teamId: string, songId: string, sheetId: string) {
     try {
-      const ref = doc(db, "teams", teamId, "songs", songId, "sheets", sheetId);
+      const ref = doc(this.db, "teams", teamId, "songs", songId, "sheets", sheetId);
       await deleteDoc(ref);
       return true;
     } catch (e) {
-      console.error(e);
+      console.error("DEBUG_ERROR:", e);
       return false;
     }
   }
@@ -114,4 +125,4 @@ class MusicSheetService extends BaseService {
   }
 }
 
-export default new MusicSheetService()
+export default MusicSheetService.getInstance()
