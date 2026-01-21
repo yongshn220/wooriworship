@@ -1,6 +1,6 @@
 import BaseService from "./BaseService";
 import { ServingRole, ServingSchedule } from "@/models/serving";
-import { db } from "@/firebase";
+import { db as defaultDb } from "@/firebase";
 import {
     collection,
     doc,
@@ -25,14 +25,16 @@ import { parseLocalDate, timestampToDateString } from "@/components/util/helper/
 
 class ServingService extends BaseService {
     private static instance: ServingService;
+    protected db: Firestore;
 
-    private constructor() {
+    private constructor(db?: Firestore) {
         super("serving"); // Placeholder, not strictly used as we use custom paths
+        this.db = db || defaultDb;
     }
 
-    public static getInstance(): ServingService {
+    public static getInstance(db?: Firestore): ServingService {
         if (!ServingService.instance) {
-            ServingService.instance = new ServingService();
+            ServingService.instance = new ServingService(db);
         }
         return ServingService.instance;
     }
@@ -42,7 +44,7 @@ class ServingService extends BaseService {
     async getRoles(teamId: string): Promise<ServingRole[]> {
         try {
             const q = query(
-                collection(db, "teams", teamId, "serving_roles"),
+                collection(this.db, "teams", teamId, "serving_roles"),
                 orderBy("order", "asc")
             );
             const snapshot = await getDocs(q);
@@ -54,27 +56,27 @@ class ServingService extends BaseService {
     }
 
     async createRole(teamId: string, role: Omit<ServingRole, "id">): Promise<ServingRole> {
-        const ref = doc(collection(db, "teams", teamId, "serving_roles"));
+        const ref = doc(collection(this.db, "teams", teamId, "serving_roles"));
         const newRole = { ...role, id: ref.id };
         await setDoc(ref, newRole);
         return newRole;
     }
 
     async updateRole(teamId: string, role: ServingRole): Promise<void> {
-        const ref = doc(db, "teams", teamId, "serving_roles", role.id);
+        const ref = doc(this.db, "teams", teamId, "serving_roles", role.id);
         await setDoc(ref, role, { merge: true });
     }
 
     async deleteRole(teamId: string, roleId: string): Promise<void> {
-        const ref = doc(db, "teams", teamId, "serving_roles", roleId);
+        const ref = doc(this.db, "teams", teamId, "serving_roles", roleId);
         await deleteDoc(ref);
     }
 
     async updateRolesOrder(teamId: string, roles: ServingRole[]): Promise<void> {
-        const batch = writeBatch(db);
+        const batch = writeBatch(this.db);
 
         roles.forEach((role, index) => {
-            const docRef = doc(db, "teams", teamId, "serving_roles", role.id);
+            const docRef = doc(this.db, "teams", teamId, "serving_roles", role.id);
             batch.update(docRef, { order: index });
         });
 
@@ -87,7 +89,7 @@ class ServingService extends BaseService {
             "Bass Guitar", "Acoustic Guitar", "Electric Guitar", "Media Team", "PPT"
         ];
 
-        const rolesRef = collection(db, "teams", teamId, "serving_roles");
+        const rolesRef = collection(this.db, "teams", teamId, "serving_roles");
 
         try {
             const existingSnapshot = await getDocs(rolesRef);
@@ -97,7 +99,7 @@ class ServingService extends BaseService {
 
             if (rolesToAdd.length === 0) return; // All exist
 
-            const batch = writeBatch(db);
+            const batch = writeBatch(this.db);
 
             rolesToAdd.forEach((name, index) => {
                 const newRoleRef = doc(rolesRef);
@@ -111,14 +113,14 @@ class ServingService extends BaseService {
     }
 
     async addDefaultMember(teamId: string, roleId: string, memberId: string): Promise<void> {
-        const ref = doc(db, "teams", teamId, "serving_roles", roleId);
+        const ref = doc(this.db, "teams", teamId, "serving_roles", roleId);
         await updateDoc(ref, {
             default_members: arrayUnion(memberId)
         });
     }
 
     async removeDefaultMember(teamId: string, roleId: string, memberId: string): Promise<void> {
-        const ref = doc(db, "teams", teamId, "serving_roles", roleId);
+        const ref = doc(this.db, "teams", teamId, "serving_roles", roleId);
         await updateDoc(ref, {
             default_members: arrayRemove(memberId)
         });
@@ -127,12 +129,12 @@ class ServingService extends BaseService {
     async cleanupMember(teamId: string, memberId: string): Promise<void> {
         try {
             const q = query(
-                collection(db, "teams", teamId, "serving_roles"),
+                collection(this.db, "teams", teamId, "serving_roles"),
                 where("default_members", "array-contains", memberId)
             );
             const rolesSnapshot = await getDocs(q);
 
-            const batch = writeBatch(db);
+            const batch = writeBatch(this.db);
             rolesSnapshot.docs.forEach((doc) => {
                 batch.update(doc.ref, {
                     default_members: arrayRemove(memberId)
@@ -153,7 +155,7 @@ class ServingService extends BaseService {
             const endD = parseLocalDate(endDate);
             endD.setHours(23, 59, 59, 999);
 
-            const colRef = collection(db, "teams", teamId, "serving_schedules");
+            const colRef = collection(this.db, "teams", teamId, "serving_schedules");
 
             // Fetch both Timestamp and String for transition period
             const [tsSnapshot, strSnapshot] = await Promise.all([
@@ -183,7 +185,7 @@ class ServingService extends BaseService {
     async getPreviousSchedules(teamId: string, beforeDate: Date, limitCount: number = 5): Promise<ServingSchedule[]> {
         try {
             const beforeDateStr = timestampToDateString(Timestamp.fromDate(beforeDate));
-            const colRef = collection(db, "teams", teamId, "serving_schedules");
+            const colRef = collection(this.db, "teams", teamId, "serving_schedules");
 
             const [tsSnapshot, strSnapshot] = await Promise.all([
                 getDocs(query(
@@ -221,7 +223,7 @@ class ServingService extends BaseService {
     async getRecentSchedules(teamId: string, limitCount: number = 5): Promise<ServingSchedule[]> {
         try {
             const q = query(
-                collection(db, "teams", teamId, "serving_schedules"),
+                collection(this.db, "teams", teamId, "serving_schedules"),
                 orderBy("date", "desc"),
                 limit(limitCount)
             );
@@ -236,7 +238,7 @@ class ServingService extends BaseService {
     async getRecentSchedulesByTag(teamId: string, tag: string, limitCount: number = 10): Promise<ServingSchedule[]> {
         try {
             const q = query(
-                collection(db, "teams", teamId, "serving_schedules"),
+                collection(this.db, "teams", teamId, "serving_schedules"),
                 where("service_tags", "array-contains", tag),
                 orderBy("date", "desc"),
                 limit(limitCount)
@@ -256,7 +258,7 @@ class ServingService extends BaseService {
             const nextD = new Date(startD);
             nextD.setDate(startD.getDate() + 1);
 
-            const colRef = collection(db, "teams", teamId, "serving_schedules");
+            const colRef = collection(this.db, "teams", teamId, "serving_schedules");
 
             const [tsSnapshot, strSnapshot] = await Promise.all([
                 getDocs(query(
@@ -283,7 +285,7 @@ class ServingService extends BaseService {
 
     async getScheduleById(teamId: string, scheduleId: string): Promise<ServingSchedule | null> {
         try {
-            const docRef = doc(db, "teams", teamId, "serving_schedules", scheduleId);
+            const docRef = doc(this.db, "teams", teamId, "serving_schedules", scheduleId);
             const docSnap = await getDoc(docRef);
 
             if (!docSnap.exists()) return null;
@@ -295,7 +297,7 @@ class ServingService extends BaseService {
     }
 
     async createSchedule(teamId: string, schedule: Omit<ServingSchedule, "id">): Promise<ServingSchedule> {
-        const ref = doc(collection(db, "teams", teamId, "serving_schedules"));
+        const ref = doc(collection(this.db, "teams", teamId, "serving_schedules"));
 
         const normalizedDate = typeof schedule.date === 'string' ? parseLocalDate(schedule.date) : schedule.date.toDate();
         normalizedDate.setHours(12, 0, 0, 0); // Normalize to local noon
@@ -321,7 +323,7 @@ class ServingService extends BaseService {
     }
 
     async updateSchedule(teamId: string, schedule: ServingSchedule): Promise<void> {
-        const docRef = doc(db, "teams", teamId, "serving_schedules", schedule.id);
+        const docRef = doc(this.db, "teams", teamId, "serving_schedules", schedule.id);
         const oldDoc = await getDoc(docRef);
         const oldData = oldDoc.data() as ServingSchedule | undefined;
 
@@ -355,7 +357,7 @@ class ServingService extends BaseService {
     async deleteSchedule(teamId: string, scheduleId: string): Promise<void> {
         await LinkingService.cleanupReferencesForServingDeletion(teamId, scheduleId);
 
-        const docRef = doc(db, "teams", teamId, "serving_schedules", scheduleId);
+        const docRef = doc(this.db, "teams", teamId, "serving_schedules", scheduleId);
         const docSnapshot = await getDoc(docRef);
         const data = docSnapshot.data() as ServingSchedule | undefined;
 
@@ -372,7 +374,7 @@ class ServingService extends BaseService {
 
     async getTemplates(teamId: string): Promise<any[]> {
         try {
-            const snapshot = await getDocs(collection(db, "teams", teamId, "serving_templates"));
+            const snapshot = await getDocs(collection(this.db, "teams", teamId, "serving_templates"));
             return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (e) {
             console.error(e);
@@ -381,17 +383,17 @@ class ServingService extends BaseService {
     }
 
     async createTemplate(teamId: string, template: any): Promise<void> {
-        const ref = doc(collection(db, "teams", teamId, "serving_templates"));
+        const ref = doc(collection(this.db, "teams", teamId, "serving_templates"));
         await setDoc(ref, { ...template, id: ref.id });
     }
 
     async updateTemplate(teamId: string, templateId: string, template: any): Promise<void> {
-        const ref = doc(db, "teams", teamId, "serving_templates", templateId);
+        const ref = doc(this.db, "teams", teamId, "serving_templates", templateId);
         await updateDoc(ref, template);
     }
 
     async deleteTemplate(teamId: string, templateId: string): Promise<void> {
-        const ref = doc(db, "teams", teamId, "serving_templates", templateId);
+        const ref = doc(this.db, "teams", teamId, "serving_templates", templateId);
         await deleteDoc(ref);
     }
 
@@ -423,7 +425,7 @@ class ServingService extends BaseService {
 
     async findRoleByName(teamId: string, name: string): Promise<ServingRole | null> {
         const q = query(
-            collection(db, "teams", teamId, "serving_roles"),
+            collection(this.db, "teams", teamId, "serving_roles"),
             where("name", "==", name),
             limit(1)
         );
@@ -436,7 +438,7 @@ class ServingService extends BaseService {
 
     async getServingConfig(teamId: string): Promise<{ customGroups: string[], customNames: string[] }> {
         try {
-            const docRef = doc(db, "teams", teamId, "serving_config", "general");
+            const docRef = doc(this.db, "teams", teamId, "serving_config", "general");
             const docSnap = await getDoc(docRef);
             if (!docSnap.exists()) return { customGroups: [], customNames: [] };
             const data = docSnap.data();
@@ -451,12 +453,12 @@ class ServingService extends BaseService {
     }
 
     async addCustomGroup(teamId: string, groupName: string): Promise<void> {
-        const ref = doc(db, "teams", teamId, "serving_config", "general");
+        const ref = doc(this.db, "teams", teamId, "serving_config", "general");
         await setDoc(ref, { custom_groups: arrayUnion(groupName) }, { merge: true });
     }
 
     async addCustomMemberName(teamId: string, name: string): Promise<void> {
-        const ref = doc(db, "teams", teamId, "serving_config", "general");
+        const ref = doc(this.db, "teams", teamId, "serving_config", "general");
         await setDoc(ref, { custom_names: arrayUnion(name) }, { merge: true });
     }
 
@@ -464,7 +466,7 @@ class ServingService extends BaseService {
 
     async getTagStats(teamId: string): Promise<Record<string, { count: number, weekdays: Record<string, number>, last_used_at: any }>> {
         try {
-            const docRef = doc(db, "teams", teamId, "config", "tag_stats");
+            const docRef = doc(this.db, "teams", teamId, "config", "tag_stats");
             const docSnap = await getDoc(docRef);
 
             if (!docSnap.exists()) return {};
@@ -477,7 +479,7 @@ class ServingService extends BaseService {
 
     async updateTagStats(teamId: string, tagIds: string[], dateString: string, mode: "add" | "remove"): Promise<void> {
         try {
-            const statsRef = doc(db, "teams", teamId, "config", "tag_stats");
+            const statsRef = doc(this.db, "teams", teamId, "config", "tag_stats");
             // Parse date string (YYYY-MM-DD) as local date to avoid UTC shifts
             const [y, m, d] = dateString.split('-').map(Number);
             const date = new Date(y, m - 1, d);
