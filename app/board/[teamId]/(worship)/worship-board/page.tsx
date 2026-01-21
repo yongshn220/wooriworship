@@ -138,13 +138,24 @@ export default function PlanPage({ params }: any) {
     if (!teamId || isLoadingPast || !hasMorePast) return;
     setIsLoadingPast(true);
     try {
-      let firstDate = new Date(); // Default to today if list is empty
+      // Ensure we find the true oldest date even if list order is messy
+      let firstDate = new Date();
       if (worships.length > 0) {
-        const first = worships[0];
+        // Find min date
+        const sorted = [...worships].sort((a, b) => {
+          const tA = a.worship_date instanceof Timestamp ? a.worship_date.toMillis() : new Date(a.worship_date as any).getTime();
+          const tB = b.worship_date instanceof Timestamp ? b.worship_date.toMillis() : new Date(b.worship_date as any).getTime();
+          return tA - tB;
+        });
+        const first = sorted[0];
         firstDate = first.worship_date instanceof Timestamp ? first.worship_date.toDate() : new Date(first.worship_date as any);
+      } else {
+        // If empty, use start of today strict
+        firstDate = new Date();
+        firstDate.setHours(0, 0, 0, 0);
       }
 
-      const LIMIT = 5;
+      const LIMIT = 10; // Increase limit for better UX
 
       // Fetch previous schedules
       const pastData = await WorshipService.getPreviousWorships(teamId, firstDate, LIMIT);
@@ -152,13 +163,20 @@ export default function PlanPage({ params }: any) {
       if (pastData.length < LIMIT) setHasMorePast(false);
 
       if (pastData.length > 0) {
-        // pastData is sorted ASC by service
-        // Filter out any duplicates
-        const newItems = pastData.filter(p => !worships.some(existing => existing.id === p.id));
+        // Merge with existing
+        setWorships(prev => {
+          const combined = [...pastData, ...prev];
+          const uniqueMap = new Map();
+          combined.forEach(w => w.id && uniqueMap.set(w.id, w));
+          const uniqueList = Array.from(uniqueMap.values()) as Worship[];
 
-        if (newItems.length > 0) {
-          setWorships(prev => [...newItems, ...prev]);
-        }
+          // Re-sort
+          return uniqueList.sort((a, b) => {
+            const tA = a.worship_date instanceof Timestamp ? a.worship_date.toMillis() : new Date(a.worship_date as any).getTime();
+            const tB = b.worship_date instanceof Timestamp ? b.worship_date.toMillis() : new Date(b.worship_date as any).getTime();
+            return tA - tB;
+          });
+        });
       }
     } catch (e) {
       console.error(e);
@@ -166,6 +184,17 @@ export default function PlanPage({ params }: any) {
       setIsLoadingPast(false);
     }
   };
+
+  // Auto-fetch past history when navigating near the start
+  useEffect(() => {
+    if (!selectedWorshipId || worships.length === 0 || !hasMorePast || isLoadingPast) return;
+    const index = worships.findIndex(w => w.id === selectedWorshipId);
+
+    // If selected item is within the first 3 items, load more history
+    if (index !== -1 && index < 3) {
+      handleLoadPast();
+    }
+  }, [selectedWorshipId, worships, hasMorePast, isLoadingPast]);
 
   // Re-select if deleted
   useEffect(() => {

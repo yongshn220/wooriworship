@@ -1,24 +1,18 @@
-import { db } from "@/firebase";
-import { collection, getDocs, doc, writeBatch, Timestamp, runTransaction, DocumentData, query, limit } from "firebase/firestore";
+import { db as defaultDb } from "@/firebase";
+import { Firestore, collection, getDocs, doc, writeBatch, Timestamp, runTransaction, DocumentData, query, limit } from "firebase/firestore";
 import { parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";
 
-class MigrationService {
+export class MigrationService {
     private static instance: MigrationService;
-    // ... (skip unchanged parts) ...
+    private db: Firestore;
 
-    // =========================================================================================
-    // Phase 3: Cleanup (Destructive)
-    // =========================================================================================
+    constructor(db?: Firestore) {
+        this.db = db || defaultDb;
+    }
 
-    // ... (existing methods)
-
-    // Helper method (private) removed from here? No, it's just brace issue.
-
-    private constructor() { }
-
-    public static getInstance(): MigrationService {
+    public static getInstance(db?: Firestore): MigrationService {
         if (!MigrationService.instance) {
-            MigrationService.instance = new MigrationService();
+            MigrationService.instance = new MigrationService(db);
         }
         return MigrationService.instance;
     }
@@ -73,12 +67,12 @@ class MigrationService {
     // =========================================================================================
 
     private async normalizeTimestamps() {
-        const teamsSnapshot = await getDocs(collection(db, "teams"));
+        const teamsSnapshot = await getDocs(collection(this.db, "teams"));
 
         // 1. Normalize ServingSchedule.date
         for (const teamDoc of teamsSnapshot.docs) {
-            const schedulesSnapshot = await getDocs(collection(db, "teams", teamDoc.id, "serving_schedules"));
-            const batch = writeBatch(db);
+            const schedulesSnapshot = await getDocs(collection(this.db, "teams", teamDoc.id, "serving_schedules"));
+            const batch = writeBatch(this.db);
             let operationCount = 0;
 
             for (const docSnapshot of schedulesSnapshot.docs) {
@@ -111,8 +105,8 @@ class MigrationService {
         }
 
         // 2. Normalize Worship.worship_date (Root Collection)
-        const worshipsSnapshot = await getDocs(collection(db, "worships"));
-        const wBatch = writeBatch(db);
+        const worshipsSnapshot = await getDocs(collection(this.db, "worships"));
+        const wBatch = writeBatch(this.db);
         let wCount = 0;
 
         for (const docSnapshot of worshipsSnapshot.docs) {
@@ -146,7 +140,7 @@ class MigrationService {
     }
 
     private async indexServingParticipants() {
-        const teamsSnapshot = await getDocs(collection(db, "teams"));
+        const teamsSnapshot = await getDocs(collection(this.db, "teams"));
 
         for (const teamDoc of teamsSnapshot.docs) {
             const schedulesSnapshot = await getDocs(collection(db, "teams", teamDoc.id, "serving_schedules"));
@@ -190,17 +184,17 @@ class MigrationService {
     // =========================================================================================
 
     private async migrateTeamsAndMembers() {
-        const teamsSnapshot = await getDocs(collection(db, "teams"));
+        const teamsSnapshot = await getDocs(collection(this.db, "teams"));
 
         for (const teamDoc of teamsSnapshot.docs) {
             const teamData = teamDoc.data();
             const userIds = teamData.users || []; // Legacy array
 
-            const batch = writeBatch(db);
+            const batch = writeBatch(this.db);
             let opCount = 0;
 
             for (const uid of userIds) {
-                const memberRef = doc(db, "teams", teamDoc.id, "members", uid);
+                const memberRef = doc(this.db, "teams", teamDoc.id, "members", uid);
                 // Check if role is admin
                 const isAdmin = (teamData.admins || []).includes(uid);
 
@@ -218,26 +212,26 @@ class MigrationService {
 
     private async migrateSubCollections() {
         // 1. Migrate root Worships -> teams/{teamId}/worships
-        const worshipsSnapshot = await getDocs(collection(db, "worships"));
-        const wBatch = writeBatch(db);
+        const worshipsSnapshot = await getDocs(collection(this.db, "worships"));
+        const wBatch = writeBatch(this.db);
         let wCount = 0;
 
         for (const wDoc of worshipsSnapshot.docs) {
             const data = wDoc.data();
             if (!data.team_id) continue;
 
-            const newRef = doc(db, "teams", data.team_id, "worships", wDoc.id);
+            const newRef = doc(this.db, "teams", data.team_id, "worships", wDoc.id);
             wBatch.set(newRef, data);
             wCount++;
         }
         if (wCount > 0) await wBatch.commit();
 
         // 2. Migrate root Songs -> teams/{teamId}/songs
-        const songsSnapshot = await getDocs(collection(db, "songs"));
+        const songsSnapshot = await getDocs(collection(this.db, "songs"));
 
         // Critical Optimization: Pre-fetch and group sub-items
-        const sheetsSnap = await getDocs(collection(db, "music_sheets"));
-        const commentsSnap = await getDocs(collection(db, "song_comments"));
+        const sheetsSnap = await getDocs(collection(this.db, "music_sheets"));
+        const commentsSnap = await getDocs(collection(this.db, "song_comments"));
 
         const sheetsBySong: Record<string, DocumentData[]> = {};
         sheetsSnap.docs.forEach(doc => {
@@ -261,17 +255,17 @@ class MigrationService {
             const data = sDoc.data();
             if (!data.team_id) continue;
 
-            await runTransaction(db, async (txn) => {
-                const newSongRef = doc(db, "teams", data.team_id, "songs", sDoc.id);
+            await runTransaction(this.db, async (txn) => {
+                const newSongRef = doc(this.db, "teams", data.team_id, "songs", sDoc.id);
                 txn.set(newSongRef, data);
             });
 
             // Migrate Sheets using Map
             const relatedSheets = sheetsBySong[sDoc.id] || [];
             if (relatedSheets.length > 0) {
-                const sheetBatch = writeBatch(db);
+                const sheetBatch = writeBatch(this.db);
                 relatedSheets.forEach(sheet => {
-                    const newSheetRef = doc(db, "teams", data.team_id, "songs", sDoc.id, "sheets", sheet.id);
+                    const newSheetRef = doc(this.db, "teams", data.team_id, "songs", sDoc.id, "sheets", sheet.id);
                     // Remove id from data payload if it exists to avoid duplication
                     const { id, ...sheetData } = sheet;
                     sheetBatch.set(newSheetRef, sheetData);
@@ -282,9 +276,9 @@ class MigrationService {
             // Migrate Comments using Map
             const relatedComments = commentsBySong[sDoc.id] || [];
             if (relatedComments.length > 0) {
-                const commentBatch = writeBatch(db);
+                const commentBatch = writeBatch(this.db);
                 relatedComments.forEach(comment => {
-                    const newCommentRef = doc(db, "teams", data.team_id, "songs", sDoc.id, "comments", comment.id);
+                    const newCommentRef = doc(this.db, "teams", data.team_id, "songs", sDoc.id, "comments", comment.id);
                     const { id, ...commentData } = comment;
                     commentBatch.set(newCommentRef, commentData);
                 });
@@ -293,13 +287,13 @@ class MigrationService {
         }
 
         // 3. Migrate Notices
-        const noticesSnapshot = await getDocs(collection(db, "notices"));
-        const nBatch = writeBatch(db);
+        const noticesSnapshot = await getDocs(collection(this.db, "notices"));
+        const nBatch = writeBatch(this.db);
         let nCount = 0;
         for (const nDoc of noticesSnapshot.docs) {
             const data = nDoc.data();
             if (!data.team_id) continue;
-            const newRef = doc(db, "teams", data.team_id, "notices", nDoc.id);
+            const newRef = doc(this.db, "teams", data.team_id, "notices", nDoc.id);
             nBatch.set(newRef, data);
             nCount++;
         }
@@ -307,8 +301,8 @@ class MigrationService {
     }
 
     private async migrateTags() {
-        const tagsSnapshot = await getDocs(collection(db, "tags"));
-        const batch = writeBatch(db);
+        const tagsSnapshot = await getDocs(collection(this.db, "tags"));
+        const batch = writeBatch(this.db);
         let count = 0;
 
         for (const tagDoc of tagsSnapshot.docs) {
@@ -320,7 +314,7 @@ class MigrationService {
                 const tagName = rest.join("-스플릿-"); // In case tag name has split char
 
                 if (teamId && tagName) {
-                    const newRef = doc(db, "teams", teamId, "song_tags", tagName);
+                    const newRef = doc(this.db, "teams", teamId, "song_tags", tagName);
                     batch.set(newRef, {
                         name: tagName,
                         original_id: legacyId // Keep trace
@@ -362,13 +356,13 @@ class MigrationService {
     }
 
     private async deleteCollectionInBatches(collectionName: string, onProgress: (log: string) => void) {
-        const colRef = collection(db, collectionName);
+        const colRef = collection(this.db, collectionName);
 
         while (true) {
             const snapshot = await getDocs(query(colRef, limit(400)));
             if (snapshot.empty) break;
 
-            const batch = writeBatch(db);
+            const batch = writeBatch(this.db);
             snapshot.docs.forEach(doc => batch.delete(doc.ref));
             await batch.commit();
 

@@ -1,5 +1,6 @@
-import { db } from "@/firebase";
+import { db as defaultDb } from "@/firebase";
 import {
+  Firestore,
   collection,
   doc,
   getDoc,
@@ -17,15 +18,17 @@ import {
 
 export default class BaseService {
   collectionName: string;
+  db: Firestore;
 
-  constructor(collectionName: string) {
+  constructor(collectionName: string, db?: Firestore) {
     this.collectionName = collectionName;
+    this.db = db || defaultDb;
   }
 
   async getDocIds(filters: Array<any>) {
     try {
       const result: Array<string> = [];
-      let q: any = collection(db, this.collectionName);
+      let q: any = collection(this.db, this.collectionName);
 
       if (filters) {
         const constraints = filters.map(f => where(f.a, f.b, f.c));
@@ -47,7 +50,7 @@ export default class BaseService {
 
   async getById(id: any) {
     try {
-      const docRef = doc(db, this.collectionName, id);
+      const docRef = doc(this.db, this.collectionName, id);
       const res = await getDoc(docRef);
       if (res.exists()) {
         return { id: id, ...res.data() };
@@ -75,7 +78,7 @@ export default class BaseService {
   async getByFilters(filters: Array<any>) {
     try {
       const result: Array<any> = [];
-      let q: any = collection(db, this.collectionName);
+      let q: any = collection(this.db, this.collectionName);
 
       if (filters) {
         const constraints = filters.map(f => where(f.a, f.b, f.c));
@@ -100,7 +103,7 @@ export default class BaseService {
     // or just return full objects as typical in Client SDK usage.
     try {
       const result: Array<any> = [];
-      let q: any = collection(db, this.collectionName);
+      let q: any = collection(this.db, this.collectionName);
 
       if (filters) {
         const constraints = filters.map(f => where(f.a, f.b, f.c));
@@ -146,7 +149,7 @@ export default class BaseService {
 
       constraints.push(limit(pageSize));
 
-      const q = query(collection(db, this.collectionName), ...constraints);
+      const q = query(collection(this.db, this.collectionName), ...constraints);
       const snapshot = await getDocs(q);
 
       snapshot.forEach((doc: any) => {
@@ -192,7 +195,7 @@ export default class BaseService {
           const subFilters = itemsToQuery.splice(0, 10);
 
           const q = query(
-            collection(db, this.collectionName),
+            collection(this.db, this.collectionName),
             where(filter.a, filter.b, subFilters)
           );
 
@@ -216,7 +219,7 @@ export default class BaseService {
 
   async create(data: any) {
     try {
-      const docRef = await addDoc(collection(db, this.collectionName), data);
+      const docRef = await addDoc(collection(this.db, this.collectionName), data);
       return docRef.id;
     } catch (e) {
       console.error(e)
@@ -226,7 +229,7 @@ export default class BaseService {
 
   async createWithId(id: string, data: any) {
     try {
-      const docRef = doc(db, this.collectionName, id);
+      const docRef = doc(this.db, this.collectionName, id);
       await setDoc(docRef, data);
       return id;
     }
@@ -239,7 +242,7 @@ export default class BaseService {
 
   async update(id: string, data: any) {
     try {
-      const docRef = doc(db, this.collectionName, id);
+      const docRef = doc(this.db, this.collectionName, id);
       await setDoc(docRef, data, { merge: true });
       return true
     }
@@ -251,7 +254,7 @@ export default class BaseService {
 
   async delete(id: string) {
     try {
-      const docRef = doc(db, this.collectionName, id);
+      const docRef = doc(this.db, this.collectionName, id);
       await deleteDoc(docRef);
       return true
     } catch (e) {

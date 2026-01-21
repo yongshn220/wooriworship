@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { format, differenceInCalendarDays } from "date-fns";
 import { Calendar, Loader2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CalendarItem } from "./types";
 import { GenericCalendarDrawer } from "./generic-calendar-drawer";
 
@@ -29,27 +29,86 @@ export function CalendarStrip({
     const itemRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-    // Effect to scroll selected item to start
-    useEffect(() => {
-        if (selectedId && itemRefs.current.has(selectedId)) {
-            const el = itemRefs.current.get(selectedId);
-            if (el) {
-                // Determine if we need to scroll? 
-                // Don't auto-scroll if user is interacting? 
-                // For now keep existing behavior but maybe 'center' or 'nearest' instead of 'start' to avoid jumpiness?
-                el.scrollIntoView({ inline: "start", behavior: "smooth", block: "nearest" });
-            }
+    // --- 1. Scroll Anchoring Logic (Standard LTR Prepend) ---
+    const prevScrollWidth = useRef(0);
+    const prevItemsLength = useRef(items.length);
+    const isPrepend = useRef(false);
+
+    // Capture state BEFORE render
+    useLayoutEffect(() => {
+        // If items length increased, we suspect prepend
+        if (items.length > prevItemsLength.current) {
+            isPrepend.current = true;
         }
-    }, [selectedId]);
+        prevItemsLength.current = items.length;
+    }, [items]);
 
-    // Threshold for triggering lazy load (pixels from left)
-    const LAZY_LOAD_SCROLL_THRESHOLD = 50;
+    // Adjust Scroll AFTER render
+    useLayoutEffect(() => {
+        if (isPrepend.current && scrollContainerRef.current) {
+            const container = scrollContainerRef.current;
+            const newScrollWidth = container.scrollWidth;
+            const diff = newScrollWidth - prevScrollWidth.current;
 
-    const handleScroll = () => {
-        if (!scrollContainerRef.current || !onLoadPrev || isLoadingPrev || !hasMorePast) return;
-        const { scrollLeft } = scrollContainerRef.current;
-        if (scrollLeft < LAZY_LOAD_SCROLL_THRESHOLD) {
-            onLoadPrev();
+            // If width grew, anchor the scroll position
+            if (diff > 0) {
+                // 1. Temporarily disable snapping to prevent "fighting"
+                container.style.scrollSnapType = "none";
+
+                // 2. Adjust position instantly
+                const newLeft = container.scrollLeft + diff;
+                container.scrollTo({ left: newLeft, behavior: "instant" });
+
+                // 3. Restore snapping after a short delay (longer than a frame)
+                // This ensures the browser accepts the new position as the "resting point"
+                const timer = setTimeout(() => {
+                    container.style.scrollSnapType = "x mandatory";
+                }, 50);
+
+                isPrepend.current = false;
+                return () => clearTimeout(timer);
+            }
+            isPrepend.current = false;
+        }
+        // Always update width for next turn
+        if (scrollContainerRef.current) {
+            prevScrollWidth.current = scrollContainerRef.current.scrollWidth;
+        }
+    }, [items]); // Run exactly when DOM updates
+
+    // --- 2. Sentinel Observation (Trigger Load) ---
+
+    // Anti-bounce / Cooldown logic
+    const isCoolingDown = useRef(false);
+
+    // When loading finishes, enforce a small "settle" period before allowing next load
+    useEffect(() => {
+        if (!isLoadingPrev) {
+            isCoolingDown.current = true;
+            const timer = setTimeout(() => {
+                isCoolingDown.current = false;
+            }, 1000); // 1s buffer to ensure user has stopped scrolling or processed new items
+            return () => clearTimeout(timer);
+        }
+    }, [isLoadingPrev]);
+
+    const observerRef = useRef<IntersectionObserver | null>(null);
+    const sentinelRef = (node: HTMLDivElement | null) => {
+        if (isLoadingPrev || !hasMorePast) return;
+        if (observerRef.current) observerRef.current.disconnect();
+
+        if (node) {
+            observerRef.current = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && onLoadPrev && !isLoadingPrev && !isCoolingDown.current) {
+                    isCoolingDown.current = true; // Lock immediately
+                    onLoadPrev();
+                }
+            }, {
+                root: scrollContainerRef.current,
+                threshold: 0.1,
+                rootMargin: "0px 0px 0px 500px" // Trigger loading when sentinel is within 500px of visible area
+            });
+            observerRef.current.observe(node);
         }
     };
 
@@ -64,7 +123,6 @@ export function CalendarStrip({
     };
 
     const CARD_SIZE_CLASSES = "snap-start scroll-mx-4 shrink-0 w-[4.5rem] h-[5.5rem] rounded-xl flex flex-col items-center justify-center transition-colors relative";
-
     return (
         <div className="relative">
             {/* Header */}
@@ -81,20 +139,28 @@ export function CalendarStrip({
                 </button>
             </div>
 
-            {/* Horizontal Scroll Container */}
+            {/* Horizontal Scroll Container (Standard LTR) */}
             <div
                 ref={scrollContainerRef}
-                onScroll={handleScroll}
-                className="flex overflow-x-auto gap-3 pb-2 -mx-4 px-4 pt-4 snap-x snap-mandatory items-center scroll-smooth no-scrollbar"
+                style={{ overflowAnchor: "none" }} // Prevent browser's native scroll anchoring from interfering
+                className="flex overflow-x-auto gap-3 pb-2 -mx-4 px-4 pt-4 snap-x snap-mandatory items-center no-scrollbar"
             >
-                {/* Loader when fetching history */}
-                {isLoadingPrev && (
-                    <div className={cn(CARD_SIZE_CLASSES, "bg-transparent border-transparent cursor-default")}>
-                        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                {/* 1. Sentinel / Loader (At Start) */}
+                {hasMorePast && (
+                    <div
+                        ref={sentinelRef}
+                        className={cn(CARD_SIZE_CLASSES, "bg-transparent border-transparent")}
+                    >
+                        {isLoadingPrev ? (
+                            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                        ) : (
+                            // Invisible trigger zone, or minimal icon
+                            <div className="w-full h-full" />
+                        )}
                     </div>
                 )}
 
-                {/* Date Cards */}
+                {/* 2. Items (Past -> Future) */}
                 {items.map((item) => (
                     <DateCard
                         key={item.id}
@@ -120,7 +186,7 @@ export function CalendarStrip({
                 selectedId={selectedId}
                 onSelect={onSelect}
             />
-        </div>
+        </div >
     );
 }
 
@@ -157,6 +223,7 @@ function DateCard({ item, isSelected, onSelect, baseClasses, setRef }: DateCardP
     return (
         <button
             ref={setRef}
+            dir="ltr"
             onClick={() => onSelect(item.id)}
             className={cn(
                 baseClasses,
