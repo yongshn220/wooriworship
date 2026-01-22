@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState, RefObject } from "react";
+import { useLayoutEffect, useState, useRef, RefObject } from "react";
 
 interface UseAnchorScrollProps {
     scrollContainerRef: RefObject<HTMLDivElement>;
@@ -14,9 +14,13 @@ export function useAnchorScroll({
     itemRefs,
     isLoading
 }: UseAnchorScrollProps) {
-    const [anchorId, setAnchorId] = useState<string | null>(null);
-    const [anchorOffset, setAnchorOffset] = useState(0);
-    const prevItemsLength = useState({ current: itemsLength })[0];
+    const anchorIdRef = useRef<string | null>(null);
+    const anchorOffsetRef = useRef(0);
+    const prevItemsLength = useRef(itemsLength);
+
+    // New: Flag to signal that we are currently restoring position
+    // and the observer should be blocked
+    const [isRestoring, setIsRestoring] = useState(false);
 
     // Capture the first visible item as the anchor
     const captureAnchor = () => {
@@ -25,24 +29,18 @@ export function useAnchorScroll({
 
         const containerLeft = container.scrollLeft;
 
-        // Iterate through item refs to find the first one that is visible
-        // We can access the map directly
         const refs = itemRefs.current;
         if (!refs) return;
 
         for (const [id, element] of Array.from(refs.entries())) {
             // Check if element is largely within view or at least the first one
-            // Simple logic: element's right edge is to the right of the container's left edge
-            // And element's left edge is not too far right (implied by iteration order usually, but Map iteration order is insertion order)
-
             // Allow a small tolerance (e.g. 5px)
             if (element.offsetLeft + element.clientWidth > containerLeft + 5) {
-                setAnchorId(id);
-                // Calculate how far into the element we are scrolled (or how far the element is from left)
-                // We want to preserve: element.offsetLeft - container.scrollLeft
+                anchorIdRef.current = id;
+                // Calculate visual offset
                 const offset = element.offsetLeft - containerLeft;
-                setAnchorOffset(offset);
-                console.log(`[Anchor] Captured ${id} at offset ${offset}`);
+                anchorOffsetRef.current = offset;
+                // console.log(`[Anchor] Captured ${id} at offset ${offset}`);
                 break;
             }
         }
@@ -52,12 +50,16 @@ export function useAnchorScroll({
     useLayoutEffect(() => {
         const container = scrollContainerRef.current;
         const hasNewItems = itemsLength > prevItemsLength.current;
+        const anchorId = anchorIdRef.current;
 
         if (container && anchorId && hasNewItems) {
             const element = itemRefs.current?.get(anchorId);
             if (element) {
-                // Calculate new scroll position to keep the element at the same visual offset
-                const newScrollLeft = element.offsetLeft - anchorOffset;
+                // Signal interruption immediately
+                setIsRestoring(true);
+
+                // Calculate new scroll position
+                const newScrollLeft = element.offsetLeft - anchorOffsetRef.current;
 
                 // Disable smooth scrolling mechanisms for this frame
                 container.style.scrollSnapType = "none";
@@ -65,24 +67,36 @@ export function useAnchorScroll({
 
                 container.scrollLeft = newScrollLeft;
 
-                console.log(`[Anchor] Restored to ${anchorId}, newScroll: ${newScrollLeft}`);
+                // console.log(`[Anchor] Restored to ${anchorId}, newScroll: ${newScrollLeft}`);
 
                 // Restore snapping after paint
                 requestAnimationFrame(() => {
                     container.style.scrollSnapType = "x mandatory";
                     container.style.scrollBehavior = "";
-                    setAnchorId(null); // Reset anchor
+                    anchorIdRef.current = null; // Reset anchor
+
+                    // Unblock observer after a safe delay
+                    // This prevents the observer from seeing the sentinel at the old position
+                    setTimeout(() => {
+                        setIsRestoring(false);
+                    }, 100);
                 });
             } else {
-                // Anchor was lost (shouldn't happen if ID persists), reset
-                setAnchorId(null);
+                anchorIdRef.current = null;
+                setIsRestoring(false);
+            }
+        } else {
+            // If no anchor or no new items, ensure we are not blocking
+            if (!hasNewItems) {
+                setIsRestoring(false);
             }
         }
 
         prevItemsLength.current = itemsLength;
-    }, [itemsLength, anchorId, anchorOffset, scrollContainerRef, itemRefs]);
+    }, [itemsLength, scrollContainerRef, itemRefs]);
 
     return {
-        captureAnchor
+        captureAnchor,
+        isRestoring
     };
 }

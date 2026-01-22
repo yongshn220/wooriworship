@@ -31,7 +31,7 @@ export function CalendarStrip({
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     // --- Anchor Scroll Logic ---
-    const { captureAnchor } = useAnchorScroll({
+    const { captureAnchor, isRestoring } = useAnchorScroll({
         scrollContainerRef,
         itemsLength: items.length,
         itemRefs,
@@ -44,9 +44,10 @@ export function CalendarStrip({
         if (observerRef.current) observerRef.current.disconnect();
 
         // Only observe if we can load more
+        // Critical: Block observation while we are restoring scroll position!
         if (node && onLoadPrev && hasMorePast) {
             observerRef.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting && !isLoadingPrev) {
+                if (entries[0].isIntersecting && !isLoadingPrev && !isRestoring) {
                     // 1. Capture the current visual anchor before loading starts
                     captureAnchor();
                     // 2. Trigger Load
