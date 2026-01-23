@@ -1,19 +1,14 @@
 "use client"
 
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import * as React from "react";
 import { Invitation } from "@/models/invitation";
-import { teamAtom, teamUpdaterAtom } from "@/global-states/teamState";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { teamAtom } from "@/global-states/teamState";
+import { useRecoilValue } from "recoil";
 import { timestampToDateStringFormatted } from "@/components/util/helper/helper-functions";
-import { toast } from "@/components/ui/use-toast";
-import { InvitationService, TeamService, UserService } from "@/apis";
-import { InvitationStatus } from "@/components/constants/enums";
-import { auth } from "@/firebase";
-import { userAtom, userUpdaterAtom } from "@/global-states/userState";
-import { pendingReceivedInvitationsUpdaterAtom } from "@/global-states/invitation-state";
-
+import { userAtom } from "@/global-states/userState";
+import { cn } from "@/lib/utils";
+import { useInvitationActions } from "./use-invitation-actions";
 
 interface Props {
   invitation: Invitation
@@ -21,82 +16,71 @@ interface Props {
 }
 
 export function InvitationCard({ invitation, onResolve }: Props) {
-  const user = auth.currentUser
   const sender = useRecoilValue(userAtom(invitation?.sender_id))
   const team = useRecoilValue(teamAtom(invitation?.team_id))
-  const setUserUpdater = useSetRecoilState(userUpdaterAtom)
-  const setInvitationsUpdater = useSetRecoilState(pendingReceivedInvitationsUpdaterAtom)
-  const setTeamUpdater = useSetRecoilState(teamUpdaterAtom)
 
-  async function handleAccept() {
-    try {
-      const promises = [
-        InvitationService.updateInvitation(invitation.id, InvitationStatus.Accepted),
-        UserService.addNewTeam(user.uid, team.id),
-        TeamService.addNewMember(user.uid, team.id)
-      ];
-      const [invitationUpdateResult, addNewTeamResult, addNewMemberResult] = await Promise.all(promises);
+  const { handleAccept, handleDecline, isLoading } = useInvitationActions();
 
-      if (!addNewTeamResult || !addNewMemberResult) {
-        console.log("err: InvitationCard-handleAccept")
-        toast({ title: "Failed to accept the team. Please try later again." })
-      }
-      else {
-        toast({ title: `You have successfully joined [${team.name}]` })
-      }
-      setUserUpdater(prev => prev + 1)
-      setInvitationsUpdater(prev => prev + 1)
-      setTeamUpdater(prev => prev + 1)
-      onResolve?.(invitation.id)
-    }
-    catch (err) {
-      console.log("err: ", err);
-      toast({ title: "Oops, Something went wrong." })
-    }
-  }
+  // Helper to format date relative or short
+  const formattedDate = timestampToDateStringFormatted(invitation?.invite_date);
 
-  async function handleDecline() {
-    try {
-      const result = await InvitationService.updateInvitation(invitation.id, InvitationStatus.Rejected);
-      if (!result) {
-        toast({ title: `Fail to declined the invitation. Please try later again.` }); return;
-      }
+  const onAcceptClick = async () => {
+    const success = await handleAccept(invitation, team);
+    if (success) {
+      onResolve?.(invitation.id);
+    }
+  };
 
-      toast({ title: `You declined invitation from [${team.name}]` })
-      setInvitationsUpdater(prev => prev + 1)
-      onResolve?.(invitation.id)
+  const onDeclineClick = async () => {
+    const success = await handleDecline(invitation, team);
+    if (success) {
+      onResolve?.(invitation.id);
     }
-    catch (err) {
-      console.log("error: " + err);
-      toast({ title: "Oops, Something went wrong." })
-    }
-  }
+  };
 
   return (
-    <div className="w-full h-full flex-start">
-      <div className="w-full flex h-40 sm:h-60 gap-8 rounded-lg bg-gradient-to-r from-[#A594F9] to-[#6247AA] text-white p-4 shadow-lg shadow-[#A594F9]/80">
-        <div className="hidden sm:block aspect-square h-full bg-white/20 rounded-sm p-2">
-          <div className="relative h-full">
-            <Image
-              alt="compose music image"
-              src="/illustration/happyMusic.svg"
-              fill
-            />
-          </div>
+    <div className="w-full">
+      <div className="group relative flex w-full items-center gap-4 rounded-3xl border bg-card p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-[1px]">
+
+        {/* Left: Squircle Avatar */}
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-500 text-xl font-bold text-white shadow-inner">
+          {team?.name ? team.name[0].toUpperCase() : "?"}
         </div>
-        <div className="w-full h-full flex flex-col">
-          <div className="flex-1 flex flex-col gap-2">
-            <p className="w-full flex-start text-2xl font-semibold">{team?.name}</p>
-            <p className="w-full flex-start text-sm text-gray-200">From {sender?.email}</p>
-          </div>
-          <div className="w-full flex-end gap-2">
-            <div className="w-full flex-start">
-              <p className="text-xs text-gray-200 border p-1 rounded-sm">{timestampToDateStringFormatted(invitation?.invite_date)}</p>
-            </div>
-            <Button variant="ghost" onClick={handleDecline} className="hover:bg-white/20 hover:text-white">Decline</Button>
-            <Button onClick={handleAccept} className="bg-[#A594F9] text-white hover:bg-[#8F7EE5]">Join</Button>
-          </div>
+
+        {/* Middle: Text Info */}
+        <div className="flex flex-1 flex-col justify-center min-w-0">
+          <h3 className="truncate text-lg font-semibold tracking-tight text-foreground">
+            {team?.name || "Unknown Team"}
+          </h3>
+          <p className="truncate text-sm text-muted-foreground">
+            Invited by <span className="font-medium text-foreground/80">{sender?.name || sender?.email || "Unknown"}</span>
+            <span className="mx-1.5 opacity-50">•</span>
+            <span className="opacity-80">{formattedDate}</span>
+          </p>
         </div>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-2 pl-2">
+          <Button
+            onClick={onDeclineClick}
+            disabled={isLoading}
+            variant="ghost"
+            size="sm"
+            className="h-9 rounded-full px-3 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            Decline
+          </Button>
+
+          <Button
+            onClick={onAcceptClick}
+            disabled={isLoading}
+            size="sm"
+            className="h-9 rounded-full px-6 text-sm font-semibold shadow-sm hover:shadow-md"
+          >
+            Join
+          </Button>
+        </div>
+
       </div>
     </div>
   )

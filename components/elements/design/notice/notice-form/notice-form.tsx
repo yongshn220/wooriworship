@@ -201,7 +201,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
             >
               <div className="space-y-4 text-center">
                 <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 1</Label>
-                <h2 className="text-2xl font-bold text-gray-900">What is this notice about?</h2>
+                <h2 className="text-2xl font-bold text-foreground">What is this notice about?</h2>
               </div>
 
               <FormSectionCard className="flex flex-col gap-6">
@@ -212,7 +212,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
                     placeholder="Notice Title..."
                     value={input.title}
                     onChange={(e) => setInput(prev => ({ ...prev, title: e.target.value }))}
-                    className="text-2xl font-black bg-gray-50 border-gray-100 h-16 rounded-2xl focus-visible:ring-ring placeholder:text-gray-300"
+                    className="text-2xl font-black bg-secondary/40 border-border h-16 rounded-2xl focus-visible:ring-ring placeholder:text-muted-foreground/40"
                   />
                 </div>
               </FormSectionCard>
@@ -234,13 +234,13 @@ export function NoticeForm({ mode, noticeId }: Props) {
             >
               <div className="space-y-4 text-center">
                 <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 2</Label>
-                <h2 className="text-2xl font-bold text-gray-900">Details</h2>
+                <h2 className="text-2xl font-bold text-foreground">Details</h2>
                 {input.title && <h3 className="text-xl font-medium text-primary break-words mt-2 px-4">{input.title}</h3>}
               </div>
 
               <FormSectionCard className="flex flex-col min-h-[300px]">
                 <Textarea
-                  className="w-full text-lg resize-none border-none px-0 shadow-none focus-visible:ring-0 leading-loose text-foreground placeholder:text-gray-300 bg-transparent p-0 min-h-[250px]"
+                  className="w-full text-lg resize-none border-none px-0 shadow-none focus-visible:ring-0 leading-loose text-foreground placeholder:text-muted-foreground/40 bg-transparent p-0 min-h-[250px]"
                   placeholder="Start writing..."
                   value={input.body}
                   onChange={(e) => setInput((prev => ({ ...prev, body: e.target.value })))}
@@ -264,13 +264,13 @@ export function NoticeForm({ mode, noticeId }: Props) {
             >
               <div className="space-y-4 text-center">
                 <Label className="text-sm font-bold text-primary uppercase tracking-wider">Final Step</Label>
-                <h2 className="text-2xl font-bold text-gray-900">Attachments</h2>
+                <h2 className="text-2xl font-bold text-foreground">Attachments</h2>
               </div>
 
               <FormSectionCard className="space-y-6 flex flex-col overflow-hidden min-h-0 flex-1">
 
                 {/* Upload Buttons */}
-                <div className="flex items-center gap-4 justify-center p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                <div className="flex items-center gap-4 justify-center p-4 bg-muted/30 rounded-2xl border border-dashed border-border">
                   <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
                     <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-white hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all")}>
                       <ImageIcon className="h-5 w-5" />
@@ -278,7 +278,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
                     </div>
                   </MultipleImageUploader>
 
-                  <div className="h-8 w-px bg-gray-200"></div>
+                  <div className="h-8 w-px bg-border"></div>
 
                   <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
                     <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-white hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all")}>
@@ -290,7 +290,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
 
                 <div className="flex-1 overflow-y-auto min-h-[100px]">
                   {imageFileContainers.length === 0 ? (
-                    <div className="h-full flex flex-col items-center justify-center text-gray-300 space-y-2 py-8">
+                    <div className="h-full flex flex-col items-center justify-center text-muted-foreground/30 space-y-2 py-8">
                       <UploadCloud className="w-12 h-12 opacity-20" />
                       <p className="text-sm font-medium">No files attached</p>
                     </div>

@@ -20,7 +20,7 @@ export function NoticeHeaderMinimal({ teamId, noticeId }: Props) {
     <div className="bg-white border w-full rounded-lg p-2 cursor-pointer hover:border-primary/50 transition-colors" onClick={() => router.push(getPathNotice(teamId))}>
       <div className="flex items-center gap-2">
         <p className="text-sm pl-2">{timestampToDateStringFormatted(notice?.last_updated_time)}</p>
-        <p className="text-sm text-gray-500">{getTimePassedFromTimestampShorten(notice?.last_updated_time)}</p>
+        <p className="text-sm text-muted-foreground">{getTimePassedFromTimestampShorten(notice?.last_updated_time)}</p>
       </div>
       <Separator />
       <div className="w-full">

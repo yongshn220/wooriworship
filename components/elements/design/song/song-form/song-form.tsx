@@ -342,27 +342,27 @@ export function SongForm({ mode, teamId, songId }: Props) {
             >
               <div className="space-y-4 text-center">
                 <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 1</Label>
-                <h2 className="text-2xl font-bold text-gray-900">Project Identity</h2>
+                <h2 className="text-2xl font-bold text-foreground">Project Identity</h2>
               </div>
 
-              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 flex flex-col gap-6">
+              <div className="bg-card p-6 rounded-3xl shadow-xl border border-border flex flex-col gap-6">
                 <div className="space-y-2">
-                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Title</Label>
+                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Title</Label>
                   <Input
                     autoFocus
                     placeholder="Song Title..."
                     value={songInput.title}
                     onChange={(e) => setSongInput(prev => ({ ...prev, title: e.target.value }))}
-                    className="text-2xl font-black bg-gray-50 border-gray-100 h-16 rounded-2xl focus-visible:ring-ring"
+                    className="text-2xl font-black bg-secondary/40 border-border h-16 rounded-2xl focus-visible:ring-ring"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Subtitle</Label>
+                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Subtitle</Label>
                   <Input
                     placeholder="Subtitle (Optional)"
                     value={songInput.subtitle}
                     onChange={(e) => setSongInput(prev => ({ ...prev, subtitle: e.target.value }))}
-                    className="text-lg font-medium bg-gray-50 border-gray-100 h-14 rounded-2xl focus-visible:ring-ring"
+                    className="text-lg font-medium bg-secondary/40 border-border h-14 rounded-2xl focus-visible:ring-ring"
                   />
                 </div>
               </div>
@@ -383,52 +383,52 @@ export function SongForm({ mode, teamId, songId }: Props) {
             >
               <div className="space-y-4 text-center">
                 <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 2</Label>
-                <h2 className="text-2xl font-bold text-gray-900">Song Details</h2>
+                <h2 className="text-2xl font-bold text-foreground">Song Details</h2>
                 <h3 className="text-xl font-medium text-primary break-words">{songInput.title}</h3>
               </div>
 
-              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-4">
+              <div className="bg-card p-6 rounded-3xl shadow-xl border border-border space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Author</Label>
+                    <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Author</Label>
                     <Input
                       placeholder="Original Author"
                       value={songInput.author}
                       onChange={(e) => setSongInput(prev => ({ ...prev, author: e.target.value }))}
-                      className="bg-gray-50 border-gray-100 rounded-xl"
+                      className="bg-secondary/40 border-border rounded-xl"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Version</Label>
+                    <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Version</Label>
                     <Input
                       placeholder="v1.0"
                       value={songInput.version}
                       onChange={(e) => setSongInput(prev => ({ ...prev, version: e.target.value }))}
-                      className="bg-gray-50 border-gray-100 rounded-xl"
+                      className="bg-secondary/40 border-border rounded-xl"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">BPM</Label>
+                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">BPM</Label>
                   <Input
                     type="number"
                     placeholder="120"
                     value={songInput.bpm ?? ""}
                     onChange={(e) => setSongInput(prev => ({ ...prev, bpm: Number(e.target.value) }))}
-                    className="bg-gray-50 border-gray-100 rounded-xl"
+                    className="bg-secondary/40 border-border rounded-xl"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Reference Link</Label>
+                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Reference Link</Label>
                   <div className="relative">
-                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="https://youtube.com/..."
                       value={songInput.link}
                       onChange={(e) => setSongInput(prev => ({ ...prev, link: e.target.value }))}
-                      className="pl-9 bg-gray-50 border-gray-100 rounded-xl"
+                      className="pl-9 bg-secondary/40 border-border rounded-xl"
                     />
                   </div>
                 </div>
@@ -450,22 +450,22 @@ export function SongForm({ mode, teamId, songId }: Props) {
             >
               <div className="space-y-4 text-center">
                 <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 3</Label>
-                <h2 className="text-2xl font-bold text-gray-900">Context & Tags</h2>
+                <h2 className="text-2xl font-bold text-foreground">Context & Tags</h2>
               </div>
 
-              <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100 space-y-5">
+              <div className="bg-card p-6 rounded-3xl shadow-xl border border-border space-y-5">
                 <div className="space-y-2">
-                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Tags</Label>
+                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Tags</Label>
                   <TagMultiSelect input={songInput} setInput={setSongInput} />
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs text-gray-400 font-bold uppercase ml-1">Description</Label>
+                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Description</Label>
                   <Textarea
                     placeholder="Add any notes or description about the song..."
                     value={songInput.description}
                     onChange={(e) => setSongInput(prev => ({ ...prev, description: e.target.value }))}
-                    className="min-h-[120px] text-base bg-gray-50 border-gray-100 rounded-xl resize-none p-3 focus-visible:ring-ring"
+                    className="min-h-[120px] text-base bg-secondary/40 border-border rounded-xl resize-none p-3 focus-visible:ring-ring"
                   />
                 </div>
               </div>
@@ -487,17 +487,17 @@ export function SongForm({ mode, teamId, songId }: Props) {
               <div className="flex items-end justify-between px-2 pb-1">
                 <div>
                   <Label className="text-sm font-bold text-primary uppercase tracking-wider">Final Step</Label>
-                  <h2 className="text-2xl font-bold text-gray-900 leading-none">Music Sheets</h2>
+                  <h2 className="text-2xl font-bold text-foreground leading-none">Music Sheets</h2>
                 </div>
                 <Button size="sm" variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={handleAddNewMusicSheet}>
                   <PlusIcon className="h-4 w-4 mr-1" /> Add Sheet
                 </Button>
               </div>
 
-              <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col">
+              <div className="flex-1 bg-card rounded-3xl shadow-xl border border-border overflow-hidden flex flex-col">
                 {musicSheetContainers.length === 0 ? (
                   <div
-                    className="flex-1 flex flex-col items-center justify-center p-6 text-center text-gray-400 cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="flex-1 flex flex-col items-center justify-center p-6 text-center text-muted-foreground/50 cursor-pointer hover:bg-muted/10 transition-colors"
                     onClick={handleAddNewMusicSheet}
                   >
                     <Music className="w-12 h-12 mb-2 opacity-20" />

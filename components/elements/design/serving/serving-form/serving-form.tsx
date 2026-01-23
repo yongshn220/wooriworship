@@ -267,14 +267,14 @@ export function ServingForm(props: ServingFormProps) {
                                                         "flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-semibold transition-all active:scale-95",
                                                         selectedTemplateId === tmp.id
                                                             ? "bg-primary/5 text-primary border border-primary shadow-sm"
-                                                            : "bg-white text-gray-500 border border-gray-100 hover:border-gray-200"
+                                                            : "bg-card text-muted-foreground border border-border hover:border-foreground/20"
                                                     )}
                                                 >
                                                     {tmp.name}
                                                 </button>
                                             ))}
                                             <button
-                                                className="flex-shrink-0 px-4 py-2 bg-transparent text-gray-400 border border-dashed border-gray-200 rounded-full text-[13px] font-medium active:scale-95 transition-all hover:bg-gray-50 hover:border-gray-300 flex items-center gap-1"
+                                                className="flex-shrink-0 px-4 py-2 bg-transparent text-muted-foreground border border-dashed border-border rounded-full text-[13px] font-medium active:scale-95 transition-all hover:bg-secondary hover:border-foreground/20 flex items-center gap-1"
                                                 onClick={() => {
                                                     setNewTemplateName("");
                                                     setCreateEmptyMode(true);
@@ -288,7 +288,7 @@ export function ServingForm(props: ServingFormProps) {
 
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-zinc-900 hover:text-black hover:bg-gray-50 transition-colors flex-shrink-0">
+                                                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-foreground hover:bg-muted transition-colors flex-shrink-0">
                                                     <MoreHorizontal className="h-5 w-5" />
                                                 </Button>
                                             </DropdownMenuTrigger>
@@ -307,7 +307,7 @@ export function ServingForm(props: ServingFormProps) {
                                                     <Pencil className="mr-2 h-4 w-4" />
                                                     Rename Template
                                                 </DropdownMenuItem>
-                                                <DropdownMenuSeparator className="my-2 bg-gray-50" />
+                                                <DropdownMenuSeparator className="my-2 bg-muted/50" />
                                                 <DropdownMenuItem
                                                     className={cn("rounded-2xl py-3 cursor-pointer", hasTemplateChanges ? "text-primary font-bold bg-primary/5" : "text-muted-foreground")}
                                                     disabled={!selectedTemplateId || !hasTemplateChanges}
@@ -332,7 +332,7 @@ export function ServingForm(props: ServingFormProps) {
                                                     <Plus className="mr-2 h-4 w-4" />
                                                     Save as New
                                                 </DropdownMenuItem>
-                                                <DropdownMenuSeparator className="my-2 bg-gray-50" />
+                                                <DropdownMenuSeparator className="my-2 bg-muted/50" />
                                                 <DropdownMenuItem
                                                     className="rounded-2xl py-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 font-bold"
                                                     onSelect={() => {
@@ -507,7 +507,7 @@ export function ServingForm(props: ServingFormProps) {
                         </Button>
                     </div>
                     <Button
-                        className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:opacity-100 disabled:shadow-none"
+                        className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-muted disabled:text-muted-foreground/50 disabled:opacity-100 disabled:shadow-none"
                         onClick={step === totalSteps - 1 ? handleSubmit : nextStep}
                         disabled={isLoading || (step === 0 && (!selectedDate || isDuplicate))}
                     >
@@ -641,14 +641,14 @@ export function ServingForm(props: ServingFormProps) {
                                         handleCreateRole();
                                     }
                                 }}
-                                className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
+                                className="h-14 rounded-2xl border-border bg-secondary/50 px-5 text-lg font-medium shadow-inner focus:bg-background transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
                                 autoFocus
                             />
                         </div>
                         <DialogFooter className="flex sm:flex-row gap-3">
                             <Button
                                 variant="ghost"
-                                className="h-12 flex-1 rounded-2xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                                className="h-12 flex-1 rounded-2xl font-bold text-muted-foreground hover:text-foreground hover:bg-secondary"
                                 onClick={() => setIsRoleDialogOpen(false)}
                             >
                                 Cancel
@@ -693,7 +693,7 @@ export function ServingForm(props: ServingFormProps) {
                                         handleSaveTemplate();
                                     }
                                 }}
-                                className="h-14 rounded-2xl border-gray-100 bg-secondary/30 px-5 text-lg font-medium shadow-inner focus:bg-white transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
+                                className="h-14 rounded-2xl border-border bg-secondary/30 px-5 text-lg font-medium shadow-inner focus:bg-background transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
                                 autoFocus
                             />
                         </div>
@@ -729,20 +729,21 @@ export function ServingForm(props: ServingFormProps) {
                                     value={tempTemplateName}
                                     onChange={(e) => setTempTemplateName(e.target.value)}
                                     placeholder="Enter template name..."
-                                    className="h-14 px-5 rounded-2xl bg-gray-50/50 border-gray-100 focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all text-lg font-medium"
+                                    placeholder="Enter template name..."
+                                    className="h-14 px-5 rounded-2xl bg-secondary/50 border-border focus:bg-background focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all text-lg font-medium"
                                     autoFocus
                                 />
                             </div>
                             <div className="flex gap-3 pt-2">
                                 <Button
                                     variant="outline"
-                                    className="flex-1 h-14 rounded-2xl border-gray-100 text-gray-500 font-bold hover:bg-gray-50 transition-all"
+                                    className="flex-1 h-14 rounded-2xl border-border text-muted-foreground font-bold hover:bg-secondary transition-all"
                                     onClick={() => setIsRenameDialogOpen(false)}
                                 >
                                     Cancel
                                 </Button>
                                 <Button
-                                    className="flex-1 h-14 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-bold shadow-lg shadow-gray-200 active:scale-[0.98] transition-all"
+                                    className="flex-1 h-14 rounded-2xl bg-foreground hover:bg-foreground/90 text-background font-bold shadow-lg shadow-muted active:scale-[0.98] transition-all"
                                     onClick={() => {
                                         handleUpdateTemplateName(tempTemplateName);
                                         setIsRenameDialogOpen(false);

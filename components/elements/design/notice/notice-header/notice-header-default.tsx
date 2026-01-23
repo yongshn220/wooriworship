@@ -45,15 +45,15 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
             <div className="flex flex-col w-full pr-4">
               {/* Title */}
               {/* Title */}
-              <h3 className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors leading-snug tracking-tight">
+              <h3 className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors leading-snug tracking-tight">
                 {notice?.title}
 
               </h3>
 
               {/* Meta Info */}
-              <div className="flex items-center flex-wrap gap-3 text-sm text-gray-400 mt-2 font-medium">
-                <span className="text-gray-700 font-semibold">{user?.name}</span>
-                <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+              <div className="flex items-center flex-wrap gap-3 text-sm text-muted-foreground mt-2 font-medium">
+                <span className="text-foreground font-semibold">{user?.name}</span>
+                <span className="w-1 h-1 bg-muted rounded-full"></span>
                 <span>{timestampToDateStringFormatted(notice?.created_by?.time)}</span>
                 <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs">
                   {getTimePassedFromTimestampShorten(notice?.created_by?.time)}
@@ -76,11 +76,11 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
                 exit={{ opacity: 0, height: 0 }}
                 className="mt-4"
               >
-                <p className="text-gray-500 line-clamp-2 leading-relaxed text-sm sm:text-base">
+                <p className="text-muted-foreground line-clamp-2 leading-relaxed text-sm sm:text-base">
                   {notice?.body}
                 </p>
                 {hasFiles && (
-                  <div className="inline-flex items-center gap-1.5 mt-3 px-2.5 py-1 bg-gray-50 rounded-full text-xs font-medium text-gray-500 border border-gray-100">
+                  <div className="inline-flex items-center gap-1.5 mt-3 px-2.5 py-1 bg-muted/30 rounded-full text-xs font-medium text-muted-foreground border border-border/50">
                     <ImageIcon className="h-3.5 w-3.5" />
                     <span>{notice.file_urls.length} attachments</span>
                   </div>
@@ -95,7 +95,7 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
                 className="mt-6"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="whitespace-pre-line break-all text-base sm:text-lg text-gray-800 leading-8 space-y-4">
+                <div className="whitespace-pre-line break-all text-base sm:text-lg text-foreground leading-8 space-y-4">
                   <Linkify>
                     {notice?.body || ""}
                   </Linkify>
@@ -103,7 +103,7 @@ export function NoticeHeaderDefault({ noticeId }: Props) {
 
                 {/* Images */}
                 {hasFiles && (
-                  <div className="mt-6 pt-6 border-t border-gray-100">
+                  <div className="mt-6 pt-6 border-t border-border/50">
                     <div className="flex flex-wrap gap-3">
                       {notice.file_urls.map((url, index) => (
                         <div

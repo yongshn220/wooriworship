@@ -171,10 +171,10 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                   placeholder="Write a description..."
                   value={basicInfo.description}
                   onChange={(e) => setBasicInfo(prev => ({ ...prev, description: e.target.value }))}
-                  className="min-h-[150px] text-lg bg-transparent border-none p-0 focus-visible:ring-0 placeholder:text-gray-300 resize-none leading-relaxed"
+                  className="min-h-[150px] text-lg bg-transparent border-none p-0 focus-visible:ring-0 placeholder:text-muted-foreground/40 resize-none leading-relaxed"
                 />
                 <div className="flex items-center gap-2">
-                  <LinkIcon className="w-5 h-5 text-gray-400" />
+                  <LinkIcon className="w-5 h-5 text-muted-foreground" />
                   <Input
                     placeholder="Add a link..."
                     value={basicInfo.link}
@@ -277,7 +277,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
           </Button>
         </div>
         <Button
-          className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:opacity-100 disabled:shadow-none"
+          className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-muted disabled:text-muted-foreground/50 disabled:opacity-100 disabled:shadow-none"
           onClick={step === totalSteps - 1 ? (mode === FormMode.CREATE ? handleCreate : handleEdit) : nextStep}
           disabled={isLoading || (step === 0 && (serviceTagIds.length === 0 || isDuplicate))}
         >

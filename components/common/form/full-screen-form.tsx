@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 // --- Root Container ---
 export const FullScreenForm = ({ children, className }: { children: React.ReactNode; className?: string }) => {
     return (
-        <div className={cn("fixed inset-0 z-[100] bg-gray-50 flex flex-col", className)}>
+        <div className={cn("fixed inset-0 z-[100] bg-background flex flex-col", className)}>
             {children}
         </div>
     );
@@ -23,14 +23,14 @@ interface FullScreenFormHeaderProps {
 
 export const FullScreenFormHeader = ({ steps, currentStep, onStepChange, onClose, className }: FullScreenFormHeaderProps) => {
     return (
-        <div className={cn("absolute top-0 left-0 right-0 z-50 w-full px-6 pt-8 pb-12 flex items-center justify-between pointer-events-none bg-gradient-to-b from-gray-50 via-gray-50/90 to-transparent", className)}>
+        <div className={cn("absolute top-0 left-0 right-0 z-50 w-full px-6 pt-8 pb-12 flex items-center justify-between pointer-events-none bg-gradient-to-b from-background via-background/90 to-transparent", className)}>
             {/* Exit Button */}
-            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-background/50 hover:bg-background shadow-sm pointer-events-auto backdrop-blur-sm" onClick={onClose}>
+            <Button variant="ghost" size="icon" className="h-11 w-11 rounded-full bg-background/50 hover:bg-background shadow-sm pointer-events-auto backdrop-blur-sm" onClick={onClose}>
                 <X className="w-5 h-5 text-muted-foreground" />
             </Button>
 
             {/* Step Bar */}
-            <div className="flex gap-1 p-1 bg-white/50 backdrop-blur-md rounded-full shadow-sm pointer-events-auto absolute top-8 left-1/2 -translate-x-1/2">
+            <div className="flex gap-1 p-1 bg-background/50 backdrop-blur-md rounded-full shadow-sm pointer-events-auto absolute top-8 left-1/2 -translate-x-1/2">
                 {steps.map((label, idx) => (
                     <button
                         key={idx}
@@ -39,7 +39,7 @@ export const FullScreenFormHeader = ({ steps, currentStep, onStepChange, onClose
                             "px-3 py-1.5 rounded-full text-[10px] font-bold transition-all",
                             currentStep === idx
                                 ? "bg-primary text-white shadow-sm"
-                                : "text-gray-400 hover:text-gray-600",
+                                : "text-muted-foreground hover:text-foreground",
                             !onStepChange && "cursor-not-allowed opacity-50"
                         )}
                         disabled={!onStepChange}
@@ -75,7 +75,7 @@ FullScreenFormBody.displayName = "FullScreenFormBody";
 // --- Footer ---
 export const FullScreenFormFooter = ({ children, className, errorMessage }: { children: React.ReactNode; className?: string; errorMessage?: string }) => {
     return (
-        <div className={cn("absolute bottom-0 left-0 right-0 z-50 w-full px-6 pb-8 pt-12 pointer-events-none bg-gradient-to-t from-gray-50 via-gray-50/90 to-transparent", className)}>
+        <div className={cn("absolute bottom-0 left-0 right-0 z-50 w-full px-6 pb-8 pt-12 pointer-events-none bg-gradient-to-t from-background via-background/90 to-transparent", className)}>
             <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto pointer-events-auto">
                 {errorMessage && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
