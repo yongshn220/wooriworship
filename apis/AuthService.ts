@@ -1,7 +1,6 @@
-
 import { auth } from "@/firebase";
 import BaseService from './BaseService';
-import { UserService } from './';
+import UserService from './UserService';
 import { User } from "@/models/user";
 import {
     signInWithEmailAndPassword,
