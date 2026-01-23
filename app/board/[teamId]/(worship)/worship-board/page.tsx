@@ -155,7 +155,7 @@ export default function PlanPage({ params }: any) {
         firstDate.setHours(0, 0, 0, 0);
       }
 
-      const LIMIT = 10; // Increase limit for better UX
+      const LIMIT = 50; // Increased limit for smoother scrolling
 
       // Fetch previous schedules
       const pastData = await WorshipService.getPreviousWorships(teamId, firstDate, LIMIT);

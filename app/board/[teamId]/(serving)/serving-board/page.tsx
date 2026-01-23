@@ -132,7 +132,7 @@ export default function ServingPage() {
             const firstDate = firstSchedule.date instanceof Timestamp ? firstSchedule.date.toDate() : new Date(firstSchedule.date);
 
             // Limit 5
-            const LIMIT = 5;
+            const LIMIT = 50;
             const pastData = await ServingService.getPreviousSchedules(teamId, firstDate, LIMIT);
 
             if (pastData.length < LIMIT) {

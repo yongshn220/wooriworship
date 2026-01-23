@@ -65,6 +65,9 @@ export function useAnchorScroll({
                 container.style.scrollSnapType = "none";
                 container.style.scrollBehavior = "auto";
 
+                // CRITICAL: Kill interia/momentum
+                container.style.overflowX = "hidden";
+
                 container.scrollLeft = newScrollLeft;
 
                 // console.log(`[Anchor] Restored to ${anchorId}, newScroll: ${newScrollLeft}`);
@@ -73,6 +76,8 @@ export function useAnchorScroll({
                 requestAnimationFrame(() => {
                     container.style.scrollSnapType = "x mandatory";
                     container.style.scrollBehavior = "";
+                    container.style.overflowX = "auto"; // Re-enable scrolling
+
                     anchorIdRef.current = null; // Reset anchor
 
                     // Unblock observer after a safe delay
