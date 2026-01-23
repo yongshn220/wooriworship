@@ -232,6 +232,7 @@ export function TagSelector({
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
+                                                    aria-label="Rename tag"
                                                     className="h-11 w-11 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
@@ -245,6 +246,7 @@ export function TagSelector({
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
+                                                aria-label="Delete tag"
                                                 className="h-11 w-11 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                                                 onClick={(e) => {
                                                     e.stopPropagation();

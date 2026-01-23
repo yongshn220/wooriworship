@@ -6,7 +6,9 @@ import { RecoilRoot } from 'recoil'
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
     return (
         <RecoilRoot>
-            {children}
+            <React.Suspense fallback={<div>Loading...</div>}>
+                {children}
+            </React.Suspense>
         </RecoilRoot>
     )
 }
