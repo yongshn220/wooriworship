@@ -2,8 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import { format, differenceInCalendarDays } from "date-fns";
-import { Calendar, Loader2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Calendar, Loader2, History, ChevronRight, ChevronLeft } from "lucide-react";
+import { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { CalendarItem } from "./types";
 import { GenericCalendarDrawer } from "./generic-calendar-drawer";
 import { useAnchorScroll } from "./use-anchor-scroll";
@@ -30,6 +30,9 @@ export function CalendarStrip({
     const itemRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
+    // State to track direction of the selected item relative to the viewport
+    const [selectionDirection, setSelectionDirection] = useState<'left' | 'right' | null>(null);
+
     // --- Anchor Scroll Logic ---
     const { captureAnchor, isRestoring } = useAnchorScroll({
         scrollContainerRef,
@@ -38,28 +41,11 @@ export function CalendarStrip({
         isLoading: !!isLoadingPrev
     });
 
-    // --- Sentinel Observation ---
-    const observerRef = useRef<IntersectionObserver | null>(null);
-    const sentinelRef = (node: HTMLDivElement | null) => {
-        if (observerRef.current) observerRef.current.disconnect();
-
-        // Only observe if we can load more
-        // Critical: Block observation while we are restoring scroll position!
-        if (node && onLoadPrev && hasMorePast) {
-            observerRef.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting && !isLoadingPrev && !isRestoring) {
-                    // 1. Capture the current visual anchor before loading starts
-                    captureAnchor();
-                    // 2. Trigger Load
-                    onLoadPrev();
-                }
-            }, {
-                root: scrollContainerRef.current,
-                threshold: 0.1,
-                // Trigger when sentinel is close (e.g., 300px)
-                rootMargin: "0px 0px 0px 300px"
-            });
-            observerRef.current.observe(node);
+    // Wrapped handler
+    const handleLoadPrev = () => {
+        if (onLoadPrev && !isLoadingPrev && !isRestoring) {
+            captureAnchor();
+            onLoadPrev();
         }
     };
 
@@ -73,10 +59,92 @@ export function CalendarStrip({
         return format(new Date(), "MMMM yyyy");
     };
 
+    // --- Scroll Management ---
+
+    // 1. Scroll Check Handler
+    const checkSelectionVisibility = () => {
+        const container = scrollContainerRef.current;
+        if (!container || !selectedId) {
+            setSelectionDirection(null);
+            return;
+        }
+
+        const selectedEl = itemRefs.current.get(selectedId);
+        if (!selectedEl) return;
+
+        const containerLeft = container.scrollLeft;
+        const containerRight = containerLeft + container.clientWidth;
+
+        const elLeft = selectedEl.offsetLeft;
+        const elRight = elLeft + selectedEl.clientWidth;
+
+        // Check visibility
+        const isVisible = (elRight > containerLeft) && (elLeft < containerRight);
+
+        if (isVisible) {
+            setSelectionDirection(null);
+        } else {
+            // Determine direction
+            if (elRight <= containerLeft) {
+                // Element is to the LEFT
+                setSelectionDirection('left');
+            } else if (elLeft >= containerRight) {
+                // Element is to the RIGHT
+                setSelectionDirection('right');
+            }
+        }
+    };
+
+    // 2. Attach Scroll Listener
+    useEffect(() => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        const onScroll = () => {
+            if (!isRestoring) { // Optional: debounce or throttle
+                checkSelectionVisibility();
+            }
+        };
+
+        container.addEventListener("scroll", onScroll);
+        // Initial check
+        checkSelectionVisibility();
+
+        return () => container.removeEventListener("scroll", onScroll);
+    }, [selectedId, items, isRestoring]);
+
+    // 3. Auto-scroll to selection ONLY when selection changes
+    // FIX: Removed isRestoring from dependency to prevent auto-jump after history load
+    useEffect(() => {
+        if (selectedId && itemRefs.current.has(selectedId)) {
+            const el = itemRefs.current.get(selectedId);
+            if (el) {
+                // If we select a new item, we want to scroll to it
+                // We do NOT want this to fire just because 'items' updated (history loaded)
+                // BUT 'items' update might re-render DOM...
+                // Actually, if selectedId doesn't change, this effect shouldn't run if we don't include 'items' or 'isRestoring'.
+                // Ideally trigger only on selectedId change.
+                el.scrollIntoView({ inline: "start", behavior: "smooth", block: "nearest" });
+            }
+        }
+    }, [selectedId]);
+
+
+    // 4. "Back to Selection" Action
+    const scrollToSelection = () => {
+        if (selectedId && itemRefs.current.has(selectedId)) {
+            const el = itemRefs.current.get(selectedId);
+            if (el) {
+                el.scrollIntoView({ inline: "center", behavior: "smooth" });
+            }
+        }
+    };
+
+
     const CARD_SIZE_CLASSES = "snap-start scroll-mx-4 shrink-0 w-[4.5rem] h-[5.5rem] rounded-xl flex flex-col items-center justify-center transition-colors relative";
 
     return (
-        <div className="relative">
+        <div className="relative group/calendar-strip">
             {/* Header */}
             <div className="flex items-center justify-between mb-2 px-1">
                 <span className="text-xs font-semibold text-muted-foreground">
@@ -95,23 +163,17 @@ export function CalendarStrip({
             <div
                 ref={scrollContainerRef}
                 style={{ overflowAnchor: "none" }}
-                className="flex overflow-x-auto gap-3 pb-2 -mx-4 px-4 pt-4 snap-x snap-mandatory items-center no-scrollbar"
+                className="flex overflow-x-auto gap-3 pb-2 -mx-4 px-4 pt-4 snap-x snap-mandatory items-center no-scrollbar relative"
             >
-                {/* Sentinel / Loader */}
-                {hasMorePast && (
-                    <div
-                        ref={sentinelRef}
-                        className={cn(CARD_SIZE_CLASSES, "bg-transparent border-transparent")}
-                    >
-                        {isLoadingPrev ? (
-                            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                        ) : (
-                            <div className="w-full h-full" />
-                        )}
-                    </div>
+                {onLoadPrev && hasMorePast && (
+                    <HistoryButton
+                        onLoadPrev={handleLoadPrev}
+                        isLoadingPrev={!!isLoadingPrev}
+                        hasMorePast={hasMorePast}
+                        baseClasses={CARD_SIZE_CLASSES}
+                    />
                 )}
 
-                {/* Items */}
                 {items.map((item) => (
                     <DateCard
                         key={item.id}
@@ -129,6 +191,30 @@ export function CalendarStrip({
                 <div className="w-1 shrink-0"></div>
             </div>
 
+            {/* Floating Back Buttons (Compass Logic) */}
+
+            {/* Left Button (Go Back to Future basically, wait.. if selection is LEFT, we are in FUTURE. So arrow points LEFT) */}
+            {selectionDirection === 'left' && (
+                <button
+                    onClick={scrollToSelection}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 mt-4 z-30 bg-white dark:bg-slate-800 shadow-lg border border-border-light dark:border-border-dark rounded-full p-2 text-primary hover:bg-slate-50 dark:hover:bg-slate-700 transition-all animate-in fade-in zoom-in slide-in-from-left-2 duration-200"
+                    aria-label="Scroll left to selected date"
+                >
+                    <ChevronLeft className="w-4 h-4" />
+                </button>
+            )}
+
+            {/* Right Button (Go Back to Past basically, wait.. if selection is RIGHT, we are in PAST. So arrow points RIGHT) */}
+            {selectionDirection === 'right' && (
+                <button
+                    onClick={scrollToSelection}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 mt-4 z-30 bg-white dark:bg-slate-800 shadow-lg border border-border-light dark:border-border-dark rounded-full p-2 text-primary hover:bg-slate-50 dark:hover:bg-slate-700 transition-all animate-in fade-in zoom-in slide-in-from-right-2 duration-200"
+                    aria-label="Scroll right to selected date"
+                >
+                    <ChevronRight className="w-4 h-4" />
+                </button>
+            )}
+
             <GenericCalendarDrawer
                 open={isCalendarOpen}
                 onOpenChange={setIsCalendarOpen}
@@ -137,6 +223,43 @@ export function CalendarStrip({
                 onSelect={onSelect}
             />
         </div >
+    );
+}
+
+// ... Sub-components (HistoryButton, DateCard) ...
+// (I will inline them same as before, unchanged)
+
+interface HistoryButtonProps {
+    onLoadPrev: () => void;
+    isLoadingPrev: boolean;
+    hasMorePast: boolean;
+    baseClasses: string;
+}
+
+function HistoryButton({ onLoadPrev, isLoadingPrev, hasMorePast, baseClasses }: HistoryButtonProps) {
+    return (
+        <button
+            onClick={hasMorePast ? onLoadPrev : undefined}
+            disabled={isLoadingPrev || !hasMorePast}
+            className={cn(
+                baseClasses,
+                "group border",
+                hasMorePast
+                    ? "bg-panel dark:bg-panel-dark border-dashed border-border-light dark:border-border-dark hover:border-slate-400 dark:hover:border-slate-500 cursor-pointer"
+                    : "bg-muted/30 border-transparent opacity-50 cursor-default hidden"
+            )}
+        >
+            {isLoadingPrev ? (
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            ) : (
+                <div className="flex flex-col items-center gap-1.5 pt-1">
+                    <History className={cn("w-5 h-5", hasMorePast ? "text-muted-foreground group-hover:text-foreground" : "text-muted-foreground/50")} />
+                    <span className={cn("text-[10px] font-bold leading-tight text-center uppercase tracking-wider", hasMorePast ? "text-muted-foreground group-hover:text-foreground" : "text-muted-foreground/50")}>
+                        {hasMorePast ? "History" : "None"}
+                    </span>
+                </div>
+            )}
+        </button>
     );
 }
 
@@ -169,7 +292,6 @@ function DateCard({ item, isSelected, onSelect, baseClasses, setRef }: DateCardP
     return (
         <button
             ref={setRef}
-            dir="ltr"
             onClick={() => onSelect(item.id)}
             className={cn(
                 baseClasses,

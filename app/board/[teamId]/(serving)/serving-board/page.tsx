@@ -93,15 +93,29 @@ export default function ServingPage() {
         async function loadData() {
             if (!teamId) return;
             try {
-                // Fetch Future: Today to 6 months future
+                // 1. Define Range: Future (Today to 6 months)
                 const today = new Date();
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+
                 const futureDate = new Date();
                 futureDate.setMonth(futureDate.getMonth() + 6);
 
                 const startStr = format(today, "yyyy-MM-dd");
                 const endStr = format(futureDate, "yyyy-MM-dd");
 
-                const data = await ServingService.getSchedules(teamId, startStr, endStr);
+                // 2. Fetch Future & Past (concurrently)
+                const [futureData, pastData] = await Promise.all([
+                    ServingService.getSchedules(teamId, startStr, endStr),
+                    ServingService.getPreviousSchedules(teamId, todayStart, 30) // Initial history load
+                ]);
+
+                // 3. Merge & Sort
+                const combined = [...pastData, ...futureData];
+                // Deduplicate just in case
+                const uniqueMap = new Map();
+                combined.forEach(s => uniqueMap.set(s.id, s));
+                const data = Array.from(uniqueMap.values()) as ServingSchedule[];
 
                 // Sort by date ASC
                 data.sort((a, b) => {
@@ -109,12 +123,27 @@ export default function ServingPage() {
                     const dateB = b.date instanceof Timestamp ? b.date.toDate().getTime() : new Date(b.date).getTime();
                     return dateA - dateB;
                 });
+
                 setSchedules(data);
 
-                // Select most recent upcoming (first item in sorted future list)
-                if (data.length > 0) {
-                    setSelectedScheduleId(data[0].id);
+                // 4. Initial Selection Logic
+                // Priority 1: First Upcoming (>= Today)
+                // Priority 2: Latest Past (Last item in list, if no upcoming)
+
+                const firstUpcoming = data.find(s => {
+                    const d = s.date instanceof Timestamp ? s.date.toDate() : parseLocalDate(s.date);
+                    return d >= todayStart;
+                });
+
+                if (firstUpcoming) {
+                    setSelectedScheduleId(firstUpcoming.id);
+                } else if (data.length > 0) {
+                    // No upcoming, but we have history. Select the last one (latest history).
+                    setSelectedScheduleId(data[data.length - 1].id);
+                } else {
+                    setSelectedScheduleId(null);
                 }
+
             } catch (e) {
                 console.error("Failed to load serving schedules", e);
             } finally {
@@ -132,7 +161,7 @@ export default function ServingPage() {
             const firstDate = firstSchedule.date instanceof Timestamp ? firstSchedule.date.toDate() : new Date(firstSchedule.date);
 
             // Limit 5
-            const LIMIT = 50;
+            const LIMIT = 30;
             const pastData = await ServingService.getPreviousSchedules(teamId, firstDate, LIMIT);
 
             if (pastData.length < LIMIT) {

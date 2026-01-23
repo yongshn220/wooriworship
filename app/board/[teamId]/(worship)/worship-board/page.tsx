@@ -79,7 +79,7 @@ export default function PlanPage({ params }: any) {
         // Concurrent Fetch: Future (6 months) + Past (5 items)
         const [futureData, pastData] = await Promise.all([
           WorshipService.getWorships(teamId, startStr, endStr),
-          WorshipService.getPreviousWorships(teamId, todayStart, 5)
+          WorshipService.getPreviousWorships(teamId, todayStart, 30)
         ]);
 
         // Merge and Deduplicate
@@ -120,6 +120,10 @@ export default function PlanPage({ params }: any) {
 
           if (firstUpcoming) {
             setSelectedWorshipId(firstUpcoming.id || null);
+          } else if (data.length > 0) {
+            // Fallback to latest history item (last item in sorted array)
+            const latestHistory = data[data.length - 1];
+            setSelectedWorshipId(latestHistory.id || null);
           } else {
             // Only History exists -> Select NULL
             setSelectedWorshipId(null);
@@ -155,7 +159,7 @@ export default function PlanPage({ params }: any) {
         firstDate.setHours(0, 0, 0, 0);
       }
 
-      const LIMIT = 50; // Increased limit for smoother scrolling
+      const LIMIT = 30; // Manual load limit
 
       // Fetch previous schedules
       const pastData = await WorshipService.getPreviousWorships(teamId, firstDate, LIMIT);
