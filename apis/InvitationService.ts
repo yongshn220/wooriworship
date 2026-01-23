@@ -10,6 +10,9 @@ class InvitationService extends BaseService {
     }
 
     async createInvitation(senderId: string, senderEmail: string, teamId: string, teamName: string, receiverEmail: string) {
+        // Enforce lowercase for receiver email
+        receiverEmail = receiverEmail.toLowerCase();
+
         // Check if already invited? Using collectionGroup or team subcollection?
         // Check filtering on team subcollection first.
         const q = query(
@@ -65,7 +68,7 @@ class InvitationService extends BaseService {
         try {
             const q = query(
                 collectionGroup(db, "invitations"),
-                where('receiver_email', '==', email),
+                where('receiver_email', '==', email.toLowerCase()),
                 where('invitation_status', '==', InvitationStatus.Pending)
             );
             const snapshot = await getDocs(q);
@@ -112,7 +115,7 @@ class InvitationService extends BaseService {
         try {
             const q = query(
                 collection(db, "teams", teamId, "invitations"),
-                where('receiver_email', '==', receiver_email)
+                where('receiver_email', '==', receiver_email.toLowerCase())
             );
             const snapshot = await getDocs(q);
             const batch = writeBatch(db);

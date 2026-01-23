@@ -1,13 +1,15 @@
 import BaseService from "./BaseService";
+import { db } from "@/firebase";
+import { collection, doc, getDocs, getDoc, setDoc, deleteDoc, query } from "firebase/firestore";
 
 class TagService extends BaseService {
   constructor() {
-    super("tags");
+    super("song_tags");
   }
 
   async getTeamTags(teamId: string) {
     try {
-      const q = query(collection(db, "teams", teamId, "tags"));
+      const q = query(collection(db, "teams", teamId, "song_tags"));
       const snapshot = await getDocs(q);
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (e) {
@@ -22,7 +24,7 @@ class TagService extends BaseService {
       name: tagName
     }
     // Use tagName as ID for uniqueness within team
-    const ref = doc(db, "teams", teamId, "tags", tagName);
+    const ref = doc(db, "teams", teamId, "song_tags", tagName);
     await setDoc(ref, newTag);
     return tagName;
   }
@@ -43,7 +45,7 @@ class TagService extends BaseService {
 
   async deleteTag(teamId: string, tagName: string) {
     try {
-      const ref = doc(db, "teams", teamId, "tags", tagName);
+      const ref = doc(db, "teams", teamId, "song_tags", tagName);
       await deleteDoc(ref);
       return true;
     } catch (e) {
@@ -54,7 +56,7 @@ class TagService extends BaseService {
 
   async getById(teamId: string, tagId: string) {
     try {
-      const ref = doc(db, "teams", teamId, "tags", tagId);
+      const ref = doc(db, "teams", teamId, "song_tags", tagId);
       const snap = await getDoc(ref);
       if (!snap.exists()) return null;
       return { id: snap.id, ...snap.data() };

@@ -298,7 +298,12 @@ function DateCard({ item, isSelected, onSelect, baseClasses, setRef }: DateCardP
                 "group",
                 isSelected
                     ? "bg-white dark:bg-panel-dark border-[2px] border-primary shadow-lg shadow-blue-500/10 dark:shadow-none z-10 active:scale-95"
-                    : "bg-panel dark:bg-panel-dark border border-border-light dark:border-border-dark hover:border-blue-300 dark:hover:border-blue-700 opacity-90"
+                    : cn(
+                        "border border-border-light dark:border-border-dark hover:border-blue-300 dark:hover:border-blue-700",
+                        isUpcoming
+                            ? "bg-panel dark:bg-panel-dark opacity-90"
+                            : "bg-muted/30 dark:bg-muted/10 opacity-60 grayscale-[0.3]"
+                    )
             )}
         >
             <div className={cn(

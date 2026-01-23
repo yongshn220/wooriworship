@@ -1,0 +1,19 @@
+{
+    "indexes": [
+        {
+            "collectionGroup": "invitations",
+            "queryScope": "COLLECTION_GROUP",
+            "fields": [
+                {
+                    "fieldPath": "receiver_email",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "invitation_status",
+                    "order": "ASCENDING"
+                }
+            ]
+        }
+    ],
+    "fieldOverrides": []
+}
