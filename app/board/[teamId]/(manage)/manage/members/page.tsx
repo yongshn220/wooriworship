@@ -28,7 +28,7 @@ export default function MembersPage() {
             const isAdminB = team?.admins?.includes(b.id);
             if (isAdminA && !isAdminB) return -1;
             if (!isAdminA && isAdminB) return 1;
-            return (a.email || "").localeCompare(b.email || "");
+            return (a.name || "").localeCompare(b.name || "");
         });
     }, [users, team?.admins]);
 
