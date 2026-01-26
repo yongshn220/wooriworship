@@ -152,7 +152,7 @@ class InvitationService extends BaseService {
         }
     }
 
-    async getById(teamId: string, invitationId: string) {
+    async getInvitationById(teamId: string, invitationId: string) {
         try {
             const ref = doc(db, "teams", teamId, "invitations", invitationId);
             const snap = await getDoc(ref);

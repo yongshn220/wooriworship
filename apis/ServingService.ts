@@ -18,14 +18,16 @@ import {
     increment,
     arrayUnion,
     arrayRemove,
-    Timestamp
+
+    Timestamp,
+    Firestore
 } from "firebase/firestore";
 import LinkingService from "./LinkingService";
 import { parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";
 
 class ServingService extends BaseService {
     private static instance: ServingService;
-    protected db: Firestore;
+
 
     private constructor(db?: Firestore) {
         super("serving"); // Placeholder, not strictly used as we use custom paths

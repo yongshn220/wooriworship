@@ -92,7 +92,7 @@ export default function PlanPage({ params }: any) {
         // Check for specific selected ID (deep link case)
         if (selectedWorshipId && !uniqueMap.has(selectedWorshipId)) {
           try {
-            const specificWorship = await WorshipService.getById(teamId, selectedWorshipId) as Worship;
+            const specificWorship = await WorshipService.getWorshipById(teamId, selectedWorshipId) as Worship;
             if (specificWorship) uniqueMap.set(specificWorship.id, specificWorship);
           } catch (ignore) { }
         }

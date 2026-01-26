@@ -9,7 +9,7 @@ class NoticeService extends BaseService {
   }
 
   // Override getById to find doc in sub-collections (teams/{teamId}/notices)
-  async getById(teamId: string, id: string) {
+  async getNoticeById(teamId: string, id: string) {
     try {
       const docRef = doc(db, "teams", teamId, "notices", id);
       const docSnap = await getDoc(docRef);

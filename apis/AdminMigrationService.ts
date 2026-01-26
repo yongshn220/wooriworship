@@ -1,11 +1,13 @@
 import * as admin from 'firebase-admin';
-import { parseLocalDate } from "@/components/util/helper/helper-functions";
+import { parseLocalDate } from "@/lib/date-utils";
 
 // Types for clarity
 type Firestore = admin.firestore.Firestore;
 type DocumentData = admin.firestore.DocumentData;
 type Timestamp = admin.firestore.Timestamp;
 const Timestamp = admin.firestore.Timestamp;
+
+import { ServiceEvent, ServiceSetlist, ServiceBand, ServiceFlow } from "@/models/services/ServiceEvent";
 
 export class AdminMigrationService {
     private static instance: AdminMigrationService;
@@ -69,8 +71,175 @@ export class AdminMigrationService {
     }
 
     // =========================================================================================
-    // Phase 1: Schema Enrichment (Pre-processing)
+    // Phase 3: V2 -> V3 Migration (Relational Schema)
     // =========================================================================================
+
+    public async migrateToUnifiedServices(teamId: string) {
+        console.log(`[V3 Migration] Starting for team: ${teamId}`);
+
+        // 0. Cleanup existing V3 services for a clean slate
+        console.log(`[V3 Migration] Cleaning up existing services for team: ${teamId}`);
+        await this.deleteCollection(`teams/${teamId}/services`, 100);
+
+        // 1. Fetch All V2 Data
+        const worshipsSnap = await this.db.collection(`teams/${teamId}/worships`).get();
+        const schedulesSnap = await this.db.collection(`teams/${teamId}/serving_schedules`).get();
+
+        const worships = worshipsSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+        const schedules = schedulesSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+
+        console.log(`[V3 Migration] Found ${worships.length} worships, ${schedules.length} schedules.`);
+
+        // 2. Join Strategy (Robust Date Join)
+        const joinedMap = new Map<string, {
+            date: Timestamp,
+            title: string,
+            tags: string[],
+            worship?: any,
+            schedule?: any
+        }>();
+
+        const getKey = (timestamp: Timestamp, tags: string[] = []) => {
+            const d = timestamp.toDate();
+            // Robust YYYY-MM-DD extraction using UTC to match Firestore default serialization
+            const year = d.getUTCFullYear();
+            const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(d.getUTCDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+
+            const sortedTags = (tags || []).sort().filter(t => t);
+            return sortedTags.length > 0 ? `${dateStr}_${sortedTags.join('_')}` : dateStr;
+        };
+
+        // Pass 1: Schedules (People Data)
+        for (const sch of schedules) {
+            const dateValue = sch.date;
+            const tags = sch.service_tags || [];
+            if (!dateValue) continue;
+
+            const date = dateValue instanceof Timestamp ? dateValue : Timestamp.fromDate(new Date(dateValue));
+            const key = getKey(date, tags);
+
+            if (!joinedMap.has(key)) {
+                joinedMap.set(key, {
+                    date,
+                    title: sch.title || "Service",
+                    tags,
+                    schedule: sch
+                });
+            } else {
+                joinedMap.get(key)!.schedule = sch;
+            }
+        }
+
+        // Pass 2: Worships (Song Data)
+        for (const w of worships) {
+            const dateValue = w.worship_date || w.date;
+            const tags = w.service_tags || [];
+            if (!dateValue) continue;
+
+            const date = dateValue instanceof Timestamp ? dateValue : Timestamp.fromDate(new Date(dateValue));
+            const key = getKey(date, tags);
+
+            if (joinedMap.has(key)) {
+                joinedMap.get(key)!.worship = w;
+            } else {
+                joinedMap.set(key, {
+                    date,
+                    title: w.title || "Worship Service",
+                    tags,
+                    worship: w
+                });
+            }
+        }
+
+        console.log(`[V3 Migration] Joined into ${joinedMap.size} unified services.`);
+
+        // 3. Transform & Write
+        let batch = this.db.batch();
+        let opCount = 0;
+        const keys = Array.from(joinedMap.keys());
+
+        for (const key of keys) {
+            const data = joinedMap.get(key)!;
+            // Use Random ID (Firestore Auto-ID) to allow multiple services per day
+            const serviceRef = this.db.collection(`teams/${teamId}/services`).doc();
+
+            // Use single tagId (migrate first tag found, or null)
+            const tagId = (data.tags && data.tags.length > 0) ? data.tags[0] : null;
+
+            // Map legacy 'roles' to new 'bands.worship_roles'
+            const worship_roles = data.schedule?.worship_roles || data.schedule?.roles || [];
+
+            const serviceDoc: any = {
+                id: serviceRef.id,
+                teamId,
+                date: data.date,
+                title: data.title,
+                tagId: tagId, // Renamed from service_tags array to single string
+                created_at: Timestamp.now(),
+                updated_at: Timestamp.now()
+            };
+
+            batch.set(serviceRef, serviceDoc);
+            opCount++;
+
+            // --- Pillar 1: setlist (SubCollection) ---
+            if (data.worship) {
+                const setlistRef = serviceRef.collection('setlists').doc('main');
+                const setlistData: any = {
+                    id: 'main',
+                    songs: data.worship.songs || [],
+                    beginning_song: data.worship.beginning_song || null,
+                    ending_song: data.worship.ending_song || null,
+                    description: data.worship.description || "",
+                    link: data.worship.link || ""
+                };
+                batch.set(setlistRef, setlistData);
+                opCount++;
+            }
+
+            // --- Pillar 2: bands (SubCollection) ---
+            if (worship_roles.length > 0) {
+                const bandRef = serviceRef.collection('bands').doc('main');
+                const bandData: any = {
+                    id: 'main',
+                    worship_roles: worship_roles
+                };
+                batch.set(bandRef, bandData);
+                opCount++;
+            }
+
+            // --- Pillar 3: flows (SubCollection) ---
+            if (data.schedule?.items && data.schedule.items.length > 0) {
+                const flowRef = serviceRef.collection('flows').doc('main');
+                const flowData: any = {
+                    id: 'main',
+                    items: data.schedule.items || [],
+                    note: data.schedule.note || ""
+                };
+                batch.set(flowRef, flowData);
+                opCount++;
+            }
+            opCount++;
+
+            if (opCount >= 400) {
+                await batch.commit();
+                batch = this.db.batch();
+                opCount = 0;
+            }
+        }
+
+        if (opCount > 0) await batch.commit();
+        console.log(`[V3 Migration] Successfully written ${joinedMap.size} unified services.`);
+    }
+
+    public async nukeV2Collections(teamId: string) {
+        console.log(`[V3 Cleanup] Duking V2 collections for team: ${teamId}`);
+        await this.deleteCollection(`teams/${teamId}/worships`, 100);
+        await this.deleteCollection(`teams/${teamId}/serving_schedules`, 100);
+        console.log(`[V3 Cleanup] Finished.`);
+    }
 
     private async normalizeTimestamps() {
         // 1. Normalize ServingSchedule.date
@@ -497,8 +666,15 @@ export class AdminMigrationService {
         });
         await batch.commit();
 
-        process.nextTick(() => {
+        console.log(`[Batch] Deleted ${batchSize} docs...`);
+
+        // Use setTimeout to avoid stack overflow but ensure execution
+        // process.nextTick can sometimes be too aggressive or lose context in certain envs
+        if (batchSize > 0) {
+            // Recursive call
             this.deleteQueryBatch(query, resolve);
-        });
+        } else {
+            resolve();
+        }
     }
 }

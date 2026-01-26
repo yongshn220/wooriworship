@@ -56,8 +56,8 @@ describe("GenericCalendarDrawer", () => {
         );
 
         // Click header to toggle view
-        const header = screen.getByText(format(today, "MMMM")).closest("div");
-        fireEvent.click(header!);
+        const monthButton = screen.getByRole("button", { name: "Toggle month selection" });
+        fireEvent.click(monthButton);
 
         // Should see month names
         expect(screen.getByText("Jan")).toBeInTheDocument();
@@ -76,29 +76,10 @@ describe("GenericCalendarDrawer", () => {
         );
 
         const prevMonth = setMonth(today, today.getMonth() - 1);
-        const prevButton = screen.getAllByRole("button")[0]; // Left chevron is usually first locally
-        // A better way is to find by icon usage or position, but buttons in header: [Left, Right]
-        // The header has [HeaderTitle, ChevronLeft, ChevronRight]
 
-        // Let's use logic:
-        // We expect the current month to change.
-
-        // Find buttons. There are buttons in the calendar grid (Days).
-        // The navigation buttons are in the header.
-        // The header buttons are siblings to the title.
-
-        // Let's rely on implementation details slightly or use container
-        // We can use console.log(screen.debug()) if stuck, but let's try assuming standard order in header
-        // The header is above the calendar.
-
-        // Actually, generic-calendar-drawer.tsx:
-        // <Button onClick={prev}> <ChevronLeft/> </Button>
-        // <Button onClick={next}> <ChevronRight/> </Button>
-
-        // We can find by their lucide icon presence, or just by order.
-        // Let's try locating the chevrons.
-        const buttons = document.querySelectorAll(".lucide-chevron-left");
-        fireEvent.click(buttons[0].closest("button")!);
+        // Use aria-label to find the specific button
+        const prevButton = screen.getByRole("button", { name: "Previous month" });
+        fireEvent.click(prevButton);
 
         expect(screen.getByText(format(prevMonth, "MMMM"))).toBeInTheDocument();
     });

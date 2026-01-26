@@ -1,6 +1,6 @@
 import BaseService from "./BaseService";
 import { SongService } from ".";
-import { Timestamp, collection, getDocs, getDoc, query, where, orderBy, limit, addDoc, doc, setDoc, deleteDoc, collectionGroup, documentId } from "firebase/firestore";
+import { Timestamp, collection, getDocs, getDoc, query, where, orderBy, limit, addDoc, doc, setDoc, deleteDoc, collectionGroup, documentId, Firestore } from "firebase/firestore";
 import { Worship } from "@/models/worship";
 import { WorshipInput } from "@/components/constants/types";
 import { db as defaultDb } from "@/firebase";
@@ -9,11 +9,9 @@ import { parseLocalDate } from "@/components/util/helper/helper-functions";
 
 class WorshipService extends BaseService {
   private static instance: WorshipService;
-  protected db: Firestore;
 
   private constructor(db?: Firestore) {
-    super("worships"); // Placeholder
-    this.db = db || defaultDb;
+    super("worships", db); // Placeholder
   }
 
   public static getInstance(db?: Firestore): WorshipService {
@@ -24,7 +22,7 @@ class WorshipService extends BaseService {
   }
 
   // Override getById to find doc in sub-collections
-  async getById(teamId: string, id: string) {
+  async getWorshipById(teamId: string, id: string) {
     if (!teamId || !id) return null;
     try {
       const docRef = doc(this.db, "teams", teamId, "worships", id);

@@ -729,7 +729,7 @@ export function ServingForm(props: ServingFormProps) {
                                     value={tempTemplateName}
                                     onChange={(e) => setTempTemplateName(e.target.value)}
                                     placeholder="Enter template name..."
-                                    placeholder="Enter template name..."
+
                                     className="h-14 px-5 rounded-2xl bg-secondary/50 border-border focus:bg-background focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all text-lg font-medium"
                                     autoFocus
                                 />

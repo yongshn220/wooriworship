@@ -1,7 +1,7 @@
 import BaseService from "./BaseService";
 import { SongComment } from "@/models/song_comments";
 import { db } from "@/firebase";
-import { Timestamp, collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
+import { Timestamp, collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
 
 
 class SongCommentService extends BaseService {
@@ -23,7 +23,7 @@ class SongCommentService extends BaseService {
     }
   }
 
-  async getById(teamId: string, songId: string, commentId: string) {
+  async getCommentById(teamId: string, songId: string, commentId: string) {
     try {
       const ref = doc(db, "teams", teamId, "songs", songId, "comments", commentId);
       const docSnap = await getDoc(ref);

@@ -76,7 +76,7 @@ export const worshipAtom = (globalForRecoil.recoilAtoms['worshipAtom'] || atomFa
     get: ({ teamId, worshipId }) => async ({ get }) => {
       get(worshipUpdaterAtom)
       try {
-        const worship = await WorshipService.getById(teamId, worshipId) as Worship
+        const worship = await WorshipService.getWorshipById(teamId, worshipId) as Worship
         if (!worship) return null
 
         return worship

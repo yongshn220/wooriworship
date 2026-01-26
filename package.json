@@ -12,6 +12,10 @@
     "db:sync-stg": "./scripts/copy-db-to-staging.sh",
     "db:migrate:v1-to-v2": "ts-node -r tsconfig-paths/register scripts/migrate-v1-to-v2.ts",
     "db:cleanup": "ts-node -r tsconfig-paths/register scripts/cleanup-legacy-db.ts",
+    "db:migrate:v2-to-v3": "ts-node -r tsconfig-paths/register scripts/migrate-v2-to-v3.ts",
+    "db:cleanup:v2": "ts-node -r tsconfig-paths/register scripts/cleanup-v2-collections.ts",
+    "db:snapshot:stg-v2": "./scripts/snapshot-staging-v2.sh",
+    "db:rollback:stg-v2": "./scripts/rollback-staging-v2.sh",
     "db:restore:prod": "./scripts/copy-snapshot-to-production.sh"
   },
   "dependencies": {

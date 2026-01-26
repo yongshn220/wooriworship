@@ -130,7 +130,7 @@ export const songAtom = atomFamily<Song, { teamId: string, songId: string }>({
       get(songUpdaterAtom)
       if (!teamId || !songId) return null
       try {
-        const song = await SongService.getById(teamId, songId) as Song
+        const song = await SongService.getSongById(teamId, songId) as Song
         if (!song) return null
 
         return song

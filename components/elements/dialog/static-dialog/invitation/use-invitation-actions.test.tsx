@@ -63,7 +63,7 @@ describe("useInvitationActions", () => {
             await result.current.handleAccept(mockInvitation, mockTeam as any);
         });
 
-        expect(InvitationService.updateInvitation).toHaveBeenCalledWith("invitation-1", InvitationStatus.Accepted);
+        expect(InvitationService.updateInvitation).toHaveBeenCalledWith("team-1", "invitation-1", InvitationStatus.Accepted);
         expect(UserService.addNewTeam).toHaveBeenCalledWith("test-user-uid", "team-1");
         expect(TeamService.addNewMember).toHaveBeenCalledWith("test-user-uid", "team-1");
         expect(toast).toHaveBeenCalledWith(expect.objectContaining({ title: expect.stringContaining("successfully joined") }));
@@ -80,7 +80,7 @@ describe("useInvitationActions", () => {
             await result.current.handleDecline(mockInvitation, mockTeam as any);
         });
 
-        expect(InvitationService.updateInvitation).toHaveBeenCalledWith("invitation-1", InvitationStatus.Rejected);
+        expect(InvitationService.updateInvitation).toHaveBeenCalledWith("team-1", "invitation-1", InvitationStatus.Rejected);
         expect(UserService.addNewTeam).not.toHaveBeenCalled();
         expect(toast).toHaveBeenCalledWith(expect.objectContaining({ title: expect.stringContaining("declined invitation") }));
     });

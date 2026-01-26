@@ -11,12 +11,12 @@ import { Firestore, collection, query, orderBy, getDocs, addDoc, doc, setDoc, de
 
 export class SongService extends BaseService {
   private static instance: SongService;
-  protected db: Firestore;
+
   protected musicSheetService: typeof MusicSheetService;
 
   private constructor(db?: Firestore, musicSheetService?: typeof MusicSheetService) {
-    super("songs"); // Placeholder
-    this.db = db || defaultDb;
+    super("songs", db); // Pass db to base constructor
+    // this.db is already set by super
     this.musicSheetService = musicSheetService || MusicSheetService;
   }
 
@@ -28,7 +28,7 @@ export class SongService extends BaseService {
   }
 
   // Override getById
-  async getById(teamId: string, id: string) {
+  async getSongById(teamId: string, id: string) {
     try {
       const docRef = doc(this.db, "teams", teamId, "songs", id);
       const docSnap = await getDoc(docRef);

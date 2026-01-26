@@ -35,18 +35,25 @@ export function GenericCalendarDrawer({
 
     // Initial load sync
     useEffect(() => {
-        if (open && selectedId) {
-            const selected = items.find(s => s.id === selectedId);
-            if (selected) {
-                setPreviewDate(selected.date);
-                setCurrentMonth(startOfMonth(selected.date));
+        if (open) {
+            if (selectedId) {
+                const selected = items.find(s => s.id === selectedId);
+                if (selected) {
+                    setPreviewDate(selected.date);
+                    setCurrentMonth(startOfMonth(selected.date));
+                    return; // Found and set
+                }
             }
-        } else if (open && !previewDate) {
-            const now = new Date();
-            setPreviewDate(now);
-            setCurrentMonth(startOfMonth(now));
+
+            // Fallback to today if no selectedId or not found
+            if (!previewDate) {
+                const now = new Date();
+                setPreviewDate(now);
+                setCurrentMonth(startOfMonth(now));
+            }
         }
-    }, [open, selectedId, items, previewDate]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open]);
 
     // Derived Data
     const datesWithItem = useMemo(() => items.map(s => s.date), [items]);
@@ -104,17 +111,32 @@ export function GenericCalendarDrawer({
         >
             {/* Custom Header */}
             <div className="flex-none px-6 py-2 flex items-center justify-between border-b border-border/50">
-                <div
-                    className="flex items-center gap-1.5 cursor-pointer hover:opacity-70 transition-opacity active:scale-95"
-                    onClick={() => setViewMode(viewMode === "days" ? "months" : "days")}
-                >
-                    <span className="text-lg font-bold text-foreground">
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setViewMode(viewMode === "months" ? "days" : "months")}
+                        className={cn(
+                            "text-lg font-bold transition-colors active:scale-95",
+                            viewMode === "months" ? "text-primary" : "text-foreground hover:text-primary/80"
+                        )}
+                        aria-label="Toggle month selection"
+                    >
                         {format(currentMonth, "MMMM")}
-                    </span>
-                    <span className="text-lg font-normal text-muted-foreground">
+                    </button>
+
+                    <button
+                        onClick={() => setViewMode(viewMode === "years" ? "days" : "years")}
+                        className={cn(
+                            "text-lg font-normal flex items-center gap-1 transition-colors active:scale-95",
+                            viewMode === "years" ? "text-primary" : "text-muted-foreground hover:text-primary/80"
+                        )}
+                        aria-label="Toggle year selection"
+                    >
                         {format(currentMonth, "yyyy")}
-                    </span>
-                    <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", viewMode !== "days" && "rotate-180")} />
+                        <ChevronDown className={cn(
+                            "h-4 w-4 transition-transform",
+                            (viewMode === "months" || viewMode === "years") && "rotate-180 text-primary"
+                        )} />
+                    </button>
                 </div>
 
                 {viewMode === "days" && (
@@ -122,12 +144,14 @@ export function GenericCalendarDrawer({
                         <Button
                             variant="ghost" size="icon" className="h-8 w-8"
                             onClick={() => setCurrentMonth(prev => setMonth(prev, getMonth(prev) - 1))}
+                            aria-label="Previous month"
                         >
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
                         <Button
                             variant="ghost" size="icon" className="h-8 w-8"
                             onClick={() => setCurrentMonth(prev => setMonth(prev, getMonth(prev) + 1))}
+                            aria-label="Next month"
                         >
                             <ChevronRight className="h-4 w-4" />
                         </Button>

@@ -57,6 +57,15 @@ service cloud.firestore {
         }
       }
 
+      // Unified Service (V3)
+      match /services/{serviceId} {
+        allow read, write: if isAuthenticated();
+        
+        match /setlists/{id} { allow read, write: if isAuthenticated(); }
+        match /bands/{id} { allow read, write: if isAuthenticated(); }
+        match /flows/{id} { allow read, write: if isAuthenticated(); }
+      }
+
       // Serving Related Headers & Config
       match /serving_roles/{roleId} {
         allow read, write: if isAuthenticated();

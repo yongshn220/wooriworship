@@ -54,7 +54,7 @@ class TagService extends BaseService {
     }
   }
 
-  async getById(teamId: string, tagId: string) {
+  async getTagById(teamId: string, tagId: string) {
     try {
       const ref = doc(db, "teams", teamId, "song_tags", tagId);
       const snap = await getDoc(ref);

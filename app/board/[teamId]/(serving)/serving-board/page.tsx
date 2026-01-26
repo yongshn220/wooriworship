@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState";
 import { fetchServingRolesSelector, servingSchedulesAtom } from "@/global-states/servingState";
+import { ServingSchedule } from "@/models/serving";
 import { ServingService } from "@/apis";
 import { ServingListSkeleton } from "./_components/serving-list-skeleton";
 import { parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";

@@ -21,7 +21,7 @@ export function TagMultiSelect({ input, setInput }: Props) {
 
   useEffect(() => {
     tagService.getTeamTags(teamId).then(_teamTags => {
-      setTeamTags(_teamTags.map(_tag => _tag.name))
+      setTeamTags(_teamTags.map((_tag: any) => _tag.name))
     })
   }, [teamId])
 
