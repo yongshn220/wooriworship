@@ -454,4 +454,51 @@ export class AdminMigrationService {
         }
         return chunked;
     }
+
+    public async cleanupLegacyData(onProgress: (log: string) => void) {
+        const legacyCollections = [
+            "songs",
+            "worships",
+            "music_sheets",
+            "song_comments",
+            "notices",
+            "tags"
+        ];
+
+        for (const colName of legacyCollections) {
+            onProgress(`Deleting collection: ${colName}...`);
+            await this.deleteCollection(colName, 500);
+        }
+
+        onProgress("Legacy Data Cleanup Finished!");
+    }
+
+    private async deleteCollection(collectionPath: string, batchSize: number) {
+        const collectionRef = this.db.collection(collectionPath);
+        const query = collectionRef.orderBy('__name__').limit(batchSize);
+
+        return new Promise((resolve, reject) => {
+            this.deleteQueryBatch(query, resolve).catch(reject);
+        });
+    }
+
+    private async deleteQueryBatch(query: admin.firestore.Query, resolve: Function) {
+        const snapshot = await query.get();
+
+        const batchSize = snapshot.size;
+        if (batchSize === 0) {
+            resolve();
+            return;
+        }
+
+        const batch = this.db.batch();
+        snapshot.docs.forEach((doc) => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+
+        process.nextTick(() => {
+            this.deleteQueryBatch(query, resolve);
+        });
+    }
 }
