@@ -3,13 +3,13 @@ import * as admin from 'firebase-admin';
 import { AdminMigrationService } from '../apis/AdminMigrationService';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as fs from 'fs';
+import * as readline from 'readline';
 
 // 1. Load Environment Variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
-import * as fs from 'fs';
 
 // 2. Initialize Firebase Admin
-// Priority: 1. Env Var  2. Local JSON File
 const envServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 const jsonFilePath = path.resolve(__dirname, '../firebase-admin-private-key.json');
 
@@ -18,20 +18,22 @@ let serviceAccount: any;
 try {
     if (envServiceAccount) {
         serviceAccount = JSON.parse(envServiceAccount);
-        console.log("✅ Loaded credentials from Environment Variable.");
+        console.log("✅ Credentials loaded from ENV.");
     } else if (fs.existsSync(jsonFilePath)) {
         serviceAccount = require(jsonFilePath);
-        console.log("✅ Loaded credentials from firebase-admin-private-key.json");
+        console.log("✅ Credentials loaded from JSON file.");
     } else {
-        throw new Error("No credentials found. Set FIREBASE_SERVICE_ACCOUNT_KEY in .env or place firebase-admin-private-key.json in root.");
+        throw new Error("Missing Credentials! Set FIREBASE_SERVICE_ACCOUNT_KEY in .env or provide firebase-admin-private-key.json");
     }
 
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
-    console.log("✅ Firebase Admin Initialized.");
+    if (!admin.apps.length) {
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+        });
+        console.log("✅ Admin SDK Initialized.");
+    }
 } catch (e: any) {
-    console.error("❌ Failed to initialize Firebase Admin:", e.message);
+    console.error("❌ Auth Error:", e.message);
     process.exit(1);
 }
 
@@ -40,18 +42,32 @@ async function runCleanup() {
     const db = admin.firestore();
     const service = AdminMigrationService.getInstance(db);
 
-    console.log("⚠️  WARNING: This will PERMANENTLY DELETE legacy collections (songs, worships, etc).");
-    console.log("⚠️  Data should have been migrated to 'teams/{teamId}/...' before running this.");
-    console.log("Starting cleanup in 5 seconds... (Ctrl+C to cancel)");
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
 
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    console.log("\n⚠️  DANGER ZONE: This will PERMANENTLY DELETE strict legacy collections:");
+    console.log("   - songs, worships, music_sheets, song_comments, notices, tags");
+    console.log("⚠️  Ensure data is migrated before proceeding.");
+
+    const answer = await new Promise<string>(resolve => rl.question('\nType "delete" to confirm cleanup: ', resolve));
+
+    if (answer !== 'delete') {
+        console.log("❌ Cancelled.");
+        rl.close();
+        process.exit(0);
+    }
+
+    rl.close();
 
     try {
+        console.log("🚀 Starting cleanup...");
         await service.cleanupLegacyData((log) => console.log(`[Cleanup] ${log}`));
-        console.log("✅ Cleanup Complete.");
+        console.log("✅ Cleanup Finished Successfully.");
         process.exit(0);
-    } catch (error) {
-        console.error("❌ Cleanup Failed:", error);
+    } catch (error: any) {
+        console.error("❌ Cleanup Failed:", error.message || error);
         process.exit(1);
     }
 }
