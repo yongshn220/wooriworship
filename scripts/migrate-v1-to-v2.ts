@@ -43,10 +43,13 @@ import { AdminMigrationService } from '../apis/AdminMigrationService';
 
         console.log(`\n🔍 Checking Safety Guard for DB: ${dbId || "(default)"}`);
 
-        // SAFETY GUARD: Enforce STGENV
-        if (!dbId || !dbId.includes("STGENV")) {
+        // SAFETY GUARD: Enforce Staging Environment
+        // Allows "stg-env", "STGENV", "staging", etc.
+        const isStaging = dbId && dbId.toLowerCase().includes("stg");
+
+        if (!isStaging) {
             console.error("\n⛔ SAFETY ALERT: Migration blocked!");
-            console.error("   Reason: Use 'STGENV' database only for migration scripts.");
+            console.error("   Reason: Use a Staging database (must contain 'stg') for migration scripts.");
             console.error(`   Current DB: ${dbId || "(default)"}`);
             process.exit(1);
         }
