@@ -41,6 +41,9 @@ export class AdminMigrationService {
             onProgress("1-3. Indexing Serving Participants...");
             await this.indexServingParticipants();
 
+            onProgress("1-4. Normalizing Serving Schedules (Legacy Fields)...");
+            await this.migrateServingSchedules();
+
             onProgress("[Phase 1] Completed.");
 
             // --- Phase 2: Structural Migration ---
@@ -186,6 +189,43 @@ export class AdminMigrationService {
                 const participants = Array.from(participantSet);
                 batch.update(docSnapshot.ref, { participants: participants });
                 count++;
+
+                if (count >= 500) {
+                    await batch.commit();
+                    batch = this.db.batch();
+                    count = 0;
+                }
+            }
+            if (count > 0) await batch.commit();
+        }
+    }
+
+    // Made public for testing or used internally
+    public async migrateServingSchedules() {
+        const teamsSnapshot = await this.db.collection("teams").get();
+
+        for (const teamDoc of teamsSnapshot.docs) {
+            const schedulesSnapshot = await this.db.collection("teams").doc(teamDoc.id).collection("serving_schedules").get();
+            if (schedulesSnapshot.empty) continue;
+
+            let batch = this.db.batch();
+            let count = 0;
+
+            for (const docSnapshot of schedulesSnapshot.docs) {
+                const data = docSnapshot.data();
+
+                // Transform Legacy Fields
+                const updates: any = {};
+
+                // 1. name -> title
+                if (!data.title && data.name) {
+                    updates.title = data.name;
+                }
+
+                if (Object.keys(updates).length > 0) {
+                    batch.update(docSnapshot.ref, updates);
+                    count++;
+                }
 
                 if (count >= 500) {
                     await batch.commit();

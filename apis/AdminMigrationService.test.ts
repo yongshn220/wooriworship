@@ -42,6 +42,47 @@ describe('AdminMigrationService', () => {
         service = new AdminMigrationService(mockFirestore as any);
     });
 
+    describe('migrateSubCollections - Notices', () => {
+        it('should transform legacy notice fields (subject/content) to new fields (title/body)', async () => {
+            // Mock Data
+            const mockNotices = [{
+                id: 'n1',
+                data: () => ({
+                    team_id: 'team1',
+                    subject: 'Legacy Title',
+                    content: 'Legacy Content',
+                    created_at: '2024-01-01'
+                })
+            }];
+
+            // Mock DB calls
+            const mockGet = jest.fn()
+                .mockResolvedValueOnce({ empty: true, docs: [] }) // Worships
+                .mockResolvedValueOnce({ empty: true, docs: [] }) // Songs
+                .mockResolvedValueOnce({ empty: true, docs: [] }) // Sheets
+                .mockResolvedValueOnce({ empty: true, docs: [] }) // Comments
+                .mockResolvedValueOnce({ empty: false, docs: mockNotices }); // Notices
+
+            mockFirestore.collection.mockImplementation((path) => {
+                return { get: mockGet };
+            });
+
+            mockFirestore.doc.mockReturnValue({ id: 'newRef' });
+
+            await (service as any).migrateSubCollections();
+
+            // Verification
+            expect(mockBatch.set).toHaveBeenCalledWith(
+                expect.any(Object), // ref
+                expect.objectContaining({
+                    team_id: 'team1',
+                    title: 'Legacy Title',
+                    body: 'Legacy Content'
+                })
+            );
+        });
+    });
+
     describe('migrateSubCollections - Music Sheets', () => {
         it('should transform legacy sheet fields (url single string) to new fields (urls array)', async () => {
             // Mock Data
@@ -54,8 +95,7 @@ describe('AdminMigrationService', () => {
                 id: 'sh1',
                 data: () => ({
                     song_id: 's1',
-                    url: 'http://legacy-url.com', // Legacy singular
-                    // created_at?
+                    url: 'http://legacy-url.com',
                 })
             }];
 
@@ -75,12 +115,10 @@ describe('AdminMigrationService', () => {
 
             await (service as any).migrateSubCollections();
 
-            // Verification
-            // Should call batch.set with transformed data
             expect(mockBatch.set).toHaveBeenCalledWith(
-                expect.any(Object), // ref
+                expect.any(Object),
                 expect.objectContaining({
-                    urls: ['http://legacy-url.com'] // Expect array!
+                    urls: ['http://legacy-url.com']
                 })
             );
         });
@@ -98,7 +136,7 @@ describe('AdminMigrationService', () => {
                 id: 'c1',
                 data: () => ({
                     song_id: 's1',
-                    content: 'Legacy Content', // Legacy field name
+                    content: 'Legacy Content',
                 })
             }];
 
@@ -118,61 +156,64 @@ describe('AdminMigrationService', () => {
 
             await (service as any).migrateSubCollections();
 
-            // Verification
-            // Should call batch.set with transformed data
             expect(mockBatch.set).toHaveBeenCalledWith(
-                expect.any(Object), // ref
+                expect.any(Object),
                 expect.objectContaining({
-                    comment: 'Legacy Content' // Expect transformed field
+                    comment: 'Legacy Content'
                 })
             );
         });
     });
 
-    describe('migrateSubCollections - Notices', () => {
-        it('should transform legacy notice fields (subject/content) to new fields (title/body)', async () => {
-            // Mock Data
-            const mockNotices = [{
-                id: 'n1',
+    describe('migrateServingSchedules', () => {
+        it('should transform legacy serving fields (name -> title) and ensure simple structure', async () => {
+            const mockTeams = [{ id: 'team1' }];
+            const mockSchedules = [{
+                id: 'sch1',
                 data: () => ({
-                    team_id: 'team1',
-                    subject: 'Legacy Title',
-                    content: 'Legacy Content',
-                    created_at: '2024-01-01'
-                })
+                    name: 'Legacy Service Name', // Legacy field
+                    title: undefined, // New field missing
+                    date: '2024-01-01'
+                }),
+                ref: { id: 'sch1' } // Mock ref for batch update
             }];
 
-            // Mock DB calls
-            // 1. Worships (Empty)
-            // 2. Songs (Empty)
-            // 3. Music Sheets (Empty)
-            // 4. Comments (Empty)
-            // 5. Notices (Mocked)
+            // Mock DB calls - need detailed structure for this test
+            // We use a custom mock function to handle dynamic paths
+            const mockCollection = jest.fn();
+            const mockDoc = jest.fn();
 
-            const mockGet = jest.fn()
-                .mockResolvedValueOnce({ empty: true, docs: [] }) // Worships
-                .mockResolvedValueOnce({ empty: true, docs: [] }) // Songs
-                .mockResolvedValueOnce({ empty: true, docs: [] }) // Sheets
-                .mockResolvedValueOnce({ empty: true, docs: [] }) // Comments
-                .mockResolvedValueOnce({ empty: false, docs: mockNotices }); // Notices
-
-            mockFirestore.collection.mockImplementation((path) => {
-                return { get: mockGet };
+            // Teams collection with chaining support
+            mockCollection.mockImplementation((path) => {
+                if (path === 'teams') {
+                    return {
+                        get: jest.fn().mockResolvedValue({ docs: mockTeams }),
+                        doc: jest.fn((docId) => ({
+                            collection: jest.fn((subCol) => {
+                                if (subCol === 'serving_schedules') {
+                                    return { get: jest.fn().mockResolvedValue({ empty: false, docs: mockSchedules }) };
+                                }
+                                return { get: jest.fn().mockResolvedValue({ empty: true }) };
+                            })
+                        }))
+                    };
+                }
+                return { get: jest.fn() };
             });
 
-            // Mock doc() for set
-            mockFirestore.doc.mockReturnValue({ id: 'newRef' });
+            // Apply mocks to service.db
+            (service as any).db = {
+                collection: mockCollection,
+                doc: mockDoc,
+                batch: mockFirestore.batch
+            };
 
-            await (service as any).migrateSubCollections();
+            await (service as any).migrateServingSchedules();
 
-            // Verification
-            // Should call batch.set with transformed data
-            expect(mockBatch.set).toHaveBeenCalledWith(
+            expect(mockBatch.update).toHaveBeenCalledWith(
                 expect.any(Object), // ref
                 expect.objectContaining({
-                    team_id: 'team1',
-                    title: 'Legacy Title',
-                    body: 'Legacy Content'
+                    title: 'Legacy Service Name'
                 })
             );
         });
