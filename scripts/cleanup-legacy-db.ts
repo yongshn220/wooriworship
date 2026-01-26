@@ -7,7 +7,12 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 
 // 1. Load Environment Variables
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+// Priority: .env.local -> .env
+const localEnv = dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
+if (localEnv.parsed) console.log("✅ Loaded .env.local");
+
+const defaultEnv = dotenv.config({ path: path.resolve(__dirname, '../.env') });
+if (defaultEnv.parsed) console.log("✅ Loaded .env");
 
 // 2. Initialize Firebase Admin
 const serviceAccountPath = path.resolve(process.cwd(), 'firebase-admin-private-key.json');
