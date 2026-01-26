@@ -35,7 +35,28 @@ try {
 
 // 3. Execution Wrapper
 async function runCleanup() {
-    const db = admin.firestore();
+    // 3a. Determine Database ID & Safety Check
+    const dbId = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID || undefined;
+
+    console.log(`\n🔍 Checking Safety Guard for DB: ${dbId || "(default)"}`);
+
+    // SAFETY GUARD: Enforce STGENV
+    if (!dbId || !dbId.includes("STGENV")) {
+        console.error("\n⛔ SAFETY ALERT: Cleanup blocked!");
+        console.error("   Reason: Use 'STGENV' database only for cleanup scripts.");
+        console.error(`   Current DB: ${dbId || "(default)"}`);
+        process.exit(1);
+    }
+
+    let db;
+    if (dbId) {
+        console.log(`📂 Target Database: ${dbId}`);
+        const { getFirestore } = require('firebase-admin/firestore');
+        db = getFirestore(dbId);
+    } else {
+        db = admin.firestore();
+    }
+
     const service = AdminMigrationService.getInstance(db);
 
     const rl = readline.createInterface({
