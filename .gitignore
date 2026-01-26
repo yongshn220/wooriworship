@@ -37,3 +37,7 @@ yarn-error.log*
 next-env.d.ts
 
 .vscode/launch.json
+
+# secrets
+service-account.json
+firebase-admin-private-key.json

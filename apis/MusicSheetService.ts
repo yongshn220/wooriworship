@@ -1,16 +1,16 @@
-import BaseService from "./BaseService";
+
 import { MusicSheetContainer } from "@/components/constants/types";
 import { MusicSheet } from "@/models/music_sheet";
 import { getFirebaseTimestampNow } from "@/components/util/helper/helper-functions";
 import { db as defaultDb } from "@/firebase";
 import { collection, getDocs, getDoc, addDoc, doc, setDoc, deleteDoc, Firestore } from "firebase/firestore";
 
-class MusicSheetService extends BaseService {
+class MusicSheetService {
   private static instance: MusicSheetService;
   protected db: Firestore;
 
   private constructor(db?: Firestore) {
-    super("music_sheets"); // Placeholder
+    // super("music_sheets");
     this.db = db || defaultDb;
   }
 

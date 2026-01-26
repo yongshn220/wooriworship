@@ -53,7 +53,7 @@ export function NoticeHeaderList({ teamId }: Props) {
         {
           visibleNoticeIdList.map((noticeId) => (
             <Suspense key={noticeId} fallback={<NoticeSkeleton />}>
-              <NoticeHeaderDefault noticeId={noticeId} />
+              <NoticeHeaderDefault noticeId={noticeId} teamId={teamId} />
             </Suspense>
           ))
         }

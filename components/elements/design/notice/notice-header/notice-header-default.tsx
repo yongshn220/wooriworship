@@ -14,16 +14,17 @@ import { BoardCard } from "@/components/common/board/board-card";
 
 interface Props {
   noticeId: string
+  teamId: string
 }
 
-export function NoticeHeaderDefault({ noticeId }: Props) {
+export function NoticeHeaderDefault({ noticeId, teamId }: Props) {
   const [fullScreenOn, setFullScreenOn] = useState({
     state: false,
     urls: []
   })
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const notice = useRecoilValue(noticeAtom(noticeId))
+  const notice = useRecoilValue(noticeAtom({ teamId, noticeId }))
   const user = useRecoilValue(userAtom(notice?.created_by.id))
 
   const hasFiles = notice?.file_urls && notice.file_urls.length > 0;

@@ -143,8 +143,8 @@ export class MigrationService {
         const teamsSnapshot = await getDocs(collection(this.db, "teams"));
 
         for (const teamDoc of teamsSnapshot.docs) {
-            const schedulesSnapshot = await getDocs(collection(db, "teams", teamDoc.id, "serving_schedules"));
-            const batch = writeBatch(db);
+            const schedulesSnapshot = await getDocs(collection(this.db, "teams", teamDoc.id, "serving_schedules"));
+            const batch = writeBatch(this.db);
             let operationCount = 0;
 
             for (const docSnapshot of schedulesSnapshot.docs) {
