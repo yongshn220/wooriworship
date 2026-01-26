@@ -40,13 +40,12 @@ async function runCleanup() {
 
     console.log(`\n🔍 Checking Safety Guard for DB: ${dbId || "(default)"}`);
 
-    // SAFETY GUARD: Enforce Staging Environment
-    // Allows "stg-env", "STGENV", "staging", etc.
-    const isStaging = dbId && dbId.toLowerCase().includes("stg");
+    // SAFETY GUARD: Enforce Staging Environment (Strict)
+    const isStaging = dbId === "stg-env";
 
     if (!isStaging) {
         console.error("\n⛔ SAFETY ALERT: Cleanup blocked!");
-        console.error("   Reason: Use a Staging database (must contain 'stg') for cleanup scripts.");
+        console.error("   Reason: You can ONLY run this script against the 'stg-env' database.");
         console.error(`   Current DB: ${dbId || "(default)"}`);
         process.exit(1);
     }
