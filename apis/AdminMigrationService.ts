@@ -322,6 +322,10 @@ export class AdminMigrationService {
                     chunk.forEach(comment => {
                         const newRef = this.db.doc(`teams/${data.team_id}/songs/${sDoc.id}/comments/${comment.id}`);
                         const { id, ...commentData } = comment;
+
+                        // Transform Legacy Fields
+                        commentData.comment = commentData.comment || commentData.content || commentData.text || "";
+
                         commentBatch.set(newRef, commentData);
                     });
                     await commentBatch.commit();

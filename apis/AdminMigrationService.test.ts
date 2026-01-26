@@ -86,6 +86,49 @@ describe('AdminMigrationService', () => {
         });
     });
 
+    describe('migrateSubCollections - Comments', () => {
+        it('should transform legacy comment fields (content) to new fields (comment)', async () => {
+            // Mock Data
+            const mockSongs = [{
+                id: 's1',
+                data: () => ({ team_id: 'team1', title: 'Song' })
+            }];
+
+            const mockComments = [{
+                id: 'c1',
+                data: () => ({
+                    song_id: 's1',
+                    content: 'Legacy Content', // Legacy field name
+                })
+            }];
+
+            // Mock DB calls sequence
+            const mockGet = jest.fn()
+                .mockResolvedValueOnce({ empty: true, docs: [] }) // Worships
+                .mockResolvedValueOnce({ empty: false, docs: mockSongs }) // Songs
+                .mockResolvedValueOnce({ empty: true, docs: [] }) // Sheets
+                .mockResolvedValueOnce({ empty: false, docs: mockComments }) // Comments
+                .mockResolvedValueOnce({ empty: true, docs: [] }); // Notices
+
+            mockFirestore.collection.mockImplementation((path) => {
+                return { get: mockGet };
+            });
+
+            mockFirestore.doc.mockReturnValue({ id: 'newRef' });
+
+            await (service as any).migrateSubCollections();
+
+            // Verification
+            // Should call batch.set with transformed data
+            expect(mockBatch.set).toHaveBeenCalledWith(
+                expect.any(Object), // ref
+                expect.objectContaining({
+                    comment: 'Legacy Content' // Expect transformed field
+                })
+            );
+        });
+    });
+
     describe('migrateSubCollections - Notices', () => {
         it('should transform legacy notice fields (subject/content) to new fields (title/body)', async () => {
             // Mock Data
