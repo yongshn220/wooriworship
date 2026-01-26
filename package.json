@@ -10,8 +10,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "db:sync-stg": "./scripts/copy-db-to-staging.sh",
-    "db:migrate": "ts-node -r tsconfig-paths/register scripts/run-migration.ts",
-    "db:cleanup": "ts-node -r tsconfig-paths/register scripts/cleanup-legacy-db.ts"
+    "db:migrate:v1-to-v2": "ts-node -r tsconfig-paths/register scripts/migrate-v1-to-v2.ts",
+    "db:cleanup": "ts-node -r tsconfig-paths/register scripts/cleanup-legacy-db.ts",
+    "db:restore:prod": "./scripts/copy-snapshot-to-production.sh"
   },
   "dependencies": {
     "@auth/firebase-adapter": "^1.5.2",
