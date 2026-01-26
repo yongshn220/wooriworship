@@ -42,6 +42,50 @@ describe('AdminMigrationService', () => {
         service = new AdminMigrationService(mockFirestore as any);
     });
 
+    describe('migrateSubCollections - Music Sheets', () => {
+        it('should transform legacy sheet fields (url single string) to new fields (urls array)', async () => {
+            // Mock Data
+            const mockSongs = [{
+                id: 's1',
+                data: () => ({ team_id: 'team1', title: 'Song' })
+            }];
+
+            const mockSheets = [{
+                id: 'sh1',
+                data: () => ({
+                    song_id: 's1',
+                    url: 'http://legacy-url.com', // Legacy singular
+                    // created_at?
+                })
+            }];
+
+            // Mock DB calls sequence
+            const mockGet = jest.fn()
+                .mockResolvedValueOnce({ empty: true, docs: [] }) // Worships
+                .mockResolvedValueOnce({ empty: false, docs: mockSongs }) // Songs
+                .mockResolvedValueOnce({ empty: false, docs: mockSheets }) // Sheets
+                .mockResolvedValueOnce({ empty: true, docs: [] }) // Comments
+                .mockResolvedValueOnce({ empty: true, docs: [] }); // Notices
+
+            mockFirestore.collection.mockImplementation((path) => {
+                return { get: mockGet };
+            });
+
+            mockFirestore.doc.mockReturnValue({ id: 'newRef' });
+
+            await (service as any).migrateSubCollections();
+
+            // Verification
+            // Should call batch.set with transformed data
+            expect(mockBatch.set).toHaveBeenCalledWith(
+                expect.any(Object), // ref
+                expect.objectContaining({
+                    urls: ['http://legacy-url.com'] // Expect array!
+                })
+            );
+        });
+    });
+
     describe('migrateSubCollections - Notices', () => {
         it('should transform legacy notice fields (subject/content) to new fields (title/body)', async () => {
             // Mock Data

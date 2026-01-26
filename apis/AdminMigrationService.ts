@@ -300,6 +300,13 @@ export class AdminMigrationService {
                         const newRef = this.db.doc(`teams/${data.team_id}/songs/${sDoc.id}/sheets/${sheet.id}`);
                         // Remove id from data payload if it exists to avoid duplication
                         const { id, ...sheetData } = sheet;
+
+                        // Transform Legacy Fields
+                        if (!sheetData.urls && sheetData.url) {
+                            sheetData.urls = [sheetData.url];
+                            delete sheetData.url;
+                        }
+
                         sheetBatch.set(newRef, sheetData);
                     });
                     await sheetBatch.commit();
