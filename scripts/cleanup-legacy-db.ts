@@ -10,27 +10,23 @@ import * as readline from 'readline';
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 // 2. Initialize Firebase Admin
-const envServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-const jsonFilePath = path.resolve(__dirname, '../firebase-admin-private-key.json');
-
-let serviceAccount: any;
+const serviceAccountPath = path.resolve(process.cwd(), 'firebase-admin-private-key.json');
 
 try {
-    if (envServiceAccount) {
-        serviceAccount = JSON.parse(envServiceAccount);
-        console.log("✅ Credentials loaded from ENV.");
-    } else if (fs.existsSync(jsonFilePath)) {
-        serviceAccount = require(jsonFilePath);
-        console.log("✅ Credentials loaded from JSON file.");
-    } else {
-        throw new Error("Missing Credentials! Set FIREBASE_SERVICE_ACCOUNT_KEY in .env or provide firebase-admin-private-key.json");
+    if (!fs.existsSync(serviceAccountPath)) {
+        console.error("\n❌ Error: firebase-admin-private-key.json not found in project root.");
+        console.error("Please download it from Firebase Console -> Project Settings -> Service Accounts");
+        console.error("and place it at:", serviceAccountPath);
+        process.exit(1);
     }
+
+    const serviceAccount = require(serviceAccountPath);
 
     if (!admin.apps.length) {
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount)
         });
-        console.log("✅ Admin SDK Initialized.");
+        console.log("✅ Admin SDK Initialized (File: firebase-admin-private-key.json)");
     }
 } catch (e: any) {
     console.error("❌ Auth Error:", e.message);
