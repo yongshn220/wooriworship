@@ -57,6 +57,10 @@ service cloud.firestore {
         }
       }
 
+      match /praise_team_roles/{roleId} {
+        allow read, write: if isAuthenticated();
+      }
+
 
       // Unified Service (V3)
       match /services/{serviceId} {
