@@ -5,8 +5,8 @@
 import { useEffect, useState, useMemo, Suspense } from "react";
 import { format } from "date-fns";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState";
 import { fetchServingRolesSelector } from "@/global-states/servingState";
+import { fetchServiceTagsSelector } from "@/global-states/teamState";
 import { serviceEventsListAtom } from "@/global-states/serviceEventState";
 import { currentPageAtom } from "@/global-states/page-state";
 import { Page } from "@/components/constants/enums";
@@ -51,6 +51,9 @@ export default function ServingPage() {
         setCurrentPage(Page.SERVING);
     }, [setCurrentPage]);
 
+    const roles = useRecoilValue(fetchServingRolesSelector(teamId || ""));
+    const serviceTags = useRecoilValue(fetchServiceTagsSelector(teamId || ""));
+
     // Map events to CalendarItem
     const calendarItems: CalendarItem[] = useMemo(() => {
         return events.map(e => {
@@ -58,7 +61,7 @@ export default function ServingPage() {
             let badgeLabel = "Event";
             if (e.tagId) {
                 // Resolve tag name
-                const tagName = team?.service_tags?.find((t: any) => t.id === e.tagId)?.name;
+                const tagName = serviceTags?.find((t: any) => t.id === e.tagId)?.name;
                 badgeLabel = tagName || e.title;
             } else if (e.title) {
                 badgeLabel = e.title;
@@ -86,9 +89,6 @@ export default function ServingPage() {
     const selectedSchedule = useMemo(() =>
         events.find(s => s.id === selectedScheduleId),
         [events, selectedScheduleId]);
-
-    const roles = useRecoilValue(fetchServingRolesSelector(teamId || ""));
-
 
     const currentUserUid = auth.currentUser?.uid;
 

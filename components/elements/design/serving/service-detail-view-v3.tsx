@@ -4,7 +4,7 @@ import { Music, Users, ListOrdered } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { teamAtom } from "@/global-states/teamState";
+import { teamAtom, fetchServiceTagsSelector } from "@/global-states/teamState";
 import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow } from "@/models/services/ServiceEvent";
 import { User } from "@/models/user";
 import { getDynamicDisplayTitle } from "@/components/util/helper/helper-functions";
@@ -36,12 +36,13 @@ export function ServiceDetailViewV3({
     currentUserUid
 }: Props) {
     const team = useRecoilValue(teamAtom(teamId));
+    const serviceTags = useRecoilValue(fetchServiceTagsSelector(teamId));
     const [previewWorshipId, setPreviewWorshipId] = useState<string | null>(null);
 
     // Resolve Display Title
     const displayTitle = getDynamicDisplayTitle(
         event.tagId ? [event.tagId] : [],
-        team?.service_tags,
+        serviceTags,
         event.title
     );
 

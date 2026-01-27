@@ -38,3 +38,17 @@ export const teamUpdaterAtom = atom({
   key: "teamUpdaterAtom",
   default: 0
 })
+
+export const serviceTagsUpdaterAtom = atom({
+  key: "serviceTagsUpdaterAtom",
+  default: 0
+});
+
+export const fetchServiceTagsSelector = selectorFamily<any[], string>({
+  key: "fetchServiceTagsSelector",
+  get: (teamId) => async ({ get }) => {
+    get(serviceTagsUpdaterAtom);
+    if (!teamId) return [];
+    return await TeamService.getServiceTags(teamId);
+  },
+});
