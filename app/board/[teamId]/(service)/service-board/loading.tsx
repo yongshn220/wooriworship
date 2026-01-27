@@ -1,5 +1,5 @@
-import { ServingListSkeleton } from "./_components/serving-list-skeleton";
+import { ServiceListSkeleton } from "./_components/service-list-skeleton";
 
 export default function Loading() {
-    return <ServingListSkeleton />;
+    return <ServiceListSkeleton />;
 }

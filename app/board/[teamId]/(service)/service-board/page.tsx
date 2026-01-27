@@ -12,26 +12,26 @@ import { currentPageAtom } from "@/global-states/page-state";
 import { Page } from "@/components/constants/enums";
 import { ServiceEvent } from "@/models/services/ServiceEvent";
 import { ServiceEventService } from "@/apis/ServiceEventService";
-import { ServingListSkeleton } from "./_components/serving-list-skeleton";
+import { ServiceListSkeleton } from "./_components/service-list-skeleton";
 import { parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";
 import { Timestamp } from "firebase/firestore";
-import { EmptyServingBoardPage } from "./_components/empty-serving-board-page";
+import { EmptyServiceBoardPage } from "./_components/empty-service-board-page";
 // import { CalendarStrip } from "@/components/elements/design/serving/calendar-strip"; // REMOVED
 import { CalendarStrip } from "@/components/common/board-calendar/calendar-strip"; // NEW
 import { CalendarItem } from "@/components/common/board-calendar/types"; // NEW
 import { useCalendarNavigation } from "@/components/common/hooks/use-calendar-navigation"; // NEW
-import { ServiceDetailContainer } from "@/components/elements/design/serving/service-detail-container";
+import { ServiceDetailContainer } from "@/components/elements/design/service/service-detail-container";
 
 import { getPathCreateServing } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
 import { auth } from "@/firebase";
 import { headerActionsAtom } from "@/app/board/_states/board-states";
-import { ServingHeaderMenu } from "@/components/elements/design/serving/serving-header-menu";
-import { ServiceCreationMenu } from "@/components/elements/design/serving/service-creation-menu";
+import { ServiceHeaderMenu } from "@/components/elements/design/service/service-header-menu";
+import { ServiceCreationMenu } from "@/components/elements/design/service/service-creation-menu";
 
-import { SwipeableView } from "@/components/elements/design/serving/swipeable-view";
+import { SwipeableView } from "@/components/elements/design/service/swipeable-view";
 // import { useServingNavigation } from "./_hooks/use-serving-navigation"; // REMOVED
-import { ServingDataPrefetcher } from "./_components/serving-data-prefetcher";
+import { ServiceDataPrefetcher } from "./_components/service-data-prefetcher";
 
 export default function ServingPage() {
     const teamId = useRecoilValue(currentTeamIdAtom);
@@ -217,14 +217,14 @@ export default function ServingPage() {
 
 
     if (loading) {
-        return <ServingListSkeleton />;
+        return <ServiceListSkeleton />;
     }
 
     if (events.length === 0) {
         return (
             <div className="flex flex-col h-full w-full bg-surface dark:bg-surface-dark relative">
                 <div className="flex-1">
-                    <EmptyServingBoardPage />
+                    <EmptyServiceBoardPage />
                 </div>
             </div>
         )
@@ -245,7 +245,7 @@ export default function ServingPage() {
 
                     {/* Details Section */}
                     <div className="mt-6">
-                        <Suspense fallback={<ServingListSkeleton />}>
+                        <Suspense fallback={<ServiceListSkeleton />}>
                             {selectedScheduleId ? (
                                 <ServiceDetailContainer
                                     serviceId={selectedScheduleId}

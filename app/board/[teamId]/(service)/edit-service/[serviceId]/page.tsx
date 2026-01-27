@@ -1,7 +1,7 @@
 "use client";
 
 import { PageInit } from "@/components/util/page/page-init";
-import { ServingForm } from "@/components/elements/design/serving/serving-form/serving-form";
+import { ServiceForm } from "@/components/elements/design/service/service-form/service-form";
 import { FormMode, Page } from "@/components/constants/enums";
 import { useEffect, useState } from "react";
 import { ServiceEventService } from "@/apis/ServiceEventService";
@@ -45,7 +45,7 @@ export default function EditServicePage({ params }: Props) {
         <div className="w-full h-full">
             <PageInit teamId={teamId} page={Page.EDIT_SERVING} />
             {schedule ? (
-                <ServingForm teamId={teamId} mode={FormMode.EDIT} initialData={schedule} />
+                <ServiceForm teamId={teamId} mode={FormMode.EDIT} initialData={schedule} />
             ) : (
                 <div className="flex items-center justify-center h-full">Loading...</div>
             )}

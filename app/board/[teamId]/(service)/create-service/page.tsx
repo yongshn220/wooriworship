@@ -1,6 +1,6 @@
 "use client";
 
-import { ServingForm } from "@/components/elements/design/serving/serving-form/serving-form";
+import { ServiceForm } from "@/components/elements/design/service/service-form/service-form";
 
 interface Props {
     params: {
@@ -11,7 +11,7 @@ interface Props {
 export default function CreateServingPage({ params }: Props) {
     return (
         <div className="w-full h-full">
-            <ServingForm teamId={params.teamId} />
+            <ServiceForm teamId={params.teamId} />
         </div>
     );
 }
