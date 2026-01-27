@@ -12,6 +12,21 @@ import { useState } from "react";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { ServiceEventService } from "@/apis/ServiceEventService";
 
+import { auth } from "@/firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useSetRecoilState } from "recoil";
+import { serviceEventsListAtom } from "@/global-states/serviceEventState";
+import { useToast } from "@/hooks/use-toast";
+
+interface Props {
+    scheduleId: string;
+    teamId: string;
+    trigger?: React.ReactNode;
+    iconType?: "horizontal" | "vertical";
+    scheduleTitle?: string;
+    scheduleDate?: string;
+}
+
 export function ServingHeaderMenu({
     scheduleId,
     teamId,
@@ -23,7 +38,7 @@ export function ServingHeaderMenu({
     const [user] = useAuthState(auth as any);
     const router = useRouter();
     const { toast } = useToast();
-    const setSchedules = useSetRecoilState(servingSchedulesAtom);
+    const setServices = useSetRecoilState(serviceEventsListAtom);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const handleEdit = () => {
@@ -37,7 +52,7 @@ export function ServingHeaderMenu({
                 title: "Schedule deleted",
                 description: "The serving schedule has been successfully removed.",
             });
-            setSchedules((prev) => prev.filter((s) => s.id !== scheduleId));
+            setServices((prev) => prev.filter((s) => s.id !== scheduleId));
         } catch (error) {
             console.error(error);
             toast({

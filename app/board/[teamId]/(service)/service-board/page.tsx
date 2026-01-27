@@ -97,15 +97,17 @@ export default function ServingPage() {
         async function loadData() {
             if (!teamId) return;
             try {
-                // 1. Define Range: Future (Today to 6 months)
-                const today = new Date();
+                // 1. Define Range: Recent Past + Future (Past 1 month to 6 months future)
                 const todayStart = new Date();
                 todayStart.setHours(0, 0, 0, 0);
 
-                const futureEnd = new Date();
+                const initialStart = new Date(todayStart);
+                initialStart.setMonth(initialStart.getMonth() - 3);
+
+                const futureEnd = new Date(todayStart);
                 futureEnd.setMonth(futureEnd.getMonth() + 6);
 
-                const data = await ServiceEventService.getServiceEvents(teamId, todayStart, futureEnd);
+                const data = await ServiceEventService.getServiceEvents(teamId, initialStart, futureEnd);
 
                 // Sort by date (ServiceEventService orders ASC, we want ASC for future? 
                 // Wait, CalendarStrip usually likes sorted data. ServiceEventService does ASC.
@@ -127,7 +129,6 @@ export default function ServingPage() {
                 setLoading(false);
             }
         }
-        loadData();
         loadData();
     }, [teamId, setEvents]); // Removed setHeaderActions from dependencies since we use it in separate effect
 
