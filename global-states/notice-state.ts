@@ -48,7 +48,7 @@ export const noticeAtom = atomFamily<Notice, { teamId: string, noticeId: string 
     get: ({ teamId, noticeId }) => async ({ get }) => {
       get(noticeUpdaterAtom)
       try {
-        const notice = await NoticeService.getById(teamId, noticeId) as Notice
+        const notice = await NoticeService.getNoticeById(teamId, noticeId) as Notice
         if (!notice) return null
 
         return notice

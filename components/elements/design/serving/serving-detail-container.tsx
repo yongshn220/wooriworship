@@ -5,7 +5,7 @@ import { usersAtom } from "@/global-states/userState";
 import { ServingSchedule, ServingRole } from "@/models/serving";
 import { ServingDetailView } from "./serving-detail-view";
 import { useMemo } from "react";
-import { useServingMemberIds } from "@/app/board/[teamId]/(serving)/serving-board/_hooks/use-serving-member-ids";
+import { useServingMemberIds } from "@/app/board/[teamId]/(service)/service-board/_hooks/use-serving-member-ids";
 
 interface Props {
     schedule: ServingSchedule;

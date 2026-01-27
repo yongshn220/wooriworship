@@ -40,7 +40,7 @@ export const songCommentAtom = atomFamily<SongComment, { teamId: string, songId:
 
         if (!commentId) return null
 
-        const comment = await SongCommentService.getById(teamId, songId, commentId) as SongComment
+        const comment = await SongCommentService.getCommentById(teamId, songId, commentId) as SongComment
         if (!comment) return null
 
         return comment

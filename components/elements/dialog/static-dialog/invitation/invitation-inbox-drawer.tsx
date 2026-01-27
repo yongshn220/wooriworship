@@ -28,7 +28,7 @@ export function InvitationInboxDrawer({ isOpen, setIsOpen }: Props) {
         setIsLoading(true);
         try {
             const data = await InvitationService.getPendingReceivedInvitations(authUser.email);
-            setInvitations(data);
+            setInvitations(data as Invitation[]);
         } catch (e) {
             console.error(e);
         } finally {

@@ -1,7 +1,8 @@
 import { db } from "@/firebase";
 import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { ServiceSetlist } from "@/models/services/ServiceEvent";
-import { SongService } from "./SongService";
+import { Song } from "@/models/song";
+import SongService from "./SongService";
 
 /**
  * SetlistService (V3)
@@ -18,7 +19,26 @@ export class SetlistService {
             const ref = doc(db, `teams/${teamId}/services/${serviceId}/setlists/main`);
             const snap = await getDoc(ref);
             if (!snap.exists()) return null;
-            return snap.data() as ServiceSetlist;
+
+            const data = snap.data() as ServiceSetlist;
+
+            // Hydrate Songs
+            if (data.songs && data.songs.length > 0) {
+                const hydratedSongs = await Promise.all(data.songs.map(async (s) => {
+                    // Start with lightweight hydration if possible, or fetch full song
+                    // Optimization: Could use a cache or batched fetch
+                    const songDetails = await SongService.getSongById(teamId, s.id) as Song;
+                    return {
+                        ...s,
+                        title: songDetails?.title || "Unknown Song",
+                        artist: songDetails?.original?.author || songDetails?.subtitle || "",
+                        key: songDetails?.keys?.[0] || ""
+                    };
+                }));
+                data.songs = hydratedSongs;
+            }
+
+            return data;
         } catch (e) {
             console.error("SetlistService.getSetlist:", e);
             return null;

@@ -53,7 +53,7 @@ export function AddableSongDetailDialog({ teamId, isOpen, setIsOpen, songId, sel
               }
               <p className="text-center font-semibold text-gray-500">{song?.original.author}</p>
             </DrawerHeader>
-            <SongDetailContent songId={songId} />
+            <SongDetailContent teamId={teamId} songId={songId} />
             <div className="w-full flex-center">
               <SongCommentArea teamId={teamId} songId={songId} />
             </div>

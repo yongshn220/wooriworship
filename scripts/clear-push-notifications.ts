@@ -90,7 +90,8 @@ async function clearPushNotifications() {
 
         let totalUpdated = 0;
 
-        for (const [index, chunk] of chunks.entries()) {
+        for (let index = 0; index < chunks.length; index++) {
+            const chunk = chunks[index];
             const batch = db.batch();
             let batchCount = 0;
 

@@ -24,40 +24,33 @@ if (!admin.apps.length) {
 }
 
 const db = getFirestore();
+const TARGET_TEAM_ID = 'CeNHlzWOb3QZBqRPE07X';
 
+async function inspectData() {
+    console.log(`Inspecting data for Team: ${TARGET_TEAM_ID}...`);
 
-async function inspectServiceData() {
-    const teamId = 'CeNHlzWOb3QZBqRPE07X'; // Target team
-    console.log(`Inspecting Team Doc: ${teamId}...`);
+    const servicesRef = db.collection(`teams/${TARGET_TEAM_ID}/services`);
+    const snapshot = await servicesRef.get();
 
-    const teamRef = db.doc(`teams/${teamId}`);
-    const teamSnap = await teamRef.get();
-
-    if (!teamSnap.exists) {
-        console.log("Team document DOES NOT EXIST!");
-        return;
-    }
-    console.log("Team document exists.");
-    const teamSubcols = await teamRef.listCollections();
-    console.log(`Team Subcollections: ${teamSubcols.map(c => c.id).join(', ')}`);
-
-
-    const servingSchedulesRef = db.collection(`teams/${teamId}/serving_schedules`);
-    const schedulesSnapshot = await servingSchedulesRef.limit(3).get();
-
-    if (schedulesSnapshot.empty) {
-        console.log("No docs found in 'serving_schedules' either.");
+    if (snapshot.empty) {
+        console.log("No services found in 'services' collection.");
         return;
     }
 
-    console.log(`Found ${schedulesSnapshot.size} docs in 'serving_schedules'. Inspecting first one...`);
-    const schedDoc = schedulesSnapshot.docs[0];
-    console.log(`\n=== Schedule ID: ${schedDoc.id} ===`);
-    console.log(JSON.stringify(schedDoc.data(), null, 2));
+    console.log(`Found ${snapshot.size} services. Listing first 5:`);
+    snapshot.docs.slice(0, 5).forEach(doc => {
+        const data = doc.data();
+        console.log(`ID: ${doc.id}`);
+        console.log(`Title: ${data.title}`);
+        console.log(`Date: ${data.date ? (data.date.toDate ? data.date.toDate().toISOString() : JSON.stringify(data.date)) : 'NULL'}`);
+        console.log(`---`);
 
-    // Check subcols
-    const subcols = await schedDoc.ref.listCollections();
-    console.log(`\nSubcollections: ${subcols.map(c => c.id).join(', ')}`);
+        // Check sub-collections
+        servicesRef.doc(doc.id).collection('setlists').get().then(s => {
+            console.log(`  [Sub] setlists count: ${s.size}`);
+            s.docs.forEach(sd => console.log(`    - Doc ID: ${sd.id}`));
+        });
+    });
 }
 
-inspectServiceData().catch(console.error);
+inspectData().catch(console.error);

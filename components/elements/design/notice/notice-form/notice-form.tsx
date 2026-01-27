@@ -41,7 +41,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
   const teamId = useRecoilValue(currentTeamIdAtom)
   const setNoticeIdsUpdater = useSetRecoilState(noticeIdsUpdaterAtom)
   const noticeUpdater = useSetRecoilState(noticeUpdaterAtom)
-  const notice = useRecoilValue(noticeAtom(noticeId))
+  const notice = useRecoilValue(noticeAtom({ teamId, noticeId: noticeId || "" }))
 
   // Form State
   const [step, setStep] = useState(0); // 0: Title, 1: Content, 2: Attachments

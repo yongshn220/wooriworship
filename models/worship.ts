@@ -4,6 +4,10 @@ export interface WorshipSongHeader {
   id: string
   note: string
   selected_music_sheet_ids: Array<string>
+  // Hydrated Fields
+  title?: string
+  artist?: string // was subtitle
+  key?: string
 }
 
 export interface Worship {

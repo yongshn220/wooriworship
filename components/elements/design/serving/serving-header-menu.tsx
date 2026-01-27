@@ -16,7 +16,7 @@ import { auth } from "@/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useSetRecoilState } from "recoil";
 import { serviceEventsListAtom } from "@/global-states/serviceEventState";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Props {
     scheduleId: string;

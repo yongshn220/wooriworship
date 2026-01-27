@@ -21,7 +21,7 @@ export const currentTeamWorshipListAtom = (globalForRecoil.recoilAtoms['currentT
       try {
         get(worshipIdsUpdaterAtom)
 
-        const services = await ServiceEventService.getServiceEvents(teamId)
+        const services = await ServiceEventService.getRecentServicesWithFlows(teamId) as any[]
         if (!services) return []
 
         // Map to legacy Worship shape for UI compatibility

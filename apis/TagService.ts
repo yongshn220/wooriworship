@@ -11,7 +11,7 @@ class TagService extends BaseService {
     try {
       const q = query(collection(db, "teams", teamId, "song_tags"));
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as { id: string, name: string }));
     } catch (e) {
       console.error(e);
       return [];

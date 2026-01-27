@@ -117,6 +117,9 @@ export class ServiceEventService {
     /**
      * Deletes a Service and its sub-collection documents.
      */
+    /**
+     * Deletes a Service and its sub-collection documents.
+     */
     static async deleteService(teamId: string, serviceId: string) {
         // 1. Cleanup References (Linking)
         await LinkingService.cleanupReferencesForServingDeletion(teamId, serviceId);
@@ -131,6 +134,20 @@ export class ServiceEventService {
         batch.delete(doc(db, `teams/${teamId}/services/${serviceId}`));
 
         await batch.commit();
+    }
+
+    static async initSubCollection(teamId: string, serviceId: string, type: 'setlist' | 'praise_assignee' | 'flow') {
+        switch (type) {
+            case 'setlist':
+                await SetlistService.initSetlist(teamId, serviceId);
+                break;
+            case 'praise_assignee':
+                await PraiseAssigneeService.initAssignees(teamId, serviceId);
+                break;
+            case 'flow':
+                await ServiceFlowService.initFlow(teamId, serviceId);
+                break;
+        }
     }
 
     // =========================================================================

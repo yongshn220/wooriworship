@@ -17,7 +17,7 @@ export const sentInvitationsAtom = atomFamily<Array<Invitation>, { userId: strin
         const invitations = await InvitationService.getTeamSentInvitations(userId, teamId)
         if (!invitations) return []
 
-        return invitations
+        return invitations as Invitation[]
       }
       catch (e) {
         console.error(e)
@@ -46,7 +46,7 @@ export const pendingReceivedInvitationsAtom = atomFamily<Array<Invitation>, stri
         const invitations = await InvitationService.getPendingReceivedInvitations(receiverEmail)
         if (!invitations) return []
 
-        return invitations
+        return invitations as Invitation[]
       }
       catch (e) {
         console.error(e)

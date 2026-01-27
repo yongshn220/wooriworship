@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function NoticeHeaderMinimal({ teamId, noticeId }: Props) {
-  const notice = useRecoilValue(noticeAtom(noticeId))
+  const notice = useRecoilValue(noticeAtom({ teamId, noticeId }))
   const router = useRouter()
 
   return (

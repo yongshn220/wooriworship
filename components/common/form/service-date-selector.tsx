@@ -88,8 +88,9 @@ export function ServiceDateSelector({
                     let maxWeekday = 0;
                     let maxCount = -1;
                     Object.entries(tagStat.weekdays || {}).forEach(([day, count]) => {
-                        if (count > maxCount) {
-                            maxCount = count;
+                        const countNum = count as number;
+                        if (countNum > maxCount) {
+                            maxCount = countNum;
                             maxWeekday = parseInt(day);
                         }
                     });

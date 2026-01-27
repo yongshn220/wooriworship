@@ -526,6 +526,7 @@ export function ServingForm(props: ServingFormProps) {
                     isOpen={!!previewWorshipId}
                     onClose={() => setPreviewWorshipId(null)}
                     worshipId={previewWorshipId}
+                    teamId={props.teamId}
                 />
 
                 {/* Member Selection Drawer */}
