@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo, Suspense } from "react";
 import { format } from "date-fns";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom, teamAtom, fetchServiceTagsSelector } from "@/global-states/teamState";
-import { fetchServingRolesSelector } from "@/global-states/servingState";
+import { fetchServingRolesSelector } from "@/global-states/serviceRolesState";
 import { serviceEventsListAtom } from "@/global-states/serviceEventState";
 import { currentPageAtom } from "@/global-states/page-state";
 import { Page } from "@/components/constants/enums";

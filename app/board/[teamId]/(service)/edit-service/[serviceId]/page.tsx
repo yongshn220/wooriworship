@@ -10,17 +10,17 @@ import { ServiceFormState } from "@/models/services/ServiceEvent";
 interface Props {
     params: {
         teamId: string;
-        servingId: string;
+        serviceId: string;
     }
 }
 
-export default function EditServingPage({ params }: Props) {
-    const { teamId, servingId } = params;
+export default function EditServicePage({ params }: Props) {
+    const { teamId, serviceId } = params;
     const [schedule, setSchedule] = useState<ServiceFormState | undefined>(undefined);
 
     useEffect(() => {
         if (!schedule) {
-            ServiceEventService.getServiceDetails(teamId, servingId)
+            ServiceEventService.getServiceDetails(teamId, serviceId)
                 .then(details => {
                     if (details && details.event) {
                         const adaptedSchedule: ServiceFormState = {
@@ -39,7 +39,7 @@ export default function EditServingPage({ params }: Props) {
                 })
                 .catch(console.error);
         }
-    }, [schedule, teamId, servingId]);
+    }, [schedule, teamId, serviceId]);
 
     return (
         <div className="w-full h-full">

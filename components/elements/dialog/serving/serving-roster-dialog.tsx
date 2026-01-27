@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { useRecoilValue } from "recoil";
-import { fetchServingRolesSelector } from "@/global-states/servingState";
+import { fetchServingRolesSelector } from "@/global-states/serviceRolesState";
 import { teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
 import { ServiceFormState } from "@/models/services/ServiceEvent";

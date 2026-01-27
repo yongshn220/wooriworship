@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { toast } from "@/components/ui/use-toast";
 
-import { fetchServingRolesSelector, servingRolesUpdaterAtom } from "@/global-states/servingState";
+import { fetchServingRolesSelector, servingRolesUpdaterAtom } from "@/global-states/serviceRolesState";
 import { teamUpdaterAtom, teamAtom } from "@/global-states/teamState";
 import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
 import { TeamService } from "@/apis";

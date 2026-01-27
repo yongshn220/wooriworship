@@ -4,7 +4,7 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { format } from "date-fns";
 import { toast } from "@/components/ui/use-toast";
 import { teamAtom } from "@/global-states/teamState";
-import { servingSchedulesAtom } from "@/global-states/servingState";
+import { servingSchedulesAtom } from "@/global-states/serviceRolesState";
 import { usersAtom } from "@/global-states/userState";
 import { ServiceEventService } from "@/apis/ServiceEventService";
 import { SetlistService } from "@/apis/SetlistService";

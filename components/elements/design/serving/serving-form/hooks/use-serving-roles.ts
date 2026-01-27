@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRecoilValueLoadable, useSetRecoilState } from "recoil";
-import { fetchServingRolesSelector, servingRolesUpdaterAtom } from "@/global-states/servingState";
+import { fetchServingRolesSelector, servingRolesUpdaterAtom } from "@/global-states/serviceRolesState";
 import { toast } from "@/components/ui/use-toast";
 import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
 

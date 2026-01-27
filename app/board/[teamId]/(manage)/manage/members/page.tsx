@@ -13,7 +13,7 @@ import { MemberRoleDrawer } from "@/components/elements/manage/member-role-drawe
 import { usersAtom } from "@/global-states/userState";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { fetchServingRolesSelector } from "@/global-states/servingState";
+import { fetchServingRolesSelector } from "@/global-states/serviceRolesState";
 
 export default function MembersPage() {
     const router = useRouter();

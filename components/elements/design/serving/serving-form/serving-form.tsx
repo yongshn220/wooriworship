@@ -20,6 +20,7 @@ import { ServingMemberList } from "@/components/elements/design/serving/serving-
 import { MemberSelector } from "./member-selector";
 import { SetlistPlanPreviewDrawer } from "@/components/elements/design/setlist/setlist-plan-preview-drawer";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
+import { getPathEditServing } from "@/components/util/helper/routes";
 import { AddActionButton } from "./serving-components";
 import { PraiseTeamCard } from "../parts/praise-team-card";
 import { ServiceOrderCard } from "../parts/service-order-card";
@@ -149,7 +150,7 @@ export function ServingForm(props: ServingFormProps) {
                                         <Button
                                             size="sm"
                                             className="h-8 px-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-bold text-xs shadow-sm flex-shrink-0"
-                                            onClick={() => router.replace(`/board/${props.teamId}/edit-serving/${duplicateId}`)}
+                                            onClick={() => router.replace(getPathEditServing(props.teamId, duplicateId))}
                                         >
                                             Edit <ArrowRight className="ml-1 w-3 h-3" />
                                         </Button>

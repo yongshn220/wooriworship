@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { ServiceFormState } from "@/models/services/ServiceEvent";
-import { fetchServingRolesSelector } from "@/global-states/servingState";
+import { fetchServingRolesSelector } from "@/global-states/serviceRolesState";
 import { usersAtom } from "@/global-states/userState";
 import { teamAtom } from "@/global-states/teamState";
 import { auth } from "@/firebase";
