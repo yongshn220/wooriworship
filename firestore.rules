@@ -57,29 +57,25 @@ service cloud.firestore {
         }
       }
 
+
       // Unified Service (V3)
       match /services/{serviceId} {
         allow read, write: if isAuthenticated();
         
         match /setlists/{id} { allow read, write: if isAuthenticated(); }
-        match /bands/{id} { allow read, write: if isAuthenticated(); }
         match /flows/{id} { allow read, write: if isAuthenticated(); }
+        match /praise_assignee/{id} { allow read, write: if isAuthenticated(); }
       }
 
-      // Serving Related Headers & Config
-      match /serving_roles/{roleId} {
-        allow read, write: if isAuthenticated();
-      }
-      match /serving_schedules/{scheduleId} {
-        allow read, write: if isAuthenticated();
-      }
+      // Serving Templates
       match /serving_templates/{templateId} {
         allow read, write: if isAuthenticated();
       }
+
       match /serving_config/{configId} {
         allow read, write: if isAuthenticated();
       }
-       match /config/{configId} { // e.g. tag_stats
+      match /config/{configId} { // e.g. tag_stats
         allow read, write: if isAuthenticated();
       }
     }

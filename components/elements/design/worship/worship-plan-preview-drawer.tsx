@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { useRecoilValue, useRecoilValueLoadable } from "recoil";
 import { worshipAtom, worshipSongListAtom } from "@/global-states/worship-state";
-import { WorshipSongListCard } from "@/app/board/[teamId]/(worship)/worship-board/_components/parts/worship-song-list-card";
+import { WorshipSongListCard } from "@/components/elements/design/worship/parts/worship-song-list-card";
 
 interface Props {
     teamId: string;

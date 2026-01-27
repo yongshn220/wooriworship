@@ -1,5 +1,5 @@
 import { HomeIcon, Music2Icon, BellIcon, CalendarDaysIcon, LayoutGridIcon, DownloadIcon, UserIcon } from "lucide-react";
-import { getPathHome, getPathManage, getPathNotice, getPathPlan, getPathServing, getPathSong, getPathWorshipView } from "@/components/util/helper/routes";
+import { getPathHome, getPathManage, getPathNotice, getPathServing, getPathSong } from "@/components/util/helper/routes";
 import { useRecoilValue } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { useRouter } from "next/navigation";
@@ -8,8 +8,6 @@ import { Page } from "@/components/constants/enums";
 import { BaseBottomNavBar } from "@/components/elements/util/navigation/base-bottom-nav-bar";
 import { currentPageAtom } from "@/global-states/page-state";
 import { Button } from "@/components/ui/button";
-import { currentWorshipIdAtom } from "@/global-states/worship-state";
-import { DownloadMusicSheetDialog } from "@/app/board/[teamId]/(worship)/worship-board/_components/download-music-sheet-dialog";
 import { motion } from "framer-motion";
 
 
@@ -20,44 +18,9 @@ export function BoardBottomNavBar() {
     return (<></>)
   }
 
-  if (currentPage === Page.WORSHIP) {
-    return (
-      <>
-        <WorshipBottomNavBar />
-        <DefaultBoardBottomNavBar />
-      </>
-    )
-  }
+  // Legacy Worship View removed. Unified Service Board is the standard.
   return (
     <DefaultBoardBottomNavBar />
-  )
-}
-
-
-export function WorshipBottomNavBar() {
-  const worshipId = useRecoilValue(currentWorshipIdAtom)
-  const teamId = useRecoilValue(currentTeamIdAtom)
-  const router = useRouter()
-
-  return (
-    <BaseBottomNavBar height={80}>
-      <div className="w-full h-full flex-center px-4 gap-4">
-        <motion.div
-          className="w-16 h-16 flex-center flex-col text-muted-foreground cursor-pointer"
-          whileTap={{ scale: 0.9 }}
-        >
-          <DownloadMusicSheetDialog worshipId={worshipId}>
-            <div className="flex-center flex-col">
-              <DownloadIcon />
-              <p className="text-xs mt-1 font-medium">Save</p>
-            </div>
-          </DownloadMusicSheetDialog>
-        </motion.div>
-        <Button className="w-full shadow-toss" onClick={() => router.push(getPathWorshipView(teamId, worshipId))}>
-          Worship View
-        </Button>
-      </div>
-    </BaseBottomNavBar>
   )
 }
 
@@ -74,22 +37,16 @@ export function DefaultBoardBottomNavBar() {
       path: getPathNotice(currentTeamId)
     },
     {
-      page: Page.WORSHIP_BOARD,
-      icon: CalendarDaysIcon,
-      label: "Plan",
-      path: getPathPlan(currentTeamId)
+      page: Page.SERVING,
+      icon: CalendarDaysIcon, // Changed from UserIcon to CalendarDaysIcon
+      label: "Service", // Renamed from Serving
+      path: getPathServing(currentTeamId)
     },
     {
       page: Page.SONG_BOARD,
       icon: Music2Icon,
       label: "Song",
       path: getPathSong(currentTeamId)
-    },
-    {
-      page: Page.SERVING,
-      icon: UserIcon,
-      label: "Serving",
-      path: getPathServing(currentTeamId)
     },
     {
       page: Page.MANAGE,

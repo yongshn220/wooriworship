@@ -10,21 +10,7 @@ import { useRouter } from "next/navigation";
 import { getPathEditServing } from "@/components/util/helper/routes";
 import { useState } from "react";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
-import { ServingService } from "@/apis";
-import { useToast } from "@/components/ui/use-toast";
-import { useSetRecoilState } from "recoil";
-import { servingSchedulesAtom } from "@/global-states/servingState";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase";
-
-interface Props {
-    scheduleId: string;
-    teamId: string;
-    trigger?: React.ReactNode;
-    iconType?: "horizontal" | "vertical";
-    scheduleTitle?: string;
-    scheduleDate?: string;
-}
+import { ServiceEventService } from "@/apis/ServiceEventService";
 
 export function ServingHeaderMenu({
     scheduleId,
@@ -46,7 +32,7 @@ export function ServingHeaderMenu({
 
     const handleDelete = async () => {
         try {
-            await ServingService.deleteSchedule(teamId, scheduleId);
+            await ServiceEventService.deleteService(teamId, scheduleId);
             toast({
                 title: "Schedule deleted",
                 description: "The serving schedule has been successfully removed.",

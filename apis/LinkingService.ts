@@ -24,7 +24,7 @@ class LinkingService {
         }
 
         const worshipRef = doc(db, "teams", teamId, "worships", worshipId);
-        const servingRef = doc(db, "teams", teamId, "serving_schedules", servingId);
+        const servingRef = doc(db, "teams", teamId, "services", servingId);
 
         try {
             await runTransaction(db, async (transaction) => {
@@ -61,7 +61,7 @@ class LinkingService {
                 const servingId = data?.serving_schedule_id;
 
                 if (servingId) {
-                    const servingRef = doc(db, "teams", teamId, "serving_schedules", servingId);
+                    const servingRef = doc(db, "teams", teamId, "services", servingId);
                     const servingDoc = await transaction.get(servingRef);
                     if (servingDoc.exists() && servingDoc.data()?.worship_id === worshipId) {
                         transaction.update(servingRef, { worship_id: null });
@@ -81,7 +81,7 @@ class LinkingService {
      * Atomically unlinks a Serving Schedule from its Worship Plan.
      */
     async unlinkServing(teamId: string, servingId: string): Promise<boolean> {
-        const servingRef = doc(db, "teams", teamId, "serving_schedules", servingId);
+        const servingRef = doc(db, "teams", teamId, "services", servingId);
 
         try {
             await runTransaction(db, async (transaction) => {

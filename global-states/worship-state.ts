@@ -1,6 +1,7 @@
 import { atom, atomFamily, selectorFamily, RecoilState } from "recoil";
 import { Worship } from "@/models/worship";
-import { WorshipService } from "@/apis";
+import { ServiceEventService } from "@/apis/ServiceEventService";
+import { SetlistService } from "@/apis/SetlistService";
 import { Song } from "@/models/song";
 import { songAtom } from "@/global-states/song-state";
 
@@ -20,20 +21,24 @@ export const currentTeamWorshipListAtom = (globalForRecoil.recoilAtoms['currentT
       try {
         get(worshipIdsUpdaterAtom)
 
-        const worshipList = await WorshipService.getTeamWorship(teamId) as Array<Worship>
-        if (!worshipList) return []
+        const services = await ServiceEventService.getServiceEvents(teamId)
+        if (!services) return []
 
-        worshipList.sort((a, b) => {
-          try {
-            const dateA = a?.worship_date?.toDate().getTime() || 0;
-            const dateB = b?.worship_date?.toDate().getTime() || 0;
-            return dateB - dateA;
-          } catch (e) {
-            return 0;
-          }
-        });
+        // Map to legacy Worship shape for UI compatibility
+        const worships: Array<Worship> = services.map(s => ({
+          id: s.id,
+          title: s.title,
+          service_tags: s.service_tags || [],
+          worship_date: s.date,
+          // Placeholder values for legacy shape (details will be fetched via worshipAtom if needed)
+          description: "",
+          link: "",
+          songs: [],
+          beginning_song: { id: null, note: "", selected_music_sheet_ids: [] },
+          ending_song: { id: null, note: "", selected_music_sheet_ids: [] },
+        } as unknown as Worship));
 
-        return worshipList
+        return worships
       }
       catch (e) {
         console.error(e)
@@ -76,8 +81,22 @@ export const worshipAtom = (globalForRecoil.recoilAtoms['worshipAtom'] || atomFa
     get: ({ teamId, worshipId }) => async ({ get }) => {
       get(worshipUpdaterAtom)
       try {
-        const worship = await WorshipService.getWorshipById(teamId, worshipId) as Worship
-        if (!worship) return null
+        const details = await ServiceEventService.getServiceDetails(teamId, worshipId)
+        if (!details) return null
+
+        // Map details to legacy Worship shape
+        const worship: Worship = {
+          id: details.event.id,
+          title: details.event.title,
+          description: details.setlist?.description || "",
+          link: details.setlist?.link || "",
+          service_tags: details.event.service_tags || [],
+          songs: details.setlist?.songs || [],
+          beginning_song: details.setlist?.beginning_song || { id: null, note: "", selected_music_sheet_ids: [] },
+          ending_song: details.setlist?.ending_song || { id: null, note: "", selected_music_sheet_ids: [] },
+          worship_date: details.event.date,
+          serving_schedule_id: details.event.id, // V3 is unified
+        } as unknown as Worship;
 
         return worship
       }

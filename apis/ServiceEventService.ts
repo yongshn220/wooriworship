@@ -2,11 +2,19 @@ import { db } from "@/firebase";
 import {
     collection, doc, getDoc, getDocs,
     query, where, orderBy, Timestamp,
-    writeBatch, setDoc, updateDoc,
-    DocumentSnapshot
+    writeBatch, setDoc, updateDoc, increment, limit
 } from "firebase/firestore";
-import { ServiceEvent, ServiceSetlist, ServiceBand, ServiceFlow } from "@/models/services/ServiceEvent";
+import { ServiceEvent } from "@/models/services/ServiceEvent";
+import { SetlistService } from "./SetlistService";
+import { PraiseAssigneeService } from "./PraiseAssigneeService";
+import { ServiceFlowService } from "./ServiceFlowService";
+import LinkingService from "./LinkingService";
+import { parseLocalDate } from "@/components/util/helper/helper-functions";
 
+/**
+ * ServiceEventService (V3 Orchestrator)
+ * Manages the root Service document and coordinates sub-services (Setlist, Assignee, Flow).
+ */
 export class ServiceEventService {
 
     // =========================================================================
@@ -29,50 +37,42 @@ export class ServiceEventService {
         );
 
         const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => doc.data() as ServiceEvent);
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServiceEvent));
     }
 
     /**
      * Fetches full details for a single service (Lazy Load).
-     * Reads Header + Setlist + Band + Flow in parallel.
+     * Delegates to sub-services for deep data.
      */
     static async getServiceDetails(teamId: string, serviceId: string) {
+        if (!teamId || !serviceId) return null;
+
         const serviceRef = doc(db, `teams/${teamId}/services/${serviceId}`);
-        const setlistRef = doc(serviceRef, 'setlists', 'main');
-        const bandRef = doc(serviceRef, 'bands', 'main');
-        const flowRef = doc(serviceRef, 'flows', 'main');
-
-        const [serviceSnap, setlistSnap, bandSnap, flowSnap] = await Promise.all([
-            getDoc(serviceRef),
-            getDoc(setlistRef),
-            getDoc(bandRef),
-            getDoc(flowRef)
-        ]);
-
+        const serviceSnap = await getDoc(serviceRef);
         if (!serviceSnap.exists()) return null;
 
-        return {
-            event: serviceSnap.data() as ServiceEvent,
-            setlist: setlistSnap.exists() ? setlistSnap.data() as ServiceSetlist : null,
-            band: bandSnap.exists() ? bandSnap.data() as ServiceBand : null,
-            flow: flowSnap.exists() ? flowSnap.data() as ServiceFlow : null
-        };
+        const event = { id: serviceSnap.id, ...serviceSnap.data() } as ServiceEvent;
+
+        const [setlist, praiseAssignee, flow] = await Promise.all([
+            SetlistService.getSetlist(teamId, serviceId),
+            PraiseAssigneeService.getAssignees(teamId, serviceId),
+            ServiceFlowService.getFlow(teamId, serviceId)
+        ]);
+
+        return { event, setlist, praiseAssignee, flow };
     }
 
     // =========================================================================
-    // 2. Writing (Create / Update)
+    // 2. Writing (Create / Update / Delete)
     // =========================================================================
 
     /**
-     * Creates a new Service (Header + Empty Sub-collections).
+     * Creates a new Service (Header + Initializes Sub-collections).
      */
     static async createService(teamId: string, data: Partial<ServiceEvent>) {
         const newDocRef = doc(collection(db, `teams/${teamId}/services`));
         const serviceId = newDocRef.id;
 
-        const batch = writeBatch(db);
-
-        // 1. Header
         const now = Timestamp.now();
         const eventData: ServiceEvent = {
             id: serviceId,
@@ -80,48 +80,168 @@ export class ServiceEventService {
             date: data.date || now,
             title: data.title || "New Service",
             service_tags: data.service_tags || [],
+            tagId: data.tagId || (data.service_tags && data.service_tags[0]) || "",
+            worship_id: data.worship_id,
             created_at: now,
             updated_at: now,
             summary: { songCount: 0 }
         };
-        batch.set(newDocRef, eventData);
 
-        // 2. Init Empty Sub-docs (Optional, but good for consistency)
-        batch.set(doc(newDocRef, 'setlists', 'main'), { id: 'main', songs: [] });
-        batch.set(doc(newDocRef, 'bands', 'main'), { id: 'main', roles: [] });
-        batch.set(doc(newDocRef, 'flows', 'main'), { id: 'main', items: [] });
+        await setDoc(newDocRef, eventData);
 
-        await batch.commit();
+        // Initialize sub-collections
+        await Promise.all([
+            SetlistService.initSetlist(teamId, serviceId),
+            PraiseAssigneeService.initAssignees(teamId, serviceId),
+            ServiceFlowService.initFlow(teamId, serviceId)
+        ]);
+
         return serviceId;
     }
 
     /**
-     * Updates ONLY the Setlist (Songs).
+     * Updates the Service Header.
      */
-    static async updateSetlist(teamId: string, serviceId: string, data: Partial<ServiceSetlist>) {
-        const ref = doc(db, `teams/${teamId}/services/${serviceId}/setlists/main`);
-        await setDoc(ref, data, { merge: true });
+    static async updateService(teamId: string, serviceId: string, data: Partial<ServiceEvent>) {
+        const ref = doc(db, `teams/${teamId}/services/${serviceId}`);
+        const updateData: any = { ...data, updated_at: Timestamp.now() };
 
-        // Optional: Update Summary in Header (songCount)
-        if (data.songs) {
-            const headerRef = doc(db, `teams/${teamId}/services/${serviceId}`);
-            await updateDoc(headerRef, { 'summary.songCount': data.songs.length });
+        // Sync tagId if service_tags changes
+        if (data.service_tags && data.service_tags.length > 0) {
+            updateData.tagId = data.service_tags[0];
+        }
+
+        await updateDoc(ref, updateData);
+    }
+
+    /**
+     * Deletes a Service and its sub-collection documents.
+     */
+    static async deleteService(teamId: string, serviceId: string) {
+        // 1. Cleanup References (Linking)
+        await LinkingService.cleanupReferencesForServingDeletion(teamId, serviceId);
+
+        // 2. Delete Sub-docs (Explicitly)
+        const batch = writeBatch(db);
+        batch.delete(doc(db, `teams/${teamId}/services/${serviceId}/setlists/main`));
+        batch.delete(doc(db, `teams/${teamId}/services/${serviceId}/praise_assignee/main`));
+        batch.delete(doc(db, `teams/${teamId}/services/${serviceId}/flows/main`));
+
+        // 3. Delete Header
+        batch.delete(doc(db, `teams/${teamId}/services/${serviceId}`));
+
+        await batch.commit();
+    }
+
+    // =========================================================================
+    // 4. Utility / History
+    // =========================================================================
+
+    static async getRecentServicesWithFlows(teamId: string, tagId?: string, limitCount: number = 10): Promise<any[]> {
+        let q = query(
+            collection(db, "teams", teamId, "services"),
+            orderBy("date", "desc"),
+            limit(limitCount)
+        );
+
+        if (tagId) {
+            q = query(
+                collection(db, "teams", teamId, "services"),
+                where("tagId", "==", tagId),
+                orderBy("date", "desc"),
+                limit(limitCount)
+            );
+        }
+
+        const snapshot = await getDocs(q);
+        const services = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServiceEvent));
+
+        const flows = await Promise.all(
+            services.map(s => ServiceFlowService.getFlow(teamId, s.id))
+        );
+
+        // Map to ServingSchedule-like shape for UI compatibility
+        return services.map((s, idx) => ({
+            ...s,
+            worship_date: s.date, // Compatibility
+            service_tag_ids: s.service_tags, // Compatibility
+            items: flows[idx]?.items || []
+        }));
+    }
+
+    static async getLegacyWorshipsByDate(teamId: string, date: Date) {
+        const startOfDay = new Date(date);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const nextDay = new Date(startOfDay);
+        nextDay.setDate(nextDay.getDate() + 1);
+
+        const q = query(
+            collection(db, `teams/${teamId}/worships`),
+            where('worship_date', '>=', Timestamp.fromDate(startOfDay)),
+            where('worship_date', '<', Timestamp.fromDate(nextDay))
+        );
+
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
+    }
+
+    static async updateTagStats(teamId: string, tagIds: string[], dateString: string, mode: "add" | "remove"): Promise<void> {
+        try {
+            const statsRef = doc(db, "teams", teamId, "config", "tag_stats");
+            const [y, m, d] = dateString.split('-').map(Number);
+            const date = new Date(y, m - 1, d);
+            const weekday = date.getDay().toString();
+            const incrementValue = mode === "add" ? 1 : -1;
+
+            const statsUpdate: any = {};
+            for (const tagId of tagIds) {
+                statsUpdate[tagId] = {
+                    count: increment(incrementValue),
+                    weekdays: {
+                        [weekday]: increment(incrementValue)
+                    }
+                };
+                if (mode === "add") {
+                    statsUpdate[tagId].last_used_at = new Date().toISOString();
+                }
+            }
+            await setDoc(statsRef, { stats: statsUpdate }, { merge: true });
+        } catch (e) {
+            console.error("Failed to update tag stats", e);
         }
     }
 
-    /**
-     * Updates ONLY the Band (Roles).
-     */
-    static async updateBand(teamId: string, serviceId: string, data: Partial<ServiceBand>) {
-        const ref = doc(db, `teams/${teamId}/services/${serviceId}/bands/main`);
-        await setDoc(ref, data, { merge: true });
+    static async getServiceByDate(teamId: string, date: Date | string) {
+        const d = typeof date === 'string' ? parseLocalDate(date) : date;
+        const start = new Date(d);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(start);
+        end.setHours(23, 59, 59, 999);
+
+        const services = await this.getServiceEvents(teamId, start, end);
+        if (services.length === 0) return null;
+
+        const details = await this.getServiceDetails(teamId, services[0].id);
+        if (!details) return null;
+
+        // Map to legacy shape for easier UI transition
+        return {
+            id: details.event.id,
+            ...details.event,
+            worship_date: details.event.date,
+            service_tags: details.event.service_tags,
+            worship_roles: details.praiseAssignee?.assignee || [],
+            items: details.flow?.items || [],
+        } as any;
     }
 
-    /**
-     * Updates ONLY the Flow (Items).
-     */
-    static async updateFlow(teamId: string, serviceId: string, data: Partial<ServiceFlow>) {
-        const ref = doc(db, `teams/${teamId}/services/${serviceId}/flows/main`);
-        await setDoc(ref, data, { merge: true });
+    static async getTagStats(teamId: string): Promise<Record<string, any>> {
+        const statsRef = doc(db, "teams", teamId, "config", "tag_stats");
+        const statsSnap = await getDoc(statsRef);
+        if (statsSnap.exists()) {
+            return statsSnap.data().stats || {};
+        }
+        return {};
     }
 }

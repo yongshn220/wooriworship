@@ -36,7 +36,7 @@ import { slideVariants } from "@/components/constants/animations";
 import { useServingFormLogic } from "./hooks/use-serving-form-logic";
 import { ServingFormProps } from "./types";
 import { auth } from "@/firebase";
-import { ServingService } from "@/apis";
+import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
 
 export function ServingForm(props: ServingFormProps) {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -202,7 +202,7 @@ export function ServingForm(props: ServingFormProps) {
                                 <div className="flex flex-col gap-4">
                                     <SortableList items={roles} onReorder={(newRoles) => {
                                         setRoles(newRoles);
-                                        ServingService.updateRolesOrder(props.teamId, newRoles).catch(console.error);
+                                        PraiseAssigneeService.updateRolesOrder(props.teamId, newRoles).catch(console.error);
                                     }}>
                                         {roles.map((role) => {
                                             const assignment = worshipRoles.find(a => a.roleId === role.id);
@@ -594,7 +594,7 @@ export function ServingForm(props: ServingFormProps) {
                                         groups={standardGroups}
                                         onAddGroup={(name) => {
                                             setStandardGroups(prev => [...prev, name]);
-                                            ServingService.addCustomGroup(props.teamId, name).catch(console.error);
+                                            PraiseAssigneeService.addCustomGroup(props.teamId, name).catch(console.error);
                                         }}
                                         onRemoveGroup={(idx) => {
                                             setStandardGroups(standardGroups.filter((_, i) => i !== idx));
@@ -602,7 +602,7 @@ export function ServingForm(props: ServingFormProps) {
                                         customMemberNames={customMemberNames}
                                         onAddCustomMember={(name) => {
                                             setCustomMemberNames(prev => [...prev, name]);
-                                            ServingService.addCustomMemberName(props.teamId, name).catch(console.error);
+                                            PraiseAssigneeService.addCustomMemberName(props.teamId, name).catch(console.error);
                                         }}
                                     />
                                 </div>

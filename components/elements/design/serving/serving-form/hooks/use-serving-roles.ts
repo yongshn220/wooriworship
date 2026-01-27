@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRecoilValueLoadable, useSetRecoilState } from "recoil";
 import { fetchServingRolesSelector, servingRolesUpdaterAtom } from "@/global-states/servingState";
 import { toast } from "@/components/ui/use-toast";
-import { ServingService } from "@/apis";
+import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
 
 export function useServingRoles(teamId: string) {
     const rolesLoadable = useRecoilValueLoadable(fetchServingRolesSelector(teamId));
@@ -35,7 +35,7 @@ export function useServingRoles(teamId: string) {
 
         setIsCreatingRole(true);
         try {
-            await ServingService.createRole(teamId, { teamId, name: newRoleName.trim(), order: roles.length });
+            await PraiseAssigneeService.createRole(teamId, { teamId, name: newRoleName.trim(), order: roles.length });
             setRolesUpdater(prev => prev + 1);
             setNewRoleName("");
             setIsRoleDialogOpen(false);
@@ -50,7 +50,7 @@ export function useServingRoles(teamId: string) {
 
     const handleDeleteRole = async (roleId: string, onItemUpdate: (roleId: string) => void) => {
         try {
-            await ServingService.deleteRole(teamId, roleId);
+            await PraiseAssigneeService.deleteRole(teamId, roleId);
             setRolesUpdater(prev => prev + 1);
             // Callback to update items in parent (if needed, but now strict separation)
             // Actually, we should clean up worshipRoles state here too

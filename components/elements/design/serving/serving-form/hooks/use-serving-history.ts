@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ServingService } from "@/apis";
+import { ServiceEventService } from "@/apis/ServiceEventService";
 import { ServingSchedule } from "@/models/serving";
 import { getSuggestionsForTitle as domainGetSuggestions } from "../utils/serving-domain-logic";
 
@@ -12,13 +12,12 @@ export function useServingHistory(teamId: string, serviceTagIds: string[], teamM
             return;
         }
         const fetchHistory = async () => {
-            if (serviceTagIds.length > 0) {
-                const recent = await ServingService.getRecentSchedulesByTag(teamId, serviceTagIds[0], 10);
-                setHistorySchedules(recent);
-            } else {
-                const recent = await ServingService.getRecentSchedules(teamId, 10);
-                setHistorySchedules(recent);
-            }
+            const recent = await ServiceEventService.getRecentServicesWithFlows(
+                teamId,
+                serviceTagIds.length > 0 ? serviceTagIds[0] : undefined,
+                10
+            );
+            setHistorySchedules(recent);
         };
         fetchHistory();
     }, [teamId, serviceTagIds]);

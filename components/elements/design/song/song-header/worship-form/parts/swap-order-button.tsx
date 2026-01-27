@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadio
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { WorshipSpecialOrderType } from "@/components/constants/enums";
 import { WorshipSongHeader } from "@/models/worship";
-import { selectedWorshipSongHeaderListAtom, worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
+import { selectedWorshipSongHeaderListAtom, worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom } from "@/global-states/worship-creation-state";
 
 interface Props {
   songHeader: WorshipSongHeader

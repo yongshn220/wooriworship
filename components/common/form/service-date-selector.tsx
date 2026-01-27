@@ -9,7 +9,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { TagSelector } from "@/components/common/tag-selector";
 import { FormSectionCard } from "@/components/common/form/full-screen-form";
 import TeamService from "@/apis/TeamService";
-import ServingService from "@/apis/ServingService";
+import { ServiceEventService } from "@/apis/ServiceEventService";
 import { useRecoilValue } from "recoil";
 import { teamAtom } from "@/global-states/teamState";
 import { Team } from "@/models/team";
@@ -63,7 +63,7 @@ export function ServiceDateSelector({
             }
 
             const now = new Date();
-            const stats = await ServingService.getTagStats(teamId);
+            const stats = await ServiceEventService.getTagStats(teamId);
             const hasStats = Object.keys(stats).length > 0;
 
             let options: { id: string | null, title: string, date: Date, score: number }[] = [];
@@ -109,8 +109,8 @@ export function ServiceDateSelector({
                     let targetWeekday = item.maxWeekday;
 
                     try {
-                        // Fetch last 5 usages
-                        const recent = await ServingService.getRecentSchedulesByTag(teamId, item.tag.id, 5);
+                        // Fetch last 5 usages (V3)
+                        const recent = await ServiceEventService.getRecentServicesWithFlows(teamId, item.tag.id, 5);
                         if (recent.length > 0) {
                             // Calculate mode weekday from recent schedules
                             const dayCounts: Record<number, number> = {};

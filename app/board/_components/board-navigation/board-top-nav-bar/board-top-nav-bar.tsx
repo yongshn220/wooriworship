@@ -110,11 +110,9 @@ export function BoardTopNavBar() {
         title: "Manage",
       },
       [Page.SERVING]: {
-        title: "Serving Schedule",
+        title: "Service",
         showLogo: false,
-        actions: (
-          <CreateActionButton onClick={() => router.push(getPathCreateServing(teamId))} />
-        )
+        // actions: Handled by page.tsx via headerActionsAtom
       },
       [Page.BOARD]: defaultConfig,
       [Page.HOME]: defaultConfig,

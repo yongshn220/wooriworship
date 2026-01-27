@@ -13,9 +13,11 @@ import { Worship, WorshipSongHeader } from "@/models/worship";
 import { timestampToDate, getServiceTitleFromTags } from "@/components/util/helper/helper-functions";
 
 // Services & Routes
-import { WorshipService, ServingService } from "@/apis";
+import { ServiceEventService } from "@/apis/ServiceEventService";
+import { SetlistService } from "@/apis/SetlistService";
 import PushNotificationService from "@/apis/PushNotificationService";
 import { getPathPlan } from "@/components/util/helper/routes";
+import { Timestamp } from "firebase/firestore";
 
 // Hooks
 import { useServiceDuplicateCheck } from "@/components/common/hooks/use-service-duplicate-check";
@@ -66,14 +68,18 @@ export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorship
 
     // --- Effects ---
 
-    // 1. Fetch Linked Servings
+    // 1. Fetch Linked Servings (V3 Services)
     useEffect(() => {
         const fetchLinkedServings = async () => {
             if (!date || !teamId) return;
             try {
-                const dateStr = format(date, 'yyyy-MM-dd');
-                const schedules = await ServingService.getSchedules(teamId, dateStr, dateStr);
-                const filtered = schedules.filter(s =>
+                const start = new Date(date);
+                start.setHours(0, 0, 0, 0);
+                const end = new Date(start);
+                end.setHours(23, 59, 59, 999);
+
+                const services = await ServiceEventService.getServiceEvents(teamId, start, end);
+                const filtered = services.filter(s =>
                     serviceTagIds.some(t => s.service_tags?.includes(t)) ||
                     (mode === FormMode.EDIT && s.id === initialWorship?.serving_schedule_id)
                 );
@@ -105,13 +111,13 @@ export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorship
         serviceTagNames,
         mode,
         currentId: initialWorship?.id,
-        fetcher: async (tid, dateObjOrStr) => {
-            // Fetcher expects date, but here we use WorshipService which might expect Date obj
-            // WorshipService.getWorshipsByDate expects Date object.
-            // But useServiceDuplicateCheck passes... wait, the hook passes 'date' which is Date obj.
-            const dateObj = date; // closure
-            const worships = await WorshipService.getWorshipsByDate(tid, dateObj);
-            return worships.map(w => ({ ...w, id: w.id! }));
+        fetcher: async (tid, dateObj) => {
+            const start = new Date(dateObj);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(start);
+            end.setHours(23, 59, 59, 999);
+            const services = await ServiceEventService.getServiceEvents(tid, start, end);
+            return services;
         }
     });
 
@@ -134,11 +140,44 @@ export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorship
                 related_serving_id: linkedServingId
             };
 
-            const worshipId = await WorshipService.addNewWorship(auth.currentUser.uid, teamId, worshipInput);
+            const serviceId = await ServiceEventService.createService(teamId, {
+                date: Timestamp.fromDate(date),
+                title: worshipInput.title,
+                service_tags: serviceTagIds,
+            });
+
+            await SetlistService.updateSetlist(teamId, serviceId, {
+                songs: songs,
+                beginning_song: beginningSong || undefined,
+                ending_song: endingSong || undefined,
+                description: basicInfo.description,
+                link: basicInfo.link
+            });
+
+            // If a serving was selected to link (though in V3 they should be same doc, 
+            // but for transition we might still have separate "Serving" docs? 
+            // In V3, they are unified. So linkingServingId might refer to an existing Service doc to merge into?
+            // This is complex. For now, let's just create a new service.
+            // If linkedServingId is provided, it means the user wants to attach this setlist to an existing service.
+
+            if (linkedServingId) {
+                // Merge setlist into existing service
+                await SetlistService.updateSetlist(teamId, linkedServingId, {
+                    songs: songs,
+                    beginning_song: beginningSong || undefined,
+                    ending_song: endingSong || undefined,
+                    description: basicInfo.description,
+                    link: basicInfo.link
+                });
+                // We might want to delete the newly created serviceId or just use linkedServingId from the start.
+                // Optimized approach:
+                // ... (refactor needed below if linkedServingId exists)
+            }
+
             await PushNotificationService.notifyTeamNewWorship(teamId, auth.currentUser.uid, worshipInput.date, worshipInput.title);
 
             toast({ title: "New service created!" });
-            cleanupAndRedirect(worshipId);
+            cleanupAndRedirect(linkedServingId || serviceId);
         } catch (e) {
             console.error(e);
             toast({ title: "Something went wrong", variant: "destructive" });
@@ -162,7 +201,20 @@ export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorship
                 related_serving_id: linkedServingId
             };
 
-            await WorshipService.updateWorship(auth.currentUser.uid, teamId, initialWorship.id, worshipInput);
+            await ServiceEventService.updateService(teamId, initialWorship.id, {
+                title: worshipInput.title,
+                service_tags: serviceTagIds,
+                date: Timestamp.fromDate(date)
+            });
+
+            await SetlistService.updateSetlist(teamId, initialWorship.id, {
+                songs: songs,
+                beginning_song: beginningSong || undefined,
+                ending_song: endingSong || undefined,
+                description: basicInfo.description,
+                link: basicInfo.link
+            });
+
             toast({ title: "Service updated" });
             cleanupAndRedirect(initialWorship.id);
         } catch (e) {

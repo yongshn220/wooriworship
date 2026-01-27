@@ -15,7 +15,8 @@ import { toast } from "@/components/ui/use-toast";
 
 import { fetchServingRolesSelector, servingRolesUpdaterAtom } from "@/global-states/servingState";
 import { teamUpdaterAtom, teamAtom } from "@/global-states/teamState";
-import { ServingService, TeamService } from "@/apis";
+import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
+import { TeamService } from "@/apis";
 import { userAtom } from "@/global-states/userState";
 
 import { ConfirmationDialog } from "@/components/elements/dialog/user-confirmation/confirmation-dialog";
@@ -84,9 +85,9 @@ export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) 
         if (!userId || !isCurrentUserAdmin) return;
         const isAssigned = currentDefaultMembers.includes(userId);
         if (isAssigned) {
-            await ServingService.removeDefaultMember(teamId, roleId, userId);
+            await PraiseAssigneeService.removeDefaultMember(teamId, roleId, userId);
         } else {
-            await ServingService.addDefaultMember(teamId, roleId, userId);
+            await PraiseAssigneeService.addDefaultMember(teamId, roleId, userId);
         }
         setServingRolesUpdater(prev => prev + 1);
     }

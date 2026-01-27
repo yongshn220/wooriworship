@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { musicSheetAtom, musicSheetsBySongIdAtom } from "@/global-states/music-sheet-state";
-import { selectedWorshipSongHeaderListAtom } from "@/app/board/[teamId]/(worship)/worship-board/_components/status";
+import { selectedWorshipSongHeaderListAtom } from "@/global-states/worship-creation-state";
 
 interface Props {
   teamId: string

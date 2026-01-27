@@ -1,5 +1,5 @@
 import { atom, selector, selectorFamily, atomFamily } from "recoil";
-import { ServiceEvent, ServiceSetlist, ServiceBand, ServiceFlow } from "@/models/services/ServiceEvent";
+import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow } from "@/models/services/ServiceEvent";
 import { ServiceEventService } from "@/apis/ServiceEventService";
 
 // =============================================================================
@@ -23,8 +23,8 @@ export const serviceSetlistAtom = atomFamily<ServiceSetlist | null, string>({
     default: null,
 });
 
-export const serviceBandAtom = atomFamily<ServiceBand | null, string>({
-    key: "serviceBandAtom",
+export const servicePraiseAssigneeAtom = atomFamily<ServicePraiseAssignee | null, string>({
+    key: "servicePraiseAssigneeAtom",
     default: null,
 });
 
@@ -72,4 +72,10 @@ export const currentServiceDetailSelector = selector({
 export const serviceListUpdaterAtom = atom({
     key: "serviceListUpdaterAtom",
     default: 0
+});
+
+// List Atom for Calendar Strip
+export const serviceEventsListAtom = atom<ServiceEvent[]>({
+    key: "serviceEventsListAtom",
+    default: []
 });

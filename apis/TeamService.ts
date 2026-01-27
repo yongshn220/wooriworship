@@ -2,7 +2,8 @@ import BaseService from "./BaseService";
 import { InvitationService, UserService } from ".";
 import { Team, TeamOption } from "@/models/team";
 import { arrayUnion, arrayRemove, Timestamp } from "@firebase/firestore";
-import ServingService from "./ServingService";
+import { PraiseAssigneeService } from "./PraiseAssigneeService";
+import { ServiceFlowService } from "./ServiceFlowService";
 
 class TeamService extends BaseService {
   constructor() {
@@ -34,9 +35,9 @@ class TeamService extends BaseService {
     }
     const teamId = await this.create(team);
     if (teamId) {
-      // Init Serving defaults
-      await ServingService.initStandardRoles(teamId);
-      await ServingService.initDefaultTemplate(teamId);
+      // Init Serving defaults (V3)
+      await PraiseAssigneeService.initStandardRoles(teamId);
+      await ServiceFlowService.initDefaultTemplate(teamId);
     }
     return teamId;
   }
@@ -98,7 +99,7 @@ class TeamService extends BaseService {
       if (!singleSide) {
         promises.push(UserService.leaveTeam(userId, teamId, true));
       }
-      promises.push(ServingService.cleanupMember(teamId, userId));
+      promises.push(PraiseAssigneeService.cleanupMember(teamId, userId));
       promises.push(this.update(teamId, { users: arrayRemove(userId) }));
       await Promise.all(promises);
       return userId;

@@ -7,11 +7,13 @@ import { ServingAssignment, ServingItem } from "@/models/serving";
 // Path: teams/{teamId}/services/{serviceId}
 // =============================================================================
 export interface ServiceEvent {
-    id: string; // e.g., "2024-05-05_SUNDAY_11AM" or auto-id
+    id: string; // Auto-ID (UUID)
     teamId: string;
     date: Timestamp;
     title: string;
-    service_tags: string[]; // e.g. ["일요예배", "11시"]
+    tagId?: string; // Optimized single tag reference
+    service_tags?: string[]; // Multiple tags support
+    worship_id?: string; // Linked Worship Plan ID
 
     // Preview Summary (Optional, for board card performance)
     summary?: {
@@ -39,10 +41,10 @@ export interface ServiceSetlist {
     ending_song?: WorshipSongHeader;
 }
 
-// Path: teams/{teamId}/services/{serviceId}/bands/main
-export interface ServiceBand {
+// Path: teams/{teamId}/services/{serviceId}/praise_assignee/main
+export interface ServicePraiseAssignee {
     id: string; // usually "main"
-    roles: ServingAssignment[]; // The cast: [{ role: 'Drum', memberIds: ['...'] }]
+    assignee: ServingAssignment[]; // The cast: [{ role: 'Drum', memberIds: ['...'] }]
     note?: string; // "Rehearsal at 2PM"
 }
 

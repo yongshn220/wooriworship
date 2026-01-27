@@ -20,16 +20,18 @@ export function getPathEditNotice(teamId: string, noticeId: string) {
   return "/" + Page.BOARD + `/${teamId}` + "/" + Page.EDIT_NOTICE + `/${noticeId}`
 }
 
+// Consolidated: Redirect Schema (Worship -> Service)
+
 export function getPathPlan(teamId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.WORSHIP_BOARD
+  return getPathServing(teamId);
 }
 
 export function getPathCreatePlan(teamId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.CREATE_WORSHIP
+  return getPathCreateServing(teamId);
 }
 
 export function getPathEditPlan(teamId: string, worshipId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.EDIT_WORSHIP + `/${worshipId}`
+  return getPathEditServing(teamId, worshipId);
 }
 
 export function getPathManage(teamId: string) {
@@ -57,11 +59,13 @@ export function getPathServing(teamId: string) {
 }
 
 export function getPathWorship(teamId: string, worshipId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.WORSHIP + `/${worshipId}`
+  // Redirect to Service Board (Service ID)
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SERVING // TODO: deep link support
 }
 
 export function getPathWorshipView(teamId: string, worshipId: string) {
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.WORSHIP_VIEW + `/${worshipId}`
+  // Redirect to Service Board
+  return getPathServing(teamId);
 }
 
 export function getPathCreateServing(teamId: string) {

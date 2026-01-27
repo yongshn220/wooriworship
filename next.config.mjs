@@ -15,6 +15,25 @@ const nextConfig = {
       },
     ]
   },
+  async redirects() {
+    return [
+      {
+        source: '/board/:teamId/serving-board',
+        destination: '/board/:teamId/service-board',
+        permanent: true,
+      },
+      {
+        source: '/board/:teamId/worship-board',
+        destination: '/board/:teamId/service-board',
+        permanent: true,
+      },
+      {
+        source: '/board/:teamId/worship',
+        destination: '/board/:teamId/service-board',
+        permanent: true,
+      }
+    ];
+  },
 };
 
 export default nextConfig;

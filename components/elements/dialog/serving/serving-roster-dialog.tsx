@@ -8,7 +8,7 @@ import { usersAtom } from "@/global-states/userState";
 import { ServingSchedule } from "@/models/serving";
 import { useEffect, useState } from "react";
 import { formatToLongDate } from "@/components/util/helper/helper-functions";
-import { ServingService } from "@/apis";
+import { ServiceEventService } from "@/apis/ServiceEventService";
 import { Spinner } from "@/components/ui/spinner";
 import { ClipboardList } from "lucide-react";
 import { ResponsiveDrawer } from "@/components/ui/responsive-drawer";
@@ -35,8 +35,8 @@ export function ServingRosterDialog({ date, teamId, trigger }: Props) {
     useEffect(() => {
         if (isOpen && teamId && date) {
             setLoading(true);
-            ServingService.getScheduleByDate(teamId, date)
-                .then(setSchedule)
+            ServiceEventService.getServiceByDate(teamId, date)
+                .then((res) => setSchedule(res as any))
                 .finally(() => setLoading(false));
         }
     }, [isOpen, teamId, date]);
