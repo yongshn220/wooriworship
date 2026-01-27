@@ -14,7 +14,7 @@ import { ServiceEvent } from "@/models/services/ServiceEvent";
 import { ServiceEventService } from "@/apis/ServiceEventService";
 import { ServingListSkeleton } from "./_components/serving-list-skeleton";
 import { parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";
-import { Timestamp } from "@firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 import { EmptyServingBoardPage } from "./_components/empty-serving-board-page";
 import { WorshipPlanPreviewDrawer } from "@/components/elements/design/worship/worship-plan-preview-drawer";
 // import { CalendarStrip } from "@/components/elements/design/serving/calendar-strip"; // REMOVED

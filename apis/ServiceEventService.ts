@@ -81,11 +81,14 @@ export class ServiceEventService {
             title: data.title || "New Service",
             service_tags: data.service_tags || [],
             tagId: data.tagId || (data.service_tags && data.service_tags[0]) || "",
-            worship_id: data.worship_id,
             created_at: now,
             updated_at: now,
             summary: { songCount: 0 }
         };
+
+        if (data.worship_id) {
+            eventData.worship_id = data.worship_id;
+        }
 
         await setDoc(newDocRef, eventData);
 
@@ -104,7 +107,13 @@ export class ServiceEventService {
      */
     static async updateService(teamId: string, serviceId: string, data: Partial<ServiceEvent>) {
         const ref = doc(db, `teams/${teamId}/services/${serviceId}`);
-        const updateData: any = { ...data, updated_at: Timestamp.now() };
+
+        // Safety check: remove undefined values
+        const cleanData = Object.fromEntries(
+            Object.entries(data).filter(([_, v]) => v !== undefined)
+        );
+
+        const updateData: any = { ...cleanData, updated_at: Timestamp.now() };
 
         // Sync tagId if service_tags changes
         if (data.service_tags && data.service_tags.length > 0) {

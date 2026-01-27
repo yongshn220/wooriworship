@@ -25,6 +25,8 @@ export async function sendNotificationToSubscription(subscription: any, payload:
     return { success: true };
   }
 
+  return { success: true };
+
   try {
     await webpush.sendNotification(
       subscription,

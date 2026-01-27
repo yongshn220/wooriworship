@@ -11,6 +11,10 @@ service cloud.firestore {
     // Root Collections
     match /users/{userId} {
       allow read, write: if isAuthenticated();
+      
+      match /config/{configId} {
+        allow read, write: if isAuthenticated();
+      }
     }
     
     match /account_settings/{userId} {
@@ -39,6 +43,10 @@ service cloud.firestore {
       }
 
       match /song_tags/{tagId} {
+        allow read, write: if isAuthenticated();
+      }
+
+      match /service_tags/{tagId} {
         allow read, write: if isAuthenticated();
       }
 

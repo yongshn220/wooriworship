@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { ResponsiveDrawer } from "@/components/ui/responsive-drawer";
 import { Calendar } from "@/components/ui/calendar";
 import { ServingSchedule } from "@/models/serving";
-import { Timestamp } from "@firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 import { parseLocalDate } from "@/components/util/helper/helper-functions";
 import { format, isSameDay, setMonth, setYear, getYear, getMonth, startOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";

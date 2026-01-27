@@ -1,7 +1,7 @@
 import BaseService from "./BaseService";
 import { InvitationService, UserService } from ".";
 import { Team, TeamOption } from "@/models/team";
-import { arrayUnion, arrayRemove, Timestamp } from "@firebase/firestore";
+import { arrayUnion, arrayRemove, Timestamp } from "firebase/firestore";
 import { PraiseAssigneeService } from "./PraiseAssigneeService";
 import { ServiceFlowService } from "./ServiceFlowService";
 
@@ -30,8 +30,7 @@ class TeamService extends BaseService {
             selected_music_sheet_ids: []
           }
         }
-      },
-      service_tags: []
+      }
     }
     const teamId = await this.create(team);
     if (teamId) {
@@ -61,26 +60,62 @@ class TeamService extends BaseService {
   }
 
   async updateServiceTags(teamId: string, tags: Array<{ id: string, name: string, order: number }>) {
-    return await this.update(teamId, { service_tags: tags });
+    const promises = tags.map(tag =>
+      this.updateChild(teamId, "service_tags", tag.id, {
+        name: tag.name,
+        order: tag.order
+      })
+    );
+    return await Promise.all(promises);
+  }
+
+  async getServiceTags(teamId: string) {
+    try {
+      const snap = await this.getChildren(teamId, "service_tags");
+      return (snap || []).sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   }
 
   async addServiceTag(teamId: string, tagName: string) {
     const team = (await this.getById(teamId)) as Team;
     if (!team) return null;
 
-    const existingTag = team.service_tags?.find((t: any) => t.name === tagName);
+    const existingTags = await this.getServiceTags(teamId);
+    const existingTag = existingTags.find((t: any) => t.name === tagName);
     if (existingTag) return existingTag.id;
 
+    const newTagId = tagName;
     const newTag = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: newTagId,
       name: tagName,
-      order: (team.service_tags?.length || 0)
+      order: existingTags.length,
+      created_at: Timestamp.now()
     };
 
-    await this.update(teamId, {
-      service_tags: [...(team.service_tags || []), newTag]
+    await this.addChild(teamId, "service_tags", newTagId, newTag);
+    return newTagId;
+  }
+
+  async deleteServiceTag(teamId: string, tagId: string) {
+    return await this.deleteChild(teamId, "service_tags", tagId);
+  }
+
+  async updateServiceTagName(teamId: string, tagId: string, newName: string) {
+    // If ID is Name, we must delete and recreate
+    const existingTags = await this.getServiceTags(teamId);
+    const tag = existingTags.find((t: any) => t.id === tagId);
+    if (!tag) return;
+
+    await this.deleteServiceTag(teamId, tagId);
+    return await this.addChild(teamId, "service_tags", newName, {
+      id: newName,
+      name: newName,
+      order: tag.order ?? 0,
+      created_at: tag.created_at || Timestamp.now()
     });
-    return newTag.id;
   }
 
   async removeAdmin(teamId: string, userId: string) {

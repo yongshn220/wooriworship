@@ -16,6 +16,7 @@ import { useState } from "react";
 import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
 import { Button } from "@/components/ui/button";
 import { addDays, nextSunday } from "date-fns";
+import { Timestamp } from "firebase/firestore";
 
 interface Props {
     teamId: string;
@@ -54,7 +55,6 @@ export function ServiceCreationMenu({ teamId, selectedServiceId }: Props) {
         setIsSubmitting(true);
         try {
             // Convert Date to Timestamp
-            const { Timestamp } = require("firebase/firestore");
             const timestampDate = Timestamp.fromDate(date);
 
             const newServiceId = await ServiceEventService.createService(teamId, {

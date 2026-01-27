@@ -262,5 +262,50 @@ export default class BaseService {
       return false
     }
   }
+
+  // Sub-collection helpers
+  async getChildren(parentId: string, subCollectionName: string) {
+    try {
+      const q = query(collection(this.db, this.collectionName, parentId, subCollectionName));
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  }
+
+  async addChild(parentId: string, subCollectionName: string, childId: string, data: any) {
+    try {
+      const docRef = doc(this.db, this.collectionName, parentId, subCollectionName, childId);
+      await setDoc(docRef, data);
+      return childId;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  async updateChild(parentId: string, subCollectionName: string, childId: string, data: any) {
+    try {
+      const docRef = doc(this.db, this.collectionName, parentId, subCollectionName, childId);
+      await setDoc(docRef, data, { merge: true });
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  }
+
+  async deleteChild(parentId: string, subCollectionName: string, childId: string) {
+    try {
+      const docRef = doc(this.db, this.collectionName, parentId, subCollectionName, childId);
+      await deleteDoc(docRef);
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  }
 }
 

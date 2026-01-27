@@ -1,4 +1,4 @@
-import { Timestamp } from "@firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 import JSZip from 'jszip';
 import { saveAs } from "file-saver";
 import { Song } from "@/models/song";

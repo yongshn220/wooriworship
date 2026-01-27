@@ -1,23 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown, X, Trash2, Pencil } from "lucide-react";
+import { Check, ChevronsUpDown, X, Trash2, Pencil, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-    CommandSeparator,
-} from "@/components/ui/command";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
 import { ModernDialog } from "@/components/ui/modern-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,13 +43,16 @@ export function TagSelector({
     const [tagToRename, setTagToRename] = React.useState<{ id: string, name: string, open: boolean }>({ id: "", name: "", open: false });
     const [newName, setNewName] = React.useState("");
 
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
     React.useEffect(() => {
         const fetchTags = async () => {
             setLoading(true);
             try {
                 if (mode === "service") {
-                    const team = await TeamService.getById(teamId);
-                    setAvailableTags((team as any)?.service_tags || []);
+                    const tags = await TeamService.getServiceTags(teamId);
+                    setAvailableTags(tags as Tag[]);
                 } else {
                     const tags = await TagService.getTeamTags(teamId);
                     setAvailableTags(tags as Tag[]);
@@ -80,6 +69,26 @@ export function TagSelector({
         }
     }, [teamId, refreshTrigger, mode]);
 
+    // Click outside handler
+    React.useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setOpen(false);
+            }
+        };
+
+        if (open) {
+            document.addEventListener("mousedown", handleClickOutside);
+            // Valid for mobile UX: do not auto-focus
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [open]);
+
     const handleUnselect = (tag: string) => {
         onTagsChange(selectedTags.filter((t) => t !== tag));
     };
@@ -91,20 +100,18 @@ export function TagSelector({
         } else {
             if (single) {
                 onTagsChange([value]);
-                setOpen(false); // Close on selection if single
+                setOpen(false);
             } else {
                 onTagsChange([...selectedTags, value]);
             }
         }
         setInputValue("");
-        // Keep open for multiple selection? UX choice. Let's keep it open.
     };
 
     const createNewTag = async () => {
         if (!inputValue.trim()) return;
         const newTagName = inputValue.trim();
 
-        // Optimistic update
         if (!selectedTags.includes(newTagName)) {
             if (single) {
                 onTagsChange([newTagName]);
@@ -117,8 +124,8 @@ export function TagSelector({
         try {
             if (mode === 'service') {
                 const newId = await TeamService.addServiceTag(teamId, newTagName);
-                const team = await TeamService.getById(teamId);
-                setAvailableTags((team as any)?.service_tags || []);
+                const tags = await TeamService.getServiceTags(teamId);
+                setAvailableTags(tags as Tag[]);
 
                 if (newId) {
                     if (single) onTagsChange([newId]);
@@ -128,7 +135,6 @@ export function TagSelector({
                 await TagService.addNewTag(teamId, newTagName);
                 const tags = await TagService.getTeamTags(teamId);
                 setAvailableTags(tags as Tag[]);
-                // For song tags, use name
                 if (single) onTagsChange([newTagName]);
                 else onTagsChange([...selectedTags, newTagName]);
             }
@@ -139,88 +145,100 @@ export function TagSelector({
     };
 
     return (
-        <div className="flex flex-col gap-2">
-            <Popover open={open} onOpenChange={setOpen} modal={true}>
-                <PopoverTrigger asChild>
-                    <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={open}
-                        className="w-full justify-between h-auto min-h-10 px-3 py-2"
-                    >
-                        <div className="flex flex-wrap gap-1 items-center">
-                            {selectedTags.length > 0 ? (
-                                selectedTags
-                                    .filter(tagValue => {
-                                        if (mode !== "service") return true;
-                                        return availableTags.some(t => t.id === tagValue) || knownTags.some(t => t.id === tagValue);
-                                    })
-                                    .map((tagValue) => {
-                                        // Resolve name
-                                        const tagObj = availableTags.find(t => (mode === "service" ? t.id : t.name) === tagValue) ||
-                                            (mode === "service" ? knownTags.find(t => t.id === tagValue) : undefined);
-                                        const displayName = tagObj ? tagObj.name : tagValue;
+        <div className="flex flex-col gap-2 relative" ref={containerRef}>
+            <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className="w-full justify-between h-auto min-h-10 px-3 py-2"
+                onClick={() => setOpen(!open)}
+            >
+                <div className="flex flex-wrap gap-1 items-center">
+                    {selectedTags.length > 0 ? (
+                        selectedTags
+                            .filter(tagValue => {
+                                if (mode !== "service") return true;
+                                return availableTags.some(t => t.id === tagValue) || knownTags.some(t => t.id === tagValue);
+                            })
+                            .map((tagValue) => {
+                                const tagObj = availableTags.find(t => (mode === "service" ? t.id : t.name) === tagValue) ||
+                                    (mode === "service" ? knownTags.find(t => t.id === tagValue) : undefined);
+                                const displayName = tagObj ? tagObj.name : tagValue;
 
-                                        return (
-                                            <Badge variant="secondary" key={tagValue} className="mr-1 mb-1">
-                                                {displayName}
-                                                <div
-                                                    className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
-                                                    onMouseDown={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                    }}
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        handleUnselect(tagValue);
-                                                    }}
-                                                >
-                                                    <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
-                                                </div>
-                                            </Badge>
-                                        )
-                                    })
-                            ) : (
-                                <span className="text-muted-foreground font-normal">{placeholder}</span>
-                            )}
+                                return (
+                                    <Badge variant="secondary" key={tagValue} className="mr-1 mb-1">
+                                        {displayName}
+                                        <div
+                                            className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
+                                            onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                            }}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                handleUnselect(tagValue);
+                                            }}
+                                        >
+                                            <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                                        </div>
+                                    </Badge>
+                                )
+                            })
+                    ) : (
+                        <span className="text-muted-foreground font-normal">{placeholder}</span>
+                    )}
+                </div>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+
+            {/* Custom Dropdown Overlay */}
+            {open && (
+                <div className="absolute top-full mt-2 w-full z-50 rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95">
+                    <div className="flex flex-col w-full">
+                        <div className="flex items-center border-b px-3">
+                            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                            <input
+                                ref={inputRef}
+                                className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                                placeholder="Search or create tag..."
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                            />
                         </div>
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                    <Command>
-                        <CommandInput
-                            placeholder="Search or create tag..."
-                            value={inputValue}
-                            onValueChange={setInputValue}
-                        />
-                        <CommandList>
-                            <CommandEmpty>
-                                {inputValue && (
-                                    <div className="p-2">
-                                        <Button variant="ghost" className="w-full justify-start text-sm" onClick={createNewTag}>
-                                            Create &quot;{inputValue}&quot;
-                                        </Button>
-                                    </div>
-                                )}
-                                {!inputValue && "No tags found."}
-                            </CommandEmpty>
-                            <CommandGroup className="overflow-y-auto max-h-[200px]">
-                                {availableTags.map((tag) => (
-                                    <CommandItem
+                        <div className="max-h-[200px] overflow-y-auto overflow-x-hidden p-1">
+                            {/* Empty State */}
+                            {!inputValue && availableTags.length === 0 && (
+                                <div className="py-6 text-center text-sm text-muted-foreground">No tags found.</div>
+                            )}
+
+                            {/* Create Option */}
+                            {inputValue && !availableTags.some(t => t.name.toLowerCase() === inputValue.toLowerCase()) && (
+                                <div className="p-1">
+                                    <button
+                                        onClick={createNewTag}
+                                        className="w-full flex select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground cursor-pointer text-left"
+                                    >
+                                        Create &quot;{inputValue}&quot;
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Available Tags */}
+                            {availableTags
+                                .filter(tag => !inputValue || tag.name.toLowerCase().includes(inputValue.toLowerCase()))
+                                .map((tag) => (
+                                    <div
                                         key={tag.id}
-                                        value={tag.name}
-                                        onSelect={() => handleSelect(tag)}
+                                        onClick={() => handleSelect(tag)}
                                         className={cn(
-                                            "flex items-center justify-between group",
-                                            mode === "service" && "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground cursor-pointer"
+                                            "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground cursor-pointer hover:bg-muted/50 transition-colors",
+                                            selectedTags.includes(mode === "service" ? tag.id : tag.name) && "bg-accent/50"
                                         )}
                                     >
-                                        <div className="flex items-center">
+                                        <div className="flex items-center flex-1">
                                             <Check
                                                 className={cn(
-                                                    "mr-2 h-4 w-4",
                                                     "mr-2 h-4 w-4",
                                                     selectedTags.includes(mode === "service" ? tag.id : tag.name) ? "opacity-100" : "opacity-0"
                                                 )}
@@ -233,36 +251,36 @@ export function TagSelector({
                                                     variant="ghost"
                                                     size="icon"
                                                     aria-label="Rename tag"
-                                                    className="h-11 w-11 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                                    className="h-8 w-8 text-muted-foreground hover:bg-background hover:text-primary z-10"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         setTagToRename({ id: tag.id, name: tag.name, open: true });
                                                         setNewName(tag.name);
                                                     }}
                                                 >
-                                                    <Pencil className="h-4 w-4" />
+                                                    <Pencil className="h-3 w-3" />
                                                 </Button>
                                             )}
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
                                                 aria-label="Delete tag"
-                                                className="h-11 w-11 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                                                className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive z-10"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     setTagToDelete({ id: tag.id, name: tag.name, open: true });
                                                 }}
                                             >
-                                                <Trash2 className="h-4 w-4" />
+                                                <Trash2 className="h-3 w-3" />
                                             </Button>
                                         </div>
-                                    </CommandItem>
-                                ))}
-                            </CommandGroup>
-                        </CommandList>
-                    </Command>
-                </PopoverContent>
-            </Popover>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <DeleteConfirmationDialog
                 isOpen={tagToDelete.open}
@@ -273,12 +291,9 @@ export function TagSelector({
                     const tagName = tagToDelete.name;
                     try {
                         if (mode === "service") {
-                            // Service tags are inside Team object. We need to filter and update.
-                            const team = await TeamService.getById(teamId);
-                            const currentTags = (team as any)?.service_tags || [];
-                            const updatedTags = currentTags.filter((t: any) => t.name !== tagName);
-                            await TeamService.updateServiceTags(teamId, updatedTags);
-                            setAvailableTags(updatedTags);
+                            await TeamService.deleteServiceTag(teamId, tagToDelete.id);
+                            const updatedTags = await TeamService.getServiceTags(teamId);
+                            setAvailableTags(updatedTags as Tag[]);
                         } else {
                             await TagService.deleteTag(teamId, tagName);
                             const newTags = await TagService.getTeamTags(teamId);
@@ -307,13 +322,16 @@ export function TagSelector({
                         return;
                     }
                     try {
-                        const team = await TeamService.getById(teamId);
-                        const currentTags = (team as any)?.service_tags || [];
-                        const updatedTags = currentTags.map((t: any) =>
-                            t.id === tagToRename.id ? { ...t, name: newName.trim() } : t
-                        );
-                        await TeamService.updateServiceTags(teamId, updatedTags);
-                        setAvailableTags(updatedTags);
+                        await TeamService.updateServiceTagName(teamId, tagToRename.id, newName.trim());
+                        const updatedTags = await TeamService.getServiceTags(teamId);
+                        setAvailableTags(updatedTags as Tag[]);
+
+                        // If renamed tag was selected, update the selection
+                        if (selectedTags.includes(tagToRename.id)) {
+                            const newSelection = selectedTags.map(id => id === tagToRename.id ? newName.trim() : id);
+                            onTagsChange(newSelection);
+                        }
+
                         setTagToRename(prev => ({ ...prev, open: false }));
                     } catch (err) {
                         console.error("Failed to rename tag", err);

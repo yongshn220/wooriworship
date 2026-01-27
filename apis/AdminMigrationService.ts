@@ -616,6 +616,47 @@ export class AdminMigrationService {
         if (count > 0) await batch.commit();
     }
 
+    public async migrateServiceTagsToSubcollection(teamId: string) {
+        console.log(`[Service Tag Migration] Starting for team: ${teamId}`);
+        const teamRef = this.db.collection("teams").doc(teamId);
+        const teamSnap = await teamRef.get();
+        if (!teamSnap.exists) return;
+
+        const teamData = teamSnap.data() || {};
+        const serviceTags = teamData.service_tags || [];
+
+        if (serviceTags.length === 0) {
+            console.log(`[Service Tag Migration] No tags found for team: ${teamId}`);
+            return;
+        }
+
+        let batch = this.db.batch();
+        let opCount = 0;
+
+        for (const tag of serviceTags) {
+            // Use name as ID for uniqueness and consistency with song_tags
+            const tagId = tag.name;
+            const tagRef = teamRef.collection("service_tags").doc(tagId);
+
+            batch.set(tagRef, {
+                id: tagId,
+                name: tag.name,
+                order: tag.order ?? 0,
+                created_at: Timestamp.now()
+            }, { merge: true });
+            opCount++;
+
+            if (opCount >= 500) {
+                await batch.commit();
+                batch = this.db.batch();
+                opCount = 0;
+            }
+        }
+
+        if (opCount > 0) await batch.commit();
+        console.log(`[Service Tag Migration] Successfully migrated ${serviceTags.length} tags for team: ${teamId}`);
+    }
+
     private chunkArray<T>(array: T[], size: number): T[][] {
         const chunked = [];
         for (let i = 0; i < array.length; i += size) {

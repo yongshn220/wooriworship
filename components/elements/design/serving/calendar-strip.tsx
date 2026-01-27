@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { ServingSchedule } from "@/models/serving";
-import { Timestamp } from "@firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 import { format } from "date-fns";
 import { Calendar, Loader2, History } from "lucide-react";
 import { parseLocalDate } from "@/components/util/helper/helper-functions";
