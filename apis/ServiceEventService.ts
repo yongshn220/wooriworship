@@ -79,8 +79,7 @@ export class ServiceEventService {
             teamId,
             date: data.date || now,
             title: data.title || "New Service",
-            service_tags: data.service_tags || [],
-            tagId: data.tagId || (data.service_tags && data.service_tags[0]) || "",
+            tagId: data.tagId || "",
             created_at: now,
             updated_at: now,
             summary: { songCount: 0 }
@@ -114,11 +113,6 @@ export class ServiceEventService {
         );
 
         const updateData: any = { ...cleanData, updated_at: Timestamp.now() };
-
-        // Sync tagId if service_tags changes
-        if (data.service_tags && data.service_tags.length > 0) {
-            updateData.tagId = data.service_tags[0];
-        }
 
         await updateDoc(ref, updateData);
     }

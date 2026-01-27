@@ -16,8 +16,8 @@ import { Team } from "@/models/team";
 
 interface ServiceDateSelectorProps {
     teamId: string;
-    serviceTagIds: string[];
-    onServiceTagIdsChange: (serviceTagIds: string[]) => void;
+    tagId: string;
+    onTagIdChange: (tagId: string) => void;
     date: Date | undefined;
     onDateChange: (date: Date | undefined) => void;
     calendarMonth?: Date;
@@ -26,8 +26,8 @@ interface ServiceDateSelectorProps {
 
 export function ServiceDateSelector({
     teamId,
-    serviceTagIds,
-    onServiceTagIdsChange,
+    tagId,
+    onTagIdChange,
     date,
     onDateChange,
     calendarMonth,
@@ -226,8 +226,8 @@ export function ServiceDateSelector({
                     <Label className="text-sm font-semibold text-muted-foreground ml-1">Service</Label>
                     <TagSelector
                         teamId={teamId}
-                        selectedTags={serviceTagIds}
-                        onTagsChange={onServiceTagIdsChange}
+                        selectedTags={tagId ? [tagId] : []}
+                        onTagsChange={(tags) => onTagIdChange(tags[0] || "")}
                         placeholder="Select Service"
                         single={true}
                         mode="service"
@@ -239,8 +239,8 @@ export function ServiceDateSelector({
                 <div className="flex flex-wrap gap-2">
                     {shortcuts.map((option) => {
                         const isSelected = !!date && isSameDay(date, option.date) && (
-                            (!!option.id && serviceTagIds.includes(option.id)) ||
-                            (!option.id && tempKnownTags.some(t => t.name === option.title && serviceTagIds.includes(t.id)))
+                            (!!option.id && tagId === option.id) ||
+                            (!option.id && tempKnownTags.some(t => t.name === option.title && tagId === t.id))
                         );
 
                         return (
@@ -264,8 +264,8 @@ export function ServiceDateSelector({
                                         }
                                     }
 
-                                    if (tagId) {
-                                        onServiceTagIdsChange([tagId]);
+                                    if (tagIdResult) {
+                                        onTagIdChange(tagIdResult);
                                     }
                                 }}
                                 className={cn(

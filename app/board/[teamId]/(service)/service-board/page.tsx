@@ -59,8 +59,8 @@ export default function ServingPage() {
             if (e.tagId) {
                 // Resolve tag name
                 const tagName = team?.service_tags?.find((t: any) => t.id === e.tagId)?.name;
-                badgeLabel = tagName || "Worship";
-            } else if (e.title && e.title.length <= 4) {
+                badgeLabel = tagName || e.title;
+            } else if (e.title) {
                 badgeLabel = e.title;
             }
 

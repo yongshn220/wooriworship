@@ -277,7 +277,7 @@ function DateCard({ item, isSelected, onSelect, baseClasses, setRef }: DateCardP
     const weekDay = format(item.date, "EEE");
 
     let topLabel = item.badgeLabel || "Event";
-    if (topLabel.length > 5) topLabel = topLabel.substring(0, 5);
+    if (topLabel.length > 6) topLabel = topLabel.substring(0, 6);
 
     const today = new Date();
     const diffDays = differenceInCalendarDays(item.date, today);

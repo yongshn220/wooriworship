@@ -12,7 +12,7 @@ export interface ServiceEvent {
     date: Timestamp;
     title: string;
     tagId?: string; // Optimized single tag reference
-    service_tags?: string[]; // Multiple tags support
+    // service_tags?: string[]; // Multiple tags support (Deprecated: use tagId)
     worship_id?: string; // Linked Worship Plan ID
 
     // Preview Summary (Optional, for board card performance)

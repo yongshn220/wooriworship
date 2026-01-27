@@ -41,7 +41,7 @@ export function ServiceCreationMenu({ teamId, selectedServiceId }: Props) {
 
     // Form State
     const [date, setDate] = useState<Date | undefined>(undefined);
-    const [serviceTagIds, setServiceTagIds] = useState<string[]>([]);
+    const [selectedTagId, setSelectedTagId] = useState<string>("");
 
     // Calendar Month State (for controlling calendar view if needed)
     const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
@@ -59,18 +59,8 @@ export function ServiceCreationMenu({ teamId, selectedServiceId }: Props) {
 
             const newServiceId = await ServiceEventService.createService(teamId, {
                 date: timestampDate,
-                // Checking ServiceEventService.ts: date: data.date || now. data.date is expected to be Timestamp if strictly typed, but let's check implementation. 
-                // Line 80: date: data.date || now. 
-                // We should probably pass Timestamp or ensure createService handles it. 
-                // HOWEVER, `ServiceDateSelector` returns Javascript `Date`. 
-                // `ServiceEventService.createService` expects `Partial<ServiceEvent>`. `ServiceEvent` has `date: Timestamp`.
-                // So we MUST convert Date to Timestamp here.
-
-                // Correction: Let's check imports.
-                // import { Timestamp } from "firebase/firestore";
-
-                service_tags: serviceTagIds,
-                title: "Worship Service", // Default title, can be updated later or inferred from tag
+                tagId: selectedTagId,
+                title: "New Service", // Default fallback, UI will show tag name if possible
             });
 
             toast({ title: "Service Created", description: "Navigating to new service..." });
@@ -111,8 +101,8 @@ export function ServiceCreationMenu({ teamId, selectedServiceId }: Props) {
                 <div className="py-4">
                     <ServiceDateSelector
                         teamId={teamId}
-                        serviceTagIds={serviceTagIds}
-                        onServiceTagIdsChange={setServiceTagIds}
+                        tagId={selectedTagId}
+                        onTagIdChange={setSelectedTagId}
                         date={date}
                         onDateChange={(d) => {
                             setDate(d);
