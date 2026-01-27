@@ -1,0 +1,99 @@
+
+import { useState } from "react";
+import { useSetRecoilState } from "recoil";
+import { toast } from "@/components/ui/use-toast";
+
+// State & Models
+import { auth } from "@/firebase";
+import { setlistUpdaterAtom, setlistIdsUpdaterAtom, currentSetlistIdAtom } from "@/global-states/setlist-state";
+import { SetlistSongHeader } from "@/models/setlist";
+import { ServiceSetlist } from "@/models/services/ServiceEvent";
+
+// Services
+import { SetlistService } from "@/apis/SetlistService";
+
+interface UseSetlistFormLogicProps {
+    teamId: string;
+    serviceId: string;
+    initialSetlist?: ServiceSetlist | null;
+    onCompleted?: () => void;
+}
+
+export function useSetlistFormLogic({ teamId, serviceId, initialSetlist, onCompleted }: UseSetlistFormLogicProps) {
+
+    // Global updaters
+    const setSetlistUpdater = useSetRecoilState(setlistUpdaterAtom);
+    const setSetlistIdsUpdater = useSetRecoilState(setlistIdsUpdaterAtom);
+    const setCurrentSetlistId = useSetRecoilState(currentSetlistIdAtom);
+
+    // --- Form State ---
+    const [step, setStep] = useState(0);
+    const [direction, setDirection] = useState(0);
+    const totalSteps = 2; // 0: Context, 1: Setlist
+
+    // Basic Info (Context)
+    const [basicInfo, setBasicInfo] = useState({
+        description: initialSetlist?.description ?? "",
+        link: initialSetlist?.link ?? "",
+    });
+
+    // Songs
+    const [songs, setSongs] = useState<SetlistSongHeader[]>(initialSetlist?.songs ?? []);
+    const [beginningSong, setBeginningSong] = useState<SetlistSongHeader | null>(initialSetlist?.beginning_song ?? null);
+    const [endingSong, setEndingSong] = useState<SetlistSongHeader | null>(initialSetlist?.ending_song ?? null);
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    // --- Handlers ---
+
+    const handleSave = async () => {
+        setIsLoading(true);
+        if (!auth.currentUser) return;
+        try {
+            await SetlistService.updateSetlist(teamId, serviceId, {
+                songs: songs,
+                beginning_song: beginningSong || undefined,
+                ending_song: endingSong || undefined,
+                description: basicInfo.description,
+                link: basicInfo.link
+            });
+
+            toast({ title: "Setlist updated" });
+
+            // Trigger global updates
+            setSetlistUpdater(prev => prev + 1);
+            setSetlistIdsUpdater(prev => prev + 1);
+
+            // Call completion handler
+            if (onCompleted) {
+                onCompleted();
+            }
+        } catch (e) {
+            console.error(e);
+            toast({ title: "Something went wrong", variant: "destructive" });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const goToStep = (targetStep: number) => {
+        setDirection(targetStep > step ? 1 : -1);
+        setStep(targetStep);
+    };
+
+    return {
+        // State
+        step, direction, totalSteps,
+        basicInfo, setBasicInfo,
+        songs, setSongs,
+        beginningSong, setBeginningSong,
+        endingSong, setEndingSong,
+        isLoading,
+
+        // Actions
+        handleSave,
+        goToStep,
+        nextStep: () => { if (step < totalSteps - 1) goToStep(step + 1); },
+        prevStep: () => { if (step > 0) goToStep(step - 1); }
+    };
+}

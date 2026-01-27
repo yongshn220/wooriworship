@@ -1,6 +1,6 @@
 import { Textarea } from "@/components/ui/textarea";
 import { useRecoilValueLoadable } from "recoil";
-import { WorshipSongHeader } from "@/models/worship";
+import { SetlistSongHeader } from "@/models/setlist";
 import { MusicSheet } from "@/models/music_sheet";
 import { songAtom } from "@/global-states/song-state";
 // Removed SwapOrderButton import as we use drag and drop now
@@ -15,8 +15,8 @@ import { Trash2 } from "lucide-react";
 interface Props {
   teamId: string
   songOrder: number
-  songHeader: WorshipSongHeader
-  onUpdate: (updatedHeader: WorshipSongHeader) => void
+  songHeader: SetlistSongHeader
+  onUpdate: (updatedHeader: SetlistSongHeader) => void
   onRemove: () => void
   dragHandle?: React.ReactNode
 }

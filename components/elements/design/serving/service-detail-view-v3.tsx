@@ -6,15 +6,20 @@ import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { teamAtom, fetchServiceTagsSelector } from "@/global-states/teamState";
 import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow } from "@/models/services/ServiceEvent";
+import { ServingRole } from "@/models/serving";
 import { User } from "@/models/user";
 import { getDynamicDisplayTitle } from "@/components/util/helper/helper-functions";
 
 // Parts
 import { ServingInfoCard } from "./parts/serving-info-card";
-import { WorshipSongListCard } from "../worship/parts/worship-song-list-card";
-import { WorshipTeamCard } from "./parts/worship-team-card";
+import { SetlistSongListCard } from "@/components/elements/design/setlist/parts/setlist-song-list-card";
+import { PraiseTeamCard } from "./parts/praise-team-card";
 import { ServiceOrderCard } from "./parts/service-order-card";
-import { WorshipPlanPreviewDrawer } from "../worship/worship-plan-preview-drawer";
+import { SetlistPlanPreviewDrawer } from "@/components/elements/design/setlist/setlist-plan-preview-drawer";
+import { PraiseAssigneeForm } from "./forms/praise-assignee-form";
+import { ServiceFlowForm } from "./forms/service-flow-form";
+import { SetlistForm } from "./forms/setlist-form";
+
 
 interface Props {
     teamId: string;
@@ -22,6 +27,7 @@ interface Props {
     setlist: ServiceSetlist | null;
     praiseAssignee: ServicePraiseAssignee | null;
     flow: ServiceFlow | null;
+    roles: ServingRole[]; // Team's serving roles for display
     members: User[]; // Resolved members for Assignee
     currentUserUid?: string | null;
 }
@@ -32,12 +38,16 @@ export function ServiceDetailViewV3({
     setlist,
     praiseAssignee,
     flow,
+    roles,
     members,
     currentUserUid
 }: Props) {
     const team = useRecoilValue(teamAtom(teamId));
     const serviceTags = useRecoilValue(fetchServiceTagsSelector(teamId));
-    const [previewWorshipId, setPreviewWorshipId] = useState<string | null>(null);
+    const [previewSetlistId, setPreviewSetlistId] = useState<string | null>(null);
+    const [isEditingSetlist, setIsEditingSetlist] = useState(false);
+    const [isEditingAssignee, setIsEditingAssignee] = useState(false);
+    const [isEditingFlow, setIsEditingFlow] = useState(false);
 
     // Resolve Display Title
     const displayTitle = getDynamicDisplayTitle(
@@ -55,12 +65,13 @@ export function ServiceDetailViewV3({
                 date={event.date}
                 worshipId={null} // V3 uses separate Setlist
                 teamId={teamId}
-                onPreview={setPreviewWorshipId} // Keeps preview logic if we link V3 setlist to preview?
+                onPreview={setPreviewSetlistId} // Keeps preview logic if we link V3 setlist to preview?
             />
+
 
             {/* 2. Set List */}
             {setlist && setlist.songs.length > 0 ? (
-                <WorshipSongListCard
+                <SetlistSongListCard
                     teamId={teamId}
                     songs={setlist.songs.map(s => ({
                         id: s.id,
@@ -78,13 +89,13 @@ export function ServiceDetailViewV3({
                         last_used_time: { seconds: 0, nanoseconds: 0 } as any,
                         updated_by: { id: "", time: { seconds: 0, nanoseconds: 0 } as any }
                     }))}
+                    onEdit={() => setIsEditingSetlist(true)}
                 />
             ) : (
-                <div onClick={() => setPreviewWorshipId("edit_mode")} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all">
+                <div onClick={() => setIsEditingSetlist(true)} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all">
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                         <Music className="w-6 h-6 text-primary" />
                     </div>
-                    {/* Note: Icons import checking needed. Music imported from lucide-react? */}
                     <h3 className="text-base font-semibold">Create Setlist</h3>
                     <p className="text-sm text-muted-foreground">Add songs to this service</p>
                 </div>
@@ -92,14 +103,15 @@ export function ServiceDetailViewV3({
 
             {/* 3. Praise Assignee */}
             {praiseAssignee && praiseAssignee.assignee.length > 0 ? (
-                <WorshipTeamCard
-                    worshipRoles={praiseAssignee.assignee}
-                    roles={[]}
+                <PraiseTeamCard
+                    praiseAssignments={praiseAssignee.assignee}
+                    roles={roles}
                     members={members}
                     currentUserUid={currentUserUid}
+                    onEdit={() => setIsEditingAssignee(true)}
                 />
             ) : (
-                <div className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all">
+                <div onClick={() => setIsEditingAssignee(true)} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all">
                     <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                         <Users className="w-6 h-6 text-blue-500" />
                     </div>
@@ -114,9 +126,10 @@ export function ServiceDetailViewV3({
                     items={flow.items}
                     members={members}
                     currentUserUid={currentUserUid}
+                    onEdit={() => setIsEditingFlow(true)}
                 />
             ) : (
-                <div className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all">
+                <div onClick={() => setIsEditingFlow(true)} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all">
                     <div className="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                         <ListOrdered className="w-6 h-6 text-orange-500" />
                     </div>
@@ -126,13 +139,44 @@ export function ServiceDetailViewV3({
             )}
 
             {/* Preview Drawer (Legacy or V3?) */}
-            {/* If we want to preview the Setlist, we need V3 compatible drawer or adapter */}
-            <WorshipPlanPreviewDrawer
+            <SetlistPlanPreviewDrawer
                 teamId={teamId}
-                isOpen={!!previewWorshipId}
-                onClose={() => setPreviewWorshipId(null)}
-                worshipId={previewWorshipId}
+                isOpen={!!previewSetlistId}
+                onClose={() => setPreviewSetlistId(null)}
+                setlistId={previewSetlistId}
             />
+
+            {/* Forms */}
+            {isEditingSetlist && (
+                <SetlistForm
+                    teamId={teamId}
+                    serviceId={event.id}
+                    initialSetlist={setlist}
+                    onCompleted={() => setIsEditingSetlist(false)}
+                    onClose={() => setIsEditingSetlist(false)}
+                />
+            )}
+
+            {isEditingAssignee && (
+                <PraiseAssigneeForm
+                    teamId={teamId}
+                    serviceId={event.id}
+                    initialAssignee={praiseAssignee}
+                    onCompleted={() => setIsEditingAssignee(false)}
+                    onClose={() => setIsEditingAssignee(false)}
+                />
+            )}
+
+            {isEditingFlow && (
+                <ServiceFlowForm
+                    teamId={teamId}
+                    serviceId={event.id}
+                    initialFlow={flow}
+                    serviceTagIds={event.tagId ? [event.tagId] : []}
+                    onCompleted={() => setIsEditingFlow(false)}
+                    onClose={() => setIsEditingFlow(false)}
+                />
+            )}
         </div>
     );
 }

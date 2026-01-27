@@ -3,12 +3,29 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { createPortal } from "react-dom";
+import { useEffect, useState } from "react";
+
 // --- Root Container ---
 export const FullScreenForm = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-    return (
-        <div className={cn("fixed inset-0 z-[100] bg-background flex flex-col", className)}>
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+        // Lock body scroll
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "unset";
+        }
+    }, []);
+
+    if (!mounted) return null;
+
+    return createPortal(
+        <div className={cn("fixed inset-0 z-[9999] bg-background flex flex-col touchscreen-fix", className)}>
             {children}
-        </div>
+        </div>,
+        document.body
     );
 };
 

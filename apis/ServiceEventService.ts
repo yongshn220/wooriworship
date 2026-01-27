@@ -184,7 +184,7 @@ export class ServiceEventService {
         return services.map((s, idx) => ({
             ...s,
             worship_date: s.date, // Compatibility
-            service_tag_ids: s.service_tags, // Compatibility
+            service_tag_ids: s.tagId ? [s.tagId] : [], // Compatibility
             items: flows[idx]?.items || []
         }));
     }
@@ -250,7 +250,7 @@ export class ServiceEventService {
             id: details.event.id,
             ...details.event,
             worship_date: details.event.date,
-            service_tags: details.event.service_tags,
+            service_tags: details.event.tagId ? [details.event.tagId] : [],
             worship_roles: details.praiseAssignee?.assignee || [],
             items: details.flow?.items || [],
         } as any;

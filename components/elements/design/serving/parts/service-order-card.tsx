@@ -10,9 +10,10 @@ interface Props {
     items: ServingItem[];
     members: User[];
     currentUserUid?: string | null;
+    onEdit?: () => void;
 }
 
-export function ServiceOrderCard({ items, members, currentUserUid }: Props) {
+export function ServiceOrderCard({ items, members, currentUserUid, onEdit }: Props) {
     if (!items || items.length === 0) return null;
 
     return (
@@ -24,9 +25,19 @@ export function ServiceOrderCard({ items, members, currentUserUid }: Props) {
                     </div>
                     <h2 className="font-bold text-base text-slate-900 dark:text-white">Service Order</h2>
                 </div>
-                <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full">
-                    {items.length} items
-                </span>
+                <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full">
+                        {items.length} items
+                    </span>
+                    {onEdit && (
+                        <button
+                            onClick={onEdit}
+                            className="text-[11px] font-bold text-slate-400 hover:text-primary transition-colors px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-white/5"
+                        >
+                            Edit
+                        </button>
+                    )}
+                </div>
             </div>
 
             <div className="bg-panel dark:bg-panel-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden">

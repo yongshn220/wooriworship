@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { musicSheetAtom, musicSheetsBySongIdAtom } from "@/global-states/music-sheet-state";
-import { selectedWorshipSongHeaderListAtom } from "@/global-states/worship-creation-state";
+import { selectedSetlistSongHeaderListAtom } from "@/global-states/setlist-creation-state";
 
 interface Props {
   teamId: string
@@ -17,7 +17,7 @@ interface Props {
 export function MusicKeySelector({ teamId, songId, isStatic = false, onSelectHandler, selectedMusicSheetIds, setMusicSheetIds }: Props) {
 
   const musicSheets = useRecoilValue(musicSheetsBySongIdAtom({ teamId, songId }))
-  const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
+  const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedSetlistSongHeaderListAtom)
 
   function handleSelectSong() {
     if (isStatic) return

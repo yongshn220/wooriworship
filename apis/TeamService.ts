@@ -18,19 +18,20 @@ class TeamService extends BaseService {
       admins: [userId],
       users: [userId],
       option: {
-        worship: {
+        setlist: {
           beginning_song: {
-            id: null,
+            id: null as any,
             note: "",
             selected_music_sheet_ids: []
           },
           ending_song: {
-            id: null,
+            id: null as any,
             note: "",
             selected_music_sheet_ids: []
           }
         }
-      }
+      },
+      service_tags: []
     }
     const teamId = await this.create(team);
     if (teamId) {
@@ -106,7 +107,7 @@ class TeamService extends BaseService {
   async updateServiceTagName(teamId: string, tagId: string, newName: string) {
     // If ID is Name, we must delete and recreate
     const existingTags = await this.getServiceTags(teamId);
-    const tag = existingTags.find((t: any) => t.id === tagId);
+    const tag = existingTags.find((t: any) => t.id === tagId) as any;
     if (!tag) return;
 
     await this.deleteServiceTag(teamId, tagId);

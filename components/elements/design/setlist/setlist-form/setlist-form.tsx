@@ -20,14 +20,14 @@ import { formatToLongDate } from "@/components/util/helper/helper-functions";
 
 // Custom Components
 import { AddedSongHeaderStatic } from "@/components/elements/design/song/song-header/worship-form/added-song-header-static";
-import { AddSongButton } from "@/components/elements/design/setlist/setlist-form/add-song-button";
+import { AddSongButton } from "./add-song-button";
 import { AddSetlistSongDialogTrigger } from "@/components/elements/design/song/song-list/setlist-form/add-setlist-song-dialog-trigger";
-import { SortableWorshipSongItem } from "./sortable-worship-song-item";
+import { SortableSetlistSongItem } from "./sortable-setlist-song-item";
 import { AddedSongHeaderDefault } from "@/components/elements/design/song/song-header/worship-form/added-song-header-default";
 import { SortableList } from "@/components/common/list/sortable-list";
 
 // Logic Hook
-import { useWorshipFormLogic } from "./hooks/use-worship-form-logic";
+import { useSetlistFormLogic } from "./hooks/use-setlist-form-logic";
 import { slideVariants } from "@/components/constants/animations";
 
 interface Props {
@@ -36,7 +36,7 @@ interface Props {
   worship: Setlist
 }
 
-export function WorshipForm({ mode, teamId, worship }: Props) {
+export function SetlistForm({ mode, teamId, worship }: Props) {
   const router = useRouter()
 
   const {
@@ -55,7 +55,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
     // Actions
     handleCreate, handleEdit,
     goToStep, nextStep, prevStep
-  } = useWorshipFormLogic({ mode, teamId, initialWorship: worship });
+  } = useSetlistFormLogic({ mode, teamId, initialWorship: worship });
 
 
   // Scroll Reset Logic
@@ -115,7 +115,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                   <Button
                     size="sm"
                     className="h-8 px-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-bold text-xs shadow-sm flex-shrink-0"
-                    onClick={() => router.replace(`/board/${teamId}/edit-worship/${duplicateId}`)}
+                    onClick={() => router.replace(`/board/${teamId}/edit-setlist/${duplicateId}`)}
                   >
                     Edit <ArrowRight className="ml-1 w-3 h-3" />
                   </Button>
@@ -225,7 +225,7 @@ export function WorshipForm({ mode, teamId, worship }: Props) {
                 {/* Reorderable List */}
                 <SortableList items={songs} onReorder={setSongs}>
                   {songs.map((songHeader, i) => (
-                    <SortableWorshipSongItem
+                    <SortableSetlistSongItem
                       key={songHeader.id || i}
                       item={songHeader}
                       teamId={teamId}

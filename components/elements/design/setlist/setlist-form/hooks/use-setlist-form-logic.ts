@@ -22,13 +22,13 @@ import { Timestamp } from "firebase/firestore";
 // Hooks
 import { useServiceDuplicateCheck } from "@/components/common/hooks/use-service-duplicate-check";
 
-interface UseWorshipFormLogicProps {
+interface UseSetlistFormLogicProps {
     mode: FormMode;
     teamId: string;
     initialWorship?: Setlist;
 }
 
-export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorshipFormLogicProps) {
+export function useSetlistFormLogic({ mode, teamId, initialWorship }: UseSetlistFormLogicProps) {
     const router = useRouter();
     const authUser = auth.currentUser;
     const team = useRecoilValue(teamAtom(teamId));
@@ -128,13 +128,13 @@ export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorship
         setIsLoading(true);
         if (!auth.currentUser) return;
         try {
-            const worshipInput = {
+            const setlistInput = {
                 title: getServiceTitleFromTags(serviceTagIds, team?.service_tags),
                 service_tags: serviceTagIds,
                 description: basicInfo.description,
                 date: date,
                 link: basicInfo.link,
-                worshipSongHeaders: songs,
+                setlistSongHeaders: songs,
                 beginningSong: beginningSong,
                 endingSong: endingSong,
                 related_serving_id: linkedServingId
@@ -142,7 +142,7 @@ export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorship
 
             const serviceId = await ServiceEventService.createService(teamId, {
                 date: Timestamp.fromDate(date),
-                title: worshipInput.title,
+                title: setlistInput.title,
                 tagId: serviceTagIds[0] || "",
             });
 
@@ -154,8 +154,8 @@ export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorship
                 link: basicInfo.link
             });
 
-            // If a serving was selected to link (though in V3 they should be same doc, 
-            // but for transition we might still have separate "Serving" docs? 
+            // If a serving was selected to link (though in V3 they should be same doc,
+            // but for transition we might still have separate "Serving" docs?
             // In V3, they are unified. So linkingServingId might refer to an existing Service doc to merge into?
             // This is complex. For now, let's just create a new service.
             // If linkedServingId is provided, it means the user wants to attach this setlist to an existing service.
@@ -174,7 +174,7 @@ export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorship
                 // ... (refactor needed below if linkedServingId exists)
             }
 
-            await PushNotificationService.notifyTeamNewWorship(teamId, auth.currentUser.uid, worshipInput.date, worshipInput.title);
+            await PushNotificationService.notifyTeamNewWorship(teamId, auth.currentUser.uid, setlistInput.date, setlistInput.title);
 
             toast({ title: "New service created!" });
             cleanupAndRedirect(linkedServingId || serviceId);
@@ -189,20 +189,20 @@ export function useWorshipFormLogic({ mode, teamId, initialWorship }: UseWorship
         setIsLoading(true);
         if (!auth.currentUser || !initialWorship?.id) return;
         try {
-            const worshipInput = {
+            const setlistInput = {
                 title: getServiceTitleFromTags(serviceTagIds, team?.service_tags),
                 service_tags: serviceTagIds,
                 description: basicInfo.description,
                 date: date,
                 link: basicInfo.link,
-                worshipSongHeaders: songs,
+                setlistSongHeaders: songs,
                 beginningSong: beginningSong,
                 endingSong: endingSong,
                 related_serving_id: linkedServingId
             };
 
             await ServiceEventService.updateService(teamId, initialWorship.id, {
-                title: worshipInput.title,
+                title: setlistInput.title,
                 tagId: serviceTagIds[0] || "",
                 date: Timestamp.fromDate(date)
             });

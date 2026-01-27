@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase/firestore";
-import { WorshipSongHeader } from "@/models/worship";
+import { SetlistSongHeader } from "@/models/setlist";
 
 export interface Team {
   id?: string
@@ -17,8 +17,13 @@ export interface Team {
 }
 
 export interface TeamOption {
-  worship: {
-    beginning_song: WorshipSongHeader
-    ending_song: WorshipSongHeader
+  setlist: {
+    beginning_song: SetlistSongHeader
+    ending_song: SetlistSongHeader
+  }
+  /** @deprecated Use setlist instead */
+  worship?: {
+    beginning_song: SetlistSongHeader
+    ending_song: SetlistSongHeader
   }
 }

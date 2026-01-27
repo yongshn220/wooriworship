@@ -10,15 +10,15 @@ import { TeamOption } from "@/models/team";
 import { TeamService } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
 import { songAtom } from "@/global-states/song-state";
-import { WorshipSongHeader } from "@/models/worship";
+import { SetlistSongHeader } from "@/models/setlist";
 import { AddableSongDetailDialogTrigger } from "@/components/elements/design/song/song-detail-card/worship-form/addable-song-detail-dialog-trigger";
 import { AddedSongInnerHeader } from "@/components/elements/design/song/song-header/worship-form/parts/added-song-inner-header";
 
 interface Props {
   teamId: string
   specialOrderType: WorshipSpecialOrderType
-  songHeader: WorshipSongHeader
-  onUpdate: (header: WorshipSongHeader) => void
+  songHeader: SetlistSongHeader
+  onUpdate: (header: SetlistSongHeader) => void
   onRemove: () => void
 }
 

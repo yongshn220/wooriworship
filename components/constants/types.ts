@@ -1,4 +1,4 @@
-import { WorshipSongHeader } from "@/models/worship";
+import { SetlistSongHeader } from "@/models/setlist";
 
 
 export interface ImageFileContainer {
@@ -21,9 +21,9 @@ export interface WorshipInput {
   description: string
   link: string
   date: Date
-  worshipSongHeaders: Array<WorshipSongHeader>
-  beginningSong: WorshipSongHeader
-  endingSong: WorshipSongHeader
+  worshipSongHeaders: Array<SetlistSongHeader>
+  beginningSong: SetlistSongHeader
+  endingSong: SetlistSongHeader
   service_tags: string[]
   serving_schedule_id?: string
 }

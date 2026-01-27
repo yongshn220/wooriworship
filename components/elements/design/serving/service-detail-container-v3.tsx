@@ -67,6 +67,7 @@ export function ServiceDetailContainerV3({ serviceId, teamId, roles, currentUser
             setlist={data.setlist}
             praiseAssignee={data.praiseAssignee}
             flow={data.flow}
+            roles={roles}
             members={members}
             currentUserUid={currentUserUid}
         />

@@ -267,7 +267,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 teamId,
                 date: dateTimestamp,
                 title,
-                service_tags: serviceTagIds,
+                tagId: serviceTagIds[0] || "",
                 worship_id: linkedWorshipId || undefined
             };
 

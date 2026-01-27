@@ -12,7 +12,7 @@ import { ServiceEventService } from "@/apis/ServiceEventService";
 import { Spinner } from "@/components/ui/spinner";
 import { ClipboardList } from "lucide-react";
 import { ResponsiveDrawer } from "@/components/ui/responsive-drawer";
-import { WorshipTeamCard } from "@/components/elements/design/serving/parts/worship-team-card";
+import { PraiseTeamCard } from "@/components/elements/design/serving/parts/praise-team-card";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
 
@@ -73,8 +73,8 @@ export function ServingRosterDialog({ date, teamId, trigger }: Props) {
                     </div>
                 ) : (
                     <div className="space-y-1">
-                        <WorshipTeamCard
-                            worshipRoles={schedule.worship_roles || schedule.roles || []}
+                        <PraiseTeamCard
+                            praiseAssignments={schedule.worship_roles || schedule.roles || []}
                             roles={roles}
                             members={teamMembers}
                             currentUserUid={user?.uid}

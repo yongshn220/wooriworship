@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase/firestore";
-import { WorshipSongHeader } from "@/models/worship";
+import { SetlistSongHeader } from "@/models/setlist";
 import { ServingAssignment, ServingItem } from "@/models/serving";
 
 // =============================================================================
@@ -32,13 +32,13 @@ export interface ServiceEvent {
 // Path: teams/{teamId}/services/{serviceId}/setlists/main
 export interface ServiceSetlist {
     id: string; // usually "main"
-    songs: WorshipSongHeader[];
+    songs: SetlistSongHeader[];
     description?: string; // Worship leader's mentorship/word
     link?: string; // YouTube link
 
     // Legacy compatibility (optional)
-    beginning_song?: WorshipSongHeader;
-    ending_song?: WorshipSongHeader;
+    beginning_song?: SetlistSongHeader;
+    ending_song?: SetlistSongHeader;
 }
 
 // Path: teams/{teamId}/services/{serviceId}/praise_assignee/main

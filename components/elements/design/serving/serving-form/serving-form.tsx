@@ -18,10 +18,10 @@ import { LinkedResourceCard } from "@/components/common/form/linked-resource-car
 import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
 import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
 import { MemberSelector } from "./member-selector";
-import { WorshipPlanPreviewDrawer } from "../../worship/worship-plan-preview-drawer";
+import { SetlistPlanPreviewDrawer } from "@/components/elements/design/setlist/setlist-plan-preview-drawer";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { AddActionButton } from "./serving-components";
-import { WorshipTeamCard } from "../parts/worship-team-card";
+import { PraiseTeamCard } from "../parts/praise-team-card";
 import { ServiceOrderCard } from "../parts/service-order-card";
 
 // Extracted Components
@@ -159,8 +159,8 @@ export function ServingForm(props: ServingFormProps) {
                                 {/* Service & Date Selection */}
                                 <ServiceDateSelector
                                     teamId={props.teamId}
-                                    serviceTagIds={serviceTagIds}
-                                    onServiceTagIdsChange={setServiceTagIds}
+                                    tagId={serviceTagIds[0] || ""}
+                                    onTagIdChange={(id) => setServiceTagIds([id])}
                                     date={selectedDate}
                                     onDateChange={(d) => d && setSelectedDate(d)}
                                     calendarMonth={currentMonth}
@@ -446,8 +446,8 @@ export function ServingForm(props: ServingFormProps) {
 
                                 {/* CUE SHEET / TIMELINE LIST */}
                                 <div className="flex flex-col w-full px-4 space-y-5 pb-24">
-                                    <WorshipTeamCard
-                                        worshipRoles={worshipRoles}
+                                    <PraiseTeamCard
+                                        praiseAssignments={worshipRoles}
                                         roles={roles}
                                         members={teamMembers}
                                         currentUserUid={auth.currentUser?.uid}
@@ -521,11 +521,11 @@ export function ServingForm(props: ServingFormProps) {
                     </Button>
                 </FullScreenFormFooter>
 
-                {/* Worship Preview Drawer */}
-                <WorshipPlanPreviewDrawer
+                {/* Setlist Preview Drawer */}
+                <SetlistPlanPreviewDrawer
                     isOpen={!!previewWorshipId}
                     onClose={() => setPreviewWorshipId(null)}
-                    worshipId={previewWorshipId}
+                    setlistId={previewWorshipId}
                     teamId={props.teamId}
                 />
 

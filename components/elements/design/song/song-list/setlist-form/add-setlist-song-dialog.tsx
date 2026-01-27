@@ -4,7 +4,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
-import { AddableSongHeaderList } from "@/components/elements/design/song/song-list/worship-form/parts/addable-song-header-list";
+import { AddableSongHeaderList } from "@/components/elements/design/song/song-list/setlist-form/parts/addable-song-header-list";
 import { LoadingCircle } from "@/components/util/animation/loading-indicator";
 import { useRecoilValue } from "recoil";
 import { songSearchInputAtom } from "@/app/board/_states/board-states";
@@ -22,7 +22,7 @@ interface Props {
   onUpdateList: (newSongs: SetlistSongHeader[]) => void
 }
 
-export function AddWorshipSongDialog({ teamId, isOpen, setIsOpen, selectedSongs, onUpdateList }: Props) {
+export function AddSetlistSongDialog({ teamId, isOpen, setIsOpen, selectedSongs, onUpdateList }: Props) {
   const input = useRecoilValue(songSearchInputAtom)
   // const selectedSongHeaderList = useRecoilValue(selectedWorshipSongHeaderListAtom) // REMOVED
 

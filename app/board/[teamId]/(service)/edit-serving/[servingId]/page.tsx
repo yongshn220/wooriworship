@@ -28,7 +28,7 @@ export default function EditServingPage({ params }: Props) {
                             teamId: details.event.teamId,
                             date: details.event.date,
                             title: details.event.title,
-                            service_tags: details.event.service_tags || (details.event.tagId ? [details.event.tagId] : []),
+                            service_tags: details.event.tagId ? [details.event.tagId] : [],
                             worship_id: details.event.worship_id,
                             worship_roles: details.praiseAssignee?.assignee || [],
                             items: details.flow?.items || [],

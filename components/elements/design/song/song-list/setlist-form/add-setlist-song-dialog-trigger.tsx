@@ -1,7 +1,7 @@
 "use client"
 
 import { Suspense, useState } from "react";
-import { AddWorshipSongDialog } from "@/components/elements/design/song/song-list/worship-form/add-worship-song-dialog";
+import { AddSetlistSongDialog } from "@/components/elements/design/song/song-list/setlist-form/add-setlist-song-dialog";
 import { SetlistSongHeader } from "@/models/setlist";
 
 interface Props {
@@ -10,13 +10,13 @@ interface Props {
   selectedSongs: SetlistSongHeader[]
   onUpdateList: (newSongs: SetlistSongHeader[]) => void
 }
-export function AddWorshipSongDialogTrigger({ teamId, children, selectedSongs, onUpdateList }: Props) {
+export function AddSetlistSongDialogTrigger({ teamId, children, selectedSongs, onUpdateList }: Props) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
     <>
       <Suspense fallback={<></>}>
-        <AddWorshipSongDialog
+        <AddSetlistSongDialog
           teamId={teamId}
           isOpen={isOpen}
           setIsOpen={setIsOpen}

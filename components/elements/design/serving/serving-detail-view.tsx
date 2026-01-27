@@ -7,9 +7,9 @@ import { teamAtom } from "@/global-states/teamState";
 import { useRecoilValue } from "recoil";
 import { getDynamicDisplayTitle } from "@/components/util/helper/helper-functions";
 import { ServingInfoCard } from "./parts/serving-info-card";
-import { WorshipTeamCard } from "./parts/worship-team-card";
+import { PraiseTeamCard } from "./parts/praise-team-card";
 import { ServiceOrderCard } from "./parts/service-order-card";
-import { WorshipPlanPreviewDrawer } from "../worship/worship-plan-preview-drawer";
+import { SetlistPlanPreviewDrawer } from "@/components/elements/design/setlist/setlist-plan-preview-drawer";
 
 interface Props {
     schedule: ServingSchedule;
@@ -41,9 +41,9 @@ export function ServingDetailView({ schedule, roles, members, currentUserUid, te
                 onPreview={setPreviewWorshipId}
             />
 
-            {/* Worship Team Section */}
-            <WorshipTeamCard
-                worshipRoles={schedule.worship_roles || []}
+            {/* Praise Team Section */}
+            <PraiseTeamCard
+                praiseAssignments={schedule.worship_roles || []}
                 roles={roles}
                 members={members}
                 currentUserUid={currentUserUid}
@@ -64,12 +64,11 @@ export function ServingDetailView({ schedule, roles, members, currentUserUid, te
             )}
 
             {/* Preview Drawer */}
-            {/* Preview Drawer */}
-            <WorshipPlanPreviewDrawer
+            <SetlistPlanPreviewDrawer
                 teamId={teamId}
                 isOpen={!!previewWorshipId}
                 onClose={() => setPreviewWorshipId(null)}
-                worshipId={previewWorshipId}
+                setlistId={previewWorshipId}
             />
         </div>
     );

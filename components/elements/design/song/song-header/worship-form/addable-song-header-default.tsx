@@ -3,14 +3,14 @@ import { songAtom } from "@/global-states/song-state";
 import { musicSheetsBySongIdAtom } from "@/global-states/music-sheet-state";
 import * as React from "react";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
-import { WorshipSongHeader } from "@/models/worship";
+import { SetlistSongHeader } from "@/models/setlist";
 import { cn } from "@/lib/utils";
 
 interface Props {
   teamId: string
   songId: string
-  selectedSongs: WorshipSongHeader[]
-  onUpdateList: (newSongs: WorshipSongHeader[]) => void
+  selectedSongs: SetlistSongHeader[]
+  onUpdateList: (newSongs: SetlistSongHeader[]) => void
 }
 
 export function AddableSongHeaderDefault({ teamId, songId, selectedSongs, onUpdateList }: Props) {

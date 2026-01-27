@@ -3,7 +3,7 @@ import { SortableItem, SortableDragHandle } from "@/components/common/list/sorta
 import { AddedSongHeaderDefault } from "@/components/elements/design/song/song-header/worship-form/added-song-header-default";
 import { SetlistSongHeader } from "@/models/setlist";
 
-interface SortableWorshipSongItemProps {
+interface SortableSetlistSongItemProps {
     item: SetlistSongHeader;
     teamId: string;
     index: number;
@@ -11,7 +11,7 @@ interface SortableWorshipSongItemProps {
     onRemove: () => void;
 }
 
-export function SortableWorshipSongItem({ item, teamId, index, onUpdate, onRemove }: SortableWorshipSongItemProps) {
+export function SortableSetlistSongItem({ item, teamId, index, onUpdate, onRemove }: SortableSetlistSongItemProps) {
     return (
         <SortableItem value={item} className="z-0 select-none">
             {(controls) => (

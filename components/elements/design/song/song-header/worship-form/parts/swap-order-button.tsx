@@ -6,20 +6,20 @@ import { ArrowUpDown } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { WorshipSpecialOrderType } from "@/components/constants/enums";
-import { WorshipSongHeader } from "@/models/worship";
-import { selectedWorshipSongHeaderListAtom, worshipBeginningSongHeaderAtom, worshipEndingSongHeaderAtom } from "@/global-states/worship-creation-state";
+import { SetlistSongHeader } from "@/models/setlist";
+import { selectedSetlistSongHeaderListAtom, setlistBeginningSongHeaderAtom, setlistEndingSongHeaderAtom } from "@/global-states/setlist-creation-state";
 
 interface Props {
-  songHeader: WorshipSongHeader
+  songHeader: SetlistSongHeader
   songOrder: number
 }
 
 type OrderValue = WorshipSpecialOrderType | string
 
 export function SwapOrderButton({ songHeader, songOrder }: Props) {
-  const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedWorshipSongHeaderListAtom)
-  const setBeginningSongHeader = useSetRecoilState(worshipBeginningSongHeaderAtom)
-  const setEndingSongHeader = useSetRecoilState(worshipEndingSongHeaderAtom)
+  const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedSetlistSongHeaderListAtom)
+  const setBeginningSongHeader = useSetRecoilState(setlistBeginningSongHeaderAtom)
+  const setEndingSongHeader = useSetRecoilState(setlistEndingSongHeaderAtom)
 
   function handleClick(value: OrderValue) {
     if (value === WorshipSpecialOrderType.BEGINNING) {

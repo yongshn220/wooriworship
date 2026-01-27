@@ -2,7 +2,9 @@
 
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Music } from "lucide-react";
+import { Music, Settings2 } from "lucide-react"; // Changed icon to verify library availability, maybe Pencil? Let's use generic Edit icon or Settings?
+// User has 'lucide-react'. Let's use 'Edit' or 'Pencil'.
+import { Edit } from "lucide-react";
 import { useState } from "react";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
 
@@ -11,19 +13,30 @@ import { Song } from "@/models/song";
 interface Props {
     songs: Song[];
     teamId: string;
+    onEdit?: () => void;
 }
 
-export function WorshipSongListCard({ songs = [], teamId }: Props) {
+export function SetlistSongListCard({ songs = [], teamId, onEdit }: Props) {
     const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
 
     return (
         <div className="space-y-3">
-            <div className="flex items-center gap-2 px-2">
-                <Music className="w-4 h-4 text-primary" />
-                <h3 className="text-lg font-bold">Songs</h3>
-                <Badge variant="secondary" className="rounded-full px-2 py-0 h-5 text-xs">
-                    {songs?.length || 0}
-                </Badge>
+            <div className="flex items-center justify-between px-2">
+                <div className="flex items-center gap-2">
+                    <Music className="w-4 h-4 text-primary" />
+                    <h3 className="text-lg font-bold">Songs</h3>
+                    <Badge variant="secondary" className="rounded-full px-2 py-0 h-5 text-xs">
+                        {songs?.length || 0}
+                    </Badge>
+                </div>
+                {onEdit && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                        className="text-muted-foreground hover:text-primary transition-colors p-1"
+                    >
+                        <Edit className="w-4 h-4" />
+                    </button>
+                )}
             </div>
 
             <div className="bg-white dark:bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm">
