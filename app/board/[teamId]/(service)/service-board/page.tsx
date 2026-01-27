@@ -20,7 +20,7 @@ import { EmptyServingBoardPage } from "./_components/empty-serving-board-page";
 import { CalendarStrip } from "@/components/common/board-calendar/calendar-strip"; // NEW
 import { CalendarItem } from "@/components/common/board-calendar/types"; // NEW
 import { useCalendarNavigation } from "@/components/common/hooks/use-calendar-navigation"; // NEW
-import { ServiceDetailContainerV3 } from "@/components/elements/design/serving/service-detail-container-v3";
+import { ServiceDetailContainer } from "@/components/elements/design/serving/service-detail-container";
 
 import { getPathCreateServing } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
@@ -247,7 +247,7 @@ export default function ServingPage() {
                     <div className="mt-6">
                         <Suspense fallback={<ServingListSkeleton />}>
                             {selectedScheduleId ? (
-                                <ServiceDetailContainerV3
+                                <ServiceDetailContainer
                                     serviceId={selectedScheduleId}
                                     teamId={teamId}
                                     roles={roles}

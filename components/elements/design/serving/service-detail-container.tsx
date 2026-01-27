@@ -5,7 +5,7 @@ import { useRecoilValue } from "recoil";
 import { usersAtom } from "@/global-states/userState";
 import { ServiceEventService } from "@/apis/ServiceEventService";
 import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow, ServiceFormState, ServiceRole } from "@/models/services/ServiceEvent";
-import { ServiceDetailViewV3 } from "./service-detail-view-v3";
+import { ServiceDetailView } from "./service-detail-view";
 import { Loader2 } from "lucide-react";
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
     currentUserUid?: string | null;
 }
 
-export function ServiceDetailContainerV3({ serviceId, teamId, roles, currentUserUid }: Props) {
+export function ServiceDetailContainer({ serviceId, teamId, roles, currentUserUid }: Props) {
     const [data, setData] = useState<{
         event: ServiceEvent;
         setlist: ServiceSetlist | null;
@@ -58,9 +58,8 @@ export function ServiceDetailContainerV3({ serviceId, teamId, roles, currentUser
 
     if (!data) return null;
 
-    // V3 View
     return (
-        <ServiceDetailViewV3
+        <ServiceDetailView
             teamId={teamId}
             event={data.event}
             setlist={data.setlist}

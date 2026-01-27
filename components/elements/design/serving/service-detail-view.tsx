@@ -31,7 +31,7 @@ interface Props {
     currentUserUid?: string | null;
 }
 
-export function ServiceDetailViewV3({
+export function ServiceDetailView({
     teamId,
     event,
     setlist,
