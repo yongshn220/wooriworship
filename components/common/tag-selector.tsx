@@ -140,7 +140,7 @@ export function TagSelector({
 
     return (
         <div className="flex flex-col gap-2">
-            <Popover open={open} onOpenChange={setOpen}>
+            <Popover open={open} onOpenChange={setOpen} modal={true}>
                 <PopoverTrigger asChild>
                     <Button
                         variant="outline"

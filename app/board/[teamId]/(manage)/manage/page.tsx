@@ -26,7 +26,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
   const authUser = auth.currentUser
   const teamId = useRecoilValue(currentTeamIdAtom)
   const team = useRecoilValue(teamAtom(teamId))
-  const accountSetting = useRecoilValue(accountSettingAtom(authUser?.uid))
+  const accountSetting = useRecoilValue(accountSettingAtom(authUser?.uid || ""))
   const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
   const setInvitationDialogState = useSetRecoilState(invitationInboxDialogOpenStateAtom)
   const [isInvitationDrawerOpen, setInvitationDrawerOpen] = useState(false)

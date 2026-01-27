@@ -115,12 +115,25 @@ export default function ServingPage() {
 
                 setEvents(data);
 
-                // Select nearest upcoming if nothing selected
+                // Select logic:
+                // 1. First upcoming event (>= today)
+                // 2. If no upcoming, select the latest past event (last element if sorted ASC)
+                // 3. Current `getServiceEvents` returns ASC sorted.
+
                 if (!selectedScheduleId && data.length > 0) {
-                    // find first event >= today
-                    const first = data[0];
-                    // ServiceEventService returns ASC from todayStart. So data[0] is nearest.
-                    setSelectedScheduleId(first.id);
+                    const now = new Date();
+                    now.setHours(0, 0, 0, 0);
+
+                    // Find first event strictly >= today (Upcoming)
+                    const firstUpcoming = data.find(e => e.date.toDate() >= now);
+
+                    if (firstUpcoming) {
+                        setSelectedScheduleId(firstUpcoming.id);
+                    } else {
+                        // All are past events. Pick the last one (Most recent past).
+                        const lastPast = data[data.length - 1];
+                        setSelectedScheduleId(lastPast.id);
+                    }
                 }
 
             } catch (e) {

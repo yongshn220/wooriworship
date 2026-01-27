@@ -1,24 +1,30 @@
 'use server'
- 
+
 import webpush from 'web-push'
- 
+
 webpush.setVapidDetails(
   'mailto:yongshn220@gmail.com',
   process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
   process.env.VAPID_PRIVATE_KEY!
 )
- 
+
 export interface PushNotificationPayload {
   title: string
   body: string
   icon?: string
 }
- 
+
 export async function sendNotificationToSubscription(subscription: any, payload: PushNotificationPayload) {
   if (!subscription) {
     throw new Error('Invalid subscription')
   }
- 
+
+  // Prevent sending notifications in staging environment
+  if (process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID === 'stg-env') {
+    console.log("🚫 [Staging] Skipped sending push notification.");
+    return { success: true };
+  }
+
   try {
     await webpush.sendNotification(
       subscription,

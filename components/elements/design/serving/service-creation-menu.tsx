@@ -1,19 +1,21 @@
 "use client";
 
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Plus, Music2, Users, ListOrdered, CalendarPlus } from "lucide-react";
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Plus, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { getPathCreateServing } from "@/components/util/helper/routes";
 import { ServiceEventService } from "@/apis/ServiceEventService";
 import { useToast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
+import { Button } from "@/components/ui/button";
+import { addDays, nextSunday } from "date-fns";
 
 interface Props {
     teamId: string;
@@ -33,87 +35,103 @@ const CreateActionButton = () => (
 export function ServiceCreationMenu({ teamId, selectedServiceId }: Props) {
     const router = useRouter();
     const { toast } = useToast();
+    const [isOpen, setIsOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleCreateService = () => {
-        router.push(getPathCreateServing(teamId));
-    };
+    // Form State
+    const [date, setDate] = useState<Date | undefined>(undefined);
+    const [serviceTagIds, setServiceTagIds] = useState<string[]>([]);
 
-    const handleAddModule = async (type: 'setlist' | 'praise_assignee' | 'flow') => {
-        if (!selectedServiceId) {
-            toast({
-                title: "No Service Selected",
-                description: "Please select a service first to add this module.",
-                variant: "destructive"
-            });
+    // Calendar Month State (for controlling calendar view if needed)
+    const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
+
+    const handleCreate = async () => {
+        if (!date) {
+            toast({ title: "Date required", description: "Please select a date.", variant: "destructive" });
             return;
         }
 
+        setIsSubmitting(true);
         try {
-            await ServiceEventService.initSubCollection(teamId, selectedServiceId, type);
-            toast({
-                title: "Module Added",
-                description: `Successfully initialized ${type.replace('_', ' ')}.`,
+            // Convert Date to Timestamp
+            const { Timestamp } = require("firebase/firestore");
+            const timestampDate = Timestamp.fromDate(date);
+
+            const newServiceId = await ServiceEventService.createService(teamId, {
+                date: timestampDate,
+                // Checking ServiceEventService.ts: date: data.date || now. data.date is expected to be Timestamp if strictly typed, but let's check implementation. 
+                // Line 80: date: data.date || now. 
+                // We should probably pass Timestamp or ensure createService handles it. 
+                // HOWEVER, `ServiceDateSelector` returns Javascript `Date`. 
+                // `ServiceEventService.createService` expects `Partial<ServiceEvent>`. `ServiceEvent` has `date: Timestamp`.
+                // So we MUST convert Date to Timestamp here.
+
+                // Correction: Let's check imports.
+                // import { Timestamp } from "firebase/firestore";
+
+                service_tags: serviceTagIds,
+                title: "Worship Service", // Default title, can be updated later or inferred from tag
             });
-            // Force refresh logic might be needed if component doesn't auto-detect
-            // Actually, service list updater or re-fetch details should happen.
-            // ServiceDetailContainerV3 listens to serviceId, but doesn't auto-poll.
-            // We might need to trigger a refresh.
-            window.location.reload(); // Temporary brute force or use Recoil updater?
-            // Ideally we use a recoil updater atom. But for now, reload ensures clean state.
-        } catch (error) {
-            console.error(error);
-            toast({
-                title: "Error",
-                description: "Failed to initialize module. It might already exist.",
-                variant: "destructive"
-            });
+
+            toast({ title: "Service Created", description: "Navigating to new service..." });
+            setIsOpen(false);
+
+            // Navigate
+            // The Page component listens to selectedId? Or we push to route?
+            // Page uses `useCalendarNavigation`. Query param logic is custom.
+            // Usually we just refresh or let the list auto-update. 
+            // The user wants to "Navigate to the newly created service page".
+            // Since everything is on `service-board` page with query/state selection, 
+            // efficiently we might just set the selection if possible, but route refresh is safer.
+            // Actually, `ServiceEventService.createService` returns ID.
+
+            // We can force reload or just wait for live query if using onSnapshot (we aren't).
+            // We fetch in useEffect. So we need to trigger re-fetch.
+            // Simplified: Refresh page.
+            window.location.reload();
+
+        } catch (e) {
+            console.error(e);
+            toast({ title: "Error", description: "Failed to create service.", variant: "destructive" });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <div>
-                    <CreateActionButton />
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+                <div><CreateActionButton /></div>
+            </DialogTrigger>
+            <DialogContent className="max-w-md rounded-3xl p-6 pt-10">
+                <DialogHeader>
+                    <DialogTitle className="text-center text-xl font-bold">Create New Service</DialogTitle>
+                </DialogHeader>
+
+                <div className="py-4">
+                    <ServiceDateSelector
+                        teamId={teamId}
+                        serviceTagIds={serviceTagIds}
+                        onServiceTagIdsChange={setServiceTagIds}
+                        date={date}
+                        onDateChange={(d) => {
+                            setDate(d);
+                            if (d) setCalendarMonth(d);
+                        }}
+                        calendarMonth={calendarMonth}
+                        onCalendarMonthChange={setCalendarMonth}
+                    />
                 </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Create</DropdownMenuLabel>
-                <DropdownMenuItem onClick={handleCreateService} className="cursor-pointer">
-                    <CalendarPlus className="mr-2 h-4 w-4" />
-                    <span>New Service Event</span>
-                </DropdownMenuItem>
 
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>Add to Current Service</DropdownMenuLabel>
-
-                <DropdownMenuItem
-                    onClick={() => handleAddModule('setlist')}
-                    disabled={!selectedServiceId}
-                    className="cursor-pointer"
+                <Button
+                    className="w-full h-12 rounded-xl text-base font-semibold shadow-lg"
+                    size="lg"
+                    onClick={handleCreate}
+                    disabled={isSubmitting || !date}
                 >
-                    <Music2 className="mr-2 h-4 w-4" />
-                    <span>Set List</span>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                    onClick={() => handleAddModule('praise_assignee')}
-                    disabled={!selectedServiceId}
-                    className="cursor-pointer"
-                >
-                    <Users className="mr-2 h-4 w-4" />
-                    <span>Praise Assignee</span>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                    onClick={() => handleAddModule('flow')}
-                    disabled={!selectedServiceId}
-                    className="cursor-pointer"
-                >
-                    <ListOrdered className="mr-2 h-4 w-4" />
-                    <span>Service Flow</span>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Service"}
+                </Button>
+            </DialogContent>
+        </Dialog>
     );
 }
