@@ -1,19 +1,19 @@
-import { ServingItem, ServingRole, ServingSchedule } from "@/models/serving";
+import { ServiceFlowItem, ServiceRole, ServiceFormState } from "@/models/services/ServiceEvent";
 import { FormMode } from "@/components/constants/enums";
 
 export interface ServingFormProps {
     teamId: string;
     mode?: FormMode;
-    initialData?: ServingSchedule;
+    initialData?: ServiceFormState;
 }
 
-export interface ServingFormState {
+export interface ServingFormStateLocal {
     step: number;
     direction: number;
     selectedDate: Date | undefined;
-    items: ServingItem[];
+    items: ServiceFlowItem[];
     // Add other state properties strictly
 }
 
 // Re-export models for convenience
-export type { ServingItem, ServingRole, ServingSchedule };
+export type { ServiceFlowItem, ServiceRole, ServiceFormState };

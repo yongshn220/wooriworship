@@ -17,7 +17,7 @@ import { getPathServing } from "@/components/util/helper/routes";
 import { FormMode } from "@/components/constants/enums";
 import { useServiceDuplicateCheck } from "@/components/common/hooks/use-service-duplicate-check";
 import { ServingFormProps } from "../types";
-import { ServingSchedule, ServingItem, ServingAssignment } from "@/models/serving";
+import { ServiceFormState, ServiceFlowItem, ServiceAssignment } from "@/models/services/ServiceEvent";
 import { getServiceTitleFromTags, parseLocalDate } from "@/components/util/helper/helper-functions";
 import { Timestamp } from "@firebase/firestore";
 import { ServiceEvent } from "@/models/services/ServiceEvent";
@@ -149,7 +149,7 @@ export function useServingFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                     order: idx,
                     title: item.title,
                     remarks: item.remarks,
-                    assignments: [] as ServingAssignment[],
+                    assignments: [] as ServiceAssignment[],
                     type: item.type,
                 })));
             }

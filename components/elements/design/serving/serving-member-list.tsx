@@ -1,13 +1,13 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ServingRole, ServingSchedule } from "@/models/serving";
+import { ServiceRole, ServiceFormState } from "@/models/services/ServiceEvent";
 import { User } from "@/models/user";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { MemberBadge, WorshipTeamRoleRow } from "./serving-form/serving-components";
 
 interface Props {
-    schedule: ServingSchedule;
-    roles: ServingRole[];
+    schedule: ServiceFormState;
+    roles: ServiceRole[];
     members: User[];
     currentUserUid?: string | null;
     filterMine?: boolean;

@@ -1,14 +1,14 @@
 "use client";
 
-import { ServingRole, ServingAssignment } from "@/models/serving";
+import { ServiceRole, ServiceAssignment } from "@/models/services/ServiceEvent";
 import { User } from "@/models/user";
 import { cn } from "@/lib/utils";
 import { Music } from "lucide-react";
 import { getMemberName } from "@/components/util/helper/helper-functions";
 
 interface Props {
-    praiseAssignments: ServingAssignment[];
-    roles: ServingRole[];
+    praiseAssignments: ServiceAssignment[];
+    roles: ServiceRole[];
     members: User[];
     currentUserUid?: string | null;
     onEdit?: () => void;

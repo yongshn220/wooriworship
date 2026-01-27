@@ -4,8 +4,7 @@ import {
     updateDoc, query, orderBy, where, writeBatch,
     arrayUnion, arrayRemove, Timestamp
 } from "firebase/firestore";
-import { ServingRole, ServingAssignment } from "@/models/serving";
-import { ServicePraiseAssignee } from "@/models/services/ServiceEvent";
+import { ServiceRole, ServiceAssignment, ServicePraiseAssignee } from "@/models/services/ServiceEvent";
 
 /**
  * PraiseAssigneeService (V3)
@@ -19,28 +18,28 @@ export class PraiseAssigneeService {
     // 1. Role Configuration (teams/{teamId}/praise_team_roles)
     // =========================================================================
 
-    static async getRoles(teamId: string): Promise<ServingRole[]> {
+    static async getRoles(teamId: string): Promise<ServiceRole[]> {
         try {
             const q = query(
                 collection(db, "teams", teamId, "praise_team_roles"),
                 orderBy("order", "asc")
             );
             const snapshot = await getDocs(q);
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServingRole));
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServiceRole));
         } catch (e) {
             console.error("PraiseAssigneeService.getRoles:", e);
             return [];
         }
     }
 
-    static async createRole(teamId: string, role: Omit<ServingRole, "id">): Promise<ServingRole> {
+    static async createRole(teamId: string, role: Omit<ServiceRole, "id">): Promise<ServiceRole> {
         const ref = doc(collection(db, "teams", teamId, "praise_team_roles"));
         const newRole = { ...role, id: ref.id };
         await setDoc(ref, newRole);
         return newRole;
     }
 
-    static async updateRole(teamId: string, role: ServingRole): Promise<void> {
+    static async updateRole(teamId: string, role: ServiceRole): Promise<void> {
         const ref = doc(db, "teams", teamId, "praise_team_roles", role.id);
         await setDoc(ref, role, { merge: true });
     }
@@ -50,7 +49,7 @@ export class PraiseAssigneeService {
         await deleteDoc(ref);
     }
 
-    static async updateRolesOrder(teamId: string, roles: ServingRole[]): Promise<void> {
+    static async updateRolesOrder(teamId: string, roles: ServiceRole[]): Promise<void> {
         const batch = writeBatch(db);
         roles.forEach((role, index) => {
             const docRef = doc(db, "teams", teamId, "praise_team_roles", role.id);

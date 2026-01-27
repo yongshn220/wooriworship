@@ -1,4 +1,4 @@
-import { ServingSchedule } from "@/models/serving";
+import { ServiceFormState } from "@/models/services/ServiceEvent";
 
 interface Member {
     id: string;
@@ -11,7 +11,7 @@ interface Member {
  */
 export const getSuggestionsForTitle = (
     title: string,
-    historySchedules: ServingSchedule[],
+    historySchedules: ServiceFormState[],
     teamMembers: Member[]
 ): { id: string, name: string }[] => {
     const normalizedTitle = title.trim();

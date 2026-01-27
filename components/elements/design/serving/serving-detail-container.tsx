@@ -2,14 +2,14 @@
 
 import { useRecoilValue } from "recoil";
 import { usersAtom } from "@/global-states/userState";
-import { ServingSchedule, ServingRole } from "@/models/serving";
+import { ServiceFormState, ServiceRole } from "@/models/services/ServiceEvent";
 import { ServingDetailView } from "./serving-detail-view";
 import { useMemo } from "react";
 import { useServingMemberIds } from "@/app/board/[teamId]/(service)/service-board/_hooks/use-serving-member-ids";
 
 interface Props {
-    schedule: ServingSchedule;
-    roles: ServingRole[];
+    schedule: ServiceFormState;
+    roles: ServiceRole[];
     teamId: string;
     currentUserUid?: string | null;
 }

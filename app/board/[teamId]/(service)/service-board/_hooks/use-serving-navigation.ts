@@ -1,4 +1,4 @@
-import { ServingSchedule } from "@/models/serving";
+import { ServiceFormState } from "@/models/services/ServiceEvent";
 import { useCallback } from "react";
 
 interface ReturnType {
@@ -9,7 +9,7 @@ interface ReturnType {
 }
 
 export function useServingNavigation(
-    schedules: ServingSchedule[],
+    schedules: ServiceFormState[],
     currentId: string | null,
     onSelect: (id: string) => void
 ): ReturnType {

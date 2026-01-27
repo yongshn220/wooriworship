@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ServingRole, ServingSchedule } from "@/models/serving";
+import { ServiceRole, ServiceFormState } from "@/models/services/ServiceEvent";
 import { User } from "@/models/user";
 import { teamAtom } from "@/global-states/teamState";
 import { useRecoilValue } from "recoil";
@@ -12,8 +12,8 @@ import { ServiceOrderCard } from "./parts/service-order-card";
 import { SetlistPlanPreviewDrawer } from "@/components/elements/design/setlist/setlist-plan-preview-drawer";
 
 interface Props {
-    schedule: ServingSchedule;
-    roles: ServingRole[];
+    schedule: ServiceFormState;
+    roles: ServiceRole[];
     members: User[];
     currentUserUid?: string | null;
     teamId: string;

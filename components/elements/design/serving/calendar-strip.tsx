@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { ServingSchedule } from "@/models/serving";
+import { ServiceFormState } from "@/models/services/ServiceEvent";
 import { Timestamp } from "firebase/firestore";
 import { format } from "date-fns";
 import { Calendar, Loader2, History } from "lucide-react";
@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { CalendarDrawer } from "./calendar-drawer";
 
 interface Props {
-    schedules: ServingSchedule[];
+    schedules: ServiceFormState[];
     selectedScheduleId: string | null;
     onSelect: (scheduleId: string) => void;
     onLoadPrev?: () => void;
@@ -153,7 +153,7 @@ function HistoryButton({ onLoadPrev, isLoadingPrev, hasMorePast = true, baseClas
 }
 
 interface DateCardProps {
-    schedule: ServingSchedule;
+    schedule: ServiceFormState;
     isSelected: boolean;
     onSelect: (id: string) => void;
     baseClasses: string;

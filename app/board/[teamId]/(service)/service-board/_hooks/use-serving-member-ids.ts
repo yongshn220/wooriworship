@@ -1,7 +1,7 @@
-import { ServingSchedule } from "@/models/serving";
+import { ServiceFormState } from "@/models/services/ServiceEvent";
 import { useMemo } from "react";
 
-export function useServingMemberIds(schedule: ServingSchedule | undefined | null): string[] {
+export function useServingMemberIds(schedule: ServiceFormState | undefined | null): string[] {
     return useMemo(() => {
         if (!schedule) return [];
         return [

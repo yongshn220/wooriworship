@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { ServiceFlowService } from "@/apis/ServiceFlowService";
-import { ServingItem, ServingAssignment } from "@/models/serving";
+import { ServiceFlowItem, ServiceAssignment } from "@/models/services/ServiceEvent";
 
-export function useServingTemplates(teamId: string, items: ServingItem[], setItems: (items: ServingItem[]) => void) {
+export function useServingTemplates(teamId: string, items: ServiceFlowItem[], setItems: (items: ServiceFlowItem[]) => void) {
     const [templates, setTemplates] = useState<any[]>([]);
     const [isTemplatesLoaded, setIsTemplatesLoaded] = useState(false);
     const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
@@ -29,7 +29,7 @@ export function useServingTemplates(teamId: string, items: ServingItem[], setIte
 
                 // Inject Sample Flow if no templates exist
                 if (data.length === 0 && itemsRef.current.length <= 1) {
-                    const sampleItems: ServingItem[] = [
+                    const sampleItems: ServiceFlowItem[] = [
                         { id: Math.random().toString(36).substr(2, 9), type: 'FLOW', title: '묵상기도', order: 0, assignments: [{ memberIds: [] }] },
                         { id: Math.random().toString(36).substr(2, 9), type: 'FLOW', title: '신앙고백', order: 1, assignments: [{ memberIds: [] }] },
                         { id: Math.random().toString(36).substr(2, 9), type: 'FLOW', title: '찬양', order: 2, assignments: [{ memberIds: [] }] },
@@ -80,7 +80,7 @@ export function useServingTemplates(teamId: string, items: ServingItem[], setIte
                 title: '찬양',
                 type: 'FLOW',
                 remarks: "",
-                assignments: [] as ServingAssignment[]
+                assignments: [] as ServiceAssignment[]
             };
 
             const itemsToSave = createEmptyMode ? [defaultFixedItem] : items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }));
@@ -102,7 +102,7 @@ export function useServingTemplates(teamId: string, items: ServingItem[], setIte
                         id: Math.random().toString(36).substr(2, 9),
                         order: 0,
                         assignments: []
-                    } as ServingItem]);
+                    } as ServiceFlowItem]);
                 }
             }
 

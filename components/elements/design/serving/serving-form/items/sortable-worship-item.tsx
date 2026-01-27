@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { GripVertical, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { WorshipTeamRoleRow, ServingCard } from "../serving-components";
-import { ServingItem } from "@/models/serving";
+import { ServiceFlowItem } from "@/models/services/ServiceEvent";
 
 interface SortableWorshipItemProps {
-    item: ServingItem;
+    item: ServiceFlowItem;
     getMemberName: (id: string) => string;
     onGoToStep2: () => void;
-    onUpdate: (newItem: ServingItem) => void;
+    onUpdate: (newItem: ServiceFlowItem) => void;
     roles: any[]; // Using any to avoid strict type issues if ServingRole isn't imported, but assuming roles structure
 }
 

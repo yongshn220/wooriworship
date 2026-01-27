@@ -5,7 +5,7 @@ import { useRecoilValue } from "recoil";
 import { fetchServingRolesSelector } from "@/global-states/servingState";
 import { teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
-import { ServingSchedule } from "@/models/serving";
+import { ServiceFormState } from "@/models/services/ServiceEvent";
 import { useEffect, useState } from "react";
 import { formatToLongDate } from "@/components/util/helper/helper-functions";
 import { ServiceEventService } from "@/apis/ServiceEventService";
@@ -23,7 +23,7 @@ interface Props {
 }
 
 export function ServingRosterDialog({ date, teamId, trigger }: Props) {
-    const [schedule, setSchedule] = useState<ServingSchedule | null>(null);
+    const [schedule, setSchedule] = useState<ServiceFormState | null>(null);
     const [loading, setLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [user] = useAuthState(auth as any);

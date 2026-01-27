@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { ServiceEventService } from "@/apis/ServiceEventService";
-import { ServingSchedule } from "@/models/serving";
+import { ServiceFormState } from "@/models/services/ServiceEvent";
 import { getSuggestionsForTitle as domainGetSuggestions } from "../utils/serving-domain-logic";
 
 export function useServingHistory(teamId: string, serviceTagIds: string[], teamMembers: any[]) {
-    const [historySchedules, setHistorySchedules] = useState<ServingSchedule[]>([]);
+    const [historySchedules, setHistorySchedules] = useState<ServiceFormState[]>([]);
 
     useEffect(() => {
         if (!teamId) {

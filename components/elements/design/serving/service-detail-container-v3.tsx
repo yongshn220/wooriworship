@@ -4,15 +4,14 @@ import { useEffect, useState, useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import { usersAtom } from "@/global-states/userState";
 import { ServiceEventService } from "@/apis/ServiceEventService";
-import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow } from "@/models/services/ServiceEvent";
-import { ServingSchedule, ServingRole } from "@/models/serving";
+import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow, ServiceFormState, ServiceRole } from "@/models/services/ServiceEvent";
 import { ServiceDetailViewV3 } from "./service-detail-view-v3";
 import { Loader2 } from "lucide-react";
 
 interface Props {
     serviceId: string;
     teamId: string;
-    roles: ServingRole[]; // Passed from page (fetched via ServiceEventService or ServingService)
+    roles: ServiceRole[]; // Passed from page (fetched via ServiceEventService or ServingService)
     currentUserUid?: string | null;
 }
 

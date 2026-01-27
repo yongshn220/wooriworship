@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
-import { ServingItem } from "@/models/serving";
+import { ServiceFlowItem } from "@/models/services/ServiceEvent";
 
 export function useServingTimeline(teamId: string) {
-    const [items, setItems] = useState<ServingItem[]>([]);
+    const [items, setItems] = useState<ServiceFlowItem[]>([]);
     const [activeSelection, setActiveSelection] = useState<{ itemId?: string; assignmentIndex?: number; roleId: string } | null>(null);
 
     // Groups config

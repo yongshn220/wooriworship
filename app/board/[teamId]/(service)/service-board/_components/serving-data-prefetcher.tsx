@@ -2,11 +2,11 @@
 
 import { useRecoilValue } from "recoil";
 import { usersAtom } from "@/global-states/userState";
-import { ServingSchedule } from "@/models/serving";
+import { ServiceFormState } from "@/models/services/ServiceEvent";
 import { useServingMemberIds } from "../_hooks/use-serving-member-ids";
 
 interface Props {
-    schedule: ServingSchedule;
+    schedule: ServiceFormState;
 }
 
 export function ServingDataPrefetcher({ schedule }: Props): null {

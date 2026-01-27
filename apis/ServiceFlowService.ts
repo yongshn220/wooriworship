@@ -3,8 +3,7 @@ import {
     collection, doc, getDoc, getDocs, setDoc, deleteDoc,
     updateDoc, Timestamp
 } from "firebase/firestore";
-import { ServingItem } from "@/models/serving";
-import { ServiceFlow } from "@/models/services/ServiceEvent";
+import { ServiceFlowItem, ServiceFlow } from "@/models/services/ServiceEvent";
 
 /**
  * ServiceFlowService (V3)

@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { ServingSchedule } from "@/models/serving";
+import { ServiceFormState } from "@/models/services/ServiceEvent";
 import { fetchServingRolesSelector } from "@/global-states/servingState";
 import { usersAtom } from "@/global-states/userState";
 import { teamAtom } from "@/global-states/teamState";
@@ -24,7 +24,7 @@ import { ServingHeaderMenu } from "@/components/elements/design/serving/serving-
 import { ServingMemberList } from "@/components/elements/design/serving/serving-member-list";
 
 interface Props {
-    schedule: ServingSchedule;
+    schedule: ServiceFormState;
     teamId: string;
     currentUserUid?: string;
     defaultExpanded?: boolean;

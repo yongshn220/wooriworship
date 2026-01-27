@@ -1,13 +1,13 @@
 "use client";
 
-import { ServingItem } from "@/models/serving";
+import { ServiceFlowItem } from "@/models/services/ServiceEvent";
 import { User } from "@/models/user";
 import { cn } from "@/lib/utils";
 import { List } from "lucide-react";
 import { getMemberName } from "@/components/util/helper/helper-functions";
 
 interface Props {
-    items: ServingItem[];
+    items: ServiceFlowItem[];
     members: User[];
     currentUserUid?: string | null;
     onEdit?: () => void;

@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { ResponsiveDrawer } from "@/components/ui/responsive-drawer";
 import { Calendar } from "@/components/ui/calendar";
-import { ServingSchedule } from "@/models/serving";
+import { ServiceFormState } from "@/models/services/ServiceEvent";
 import { Timestamp } from "firebase/firestore";
 import { parseLocalDate } from "@/components/util/helper/helper-functions";
 import { format, isSameDay, setMonth, setYear, getYear, getMonth, startOfMonth } from "date-fns";
@@ -14,7 +14,7 @@ import { ChevronRight, ChevronLeft, ChevronDown } from "lucide-react";
 interface Props {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    schedules: ServingSchedule[];
+    schedules: ServiceFormState[];
     selectedScheduleId: string | null;
     onSelect: (scheduleId: string) => void;
     currentUserUid?: string | null;

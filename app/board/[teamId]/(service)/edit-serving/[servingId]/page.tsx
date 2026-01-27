@@ -5,7 +5,7 @@ import { ServingForm } from "@/components/elements/design/serving/serving-form/s
 import { FormMode, Page } from "@/components/constants/enums";
 import { useEffect, useState } from "react";
 import { ServiceEventService } from "@/apis/ServiceEventService";
-import { ServingSchedule } from "@/models/serving";
+import { ServiceFormState } from "@/models/services/ServiceEvent";
 
 interface Props {
     params: {
@@ -16,14 +16,14 @@ interface Props {
 
 export default function EditServingPage({ params }: Props) {
     const { teamId, servingId } = params;
-    const [schedule, setSchedule] = useState<ServingSchedule | undefined>(undefined);
+    const [schedule, setSchedule] = useState<ServiceFormState | undefined>(undefined);
 
     useEffect(() => {
         if (!schedule) {
             ServiceEventService.getServiceDetails(teamId, servingId)
                 .then(details => {
                     if (details && details.event) {
-                        const adaptedSchedule: ServingSchedule = {
+                        const adaptedSchedule: ServiceFormState = {
                             id: details.event.id,
                             teamId: details.event.teamId,
                             date: details.event.date,

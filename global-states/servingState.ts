@@ -1,13 +1,13 @@
 import { atom, selectorFamily } from "recoil";
-import { ServingRole, ServingSchedule } from "@/models/serving";
+import { ServiceRole, ServiceFormState } from "@/models/services/ServiceEvent";
 import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
 
-export const servingRolesAtom = atom<ServingRole[]>({
+export const servingRolesAtom = atom<ServiceRole[]>({
     key: "servingRolesAtom",
     default: [],
 });
 
-export const servingSchedulesAtom = atom<ServingSchedule[]>({
+export const servingSchedulesAtom = atom<ServiceFormState[]>({
     key: "servingSchedulesAtom",
     default: [],
 });
@@ -17,7 +17,7 @@ export const servingRolesUpdaterAtom = atom({
     default: 0,
 });
 
-export const fetchServingRolesSelector = selectorFamily<ServingRole[], string>({
+export const fetchServingRolesSelector = selectorFamily<ServiceRole[], string>({
     key: "fetchServingRolesSelector",
     get: (teamId) => async ({ get }) => {
         get(servingRolesUpdaterAtom); // Dependency
