@@ -39,6 +39,8 @@ interface FullScreenFormHeaderProps {
 }
 
 export const FullScreenFormHeader = ({ steps, currentStep, onStepChange, onClose, className }: FullScreenFormHeaderProps) => {
+    const showStepBar = steps.length > 1;
+
     return (
         <div className={cn("absolute top-0 left-0 right-0 z-50 w-full px-6 pt-8 pb-12 flex items-center justify-between pointer-events-none bg-gradient-to-b from-background via-background/90 to-transparent", className)}>
             {/* Exit Button */}
@@ -46,25 +48,27 @@ export const FullScreenFormHeader = ({ steps, currentStep, onStepChange, onClose
                 <X className="w-5 h-5 text-muted-foreground" />
             </Button>
 
-            {/* Step Bar */}
-            <div className="flex gap-1 p-1 bg-background/50 backdrop-blur-md rounded-full shadow-sm pointer-events-auto absolute top-8 left-1/2 -translate-x-1/2">
-                {steps.map((label, idx) => (
-                    <button
-                        key={idx}
-                        onClick={() => onStepChange?.(idx)}
-                        className={cn(
-                            "px-3 py-1.5 rounded-full text-[10px] font-bold transition-all",
-                            currentStep === idx
-                                ? "bg-primary text-white shadow-sm"
-                                : "text-muted-foreground hover:text-foreground",
-                            !onStepChange && "cursor-not-allowed opacity-50"
-                        )}
-                        disabled={!onStepChange}
-                    >
-                        {label}
-                    </button>
-                ))}
-            </div>
+            {/* Step Bar - Only show if multiple steps */}
+            {showStepBar && (
+                <div className="flex gap-1 p-1 bg-background/50 backdrop-blur-md rounded-full shadow-sm pointer-events-auto absolute top-8 left-1/2 -translate-x-1/2">
+                    {steps.map((label, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => onStepChange?.(idx)}
+                            className={cn(
+                                "px-3 py-1.5 rounded-full text-[10px] font-bold transition-all",
+                                currentStep === idx
+                                    ? "bg-primary text-white shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground",
+                                !onStepChange && "cursor-not-allowed opacity-50"
+                            )}
+                            disabled={!onStepChange}
+                        >
+                            {label}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             <div className="w-10" /> {/* Spacer */}
         </div>
