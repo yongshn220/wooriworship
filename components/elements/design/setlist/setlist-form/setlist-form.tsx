@@ -19,11 +19,11 @@ import { ServiceDateSelector } from "@/components/common/form/service-date-selec
 import { formatToLongDate } from "@/components/util/helper/helper-functions";
 
 // Custom Components
-import { AddedSongHeaderStatic } from "@/components/elements/design/song/song-header/worship-form/added-song-header-static";
+import { AddedSongHeaderStatic } from "@/components/elements/design/song/song-header/setlist-form/added-song-header-static";
 import { AddSongButton } from "./add-song-button";
 import { AddSetlistSongDialogTrigger } from "@/components/elements/design/song/song-list/setlist-form/add-setlist-song-dialog-trigger";
 import { SortableSetlistSongItem } from "./sortable-setlist-song-item";
-import { AddedSongHeaderDefault } from "@/components/elements/design/song/song-header/worship-form/added-song-header-default";
+import { AddedSongHeaderDefault } from "@/components/elements/design/song/song-header/setlist-form/added-song-header-default";
 import { SortableList } from "@/components/common/list/sortable-list";
 
 // Logic Hook

@@ -14,7 +14,7 @@ import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFor
 import { WorshipSpecialOrderType } from "@/components/constants/enums";
 
 // Custom Components
-import { AddedSongHeaderStatic } from "@/components/elements/design/song/song-header/worship-form/added-song-header-static";
+import { AddedSongHeaderStatic } from "@/components/elements/design/song/song-header/setlist-form/added-song-header-static";
 import { AddSongButton } from "@/components/elements/design/setlist/setlist-form/add-song-button";
 import { AddSetlistSongDialogTrigger } from "@/components/elements/design/song/song-list/setlist-form/add-setlist-song-dialog-trigger";
 import { SortableSetlistSongItem } from "@/components/elements/design/setlist/setlist-form/sortable-setlist-song-item";

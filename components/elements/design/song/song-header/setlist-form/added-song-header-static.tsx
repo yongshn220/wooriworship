@@ -11,8 +11,8 @@ import { TeamApi } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
 import { songAtom } from "@/global-states/song-state";
 import { SetlistSongHeader } from "@/models/setlist";
-import { AddableSongDetailDialogTrigger } from "@/components/elements/design/song/song-detail-card/worship-form/addable-song-detail-dialog-trigger";
-import { AddedSongInnerHeader } from "@/components/elements/design/song/song-header/worship-form/parts/added-song-inner-header";
+import { AddableSongDetailDialogTrigger } from "@/components/elements/design/song/song-detail-card/setlist-form/addable-song-detail-dialog-trigger";
+import { AddedSongInnerHeader } from "@/components/elements/design/song/song-header/setlist-form/parts/added-song-inner-header";
 
 interface Props {
   teamId: string

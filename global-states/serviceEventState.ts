@@ -1,5 +1,5 @@
 import { atom, selector, selectorFamily, atomFamily } from "recoil";
-import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow } from "@/models/services/ServiceEvent";
+import { ServiceEvent, ServiceSetlist, ServicePraiseTeam, ServiceFlow } from "@/models/services/ServiceEvent";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
 
 // =============================================================================
@@ -23,8 +23,8 @@ export const serviceSetlistAtom = atomFamily<ServiceSetlist | null, string>({
     default: null,
 });
 
-export const servicePraiseAssigneeAtom = atomFamily<ServicePraiseAssignee | null, string>({
-    key: "servicePraiseAssigneeAtom",
+export const servicePraiseTeamAtom = atomFamily<ServicePraiseTeam | null, string>({
+    key: "servicePraiseTeamAtom",
     default: null,
 });
 

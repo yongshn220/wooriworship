@@ -34,9 +34,3 @@ export interface Setlist {
   }
 }
 
-// Legacy aliases for backwards compatibility during migration
-/** @deprecated Use SetlistSongHeader instead */
-export type WorshipSongHeader = SetlistSongHeader;
-
-/** @deprecated Use Setlist instead */
-export type Worship = Setlist;

@@ -29,7 +29,7 @@ import { ServiceOrderCard } from "../parts/service-order-card";
 import { ServiceFormSkeleton } from "./service-form-skeleton";
 import { SortableList } from "@/components/common/list/sortable-list";
 import { SortableRoleItem } from "./items/sortable-role-item";
-import { SortableWorshipItem } from "./items/sortable-worship-item";
+import { SortablePraiseTeamItem } from "./items/sortable-praise-team-item";
 import { SortableTimelineItem } from "./items/sortable-timeline-item";
 import { slideVariants } from "@/components/constants/animations";
 
@@ -50,7 +50,7 @@ export function ServiceForm(props: ServiceFormProps) {
         step, direction, totalSteps,
         selectedDate, currentMonth, serviceTagIds, items,
         templates, isTemplatesLoaded, selectedTemplateId, hasTemplateChanges,
-        availableWorships, linkedWorshipId, previewWorshipId,
+        availableSetlists, linkedSetlistId, previewSetlistId,
         activeSelection, isLoading,
         isRoleDialogOpen, newRoleName, isCreatingRole, isTemplateDialogOpen, isRenameDialogOpen,
         newTemplateName, tempTemplateName, createEmptyMode,
@@ -61,10 +61,10 @@ export function ServiceForm(props: ServiceFormProps) {
         // Setters
         setStep, setDirection, setSelectedDate, setCurrentMonth, setServiceTagIds, setItems,
         setTemplates, setIsTemplatesLoaded, setSelectedTemplateId, setHasTemplateChanges,
-        setLinkedWorshipId, setPreviewWorshipId, setActiveSelection,
+        setLinkedSetlistId, setPreviewSetlistId, setActiveSelection,
         setIsRoleDialogOpen, setNewRoleName, setIsTemplateDialogOpen, setIsRenameDialogOpen,
         setNewTemplateName, setTempTemplateName, setCreateEmptyMode, setStandardGroups, setCustomMemberNames,
-        setDeleteConfirm, setRoles, worshipRoles, handleAssignMemberToRole,
+        setDeleteConfirm, setRoles, praiseTeam, handleAssignMemberToRole,
 
         // Actions
         handleAddMember, handleSubmit, handleCreateRole, handleDeleteRole,
@@ -170,15 +170,15 @@ export function ServiceForm(props: ServiceFormProps) {
 
                                 {/* Linked Worship Plan */}{/* ... keeping existing code flow ... */}
                                 <LinkedResourceCard
-                                    label="Linked Worship Plan"
-                                    items={availableWorships.map(plan => ({
+                                    label="Linked Setlist"
+                                    items={availableSetlists.map(plan => ({
                                         id: plan.id,
-                                        title: plan.title || "Untitled Worship",
+                                        title: plan.title || "Untitled Setlist",
                                         description: format(plan.worship_date.toDate(), "yyyy-MM-dd")
                                     }))}
-                                    selectedId={linkedWorshipId}
-                                    onSelect={setLinkedWorshipId}
-                                    onPreview={setPreviewWorshipId}
+                                    selectedId={linkedSetlistId}
+                                    onSelect={setLinkedSetlistId}
+                                    onPreview={setPreviewSetlistId}
                                 />
                             </motion.div>
                         )}
@@ -206,7 +206,7 @@ export function ServiceForm(props: ServiceFormProps) {
                                         PraiseTeamApi.updateRolesOrder(props.teamId, newRoles).catch(console.error);
                                     }}>
                                         {roles.map((role) => {
-                                            const assignment = worshipRoles.find(a => a.roleId === role.id);
+                                            const assignment = praiseTeam.find(a => a.roleId === role.id);
                                             const memberIds = assignment?.memberIds || [];
 
                                             return (
@@ -448,7 +448,7 @@ export function ServiceForm(props: ServiceFormProps) {
                                 {/* CUE SHEET / TIMELINE LIST */}
                                 <div className="flex flex-col w-full px-4 space-y-5 pb-24">
                                     <PraiseTeamCard
-                                        praiseAssignments={worshipRoles}
+                                        praiseAssignments={praiseTeam}
                                         roles={roles}
                                         members={teamMembers}
                                         currentUserUid={auth.currentUser?.uid}
@@ -460,7 +460,7 @@ export function ServiceForm(props: ServiceFormProps) {
                                         currentUserUid={auth.currentUser?.uid}
                                     />
 
-                                    {items.length === 0 && worshipRoles.length === 0 && (
+                                    {items.length === 0 && praiseTeam.length === 0 && (
                                         <div className="py-12 text-center space-y-3">
                                             <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center mx-auto">
                                                 <FileText className="w-5 h-5 text-muted-foreground/50" />
@@ -524,9 +524,9 @@ export function ServiceForm(props: ServiceFormProps) {
 
                 {/* Setlist Preview Drawer */}
                 <SetlistPlanPreviewDrawer
-                    isOpen={!!previewWorshipId}
-                    onClose={() => setPreviewWorshipId(null)}
-                    setlistId={previewWorshipId}
+                    isOpen={!!previewSetlistId}
+                    onClose={() => setPreviewSetlistId(null)}
+                    setlistId={previewSetlistId}
                     teamId={props.teamId}
                 />
 
@@ -582,7 +582,7 @@ export function ServiceForm(props: ServiceFormProps) {
                                             activeSelection?.itemId && activeSelection.assignmentIndex !== undefined
                                                 ? items.find(i => i.id === activeSelection.itemId)?.assignments[activeSelection.assignmentIndex]?.memberIds || []
                                                 : activeSelection?.roleId
-                                                    ? worshipRoles.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
+                                                    ? praiseTeam.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
                                                     : []
                                         }
                                         onSelect={(memberId) => {

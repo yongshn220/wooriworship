@@ -14,7 +14,7 @@ import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFor
 
 // Logic & Types
 import { usePraiseAssigneeFormLogic } from "./hooks/use-praise-assignee-form-logic";
-import { ServicePraiseAssignee } from "@/models/services/ServiceEvent";
+import { ServicePraiseTeam } from "@/models/services/ServiceEvent";
 import { slideVariants } from "@/components/constants/animations";
 import { SortableList } from "@/components/common/list/sortable-list";
 import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
@@ -28,7 +28,7 @@ import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-conf
 interface Props {
     teamId: string;
     serviceId: string;
-    initialAssignee?: ServicePraiseAssignee | null;
+    initialAssignee?: ServicePraiseTeam | null;
     onCompleted: () => void;
     onClose: () => void;
 }
@@ -37,7 +37,7 @@ export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompl
     const {
         isLoading,
         roles,
-        worshipRoles,
+        praiseTeam,
 
         // UI State
         isRoleDialogOpen,
@@ -93,7 +93,7 @@ export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompl
                             PraiseTeamApi.updateRolesOrder(teamId, newRoles).catch(console.error);
                         }}>
                             {roles.map((role) => {
-                                const assignment = worshipRoles.find(a => a.roleId === role.id);
+                                const assignment = praiseTeam.find(a => a.roleId === role.id);
                                 const memberIds = assignment?.memberIds || [];
 
                                 return (
@@ -178,7 +178,7 @@ export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompl
                                     searchQuery={memberSearchQuery}
                                     selectedMemberIds={
                                         activeSelection?.roleId
-                                            ? worshipRoles.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
+                                            ? praiseTeam.find(a => a.roleId === activeSelection.roleId)?.memberIds || []
                                             : []
                                     }
                                     onSelect={(memberId) => {

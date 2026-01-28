@@ -1,7 +1,7 @@
 "use client"
 
 import {useState} from "react";
-import {AddableSongDetailDialog} from "@/components/elements/design/song/song-detail-card/worship-form/addable-song-detail-dialog";
+import {AddableSongDetailDialog} from "@/components/elements/design/song/song-detail-card/setlist-form/addable-song-detail-dialog";
 
 interface Props {
   children: React.ReactNode

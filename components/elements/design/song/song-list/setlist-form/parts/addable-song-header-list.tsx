@@ -7,7 +7,7 @@ import * as React from "react";
 import { useState } from "react";
 import {
   AddableSongHeaderDefault
-} from "@/components/elements/design/song/song-header/worship-form/addable-song-header-default";
+} from "@/components/elements/design/song/song-header/setlist-form/addable-song-header-default";
 import { SetlistSongHeader } from "@/models/setlist";
 
 interface Props {

@@ -19,7 +19,7 @@ export interface ServiceRole {
 
 /**
  * Assignment of members to a role or custom label
- * Used in ServicePraiseAssignee and ServiceFlowItem
+ * Used in ServicePraiseTeam and ServiceFlowItem
  */
 export interface ServiceAssignment {
     roleId?: string;       // Reference to ServiceRole
@@ -62,7 +62,7 @@ export interface ServiceEvent {
     title: string;
     tagId?: string; // Optimized single tag reference
     // service_tags?: string[]; // Multiple tags support (Deprecated: use tagId)
-    worship_id?: string; // Linked Worship Plan ID
+    setlist_id?: string; // Linked Setlist ID
 
     // Preview Summary (Optional, for board card performance)
     summary?: {
@@ -97,9 +97,6 @@ export interface ServicePraiseTeam {
     note?: string; // "Rehearsal at 2PM"
 }
 
-/** @deprecated Use ServicePraiseTeam instead */
-export type ServicePraiseAssignee = ServicePraiseTeam;
-
 // Path: teams/{teamId}/services/{serviceId}/flows/main
 export interface ServiceFlow {
     id: string; // usually "main"
@@ -121,10 +118,10 @@ export interface ServiceFormState {
     date: string | Timestamp; // Stored as Timestamp (UTC) in DB, kept as string for form compatibility
     title?: string;
     service_tags: string[]; // List of tag IDs (for form, single tagId is preferred in ServiceEvent)
-    worship_roles?: ServiceAssignment[]; // Praise team role assignments (legacy name kept for compatibility)
-    items?: ServiceFlowItem[]; // Service flow/cue-sheet items (legacy name kept for compatibility)
+    praise_team?: ServiceAssignment[]; // Praise team role assignments
+    items?: ServiceFlowItem[]; // Service flow/cue-sheet items
     templateId?: string; // Track which template was used
-    worship_id?: string; // Linked Setlist ID
+    setlist_id?: string; // Linked Setlist ID
     roles?: { // Legacy V1 compatibility
         roleId: string;
         memberIds: string[];
@@ -132,21 +129,3 @@ export interface ServiceFormState {
     note?: string;
 }
 
-// =============================================================================
-// Legacy Aliases (for backwards compatibility during migration)
-// =============================================================================
-
-/** @deprecated Use ServiceRole instead */
-export type ServingRole = ServiceRole;
-
-/** @deprecated Use ServiceAssignment instead */
-export type ServingAssignment = ServiceAssignment;
-
-/** @deprecated Use ServiceFlowItem instead */
-export type ServingItem = ServiceFlowItem;
-
-/** @deprecated Use ServiceFlowTemplate instead */
-export type ServingTemplate = ServiceFlowTemplate;
-
-/** @deprecated Use ServiceFormState instead */
-export type ServingSchedule = ServiceFormState;

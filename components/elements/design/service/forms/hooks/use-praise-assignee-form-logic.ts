@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
-import { ServicePraiseAssignee } from "@/models/services/ServiceEvent";
+import { ServicePraiseTeam } from "@/models/services/ServiceEvent";
 import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
 import { useServiceRoles } from "../../service-form/hooks/use-service-roles";
 import { toast } from "@/components/ui/use-toast";
@@ -11,7 +11,7 @@ import { toast } from "@/components/ui/use-toast";
 interface UsePraiseAssigneeFormLogicProps {
     teamId: string;
     serviceId: string;
-    initialAssignee?: ServicePraiseAssignee | null;
+    initialAssignee?: ServicePraiseTeam | null;
     onCompleted: () => void;
 }
 
@@ -25,8 +25,8 @@ export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee,
     // Reuse existing roles logic
     const {
         roles,
-        worshipRoles,
-        setWorshipRoles,
+        praiseTeam,
+        setPraiseTeam,
         isRoleDialogOpen,
         setIsRoleDialogOpen,
         newRoleName,
@@ -42,9 +42,9 @@ export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee,
     // Initialize Assignments
     useEffect(() => {
         if (initialAssignee?.assignments) {
-            setWorshipRoles(initialAssignee.assignments);
+            setPraiseTeam(initialAssignee.assignments);
         }
-    }, [initialAssignee, setWorshipRoles]);
+    }, [initialAssignee, setPraiseTeam]);
 
     const [activeSelection, setActiveSelection] = useState<{ roleId: string } | null>(null);
     const [standardGroups, setStandardGroups] = useState<string[]>([]);
@@ -68,7 +68,7 @@ export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee,
         setIsLoading(true);
         try {
             await PraiseTeamApi.updatePraiseTeam(teamId, serviceId, {
-                assignments: worshipRoles
+                assignments: praiseTeam
             });
             toast({ title: "Team assignments saved!" });
             onCompleted();
@@ -84,7 +84,7 @@ export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee,
         // State
         isLoading,
         roles,
-        worshipRoles,
+        praiseTeam,
 
         // UI State
         isRoleDialogOpen,

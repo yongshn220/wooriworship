@@ -3,7 +3,7 @@ import { ServiceRole, ServiceFormState } from "@/models/services/ServiceEvent";
 import { User } from "@/models/user";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { MemberBadge, WorshipTeamRoleRow } from "./service-form/service-components";
+import { MemberBadge } from "./service-form/service-components";
 
 interface Props {
     schedule: ServiceFormState;
@@ -23,11 +23,11 @@ export function ServiceMemberList({ schedule, roles, members, currentUserUid, fi
     };
     const getMember = (uid: string) => members.find(m => m.id === uid);
 
-    // 1. New Timeline View (If items or worship_roles exist)
+    // 1. New Timeline View (If items or praise_team exist)
     const hasItems = schedule.items && schedule.items.length > 0;
-    const hasWorshipRoles = schedule.worship_roles && schedule.worship_roles.length > 0;
+    const hasPraiseTeam = schedule.praise_team && schedule.praise_team.length > 0;
 
-    if (hasItems || hasWorshipRoles) {
+    if (hasItems || hasPraiseTeam) {
         return (
             <div className="flex flex-col w-full gap-6">
                 {/* 1. Roles Section */}
@@ -43,9 +43,9 @@ export function ServiceMemberList({ schedule, roles, members, currentUserUid, fi
                     </div>
 
                     {/* Roles List or Empty State */}
-                    {hasWorshipRoles ? (
+                    {hasPraiseTeam ? (
                         <div className="flex flex-col w-full">
-                            {schedule.worship_roles!.map((assign, index) => {
+                            {schedule.praise_team!.map((assign, index) => {
                                 if (assign.memberIds.length === 0) return null;
                                 if (filterMine && !assign.memberIds.includes(currentUserUid || "")) return null;
                                 const role = roles.find(r => r.id === assign.roleId);
@@ -113,7 +113,7 @@ export function ServiceMemberList({ schedule, roles, members, currentUserUid, fi
                     {hasItems ? (
                         <div className="flex flex-col w-full">
                             {schedule.items
-                                ?.filter(i => (i as any).type !== 'WORSHIP_TEAM')
+                                ?.filter(i => (i as any).type !== 'PRAISE_TEAM')
                                 .slice()
                                 .sort((a, b) => a.order - b.order)
                                 .map((item, index) => {

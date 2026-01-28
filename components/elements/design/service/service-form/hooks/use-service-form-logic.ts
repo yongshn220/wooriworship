@@ -38,8 +38,8 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
     const {
         roles,
         setRoles,
-        worshipRoles,
-        setWorshipRoles,
+        praiseTeam,
+        setPraiseTeam,
         isRoleDialogOpen,
         setIsRoleDialogOpen,
         newRoleName,
@@ -104,9 +104,9 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
     const [serviceTagIds, setServiceTagIds] = useState<string[]>([]);
 
     // --- 5. Worship Linking ---
-    const [availableWorships, setAvailableWorships] = useState<any[]>([]);
-    const [linkedWorshipId, setLinkedWorshipId] = useState<string | null>(null);
-    const [previewWorshipId, setPreviewWorshipId] = useState<string | null>(null);
+    const [availableSetlists, setAvailableSetlists] = useState<any[]>([]);
+    const [linkedSetlistId, setLinkedSetlistId] = useState<string | null>(null);
+    const [previewSetlistId, setPreviewSetlistId] = useState<string | null>(null);
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -171,61 +171,61 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
             setCurrentMonth(parsedDate);
             setServiceTagIds(initialData.service_tags || []);
 
-            // Set Linked Worship
-            if (initialData.worship_id) setLinkedWorshipId(initialData.worship_id);
+            // Set Linked Setlist
+            if (initialData.setlist_id) setLinkedSetlistId(initialData.setlist_id);
 
             // Set Template ID if exists
             if (initialData.templateId) setSelectedTemplateId(initialData.templateId);
 
             // Load Flow Items (Strict separation)
             if (initialData.items && initialData.items.length > 0) {
-                setItems(initialData.items.filter(i => (i as any).type !== 'WORSHIP_TEAM'));
+                setItems(initialData.items.filter(i => (i as any).type !== 'PRAISE_TEAM'));
             }
 
-            // Load Roles
-            if (initialData.worship_roles && initialData.worship_roles.length > 0) {
-                setWorshipRoles(initialData.worship_roles);
+            // Load Praise Team
+            if (initialData.praise_team && initialData.praise_team.length > 0) {
+                setPraiseTeam(initialData.praise_team);
             } else if (initialData.items) {
-                const oldRolesItem = initialData.items.find(i => (i as any).type === 'WORSHIP_TEAM');
+                const oldRolesItem = initialData.items.find(i => (i as any).type === 'PRAISE_TEAM');
                 if (oldRolesItem?.assignments) {
-                    setWorshipRoles(oldRolesItem.assignments);
+                    setPraiseTeam(oldRolesItem.assignments);
                 } else if (initialData.roles) {
                     const migratedRoles = initialData.roles.map(r => ({ roleId: r.roleId, memberIds: r.memberIds }));
-                    setWorshipRoles(migratedRoles);
+                    setPraiseTeam(migratedRoles);
                 }
             }
 
             isInitialDataLoaded.current = true;
         }
-    }, [mode, initialData, roles, setItems, setWorshipRoles, setSelectedTemplateId]);
+    }, [mode, initialData, roles, setItems, setPraiseTeam, setSelectedTemplateId]);
 
 
-    // Fetch available worship plans
+    // Fetch available setlists (legacy worships)
     useEffect(() => {
         if (selectedDate && teamId) {
-            ServiceEventApi.getLegacyWorshipsByDate(teamId, selectedDate).then(worships => {
-                const filteredWorships = worships.filter(w =>
-                    serviceTagIds.some(t => w.service_tags?.includes(t)) ||
-                    (mode === FormMode.EDIT && w.id === initialData?.worship_id)
+            ServiceEventApi.getLegacyWorshipsByDate(teamId, selectedDate).then(setlists => {
+                const filteredSetlists = setlists.filter(s =>
+                    serviceTagIds.some(t => s.service_tags?.includes(t)) ||
+                    (mode === FormMode.EDIT && s.id === initialData?.setlist_id)
                 );
 
-                setAvailableWorships(filteredWorships);
+                setAvailableSetlists(filteredSetlists);
 
-                const currentSelectionExists = filteredWorships.some(w => w.id === linkedWorshipId);
+                const currentSelectionExists = filteredSetlists.some(s => s.id === linkedSetlistId);
 
                 if (currentSelectionExists) {
                     // Keep
-                } else if (filteredWorships.length > 0) {
-                    setLinkedWorshipId(filteredWorships[0].id);
+                } else if (filteredSetlists.length > 0) {
+                    setLinkedSetlistId(filteredSetlists[0].id);
                 } else {
-                    setLinkedWorshipId(null);
+                    setLinkedSetlistId(null);
                 }
             });
         } else {
-            setAvailableWorships([]);
-            setLinkedWorshipId(null);
+            setAvailableSetlists([]);
+            setLinkedSetlistId(null);
         }
-    }, [selectedDate, teamId, mode, initialData, serviceTagIds, linkedWorshipId]);
+    }, [selectedDate, teamId, mode, initialData, serviceTagIds, linkedSetlistId]);
 
     // Duplicate Check using ServiceEventApi
     const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
@@ -250,8 +250,8 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
     // Wrapped Actions
     const handleDeleteRole = (roleId: string) => {
         baseHandleDeleteRole(roleId, (deletedId) => {
-            // Clean up from worshipRoles
-            setWorshipRoles(prev => prev.filter(a => a.roleId !== deletedId));
+            // Clean up from praiseTeam
+            setPraiseTeam(prev => prev.filter(a => a.roleId !== deletedId));
         });
     };
 
@@ -268,7 +268,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 date: dateTimestamp,
                 title,
                 tagId: serviceTagIds[0] || "",
-                worship_id: linkedWorshipId || undefined
+                setlist_id: linkedSetlistId || undefined
             };
 
             let targetServiceId: string;
@@ -283,19 +283,19 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                     // Actually, if created from template, items are in flow. 
                     // Setlist is separate. In Form V3, Setlist might be linked or managed separately.
                     // For now, init empty setlist unless linked.
-                    PraiseTeamApi.updatePraiseTeam(teamId, targetServiceId, { assignments: worshipRoles }),
+                    PraiseTeamApi.updatePraiseTeam(teamId, targetServiceId, { assignments: praiseTeam }),
                     ServiceFlowApi.updateFlow(teamId, targetServiceId, { items: items })
                 ]);
 
-                // 3. Link Worship Request IF selected during create (Worship plan select)
-                if (linkedWorshipId) {
-                    await LinkingApi.linkWorshipAndServing(teamId, linkedWorshipId, targetServiceId);
+                // 3. Link Setlist IF selected during create
+                if (linkedSetlistId) {
+                    await LinkingApi.linkSetlistAndService(teamId, linkedSetlistId, targetServiceId);
                 }
 
                 // 4. Notify & Stats
                 const allAssignedMembers = Array.from(new Set([
                     ...items.flatMap(item => item.assignments.flatMap(a => a.memberIds)),
-                    ...worshipRoles.flatMap(r => r.memberIds)
+                    ...praiseTeam.flatMap(r => r.memberIds)
                 ]));
                 await PushNotificationApi.notifyMembersServingAssignment(
                     teamId,
@@ -322,17 +322,17 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 await Promise.all([
                     // Full update: Setlist is not currently editable in this specific ServingForm (V3 plan separate)
                     // But for consistency let's keep sub-services.
-                    PraiseTeamApi.updatePraiseTeam(teamId, targetServiceId, { assignments: worshipRoles }),
+                    PraiseTeamApi.updatePraiseTeam(teamId, targetServiceId, { assignments: praiseTeam }),
                     ServiceFlowApi.updateFlow(teamId, targetServiceId, { items: items })
                 ]);
 
                 // 3. Update Link
-                if (linkedWorshipId !== initialData.worship_id) {
-                    if (initialData.worship_id) {
-                        await LinkingApi.unlinkWorship(teamId, initialData.worship_id);
+                if (linkedSetlistId !== initialData.setlist_id) {
+                    if (initialData.setlist_id) {
+                        await LinkingApi.unlinkSetlist(teamId, initialData.setlist_id);
                     }
-                    if (linkedWorshipId) {
-                        await LinkingApi.linkWorshipAndServing(teamId, linkedWorshipId, targetServiceId);
+                    if (linkedSetlistId) {
+                        await LinkingApi.linkSetlistAndService(teamId, linkedSetlistId, targetServiceId);
                     }
                 }
 
@@ -387,24 +387,24 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         step, direction, totalSteps,
         selectedDate, currentMonth, serviceTagIds, items,
         templates, isTemplatesLoaded, selectedTemplateId, hasTemplateChanges,
-        availableWorships, linkedWorshipId, previewWorshipId,
+        availableSetlists, linkedSetlistId, previewSetlistId,
         activeSelection, isLoading,
         isRoleDialogOpen, newRoleName, isCreatingRole, isTemplateDialogOpen, isRenameDialogOpen,
         newTemplateName, tempTemplateName, createEmptyMode,
         standardGroups, customMemberNames, newGroupInput, deleteConfirm,
         roles, team, teamMembers, historySchedules,
         isDuplicate, duplicateId, duplicateErrorMessage,
-        worshipRoles, // Added worshipRoles to return
+        praiseTeam, // Added praiseTeam to return
 
         // Setters
         setStep, setDirection, setSelectedDate, setCurrentMonth, setServiceTagIds, setItems,
         setTemplates, setIsTemplatesLoaded, setSelectedTemplateId, setHasTemplateChanges,
-        setAvailableWorships, setLinkedWorshipId, setPreviewWorshipId, setActiveSelection, setIsLoading,
+        setAvailableSetlists, setLinkedSetlistId, setPreviewSetlistId, setActiveSelection, setIsLoading,
         setIsRoleDialogOpen, setNewRoleName, setIsTemplateDialogOpen, setIsRenameDialogOpen,
 
         setNewTemplateName, setTempTemplateName, setCreateEmptyMode, setStandardGroups, setCustomMemberNames,
         setNewGroupInput, setDeleteConfirm, setRoles,
-        setWorshipRoles, // Added setter
+        setPraiseTeam, // Added setter
 
         // Actions
         handleAddMember, handleAssignMemberToRole, handleSubmit, handleCreateRole, handleDeleteRole,

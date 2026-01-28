@@ -85,8 +85,8 @@ export class ServiceEventApi {
             summary: { songCount: 0 }
         };
 
-        if (data.worship_id) {
-            eventData.worship_id = data.worship_id;
+        if (data.setlist_id) {
+            eventData.setlist_id = data.setlist_id;
         }
 
         await setDoc(newDocRef, eventData);
@@ -125,7 +125,7 @@ export class ServiceEventApi {
      */
     static async deleteService(teamId: string, serviceId: string) {
         // 1. Cleanup References (Linking)
-        await LinkingApi.cleanupReferencesForServingDeletion(teamId, serviceId);
+        await LinkingApi.cleanupReferencesForServiceDeletion(teamId, serviceId);
 
         // 2. Delete Sub-docs (Explicitly)
         const batch = writeBatch(db);
@@ -249,9 +249,9 @@ export class ServiceEventApi {
         return {
             id: details.event.id,
             ...details.event,
-            worship_date: details.event.date,
+            date: details.event.date,
             service_tags: details.event.tagId ? [details.event.tagId] : [],
-            worship_roles: details.praiseAssignee?.assignments || [],
+            praise_team: details.praiseAssignee?.assignments || [],
             items: details.flow?.items || [],
         } as any;
     }

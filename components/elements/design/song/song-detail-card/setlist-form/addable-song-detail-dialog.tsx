@@ -5,7 +5,7 @@ import { useRecoilValue } from "recoil";
 import { songAtom } from "@/global-states/song-state";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { MusicKeySelector } from "@/components/elements/design/song/song-detail-card/worship-form/parts/music-key-selector";
+import { MusicKeySelector } from "@/components/elements/design/song/song-detail-card/setlist-form/parts/music-key-selector";
 import { SongDetailMenuButton } from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-menu-button";
 import { SongDetailContent } from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-content";
 import { SongCommentArea } from "@/components/elements/design/song/song-detail-card/default/parts/song-comment-area";

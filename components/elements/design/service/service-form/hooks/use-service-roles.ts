@@ -16,7 +16,7 @@ export function useServiceRoles(teamId: string) {
         }
     }, [rolesLoadable.state, rolesLoadable.contents]);
 
-    const [worshipRoles, setWorshipRoles] = useState<{ roleId?: string; memberIds: string[] }[]>([]);
+    const [praiseTeam, setPraiseTeam] = useState<{ roleId?: string; memberIds: string[] }[]>([]);
 
     const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
     const [newRoleName, setNewRoleName] = useState("");
@@ -53,8 +53,8 @@ export function useServiceRoles(teamId: string) {
             await PraiseTeamApi.deleteRole(teamId, roleId);
             setRolesUpdater(prev => prev + 1);
             // Callback to update items in parent (if needed, but now strict separation)
-            // Actually, we should clean up worshipRoles state here too
-            setWorshipRoles(prev => prev.filter(r => r.roleId !== roleId));
+            // Actually, we should clean up praiseTeam state here too
+            setPraiseTeam(prev => prev.filter(r => r.roleId !== roleId));
 
             toast({ title: "Role deleted" });
             setDeleteConfirm(prev => ({ ...prev, open: false }));
@@ -65,7 +65,7 @@ export function useServiceRoles(teamId: string) {
     };
 
     const handleAssignMemberToRole = (roleId: string, uid: string) => {
-        setWorshipRoles(prev => {
+        setPraiseTeam(prev => {
             const existingIndex = prev.findIndex(r => r.roleId === roleId);
             if (existingIndex >= 0) {
                 const existingRole = prev[existingIndex];
@@ -86,8 +86,8 @@ export function useServiceRoles(teamId: string) {
     return {
         roles,
         setRoles,
-        worshipRoles,
-        setWorshipRoles,
+        praiseTeam,
+        setPraiseTeam,
         isRoleDialogOpen,
         setIsRoleDialogOpen,
         newRoleName,

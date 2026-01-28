@@ -152,10 +152,10 @@ export function MemberBadge({ name, onRemove, className, isMe = false }: MemberB
 }
 
 /**
- * Reusable Row Component for Worship Team displaying Role and Members vertically or horizontally.
- * Used in Step 3 (SortableWorshipItem) and Step 4 (Review).
+ * Reusable Row Component for Praise Team displaying Role and Members vertically or horizontally.
+ * Used in Step 3 (SortablePraiseTeamItem) and Step 4 (Review).
  */
-interface WorshipTeamRoleRowProps {
+interface PraiseTeamRoleRowProps {
     roleName: string;
     memberIds: string[];
     getMemberName: (id: string) => string;
@@ -163,7 +163,7 @@ interface WorshipTeamRoleRowProps {
     currentUserUid?: string | null;
 }
 
-export function WorshipTeamRoleRow({ roleName, memberIds, getMemberName, className, currentUserUid }: WorshipTeamRoleRowProps) {
+export function PraiseTeamRoleRow({ roleName, memberIds, getMemberName, className, currentUserUid }: PraiseTeamRoleRowProps) {
     if (memberIds.length === 0) return null;
 
     return (

@@ -7,7 +7,7 @@ type DocumentData = admin.firestore.DocumentData;
 type Timestamp = admin.firestore.Timestamp;
 const Timestamp = admin.firestore.Timestamp;
 
-import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow } from "@/models/services/ServiceEvent";
+import { ServiceEvent, ServiceSetlist, ServicePraiseTeam, ServiceFlow } from "@/models/services/ServiceEvent";
 
 export class AdminMigrationApi {
     private static instance: AdminMigrationApi;

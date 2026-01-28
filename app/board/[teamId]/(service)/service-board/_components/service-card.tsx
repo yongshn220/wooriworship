@@ -28,7 +28,7 @@ interface Props {
     teamId: string;
     currentUserUid?: string;
     defaultExpanded?: boolean;
-    onPreviewWorship?: (worshipId: string) => void;
+    onPreviewSetlist?: (setlistId: string) => void;
 }
 
 // Default expanded to true as requested
@@ -36,7 +36,7 @@ import { useCardExpansion } from "@/hooks/use-card-expansion";
 
 // ...
 
-export function ServiceCard({ schedule, teamId, currentUserUid, defaultExpanded = true, onPreviewWorship }: Props) {
+export function ServiceCard({ schedule, teamId, currentUserUid, defaultExpanded = true, onPreviewSetlist }: Props) {
     const { isExpanded, setIsExpanded, toggleExpand } = useCardExpansion(schedule.id, defaultExpanded);
     const roles = useRecoilValue(fetchServingRolesSelector(teamId));
     const team = useRecoilValue(teamAtom(teamId));
@@ -45,7 +45,7 @@ export function ServiceCard({ schedule, teamId, currentUserUid, defaultExpanded 
     // Gather all member IDs involved in this schedule for batch fetching
     const allMemberIds = [
         ...(schedule.items?.flatMap(item => item.assignments.flatMap(a => a.memberIds)) || []),
-        ...(schedule.worship_roles?.flatMap(a => a.memberIds) || []),
+        ...(schedule.praise_team?.flatMap(a => a.memberIds) || []),
         ...(schedule.roles?.flatMap(r => r.memberIds) || []) // Fallback for really old data
     ];
 
@@ -58,7 +58,7 @@ export function ServiceCard({ schedule, teamId, currentUserUid, defaultExpanded 
     // Check if current user is serving in this schedule
     const isMeServing = currentUserUid ? (
         (schedule.items?.some(item => item.assignments.some(a => a.memberIds.includes(currentUserUid))) || false) ||
-        (schedule.worship_roles?.some(a => a.memberIds.includes(currentUserUid)) || false) ||
+        (schedule.praise_team?.some(a => a.memberIds.includes(currentUserUid)) || false) ||
         (schedule.roles?.some(r => r.memberIds.includes(currentUserUid)) || false)
     ) : false;
 
@@ -122,17 +122,17 @@ export function ServiceCard({ schedule, teamId, currentUserUid, defaultExpanded 
 
                             {/* Right Actions */}
                             <div className="flex items-center gap-2">
-                                {/* Worship Plan Link Button */}
-                                {schedule.worship_id && onPreviewWorship && (
+                                {/* Setlist Link Button */}
+                                {schedule.setlist_id && onPreviewSetlist && (
                                     <div
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            onPreviewWorship(schedule.worship_id!);
+                                            onPreviewSetlist(schedule.setlist_id!);
                                         }}
                                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors cursor-pointer"
                                     >
                                         <LinkIcon className="w-3.5 h-3.5" />
-                                        <span className="text-xs font-bold">See worship plan</span>
+                                        <span className="text-xs font-bold">See setlist</span>
                                     </div>
                                 )}
 
@@ -211,7 +211,7 @@ export function ServiceCard({ schedule, teamId, currentUserUid, defaultExpanded 
                         ) : (
                             <p className="mt-2 text-sm text-muted-foreground line-clamp-1">
                                 {schedule.items ? `${schedule.items.length} items` : `${schedule.roles?.length || 0} roles`}
-                                {schedule.worship_roles && schedule.worship_roles.length > 0 && `, ${schedule.worship_roles.length} roles`}
+                                {schedule.praise_team && schedule.praise_team.length > 0 && `, ${schedule.praise_team.length} roles`}
                                 , {allMemberIds.length} members assigned
                             </p>
                         )}

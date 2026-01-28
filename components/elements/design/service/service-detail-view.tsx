@@ -5,7 +5,7 @@ import { Music, Users, ListOrdered } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { teamAtom, fetchServiceTagsSelector } from "@/global-states/teamState";
-import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow, ServiceRole } from "@/models/services/ServiceEvent";
+import { ServiceEvent, ServiceSetlist, ServicePraiseTeam, ServiceFlow, ServiceRole } from "@/models/services/ServiceEvent";
 import { User } from "@/models/user";
 import { getDynamicDisplayTitle } from "@/components/util/helper/helper-functions";
 
@@ -24,7 +24,7 @@ interface Props {
     teamId: string;
     event: ServiceEvent;
     setlist: ServiceSetlist | null;
-    praiseAssignee: ServicePraiseAssignee | null;
+    praiseAssignee: ServicePraiseTeam | null;
     flow: ServiceFlow | null;
     roles: ServiceRole[]; // Team's serving roles for display
     members: User[]; // Resolved members for Assignee

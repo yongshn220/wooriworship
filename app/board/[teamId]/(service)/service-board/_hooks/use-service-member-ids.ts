@@ -6,7 +6,7 @@ export function useServiceMemberIds(schedule: ServiceFormState | undefined | nul
         if (!schedule) return [];
         return [
             ...(schedule.items?.flatMap(item => item.assignments.flatMap(a => a.memberIds)) || []),
-            ...(schedule.worship_roles?.flatMap(a => a.memberIds) || []),
+            ...(schedule.praise_team?.flatMap(a => a.memberIds) || []),
             ...(schedule.roles?.flatMap(r => r.memberIds) || [])
         ];
     }, [schedule]);

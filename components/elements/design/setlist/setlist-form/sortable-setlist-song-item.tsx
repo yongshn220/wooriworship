@@ -1,6 +1,6 @@
 import React from "react";
 import { SortableItem, SortableDragHandle } from "@/components/common/list/sortable-list";
-import { AddedSongHeaderDefault } from "@/components/elements/design/song/song-header/worship-form/added-song-header-default";
+import { AddedSongHeaderDefault } from "@/components/elements/design/song/song-header/setlist-form/added-song-header-default";
 import { SetlistSongHeader } from "@/models/setlist";
 
 interface SortableSetlistSongItemProps {

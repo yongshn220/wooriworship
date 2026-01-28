@@ -5,10 +5,10 @@ import { SortableItem, SortableDragHandle } from "@/components/common/list/sorta
 import { Button } from "@/components/ui/button";
 import { GripVertical, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { WorshipTeamRoleRow, ServingCard } from "../service-components";
+import { PraiseTeamRoleRow, ServingCard } from "../service-components";
 import { ServiceFlowItem } from "@/models/services/ServiceEvent";
 
-interface SortableWorshipItemProps {
+interface SortablePraiseTeamItemProps {
     item: ServiceFlowItem;
     getMemberName: (id: string) => string;
     onGoToStep2: () => void;
@@ -16,7 +16,7 @@ interface SortableWorshipItemProps {
     roles: any[]; // Using any to avoid strict type issues if ServingRole isn't imported, but assuming roles structure
 }
 
-export function SortableWorshipItem({ item, getMemberName, onGoToStep2, onUpdate, roles }: SortableWorshipItemProps) {
+export function SortablePraiseTeamItem({ item, getMemberName, onGoToStep2, onUpdate, roles }: SortablePraiseTeamItemProps) {
     // Determine active roles (those with assigned members)
     const activeRoles = roles.filter(role => {
         const assignment = item.assignments.find(a => a.roleId === role.id);
@@ -68,7 +68,7 @@ export function SortableWorshipItem({ item, getMemberName, onGoToStep2, onUpdate
                                     if (!assignment) return null;
 
                                     return (
-                                        <WorshipTeamRoleRow
+                                        <PraiseTeamRoleRow
                                             key={role.id}
                                             roleName={role.name}
                                             memberIds={assignment.memberIds}

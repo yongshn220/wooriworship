@@ -74,7 +74,7 @@ export function ServiceRosterDialog({ date, teamId, trigger }: Props) {
                 ) : (
                     <div className="space-y-1">
                         <PraiseTeamCard
-                            praiseAssignments={schedule.worship_roles || schedule.roles || []}
+                            praiseAssignments={schedule.praise_team || schedule.roles || []}
                             roles={roles}
                             members={teamMembers}
                             currentUserUid={user?.uid}

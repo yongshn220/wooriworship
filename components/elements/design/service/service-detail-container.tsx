@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRecoilValue } from "recoil";
 import { usersAtom } from "@/global-states/userState";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
-import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow, ServiceFormState, ServiceRole } from "@/models/services/ServiceEvent";
+import { ServiceEvent, ServiceSetlist, ServicePraiseTeam, ServiceFlow, ServiceFormState, ServiceRole } from "@/models/services/ServiceEvent";
 import { ServiceDetailView } from "./service-detail-view";
 import { Loader2 } from "lucide-react";
 
@@ -19,7 +19,7 @@ export function ServiceDetailContainer({ serviceId, teamId, roles, currentUserUi
     const [data, setData] = useState<{
         event: ServiceEvent;
         setlist: ServiceSetlist | null;
-        praiseAssignee: ServicePraiseAssignee | null;
+        praiseAssignee: ServicePraiseTeam | null;
         flow: ServiceFlow | null;
     } | null>(null);
 
