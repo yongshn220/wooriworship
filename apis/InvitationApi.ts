@@ -1,10 +1,10 @@
 import { db } from "@/firebase";
 import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, writeBatch, collectionGroup, getDoc } from "firebase/firestore";
 import { InvitationStatus } from "@/components/constants/enums";
-import BaseService from "./BaseService";
-import EmailService from "./EmailService";
+import BaseApi from "./BaseApi";
+import EmailApi from "./EmailApi";
 
-class InvitationService extends BaseService {
+class InvitationApi extends BaseApi {
     constructor() {
         super("invitations");
     }
@@ -31,11 +31,11 @@ class InvitationService extends BaseService {
             // But BaseService("invitations") queries invitations collection.
             // If the check was "Has this user been invited before?", that's odd.
             // Let's assume the check was "Is this user opted out?" or "Already invited".
-            // If logic is "Is user opted out", we should check UserService or a global exclusion list.
+            // If logic is "Is user opted out", we should check UserApi or a global exclusion list.
             // The old code checked: `this.getByFilters([{a:'email', b:'==', c:receiverEmail}])`.
             // If "invitations" collection holds USERS? No, it holds invitations.
             // Wait, maybe "registered_user" variable name is misleading or I misunderstood `this.getByFilters` on `invitations`.
-            // Ah, `InvitationService` extends `BaseService` with "invitations".
+            // Ah, `InvitationApi` extends `BaseService` with "invitations".
             // So it was checking if there is an invitation for this email.
             // If `registered_user[0].invite_optin` is checked... Invitations don't usually have `invite_optin`. Users do.
             // **CRITICAL FINDING**: The old code might be querying `users` collection implicitly?
@@ -43,7 +43,7 @@ class InvitationService extends BaseService {
             // So it queried "invitations" collection for `email == receiverEmail`.
             // Does an invitation document have `invite_optin`? Unlikely.
             // This looks like a legacy bug or "invitations" collection was doing double duty.
-            // OR `InvitationService` shouldn't extend BaseService("invitations") but likely did.
+            // OR `InvitationApi` shouldn't extend BaseService("invitations") but likely did.
             // Checking `UserService` seems more appropriate for opt-in check.
             // For now, I will skip the opt-in check or assume it's checking duplications in THIS team.
             // I'll stick to logic: Create invitation in SubCollection.
@@ -57,7 +57,7 @@ class InvitationService extends BaseService {
             sender_id: senderId,
             team_id: teamId
         }
-        await EmailService.sendEmail(senderEmail, receiverEmail, teamName);
+        await EmailApi.sendEmail(senderEmail, receiverEmail, teamName);
 
         const ref = await addDoc(collection(db, "teams", teamId, "invitations"), newInvitation);
         return ref.id;
@@ -165,4 +165,4 @@ class InvitationService extends BaseService {
     }
 }
 
-export default new InvitationService();
+export default new InvitationApi();

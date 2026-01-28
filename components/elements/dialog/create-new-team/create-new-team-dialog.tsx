@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { TeamIcon } from "@/components/elements/design/team/team-icon";
 import { ReactNode, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
-import { TeamService, UserService } from '@/apis';
+import { TeamApi, UserApi } from '@/apis';
 import { auth } from "@/firebase";
 import { useSetRecoilState } from "recoil";
 import { userUpdaterAtom } from "@/global-states/userState";
@@ -34,8 +34,8 @@ export function CreateNewTeamDialog({ children, open, onOpenChange }: Props) {
   async function handleCreateNewTeam() {
     if (authUser) {
       try {
-        const teamId = await TeamService.addNewTeam(authUser.uid, teamName);
-        UserService.addNewTeam(authUser.uid, teamId).then(teamId => {
+        const teamId = await TeamApi.addNewTeam(authUser.uid, teamName);
+        UserApi.addNewTeam(authUser.uid, teamId).then(teamId => {
           if (!teamId) {
             toast({ title: "Oops, fail to create team. Please try again later.", })
           }

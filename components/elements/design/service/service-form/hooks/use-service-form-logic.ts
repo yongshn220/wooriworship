@@ -6,12 +6,12 @@ import { toast } from "@/components/ui/use-toast";
 import { teamAtom } from "@/global-states/teamState";
 import { servingSchedulesAtom } from "@/global-states/serviceRolesState";
 import { usersAtom } from "@/global-states/userState";
-import { ServiceEventService } from "@/apis/ServiceEventService";
-import { SetlistService } from "@/apis/SetlistService";
-import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
-import { ServiceFlowService } from "@/apis/ServiceFlowService";
-import LinkingService from "@/apis/LinkingService";
-import PushNotificationService from "@/apis/PushNotificationService";
+import { ServiceEventApi } from "@/apis/ServiceEventApi";
+import { SetlistApi } from "@/apis/SetlistApi";
+import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
+import { ServiceFlowApi } from "@/apis/ServiceFlowApi";
+import LinkingApi from "@/apis/LinkingApi";
+import PushNotificationApi from "@/apis/PushNotificationApi";
 import { auth } from "@/firebase";
 import { getPathServing } from "@/components/util/helper/routes";
 import { FormMode } from "@/components/constants/enums";
@@ -203,7 +203,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
     // Fetch available worship plans
     useEffect(() => {
         if (selectedDate && teamId) {
-            ServiceEventService.getLegacyWorshipsByDate(teamId, selectedDate).then(worships => {
+            ServiceEventApi.getLegacyWorshipsByDate(teamId, selectedDate).then(worships => {
                 const filteredWorships = worships.filter(w =>
                     serviceTagIds.some(t => w.service_tags?.includes(t)) ||
                     (mode === FormMode.EDIT && w.id === initialData?.worship_id)
@@ -227,7 +227,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         }
     }, [selectedDate, teamId, mode, initialData, serviceTagIds, linkedWorshipId]);
 
-    // Duplicate Check using ServiceEventService
+    // Duplicate Check using ServiceEventApi
     const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
     const { isDuplicate, duplicateId, errorMessage: duplicateErrorMessage } = useServiceDuplicateCheck({
         teamId,
@@ -241,7 +241,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
             const e = end ? parseLocalDate(end) : s;
             e.setHours(23, 59, 59);
             // Cast to any or adapted type that satisfies useServiceDuplicateCheck T
-            const services = await ServiceEventService.getServiceEvents(tid, s, e);
+            const services = await ServiceEventApi.getServiceEvents(tid, s, e);
             return services as unknown as { id: string, service_tags?: string[] }[];
         }
     });
@@ -275,21 +275,21 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
 
             if (mode === FormMode.CREATE) {
                 // 1. Create Core Service
-                targetServiceId = await ServiceEventService.createService(teamId, serviceData);
+                targetServiceId = await ServiceEventApi.createService(teamId, serviceData);
 
                 // 2. Parallel Updates for Sub-Collections
                 await Promise.all([
-                    SetlistService.updateSetlist(teamId, targetServiceId, { songs: [] }), // Setlist empty init or from worship? 
+                    SetlistApi.updateSetlist(teamId, targetServiceId, { songs: [] }), // Setlist empty init or from worship? 
                     // Actually, if created from template, items are in flow. 
                     // Setlist is separate. In Form V3, Setlist might be linked or managed separately.
                     // For now, init empty setlist unless linked.
-                    PraiseAssigneeService.updateAssignees(teamId, targetServiceId, { assignee: worshipRoles }),
-                    ServiceFlowService.updateFlow(teamId, targetServiceId, { items: items })
+                    PraiseTeamApi.updatePraiseTeam(teamId, targetServiceId, { assignments: worshipRoles }),
+                    ServiceFlowApi.updateFlow(teamId, targetServiceId, { items: items })
                 ]);
 
                 // 3. Link Worship Request IF selected during create (Worship plan select)
                 if (linkedWorshipId) {
-                    await LinkingService.linkWorshipAndServing(teamId, linkedWorshipId, targetServiceId);
+                    await LinkingApi.linkWorshipAndServing(teamId, linkedWorshipId, targetServiceId);
                 }
 
                 // 4. Notify & Stats
@@ -297,7 +297,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                     ...items.flatMap(item => item.assignments.flatMap(a => a.memberIds)),
                     ...worshipRoles.flatMap(r => r.memberIds)
                 ]));
-                await PushNotificationService.notifyMembersServingAssignment(
+                await PushNotificationApi.notifyMembersServingAssignment(
                     teamId,
                     auth.currentUser?.uid || "",
                     selectedDate,
@@ -307,7 +307,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 // Keep Stats Logic
                 if (serviceTagIds.length > 0) {
                     const dateStr = format(selectedDate, "yyyy-MM-dd");
-                    await ServiceEventService.updateTagStats(teamId, serviceTagIds, dateStr, "add");
+                    await ServiceEventApi.updateTagStats(teamId, serviceTagIds, dateStr, "add");
                 }
 
                 toast({ title: "Service created!" });
@@ -316,23 +316,23 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 targetServiceId = initialData.id;
 
                 // 1. Update Core
-                await ServiceEventService.updateService(teamId, targetServiceId, serviceData);
+                await ServiceEventApi.updateService(teamId, targetServiceId, serviceData);
 
                 // 2. Update Sub-collections
                 await Promise.all([
                     // Full update: Setlist is not currently editable in this specific ServingForm (V3 plan separate)
                     // But for consistency let's keep sub-services.
-                    PraiseAssigneeService.updateAssignees(teamId, targetServiceId, { assignee: worshipRoles }),
-                    ServiceFlowService.updateFlow(teamId, targetServiceId, { items: items })
+                    PraiseTeamApi.updatePraiseTeam(teamId, targetServiceId, { assignments: worshipRoles }),
+                    ServiceFlowApi.updateFlow(teamId, targetServiceId, { items: items })
                 ]);
 
                 // 3. Update Link
                 if (linkedWorshipId !== initialData.worship_id) {
                     if (initialData.worship_id) {
-                        await LinkingService.unlinkWorship(teamId, initialData.worship_id);
+                        await LinkingApi.unlinkWorship(teamId, initialData.worship_id);
                     }
                     if (linkedWorshipId) {
-                        await LinkingService.linkWorshipAndServing(teamId, linkedWorshipId, targetServiceId);
+                        await LinkingApi.linkWorshipAndServing(teamId, linkedWorshipId, targetServiceId);
                     }
                 }
 
@@ -345,8 +345,8 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 // naive check
                 if (JSON.stringify(oldTags) !== JSON.stringify(serviceTagIds)) {
                     const dateStr = format(selectedDate, "yyyy-MM-dd");
-                    if (oldTags.length) await ServiceEventService.updateTagStats(teamId, oldTags, dateStr, "remove");
-                    if (serviceTagIds.length) await ServiceEventService.updateTagStats(teamId, serviceTagIds, dateStr, "add");
+                    if (oldTags.length) await ServiceEventApi.updateTagStats(teamId, oldTags, dateStr, "remove");
+                    if (serviceTagIds.length) await ServiceEventApi.updateTagStats(teamId, serviceTagIds, dateStr, "add");
                 }
 
                 toast({ title: "Service updated!" });
@@ -357,7 +357,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
             // "ServiceEvent" (V3) -> "ServingSchedule" (V1/V2 Adapter)
             // Or just invalidate/refetch.
             // For now, let's skip atom update if it's too complex or adapt it manually.
-            // The list page uses ServiceEventService to fetch, so it should be fine on next fetch.
+            // The list page uses ServiceEventApi to fetch, so it should be fine on next fetch.
             // But if we want instant UI feedback, we can try adapting.
 
             // Since we are moving away from servingSchedulesAtom (which holds legacy arrays), 

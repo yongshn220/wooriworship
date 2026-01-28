@@ -1,6 +1,6 @@
 import { auth } from "@/firebase";
-import BaseService from './BaseService';
-import UserService from './UserService';
+import BaseApi from './BaseApi';
+import UserApi from './UserApi';
 import { User } from "@/models/user";
 import {
     signInWithEmailAndPassword,
@@ -13,22 +13,22 @@ import {
     Auth
 } from "firebase/auth";
 
-export class AuthService extends BaseService {
-    private static instance: AuthService;
+export class AuthApi extends BaseApi {
+    private static instance: AuthApi;
     private auth: Auth;
-    private userService: typeof UserService;
+    private userService: typeof UserApi;
 
-    private constructor(authInstance?: Auth, userService?: typeof UserService) {
+    private constructor(authInstance?: Auth, userService?: typeof UserApi) {
         super("users");
         this.auth = authInstance || auth;
-        this.userService = userService || UserService;
+        this.userService = userService || UserApi;
     }
 
-    public static getInstance(authInstance?: Auth, userService?: typeof UserService): AuthService {
-        if (!AuthService.instance) {
-            AuthService.instance = new AuthService(authInstance, userService);
+    public static getInstance(authInstance?: Auth, userService?: typeof UserApi): AuthApi {
+        if (!AuthApi.instance) {
+            AuthApi.instance = new AuthApi(authInstance, userService);
         }
-        return AuthService.instance;
+        return AuthApi.instance;
     }
 
     async login(email: string, password: string) {
@@ -80,4 +80,4 @@ export class AuthService extends BaseService {
         await sendPasswordResetEmail(this.auth, email);
     }
 }
-export default AuthService.getInstance();
+export default AuthApi.getInstance();

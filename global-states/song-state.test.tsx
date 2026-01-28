@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { RecoilRoot, useRecoilValue, useRecoilValueLoadable } from 'recoil';
 import { currentTeamSortedSongsAtom } from './song-state';
-import { SongService } from '@/apis';
+import { SongApi } from '@/apis';
 import { Song } from '@/models/song';
 import {
     songSearchInputAtom,
@@ -40,7 +40,7 @@ describe('SongState', () => {
 
     describe('currentTeamSortedSongsAtom', () => {
         it('should return all songs when no filters are active', async () => {
-            (SongService.getSong as jest.Mock).mockResolvedValue(mockSongs);
+            (SongApi.getSong as jest.Mock).mockResolvedValue(mockSongs);
 
             const { result } = renderHook(() => useRecoilValueLoadable(currentTeamSortedSongsAtom('team-1')), {
                 wrapper: createWrapper()
@@ -53,7 +53,7 @@ describe('SongState', () => {
         });
 
         it('should filter by search input (title)', async () => {
-            (SongService.getSong as jest.Mock).mockResolvedValue(mockSongs);
+            (SongApi.getSong as jest.Mock).mockResolvedValue(mockSongs);
 
             const { result } = renderHook(() => useRecoilValueLoadable(currentTeamSortedSongsAtom('team-search')), {
                 wrapper: createWrapper(({ set }) => {
@@ -70,7 +70,7 @@ describe('SongState', () => {
         });
 
         it('should filter by tags', async () => {
-            (SongService.getSong as jest.Mock).mockResolvedValue(mockSongs);
+            (SongApi.getSong as jest.Mock).mockResolvedValue(mockSongs);
 
             const { result } = renderHook(() => useRecoilValueLoadable(currentTeamSortedSongsAtom('team-tags')), {
                 wrapper: createWrapper(({ set }) => {
@@ -87,7 +87,7 @@ describe('SongState', () => {
         });
 
         it('should sort by last used date descending', async () => {
-            (SongService.getSong as jest.Mock).mockResolvedValue(mockSongs);
+            (SongApi.getSong as jest.Mock).mockResolvedValue(mockSongs);
 
             const { result } = renderHook(() => useRecoilValueLoadable(currentTeamSortedSongsAtom('team-sort')), {
                 wrapper: createWrapper(({ set }) => {

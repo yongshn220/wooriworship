@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ServiceEventService } from "@/apis/ServiceEventService";
+import { ServiceEventApi } from "@/apis/ServiceEventApi";
 import { useToast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -57,7 +57,7 @@ export function ServiceCreationMenu({ teamId, selectedServiceId }: Props) {
             // Convert Date to Timestamp
             const timestampDate = Timestamp.fromDate(date);
 
-            const newServiceId = await ServiceEventService.createService(teamId, {
+            const newServiceId = await ServiceEventApi.createService(teamId, {
                 date: timestampDate,
                 tagId: selectedTagId,
                 title: "New Service", // Default fallback, UI will show tag name if possible
@@ -73,7 +73,7 @@ export function ServiceCreationMenu({ teamId, selectedServiceId }: Props) {
             // The user wants to "Navigate to the newly created service page".
             // Since everything is on `service-board` page with query/state selection, 
             // efficiently we might just set the selection if possible, but route refresh is safer.
-            // Actually, `ServiceEventService.createService` returns ID.
+            // Actually, `ServiceEventApi.createService` returns ID.
 
             // We can force reload or just wait for live query if using onSnapshot (we aren't).
             // We fetch in useEffect. So we need to trigger re-fetch.

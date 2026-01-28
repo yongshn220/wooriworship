@@ -1,11 +1,11 @@
-import BaseService from "./BaseService";
-import { InvitationService, UserService } from ".";
+import BaseApi from "./BaseApi";
+import { InvitationApi, UserApi } from ".";
 import { Team, TeamOption } from "@/models/team";
 import { arrayUnion, arrayRemove, Timestamp } from "firebase/firestore";
-import { PraiseAssigneeService } from "./PraiseAssigneeService";
-import { ServiceFlowService } from "./ServiceFlowService";
+import { PraiseTeamApi } from "./PraiseTeamApi";
+import { ServiceFlowApi } from "./ServiceFlowApi";
 
-class TeamService extends BaseService {
+class TeamApi extends BaseApi {
   constructor() {
     super("teams");
   }
@@ -36,8 +36,8 @@ class TeamService extends BaseService {
     const teamId = await this.create(team);
     if (teamId) {
       // Init Serving defaults (V3)
-      await PraiseAssigneeService.initStandardRoles(teamId);
-      await ServiceFlowService.initDefaultTemplate(teamId);
+      await PraiseTeamApi.initStandardRoles(teamId);
+      await ServiceFlowApi.initDefaultTemplate(teamId);
     }
     return teamId;
   }
@@ -126,16 +126,16 @@ class TeamService extends BaseService {
   async removeMember(userId: string, teamId: string, singleSide: Boolean) {
     if (userId && teamId) {
       const promises = [];
-      const quiter: any = await UserService.getById(userId);
+      const quiter: any = await UserApi.getById(userId);
       if (quiter.email == null) {
         console.error("user email is missing");
         return false;
       }
-      promises.push(InvitationService.deleteTeamReceiverInvitations(teamId, quiter.email))
+      promises.push(InvitationApi.deleteTeamReceiverInvitations(teamId, quiter.email))
       if (!singleSide) {
-        promises.push(UserService.leaveTeam(userId, teamId, true));
+        promises.push(UserApi.leaveTeam(userId, teamId, true));
       }
-      promises.push(PraiseAssigneeService.cleanupMember(teamId, userId));
+      promises.push(PraiseTeamApi.cleanupMember(teamId, userId));
       promises.push(this.update(teamId, { users: arrayRemove(userId) }));
       await Promise.all(promises);
       return userId;
@@ -148,12 +148,12 @@ class TeamService extends BaseService {
   async deleteTeam(team: Team) {
     const promises = [];
     try {
-      const invitations = await InvitationService.getTeamInvitations(team.id);
+      const invitations = await InvitationApi.getTeamInvitations(team.id);
       for (const invitation of invitations) {
-        promises.push(InvitationService.delete(invitation.id));
+        promises.push(InvitationApi.delete(invitation.id));
       }
       for (const user of team.users) {
-        promises.push(UserService.leaveTeam(user, team.id, true));
+        promises.push(UserApi.leaveTeam(user, team.id, true));
       }
       promises.push(this.delete(team.id));
       await Promise.all(promises);
@@ -165,4 +165,4 @@ class TeamService extends BaseService {
   }
 }
 
-export default new TeamService();
+export default new TeamApi();

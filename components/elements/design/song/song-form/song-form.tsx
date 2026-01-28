@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { teamAtom } from "@/global-states/teamState";
-import { SongService, StorageService, TagService } from "@/apis";
+import { SongApi, StorageApi, TagApi } from "@/apis";
 import { FormMode } from "@/components/constants/enums";
 import { useRouter } from "next/navigation";
 import { getPathSongDetail } from "@/components/util/helper/routes";
@@ -16,7 +16,7 @@ import { auth } from "@/firebase";
 import { songAtom, songUpdaterAtom } from "@/global-states/song-state";
 import { ImageFileContainer, MusicSheetContainer } from "@/components/constants/types";
 import { v4 as uuid } from "uuid";
-import MusicSheetService from "@/apis/MusicSheetService";
+import MusicSheetApi from "@/apis/MusicSheetApi";
 import { musicSheetIdsUpdaterAtom, musicSheetsBySongIdAtom, musicSheetUpdaterAtom } from "@/global-states/music-sheet-state";
 import { MusicSheet } from "@/models/music_sheet";
 import { getAllUrlsFromMusicSheetContainers, getAllUrlsFromSongMusicSheets } from "@/components/util/helper/helper-functions";
@@ -136,18 +136,18 @@ export function SongForm({ mode, teamId, songId }: Props) {
     if (!createValidCheck()) return false
 
     try {
-      const newSongId = await SongService.addNewSong(authUser?.uid, teamId, songInput, musicSheetContainers)
+      const newSongId = await SongApi.addNewSong(authUser?.uid, teamId, songInput, musicSheetContainers)
       if (!newSongId) {
         toast({ description: `Fail to create a song. Please try again.` })
         return
       }
 
       const uploadedMusicSheetContainers = await uploadMusicSheetContainers(musicSheetContainers)
-      if (await MusicSheetService.addNewMusicSheets(authUser?.uid, teamId, newSongId, uploadedMusicSheetContainers) === false) {
+      if (await MusicSheetApi.addNewMusicSheets(authUser?.uid, teamId, newSongId, uploadedMusicSheetContainers) === false) {
         console.log("err:song-board-form:handleCreate. Fail to create music sheets."); return
       }
 
-      if (await TagService.addNewTags(teamId, songInput.tags) === false) {
+      if (await TagApi.addNewTags(teamId, songInput.tags) === false) {
         console.log("err:song-board-form:handleCreate. Fail to create tags")
       }
 
@@ -194,21 +194,21 @@ export function SongForm({ mode, teamId, songId }: Props) {
       // Delete music sheet images if removed.
       const newMusicSheetContainers = await uploadMusicSheetContainers(musicSheetContainers)
       const urlsToDelete = getRemovedMusicSheetUrls(musicSheets, newMusicSheetContainers)
-      promises.push(StorageService.deleteFileByUrls(urlsToDelete))
+      promises.push(StorageApi.deleteFileByUrls(urlsToDelete))
 
       // Delete music sheet document if removed.
       const musicSheetIdsToDelete = getRemovedMusicSheetIds(musicSheets, newMusicSheetContainers)
       musicSheetIdsToDelete.forEach(id => {
-        promises.push(MusicSheetService.deleteMusicSheet(teamId, song!.id, id))
+        promises.push(MusicSheetApi.deleteMusicSheet(teamId, song!.id, id))
       })
 
       // Update music sheet
       newMusicSheetContainers.forEach(mContainer => {
-        promises.push(MusicSheetService.updateMusicSheet(authUser?.uid, teamId, song!.id, mContainer))
+        promises.push(MusicSheetApi.updateMusicSheet(authUser?.uid, teamId, song!.id, mContainer))
       })
       // Update Song and tags
-      promises.push(SongService.updateSong(authUser?.uid, teamId, song!.id, songInput, musicSheetContainers));
-      promises.push(TagService.addNewTags(teamId, songInput?.tags));
+      promises.push(SongApi.updateSong(authUser?.uid, teamId, song!.id, songInput, musicSheetContainers));
+      promises.push(TagApi.addNewTags(teamId, songInput?.tags));
 
       await Promise.all(promises)
 
@@ -232,7 +232,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
   async function uploadMusicSheetContainers(_musicSheetContainers: MusicSheetContainer[]) {
     const newMusicSheetContainers = []
     for (const mContainer of _musicSheetContainers) {
-      const newMContainer = await StorageService.uploadMusicSheetContainer(teamId, mContainer)
+      const newMContainer = await StorageApi.uploadMusicSheetContainer(teamId, mContainer)
       if (!newMContainer) {
         console.log("Song:handleCreate: fail to upload music sheet container."); continue
       }

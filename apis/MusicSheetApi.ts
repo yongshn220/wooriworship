@@ -5,8 +5,8 @@ import { getFirebaseTimestampNow } from "@/components/util/helper/helper-functio
 import { db as defaultDb } from "@/firebase";
 import { collection, getDocs, getDoc, addDoc, doc, setDoc, deleteDoc, Firestore } from "firebase/firestore";
 
-class MusicSheetService {
-  private static instance: MusicSheetService;
+class MusicSheetApi {
+  private static instance: MusicSheetApi;
   protected db: Firestore;
 
   private constructor(db?: Firestore) {
@@ -14,11 +14,11 @@ class MusicSheetService {
     this.db = db || defaultDb;
   }
 
-  public static getInstance(db?: Firestore): MusicSheetService {
-    if (!MusicSheetService.instance) {
-      MusicSheetService.instance = new MusicSheetService(db);
+  public static getInstance(db?: Firestore): MusicSheetApi {
+    if (!MusicSheetApi.instance) {
+      MusicSheetApi.instance = new MusicSheetApi(db);
     }
-    return MusicSheetService.instance;
+    return MusicSheetApi.instance;
   }
 
   async getSongMusicSheets(teamId: string, songId: string) {
@@ -125,4 +125,4 @@ class MusicSheetService {
   }
 }
 
-export default MusicSheetService.getInstance()
+export default MusicSheetApi.getInstance()

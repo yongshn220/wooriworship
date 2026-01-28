@@ -29,6 +29,7 @@ interface Props {
     roles: ServiceRole[]; // Team's serving roles for display
     members: User[]; // Resolved members for Assignee
     currentUserUid?: string | null;
+    onDataChanged?: () => void; // Callback to refetch data after form saves
 }
 
 export function ServiceDetailView({
@@ -39,7 +40,8 @@ export function ServiceDetailView({
     flow,
     roles,
     members,
-    currentUserUid
+    currentUserUid,
+    onDataChanged
 }: Props) {
     const team = useRecoilValue(teamAtom(teamId));
     const serviceTags = useRecoilValue(fetchServiceTagsSelector(teamId));
@@ -101,9 +103,9 @@ export function ServiceDetailView({
             )}
 
             {/* 3. Praise Assignee */}
-            {praiseAssignee && praiseAssignee.assignee.length > 0 ? (
+            {praiseAssignee && praiseAssignee.assignments && praiseAssignee.assignments.length > 0 ? (
                 <PraiseTeamCard
-                    praiseAssignments={praiseAssignee.assignee}
+                    praiseAssignments={praiseAssignee.assignments}
                     roles={roles}
                     members={members}
                     currentUserUid={currentUserUid}
@@ -151,7 +153,10 @@ export function ServiceDetailView({
                     teamId={teamId}
                     serviceId={event.id}
                     initialSetlist={setlist}
-                    onCompleted={() => setIsEditingSetlist(false)}
+                    onCompleted={() => {
+                        onDataChanged?.();
+                        setIsEditingSetlist(false);
+                    }}
                     onClose={() => setIsEditingSetlist(false)}
                 />
             )}
@@ -161,7 +166,10 @@ export function ServiceDetailView({
                     teamId={teamId}
                     serviceId={event.id}
                     initialAssignee={praiseAssignee}
-                    onCompleted={() => setIsEditingAssignee(false)}
+                    onCompleted={() => {
+                        onDataChanged?.();
+                        setIsEditingAssignee(false);
+                    }}
                     onClose={() => setIsEditingAssignee(false)}
                 />
             )}
@@ -172,7 +180,10 @@ export function ServiceDetailView({
                     serviceId={event.id}
                     initialFlow={flow}
                     serviceTagIds={event.tagId ? [event.tagId] : []}
-                    onCompleted={() => setIsEditingFlow(false)}
+                    onCompleted={() => {
+                        onDataChanged?.();
+                        setIsEditingFlow(false);
+                    }}
                     onClose={() => setIsEditingFlow(false)}
                 />
             )}

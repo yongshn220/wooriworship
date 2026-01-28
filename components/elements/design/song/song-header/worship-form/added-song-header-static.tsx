@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { teamAtom } from "@/global-states/teamState";
 import { TeamOption } from "@/models/team";
-import { TeamService } from "@/apis";
+import { TeamApi } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
 import { songAtom } from "@/global-states/song-state";
 import { SetlistSongHeader } from "@/models/setlist";
@@ -100,7 +100,7 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader, on
           : { id: null, note: "", selected_music_sheet_ids: [] }
       }
 
-      if (await TeamService.updateTeamOption(teamId, teamOption) === false) {
+      if (await TeamApi.updateTeamOption(teamId, teamOption) === false) {
         /* On Error */
         console.log("err:setStaticSongAsDefaultOption")
         toast({

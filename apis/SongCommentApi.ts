@@ -1,10 +1,10 @@
-import BaseService from "./BaseService";
+import BaseApi from "./BaseApi";
 import { SongComment } from "@/models/song_comments";
 import { db } from "@/firebase";
 import { Timestamp, collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
 
 
-class SongCommentService extends BaseService {
+class SongCommentApi extends BaseApi {
   constructor() {
     super("song_comments"); // Placeholder
   }
@@ -72,4 +72,4 @@ class SongCommentService extends BaseService {
   }
 }
 
-export default new SongCommentService();
+export default new SongCommentApi();

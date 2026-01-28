@@ -4,15 +4,15 @@ import {
     updateDoc, query, orderBy, where, writeBatch,
     arrayUnion, arrayRemove, Timestamp
 } from "firebase/firestore";
-import { ServiceRole, ServiceAssignment, ServicePraiseAssignee } from "@/models/services/ServiceEvent";
+import { ServiceRole, ServiceAssignment, ServicePraiseTeam } from "@/models/services/ServiceEvent";
 
 /**
- * PraiseAssigneeService (V3)
+ * PraiseTeamApi (V3)
  * Handles:
  * 1. Global Role Configuration: teams/{teamId}/praise_team_roles
  * 2. Service-specific Assignees: teams/{teamId}/services/{serviceId}/praise_assignee/main
  */
-export class PraiseAssigneeService {
+export class PraiseTeamApi {
 
     // =========================================================================
     // 1. Role Configuration (teams/{teamId}/praise_team_roles)
@@ -27,7 +27,7 @@ export class PraiseAssigneeService {
             const snapshot = await getDocs(q);
             return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServiceRole));
         } catch (e) {
-            console.error("PraiseAssigneeService.getRoles:", e);
+            console.error("PraiseTeamApi.getRoles:", e);
             return [];
         }
     }
@@ -73,25 +73,25 @@ export class PraiseAssigneeService {
     }
 
     // =========================================================================
-    // 2. Service-specific Assignees (teams/{teamId}/services/{serviceId}/praise_assignee/main)
+    // 2. Service-specific Praise Team (teams/{teamId}/services/{serviceId}/praise_team/main)
     // =========================================================================
 
-    static async getAssignees(teamId: string, serviceId: string): Promise<ServicePraiseAssignee | null> {
+    static async getPraiseTeam(teamId: string, serviceId: string): Promise<ServicePraiseTeam | null> {
         if (!teamId || !serviceId) return null;
         try {
-            const ref = doc(db, `teams/${teamId}/services/${serviceId}/praise_assignee/main`);
+            const ref = doc(db, `teams/${teamId}/services/${serviceId}/praise_team/main`);
             const snap = await getDoc(ref);
             if (!snap.exists()) return null;
-            return snap.data() as ServicePraiseAssignee;
+            return snap.data() as ServicePraiseTeam;
         } catch (e) {
-            console.error("PraiseAssigneeService.getAssignees:", e);
+            console.error("PraiseTeamApi.getPraiseTeam:", e);
             return null;
         }
     }
 
-    static async updateAssignees(teamId: string, serviceId: string, data: Partial<ServicePraiseAssignee>) {
+    static async updatePraiseTeam(teamId: string, serviceId: string, data: Partial<ServicePraiseTeam>) {
         if (!teamId || !serviceId) return;
-        const ref = doc(db, `teams/${teamId}/services/${serviceId}/praise_assignee/main`);
+        const ref = doc(db, `teams/${teamId}/services/${serviceId}/praise_team/main`);
         await setDoc(ref, {
             ...data,
             id: 'main',
@@ -99,9 +99,9 @@ export class PraiseAssigneeService {
         }, { merge: true });
     }
 
-    static async initAssignees(teamId: string, serviceId: string) {
-        const ref = doc(db, `teams/${teamId}/services/${serviceId}/praise_assignee/main`);
-        await setDoc(ref, { id: 'main', assignee: [] });
+    static async initPraiseTeam(teamId: string, serviceId: string) {
+        const ref = doc(db, `teams/${teamId}/services/${serviceId}/praise_team/main`);
+        await setDoc(ref, { id: 'main', assignments: [] });
     }
 
     // =========================================================================
@@ -109,17 +109,17 @@ export class PraiseAssigneeService {
     // =========================================================================
 
     static async addCustomGroup(teamId: string, groupName: string): Promise<void> {
-        const ref = doc(db, "teams", teamId, "serving_config", "general");
+        const ref = doc(db, "teams", teamId, "service_config", "general");
         await setDoc(ref, { custom_groups: arrayUnion(groupName) }, { merge: true });
     }
 
     static async addCustomMemberName(teamId: string, name: string): Promise<void> {
-        const ref = doc(db, "teams", teamId, "serving_config", "general");
+        const ref = doc(db, "teams", teamId, "service_config", "general");
         await setDoc(ref, { custom_names: arrayUnion(name) }, { merge: true });
     }
 
-    static async getServingConfig(teamId: string): Promise<{ customGroups: string[], customNames: string[] }> {
-        const docRef = doc(db, "teams", teamId, "serving_config", "general");
+    static async getServiceConfig(teamId: string): Promise<{ customGroups: string[], customNames: string[] }> {
+        const docRef = doc(db, "teams", teamId, "service_config", "general");
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             const data = docSnap.data();
@@ -172,8 +172,8 @@ export class PraiseAssigneeService {
         }
     }
 
-    static async deleteAssignees(teamId: string, serviceId: string) {
-        const ref = doc(db, `teams/${teamId}/services/${serviceId}/praise_assignee/main`);
+    static async deletePraiseTeam(teamId: string, serviceId: string) {
+        const ref = doc(db, `teams/${teamId}/services/${serviceId}/praise_team/main`);
         await deleteDoc(ref);
     }
 }

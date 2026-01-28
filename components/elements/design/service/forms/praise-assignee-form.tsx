@@ -17,7 +17,7 @@ import { usePraiseAssigneeFormLogic } from "./hooks/use-praise-assignee-form-log
 import { ServicePraiseAssignee } from "@/models/services/ServiceEvent";
 import { slideVariants } from "@/components/constants/animations";
 import { SortableList } from "@/components/common/list/sortable-list";
-import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
+import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
 
 // Shared Components (Relative Paths updated for new location)
 import { SortableRoleItem } from "../service-form/items/sortable-role-item";
@@ -90,7 +90,7 @@ export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompl
                             // But we should call API to save order
                             // setRoles is exposed from hook.
                             // But the hook implementation of setRoles might likely be just local state setter.
-                            PraiseAssigneeService.updateRolesOrder(teamId, newRoles).catch(console.error);
+                            PraiseTeamApi.updateRolesOrder(teamId, newRoles).catch(console.error);
                         }}>
                             {roles.map((role) => {
                                 const assignment = worshipRoles.find(a => a.roleId === role.id);
@@ -190,7 +190,7 @@ export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompl
                                     groups={standardGroups}
                                     onAddGroup={(name) => {
                                         setStandardGroups(prev => [...prev, name]);
-                                        PraiseAssigneeService.addCustomGroup(teamId, name).catch(console.error);
+                                        PraiseTeamApi.addCustomGroup(teamId, name).catch(console.error);
                                     }}
                                     onRemoveGroup={(idx) => {
                                         setStandardGroups(standardGroups.filter((_, i) => i !== idx));
@@ -198,7 +198,7 @@ export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompl
                                     customMemberNames={customMemberNames}
                                     onAddCustomMember={(name) => {
                                         setCustomMemberNames(prev => [...prev, name]);
-                                        PraiseAssigneeService.addCustomMemberName(teamId, name).catch(console.error);
+                                        PraiseTeamApi.addCustomMemberName(teamId, name).catch(console.error);
                                     }}
                                 />
                             </div>

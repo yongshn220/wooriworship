@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as admin from 'firebase-admin';
 import * as fs from 'fs';
-import { AdminMigrationService } from '../apis/AdminMigrationService';
+import { AdminMigrationApi } from '../apis/AdminMigrationApi';
 
 // 1. Main Execution
 (async () => {
@@ -49,7 +49,7 @@ import { AdminMigrationService } from '../apis/AdminMigrationService';
             db = admin.firestore();
         }
 
-        const service = AdminMigrationService.getInstance(db);
+        const service = AdminMigrationApi.getInstance(db);
 
         // 4. Fetch All Teams
         console.log("\n🔍 Fetching all teams...");

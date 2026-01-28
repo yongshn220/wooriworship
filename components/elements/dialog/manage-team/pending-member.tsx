@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Invitation } from "@/models/invitation";
-import { InvitationService } from "@/apis";
+import { InvitationApi } from "@/apis";
 import { InvitationStatus } from "@/components/constants/enums";
 import { toast } from "@/components/ui/use-toast";
 import { sentInvitationsUpdaterAtom } from "@/global-states/invitation-state";
@@ -16,7 +16,7 @@ export function PendingMember({ invitation }: Props) {
   const sentInvitationsUpdater = useSetRecoilState(sentInvitationsUpdaterAtom)
 
   async function handleRemoveInvitation() {
-    if (await InvitationService.delete(invitation.id) === false) {
+    if (await InvitationApi.delete(invitation.id) === false) {
       toast({ title: "Something went wrong. Please try again later." })
       return;
     }

@@ -7,7 +7,7 @@ import { SetlistSongHeader } from "@/models/setlist";
 
 /**
  * Team's role definition for praise team assignments
- * Stored in: teams/{teamId}/praise_roles/{roleId}
+ * Stored in: teams/{teamId}/praise_team_roles/{roleId}
  */
 export interface ServiceRole {
     id: string;
@@ -42,12 +42,13 @@ export interface ServiceFlowItem {
 /**
  * Template for service flow items
  * Stored in: teams/{teamId}/service_flow_templates/{templateId}
+ * Now includes assignments for member presets
  */
 export interface ServiceFlowTemplate {
     id: string;
     teamId: string;
     name: string;
-    items: Omit<ServiceFlowItem, "id" | "assignments">[];
+    items: Omit<ServiceFlowItem, "id">[];  // Includes assignments for member presets
 }
 
 // =============================================================================
@@ -89,12 +90,15 @@ export interface ServiceSetlist {
     ending_song?: SetlistSongHeader;
 }
 
-// Path: teams/{teamId}/services/{serviceId}/praise_assignee/main
-export interface ServicePraiseAssignee {
+// Path: teams/{teamId}/services/{serviceId}/praise_team/main
+export interface ServicePraiseTeam {
     id: string; // usually "main"
-    assignee: ServiceAssignment[]; // The cast: [{ role: 'Drum', memberIds: ['...'] }]
+    assignments: ServiceAssignment[]; // The cast: [{ roleId: 'drum', memberIds: ['...'] }]
     note?: string; // "Rehearsal at 2PM"
 }
+
+/** @deprecated Use ServicePraiseTeam instead */
+export type ServicePraiseAssignee = ServicePraiseTeam;
 
 // Path: teams/{teamId}/services/{serviceId}/flows/main
 export interface ServiceFlow {

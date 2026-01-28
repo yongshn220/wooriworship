@@ -1,16 +1,16 @@
 import { db } from "@/firebase";
 import { doc, collection, runTransaction } from "firebase/firestore";
 
-class LinkingService {
-    private static instance: LinkingService;
+class LinkingApi {
+    private static instance: LinkingApi;
 
     private constructor() { }
 
-    public static getInstance(): LinkingService {
-        if (!LinkingService.instance) {
-            LinkingService.instance = new LinkingService();
+    public static getInstance(): LinkingApi {
+        if (!LinkingApi.instance) {
+            LinkingApi.instance = new LinkingApi();
         }
-        return LinkingService.instance;
+        return LinkingApi.instance;
     }
 
     /**
@@ -124,4 +124,4 @@ class LinkingService {
     }
 }
 
-export default LinkingService.getInstance();
+export default LinkingApi.getInstance();

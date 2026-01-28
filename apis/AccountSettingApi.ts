@@ -1,10 +1,10 @@
 import { AccountSetting } from '@/models/account-setting';
-import BaseService from './BaseService';
+import BaseApi from './BaseApi';
 import { getFirebaseTimestampNow } from '@/components/util/helper/helper-functions';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 
-class AccountSettingService { // Removed BaseService inheritance as path is dynamic
+class AccountSettingApi { // Removed BaseApi inheritance as path is dynamic
 
   async getAccountSetting(userId: string): Promise<AccountSetting | null> {
     if (!userId) {
@@ -46,4 +46,4 @@ class AccountSettingService { // Removed BaseService inheritance as path is dyna
   }
 }
 
-export default new AccountSettingService();
+export default new AccountSettingApi();

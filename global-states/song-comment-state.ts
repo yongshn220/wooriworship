@@ -1,6 +1,6 @@
 import { atom, atomFamily, selectorFamily } from "recoil";
 import { SongComment } from "@/models/song_comments";
-import { SongCommentService } from "@/apis";
+import { SongCommentApi } from "@/apis";
 
 export const songCommentIdsAtom = atomFamily<Array<string>, { teamId: string, songId: string }>({
   key: "songCommentIdsAtom",
@@ -11,7 +11,7 @@ export const songCommentIdsAtom = atomFamily<Array<string>, { teamId: string, so
       try {
         get(songCommentIdsUpdaterAtom)
 
-        const commentList = await SongCommentService.getSongComments(props?.songId, props?.teamId) as Array<SongComment>
+        const commentList = await SongCommentApi.getSongComments(props?.songId, props?.teamId) as Array<SongComment>
         if (!commentList) return []
 
         return commentList.map((comment: SongComment) => comment.id)
@@ -40,7 +40,7 @@ export const songCommentAtom = atomFamily<SongComment, { teamId: string, songId:
 
         if (!commentId) return null
 
-        const comment = await SongCommentService.getCommentById(teamId, songId, commentId) as SongComment
+        const comment = await SongCommentApi.getCommentById(teamId, songId, commentId) as SongComment
         if (!comment) return null
 
         return comment

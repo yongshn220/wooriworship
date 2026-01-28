@@ -1,30 +1,30 @@
-import BaseService from "./BaseService";
-import { StorageService } from ".";
-import SongCommentService from "./SongCommentService";
+import BaseApi from "./BaseApi";
+import { StorageApi } from ".";
+import SongCommentApi from "./SongCommentApi";
 import { Song } from "@/models/song";
 import { getAllUrlsFromSongMusicSheets, getFirebaseTimestampNow } from "@/components/util/helper/helper-functions";
-import MusicSheetService from "@/apis/MusicSheetService";
+import MusicSheetApi from "@/apis/MusicSheetApi";
 import { MusicSheetContainer } from "@/components/constants/types";
 import { SongInput } from "@/components/elements/design/song/song-form/song-form";
 import { db as defaultDb } from "@/firebase";
 import { Firestore, collection, query, orderBy, getDocs, addDoc, doc, setDoc, deleteDoc, getDoc, collectionGroup, where, limit, documentId } from "firebase/firestore";
 
-export class SongService extends BaseService {
-  private static instance: SongService;
+export class SongApi extends BaseApi {
+  private static instance: SongApi;
 
-  protected musicSheetService: typeof MusicSheetService;
+  protected musicSheetApi: typeof MusicSheetApi;
 
-  private constructor(db?: Firestore, musicSheetService?: typeof MusicSheetService) {
+  private constructor(db?: Firestore, musicSheetApi?: typeof MusicSheetApi) {
     super("songs", db); // Pass db to base constructor
     // this.db is already set by super
-    this.musicSheetService = musicSheetService || MusicSheetService;
+    this.musicSheetApi = musicSheetApi || MusicSheetApi;
   }
 
-  public static getInstance(db?: Firestore, musicSheetService?: typeof MusicSheetService): SongService {
-    if (!SongService.instance) {
-      SongService.instance = new SongService(db, musicSheetService);
+  public static getInstance(db?: Firestore, musicSheetApi?: typeof MusicSheetApi): SongApi {
+    if (!SongApi.instance) {
+      SongApi.instance = new SongApi(db, musicSheetApi);
     }
-    return SongService.instance;
+    return SongApi.instance;
   }
 
   // Override getById
@@ -122,7 +122,7 @@ export class SongService extends BaseService {
 
       if (musicSheetContainers && musicSheetContainers.length > 0) {
         for (const container of musicSheetContainers) {
-          await this.musicSheetService.addNewMusicSheet(userId, teamId, ref.id, container);
+          await this.musicSheetApi.addNewMusicSheet(userId, teamId, ref.id, container);
         }
       }
 
@@ -187,18 +187,18 @@ export class SongService extends BaseService {
       const song = { id: songSnap.id, ...songSnap.data() } as Song;
 
       const promises = [];
-      const comments = await SongCommentService.getSongComments(song.id, teamId);
+      const comments = await SongCommentApi.getSongComments(song.id, teamId);
       for (const comment of comments) {
-        promises.push(SongCommentService.deleteSongComment(teamId, song.id, comment?.id));
+        promises.push(SongCommentApi.deleteSongComment(teamId, song.id, comment?.id));
       }
 
-      const musicSheets = await this.musicSheetService.getSongMusicSheets(teamId, song.id)
+      const musicSheets = await this.musicSheetApi.getSongMusicSheets(teamId, song.id)
       for (const musicSheet of musicSheets) {
-        promises.push(this.musicSheetService.deleteMusicSheet(teamId, song.id, musicSheet?.id))
+        promises.push(this.musicSheetApi.deleteMusicSheet(teamId, song.id, musicSheet?.id))
       }
 
       const musicSheetUrls = getAllUrlsFromSongMusicSheets(musicSheets)
-      promises.push(StorageService.deleteFileByUrls(musicSheetUrls ?? []))
+      promises.push(StorageApi.deleteFileByUrls(musicSheetUrls ?? []))
       await Promise.all(promises);
 
       await deleteDoc(songRef);
@@ -210,4 +210,4 @@ export class SongService extends BaseService {
   }
 }
 
-export default SongService.getInstance();
+export default SongApi.getInstance();

@@ -1,6 +1,6 @@
 import { atom, atomFamily, selectorFamily } from "recoil";
 import { Team } from "@/models/team";
-import TeamService from "@/apis/TeamService";
+import TeamApi from "@/apis/TeamApi";
 
 
 export const currentTeamIdAtom = atom<string>({
@@ -21,7 +21,7 @@ export const teamAtom = atomFamily<Team, string>({
       try {
         if (!teamId) return null
 
-        const team = await TeamService.getById(teamId) as Team
+        const team = await TeamApi.getById(teamId) as Team
         if (!team) return null
 
         return team
@@ -49,6 +49,6 @@ export const fetchServiceTagsSelector = selectorFamily<any[], string>({
   get: (teamId) => async ({ get }) => {
     get(serviceTagsUpdaterAtom);
     if (!teamId) return [];
-    return await TeamService.getServiceTags(teamId);
+    return await TeamApi.getServiceTags(teamId);
   },
 });

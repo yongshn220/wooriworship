@@ -1,6 +1,6 @@
 import { atom, selectorFamily } from "recoil";
 import { ServiceRole, ServiceFormState } from "@/models/services/ServiceEvent";
-import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
+import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
 
 export const servingRolesAtom = atom<ServiceRole[]>({
     key: "servingRolesAtom",
@@ -22,6 +22,6 @@ export const fetchServingRolesSelector = selectorFamily<ServiceRole[], string>({
     get: (teamId) => async ({ get }) => {
         get(servingRolesUpdaterAtom); // Dependency
         if (!teamId) return [];
-        return await PraiseAssigneeService.getRoles(teamId);
+        return await PraiseTeamApi.getRoles(teamId);
     },
 });

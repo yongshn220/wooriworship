@@ -4,7 +4,7 @@ import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'r
 import MultipleSelector, { Option } from '@/components/ui/multiple-selector';
 import { useRecoilValue } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
-import tagService from "@/apis/TagService";
+import tagService from "@/apis/TagApi";
 import { toast } from "@/components/ui/use-toast";
 import { SongInput } from "@/components/elements/design/song/song-form/song-form";
 

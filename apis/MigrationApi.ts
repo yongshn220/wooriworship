@@ -2,19 +2,19 @@ import { db as defaultDb } from "@/firebase";
 import { Firestore, collection, getDocs, doc, writeBatch, Timestamp, runTransaction, DocumentData, query, limit } from "firebase/firestore";
 import { parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";
 
-export class MigrationService {
-    private static instance: MigrationService;
+export class MigrationApi {
+    private static instance: MigrationApi;
     private db: Firestore;
 
     constructor(db?: Firestore) {
         this.db = db || defaultDb;
     }
 
-    public static getInstance(db?: Firestore): MigrationService {
-        if (!MigrationService.instance) {
-            MigrationService.instance = new MigrationService(db);
+    public static getInstance(db?: Firestore): MigrationApi {
+        if (!MigrationApi.instance) {
+            MigrationApi.instance = new MigrationApi(db);
         }
-        return MigrationService.instance;
+        return MigrationApi.instance;
     }
 
     /**
@@ -371,4 +371,4 @@ export class MigrationService {
     }
 }
 
-export default MigrationService.getInstance();
+export default MigrationApi.getInstance();

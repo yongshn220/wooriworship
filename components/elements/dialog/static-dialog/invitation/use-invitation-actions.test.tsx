@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { useInvitationActions } from "./use-invitation-actions";
-import { InvitationService, TeamService, UserService } from "@/apis";
+import { InvitationApi, TeamApi, UserApi } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
 import { InvitationStatus } from "@/components/constants/enums";
 import { RecoilRoot } from "recoil";
@@ -51,9 +51,9 @@ describe("useInvitationActions", () => {
     });
 
     it("handleAccept should call necessary services and show success toast", async () => {
-        (InvitationService.updateInvitation as jest.Mock).mockResolvedValue(true);
-        (UserService.addNewTeam as jest.Mock).mockResolvedValue(true);
-        (TeamService.addNewMember as jest.Mock).mockResolvedValue(true);
+        (InvitationApi.updateInvitation as jest.Mock).mockResolvedValue(true);
+        (UserApi.addNewTeam as jest.Mock).mockResolvedValue(true);
+        (TeamApi.addNewMember as jest.Mock).mockResolvedValue(true);
 
         const { result } = renderHook(() => useInvitationActions(), {
             wrapper: RecoilRoot
@@ -63,14 +63,14 @@ describe("useInvitationActions", () => {
             await result.current.handleAccept(mockInvitation, mockTeam as any);
         });
 
-        expect(InvitationService.updateInvitation).toHaveBeenCalledWith("team-1", "invitation-1", InvitationStatus.Accepted);
-        expect(UserService.addNewTeam).toHaveBeenCalledWith("test-user-uid", "team-1");
-        expect(TeamService.addNewMember).toHaveBeenCalledWith("test-user-uid", "team-1");
+        expect(InvitationApi.updateInvitation).toHaveBeenCalledWith("team-1", "invitation-1", InvitationStatus.Accepted);
+        expect(UserApi.addNewTeam).toHaveBeenCalledWith("test-user-uid", "team-1");
+        expect(TeamApi.addNewMember).toHaveBeenCalledWith("test-user-uid", "team-1");
         expect(toast).toHaveBeenCalledWith(expect.objectContaining({ title: expect.stringContaining("successfully joined") }));
     });
 
     it("handleDecline should update status and show decline toast", async () => {
-        (InvitationService.updateInvitation as jest.Mock).mockResolvedValue(true);
+        (InvitationApi.updateInvitation as jest.Mock).mockResolvedValue(true);
 
         const { result } = renderHook(() => useInvitationActions(), {
             wrapper: RecoilRoot
@@ -80,13 +80,13 @@ describe("useInvitationActions", () => {
             await result.current.handleDecline(mockInvitation, mockTeam as any);
         });
 
-        expect(InvitationService.updateInvitation).toHaveBeenCalledWith("team-1", "invitation-1", InvitationStatus.Rejected);
-        expect(UserService.addNewTeam).not.toHaveBeenCalled();
+        expect(InvitationApi.updateInvitation).toHaveBeenCalledWith("team-1", "invitation-1", InvitationStatus.Rejected);
+        expect(UserApi.addNewTeam).not.toHaveBeenCalled();
         expect(toast).toHaveBeenCalledWith(expect.objectContaining({ title: expect.stringContaining("declined invitation") }));
     });
 
     it("should handle error during accept", async () => {
-        (InvitationService.updateInvitation as jest.Mock).mockRejectedValue(new Error("Network error"));
+        (InvitationApi.updateInvitation as jest.Mock).mockRejectedValue(new Error("Network error"));
 
         const { result } = renderHook(() => useInvitationActions(), {
             wrapper: RecoilRoot

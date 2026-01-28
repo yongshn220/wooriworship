@@ -5,7 +5,7 @@ import { Song } from "@/models/song";
 import { MusicSheetContainer } from "@/components/constants/types";
 import { MusicSheet } from "@/models/music_sheet";
 import { User } from "@/models/user";
-import MusicSheetService from "@/apis/MusicSheetService";
+import MusicSheetApi from "@/apis/MusicSheetApi";
 import { parseLocalDate } from "@/lib/date-utils";
 
 export function getFirebaseTimestampNow() {
@@ -308,7 +308,7 @@ export async function downloadMultipleMusicSheets(songs: Array<Song>) {
 
   // Add files to the zip
   for (const song of songs) {
-    const musicSheets = await MusicSheetService.getSongMusicSheets(song?.team_id, song?.id)
+    const musicSheets = await MusicSheetApi.getSongMusicSheets(song?.team_id, song?.id)
     for (const musicSheet of musicSheets) {
       let index = 1
       for (const url of musicSheet?.urls) {
@@ -335,7 +335,7 @@ export async function shareMusicSheets(songs: Array<Song>) {
     const files: File[] = []
 
     for (const song of songs) {
-      const musicSheets = await MusicSheetService.getSongMusicSheets(song?.team_id, song?.id)
+      const musicSheets = await MusicSheetApi.getSongMusicSheets(song?.team_id, song?.id)
       for (const musicSheet of musicSheets) {
         let index = 1
         for (const url of musicSheet?.urls) {

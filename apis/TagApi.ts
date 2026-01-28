@@ -1,8 +1,8 @@
-import BaseService from "./BaseService";
+import BaseApi from "./BaseApi";
 import { db } from "@/firebase";
 import { collection, doc, getDocs, getDoc, setDoc, deleteDoc, query } from "firebase/firestore";
 
-class TagService extends BaseService {
+class TagApi extends BaseApi {
   constructor() {
     super("song_tags");
   }
@@ -67,4 +67,4 @@ class TagService extends BaseService {
   }
 }
 
-export default new TagService();
+export default new TagApi();

@@ -2,13 +2,13 @@ import { db } from "@/firebase";
 import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { ServiceSetlist } from "@/models/services/ServiceEvent";
 import { Song } from "@/models/song";
-import SongService from "./SongService";
+import SongApi from "./SongApi";
 
 /**
- * SetlistService (V3)
+ * SetlistApi (V3)
  * Handles setlists for services: teams/{teamId}/services/{serviceId}/setlists/main
  */
-export class SetlistService {
+export class SetlistApi {
 
     /**
      * Fetches the setlist for a specific service.
@@ -27,7 +27,7 @@ export class SetlistService {
                 const hydratedSongs = await Promise.all(data.songs.map(async (s) => {
                     // Start with lightweight hydration if possible, or fetch full song
                     // Optimization: Could use a cache or batched fetch
-                    const songDetails = await SongService.getSongById(teamId, s.id) as Song;
+                    const songDetails = await SongApi.getSongById(teamId, s.id) as Song;
                     return {
                         ...s,
                         title: songDetails?.title || "Unknown Song",
@@ -40,14 +40,14 @@ export class SetlistService {
 
             return data;
         } catch (e) {
-            console.error("SetlistService.getSetlist:", e);
+            console.error("SetlistApi.getSetlist:", e);
             return null;
         }
     }
 
     /**
      * Updates the setlist for a specific service.
-     * Also updates song usage stats via SongService.
+     * Also updates song usage stats via SongApi.
      */
     static async updateSetlist(teamId: string, serviceId: string, data: Partial<ServiceSetlist>) {
         if (!teamId || !serviceId) return;
@@ -62,17 +62,22 @@ export class SetlistService {
                 if (data.ending_song?.id) songIds.push(data.ending_song.id);
 
                 const uniqueIds = Array.from(new Set(songIds));
-                const promises = uniqueIds.map(id => SongService.utilizeSong(teamId, id));
+                const promises = uniqueIds.map(id => SongApi.utilizeSong(teamId, id));
                 await Promise.all(promises);
             }
 
+            // Filter out undefined values (Firebase doesn't allow undefined)
+            const cleanData = Object.fromEntries(
+                Object.entries(data).filter(([_, v]) => v !== undefined)
+            );
+
             await setDoc(ref, {
-                ...data,
+                ...cleanData,
                 id: 'main',
                 updated_at: Timestamp.now()
             }, { merge: true });
         } catch (e) {
-            console.error("SetlistService.updateSetlist:", e);
+            console.error("SetlistApi.updateSetlist:", e);
             throw e;
         }
     }

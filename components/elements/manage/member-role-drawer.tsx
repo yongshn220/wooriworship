@@ -15,8 +15,8 @@ import { toast } from "@/components/ui/use-toast";
 
 import { fetchServingRolesSelector, servingRolesUpdaterAtom } from "@/global-states/serviceRolesState";
 import { teamUpdaterAtom, teamAtom } from "@/global-states/teamState";
-import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
-import { TeamService } from "@/apis";
+import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
+import { TeamApi } from "@/apis";
 import { userAtom } from "@/global-states/userState";
 
 import { ConfirmationDialog } from "@/components/elements/dialog/user-confirmation/confirmation-dialog";
@@ -70,14 +70,14 @@ export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) 
             }
             setShowRevokeDialog(true);
         } else {
-            await TeamService.addAdmin(teamId, userId);
+            await TeamApi.addAdmin(teamId, userId);
             setTeamUpdater(prev => prev + 1);
         }
     }
 
     async function handleRevokeAdmin() {
         if (!userId) return;
-        await TeamService.removeAdmin(teamId, userId);
+        await TeamApi.removeAdmin(teamId, userId);
         setTeamUpdater(prev => prev + 1);
     }
 
@@ -85,9 +85,9 @@ export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) 
         if (!userId || !isCurrentUserAdmin) return;
         const isAssigned = currentDefaultMembers.includes(userId);
         if (isAssigned) {
-            await PraiseAssigneeService.removeDefaultMember(teamId, roleId, userId);
+            await PraiseTeamApi.removeDefaultMember(teamId, roleId, userId);
         } else {
-            await PraiseAssigneeService.addDefaultMember(teamId, roleId, userId);
+            await PraiseTeamApi.addDefaultMember(teamId, roleId, userId);
         }
         setServingRolesUpdater(prev => prev + 1);
     }
@@ -95,7 +95,7 @@ export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) 
     async function handleRemoveMember() {
         if (!userId) return;
         try {
-            const result = await TeamService.removeMember(userId, teamId, false);
+            const result = await TeamApi.removeMember(userId, teamId, false);
             if (result === false) {
                 toast({ title: "Failed to remove member", variant: "destructive" });
                 return;

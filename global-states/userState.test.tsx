@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { RecoilRoot, useRecoilValueLoadable } from 'recoil';
 import { userAtom, usersAtom } from './userState';
-import { UserService } from '@/apis';
+import { UserApi } from '@/apis';
 import { User } from '@/models/user';
 
 // Mock Services
@@ -25,7 +25,7 @@ describe('UserState', () => {
         it('should fetch user by ID', async () => {
             const userId = 'user-1';
             const mockUser = { id: 'user-1', name: 'John Doe' } as User;
-            (UserService.getById as jest.Mock).mockResolvedValue(mockUser);
+            (UserApi.getById as jest.Mock).mockResolvedValue(mockUser);
 
             const { result } = renderHook(() => useRecoilValueLoadable(userAtom(userId)), { wrapper });
 
@@ -37,7 +37,7 @@ describe('UserState', () => {
 
         it('should return null on fetch failure', async () => {
             const userId = 'user-error-case';
-            (UserService.getById as jest.Mock).mockRejectedValue(new Error('Fetch failed'));
+            (UserApi.getById as jest.Mock).mockRejectedValue(new Error('Fetch failed'));
 
             const { result } = renderHook(() => useRecoilValueLoadable(userAtom(userId)), { wrapper });
 
@@ -52,7 +52,7 @@ describe('UserState', () => {
         it('should fetch multiple users by IDs', async () => {
             const userIds = ['u1', 'u2'];
             const mockUsers = [{ id: 'u1' }, { id: 'u2' }] as User[];
-            (UserService.getByIds as jest.Mock).mockResolvedValue(mockUsers);
+            (UserApi.getByIds as jest.Mock).mockResolvedValue(mockUsers);
 
             const { result } = renderHook(() => useRecoilValueLoadable(usersAtom(userIds)), { wrapper });
 

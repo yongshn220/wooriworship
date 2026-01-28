@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
-import { InvitationService, TeamService, UserService } from "@/apis";
+import { InvitationApi, TeamApi, UserApi } from "@/apis";
 import { InvitationStatus } from "@/components/constants/enums";
 import { auth } from "@/firebase";
 import { useSetRecoilState } from "recoil";
@@ -23,9 +23,9 @@ export function useInvitationActions() {
 
         try {
             const promises = [
-                InvitationService.updateInvitation(team.id, invitation.id, InvitationStatus.Accepted),
-                UserService.addNewTeam(user.uid, team.id),
-                TeamService.addNewMember(user.uid, team.id)
+                InvitationApi.updateInvitation(team.id, invitation.id, InvitationStatus.Accepted),
+                UserApi.addNewTeam(user.uid, team.id),
+                TeamApi.addNewMember(user.uid, team.id)
             ];
             const [invitationUpdateResult, addNewTeamResult, addNewMemberResult] = await Promise.all(promises);
 
@@ -53,7 +53,7 @@ export function useInvitationActions() {
     async function handleDecline(invitation: Invitation, team: Team) {
         setIsLoading(true);
         try {
-            const result = await InvitationService.updateInvitation(team.id, invitation.id, InvitationStatus.Rejected);
+            const result = await InvitationApi.updateInvitation(team.id, invitation.id, InvitationStatus.Rejected);
             if (!result) {
                 toast({ title: `Fail to declined the invitation. Please try later again.` });
                 return false;

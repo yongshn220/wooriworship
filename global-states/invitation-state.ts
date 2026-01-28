@@ -1,5 +1,5 @@
 import { atom, atomFamily, selectorFamily } from "recoil";
-import { InvitationService } from "@/apis";
+import { InvitationApi } from "@/apis";
 import { Invitation } from "@/models/invitation";
 
 
@@ -14,7 +14,7 @@ export const sentInvitationsAtom = atomFamily<Array<Invitation>, { userId: strin
         get(sentInvitationsUpdaterAtom)
         if (!userId || !teamId) return []
 
-        const invitations = await InvitationService.getTeamSentInvitations(userId, teamId)
+        const invitations = await InvitationApi.getTeamSentInvitations(userId, teamId)
         if (!invitations) return []
 
         return invitations as Invitation[]
@@ -43,7 +43,7 @@ export const pendingReceivedInvitationsAtom = atomFamily<Array<Invitation>, stri
       if (!receiverEmail) return []
 
       try {
-        const invitations = await InvitationService.getPendingReceivedInvitations(receiverEmail)
+        const invitations = await InvitationApi.getPendingReceivedInvitations(receiverEmail)
         if (!invitations) return []
 
         return invitations as Invitation[]

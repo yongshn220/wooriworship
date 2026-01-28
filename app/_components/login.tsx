@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { LandingMode } from "@/app/_components/landing-page"
-import { AuthService } from "@/apis"
+import { AuthApi } from "@/apis"
 import { toast } from "@/components/ui/use-toast"
 import { motion } from "framer-motion"
 import {
@@ -39,7 +39,7 @@ export function Login({ setMode }: { setMode: (mode: LandingMode) => void }) {
   async function onSubmit(data: LoginFormValues) {
     setIsLoading(true)
     try {
-      const user = await AuthService.login(data.email, data.password)
+      const user = await AuthApi.login(data.email, data.password)
       toast({ title: `Hello, ${user.name} :)` })
     } catch (err: any) {
       switch (err.code) {

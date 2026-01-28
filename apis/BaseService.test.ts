@@ -1,4 +1,4 @@
-import BaseService from './BaseService';
+import BaseApi from './BaseService';
 import {
     collection,
     getDocs,

@@ -16,7 +16,7 @@ import {
   documentId
 } from "firebase/firestore";
 
-export default class BaseService {
+export default class BaseApi {
   collectionName: string;
   db: Firestore;
 

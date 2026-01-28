@@ -1,9 +1,9 @@
-import BaseService from "./BaseService";
-import { StorageService } from ".";
+import BaseApi from "./BaseApi";
+import { StorageApi } from ".";
 import { db } from "@/firebase";
 import { collection, query, orderBy, getDocs, addDoc, doc, setDoc, getDoc, deleteDoc, collectionGroup, where, documentId, limit } from "firebase/firestore";
 
-class NoticeService extends BaseService {
+class NoticeApi extends BaseApi {
   constructor() {
     super("notices"); // Placeholder
   }
@@ -72,7 +72,7 @@ class NoticeService extends BaseService {
   async deleteNotice(teamId: string, noticeId: string) {
     try {
       // Need to fetch file_urls first?
-      // But BaseService.getById is for root collection... 
+      // But BaseApi.getById is for root collection... 
       // We need a getByIdInTeam.
 
       const noticeRef = doc(db, "teams", teamId, "notices", noticeId);
@@ -82,7 +82,7 @@ class NoticeService extends BaseService {
       if (!notice) {
         return true;
       }
-      await StorageService.deleteNoticeFiles(notice.file_urls ? notice.file_urls : []);
+      await StorageApi.deleteNoticeFiles(notice.file_urls ? notice.file_urls : []);
       await deleteDoc(noticeRef);
       return true;
     } catch (err) {
@@ -109,4 +109,4 @@ class NoticeService extends BaseService {
   }
 }
 
-export default new NoticeService();
+export default new NoticeApi();

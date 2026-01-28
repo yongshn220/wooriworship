@@ -1,5 +1,5 @@
-import { AuthService } from "./AuthService";
-import { UserService } from "./";
+import { AuthApi } from "./AuthApi";
+import { UserApi } from "./";
 import {
     signInWithEmailAndPassword,
     signInWithCustomToken,
@@ -16,7 +16,7 @@ jest.mock("@/firebase", () => ({
     },
 }));
 
-jest.mock("./UserService", () => ({
+jest.mock("./UserApi", () => ({
     getById: jest.fn(),
     update: jest.fn(),
 }));
@@ -41,7 +41,7 @@ describe("AuthService", () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        const AuthServiceClass = require("./AuthService").AuthService;
+        const AuthServiceClass = require("./AuthApi").AuthService;
         AuthServiceClass["instance"] = null; // Reset singleton
 
         serviceInstance = AuthServiceClass.getInstance(mockAuth, mockUserService);
@@ -53,13 +53,13 @@ describe("AuthService", () => {
             const mockServerUser = { id: "user-1", name: "Test User" };
 
             (signInWithEmailAndPassword as jest.Mock).mockResolvedValue({ user: mockUser });
-            mockUserService.getById.mockResolvedValue(mockServerUser);
+            mockUserApi.getById.mockResolvedValue(mockServerUser);
 
             const result = await serviceInstance.login("test@test.com", "password");
 
             expect(signInWithEmailAndPassword).toHaveBeenCalledWith(mockAuth, "test@test.com", "password");
-            expect(mockUserService.getById).toHaveBeenCalledWith("user-1");
-            expect(mockUserService.update).toHaveBeenCalledWith("user-1", expect.objectContaining({ last_logged_in_time: expect.any(Date) }));
+            expect(mockUserApi.getById).toHaveBeenCalledWith("user-1");
+            expect(mockUserApi.update).toHaveBeenCalledWith("user-1", expect.objectContaining({ last_logged_in_time: expect.any(Date) }));
             expect(result).toEqual(mockServerUser);
         });
 
@@ -69,7 +69,7 @@ describe("AuthService", () => {
             const result = await serviceInstance.login("test@test.com", "password");
 
             expect(result).toBeNull();
-            expect(mockUserService.update).not.toHaveBeenCalled();
+            expect(mockUserApi.update).not.toHaveBeenCalled();
         });
     });
 

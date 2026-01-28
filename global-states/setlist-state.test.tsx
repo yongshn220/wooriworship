@@ -1,9 +1,9 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { RecoilRoot, useRecoilValue, useRecoilValueLoadable } from 'recoil';
 import { currentTeamSetlistListAtom, setlistSongListAtom } from './setlist-state';
-import { ServiceEventService } from '@/apis/ServiceEventService';
-import { SetlistService } from '@/apis/SetlistService';
-import { SongService } from '@/apis';
+import { ServiceEventApi } from '@/apis/ServiceEventApi';
+import { SetlistApi } from '@/apis/SetlistApi';
+import { SongApi } from '@/apis';
 import { Setlist } from '@/models/setlist';
 import { Song } from '@/models/song';
 import { Timestamp } from 'firebase/firestore';
@@ -44,7 +44,7 @@ describe('SetlistState', () => {
                 { id: 's2', date: Timestamp.fromDate(new Date('2023-02-01')), title: 'Service 2' },
             ];
 
-            (ServiceEventService.getServiceEvents as jest.Mock).mockResolvedValue(mockServices);
+            (ServiceEventApi.getServiceEvents as jest.Mock).mockResolvedValue(mockServices);
 
             const { result } = renderHook(() => useRecoilValue(currentTeamSetlistListAtom(teamId)), { wrapper });
 
@@ -58,7 +58,7 @@ describe('SetlistState', () => {
 
         it('should return empty array on fetch failure', async () => {
             const teamId = 'team-error-case';
-            (ServiceEventService.getServiceEvents as jest.Mock).mockRejectedValue(new Error('Fetch failed'));
+            (ServiceEventApi.getServiceEvents as jest.Mock).mockRejectedValue(new Error('Fetch failed'));
 
             const { result } = renderHook(() => useRecoilValueLoadable(currentTeamSetlistListAtom(teamId)), { wrapper });
 
@@ -80,10 +80,10 @@ describe('SetlistState', () => {
                 setlist: { songs: [{ id: 'song1' }, { id: 'song2' }] }
             };
 
-            (ServiceEventService.getServiceDetails as jest.Mock).mockResolvedValue(mockDetails);
+            (ServiceEventApi.getServiceDetails as jest.Mock).mockResolvedValue(mockDetails);
 
             // Mock Song fetch
-            (SongService.getById as jest.Mock).mockImplementation((tid, sid) => {
+            (SongApi.getById as jest.Mock).mockImplementation((tid, sid) => {
                 if (sid === 'song1') return Promise.resolve({ id: 'song1', title: 'Song A' } as Song);
                 if (sid === 'song2') return Promise.resolve({ id: 'song2', title: 'Song B' } as Song);
                 return Promise.resolve(null);

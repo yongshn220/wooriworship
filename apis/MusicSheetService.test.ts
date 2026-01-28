@@ -1,4 +1,4 @@
-import { MusicSheetService } from './MusicSheetService'; // Use default import to get instance, or class if exported
+import { MusicSheetApi } from './MusicSheetService'; // Use default import to get instance, or class if exported
 import { collection, addDoc, doc, setDoc, deleteDoc, getDocs, getDoc, Timestamp } from 'firebase/firestore';
 
 // Mock dependencies

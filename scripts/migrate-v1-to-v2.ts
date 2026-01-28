@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as admin from 'firebase-admin';
 import * as fs from 'fs';
-import { AdminMigrationService } from '../apis/AdminMigrationService';
+import { AdminMigrationApi } from '../apis/AdminMigrationApi';
 
 // 1. Main Execution
 (async () => {
@@ -64,7 +64,7 @@ import { AdminMigrationService } from '../apis/AdminMigrationService';
             db = admin.firestore();
         }
 
-        const migrationService = AdminMigrationService.getInstance(db);
+        const migrationService = AdminMigrationApi.getInstance(db);
 
         // 4. Confirmation
         // Dynamic import logic removed - using standard requires/imports now as we are in Node environment

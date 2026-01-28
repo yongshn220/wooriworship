@@ -1,6 +1,6 @@
 import { atom, atomFamily, selectorFamily } from "recoil";
 import { Notice } from "@/models/notice";
-import NoticeService from "@/apis/NoticeService";
+import NoticeApi from "@/apis/NoticeApi";
 
 
 export const noticeIdsAtom = atomFamily<Array<string>, string>({
@@ -12,7 +12,7 @@ export const noticeIdsAtom = atomFamily<Array<string>, string>({
       get(noticeIdsUpdaterAtom)
 
       try {
-        const noticeList = await NoticeService.getTeamNotices(teamId) as Array<Notice>
+        const noticeList = await NoticeApi.getTeamNotices(teamId) as Array<Notice>
         if (!noticeList) return []
 
         noticeList.sort((a, b) => {
@@ -48,7 +48,7 @@ export const noticeAtom = atomFamily<Notice, { teamId: string, noticeId: string 
     get: ({ teamId, noticeId }) => async ({ get }) => {
       get(noticeUpdaterAtom)
       try {
-        const notice = await NoticeService.getNoticeById(teamId, noticeId) as Notice
+        const notice = await NoticeApi.getNoticeById(teamId, noticeId) as Notice
         if (!notice) return null
 
         return notice

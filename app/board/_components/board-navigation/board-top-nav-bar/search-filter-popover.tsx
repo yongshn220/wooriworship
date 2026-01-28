@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useRecoilValueLoadable } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
-import tagService from "@/apis/TagService";
+import tagService from "@/apis/TagApi";
 import { songBoardSelectedSortOptionAtom, searchSelectedTagsAtom, searchSelectedKeysAtom } from "@/app/board/_states/board-states";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";

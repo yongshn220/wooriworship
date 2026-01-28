@@ -9,19 +9,19 @@ const Timestamp = admin.firestore.Timestamp;
 
 import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow } from "@/models/services/ServiceEvent";
 
-export class AdminMigrationService {
-    private static instance: AdminMigrationService;
+export class AdminMigrationApi {
+    private static instance: AdminMigrationApi;
     private db: Firestore;
 
     constructor(db: Firestore) {
         this.db = db;
     }
 
-    public static getInstance(db: Firestore): AdminMigrationService {
-        if (!AdminMigrationService.instance) {
-            AdminMigrationService.instance = new AdminMigrationService(db);
+    public static getInstance(db: Firestore): AdminMigrationApi {
+        if (!AdminMigrationApi.instance) {
+            AdminMigrationApi.instance = new AdminMigrationApi(db);
         }
-        return AdminMigrationService.instance;
+        return AdminMigrationApi.instance;
     }
 
     /**

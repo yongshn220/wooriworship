@@ -20,7 +20,7 @@ import { useServiceFlowFormLogic } from "./hooks/use-service-flow-form-logic";
 import { ServiceFlow } from "@/models/services/ServiceEvent";
 import { slideVariants } from "@/components/constants/animations";
 import { SortableList } from "@/components/common/list/sortable-list";
-import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
+import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
 
 // Shared Components (Relative Paths updated for new location)
 import { SortableTimelineItem } from "../service-form/items/sortable-timeline-item";
@@ -114,7 +114,7 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                                                 ...it,
                                                 id: Math.random().toString(36).substr(2, 9),
                                                 order: idx,
-                                                assignments: []
+                                                assignments: it.assignments || [{ memberIds: [] }]
                                             })));
                                         }}
                                         className={cn(
@@ -358,7 +358,7 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                                     groups={standardGroups}
                                     onAddGroup={(name) => {
                                         setStandardGroups(prev => [...prev, name]);
-                                        PraiseAssigneeService.addCustomGroup(teamId, name).catch(console.error);
+                                        PraiseTeamApi.addCustomGroup(teamId, name).catch(console.error);
                                     }}
                                     onRemoveGroup={(idx) => {
                                         setStandardGroups(standardGroups.filter((_, i) => i !== idx));
@@ -366,7 +366,7 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                                     customMemberNames={customMemberNames}
                                     onAddCustomMember={(name) => {
                                         setCustomMemberNames(prev => [...prev, name]);
-                                        PraiseAssigneeService.addCustomMemberName(teamId, name).catch(console.error);
+                                        PraiseTeamApi.addCustomMemberName(teamId, name).catch(console.error);
                                     }}
                                 />
                             </div>

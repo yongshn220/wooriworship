@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { getPathEditServing } from "@/components/util/helper/routes";
 import { useState } from "react";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
-import { ServiceEventService } from "@/apis/ServiceEventService";
+import { ServiceEventApi } from "@/apis/ServiceEventApi";
 
 import { auth } from "@/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -47,7 +47,7 @@ export function ServiceHeaderMenu({
 
     const handleDelete = async () => {
         try {
-            await ServiceEventService.deleteService(teamId, scheduleId);
+            await ServiceEventApi.deleteService(teamId, scheduleId);
             toast({
                 title: "Schedule deleted",
                 description: "The serving schedule has been successfully removed.",

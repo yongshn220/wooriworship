@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/use-toast"
-import { AuthService } from "@/apis"
+import { AuthApi } from "@/apis"
 
 const formSchema = z.object({
     email: z.string().email({
@@ -47,7 +47,7 @@ export function ForgotPasswordDialog({ children }: { children: React.ReactNode }
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true)
         try {
-            await AuthService.resetPassword(values.email)
+            await AuthApi.resetPassword(values.email)
             toast({
                 title: "Check your email",
                 description: "We sent you a password reset link.",

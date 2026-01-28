@@ -4,7 +4,7 @@ import { useRecoilValue } from "recoil";
 import { teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
 import { ServiceFlow } from "@/models/services/ServiceEvent";
-import { ServiceFlowService } from "@/apis/ServiceFlowService";
+import { ServiceFlowApi } from "@/apis/ServiceFlowApi";
 import { useServiceTimeline } from "../../service-form/hooks/use-service-timeline";
 import { useServiceTemplates } from "../../service-form/hooks/use-service-templates";
 import { useServiceHistory } from "../../service-form/hooks/use-service-history";
@@ -80,7 +80,7 @@ export function useServiceFlowFormLogic({ teamId, serviceId, initialFlow, servic
     const handleSave = async () => {
         setIsLoading(true);
         try {
-            await ServiceFlowService.updateFlow(teamId, serviceId, {
+            await ServiceFlowApi.updateFlow(teamId, serviceId, {
                 items: items
             });
             toast({ title: "Service flow saved!" });

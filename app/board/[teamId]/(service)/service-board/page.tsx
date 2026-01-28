@@ -11,7 +11,7 @@ import { serviceEventsListAtom } from "@/global-states/serviceEventState";
 import { currentPageAtom } from "@/global-states/page-state";
 import { Page } from "@/components/constants/enums";
 import { ServiceEvent } from "@/models/services/ServiceEvent";
-import { ServiceEventService } from "@/apis/ServiceEventService";
+import { ServiceEventApi } from "@/apis/ServiceEventApi";
 import { ServiceListSkeleton } from "./_components/service-list-skeleton";
 import { parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";
 import { Timestamp } from "firebase/firestore";
@@ -106,10 +106,10 @@ export default function ServingPage() {
                 const futureEnd = new Date(todayStart);
                 futureEnd.setMonth(futureEnd.getMonth() + 6);
 
-                const data = await ServiceEventService.getServiceEvents(teamId, initialStart, futureEnd);
+                const data = await ServiceEventApi.getServiceEvents(teamId, initialStart, futureEnd);
 
-                // Sort by date (ServiceEventService orders ASC, we want ASC for future? 
-                // Wait, CalendarStrip usually likes sorted data. ServiceEventService does ASC.
+                // Sort by date (ServiceEventApi orders ASC, we want ASC for future? 
+                // Wait, CalendarStrip usually likes sorted data. ServiceEventApi does ASC.
                 // But `setEvents(data)` replaces existing.
 
                 setEvents(data);
@@ -169,7 +169,7 @@ export default function ServingPage() {
             if (firstEvent) {
                 endDate = firstEvent.date.toDate();
                 // Subtract 1ms to avoid overlap? Or query strictly less than.
-                // ServiceEventService has specific query methods list? 
+                // ServiceEventApi has specific query methods list? 
                 // It has `getServiceEvents`. I can re-use it.
             }
 
@@ -177,7 +177,7 @@ export default function ServingPage() {
             const startDate = new Date(endDate);
             startDate.setMonth(startDate.getMonth() - 6);
 
-            const data = await ServiceEventService.getServiceEvents(teamId, startDate, endDate);
+            const data = await ServiceEventApi.getServiceEvents(teamId, startDate, endDate);
 
             if (data.length === 0) {
                 setHasMorePast(false);
@@ -189,7 +189,7 @@ export default function ServingPage() {
 
                 if (newData.length === 0) setHasMorePast(false);
 
-                // Sort ASC (ServiceEventService returns ASC)
+                // Sort ASC (ServiceEventApi returns ASC)
                 const merged = [...newData, ...events].sort((a, b) => a.date.seconds - b.date.seconds);
                 setEvents(merged);
             }

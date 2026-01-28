@@ -1,6 +1,6 @@
 
 import * as admin from 'firebase-admin';
-import { AdminMigrationService } from '../apis/AdminMigrationService';
+import { AdminMigrationApi } from '../apis/AdminMigrationApi';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -64,7 +64,7 @@ async function runCleanup() {
         db = admin.firestore();
     }
 
-    const service = AdminMigrationService.getInstance(db);
+    const service = AdminMigrationApi.getInstance(db);
 
     const rl = readline.createInterface({
         input: process.stdin,

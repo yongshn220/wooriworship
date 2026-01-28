@@ -3,7 +3,7 @@ import useLocalStorage from "../hook/use-local-storage";
 import { v4 as uuid } from 'uuid';
 import { isServiceWorkerSupported, registerServiceWorker } from "../helper/push-notification";
 import { auth } from "@/firebase";
-import PushNotificationService from "@/apis/PushNotificationService";
+import PushNotificationApi from "@/apis/PushNotificationApi";
 
 export interface LocalStorageUtility {
   deviceId: string
@@ -31,7 +31,7 @@ export default function Initialization() {
       try {
         await registerServiceWorker();
         console.log("Service Worker registered, refreshing subscription for user:", user.uid);
-        await PushNotificationService.refreshSubscription(user.uid, utility.deviceId);
+        await PushNotificationApi.refreshSubscription(user.uid, utility.deviceId);
         console.log("Push notification subscription refreshed successfully");
       }
       catch (error) {

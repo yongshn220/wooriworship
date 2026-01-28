@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ServiceEventService } from "@/apis/ServiceEventService";
+import { ServiceEventApi } from "@/apis/ServiceEventApi";
 import { ServiceFormState } from "@/models/services/ServiceEvent";
 import { getSuggestionsForTitle as domainGetSuggestions } from "../utils/service-domain-logic";
 
@@ -12,7 +12,7 @@ export function useServiceHistory(teamId: string, serviceTagIds: string[], teamM
             return;
         }
         const fetchHistory = async () => {
-            const recent = await ServiceEventService.getRecentServicesWithFlows(
+            const recent = await ServiceEventApi.getRecentServicesWithFlows(
                 teamId,
                 serviceTagIds.length > 0 ? serviceTagIds[0] : undefined,
                 10

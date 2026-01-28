@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
+import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
 import { ServiceFlowItem } from "@/models/services/ServiceEvent";
 
 export function useServiceTimeline(teamId: string) {
@@ -13,7 +13,7 @@ export function useServiceTimeline(teamId: string) {
 
     useEffect(() => {
         if (teamId) {
-            PraiseAssigneeService.getServingConfig(teamId).then(config => {
+            PraiseTeamApi.getServiceConfig(teamId).then(config => {
                 if (config.customGroups.length > 0) {
                     setStandardGroups(prev => Array.from(new Set([...prev, ...config.customGroups])));
                 }

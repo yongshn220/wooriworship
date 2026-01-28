@@ -1,8 +1,8 @@
-import BaseService from "./BaseService"
+import BaseApi from "./BaseApi"
 import { arrayUnion, arrayRemove } from "firebase/firestore";
-import TeamService from "./TeamService";
+import TeamApi from "./TeamApi";
 
-class UserService extends BaseService {
+class UserApi extends BaseApi {
     constructor() {
         super("users");
     }
@@ -44,7 +44,7 @@ class UserService extends BaseService {
     async leaveTeam(userId: string, teamId: string, singleSide: Boolean) {
         if (userId && teamId) {
             if (!singleSide) {
-                await TeamService.removeMember(userId, teamId, true);
+                await TeamApi.removeMember(userId, teamId, true);
             }
             await this.update(userId, { teams: arrayRemove(teamId) });
             return teamId;
@@ -54,4 +54,4 @@ class UserService extends BaseService {
         }
     }
 }
-export default new UserService();
+export default new UserApi();

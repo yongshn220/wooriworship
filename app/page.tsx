@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { auth } from "@/firebase";
 import { getPathBoard, getPathPlan } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
-import { UserService } from "@/apis";
+import { UserApi } from "@/apis";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
 import { sendEmailVerification, onAuthStateChanged, signOut } from "firebase/auth";
 
@@ -46,7 +46,7 @@ export default function RoutePage() {
         //   return;
         // }
 
-        UserService.getById(authUser.uid).then((user: any) => {
+        UserApi.getById(authUser.uid).then((user: any) => {
           if (!user) {
             return;
           }

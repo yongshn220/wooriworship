@@ -1,19 +1,19 @@
-export { default as AuthService } from './AuthService';
-export { default as TeamService } from './TeamService';
-export { default as SongService } from './SongService';
-export { default as UserService } from './UserService';
-export { default as TagService } from './TagService';
-export { default as SongCommentService } from './SongCommentService';
-export { default as InvitationService } from './InvitationService';
-export { default as EmailService } from './EmailService';
-export { default as StorageService } from './StorageService';
-export { default as NoticeService } from './NoticeService';
-export { default as MusicSheetService } from './MusicSheetService';
-export { default as AccountSettingService } from './AccountSettingService';
-export { default as PushNotificationService } from './PushNotificationService';
+export { default as AuthApi } from './AuthApi';
+export { default as TeamApi } from './TeamApi';
+export { default as SongApi } from './SongApi';
+export { default as UserApi } from './UserApi';
+export { default as TagApi } from './TagApi';
+export { default as SongCommentApi } from './SongCommentApi';
+export { default as InvitationApi } from './InvitationApi';
+export { default as EmailApi } from './EmailApi';
+export { default as StorageApi } from './StorageApi';
+export { default as NoticeApi } from './NoticeApi';
+export { default as MusicSheetApi } from './MusicSheetApi';
+export { default as AccountSettingApi } from './AccountSettingApi';
+export { default as PushNotificationApi } from './PushNotificationApi';
 
-// V3 Modular Services
-export { ServiceEventService } from './ServiceEventService';
-export { SetlistService } from './SetlistService';
-export { PraiseAssigneeService } from './PraiseAssigneeService';
-export { ServiceFlowService } from './ServiceFlowService';
+// V3 Modular APIs
+export { ServiceEventApi } from './ServiceEventApi';
+export { SetlistApi } from './SetlistApi';
+export { PraiseTeamApi } from './PraiseTeamApi';
+export { ServiceFlowApi } from './ServiceFlowApi';

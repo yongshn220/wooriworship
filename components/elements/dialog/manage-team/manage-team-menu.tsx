@@ -3,7 +3,7 @@ import MenuIcon from "@/public/icons/menuIcon.svg";
 import { DoorOpenIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { TeamService } from "@/apis";
+import { TeamApi } from "@/apis";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { userUpdaterAtom } from "@/global-states/userState";
 import { currentTeamIdAtom, teamAtom, teamUpdaterAtom } from "@/global-states/teamState";
@@ -32,8 +32,8 @@ export function ManageTeamMenu() {
         toast({ title: "No Permission", description: `Only Leader can delete team.` }); return;
       }
 
-      if (await TeamService.deleteTeam(team) === false) {
-        console.log("err | TeamService.deleteTeam")
+      if (await TeamApi.deleteTeam(team) === false) {
+        console.log("err | TeamApi.deleteTeam")
         toast({ title: "Something went wrong. Please try later again." })
         return;
       }
@@ -60,7 +60,7 @@ export function ManageTeamMenu() {
       toast({ title: "You can't leave the team.", description: 'You are the only leader of this team. Please grant new leader and try again.' })
       return;
     }
-    if (await TeamService.removeMember(authUser.uid, team.id, false) === false) {
+    if (await TeamApi.removeMember(authUser.uid, team.id, false) === false) {
       toast({ title: "Something went wrong.", description: "Please contact us." })
     }
 

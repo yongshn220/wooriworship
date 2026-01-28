@@ -4,7 +4,7 @@ import * as React from "react";
 import { Suspense, useEffect, useState } from "react";
 import { auth } from "@/firebase";
 import { Invitation } from "@/models/invitation";
-import { InvitationService } from "@/apis";
+import { InvitationApi } from "@/apis";
 import { InvitationCard } from "@/components/elements/dialog/static-dialog/invitation/invitation-card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Mail } from "lucide-react";
@@ -27,7 +27,7 @@ export function InvitationInboxDrawer({ isOpen, setIsOpen }: Props) {
 
         setIsLoading(true);
         try {
-            const data = await InvitationService.getPendingReceivedInvitations(authUser.email);
+            const data = await InvitationApi.getPendingReceivedInvitations(authUser.email);
             setInvitations(data as Invitation[]);
         } catch (e) {
             console.error(e);

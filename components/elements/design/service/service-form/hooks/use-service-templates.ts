@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
-import { ServiceFlowService } from "@/apis/ServiceFlowService";
+import { ServiceFlowApi } from "@/apis/ServiceFlowApi";
 import { ServiceFlowItem, ServiceAssignment } from "@/models/services/ServiceEvent";
 
 export function useServiceTemplates(teamId: string, items: ServiceFlowItem[], setItems: (items: ServiceFlowItem[]) => void) {
@@ -23,7 +23,7 @@ export function useServiceTemplates(teamId: string, items: ServiceFlowItem[], se
     // Initial Load
     useEffect(() => {
         if (teamId) {
-            ServiceFlowService.getTemplates(teamId).then(data => {
+            ServiceFlowApi.getTemplates(teamId).then(data => {
                 setTemplates(data);
                 setIsTemplatesLoaded(true);
 
@@ -41,12 +41,22 @@ export function useServiceTemplates(teamId: string, items: ServiceFlowItem[], se
                         { id: Math.random().toString(36).substr(2, 9), type: 'FLOW', title: '축도', order: 8, assignments: [{ memberIds: [] }] },
                     ];
                     setItems(sampleItems);
+                } else if (data.length > 0 && itemsRef.current.length <= 1) {
+                    // Auto-select first template when form opens with templates available
+                    const firstTemplate = data[0];
+                    setSelectedTemplateId(firstTemplate.id);
+                    setItems(firstTemplate.items.map((it: any, idx: number) => ({
+                        ...it,
+                        id: Math.random().toString(36).substr(2, 9),
+                        order: idx,
+                        assignments: it.assignments || [{ memberIds: [] }]
+                    })));
                 }
             }).catch(console.error);
         }
     }, [teamId, setItems]);
 
-    // Track changes
+    // Track changes (including assignments)
     useEffect(() => {
         if (!selectedTemplateId) {
             setHasTemplateChanges(true);
@@ -56,19 +66,21 @@ export function useServiceTemplates(teamId: string, items: ServiceFlowItem[], se
         const currentTemplate = templates.find(t => t.id === selectedTemplateId);
         if (!currentTemplate) return;
 
-        const currentItemsSimplifed = items.map(i => ({
+        const currentItemsSimplified = items.map(i => ({
             title: i.title,
             type: i.type,
-            remarks: i.remarks || ""
+            remarks: i.remarks || "",
+            assignments: i.assignments || []
         }));
 
         const templateItemsSimplified = currentTemplate.items.map((i: any) => ({
             title: i.title,
             type: i.type,
-            remarks: i.remarks || ""
+            remarks: i.remarks || "",
+            assignments: i.assignments || []
         }));
 
-        const isSame = JSON.stringify(currentItemsSimplifed) === JSON.stringify(templateItemsSimplified);
+        const isSame = JSON.stringify(currentItemsSimplified) === JSON.stringify(templateItemsSimplified);
         setHasTemplateChanges(!isSame);
     }, [items, selectedTemplateId, templates]);
 
@@ -83,14 +95,23 @@ export function useServiceTemplates(teamId: string, items: ServiceFlowItem[], se
                 assignments: [] as ServiceAssignment[]
             };
 
-            const itemsToSave = createEmptyMode ? [defaultFixedItem] : items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }));
+            // Include assignments when saving templates
+            const itemsToSave = createEmptyMode
+                ? [defaultFixedItem]
+                : items.map(i => ({
+                    title: i.title,
+                    type: i.type,
+                    remarks: i.remarks || "",
+                    order: i.order,
+                    assignments: i.assignments || []
+                }));
             const templateData = {
                 name: newTemplateName.trim(),
                 teamId,
                 items: itemsToSave
             };
-            await ServiceFlowService.createTemplate(teamId, templateData);
-            const newTemps = await ServiceFlowService.getTemplates(teamId);
+            await ServiceFlowApi.createTemplate(teamId, templateData);
+            const newTemps = await ServiceFlowApi.getTemplates(teamId);
             setTemplates(newTemps);
 
             const createdTemplate = newTemps.find(t => t.name === newTemplateName.trim());
@@ -123,12 +144,19 @@ export function useServiceTemplates(teamId: string, items: ServiceFlowItem[], se
         if (!selectedTemplateId) return;
         try {
             const currentTemp = templates.find(t => t.id === selectedTemplateId);
+            // Include assignments when updating templates
             const templateData = {
                 name: currentTemp?.name,
-                items: items.map(i => ({ title: i.title, type: i.type, remarks: i.remarks || "" }))
+                items: items.map(i => ({
+                    title: i.title,
+                    type: i.type,
+                    remarks: i.remarks || "",
+                    order: i.order,
+                    assignments: i.assignments || []
+                }))
             };
-            await ServiceFlowService.updateTemplate(teamId, selectedTemplateId, templateData);
-            const newTemps = await ServiceFlowService.getTemplates(teamId);
+            await ServiceFlowApi.updateTemplate(teamId, selectedTemplateId, templateData);
+            const newTemps = await ServiceFlowApi.getTemplates(teamId);
             setTemplates(newTemps);
             toast({ title: "Template updated!" });
         } catch (e) {
@@ -140,8 +168,8 @@ export function useServiceTemplates(teamId: string, items: ServiceFlowItem[], se
     const handleDeleteTemplate = async () => {
         if (!selectedTemplateId) return;
         try {
-            await ServiceFlowService.deleteTemplate(teamId, selectedTemplateId);
-            const newTemps = await ServiceFlowService.getTemplates(teamId);
+            await ServiceFlowApi.deleteTemplate(teamId, selectedTemplateId);
+            const newTemps = await ServiceFlowApi.getTemplates(teamId);
             setTemplates(newTemps);
             setSelectedTemplateId(null);
             setItems([]);
@@ -158,7 +186,7 @@ export function useServiceTemplates(teamId: string, items: ServiceFlowItem[], se
         setTemplates(prev => prev.map(t => t.id === selectedTemplateId ? { ...t, name: newName } : t));
         if (newName.trim()) {
             try {
-                await ServiceFlowService.updateTemplate(teamId, selectedTemplateId, { name: newName.trim() });
+                await ServiceFlowApi.updateTemplate(teamId, selectedTemplateId, { name: newName.trim() });
             } catch (e) {
                 console.error(e);
             }

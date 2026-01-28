@@ -8,8 +8,8 @@ import { ModernDialog } from "@/components/ui/modern-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import TagService from "@/apis/TagService";
-import TeamService from "@/apis/TeamService";
+import TagApi from "@/apis/TagApi";
+import TeamApi from "@/apis/TeamApi";
 import { Tag } from "@/models/tag";
 
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
@@ -51,10 +51,10 @@ export function TagSelector({
             setLoading(true);
             try {
                 if (mode === "service") {
-                    const tags = await TeamService.getServiceTags(teamId);
+                    const tags = await TeamApi.getServiceTags(teamId);
                     setAvailableTags(tags as Tag[]);
                 } else {
-                    const tags = await TagService.getTeamTags(teamId);
+                    const tags = await TagApi.getTeamTags(teamId);
                     setAvailableTags(tags as Tag[]);
                 }
             } catch (error) {
@@ -123,8 +123,8 @@ export function TagSelector({
 
         try {
             if (mode === 'service') {
-                const newId = await TeamService.addServiceTag(teamId, newTagName);
-                const tags = await TeamService.getServiceTags(teamId);
+                const newId = await TeamApi.addServiceTag(teamId, newTagName);
+                const tags = await TeamApi.getServiceTags(teamId);
                 setAvailableTags(tags as Tag[]);
 
                 if (newId) {
@@ -132,8 +132,8 @@ export function TagSelector({
                     else onTagsChange([...selectedTags, newId]);
                 }
             } else {
-                await TagService.addNewTag(teamId, newTagName);
-                const tags = await TagService.getTeamTags(teamId);
+                await TagApi.addNewTag(teamId, newTagName);
+                const tags = await TagApi.getTeamTags(teamId);
                 setAvailableTags(tags as Tag[]);
                 if (single) onTagsChange([newTagName]);
                 else onTagsChange([...selectedTags, newTagName]);
@@ -291,12 +291,12 @@ export function TagSelector({
                     const tagName = tagToDelete.name;
                     try {
                         if (mode === "service") {
-                            await TeamService.deleteServiceTag(teamId, tagToDelete.id);
-                            const updatedTags = await TeamService.getServiceTags(teamId);
+                            await TeamApi.deleteServiceTag(teamId, tagToDelete.id);
+                            const updatedTags = await TeamApi.getServiceTags(teamId);
                             setAvailableTags(updatedTags as Tag[]);
                         } else {
-                            await TagService.deleteTag(teamId, tagName);
-                            const newTags = await TagService.getTeamTags(teamId);
+                            await TagApi.deleteTag(teamId, tagName);
+                            const newTags = await TagApi.getTeamTags(teamId);
                             setAvailableTags(newTags as Tag[]);
                         }
 
@@ -322,8 +322,8 @@ export function TagSelector({
                         return;
                     }
                     try {
-                        await TeamService.updateServiceTagName(teamId, tagToRename.id, newName.trim());
-                        const updatedTags = await TeamService.getServiceTags(teamId);
+                        await TeamApi.updateServiceTagName(teamId, tagToRename.id, newName.trim());
+                        const updatedTags = await TeamApi.getServiceTags(teamId);
                         setAvailableTags(updatedTags as Tag[]);
 
                         // If renamed tag was selected, update the selection

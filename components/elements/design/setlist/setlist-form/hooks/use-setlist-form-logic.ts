@@ -13,9 +13,9 @@ import { Setlist, SetlistSongHeader } from "@/models/setlist";
 import { timestampToDate, getServiceTitleFromTags } from "@/components/util/helper/helper-functions";
 
 // Services & Routes
-import { ServiceEventService } from "@/apis/ServiceEventService";
-import { SetlistService } from "@/apis/SetlistService";
-import PushNotificationService from "@/apis/PushNotificationService";
+import { ServiceEventApi } from "@/apis/ServiceEventApi";
+import { SetlistApi } from "@/apis/SetlistApi";
+import PushNotificationApi from "@/apis/PushNotificationApi";
 import { getPathPlan } from "@/components/util/helper/routes";
 import { Timestamp } from "firebase/firestore";
 
@@ -78,7 +78,7 @@ export function useSetlistFormLogic({ mode, teamId, initialWorship }: UseSetlist
                 const end = new Date(start);
                 end.setHours(23, 59, 59, 999);
 
-                const services = await ServiceEventService.getServiceEvents(teamId, start, end);
+                const services = await ServiceEventApi.getServiceEvents(teamId, start, end);
                 const filtered = services.filter(s =>
                     serviceTagIds.some(t => s.tagId === t) ||
                     (mode === FormMode.EDIT && s.id === initialWorship?.serving_schedule_id)
@@ -116,7 +116,7 @@ export function useSetlistFormLogic({ mode, teamId, initialWorship }: UseSetlist
             start.setHours(0, 0, 0, 0);
             const end = new Date(start);
             end.setHours(23, 59, 59, 999);
-            const services = await ServiceEventService.getServiceEvents(tid, start, end);
+            const services = await ServiceEventApi.getServiceEvents(tid, start, end);
             return services;
         }
     });
@@ -140,13 +140,13 @@ export function useSetlistFormLogic({ mode, teamId, initialWorship }: UseSetlist
                 related_serving_id: linkedServingId
             };
 
-            const serviceId = await ServiceEventService.createService(teamId, {
+            const serviceId = await ServiceEventApi.createService(teamId, {
                 date: Timestamp.fromDate(date),
                 title: setlistInput.title,
                 tagId: serviceTagIds[0] || "",
             });
 
-            await SetlistService.updateSetlist(teamId, serviceId, {
+            await SetlistApi.updateSetlist(teamId, serviceId, {
                 songs: songs,
                 beginning_song: beginningSong || undefined,
                 ending_song: endingSong || undefined,
@@ -162,7 +162,7 @@ export function useSetlistFormLogic({ mode, teamId, initialWorship }: UseSetlist
 
             if (linkedServingId) {
                 // Merge setlist into existing service
-                await SetlistService.updateSetlist(teamId, linkedServingId, {
+                await SetlistApi.updateSetlist(teamId, linkedServingId, {
                     songs: songs,
                     beginning_song: beginningSong || undefined,
                     ending_song: endingSong || undefined,
@@ -174,7 +174,7 @@ export function useSetlistFormLogic({ mode, teamId, initialWorship }: UseSetlist
                 // ... (refactor needed below if linkedServingId exists)
             }
 
-            await PushNotificationService.notifyTeamNewWorship(teamId, auth.currentUser.uid, setlistInput.date, setlistInput.title);
+            await PushNotificationApi.notifyTeamNewWorship(teamId, auth.currentUser.uid, setlistInput.date, setlistInput.title);
 
             toast({ title: "New service created!" });
             cleanupAndRedirect(linkedServingId || serviceId);
@@ -201,13 +201,13 @@ export function useSetlistFormLogic({ mode, teamId, initialWorship }: UseSetlist
                 related_serving_id: linkedServingId
             };
 
-            await ServiceEventService.updateService(teamId, initialWorship.id, {
+            await ServiceEventApi.updateService(teamId, initialWorship.id, {
                 title: setlistInput.title,
                 tagId: serviceTagIds[0] || "",
                 date: Timestamp.fromDate(date)
             });
 
-            await SetlistService.updateSetlist(teamId, initialWorship.id, {
+            await SetlistApi.updateSetlist(teamId, initialWorship.id, {
                 songs: songs,
                 beginning_song: beginningSong || undefined,
                 ending_song: endingSong || undefined,

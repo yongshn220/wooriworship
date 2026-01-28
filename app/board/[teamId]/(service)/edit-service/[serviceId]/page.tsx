@@ -4,7 +4,7 @@ import { PageInit } from "@/components/util/page/page-init";
 import { ServiceForm } from "@/components/elements/design/service/service-form/service-form";
 import { FormMode, Page } from "@/components/constants/enums";
 import { useEffect, useState } from "react";
-import { ServiceEventService } from "@/apis/ServiceEventService";
+import { ServiceEventApi } from "@/apis/ServiceEventApi";
 import { ServiceFormState } from "@/models/services/ServiceEvent";
 
 interface Props {
@@ -20,7 +20,7 @@ export default function EditServicePage({ params }: Props) {
 
     useEffect(() => {
         if (!schedule) {
-            ServiceEventService.getServiceDetails(teamId, serviceId)
+            ServiceEventApi.getServiceDetails(teamId, serviceId)
                 .then(details => {
                     if (details && details.event) {
                         const adaptedSchedule: ServiceFormState = {
@@ -30,7 +30,7 @@ export default function EditServicePage({ params }: Props) {
                             title: details.event.title,
                             service_tags: details.event.tagId ? [details.event.tagId] : [],
                             worship_id: details.event.worship_id,
-                            worship_roles: details.praiseAssignee?.assignee || [],
+                            worship_roles: details.praiseAssignee?.assignments || [],
                             items: details.flow?.items || [],
                             roles: [],
                         };

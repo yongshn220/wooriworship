@@ -1,5 +1,5 @@
 import { atom, atomFamily, selectorFamily } from "recoil";
-import { UserService } from "@/apis";
+import { UserApi } from "@/apis";
 import { User } from "@/models/user";
 
 
@@ -12,7 +12,7 @@ export const userAtom = atomFamily<User, string>({
       try {
         if (!userId) return null
 
-        const user = await UserService.getById(userId) as User
+        const user = await UserApi.getById(userId) as User
         if (!user) return null
 
         return user
@@ -34,7 +34,7 @@ export const usersAtom = atomFamily<Array<User>, Array<string>>({
       if (!userIds || userIds.length === 0) return []
 
       try {
-        const users = await UserService.getByIds([...userIds]) as Array<User>;
+        const users = await UserApi.getByIds([...userIds]) as Array<User>;
         return users || [];
       } catch (e) {
         console.error(e);

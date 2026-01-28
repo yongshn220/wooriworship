@@ -1,14 +1,14 @@
 import { AccountSetting, PushNotification, Subscription } from '@/models/account-setting';
 import { getNewSubscription } from '@/components/util/helper/push-notification';
 import { getFirebaseTimestampNow } from '@/components/util/helper/helper-functions';
-import AccountSettingService from './AccountSettingService';
+import AccountSettingApi from './AccountSettingApi';
 import { sendNotificationToMultipleSubscriptions, PushNotificationPayload } from '@/actions/push-notification/push-notification';
-import TeamService from './TeamService';
+import TeamApi from './TeamApi';
 import { Team } from '@/models/team';
 
-class PushNotificationService {
+class PushNotificationApi {
   async updateOptState(uid: string, isEnabled: boolean) {
-    const setting = await AccountSettingService.getAccountSetting(uid);
+    const setting = await AccountSettingApi.getAccountSetting(uid);
     if (!setting) return;
 
     if (setting.push_notification.is_enabled === isEnabled) {
@@ -21,7 +21,7 @@ class PushNotificationService {
       updated_time: getFirebaseTimestampNow()
     }
 
-    await AccountSettingService.update(uid, {
+    await AccountSettingApi.update(uid, {
       push_notification: notif
     });
   }
@@ -33,7 +33,7 @@ class PushNotificationService {
     }
 
 
-    const setting = await AccountSettingService.getAccountSetting(uid);
+    const setting = await AccountSettingApi.getAccountSetting(uid);
     if (!setting) {
       console.error("Failed to get or create account setting");
       return;
@@ -63,7 +63,7 @@ class PushNotificationService {
         updated_time: getFirebaseTimestampNow()
       }
 
-      await AccountSettingService.update(uid, {
+      await AccountSettingApi.update(uid, {
         push_notification: notif
       });
 
@@ -76,7 +76,7 @@ class PushNotificationService {
   async notifyTeamNewWorship(teamId: string, creatorUid: string, worshipDate: Date, worshipTitle: string) {
     try {
       // Get team data to get member UIDs
-      const team = await TeamService.getById(teamId) as Team;
+      const team = await TeamApi.getById(teamId) as Team;
       if (!team) {
         console.error("Team not found", { teamId });
         return;
@@ -85,7 +85,7 @@ class PushNotificationService {
       // Get all team members' account settings except the creator
       const memberUids = team.users.filter(uid => uid !== creatorUid);
       const memberSettings = await Promise.all(
-        memberUids.map(uid => AccountSettingService.getAccountSetting(uid))
+        memberUids.map(uid => AccountSettingApi.getAccountSetting(uid))
       );
 
       // Collect all active subscriptions from members who have enabled notifications
@@ -120,12 +120,12 @@ class PushNotificationService {
 
   async notifyTeamNewNotice(teamId: string, creatorUid: string, noticeTitle: string) {
     try {
-      const team = await TeamService.getById(teamId) as Team;
+      const team = await TeamApi.getById(teamId) as Team;
       if (!team) return;
 
       const memberUids = team.users.filter(uid => uid !== creatorUid);
       const memberSettings = await Promise.all(
-        memberUids.map(uid => AccountSettingService.getAccountSetting(uid))
+        memberUids.map(uid => AccountSettingApi.getAccountSetting(uid))
       );
 
       const activeSubscriptions = memberSettings
@@ -155,7 +155,7 @@ class PushNotificationService {
       if (targetMemberIds.length === 0) return;
 
       const memberSettings = await Promise.all(
-        targetMemberIds.map(uid => AccountSettingService.getAccountSetting(uid))
+        targetMemberIds.map(uid => AccountSettingApi.getAccountSetting(uid))
       );
 
       const activeSubscriptions = memberSettings
@@ -180,4 +180,4 @@ class PushNotificationService {
   }
 }
 
-export default new PushNotificationService(); 
+export default new PushNotificationApi(); 

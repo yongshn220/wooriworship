@@ -1,7 +1,7 @@
 import { EmailJsConst } from '@/components/constants/constants';
 import emailjs from 'emailjs-com';
 
-class EmailService {
+class EmailApi {
 
     async sendEmail(senderEmail: string, receiverEmail: string, teamName: string) {
         const emailContent = this.formateCommentEmail(senderEmail, receiverEmail, teamName)
@@ -57,4 +57,4 @@ class EmailService {
     
 }
 
-export default new EmailService();
+export default new EmailApi();

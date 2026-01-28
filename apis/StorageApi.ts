@@ -2,7 +2,7 @@ import { storage } from "@/firebase"
 import { deleteObject, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { ImageFileContainer, MusicSheetContainer } from "@/components/constants/types";
 
-class StorageService {
+class StorageApi {
   constructor() {
   }
 
@@ -160,4 +160,4 @@ class StorageService {
   }
 }
 
-export default new StorageService();
+export default new StorageApi();

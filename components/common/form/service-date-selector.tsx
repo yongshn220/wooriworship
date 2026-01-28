@@ -8,8 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { TagSelector } from "@/components/common/tag-selector";
 import { FormSectionCard } from "@/components/common/form/full-screen-form";
-import TeamService from "@/apis/TeamService";
-import { ServiceEventService } from "@/apis/ServiceEventService";
+import TeamApi from "@/apis/TeamApi";
+import { ServiceEventApi } from "@/apis/ServiceEventApi";
 import { teamAtom, fetchServiceTagsSelector, serviceTagsUpdaterAtom } from "@/global-states/teamState";
 import { Team } from "@/models/team";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -52,7 +52,7 @@ export function ServiceDateSelector({
         const calculateSmartShortcuts = async () => {
             // Refresh is handled by serviceTags dependency in Recoil
             const now = new Date();
-            const stats = await ServiceEventService.getTagStats(teamId);
+            const stats = await ServiceEventApi.getTagStats(teamId);
             const hasStats = Object.keys(stats).length > 0;
 
             let options: { id: string | null, title: string, date: Date, score: number }[] = [];
@@ -99,7 +99,7 @@ export function ServiceDateSelector({
 
                     try {
                         // Fetch last 5 usages (V3)
-                        const recent = await ServiceEventService.getRecentServicesWithFlows(teamId, item.tag.id, 5);
+                        const recent = await ServiceEventApi.getRecentServicesWithFlows(teamId, item.tag.id, 5);
                         if (recent.length > 0) {
                             // Calculate mode weekday from recent schedules
                             const dayCounts: Record<number, number> = {};
@@ -244,7 +244,7 @@ export function ServiceDateSelector({
                                     // If tag doesn't exist (ID is null), create it using the default name
                                     // This only happens for fallback heuristic options
                                     if (!tagId) {
-                                        tagId = await TeamService.addServiceTag(teamId, option.title);
+                                        tagId = await TeamApi.addServiceTag(teamId, option.title);
                                         if (tagId) {
                                             setTagRefresh(prev => prev + 1);
                                         }

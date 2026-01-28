@@ -1,13 +1,13 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@/lib/test-utils";
 import { ServiceDateSelector } from "./service-date-selector";
-import TeamService from "@/apis/TeamService";
-import { ServiceEventService } from "@/apis/ServiceEventService";
+import TeamApi from "@/apis/TeamApi";
+import { ServiceEventApi } from "@/apis/ServiceEventApi";
 import { format, addDays } from "date-fns";
 
 // Mock dependencies
-jest.mock("@/apis/TeamService");
-jest.mock("@/apis/ServiceEventService");
+jest.mock("@/apis/TeamApi");
+jest.mock("@/apis/ServiceEventApi");
 
 describe("ServiceDateSelector", () => {
     const mockTeamId = "team-123";
@@ -21,9 +21,9 @@ describe("ServiceDateSelector", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        (TeamService.getById as jest.Mock).mockResolvedValue({ service_tags: mockServiceTags });
-        (ServiceEventService.getTagStats as jest.Mock).mockResolvedValue({});
-        (ServiceEventService.getRecentServicesWithFlows as jest.Mock).mockResolvedValue([]);
+        (TeamApi.getById as jest.Mock).mockResolvedValue({ service_tags: mockServiceTags });
+        (ServiceEventApi.getTagStats as jest.Mock).mockResolvedValue({});
+        (ServiceEventApi.getRecentServicesWithFlows as jest.Mock).mockResolvedValue([]);
     });
 
     it("renders with initial date and tag selector", async () => {
@@ -70,7 +70,7 @@ describe("ServiceDateSelector", () => {
 
     it("generates data-driven shortcuts based on stats", async () => {
         // Mock high usage for Friday Prayer
-        (ServiceEventService.getTagStats as jest.Mock).mockResolvedValue({
+        (ServiceEventApi.getTagStats as jest.Mock).mockResolvedValue({
             "svc-2": { count: 100, last_used_at: new Date().toISOString() } // High score
         });
 

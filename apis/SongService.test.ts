@@ -1,5 +1,5 @@
-import { SongService } from './SongService';
-import { MusicSheetService } from './MusicSheetService';
+import { SongApi } from './SongService';
+import { MusicSheetApi } from './MusicSheetService';
 import { collection, addDoc, doc, setDoc, deleteDoc, getDocs, getDoc, Timestamp, runTransaction } from 'firebase/firestore';
 
 // Mock dependencies
@@ -48,7 +48,7 @@ jest.mock('.', () => ({
     },
 }));
 
-const mockMusicSheetService = {
+const mockMusicSheetApi = {
     addNewMusicSheet: jest.fn(),
     deleteMusicSheet: jest.fn(),
     getSongMusicSheets: jest.fn(() => Promise.resolve([])),
@@ -66,7 +66,7 @@ describe('SongService', () => {
 
         serviceInstance = SongServiceClass.getInstance(
             {} as any, // Mock DB
-            mockMusicSheetService
+            mockMusicSheetApi
         );
     });
 
@@ -80,7 +80,7 @@ describe('SongService', () => {
             };
 
             (addDoc as jest.Mock).mockResolvedValue({ id: 'song-1' });
-            (mockMusicSheetService.addNewMusicSheet as jest.Mock).mockResolvedValue('sheet-1');
+            (mockMusicSheetApi.addNewMusicSheet as jest.Mock).mockResolvedValue('sheet-1');
 
             // Correct args: userId, teamId, songInput, musicSheetContainers
             await serviceInstance.addNewSong('user-1', 'team-1', mockSong, mockSong.music_sheets);
@@ -95,7 +95,7 @@ describe('SongService', () => {
             );
 
             // Verify music sheet creation
-            expect(mockMusicSheetService.addNewMusicSheet).toHaveBeenCalledWith(
+            expect(mockMusicSheetApi.addNewMusicSheet).toHaveBeenCalledWith(
                 'user-1',
                 'team-1',
                 'song-1', // The ID returned by addDoc
@@ -135,7 +135,7 @@ describe('SongService', () => {
             });
 
             // Mock getDocs for subcollections (sheets) (Actually service uses musicSheetService.getSongMusicSheets)
-            (mockMusicSheetService.getSongMusicSheets as jest.Mock).mockResolvedValue([
+            (mockMusicSheetApi.getSongMusicSheets as jest.Mock).mockResolvedValue([
                 { id: 'sheet-1' }
             ]);
 
@@ -148,7 +148,7 @@ describe('SongService', () => {
 
             // 2. Verify interactions with dependencies
             // We expect deleteMusicSheet to be called for the retrieved sheet
-            expect(mockMusicSheetService.deleteMusicSheet).toHaveBeenCalledWith(
+            expect(mockMusicSheetApi.deleteMusicSheet).toHaveBeenCalledWith(
                 'team-1',
                 'song-1',
                 'sheet-1'

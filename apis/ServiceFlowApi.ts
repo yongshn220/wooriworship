@@ -6,12 +6,12 @@ import {
 import { ServiceFlowItem, ServiceFlow } from "@/models/services/ServiceEvent";
 
 /**
- * ServiceFlowService (V3)
+ * ServiceFlowApi (V3)
  * Handles:
  * 1. Service-specific Flow: teams/{teamId}/services/{serviceId}/flows/main
- * 2. Global Flow Templates: teams/{teamId}/serving_templates
+ * 2. Global Flow Templates: teams/{teamId}/service_flow_templates
  */
-export class ServiceFlowService {
+export class ServiceFlowApi {
 
     // =========================================================================
     // 1. Service-specific Flow (teams/{teamId}/services/{serviceId}/flows/main)
@@ -25,7 +25,7 @@ export class ServiceFlowService {
             if (!snap.exists()) return null;
             return snap.data() as ServiceFlow;
         } catch (e) {
-            console.error("ServiceFlowService.getFlow:", e);
+            console.error("ServiceFlowApi.getFlow:", e);
             return null;
         }
     }
@@ -46,31 +46,31 @@ export class ServiceFlowService {
     }
 
     // =========================================================================
-    // 2. Flow Templates (teams/{teamId}/serving_templates)
+    // 2. Flow Templates (teams/{teamId}/service_flow_templates)
     // =========================================================================
 
     static async getTemplates(teamId: string): Promise<any[]> {
         try {
-            const snapshot = await getDocs(collection(db, "teams", teamId, "serving_templates"));
+            const snapshot = await getDocs(collection(db, "teams", teamId, "service_flow_templates"));
             return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (e) {
-            console.error("ServiceFlowService.getTemplates:", e);
+            console.error("ServiceFlowApi.getTemplates:", e);
             return [];
         }
     }
 
     static async createTemplate(teamId: string, template: any): Promise<void> {
-        const ref = doc(collection(db, "teams", teamId, "serving_templates"));
+        const ref = doc(collection(db, "teams", teamId, "service_flow_templates"));
         await setDoc(ref, { ...template, id: ref.id });
     }
 
     static async updateTemplate(teamId: string, templateId: string, template: any): Promise<void> {
-        const ref = doc(db, "teams", teamId, "serving_templates", templateId);
+        const ref = doc(db, "teams", teamId, "service_flow_templates", templateId);
         await updateDoc(ref, template);
     }
 
     static async deleteTemplate(teamId: string, templateId: string): Promise<void> {
-        const ref = doc(db, "teams", teamId, "serving_templates", templateId);
+        const ref = doc(db, "teams", teamId, "service_flow_templates", templateId);
         await deleteDoc(ref);
     }
 

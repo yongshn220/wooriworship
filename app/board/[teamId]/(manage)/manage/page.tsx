@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "@/components/ui/use-toast"
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState"
-import { AuthService } from "@/apis"
+import { AuthApi } from "@/apis"
 import { Bell, LogOut, Mail, MailIcon, Settings, Users, UserPlus } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import { useRecoilValue, useSetRecoilState } from "recoil"
@@ -16,7 +16,7 @@ import { MenuItem } from "@/app/board/[teamId]/(manage)/manage/_components/menu-
 import { MenuGroup } from "@/app/board/[teamId]/(manage)/manage/_components/menu-group";
 import { TeamProfileCard } from "@/app/board/[teamId]/(manage)/manage/_components/team-profile-card";
 import { accountSettingAtom } from "@/global-states/account-setting"
-import PushNotificationService from "@/apis/PushNotificationService"
+import PushNotificationApi from "@/apis/PushNotificationApi"
 import { TeamSelect } from "@/components/elements/design/team/team-select";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
@@ -39,7 +39,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
 
   async function handleSignOut() {
     try {
-      await AuthService.logout()
+      await AuthApi.logout()
       setCurrentTeamId(null)
       toast({ title: "Goodbye :)" })
       router.replace("/")
@@ -53,7 +53,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
   async function updatePushNotificationOptState(isEnabled: boolean) {
     if (!authUser?.uid) return;
 
-    await PushNotificationService.updateOptState(authUser.uid, isEnabled)
+    await PushNotificationApi.updateOptState(authUser.uid, isEnabled)
   }
 
   return (

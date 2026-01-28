@@ -7,7 +7,7 @@ import { songCommentAtom, songCommentUpdater } from "@/global-states/song-commen
 import { userAtom } from "@/global-states/userState";
 import { auth } from "@/firebase";
 import { getTimePassedFromTimestampShorten } from "@/components/util/helper/helper-functions";
-import { SongCommentService } from "@/apis";
+import { SongCommentApi } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
 
 
@@ -26,7 +26,7 @@ export function CommentItem({ teamId, songId, commentId }: Props) {
   const [commentInput, setCommentInput] = useState<string>(comment?.comment ?? "")
 
   async function handleEditComment() {
-    if (!await SongCommentService.updateSongComment(teamId, songId, commentId, commentInput)) {
+    if (!await SongCommentApi.updateSongComment(teamId, songId, commentId, commentInput)) {
       toast({ description: "Fail to edit comment. Please try again." })
       return;
     }

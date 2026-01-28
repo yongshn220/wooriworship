@@ -37,7 +37,7 @@ import { slideVariants } from "@/components/constants/animations";
 import { useServiceFormLogic } from "./hooks/use-service-form-logic";
 import { ServiceFormProps } from "./types";
 import { auth } from "@/firebase";
-import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
+import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
 
 export function ServiceForm(props: ServiceFormProps) {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -203,7 +203,7 @@ export function ServiceForm(props: ServiceFormProps) {
                                 <div className="flex flex-col gap-4">
                                     <SortableList items={roles} onReorder={(newRoles) => {
                                         setRoles(newRoles);
-                                        PraiseAssigneeService.updateRolesOrder(props.teamId, newRoles).catch(console.error);
+                                        PraiseTeamApi.updateRolesOrder(props.teamId, newRoles).catch(console.error);
                                     }}>
                                         {roles.map((role) => {
                                             const assignment = worshipRoles.find(a => a.roleId === role.id);
@@ -596,7 +596,7 @@ export function ServiceForm(props: ServiceFormProps) {
                                         groups={standardGroups}
                                         onAddGroup={(name) => {
                                             setStandardGroups(prev => [...prev, name]);
-                                            PraiseAssigneeService.addCustomGroup(props.teamId, name).catch(console.error);
+                                            PraiseTeamApi.addCustomGroup(props.teamId, name).catch(console.error);
                                         }}
                                         onRemoveGroup={(idx) => {
                                             setStandardGroups(standardGroups.filter((_, i) => i !== idx));
@@ -604,7 +604,7 @@ export function ServiceForm(props: ServiceFormProps) {
                                         customMemberNames={customMemberNames}
                                         onAddCustomMember={(name) => {
                                             setCustomMemberNames(prev => [...prev, name]);
-                                            PraiseAssigneeService.addCustomMemberName(props.teamId, name).catch(console.error);
+                                            PraiseTeamApi.addCustomMemberName(props.teamId, name).catch(console.error);
                                         }}
                                     />
                                 </div>

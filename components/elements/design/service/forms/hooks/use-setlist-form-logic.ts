@@ -10,7 +10,7 @@ import { SetlistSongHeader } from "@/models/setlist";
 import { ServiceSetlist } from "@/models/services/ServiceEvent";
 
 // Services
-import { SetlistService } from "@/apis/SetlistService";
+import { SetlistApi } from "@/apis/SetlistApi";
 
 interface UseSetlistFormLogicProps {
     teamId: string;
@@ -50,7 +50,7 @@ export function useSetlistFormLogic({ teamId, serviceId, initialSetlist, onCompl
         setIsLoading(true);
         if (!auth.currentUser) return;
         try {
-            await SetlistService.updateSetlist(teamId, serviceId, {
+            await SetlistApi.updateSetlist(teamId, serviceId, {
                 songs: songs,
                 beginning_song: beginningSong || undefined,
                 ending_song: endingSong || undefined,

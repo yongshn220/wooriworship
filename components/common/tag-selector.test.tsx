@@ -1,13 +1,13 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@/lib/test-utils";
 import { TagSelector } from "./tag-selector";
-import TagService from "@/apis/TagService";
-import TeamService from "@/apis/TeamService";
+import TagApi from "@/apis/TagApi";
+import TeamApi from "@/apis/TeamApi";
 import { act } from "react-dom/test-utils";
 
 // Mock dependencies
-jest.mock("@/apis/TagService");
-jest.mock("@/apis/TeamService");
+jest.mock("@/apis/TagApi");
+jest.mock("@/apis/TeamApi");
 
 describe("TagSelector", () => {
     const mockTeamId = "team-123";
@@ -22,8 +22,8 @@ describe("TagSelector", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        (TagService.getTeamTags as jest.Mock).mockResolvedValue(mockTags);
-        (TeamService.getById as jest.Mock).mockResolvedValue({ service_tags: mockServiceTags });
+        (TagApi.getTeamTags as jest.Mock).mockResolvedValue(mockTags);
+        (TeamApi.getById as jest.Mock).mockResolvedValue({ service_tags: mockServiceTags });
     });
 
     it("renders with placeholder", async () => {
@@ -53,7 +53,7 @@ describe("TagSelector", () => {
         fireEvent.click(trigger);
 
         await waitFor(() => {
-            expect(TagService.getTeamTags).toHaveBeenCalledWith(mockTeamId);
+            expect(TagApi.getTeamTags).toHaveBeenCalledWith(mockTeamId);
         });
 
         expect(screen.getByText("Worship")).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe("TagSelector", () => {
         fireEvent.click(trigger);
 
         await waitFor(() => {
-            expect(TeamService.getById).toHaveBeenCalledWith(mockTeamId);
+            expect(TeamApi.getById).toHaveBeenCalledWith(mockTeamId);
         });
 
         expect(screen.getByText("Sunday Service")).toBeInTheDocument();
@@ -104,9 +104,9 @@ describe("TagSelector", () => {
 
     it("creates a new tag calling appropriate service", async () => {
         const onTagsChange = jest.fn();
-        (TagService.addNewTag as jest.Mock).mockResolvedValue(true);
+        (TagApi.addNewTag as jest.Mock).mockResolvedValue(true);
         // Mock getTeamTags to return the new tag after addition
-        (TagService.getTeamTags as jest.Mock)
+        (TagApi.getTeamTags as jest.Mock)
             .mockResolvedValueOnce(mockTags)
             .mockResolvedValueOnce([...mockTags, { id: "tag-3", name: "New Tag" }]);
 
@@ -129,7 +129,7 @@ describe("TagSelector", () => {
         fireEvent.click(createButton);
 
         await waitFor(() => {
-            expect(TagService.addNewTag).toHaveBeenCalledWith(mockTeamId, "New Tag");
+            expect(TagApi.addNewTag).toHaveBeenCalledWith(mockTeamId, "New Tag");
         });
 
         // Optimistic update check or after refresh
@@ -137,8 +137,8 @@ describe("TagSelector", () => {
     });
 
     it("deletes a tag with confirmation", async () => {
-        (TagService.deleteTag as jest.Mock).mockResolvedValue(true);
-        (TagService.getTeamTags as jest.Mock)
+        (TagApi.deleteTag as jest.Mock).mockResolvedValue(true);
+        (TagApi.getTeamTags as jest.Mock)
             .mockResolvedValueOnce(mockTags)
             .mockResolvedValueOnce([mockTags[1]]); // Return only remaining tags
 
@@ -180,7 +180,7 @@ describe("TagSelector", () => {
         fireEvent.click(confirmButton);
 
         await waitFor(() => {
-            expect(TagService.deleteTag).toHaveBeenCalledWith(mockTeamId, "Worship");
+            expect(TagApi.deleteTag).toHaveBeenCalledWith(mockTeamId, "Worship");
         });
     });
 });

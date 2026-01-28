@@ -7,7 +7,7 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { useState } from "react";
 import { noticeUpdaterAtom, noticeIdsUpdaterAtom } from "@/global-states/notice-state";
-import { NoticeService } from "@/apis";
+import { NoticeApi } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -30,7 +30,7 @@ export function NoticeHeaderMenu({ noticeId, createdById }: Props) {
 
   const handleDelete = async () => {
     try {
-      await NoticeService.deleteNotice(teamId, noticeId);
+      await NoticeApi.deleteNotice(teamId, noticeId);
       toast({
         title: "Notice deleted",
         description: "The notice has been successfully deleted.",

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getPathSong, getPathSongEdit } from "@/components/util/helper/routes";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { SongService } from "@/apis";
+import { SongApi } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
 import { CopyIcon, SquarePen, Trash2Icon, LinkIcon, DownloadIcon } from "lucide-react";
 import { currentTeamSongIdsAtom, songAtom, songUpdaterAtom } from "@/global-states/song-state";
@@ -33,7 +33,7 @@ export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = fal
 
   async function handleDeleteSong() {
     try {
-      SongService.deleteSong(teamId, songId).then((isSuccess) => {
+      SongApi.deleteSong(teamId, songId).then((isSuccess) => {
         if (isSuccess) {
           setSongUpdater((prev) => prev + 1)
           toast({ title: "Song deleted successfully", description: "" })

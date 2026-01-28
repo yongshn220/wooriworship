@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRecoilValue } from "recoil";
 import { usersAtom } from "@/global-states/userState";
-import { ServiceEventService } from "@/apis/ServiceEventService";
+import { ServiceEventApi } from "@/apis/ServiceEventApi";
 import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow, ServiceFormState, ServiceRole } from "@/models/services/ServiceEvent";
 import { ServiceDetailView } from "./service-detail-view";
 import { Loader2 } from "lucide-react";
@@ -11,7 +11,7 @@ import { Loader2 } from "lucide-react";
 interface Props {
     serviceId: string;
     teamId: string;
-    roles: ServiceRole[]; // Passed from page (fetched via ServiceEventService or ServingService)
+    roles: ServiceRole[]; // Passed from page (fetched via ServiceEventApi or ServingService)
     currentUserUid?: string | null;
 }
 
@@ -25,10 +25,21 @@ export function ServiceDetailContainer({ serviceId, teamId, roles, currentUserUi
 
     const [loading, setLoading] = useState(false);
 
+    // Refetch function for use after form saves
+    const refetchData = useCallback(async () => {
+        if (!serviceId) return;
+        try {
+            const res = await ServiceEventApi.getServiceDetails(teamId, serviceId);
+            setData(res);
+        } catch (e) {
+            console.error("Failed to refetch service details:", e);
+        }
+    }, [teamId, serviceId]);
+
     useEffect(() => {
         if (serviceId) {
             setLoading(true);
-            ServiceEventService.getServiceDetails(teamId, serviceId)
+            ServiceEventApi.getServiceDetails(teamId, serviceId)
                 .then(res => {
                     setData(res);
                 })
@@ -39,11 +50,25 @@ export function ServiceDetailContainer({ serviceId, teamId, roles, currentUserUi
         }
     }, [serviceId, teamId]);
 
-    // Prefetch members
+    // Prefetch members from both praiseAssignee and flow
     const memberIds = useMemo(() => {
-        if (!data?.praiseAssignee?.assignee) return [];
-        return data.praiseAssignee.assignee.flatMap(r => r.memberIds);
-    }, [data?.praiseAssignee]);
+        const ids: string[] = [];
+
+        // Collect from praiseAssignee (praise_team)
+        if (data?.praiseAssignee?.assignments) {
+            ids.push(...data.praiseAssignee.assignments.flatMap(r => r.memberIds));
+        }
+
+        // Collect from flow items
+        if (data?.flow?.items) {
+            ids.push(...data.flow.items.flatMap(item =>
+                item.assignments?.flatMap(a => a.memberIds) || []
+            ));
+        }
+
+        // Return unique IDs (filter out group: prefixed items)
+        return Array.from(new Set(ids)).filter(id => !id.startsWith('group:'));
+    }, [data?.praiseAssignee, data?.flow]);
 
     // Recoil Suspense handling for members
     const members = useRecoilValue(usersAtom(memberIds));
@@ -68,6 +93,7 @@ export function ServiceDetailContainer({ serviceId, teamId, roles, currentUserUi
             roles={roles}
             members={members}
             currentUserUid={currentUserUid}
+            onDataChanged={refetchData}
         />
     );
 }

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState";
-import { InvitationService } from "@/apis";
+import { InvitationApi } from "@/apis";
 import { auth } from "@/firebase";
 import { toast } from "@/components/ui/use-toast";
 import { sentInvitationsAtom, sentInvitationsUpdaterAtom } from "@/global-states/invitation-state";
@@ -60,7 +60,7 @@ export function InvitationDrawer({ open, onOpenChange }: Props) {
                 return;
             }
 
-            const invitationId = await InvitationService.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, receiverEmail.toLowerCase());
+            const invitationId = await InvitationApi.createInvitation(authUser?.uid, authUser?.email, currentTeamId, team?.name, receiverEmail.toLowerCase());
 
             if (!invitationId) {
                 toast({ title: "Can't send invitation", description: "The following user set up a restriction on team invitation or email." });

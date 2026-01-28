@@ -1,6 +1,6 @@
 import { atom, atomFamily, selectorFamily } from "recoil";
 import { Song } from "@/models/song";
-import { SongService } from "@/apis";
+import { SongApi } from "@/apis";
 import { searchSelectedTagsAtom, searchSelectedKeysAtom, songBoardSelectedSortOptionAtom, songSearchInputAtom } from "@/app/board/_states/board-states";
 import { SongBoardSortOption } from "@/components/constants/enums";
 import { getInitialChar } from "@/components/util/helper/helper-functions";
@@ -14,7 +14,7 @@ export const songIdsAtom = atomFamily<Array<string>, string>({
       if (!teamId) return []
 
       try {
-        const songIds = await SongService.getSongIds(teamId)
+        const songIds = await SongApi.getSongIds(teamId)
         if (!songIds) return []
 
         return songIds
@@ -35,7 +35,7 @@ export const currentTeamSortedSongsAtom = selectorFamily<Array<Song>, string>({
     if (!teamId) return []
 
     try {
-      let songList = await SongService.getSong(teamId) as Song[]
+      let songList = await SongApi.getSong(teamId) as Song[]
       if (!songList) return []
 
       const searchInput = get(songSearchInputAtom)
@@ -130,7 +130,7 @@ export const songAtom = atomFamily<Song, { teamId: string, songId: string }>({
       get(songUpdaterAtom)
       if (!teamId || !songId) return null
       try {
-        const song = await SongService.getSongById(teamId, songId) as Song
+        const song = await SongApi.getSongById(teamId, songId) as Song
         if (!song) return null
 
         return song
@@ -154,7 +154,7 @@ export const teamUniqueKeysSelector = selectorFamily<Array<string>, string>({
     get(songUpdaterAtom)
     if (!teamId) return []
     try {
-      const songList = await SongService.getSong(teamId) as Song[]
+      const songList = await SongApi.getSong(teamId) as Song[]
       if (!songList) return []
 
       const allKeys = new Set<string>()

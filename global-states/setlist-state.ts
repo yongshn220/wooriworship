@@ -1,6 +1,6 @@
 import { atom, atomFamily, selectorFamily, RecoilState } from "recoil";
 import { Setlist } from "@/models/setlist";
-import { ServiceEventService } from "@/apis/ServiceEventService";
+import { ServiceEventApi } from "@/apis/ServiceEventApi";
 import { Song } from "@/models/song";
 import { songAtom } from "@/global-states/song-state";
 
@@ -20,7 +20,7 @@ export const currentTeamSetlistListAtom = (globalForRecoil.recoilAtoms['currentT
       try {
         get(setlistIdsUpdaterAtom)
 
-        const services = await ServiceEventService.getRecentServicesWithFlows(teamId) as any[]
+        const services = await ServiceEventApi.getRecentServicesWithFlows(teamId) as any[]
         if (!services) return []
 
         // Map to Setlist shape for UI compatibility
@@ -80,7 +80,7 @@ export const setlistAtom = (globalForRecoil.recoilAtoms['setlistAtom'] || atomFa
     get: ({ teamId, setlistId }) => async ({ get }) => {
       get(setlistUpdaterAtom)
       try {
-        const details = await ServiceEventService.getServiceDetails(teamId, setlistId)
+        const details = await ServiceEventApi.getServiceDetails(teamId, setlistId)
         if (!details) return null
 
         // Map details to Setlist shape

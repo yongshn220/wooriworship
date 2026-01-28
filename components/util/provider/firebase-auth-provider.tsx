@@ -10,7 +10,7 @@
 //
 // async function syncFirebaseAuth(session: Session) {
 //   if (session && session.firebaseToken) {
-//     const result = await AuthService.loginWithCustomToken(session.firebaseToken)
+//     const result = await AuthApi.loginWithCustomToken(session.firebaseToken)
 //
 //     if (result) {
 //       console.log("fb sync succ")
@@ -23,7 +23,7 @@
 //   }
 //   else {
 //     console.log("no session")
-//     await AuthService.logout();
+//     await AuthApi.logout();
 //     return false
 //   }
 // }

@@ -1,4 +1,4 @@
-import { AdminMigrationService } from './AdminMigrationService';
+import { AdminMigrationApi } from './AdminMigrationService';
 import * as admin from 'firebase-admin';
 
 // Mock specific parts of firebase-admin

@@ -4,7 +4,7 @@ import React, {useState} from "react";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
 import {auth} from "@/firebase";
-import SongCommentService from "@/apis/SongCommentService";
+import SongCommentApi from "@/apis/SongCommentApi";
 import {toast} from "@/components/ui/use-toast";
 import {useSetRecoilState} from "recoil";
 import {songCommentIdsAtom} from "@/global-states/song-comment-state";
@@ -21,7 +21,7 @@ export function CreateComment({teamId, songId}: Props) {
 
   async function handleSubmit(e: any) {
     e.preventDefault()
-    const docId = await SongCommentService.addNewSongComment(authUser.uid, teamId, songId, comment)
+    const docId = await SongCommentApi.addNewSongComment(authUser.uid, teamId, songId, comment)
     if (!docId) {
       toast({title: "Fail to create a comment. Please try again."})
       return;

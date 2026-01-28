@@ -1,4 +1,4 @@
-import { MigrationService } from './MigrationService';
+import { MigrationApi } from './MigrationService';
 import {
     collection,
     getDocs,

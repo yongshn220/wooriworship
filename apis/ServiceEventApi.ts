@@ -5,17 +5,17 @@ import {
     writeBatch, setDoc, updateDoc, increment, limit
 } from "firebase/firestore";
 import { ServiceEvent } from "@/models/services/ServiceEvent";
-import { SetlistService } from "./SetlistService";
-import { PraiseAssigneeService } from "./PraiseAssigneeService";
-import { ServiceFlowService } from "./ServiceFlowService";
-import LinkingService from "./LinkingService";
+import { SetlistApi } from "./SetlistApi";
+import { PraiseTeamApi } from "./PraiseTeamApi";
+import { ServiceFlowApi } from "./ServiceFlowApi";
+import LinkingApi from "./LinkingApi";
 import { parseLocalDate } from "@/components/util/helper/helper-functions";
 
 /**
- * ServiceEventService (V3 Orchestrator)
+ * ServiceEventApi (V3 Orchestrator)
  * Manages the root Service document and coordinates sub-services (Setlist, Assignee, Flow).
  */
-export class ServiceEventService {
+export class ServiceEventApi {
 
     // =========================================================================
     // 1. Fetching (Read)
@@ -54,9 +54,9 @@ export class ServiceEventService {
         const event = { id: serviceSnap.id, ...serviceSnap.data() } as ServiceEvent;
 
         const [setlist, praiseAssignee, flow] = await Promise.all([
-            SetlistService.getSetlist(teamId, serviceId),
-            PraiseAssigneeService.getAssignees(teamId, serviceId),
-            ServiceFlowService.getFlow(teamId, serviceId)
+            SetlistApi.getSetlist(teamId, serviceId),
+            PraiseTeamApi.getPraiseTeam(teamId, serviceId),
+            ServiceFlowApi.getFlow(teamId, serviceId)
         ]);
 
         return { event, setlist, praiseAssignee, flow };
@@ -93,9 +93,9 @@ export class ServiceEventService {
 
         // Initialize sub-collections
         await Promise.all([
-            SetlistService.initSetlist(teamId, serviceId),
-            PraiseAssigneeService.initAssignees(teamId, serviceId),
-            ServiceFlowService.initFlow(teamId, serviceId)
+            SetlistApi.initSetlist(teamId, serviceId),
+            PraiseTeamApi.initPraiseTeam(teamId, serviceId),
+            ServiceFlowApi.initFlow(teamId, serviceId)
         ]);
 
         return serviceId;
@@ -125,12 +125,12 @@ export class ServiceEventService {
      */
     static async deleteService(teamId: string, serviceId: string) {
         // 1. Cleanup References (Linking)
-        await LinkingService.cleanupReferencesForServingDeletion(teamId, serviceId);
+        await LinkingApi.cleanupReferencesForServingDeletion(teamId, serviceId);
 
         // 2. Delete Sub-docs (Explicitly)
         const batch = writeBatch(db);
         batch.delete(doc(db, `teams/${teamId}/services/${serviceId}/setlists/main`));
-        batch.delete(doc(db, `teams/${teamId}/services/${serviceId}/praise_assignee/main`));
+        batch.delete(doc(db, `teams/${teamId}/services/${serviceId}/praise_team/main`));
         batch.delete(doc(db, `teams/${teamId}/services/${serviceId}/flows/main`));
 
         // 3. Delete Header
@@ -139,16 +139,16 @@ export class ServiceEventService {
         await batch.commit();
     }
 
-    static async initSubCollection(teamId: string, serviceId: string, type: 'setlist' | 'praise_assignee' | 'flow') {
+    static async initSubCollection(teamId: string, serviceId: string, type: 'setlist' | 'praise_team' | 'flow') {
         switch (type) {
             case 'setlist':
-                await SetlistService.initSetlist(teamId, serviceId);
+                await SetlistApi.initSetlist(teamId, serviceId);
                 break;
-            case 'praise_assignee':
-                await PraiseAssigneeService.initAssignees(teamId, serviceId);
+            case 'praise_team':
+                await PraiseTeamApi.initPraiseTeam(teamId, serviceId);
                 break;
             case 'flow':
-                await ServiceFlowService.initFlow(teamId, serviceId);
+                await ServiceFlowApi.initFlow(teamId, serviceId);
                 break;
         }
     }
@@ -177,7 +177,7 @@ export class ServiceEventService {
         const services = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServiceEvent));
 
         const flows = await Promise.all(
-            services.map(s => ServiceFlowService.getFlow(teamId, s.id))
+            services.map(s => ServiceFlowApi.getFlow(teamId, s.id))
         );
 
         // Map to ServingSchedule-like shape for UI compatibility
@@ -251,7 +251,7 @@ export class ServiceEventService {
             ...details.event,
             worship_date: details.event.date,
             service_tags: details.event.tagId ? [details.event.tagId] : [],
-            worship_roles: details.praiseAssignee?.assignee || [],
+            worship_roles: details.praiseAssignee?.assignments || [],
             items: details.flow?.items || [],
         } as any;
     }

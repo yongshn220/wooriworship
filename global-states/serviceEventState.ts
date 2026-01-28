@@ -1,6 +1,6 @@
 import { atom, selector, selectorFamily, atomFamily } from "recoil";
 import { ServiceEvent, ServiceSetlist, ServicePraiseAssignee, ServiceFlow } from "@/models/services/ServiceEvent";
-import { ServiceEventService } from "@/apis/ServiceEventService";
+import { ServiceEventApi } from "@/apis/ServiceEventApi";
 
 // =============================================================================
 // 1. Selection State

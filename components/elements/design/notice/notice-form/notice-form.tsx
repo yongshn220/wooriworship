@@ -13,8 +13,8 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { noticeAtom, noticeUpdaterAtom, noticeIdsUpdaterAtom } from "@/global-states/notice-state";
 
-import { NoticeService, StorageService } from "@/apis";
-import PushNotificationService from "@/apis/PushNotificationService";
+import { NoticeApi, StorageApi } from "@/apis";
+import PushNotificationApi from "@/apis/PushNotificationApi";
 import { toast } from "@/components/ui/use-toast";
 import MultipleImageUploader from "@/components/elements/util/image/multiple-image-uploader";
 import PdfUploader from "@/components/elements/util/image/pdf-uploader";
@@ -90,7 +90,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
       const filesToAdd = imageFileContainers.filter(item => !!item.id) as Array<ImageFileContainer>
       const urlsToDelete = notice.file_urls.filter(url => !curImageUrls.includes(url))
       let urlsToKeep = notice.file_urls.filter(url => curImageUrls.includes(url))
-      const newDownloadUrls = await StorageService.updateNoticeFiles(teamId, filesToAdd, urlsToDelete);
+      const newDownloadUrls = await StorageApi.updateNoticeFiles(teamId, filesToAdd, urlsToDelete);
       if (newDownloadUrls.length > 0) {
         urlsToKeep = urlsToKeep.concat(newDownloadUrls)
       }
@@ -99,7 +99,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
         body: input?.body,
         file_urls: urlsToKeep
       }
-      if (await NoticeService.updateNotice(teamId, noticeId, noticeInput) === false) {
+      if (await NoticeApi.updateNotice(teamId, noticeId, noticeInput) === false) {
         toast({ description: "Fail to edit notice-board. Please try again." }); return
       }
 
@@ -125,13 +125,13 @@ export function NoticeForm({ mode, noticeId }: Props) {
   async function handleCreate() {
     setIsLoading(true)
     try {
-      const downloadUrls = await StorageService.uploadNoticeFiles(teamId, imageFileContainers)
+      const downloadUrls = await StorageApi.uploadNoticeFiles(teamId, imageFileContainers)
       const noticeInput = {
         title: input.title,
         body: input.body,
         file_urls: downloadUrls
       }
-      const noticeId = await NoticeService.addNewNotice(authUser.uid, teamId, noticeInput);
+      const noticeId = await NoticeApi.addNewNotice(authUser.uid, teamId, noticeInput);
       if (!noticeId) {
         toast({
           description: "Fail to create notice-board. Please try again."
@@ -143,7 +143,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
         title: `New Notice created!`,
         description: input.title,
       })
-      await PushNotificationService.notifyTeamNewNotice(teamId, authUser.uid, input.title);
+      await PushNotificationApi.notifyTeamNewNotice(teamId, authUser.uid, input.title);
       setNoticeIdsUpdater((prev) => prev + 1)
 
       clearContents()

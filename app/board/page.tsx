@@ -12,7 +12,7 @@ import { TeamSelect } from '@/components/elements/design/team/team-select'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { currentTeamIdAtom } from '@/global-states/teamState'
 import { getPathPlan } from '@/components/util/helper/routes'
-import AuthService from '@/apis/AuthService'
+import AuthApi from '@/apis/AuthApi'
 import { toast } from '@/components/ui/use-toast'
 import { pendingReceivedInvitationsAtom } from '@/global-states/invitation-state'
 import { auth } from '@/firebase'
@@ -34,7 +34,7 @@ export default function BoardPage() {
 
   async function handleSignOut() {
     try {
-      await AuthService.logout()
+      await AuthApi.logout()
       setTeamId(null)
       toast({ title: "Goodbye :)" })
       router.replace("/")

@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { LandingMode } from "@/app/_components/landing-page"
-import { AuthService, UserService } from "@/apis"
+import { AuthApi, UserApi } from "@/apis"
 import {
   Form,
   FormControl,
@@ -43,18 +43,18 @@ export function Signup({ setMode }: { setMode: (mode: LandingMode) => void }) {
     setIsLoading(true)
     try {
       // 1. Register with Firebase Auth
-      const userCredential = await AuthService.register(data.email, data.password)
+      const userCredential = await AuthApi.register(data.email, data.password)
 
       if (userCredential.user) {
         // 2. Create user record in DB
-        await UserService.addNewUser(
+        await UserApi.addNewUser(
           userCredential.user.uid,
           data.email,
           data.name
         )
 
         // 3. Send Verification Email
-        await AuthService.sendEmailVerification(userCredential.user);
+        await AuthApi.sendEmailVerification(userCredential.user);
 
         toast({
           title: "Account created successfully!",

@@ -1,6 +1,6 @@
 import { atom, atomFamily, selectorFamily } from "recoil";
 import { MusicSheet } from "@/models/music_sheet";
-import MusicSheetService from "@/apis/MusicSheetService";
+import MusicSheetApi from "@/apis/MusicSheetApi";
 
 
 export const musicSheetIdsAtom = atomFamily<Array<string>, { teamId: string, songId: string }>({
@@ -12,7 +12,7 @@ export const musicSheetIdsAtom = atomFamily<Array<string>, { teamId: string, son
       try {
         get(musicSheetIdsUpdaterAtom)
 
-        const musicSheetList = await MusicSheetService.getSongMusicSheets(teamId, songId)
+        const musicSheetList = await MusicSheetApi.getSongMusicSheets(teamId, songId)
         if (!musicSheetList) return []
 
         return musicSheetList?.map(sheet => sheet.id)
@@ -65,7 +65,7 @@ export const musicSheetAtom = atomFamily<MusicSheet, { teamId: string, songId: s
     get: ({ teamId, songId, sheetId }) => async ({ get }) => {
       get(musicSheetUpdaterAtom)
       try {
-        const musicSheet = await MusicSheetService.getById(teamId, songId, sheetId) as MusicSheet
+        const musicSheet = await MusicSheetApi.getById(teamId, songId, sheetId) as MusicSheet
         if (!musicSheet) return null
 
         return musicSheet

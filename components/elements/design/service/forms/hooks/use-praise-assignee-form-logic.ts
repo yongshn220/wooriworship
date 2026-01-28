@@ -3,7 +3,7 @@ import { useRecoilValue } from "recoil";
 import { teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
 import { ServicePraiseAssignee } from "@/models/services/ServiceEvent";
-import { PraiseAssigneeService } from "@/apis/PraiseAssigneeService";
+import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
 import { useServiceRoles } from "../../service-form/hooks/use-service-roles";
 import { toast } from "@/components/ui/use-toast";
 
@@ -41,8 +41,8 @@ export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee,
 
     // Initialize Assignments
     useEffect(() => {
-        if (initialAssignee?.assignee) {
-            setWorshipRoles(initialAssignee.assignee);
+        if (initialAssignee?.assignments) {
+            setWorshipRoles(initialAssignee.assignments);
         }
     }, [initialAssignee, setWorshipRoles]);
 
@@ -53,7 +53,7 @@ export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee,
     // Initialize Config (Groups & Custom Names)
     useEffect(() => {
         if (teamId) {
-            PraiseAssigneeService.getServingConfig(teamId).then(config => {
+            PraiseTeamApi.getServiceConfig(teamId).then(config => {
                 if (config.customGroups.length > 0) {
                     setStandardGroups(prev => Array.from(new Set([...prev, ...config.customGroups])));
                 }
@@ -67,8 +67,8 @@ export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee,
     const handleSave = async () => {
         setIsLoading(true);
         try {
-            await PraiseAssigneeService.updateAssignees(teamId, serviceId, {
-                assignee: worshipRoles
+            await PraiseTeamApi.updatePraiseTeam(teamId, serviceId, {
+                assignments: worshipRoles
             });
             toast({ title: "Team assignments saved!" });
             onCompleted();
