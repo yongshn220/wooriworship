@@ -58,7 +58,7 @@ export function ServiceDetailView({
     );
 
     return (
-        <div className="space-y-5 pb-24">
+        <div className="space-y-5 pb-24" data-testid="service-detail">
             {/* 1. Info Card */}
             <ServiceInfoCard
                 scheduleId={event.id}
@@ -93,7 +93,7 @@ export function ServiceDetailView({
                     onEdit={() => setIsEditingSetlist(true)}
                 />
             ) : (
-                <div onClick={() => setIsEditingSetlist(true)} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all">
+                <div onClick={() => setIsEditingSetlist(true)} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all" data-testid="create-setlist-placeholder">
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                         <Music className="w-6 h-6 text-primary" />
                     </div>
@@ -112,7 +112,7 @@ export function ServiceDetailView({
                     onEdit={() => setIsEditingAssignee(true)}
                 />
             ) : (
-                <div onClick={() => setIsEditingAssignee(true)} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all">
+                <div onClick={() => setIsEditingAssignee(true)} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all" data-testid="create-team-placeholder">
                     <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                         <Users className="w-6 h-6 text-blue-500" />
                     </div>
@@ -130,7 +130,7 @@ export function ServiceDetailView({
                     onEdit={() => setIsEditingFlow(true)}
                 />
             ) : (
-                <div onClick={() => setIsEditingFlow(true)} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all">
+                <div onClick={() => setIsEditingFlow(true)} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all" data-testid="create-flow-placeholder">
                     <div className="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                         <ListOrdered className="w-6 h-6 text-orange-500" />
                     </div>

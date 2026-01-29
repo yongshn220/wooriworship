@@ -10,15 +10,31 @@ export function BoardAuthenticate({children}: Readonly<{ children: React.ReactNo
   const router = useRouter()
 
   useEffect(() => {
-    auth.onAuthStateChanged((authUser) => {
-      if (authUser) {
-        setAccess(true)
-      }
-      else {
-        toast({title: "Please login to access this page."})
-        router.replace("/")
-      }
-    });
+    let unsubscribe: (() => void) | null = null
+    let cancelled = false
+
+    // authStateReady() waits for Firebase Auth to finish resolving the
+    // persisted auth state from IndexedDB before we check auth status.
+    // Without this, onAuthStateChanged can fire with null during the
+    // initial persistence check, causing a redirect loop.
+    auth.authStateReady().then(() => {
+      if (cancelled) return
+
+      unsubscribe = auth.onAuthStateChanged((authUser) => {
+        if (cancelled) return
+        if (authUser) {
+          setAccess(true)
+        } else {
+          toast({title: "Please login to access this page."})
+          router.replace("/")
+        }
+      })
+    })
+
+    return () => {
+      cancelled = true
+      unsubscribe?.()
+    }
   }, [router]);
 
 

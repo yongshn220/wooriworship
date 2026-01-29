@@ -75,7 +75,7 @@ export function ServiceDetailContainer({ serviceId, teamId, roles, currentUserUi
 
     if (loading) {
         return (
-            <div className="flex justify-center p-12">
+            <div className="flex justify-center p-12" data-testid="service-loading">
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
         );

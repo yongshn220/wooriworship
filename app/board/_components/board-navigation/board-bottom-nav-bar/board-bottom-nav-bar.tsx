@@ -66,6 +66,7 @@ export function DefaultBoardBottomNavBar() {
           return (
             <motion.div
               key={item.label}
+              data-testid={`nav-${item.label.toLowerCase()}`}
               className={cn(
                 "w-16 h-full flex-col flex-center cursor-pointer transition-colors duration-300",
                 isActive ? "text-primary" : "text-muted-foreground"

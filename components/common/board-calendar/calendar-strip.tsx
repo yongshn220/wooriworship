@@ -144,7 +144,7 @@ export function CalendarStrip({
     const CARD_SIZE_CLASSES = "snap-start scroll-mx-4 shrink-0 w-[4.5rem] h-[5.5rem] rounded-xl flex flex-col items-center justify-center transition-colors relative";
 
     return (
-        <div className="relative group/calendar-strip">
+        <div className="relative group/calendar-strip" data-testid="calendar-strip">
             {/* Header */}
             <div className="flex items-center justify-between mb-2 px-1">
                 <span className="text-xs font-semibold text-muted-foreground">

@@ -25,7 +25,7 @@ export function ServiceInfoCard({ scheduleId, title, date, worshipId, teamId, on
     const dateStr = format(dateObj, "yyyy. M. d (EEE)");
 
     return (
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-5 relative overflow-hidden border border-blue-100 dark:border-blue-800/50">
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-5 relative overflow-hidden border border-blue-100 dark:border-blue-800/50" data-testid="service-info-card">
             <div className="flex flex-col gap-4 relative z-10">
                 <div className="flex justify-between items-start">
                     <div>
