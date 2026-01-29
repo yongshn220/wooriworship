@@ -1,20 +1,8 @@
-import { test as base, expect, Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 
 /**
- * Auth fixture that handles Firebase login.
- *
- * Usage:
- *   Set E2E_USER_EMAIL and E2E_USER_PASSWORD environment variables,
- *   or create a .env.test file in the project root.
- *
- *   E2E_USER_EMAIL=test@example.com
- *   E2E_USER_PASSWORD=testpassword123
- *   E2E_TEAM_ID=your-team-id
- */
-export const test = base.extend<{ authenticatedPage: typeof base }>({});
-
-/**
- * Login helper - call in beforeEach or use stored auth state.
+ * Login and wait for auth to settle.
+ * Firebase Auth + Next.js client-side routing can be slow.
  */
 export async function login(page: Page) {
   const email = process.env.E2E_USER_EMAIL;
@@ -28,32 +16,40 @@ export async function login(page: Page) {
   }
 
   await page.goto('/');
-
-  // Wait for animations and auth state check
+  await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
 
-  // Check if already logged in (redirected to /board)
+  // Already logged in?
   if (page.url().includes('/board')) return;
 
-  // Fill login form using label selectors (Playwright best practice)
+  // Fill and submit login form
   await page.getByLabel('Email').fill(email);
   await page.getByLabel('Password').fill(password);
   await page.getByRole('button', { name: 'Sign In' }).click();
 
-  // Wait for navigation to board (team selector)
-  await expect(page).toHaveURL(/\/board/, { timeout: 15000 });
+  // Wait for redirect: Firebase auth + Next.js router.replace can take time
+  await page.waitForURL('**/board**', { timeout: 30000 });
 }
 
 /**
- * Navigate to a specific team's board after login.
+ * Navigate to team's service board.
+ * Uses domcontentloaded instead of networkidle (Firebase keeps sockets open).
  */
 export async function navigateToTeam(page: Page, teamId?: string) {
   const id = teamId || process.env.E2E_TEAM_ID;
   if (!id) {
     throw new Error('Team ID required. Set E2E_TEAM_ID or pass teamId parameter.');
   }
+
   await page.goto(`/board/${id}/service-board`);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
+
+  // Wait until either content appears or loading spinner clears
+  // (timeout is OK - page may still be loading data)
+  await page.waitForFunction(
+    () => document.querySelectorAll('[class*="animate-spin"]').length === 0,
+    { timeout: 20000 }
+  ).catch(() => {});
 }
 
 export { expect };
