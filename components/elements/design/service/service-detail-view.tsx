@@ -18,6 +18,7 @@ import { SetlistPlanPreviewDrawer } from "@/components/elements/design/setlist/s
 import { PraiseAssigneeForm } from "./forms/praise-assignee-form";
 import { ServiceFlowForm } from "./forms/service-flow-form";
 import { SetlistForm } from "./forms/setlist-form";
+import { EmptyStateCard } from "@/components/elements/design/common/empty-state-card";
 
 
 interface Props {
@@ -93,13 +94,14 @@ export function ServiceDetailView({
                     onEdit={() => setIsEditingSetlist(true)}
                 />
             ) : (
-                <div onClick={() => setIsEditingSetlist(true)} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all" data-testid="create-setlist-placeholder">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <Music className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="text-base font-semibold">Create Setlist</h3>
-                    <p className="text-sm text-muted-foreground">Add songs to this service</p>
-                </div>
+                <EmptyStateCard
+                    onClick={() => setIsEditingSetlist(true)}
+                    icon={Music}
+                    iconColorClassName="bg-primary/10 text-primary"
+                    message="Create Setlist"
+                    description="Add songs to this service"
+                    data-testid="create-setlist-placeholder"
+                />
             )}
 
             {/* 3. Praise Assignee */}
@@ -112,13 +114,14 @@ export function ServiceDetailView({
                     onEdit={() => setIsEditingAssignee(true)}
                 />
             ) : (
-                <div onClick={() => setIsEditingAssignee(true)} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all" data-testid="create-team-placeholder">
-                    <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <Users className="w-6 h-6 text-blue-500" />
-                    </div>
-                    <h3 className="text-base font-semibold">Assign Team</h3>
-                    <p className="text-sm text-muted-foreground">Assign members for this service</p>
-                </div>
+                <EmptyStateCard
+                    onClick={() => setIsEditingAssignee(true)}
+                    icon={Users}
+                    iconColorClassName="bg-blue-500/10 text-blue-500"
+                    message="Assign Team"
+                    description="Assign members for this service"
+                    data-testid="create-team-placeholder"
+                />
             )}
 
             {/* 4. Service Flow */}
@@ -130,13 +133,14 @@ export function ServiceDetailView({
                     onEdit={() => setIsEditingFlow(true)}
                 />
             ) : (
-                <div onClick={() => setIsEditingFlow(true)} className="group border-2 border-dashed border-muted-foreground/20 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 hover:border-muted-foreground/40 transition-all" data-testid="create-flow-placeholder">
-                    <div className="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <ListOrdered className="w-6 h-6 text-orange-500" />
-                    </div>
-                    <h3 className="text-base font-semibold">Create Flow</h3>
-                    <p className="text-sm text-muted-foreground">Add service sequence items</p>
-                </div>
+                <EmptyStateCard
+                    onClick={() => setIsEditingFlow(true)}
+                    icon={ListOrdered}
+                    iconColorClassName="bg-orange-500/10 text-orange-500"
+                    message="Create Flow"
+                    description="Add service sequence items"
+                    data-testid="create-flow-placeholder"
+                />
             )}
 
             {/* Preview Drawer (Legacy or V3?) */}

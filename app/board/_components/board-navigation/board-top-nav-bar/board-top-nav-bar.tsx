@@ -34,7 +34,7 @@ const ActionButton = ({ onClick, icon: Icon, label, variant = 'default' }: Actio
     whileHover={{ scale: 1.05 }}
     whileTap={{ scale: 0.95 }}
     className={cn(
-      "group relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200",
+      "group relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 min-h-touch",
       variant === 'default'
         ? "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground"
         : "hover:bg-muted text-muted-foreground hover:text-foreground"
@@ -50,7 +50,7 @@ const CreateActionButton = ({ onClick }: { onClick: () => void }) => (
     onClick={onClick}
     whileHover={{ scale: 1.05 }}
     whileTap={{ scale: 0.95 }}
-    className="flex items-center justify-center w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-sm hover:opacity-90 transition-opacity"
+    className="flex items-center justify-center w-11 h-11 rounded-full bg-primary text-primary-foreground shadow-sm hover:opacity-90 transition-opacity"
   >
     <Plus className="w-5 h-5 stroke-[3px]" />
   </motion.button>
@@ -150,7 +150,7 @@ export function BoardTopNavBar() {
                 whileHover={{ scale: 1.1, rotate: 90 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={handleCloseSearch}
-                className="p-2 rounded-full hover:bg-muted text-muted-foreground"
+                className="p-2 rounded-full hover:bg-muted text-muted-foreground min-h-touch min-w-touch flex items-center justify-center"
               >
                 <XIcon className="w-5 h-5" />
               </motion.button>

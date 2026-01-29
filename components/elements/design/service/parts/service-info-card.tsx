@@ -45,7 +45,7 @@ export function ServiceInfoCard({ scheduleId, title, date, worshipId, teamId, on
                         scheduleTitle={title}
                         scheduleDate={format(dateObj, "yyyy/MM/dd")}
                         trigger={
-                            <button className="text-muted-foreground hover:text-foreground transition-colors p-1 -mr-2 -mt-2">
+                            <button className="text-muted-foreground hover:text-foreground transition-colors min-h-touch min-w-touch inline-flex items-center justify-center -mr-2 -mt-2">
                                 <MoreVertical className="w-5 h-5" />
                             </button>
                         }
@@ -63,7 +63,7 @@ export function ServiceInfoCard({ scheduleId, title, date, worshipId, teamId, on
                                     router.push(getPathWorshipView(teamId, worshipId));
                                 }
                             }}
-                            className="bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold h-9 rounded-xl px-4 shadow-sm border border-transparent transition-all active:scale-95 flex items-center gap-1.5"
+                            className="bg-card text-blue-600 dark:text-blue-400 hover:bg-muted font-semibold h-11 rounded-xl px-4 shadow-sm border border-transparent transition-all active:scale-95 flex items-center gap-1.5"
                         >
                             worship plan
                             <ArrowRight className="w-4 h-4" />
