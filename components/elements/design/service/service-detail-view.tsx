@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useRecoilValue } from "recoil";
 import { teamAtom, fetchServiceTagsSelector } from "@/global-states/teamState";
 import { ServiceEvent, ServiceSetlist, ServicePraiseTeam, ServiceFlow, ServiceRole } from "@/models/services/ServiceEvent";
+import { MyAssignmentRole } from "@/models/services/MyAssignment";
 import { User } from "@/models/user";
 import { getDynamicDisplayTitle } from "@/components/util/helper/helper-functions";
 import { SetlistApi } from "@/apis/SetlistApi";
@@ -38,6 +39,7 @@ interface Props {
     members: User[]; // Resolved members for Assignee
     currentUserUid?: string | null;
     onDataChanged?: () => void; // Callback to refetch data after form saves
+    myRoles?: MyAssignmentRole[];
 }
 
 export function ServiceDetailView({
@@ -49,7 +51,8 @@ export function ServiceDetailView({
     roles,
     members,
     currentUserUid,
-    onDataChanged
+    onDataChanged,
+    myRoles
 }: Props) {
     const router = useRouter();
     const team = useRecoilValue(teamAtom(teamId));
@@ -96,6 +99,7 @@ export function ServiceDetailView({
                 setlistId={null} // V3 uses separate Setlist
                 teamId={teamId}
                 onPreview={setPreviewSetlistId} // Keeps preview logic if we link V3 setlist to preview?
+                myRoles={myRoles}
             />
 
 

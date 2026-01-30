@@ -25,15 +25,20 @@ export class ServiceEventApi {
      * Fetches the list of Service Headers (Lightweight).
      * Used for the Calendar / Main Board view.
      */
-    static async getServiceEvents(teamId: string, startDate: Date, endDate: Date): Promise<ServiceEvent[]> {
+    static async getServiceEvents(teamId: string, startDate: Date, endDate: Date, limitCount?: number): Promise<ServiceEvent[]> {
         const startTs = Timestamp.fromDate(startDate);
         const endTs = Timestamp.fromDate(endDate);
 
-        const q = query(
-            collection(db, `teams/${teamId}/services`),
+        const constraints = [
             where("date", ">=", startTs),
             where("date", "<=", endTs),
-            orderBy("date", "asc")
+            orderBy("date", "asc"),
+            ...(limitCount ? [limit(limitCount)] : []),
+        ];
+
+        const q = query(
+            collection(db, `teams/${teamId}/services`),
+            ...constraints
         );
 
         const snapshot = await getDocs(q);

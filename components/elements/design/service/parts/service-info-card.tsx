@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, ArrowRight, MoreVertical } from "lucide-react";
+import { Calendar, ArrowRight, MoreVertical, Mic, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,8 @@ import { getPathSetlistView } from "@/components/util/helper/routes";
 import { Timestamp } from "@firebase/firestore";
 import { parseLocalDate } from "@/components/util/helper/helper-functions";
 import { ServiceHeaderMenu } from "../service-header-menu";
+import { MyAssignmentRole } from "@/models/services/MyAssignment";
+import { cn } from "@/lib/utils";
 
 interface Props {
     scheduleId: string;
@@ -16,9 +18,10 @@ interface Props {
     setlistId?: string;
     teamId: string;
     onPreview?: (setlistId: string) => void;
+    myRoles?: MyAssignmentRole[];
 }
 
-export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, onPreview }: Props) {
+export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, onPreview, myRoles }: Props) {
     const router = useRouter();
 
     const dateObj = date instanceof Timestamp ? date.toDate() : (date instanceof Date ? date : parseLocalDate(date));
@@ -36,6 +39,31 @@ export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, on
                             <Calendar className="w-4 h-4" />
                             <span className="text-sm">{dateStr}</span>
                         </div>
+                        {myRoles && myRoles.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mt-2">
+                                {myRoles.map((role, idx) => (
+                                    <span
+                                        key={idx}
+                                        className={cn(
+                                            "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold",
+                                            role.source === 'praise_team'
+                                                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                                                : "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
+                                        )}
+                                    >
+                                        {role.source === 'praise_team' ? (
+                                            <Mic className="w-3 h-3" />
+                                        ) : (
+                                            <User className="w-3 h-3" />
+                                        )}
+                                        {role.roleName}
+                                        {role.flowItemTitle && (
+                                            <span className="text-[10px] opacity-70">· {role.flowItemTitle}</span>
+                                        )}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <ServiceHeaderMenu

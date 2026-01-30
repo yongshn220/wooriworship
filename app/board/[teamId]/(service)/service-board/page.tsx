@@ -35,7 +35,7 @@ import { SwipeableView } from "@/components/elements/design/service/swipeable-vi
 import { ServiceDataPrefetcher } from "./_components/service-data-prefetcher";
 import { useMyAssignments } from "@/hooks/use-my-assignments";
 import { ServiceBoardHeaderLeft, ServiceBoardHeaderRight } from "./_components/service-board-header";
-import { MyAssignmentsSummary } from "./_components/my-assignments-summary";
+import { MyAssignmentRole } from "@/models/services/MyAssignment";
 import { GenericCalendarDrawer } from "@/components/common/board-calendar/generic-calendar-drawer";
 
 export default function ServingPage() {
@@ -112,9 +112,6 @@ export default function ServingPage() {
     });
 
     const handleModeChange = (newMode: 'all' | 'mine') => {
-        if (newMode === 'mine') {
-            setCacheVersion(prev => prev + 1);
-        }
         setFilterMode(newMode);
     };
 
@@ -135,12 +132,19 @@ export default function ServingPage() {
         return calendarItems;
     }, [calendarItems, filterMode, assignedServiceIds]);
 
+    // Current user's roles for the selected service (Mine mode)
+    const myRolesForSelected = useMemo(() => {
+        if (filterMode !== 'mine' || !selectedScheduleId) return undefined;
+        const assignment = myAssignments.find(a => a.serviceId === selectedScheduleId);
+        return assignment?.roles;
+    }, [filterMode, selectedScheduleId, myAssignments]);
+
     // Load schedules (Initial: Upcoming only)
     useEffect(() => {
         async function loadData() {
             if (!teamId) return;
             try {
-                // 1. Define Range: Recent Past + Future (Past 1 month to 6 months future)
+                // 1. Define Range: Past 3 months + Future 6 months
                 const todayStart = new Date();
                 todayStart.setHours(0, 0, 0, 0);
 
@@ -150,13 +154,13 @@ export default function ServingPage() {
                 const futureEnd = new Date(todayStart);
                 futureEnd.setMonth(futureEnd.getMonth() + 6);
 
-                const data = await ServiceEventApi.getServiceEvents(teamId, initialStart, futureEnd);
-
-                // Sort by date (ServiceEventApi orders ASC, we want ASC for future? 
-                // Wait, CalendarStrip usually likes sorted data. ServiceEventApi does ASC.
-                // But `setEvents(data)` replaces existing.
+                const [data, olderProbe] = await Promise.all([
+                    ServiceEventApi.getServiceEvents(teamId, initialStart, futureEnd),
+                    ServiceEventApi.getServiceEvents(teamId, new Date(2000, 0, 1), initialStart, 1),
+                ]);
 
                 setEvents(data);
+                setHasMorePast(olderProbe.length > 0);
 
                 // Select logic:
                 // 1. First upcoming event (>= today)
@@ -309,24 +313,6 @@ export default function ServingPage() {
                         assignedServiceIds={assignedServiceIds}
                     />
 
-                    {/* Assignment Summary (Mine mode only) */}
-                    {filterMode === 'mine' && (
-                        isAssignmentsLoading ? (
-                            <div className="space-y-2">
-                                <div className="h-4 w-40 bg-muted rounded animate-pulse" />
-                                <div className="h-20 bg-muted/50 rounded-xl animate-pulse" />
-                                <div className="h-20 bg-muted/50 rounded-xl animate-pulse" />
-                                <div className="h-20 bg-muted/50 rounded-xl animate-pulse" />
-                            </div>
-                        ) : (
-                            <MyAssignmentsSummary
-                                assignments={myAssignments}
-                                selectedServiceId={selectedScheduleId}
-                                onSelectService={setSelectedScheduleId}
-                            />
-                        )
-                    )}
-
                     {/* Details Section */}
                     <div className="mt-6">
                         <Suspense fallback={<ServiceListSkeleton />}>
@@ -336,6 +322,7 @@ export default function ServingPage() {
                                     teamId={teamId}
                                     roles={roles}
                                     currentUserUid={currentUserUid}
+                                    myRoles={myRolesForSelected}
                                 />
                             ) : (
                                 <div className="flex flex-col items-center justify-center p-10 text-muted-foreground border-2 border-dashed rounded-xl border-slate-200 dark:border-slate-800">

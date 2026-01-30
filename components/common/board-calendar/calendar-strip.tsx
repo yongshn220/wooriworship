@@ -130,7 +130,7 @@ export function CalendarStrip({
     };
 
 
-    const CARD_SIZE_CLASSES = "snap-start scroll-mx-4 shrink-0 w-[4.5rem] h-[5.5rem] rounded-xl flex flex-col items-center justify-center transition-colors relative";
+    const CARD_SIZE_CLASSES = "snap-start scroll-mx-4 shrink-0 w-[5.5rem] h-[7rem] rounded-xl flex flex-col items-center justify-center transition-colors relative";
 
     return (
         <div className="relative group/calendar-strip" data-testid="calendar-strip">
@@ -277,7 +277,7 @@ function DateCard({ item, isSelected, onSelect, baseClasses, setRef, assignedDot
             )}
         >
             <div className={cn(
-                "text-[9px] font-bold px-2 py-0.5 rounded-full absolute -top-2.5 border shadow-sm z-20 whitespace-nowrap",
+                "text-[10px] font-bold px-2 py-0.5 rounded-full absolute -top-2.5 border shadow-sm z-20 whitespace-nowrap",
                 isSelected
                     ? "text-primary bg-blue-50 dark:bg-blue-900/40 border-blue-100 dark:border-blue-800"
                     : "text-muted-foreground bg-muted dark:bg-white/10 border-border-light dark:border-border-dark -top-2"
@@ -286,25 +286,25 @@ function DateCard({ item, isSelected, onSelect, baseClasses, setRef, assignedDot
             </div>
 
             <span className={cn(
-                "text-[9px] font-bold uppercase mt-3",
+                "text-[11px] font-bold uppercase mt-3",
                 isSelected ? "text-primary" : "text-muted-foreground group-hover:text-primary"
             )}>
                 {month}
             </span>
             <span className={cn(
-                "text-xl font-bold -my-0.5",
+                "text-2xl font-bold -my-0.5",
                 isSelected ? "text-foreground" : "text-foreground"
             )}>
                 {day}
             </span>
 
             <div className="flex flex-col items-center leading-none mt-0.5">
-                <span className="text-[9px] font-medium text-muted-foreground">
+                <span className="text-[11px] font-medium text-muted-foreground">
                     {weekDay}
                 </span>
                 {dDayLabel && (
                     <span className={cn(
-                        "text-[9px] font-bold mt-0.5",
+                        "text-[10px] font-bold mt-0.5",
                         isSelected ? "text-blue-600 dark:text-blue-400" : "text-blue-500/80"
                     )}>
                         {dDayLabel}
@@ -313,7 +313,7 @@ function DateCard({ item, isSelected, onSelect, baseClasses, setRef, assignedDot
             </div>
 
             {assignedDot && !isSelected && (
-                <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-500 rounded-full" />
             )}
         </button>
     );

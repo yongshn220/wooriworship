@@ -5,6 +5,7 @@ import { useRecoilValue } from "recoil";
 import { usersAtom } from "@/global-states/userState";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
 import { ServiceEvent, ServiceSetlist, ServicePraiseTeam, ServiceFlow, ServiceFormState, ServiceRole } from "@/models/services/ServiceEvent";
+import { MyAssignmentRole } from "@/models/services/MyAssignment";
 import { ServiceDetailView } from "./service-detail-view";
 import { Loader2 } from "lucide-react";
 
@@ -13,9 +14,10 @@ interface Props {
     teamId: string;
     roles: ServiceRole[]; // Passed from page (fetched via ServiceEventApi or ServingService)
     currentUserUid?: string | null;
+    myRoles?: MyAssignmentRole[];
 }
 
-export function ServiceDetailContainer({ serviceId, teamId, roles, currentUserUid }: Props) {
+export function ServiceDetailContainer({ serviceId, teamId, roles, currentUserUid, myRoles }: Props) {
     const [data, setData] = useState<{
         event: ServiceEvent;
         setlist: ServiceSetlist | null;
@@ -94,6 +96,7 @@ export function ServiceDetailContainer({ serviceId, teamId, roles, currentUserUi
             members={members}
             currentUserUid={currentUserUid}
             onDataChanged={refetchData}
+            myRoles={myRoles}
         />
     );
 }
