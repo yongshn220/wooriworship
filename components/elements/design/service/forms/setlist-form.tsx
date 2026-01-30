@@ -58,7 +58,7 @@ export function SetlistForm({ teamId, serviceId, initialSetlist, onCompleted, on
     }, [step]);
 
     return (
-        <FullScreenForm>
+        <FullScreenForm data-testid="setlist-form">
             <FullScreenFormHeader
                 steps={["Context", "Setlist"]}
                 currentStep={step}
@@ -199,6 +199,7 @@ export function SetlistForm({ teamId, serviceId, initialSetlist, onCompleted, on
                     </Button>
                 </div>
                 <Button
+                    data-testid="form-submit"
                     className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:bg-muted disabled:text-muted-foreground/50 disabled:opacity-100 disabled:shadow-none"
                     onClick={step === totalSteps - 1 ? handleSave : nextStep}
                     disabled={isLoading}

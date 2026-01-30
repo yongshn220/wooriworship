@@ -63,9 +63,8 @@ export function getPathWorship(teamId: string, worshipId: string) {
   return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SERVING // TODO: deep link support
 }
 
-export function getPathWorshipView(teamId: string, worshipId: string) {
-  // Redirect to Service Board
-  return getPathServing(teamId);
+export function getPathWorshipView(teamId: string, serviceId: string) {
+  return "/" + Page.BOARD + `/${teamId}` + "/setlist-view" + `/${serviceId}`
 }
 
 export function getPathCreateServing(teamId: string) {

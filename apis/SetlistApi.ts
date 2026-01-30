@@ -1,5 +1,5 @@
 import { db } from "@/firebase";
-import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc, Timestamp } from "firebase/firestore";
 import { ServiceSetlist } from "@/models/services/ServiceEvent";
 import { Song } from "@/models/song";
 import SongApi from "./SongApi";
@@ -88,5 +88,14 @@ export class SetlistApi {
     static async initSetlist(teamId: string, serviceId: string) {
         const ref = doc(db, `teams/${teamId}/services/${serviceId}/setlists/main`);
         await setDoc(ref, { id: 'main', songs: [] });
+    }
+
+    /**
+     * Deletes the setlist for a specific service.
+     */
+    static async deleteSetlist(teamId: string, serviceId: string): Promise<void> {
+        if (!teamId || !serviceId) return;
+        const ref = doc(db, `teams/${teamId}/services/${serviceId}/setlists/main`);
+        await deleteDoc(ref);
     }
 }

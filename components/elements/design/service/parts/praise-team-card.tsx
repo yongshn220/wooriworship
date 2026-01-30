@@ -13,19 +13,20 @@ interface Props {
     members: User[];
     currentUserUid?: string | null;
     onEdit?: () => void;
+    onDelete?: () => void;
 }
 
-export function PraiseTeamCard({ praiseAssignments, roles, members, currentUserUid, onEdit }: Props) {
+export function PraiseTeamCard({ praiseAssignments, roles, members, currentUserUid, onEdit, onDelete }: Props) {
     if (!praiseAssignments || praiseAssignments.length === 0) return null;
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-2" data-testid="praise-team-card">
             <SectionHeader
                 icon={Music}
                 iconColorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
                 title="Praise Team"
-                badge={`${praiseAssignments.length} roles`}
                 onEdit={onEdit}
+                onDelete={onDelete}
             />
 
             <SectionCardContainer>

@@ -1,13 +1,20 @@
 "use client";
 
-import { Music, Users, ListOrdered } from "lucide-react";
+import { ListMusic, Users, ListOrdered } from "lucide-react";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useRecoilValue } from "recoil";
 import { teamAtom, fetchServiceTagsSelector } from "@/global-states/teamState";
 import { ServiceEvent, ServiceSetlist, ServicePraiseTeam, ServiceFlow, ServiceRole } from "@/models/services/ServiceEvent";
 import { User } from "@/models/user";
 import { getDynamicDisplayTitle } from "@/components/util/helper/helper-functions";
+import { SetlistApi } from "@/apis/SetlistApi";
+import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
+import { ServiceFlowApi } from "@/apis/ServiceFlowApi";
+import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
+import { useToast } from "@/components/ui/use-toast";
+import { getPathWorshipView } from "@/components/util/helper/routes";
 
 // Parts
 import { ServiceInfoCard } from "./parts/service-info-card";
@@ -44,12 +51,33 @@ export function ServiceDetailView({
     currentUserUid,
     onDataChanged
 }: Props) {
+    const router = useRouter();
     const team = useRecoilValue(teamAtom(teamId));
     const serviceTags = useRecoilValue(fetchServiceTagsSelector(teamId));
     const [previewSetlistId, setPreviewSetlistId] = useState<string | null>(null);
     const [isEditingSetlist, setIsEditingSetlist] = useState(false);
     const [isEditingAssignee, setIsEditingAssignee] = useState(false);
     const [isEditingFlow, setIsEditingFlow] = useState(false);
+    const { toast } = useToast();
+    const [deletingTarget, setDeletingTarget] = useState<"setlist" | "assignee" | "flow" | null>(null);
+
+    const handleDeleteSetlist = async () => {
+        await SetlistApi.deleteSetlist(teamId, event.id);
+        toast({ title: "Setlist deleted" });
+        onDataChanged?.();
+    };
+
+    const handleDeleteAssignee = async () => {
+        await PraiseTeamApi.deletePraiseTeam(teamId, event.id);
+        toast({ title: "Praise team deleted" });
+        onDataChanged?.();
+    };
+
+    const handleDeleteFlow = async () => {
+        await ServiceFlowApi.deleteFlow(teamId, event.id);
+        toast({ title: "Service flow deleted" });
+        onDataChanged?.();
+    };
 
     // Resolve Display Title
     const displayTitle = getDynamicDisplayTitle(
@@ -92,11 +120,13 @@ export function ServiceDetailView({
                         updated_by: { id: "", time: { seconds: 0, nanoseconds: 0 } as any }
                     }))}
                     onEdit={() => setIsEditingSetlist(true)}
+                    onDelete={() => setDeletingTarget("setlist")}
+                    onWorshipView={() => router.push(getPathWorshipView(teamId, event.id))}
                 />
             ) : (
                 <EmptyStateCard
                     onClick={() => setIsEditingSetlist(true)}
-                    icon={Music}
+                    icon={ListMusic}
                     iconColorClassName="bg-primary/10 text-primary"
                     message="Create Setlist"
                     description="Add songs to this service"
@@ -112,6 +142,7 @@ export function ServiceDetailView({
                     members={members}
                     currentUserUid={currentUserUid}
                     onEdit={() => setIsEditingAssignee(true)}
+                    onDelete={() => setDeletingTarget("assignee")}
                 />
             ) : (
                 <EmptyStateCard
@@ -131,6 +162,7 @@ export function ServiceDetailView({
                     members={members}
                     currentUserUid={currentUserUid}
                     onEdit={() => setIsEditingFlow(true)}
+                    onDelete={() => setDeletingTarget("flow")}
                 />
             ) : (
                 <EmptyStateCard
@@ -191,6 +223,29 @@ export function ServiceDetailView({
                     onClose={() => setIsEditingFlow(false)}
                 />
             )}
+
+            {/* Delete Confirmation Dialogs */}
+            <DeleteConfirmationDialog
+                isOpen={deletingTarget === "setlist"}
+                setOpen={(open) => !open && setDeletingTarget(null)}
+                title="Delete Setlist?"
+                description="All songs in this setlist will be removed. This action cannot be undone."
+                onDeleteHandler={handleDeleteSetlist}
+            />
+            <DeleteConfirmationDialog
+                isOpen={deletingTarget === "assignee"}
+                setOpen={(open) => !open && setDeletingTarget(null)}
+                title="Delete Praise Team?"
+                description="All team assignments will be removed. This action cannot be undone."
+                onDeleteHandler={handleDeleteAssignee}
+            />
+            <DeleteConfirmationDialog
+                isOpen={deletingTarget === "flow"}
+                setOpen={(open) => !open && setDeletingTarget(null)}
+                title="Delete Service Flow?"
+                description="All flow items will be removed. This action cannot be undone."
+                onDeleteHandler={handleDeleteFlow}
+            />
         </div>
     );
 }

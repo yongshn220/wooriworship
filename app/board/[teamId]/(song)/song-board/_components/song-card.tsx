@@ -23,6 +23,7 @@ export function SongCard({ teamId, songId, index }: Props) {
     return (
         <div
             className="relative transition-colors duration-200 group min-h-[80px] hover:bg-muted/50"
+            data-testid="song-item"
         >
             <SongDetailDialogTrigger teamId={teamId} songId={songId}>
                 <div className="flex items-center w-full h-full p-3 sm:p-5 gap-3 cursor-pointer">

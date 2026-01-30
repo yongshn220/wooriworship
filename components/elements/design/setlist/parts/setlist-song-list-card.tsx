@@ -1,10 +1,10 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Music } from "lucide-react";
+import { ListMusic, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
 import { SectionHeader, SectionCardContainer } from "@/components/common/section-card";
+import { Button } from "@/components/ui/button";
 
 import { Song } from "@/models/song";
 
@@ -12,19 +12,21 @@ interface Props {
     songs: Song[];
     teamId: string;
     onEdit?: () => void;
+    onDelete?: () => void;
+    onWorshipView?: () => void;
 }
 
-export function SetlistSongListCard({ songs = [], teamId, onEdit }: Props) {
+export function SetlistSongListCard({ songs = [], teamId, onEdit, onDelete, onWorshipView }: Props) {
     const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-2" data-testid="setlist-card">
             <SectionHeader
-                icon={Music}
+                icon={ListMusic}
                 iconColorClassName="bg-primary/10 text-primary"
-                title="Songs"
-                badge={`${songs?.length || 0}`}
+                title="Setlist"
                 onEdit={onEdit}
+                onDelete={onDelete}
             />
 
             <SectionCardContainer>
@@ -35,25 +37,23 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit }: Props) {
                             return (
                                 <div
                                     key={song.id || idx}
-                                    className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors cursor-pointer active:bg-muted/50"
+                                    className="grid grid-cols-[2.5rem_1fr_1.1fr] gap-3 px-3 py-3 items-center hover:bg-muted/50 transition-colors cursor-pointer"
                                     onClick={() => song.id && setSelectedSongId(song.id)}
                                 >
-                                    <div className="w-8 text-center shrink-0 text-sm font-bold text-muted-foreground/50">
-                                        {idx + 1}
+                                    <div className="text-muted-foreground font-mono text-xs font-medium">
+                                        {(idx + 1).toString().padStart(2, '0')}
                                     </div>
-                                    <div className="w-10 flex justify-center shrink-0">
+                                    <div className="font-semibold text-sm text-foreground leading-tight truncate">
+                                        {song.title || "Untitled"}
+                                    </div>
+                                    <div className="text-right flex flex-col items-end">
                                         {song?.keys?.[0] ? (
-                                            <Badge variant="outline" className="font-mono text-sm font-bold border-border bg-muted/20 px-1.5">
+                                            <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-lg border text-[11px] font-bold shadow-sm whitespace-nowrap bg-card border-border text-muted-foreground">
                                                 {song.keys[0]}
-                                            </Badge>
+                                            </span>
                                         ) : (
                                             <span className="text-xs text-muted-foreground">-</span>
                                         )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="font-semibold text-foreground truncate">
-                                            {song.title || "Untitled"}
-                                        </h4>
                                     </div>
                                 </div>
                             )
@@ -62,6 +62,18 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit }: Props) {
                 ) : (
                     <div className="p-8 text-center text-muted-foreground italic">
                         No songs added yet.
+                    </div>
+                )}
+                {onWorshipView && (
+                    <div className="flex justify-end px-3 py-2 border-t border-border">
+                        <Button
+                            variant="ghost"
+                            onClick={onWorshipView}
+                            className="text-blue-600 dark:text-blue-400 hover:bg-muted font-semibold h-9 rounded-xl px-3 text-sm flex items-center gap-1.5"
+                        >
+                            worship plan
+                            <ArrowRight className="w-4 h-4" />
+                        </Button>
                     </div>
                 )}
             </SectionCardContainer>

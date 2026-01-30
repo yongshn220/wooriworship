@@ -14,7 +14,7 @@ export function NewNoticeButton() {
 
   return (
     <div>
-      <Button disabled={!teamId} className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={() => router.push(getPathCreateNotice(teamId))}>
+      <Button disabled={!teamId} className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={() => router.push(getPathCreateNotice(teamId))} data-testid="create-notice-button">
         + Add Notice
       </Button>
     </div>

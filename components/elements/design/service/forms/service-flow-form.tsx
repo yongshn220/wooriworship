@@ -86,7 +86,7 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
     const [memberSearchQuery, setMemberSearchQuery] = React.useState("");
 
     return (
-        <FullScreenForm>
+        <FullScreenForm data-testid="service-flow-form">
             <FullScreenFormHeader
                 steps={["Cuesheet"]}
                 currentStep={0}
@@ -295,6 +295,7 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                 </div>
 
                 <Button
+                    data-testid="form-submit"
                     className="h-12 w-full rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                     onClick={handleSave}
                     disabled={isLoading}

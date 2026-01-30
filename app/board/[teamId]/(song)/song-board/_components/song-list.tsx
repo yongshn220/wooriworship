@@ -139,7 +139,7 @@ export function SongList({ teamId }: Props) {
         <div className="w-32 shrink-0 text-center">Key</div>
       </div>
 
-      <div className="flex flex-col divide-y divide-border">
+      <div className="flex flex-col divide-y divide-border" data-testid="song-list">
         {
           visibleSongIds.map((songId, index) => (
             <div key={songId} id={`song-row-${index}`}>

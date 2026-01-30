@@ -317,7 +317,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
 
 
   return (
-    <FullScreenForm>
+    <FullScreenForm data-testid="song-form">
       <FullScreenFormHeader
         steps={["Identity", "Details", "Context", "Sheets"]}
         currentStep={step}
@@ -354,6 +354,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
                     value={songInput.title}
                     onChange={(e) => setSongInput(prev => ({ ...prev, title: e.target.value }))}
                     className="text-2xl font-black bg-secondary/40 border-border h-16 rounded-2xl focus-visible:ring-ring"
+                    data-testid="song-title-input"
                   />
                 </div>
                 <div className="space-y-2">
@@ -538,6 +539,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
           onClick={step === totalSteps - 1 ? (mode === FormMode.CREATE ? handleCreate : handleEdit) : nextStep}
           disabled={isLoading || (step === 0 && !songInput.title)}
           className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
+          data-testid="form-submit"
         >
           {isLoading ? "Saving..." : step === totalSteps - 1 ? (mode === FormMode.CREATE ? "Create Song" : "Save Changes") : "Next Step"}
           {step === totalSteps - 1 ? <Check className="w-5 h-5 ml-1" /> : <ArrowRight className="w-5 h-5 ml-1" />}

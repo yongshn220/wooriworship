@@ -40,6 +40,7 @@ export function NoticeHeaderDefault({ noticeId, teamId }: Props) {
           e.stopPropagation();
           setIsExpanded(false);
         }}
+        data-testid="notice-item"
       >
         <div className="p-5 sm:p-6">
           <div className="flex justify-between items-start">

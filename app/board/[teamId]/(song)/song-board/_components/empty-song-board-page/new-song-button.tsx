@@ -13,7 +13,7 @@ export function NewSongButton() {
 
   return (
     <div>
-      <Button disabled={!teamId} className="bg-blue-500 hover:bg-blue-400" onClick={() => router.push(getPathCreateSong(teamId))}>
+      <Button disabled={!teamId} className="bg-blue-500 hover:bg-blue-400" onClick={() => router.push(getPathCreateSong(teamId))} data-testid="create-song-button">
         + Add Song
       </Button>
     </div>

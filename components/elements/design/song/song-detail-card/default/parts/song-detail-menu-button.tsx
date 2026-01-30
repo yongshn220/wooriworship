@@ -60,7 +60,7 @@ export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = fal
     <>
       <DeleteConfirmationDialog isOpen={isDeleteDialogOpen} setOpen={setDeleteDialogOpen} title="Delete Song" description={`Do you really want to delete [${songTitle}]? This action can't be undone.`} onDeleteHandler={handleDeleteSong} />
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger data-testid="song-menu">
           <MenuIcon />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="min-w-[200px] p-2 flex-center flex-col">
@@ -80,12 +80,12 @@ export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = fal
               <CopyIcon className="mr-3 w-5 h-5" />
               <p>Duplicate</p>
             </Button>
-            <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => handleEditSong()}>
+            <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => handleEditSong()} data-testid="song-edit">
               <SquarePen className="mr-3 w-5 h-5" />
               <p>Edit</p>
             </Button>
             {!readOnly && (
-              <Button variant="ghost" className="text-red-600 focus:bg-red-50 focus:text-red-500 cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteDialogOpen((prev) => !prev)}>
+              <Button variant="ghost" className="text-red-600 focus:bg-red-50 focus:text-red-500 cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteDialogOpen((prev) => !prev)} data-testid="song-delete">
                 <Trash2Icon className="mr-3 w-5 h-5" />
                 <p>Delete</p>
               </Button>

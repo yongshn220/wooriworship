@@ -45,6 +45,15 @@ export class ServiceFlowApi {
         await setDoc(ref, { id: 'main', items: [] });
     }
 
+    /**
+     * Deletes the flow for a specific service.
+     */
+    static async deleteFlow(teamId: string, serviceId: string): Promise<void> {
+        if (!teamId || !serviceId) return;
+        const ref = doc(db, `teams/${teamId}/services/${serviceId}/flows/main`);
+        await deleteDoc(ref);
+    }
+
     // =========================================================================
     // 2. Flow Templates (teams/{teamId}/service_flow_templates)
     // =========================================================================

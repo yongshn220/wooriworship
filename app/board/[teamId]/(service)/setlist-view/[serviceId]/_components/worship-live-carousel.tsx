@@ -1,0 +1,116 @@
+'use client'
+
+import * as React from "react"
+import { useEffect, useMemo, useState } from "react"
+import { Carousel, type CarouselApi, CarouselContent, } from "@/components/ui/carousel"
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { setlistAtom } from "@/global-states/setlist-state";
+import { SetlistSongHeader } from "@/models/setlist";
+import { worshipIndexAtom, worshipIndexChangeEventAtom, worshipNoteAtom, worshipMultipleSheetsViewModeAtom } from "../_states/worship-detail-states";
+import { WorshipLiveCarouselItemWrapper } from "./worship-live-carousel-item";
+
+interface Props {
+    teamId: string
+    serviceId: string
+}
+
+export interface MusicSheetCounts {
+    id: string,
+    count: number,
+    note?: string
+}
+
+export function WorshipLiveCarousel({ teamId, serviceId }: Props) {
+    const setlist = useRecoilValue(setlistAtom({ teamId, setlistId: serviceId }))
+    const setWorshipIndex = useSetRecoilState(worshipIndexAtom)
+    const setWorshipNote = useSetRecoilState(worshipNoteAtom)
+    const worshipIndexChangeEvent = useRecoilValue(worshipIndexChangeEventAtom)
+    const [musicSheetCounts, setMusicSheetCounts] = useState<Array<MusicSheetCounts>>([])
+    const [api, setApi] = useState<CarouselApi>()
+    const carouselOptions = useMemo(() => ({ align: "start" } as const), [])
+
+    const aggregatedSongHeaders = useMemo(() => {
+        const headers: Array<SetlistSongHeader> = []
+        if (setlist?.beginning_song?.id) {
+            headers.push(setlist?.beginning_song)
+        }
+        setlist?.songs?.forEach((songHeader) => {
+            headers.push(songHeader)
+        })
+        if (setlist?.ending_song?.id) {
+            headers.push(setlist?.ending_song)
+        }
+        return headers
+    }, [setlist?.beginning_song, setlist?.ending_song, setlist?.songs])
+
+    const sortedMusicSheetCounts = useMemo(() => {
+        return aggregatedSongHeaders.map(header =>
+            musicSheetCounts.find(c => c.id === header.id)
+        ).filter((item): item is MusicSheetCounts => !!item)
+    }, [aggregatedSongHeaders, musicSheetCounts])
+
+    useEffect(() => {
+        if (api) {
+            api.scrollTo(worshipIndexChangeEvent);
+        }
+    }, [api, worshipIndexChangeEvent]);
+
+    useEffect(() => {
+        if (!api) return
+
+        const handleSelect = () => {
+            const currentIndex = api.selectedScrollSnap()
+            setWorshipIndex((prev) => ({ ...prev, current: currentIndex }))
+
+            let accumulatedCount = 0
+            let foundNote = ""
+
+            for (const item of sortedMusicSheetCounts) {
+                if (currentIndex < accumulatedCount + item.count) {
+                    foundNote = item.note || ""
+                    break
+                }
+                accumulatedCount += item.count
+            }
+            setWorshipNote(foundNote)
+        }
+
+        api.on("select", handleSelect)
+        handleSelect()
+
+        return () => {
+            api.off("select", handleSelect)
+        }
+    }, [sortedMusicSheetCounts, setWorshipIndex, setWorshipNote, api])
+
+    const multipleSheetsViewMode = useRecoilValue(worshipMultipleSheetsViewModeAtom)
+
+    useEffect(() => {
+        setWorshipIndex((prev) => ({ ...prev, current: 0 }))
+        if (api) {
+            api.scrollTo(0, true)
+        }
+    }, [multipleSheetsViewMode, setWorshipIndex, api])
+
+    useEffect(() => {
+        let totalCounts = 0
+        sortedMusicSheetCounts.forEach((count) => {
+            totalCounts += count?.count
+        })
+        setWorshipIndex((prev) => ({ ...prev, total: totalCounts }))
+    }, [sortedMusicSheetCounts, setWorshipIndex]);
+
+    return (
+        <div id="song-carousel" className="w-full h-full">
+            <Carousel opts={carouselOptions} setApi={setApi} className="w-full h-full">
+                <CarouselContent className="h-full">
+                    {
+                        aggregatedSongHeaders?.map((songHeader, index) => (
+                            <WorshipLiveCarouselItemWrapper key={index} teamId={teamId} songHeader={songHeader} setMusicSheetCounts={setMusicSheetCounts} />
+                        ))
+                    }
+                </CarouselContent>
+            </Carousel>
+        </div>
+    )
+}

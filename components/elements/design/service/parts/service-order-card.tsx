@@ -12,19 +12,20 @@ interface Props {
     members: User[];
     currentUserUid?: string | null;
     onEdit?: () => void;
+    onDelete?: () => void;
 }
 
-export function ServiceOrderCard({ items, members, currentUserUid, onEdit }: Props) {
+export function ServiceOrderCard({ items, members, currentUserUid, onEdit, onDelete }: Props) {
     if (!items || items.length === 0) return null;
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-2" data-testid="service-order-card">
             <SectionHeader
                 icon={List}
                 iconColorClassName="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400"
                 title="Service Order"
-                badge={`${items.length} items`}
                 onEdit={onEdit}
+                onDelete={onDelete}
             />
 
             <SectionCardContainer>
