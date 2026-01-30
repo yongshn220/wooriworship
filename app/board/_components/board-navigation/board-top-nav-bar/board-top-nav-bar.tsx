@@ -12,7 +12,7 @@ import { BaseTopNavBar } from "@/components/elements/util/navigation/base-top-na
 import { MainLogoSmall } from "@/components/elements/util/logo/main-logo";
 import { currentPageAtom } from "@/global-states/page-state";
 import { motion, AnimatePresence } from "framer-motion";
-import { headerActionsAtom, planSearchInputAtom, songSearchInputAtom } from "@/app/board/_states/board-states";
+import { headerActionsAtom, headerLeftContentAtom, planSearchInputAtom, songSearchInputAtom } from "@/app/board/_states/board-states";
 
 interface HeaderConfig {
   title?: string;
@@ -65,6 +65,7 @@ export function BoardTopNavBar() {
   const setSongSearch = useSetRecoilState(songSearchInputAtom);
   const setPlanSearch = useSetRecoilState(planSearchInputAtom);
   const headerActions = useRecoilValue(headerActionsAtom);
+  const headerLeftContent = useRecoilValue(headerLeftContentAtom);
 
   useEffect(() => {
     setIsSearchOpen(false);
@@ -164,9 +165,11 @@ export function BoardTopNavBar() {
               transition={{ duration: 0.2 }}
               className="w-full flex items-center justify-between"
             >
-              {/* Left Side: Title or Logo */}
+              {/* Left Side: Custom Content, Logo, or Title */}
               <div className="flex items-center gap-3">
-                {currentConfig.showLogo ? (
+                {headerLeftContent ? (
+                  headerLeftContent
+                ) : currentConfig.showLogo ? (
                   <div className="opacity-90 hover:opacity-100 transition-opacity">
                     <MainLogoSmall />
                   </div>

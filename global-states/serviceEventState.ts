@@ -1,5 +1,5 @@
 import { atom, selector, selectorFamily, atomFamily } from "recoil";
-import { ServiceEvent, ServiceSetlist, ServicePraiseTeam, ServiceFlow } from "@/models/services/ServiceEvent";
+import { ServiceEvent, ServiceSetlist, ServicePraiseTeam, ServiceFlow, ServiceAssignment, ServiceFlowItem } from "@/models/services/ServiceEvent";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
 
 // =============================================================================
@@ -78,4 +78,23 @@ export const serviceListUpdaterAtom = atom({
 export const serviceEventsListAtom = atom<ServiceEvent[]>({
     key: "serviceEventsListAtom",
     default: []
+});
+
+// =============================================================================
+// 4. My Assignments State
+// =============================================================================
+export const serviceFilterModeAtom = atom<'all' | 'mine'>({
+    key: "serviceFilterModeAtom",
+    default: 'all',
+});
+
+// Cache: service ID -> unwrapped assignment data
+// PraiseTeamApi.getPraiseTeam() returns ServicePraiseTeam | null -> we store .assignments
+// ServiceFlowApi.getFlow() returns ServiceFlow | null -> we store .items
+export const myAssignmentsCacheAtom = atom<Record<string, {
+    praiseTeamAssignments: ServiceAssignment[];
+    flowItems: ServiceFlowItem[];
+}>>({
+    key: "myAssignmentsCacheAtom",
+    default: {},
 });

@@ -17,6 +17,11 @@ export const headerActionsAtom = atom<React.ReactNode | null>({
   default: null,
 });
 
+export const headerLeftContentAtom = atom<React.ReactNode | null>({
+    key: 'headerLeftContentAtom',
+    default: null,
+});
+
 export const searchSelectedTagsAtom = atom<Array<string>>({
   key: "searchSelectedTagsAtom",
   default: []

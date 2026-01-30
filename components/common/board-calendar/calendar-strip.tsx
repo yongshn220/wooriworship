@@ -2,10 +2,9 @@
 
 import { cn } from "@/lib/utils";
 import { format, differenceInCalendarDays } from "date-fns";
-import { Calendar, Loader2, History, ChevronRight, ChevronLeft } from "lucide-react";
-import { useEffect, useRef, useState, useLayoutEffect } from "react";
+import { Loader2, History, ChevronRight, ChevronLeft } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { CalendarItem } from "./types";
-import { GenericCalendarDrawer } from "./generic-calendar-drawer";
 import { useAnchorScroll } from "./use-anchor-scroll";
 
 interface Props {
@@ -15,7 +14,7 @@ interface Props {
     onLoadPrev?: () => void;
     isLoadingPrev?: boolean;
     hasMorePast?: boolean;
-    calendarDrawerTitle?: string;
+    assignedServiceIds?: string[];
 }
 
 export function CalendarStrip({
@@ -25,10 +24,10 @@ export function CalendarStrip({
     onLoadPrev,
     isLoadingPrev,
     hasMorePast = true,
+    assignedServiceIds,
 }: Props) {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
-    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     // State to track direction of the selected item relative to the viewport
     const [selectionDirection, setSelectionDirection] = useState<'left' | 'right' | null>(null);
@@ -47,16 +46,6 @@ export function CalendarStrip({
             captureAnchor();
             onLoadPrev();
         }
-    };
-
-    const getMonthLabel = () => {
-        if (selectedId) {
-            const selected = items.find(s => s.id === selectedId);
-            if (selected) {
-                return format(selected.date, "MMMM yyyy");
-            }
-        }
-        return format(new Date(), "MMMM yyyy");
     };
 
     // --- Scroll Management ---
@@ -145,20 +134,6 @@ export function CalendarStrip({
 
     return (
         <div className="relative group/calendar-strip" data-testid="calendar-strip">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-2 px-1">
-                <span className="text-xs font-semibold text-muted-foreground">
-                    {getMonthLabel()}
-                </span>
-                <button
-                    onClick={() => setIsCalendarOpen(true)}
-                    className="text-primary text-[11px] font-bold uppercase hover:bg-muted px-2 py-1 rounded transition-colors tracking-wide flex items-center gap-1 min-h-touch"
-                >
-                    CALENDAR
-                    <Calendar className="w-3.5 h-3.5" />
-                </button>
-            </div>
-
             {/* Horizontal Scroll Container */}
             <div
                 ref={scrollContainerRef}
@@ -185,6 +160,7 @@ export function CalendarStrip({
                             if (el) itemRefs.current.set(item.id, el);
                             else itemRefs.current.delete(item.id);
                         }}
+                        assignedDot={assignedServiceIds?.includes(item.id)}
                     />
                 ))}
 
@@ -215,13 +191,6 @@ export function CalendarStrip({
                 </button>
             )}
 
-            <GenericCalendarDrawer
-                open={isCalendarOpen}
-                onOpenChange={setIsCalendarOpen}
-                items={items}
-                selectedId={selectedId}
-                onSelect={onSelect}
-            />
         </div >
     );
 }
@@ -269,9 +238,10 @@ interface DateCardProps {
     onSelect: (id: string) => void;
     baseClasses: string;
     setRef: (el: HTMLButtonElement | null) => void;
+    assignedDot?: boolean;
 }
 
-function DateCard({ item, isSelected, onSelect, baseClasses, setRef }: DateCardProps) {
+function DateCard({ item, isSelected, onSelect, baseClasses, setRef, assignedDot }: DateCardProps) {
     const day = format(item.date, "d");
     const month = format(item.date, "MMM");
     const weekDay = format(item.date, "EEE");
@@ -341,6 +311,10 @@ function DateCard({ item, isSelected, onSelect, baseClasses, setRef }: DateCardP
                     </span>
                 )}
             </div>
+
+            {assignedDot && !isSelected && (
+                <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-blue-500 rounded-full" />
+            )}
         </button>
     );
 }

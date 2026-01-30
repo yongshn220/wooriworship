@@ -25,13 +25,18 @@ import { ServiceDetailContainer } from "@/components/elements/design/service/ser
 import { getPathCreateServing } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
 import { auth } from "@/firebase";
-import { headerActionsAtom } from "@/app/board/_states/board-states";
+import { headerActionsAtom, headerLeftContentAtom } from "@/app/board/_states/board-states";
+import { serviceFilterModeAtom } from "@/global-states/serviceEventState";
 import { ServiceHeaderMenu } from "@/components/elements/design/service/service-header-menu";
 import { ServiceCreationMenu } from "@/components/elements/design/service/service-creation-menu";
 
 import { SwipeableView } from "@/components/elements/design/service/swipeable-view";
 // import { useServingNavigation } from "./_hooks/use-serving-navigation"; // REMOVED
 import { ServiceDataPrefetcher } from "./_components/service-data-prefetcher";
+import { useMyAssignments } from "@/hooks/use-my-assignments";
+import { ServiceBoardHeaderLeft, ServiceBoardHeaderRight } from "./_components/service-board-header";
+import { MyAssignmentsSummary } from "./_components/my-assignments-summary";
+import { GenericCalendarDrawer } from "@/components/common/board-calendar/generic-calendar-drawer";
 
 export default function ServingPage() {
     const teamId = useRecoilValue(currentTeamIdAtom);
@@ -43,7 +48,13 @@ export default function ServingPage() {
     const [hasMorePast, setHasMorePast] = useState(true);
     const router = useRouter();
     const setHeaderActions = useSetRecoilState(headerActionsAtom);
+    const setHeaderLeftContent = useSetRecoilState(headerLeftContentAtom);
     const setCurrentPage = useSetRecoilState(currentPageAtom);
+
+    // My Assignments state
+    const [filterMode, setFilterMode] = useRecoilState(serviceFilterModeAtom);
+    const [cacheVersion, setCacheVersion] = useState(0);
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     // Set Page ID for Navbar Title and Config
     useEffect(() => {
@@ -90,6 +101,39 @@ export default function ServingPage() {
         [events, selectedScheduleId]);
 
     const currentUserUid = auth.currentUser?.uid;
+
+    const { myAssignments, assignedServiceIds, isLoading: isAssignmentsLoading } = useMyAssignments({
+        teamId: teamId || "",
+        events,
+        currentUserUid: currentUserUid || "",
+        roles,
+        serviceTags,
+        cacheVersion,
+    });
+
+    const handleModeChange = (newMode: 'all' | 'mine') => {
+        if (newMode === 'mine') {
+            setCacheVersion(prev => prev + 1);
+        }
+        setFilterMode(newMode);
+    };
+
+    const getMonthLabel = () => {
+        if (selectedScheduleId) {
+            const selected = events.find(s => s.id === selectedScheduleId);
+            if (selected) {
+                return format(selected.date.toDate(), "MMMM yyyy");
+            }
+        }
+        return format(new Date(), "MMMM yyyy");
+    };
+
+    const filteredCalendarItems = useMemo(() => {
+        if (filterMode === 'mine') {
+            return calendarItems.filter(item => assignedServiceIds.includes(item.id));
+        }
+        return calendarItems;
+    }, [calendarItems, filterMode, assignedServiceIds]);
 
     // Load schedules (Initial: Upcoming only)
     useEffect(() => {
@@ -144,16 +188,30 @@ export default function ServingPage() {
         loadData();
     }, [teamId, setEvents]); // Removed setHeaderActions from dependencies since we use it in separate effect
 
-    // Set Header Actions (Mount ServiceCreationMenu)
+    // Set Header Content (Left: Toggle + Month, Right: Calendar + Create)
     useEffect(() => {
-        setHeaderActions(
-            <ServiceCreationMenu
-                teamId={teamId || ""}
-                selectedServiceId={selectedScheduleId}
+        setHeaderLeftContent(
+            <ServiceBoardHeaderLeft
+                filterMode={filterMode}
+                onFilterModeChange={handleModeChange}
+                myCount={assignedServiceIds.length}
+                monthLabel={getMonthLabel()}
             />
         );
-        return () => setHeaderActions(null);
-    }, [teamId, selectedScheduleId, setHeaderActions]);
+        setHeaderActions(
+            <div className="flex items-center gap-1">
+                <ServiceBoardHeaderRight onCalendarOpen={() => setIsCalendarOpen(true)} />
+                <ServiceCreationMenu
+                    teamId={teamId || ""}
+                    selectedServiceId={selectedScheduleId}
+                />
+            </div>
+        );
+        return () => {
+            setHeaderLeftContent(null);
+            setHeaderActions(null);
+        };
+    }, [teamId, selectedScheduleId, filterMode, assignedServiceIds.length, setHeaderActions, setHeaderLeftContent]);
 
 
 
@@ -212,8 +270,15 @@ export default function ServingPage() {
         }
     }, [events, selectedScheduleId]);
 
-
-
+    // Auto-select first upcoming assigned service when switching to Mine
+    useEffect(() => {
+        if (filterMode === 'mine' && !isAssignmentsLoading && myAssignments.length > 0) {
+            const currentIsInFiltered = assignedServiceIds.includes(selectedScheduleId || "");
+            if (!currentIsInFiltered) {
+                setSelectedScheduleId(myAssignments[0].serviceId);
+            }
+        }
+    }, [filterMode, isAssignmentsLoading, myAssignments, assignedServiceIds, selectedScheduleId]);
 
 
     if (loading) {
@@ -235,13 +300,32 @@ export default function ServingPage() {
             <div className="flex-1 overflow-y-auto pb-safe">
                 <main className="max-w-lg mx-auto px-4 pt-2 space-y-5 pb-24">
                     <CalendarStrip
-                        items={calendarItems}
+                        items={filteredCalendarItems}
                         selectedId={selectedScheduleId}
                         onSelect={setSelectedScheduleId}
                         onLoadPrev={handleLoadPrev}
                         isLoadingPrev={isLoadingPast}
                         hasMorePast={hasMorePast}
+                        assignedServiceIds={assignedServiceIds}
                     />
+
+                    {/* Assignment Summary (Mine mode only) */}
+                    {filterMode === 'mine' && (
+                        isAssignmentsLoading ? (
+                            <div className="space-y-2">
+                                <div className="h-4 w-40 bg-muted rounded animate-pulse" />
+                                <div className="h-20 bg-muted/50 rounded-xl animate-pulse" />
+                                <div className="h-20 bg-muted/50 rounded-xl animate-pulse" />
+                                <div className="h-20 bg-muted/50 rounded-xl animate-pulse" />
+                            </div>
+                        ) : (
+                            <MyAssignmentsSummary
+                                assignments={myAssignments}
+                                selectedServiceId={selectedScheduleId}
+                                onSelectService={setSelectedScheduleId}
+                            />
+                        )
+                    )}
 
                     {/* Details Section */}
                     <div className="mt-6">
@@ -262,6 +346,15 @@ export default function ServingPage() {
                     </div>
                 </main>
             </div>
+
+            <GenericCalendarDrawer
+                open={isCalendarOpen}
+                onOpenChange={setIsCalendarOpen}
+                items={filteredCalendarItems}
+                selectedId={selectedScheduleId}
+                onSelect={setSelectedScheduleId}
+                assignedIds={filterMode === 'mine' ? assignedServiceIds : undefined}
+            />
         </div>
     );
 }
