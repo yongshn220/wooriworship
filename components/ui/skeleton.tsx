@@ -6,7 +6,7 @@ function Skeleton({
 }: React.HTMLAttributes<HTMLDivElement>) {
     return (
         <div
-            className={cn("animate-pulse rounded-md bg-gray-200", className)} // Using bg-gray-200 as generic placeholder if muted is not defined
+            className={cn("animate-pulse rounded-md bg-muted", className)} // Using bg-muted as generic placeholder
             {...props}
         />
     )

@@ -44,7 +44,7 @@ export function ModernDialog({
     const getActionButtonStyle = () => {
         switch (variant) {
             case "destructive":
-                return "bg-white border-2 border-red-100 text-red-600 hover:bg-red-50 hover:border-red-200 hover:text-red-700 shadow-sm";
+                return "bg-card border-2 border-destructive/20 text-destructive hover:bg-destructive/5 hover:border-destructive/30 hover:text-destructive shadow-sm";
             case "primary":
                 return "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm";
             default:
@@ -54,24 +54,24 @@ export function ModernDialog({
 
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="w-[90%] max-w-[400px] rounded-[32px] p-8 gap-6 sm:rounded-[32px] border-none shadow-xl bg-white">
+            <AlertDialogContent className="w-[90%] max-w-[400px] rounded-[32px] p-8 gap-6 sm:rounded-[32px] border-none shadow-xl bg-card">
                 <AlertDialogHeader className="flex flex-col items-center text-center space-y-4">
                     {/* Icon Area */}
                     {icon && (
                         <div className={cn(
                             "w-12 h-12 rounded-full flex items-center justify-center mb-2",
-                            variant === "destructive" ? "bg-red-50 text-red-500" : "bg-primary/10 text-primary"
+                            variant === "destructive" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"
                         )}>
                             {icon}
                         </div>
                     )}
 
-                    <AlertDialogTitle className="text-xl font-bold tracking-tight text-gray-900">
+                    <AlertDialogTitle className="text-xl font-bold tracking-tight text-foreground">
                         {title}
                     </AlertDialogTitle>
 
                     {description && (
-                        <AlertDialogDescription className="text-gray-500 text-sm leading-relaxed max-w-[280px]">
+                        <AlertDialogDescription className="text-muted-foreground text-sm leading-relaxed max-w-[280px]">
                             {description}
                         </AlertDialogDescription>
                     )}
@@ -81,16 +81,18 @@ export function ModernDialog({
 
                 <div className="flex gap-3 w-full mt-2">
                     <Button
+                        data-testid="dialog-cancel"
                         variant="ghost"
                         onClick={() => onOpenChange(false)}
                         disabled={isLoading}
-                        className="flex-1 h-12 rounded-2xl bg-gray-100 text-gray-600 font-semibold hover:bg-gray-200 hover:text-gray-800"
+                        className="flex-1 h-12 rounded-2xl bg-muted text-muted-foreground font-semibold hover:bg-muted/80 hover:text-foreground"
                     >
                         {cancelText}
                     </Button>
 
                     {onAction && (
                         <Button
+                            data-testid="dialog-confirm"
                             onClick={async (e) => {
                                 e.preventDefault();
                                 if (onAction) await onAction();

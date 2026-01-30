@@ -176,7 +176,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
   // Animation Variants
 
   return (
-    <FullScreenForm>
+    <FullScreenForm data-testid="notice-form">
       <FullScreenFormHeader
         steps={["Title", "Content", "Attachments"]}
         currentStep={step}
@@ -213,6 +213,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
                     value={input.title}
                     onChange={(e) => setInput(prev => ({ ...prev, title: e.target.value }))}
                     className="text-2xl font-black bg-secondary/40 border-border h-16 rounded-2xl focus-visible:ring-ring placeholder:text-muted-foreground/40"
+                    data-testid="notice-title-input"
                   />
                 </div>
               </FormSectionCard>
@@ -244,6 +245,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
                   placeholder="Start writing..."
                   value={input.body}
                   onChange={(e) => setInput((prev => ({ ...prev, body: e.target.value })))}
+                  data-testid="notice-body-input"
                 />
               </FormSectionCard>
 
@@ -272,7 +274,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
                 {/* Upload Buttons */}
                 <div className="flex items-center gap-4 justify-center p-4 bg-muted/30 rounded-2xl border border-dashed border-border">
                   <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
-                    <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-white hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all")}>
+                    <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all")}>
                       <ImageIcon className="h-5 w-5" />
                       <span className="font-bold">Add Image</span>
                     </div>
@@ -281,7 +283,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
                   <div className="h-8 w-px bg-border"></div>
 
                   <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
-                    <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-white hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all")}>
+                    <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all")}>
                       <FileText className="h-5 w-5" />
                       <span className="font-bold">Add PDF</span>
                     </div>
@@ -322,7 +324,8 @@ export function NoticeForm({ mode, noticeId }: Props) {
         <Button
           onClick={step === totalSteps - 1 ? (mode === FormMode.CREATE ? handleCreate : handleEdit) : nextStep}
           disabled={isLoading || (step === 0 && !input.title)}
-          className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
+          className="h-12 flex-1 rounded-full bg-primary text-primary-foreground text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
+          data-testid="form-submit"
         >
           {isLoading ? "Saving..." : step === totalSteps - 1 ? (mode === FormMode.CREATE ? "Publish Notice" : "Save Changes") : "Next Step"}
           {step === totalSteps - 1 ? <Check className="w-5 h-5 ml-1" /> : <ArrowRight className="w-5 h-5 ml-1" />}

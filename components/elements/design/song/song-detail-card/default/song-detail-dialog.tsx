@@ -48,22 +48,22 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
       <DrawerContent className="h-screen rounded-none flex flex-col focus:outline-none mt-0">
         <DrawerTitle className="hidden">{song?.title || "Song Detail"}</DrawerTitle>
         {/* Top Header Bar */}
-        <div className="relative flex items-center justify-between p-3 border-b bg-white/80 backdrop-blur-md shrink-0 z-20 h-[60px]">
+        <div className="relative flex items-center justify-between p-3 border-b bg-background/80 backdrop-blur-md shrink-0 z-20 h-[60px]">
 
           {/* Left: Close Button */}
           <div className="relative z-10 flex items-center justify-start w-[80px]">
-            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="-ml-2 hover:bg-gray-100/50">
-              <X className="h-6 w-6 text-gray-600" />
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="-ml-2 hover:bg-muted/50">
+              <X className="h-6 w-6 text-muted-foreground" />
             </Button>
           </div>
 
           {/* Center: Title & Subtitle (Absolute) */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-180px)] flex flex-col items-center justify-center pointer-events-none">
-            <h3 className="font-bold text-[15px] leading-tight text-center text-gray-900 line-clamp-2">
+            <h3 className="font-bold text-[15px] leading-tight text-center text-foreground line-clamp-2">
               {song?.title || "Untitled"}
             </h3>
             {song?.subtitle && (
-              <p className="text-[11px] text-gray-500 font-medium text-center mt-0.5 line-clamp-1">
+              <p className="text-[11px] text-muted-foreground font-medium text-center mt-0.5 line-clamp-1">
                 {song.subtitle}
               </p>
             )}
@@ -76,14 +76,14 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
         </div>
 
         {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto no-scrollbar bg-gray-50 relative">
+        <div className="flex-1 overflow-y-auto no-scrollbar bg-muted/30 relative">
           <Suspense fallback={<div className="h-full flex-center">Loading...</div>}>
 
             {/* Floating Key Selector (Overlay) */}
             <div className="absolute top-4 right-4 z-10">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="h-9 px-3 text-sm font-semibold bg-white/90 backdrop-blur shadow-sm border-gray-200 hover:bg-white gap-2">
+                  <Button variant="outline" className="h-9 px-3 text-sm font-semibold bg-card/90 backdrop-blur shadow-sm border-border hover:bg-card gap-2">
                     <Suspense fallback={<span>-</span>}>
                       {selectedMusicSheetId ? <SelectedKeyTrigger teamId={teamId} songId={songId} musicSheetId={selectedMusicSheetId} /> : <span>Key</span>}
                     </Suspense>
@@ -91,7 +91,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-[100]">
-                  <Suspense fallback={<div className="p-2 text-sm text-gray-400">Loading keys...</div>}>
+                  <Suspense fallback={<div className="p-2 text-sm text-muted-foreground">Loading keys...</div>}>
                     {musicSheetIds?.map((id) => (
                       <KeyDropdownItem
                         key={id}
@@ -114,8 +114,8 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
             </div>
 
             {/* Info Section (Below) */}
-            <div className="bg-white p-4 pb-10 rounded-t-xl -mt-4 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-20">
-              <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-6" />
+            <div className="bg-card p-4 pb-10 rounded-t-xl -mt-4 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-20">
+              <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-6" />
               <SongDetailContent teamId={teamId} songId={songId} />
             </div>
 
