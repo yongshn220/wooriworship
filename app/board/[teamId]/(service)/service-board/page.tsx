@@ -154,9 +154,11 @@ export default function ServingPage() {
                 const futureEnd = new Date(todayStart);
                 futureEnd.setMonth(futureEnd.getMonth() + 6);
 
+                // Probe boundary must be strictly before initialStart to avoid overlap
+                const probEnd = new Date(initialStart.getTime() - 1);
                 const [data, olderProbe] = await Promise.all([
                     ServiceEventApi.getServiceEvents(teamId, initialStart, futureEnd),
-                    ServiceEventApi.getServiceEvents(teamId, new Date(2000, 0, 1), initialStart, 1),
+                    ServiceEventApi.getServiceEvents(teamId, new Date(2000, 0, 1), probEnd, 1),
                 ]);
 
                 setEvents(data);
@@ -307,9 +309,9 @@ export default function ServingPage() {
                         items={filteredCalendarItems}
                         selectedId={selectedScheduleId}
                         onSelect={setSelectedScheduleId}
-                        onLoadPrev={handleLoadPrev}
+                        onLoadPrev={filterMode === 'all' ? handleLoadPrev : undefined}
                         isLoadingPrev={isLoadingPast}
-                        hasMorePast={hasMorePast}
+                        hasMorePast={filterMode === 'all' && hasMorePast}
                         assignedServiceIds={assignedServiceIds}
                     />
 
