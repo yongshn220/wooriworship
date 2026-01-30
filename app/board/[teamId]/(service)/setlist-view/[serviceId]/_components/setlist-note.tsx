@@ -1,15 +1,15 @@
 import * as React from "react";
 import { useRecoilValue } from "recoil";
-import { worshipLiveOptionsAtom, worshipNoteAtom } from "../_states/worship-detail-states";
+import { setlistLiveOptionsAtom, setlistNoteAtom } from "../_states/setlist-view-states";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface Props {
     constraintsRef?: React.RefObject<Element>
 }
 
-export function WorshipNote({ constraintsRef }: Props) {
-    const menu = useRecoilValue(worshipLiveOptionsAtom)
-    const description = useRecoilValue(worshipNoteAtom)
+export function SetlistNote({ constraintsRef }: Props) {
+    const menu = useRecoilValue(setlistLiveOptionsAtom)
+    const description = useRecoilValue(setlistNoteAtom)
 
     return (
         <AnimatePresence>

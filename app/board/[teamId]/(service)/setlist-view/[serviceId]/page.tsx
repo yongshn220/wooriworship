@@ -2,10 +2,10 @@
 
 import { Dialog, DialogContentNoCloseButton, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { WorshipLiveCarousel } from "./_components/worship-live-carousel";
-import { WorshipControlDock } from "./_components/worship-control-dock";
-import { WorshipIndexIndicator } from "./_components/worship-index-indicator";
-import { WorshipNote } from "./_components/worship-note";
+import { SetlistLiveCarousel } from "./_components/setlist-live-carousel";
+import { SetlistControlDock } from "./_components/setlist-control-dock";
+import { SetlistIndexIndicator } from "./_components/setlist-index-indicator";
+import { SetlistNote } from "./_components/setlist-note";
 
 import { useRef } from "react";
 import * as React from "react";
@@ -17,7 +17,7 @@ export default function SetlistViewPage({ params }: any) {
 
     function handleOpenChange(isOpen: boolean) {
         // Prevent implicit closing (Esc, Background click) to avoid accidental exits during mode switches
-        // Users must use the "Exit Worship" button in the menu
+        // Users must use the "Exit" button in the menu
     }
 
     return (
@@ -29,21 +29,21 @@ export default function SetlistViewPage({ params }: any) {
                 className="flex-center w-full max-w-8xl h-full p-0 bg-transparent border-none shadow-none focus:outline-none ring-0 outline-none"
             >
                 <VisuallyHidden>
-                    <DialogTitle>Worship Live Page</DialogTitle>
+                    <DialogTitle>Setlist Live Page</DialogTitle>
                 </VisuallyHidden>
 
                 <div
                     ref={containerRef}
                     className="relative w-full h-full bg-background overflow-hidden touch-none"
                 >
-                    <WorshipLiveCarousel teamId={teamId} serviceId={serviceId} />
+                    <SetlistLiveCarousel teamId={teamId} serviceId={serviceId} />
 
-                    <WorshipNote constraintsRef={containerRef} />
+                    <SetlistNote constraintsRef={containerRef} />
 
-                    <WorshipControlDock teamId={teamId} serviceId={serviceId} />
+                    <SetlistControlDock teamId={teamId} serviceId={serviceId} />
 
                     <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-30">
-                        <WorshipIndexIndicator />
+                        <SetlistIndexIndicator />
                     </div>
                 </div>
             </DialogContentNoCloseButton>

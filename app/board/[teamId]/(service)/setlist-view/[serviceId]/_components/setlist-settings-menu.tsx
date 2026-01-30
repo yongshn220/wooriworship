@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import { getPathServing } from "@/components/util/helper/routes";
 import { Button } from "@/components/ui/button";
-import { WorshipViewPageModeSelect } from "./worship-view-page-mode-select";
+import { SetlistViewPageModeSelect } from "./setlist-view-page-mode-select";
 import { Label } from "@/components/ui/label";
 import { MultipleSheetsViewSelect } from "./multiple-sheets-view-select";
 
@@ -14,7 +14,7 @@ interface Props {
     serviceId: string,
 }
 
-export function WorshipSettingsMenu({ teamId, serviceId }: Props) {
+export function SetlistSettingsMenu({ teamId, serviceId }: Props) {
     const router = useRouter()
 
     function handleExit() {
@@ -25,7 +25,7 @@ export function WorshipSettingsMenu({ teamId, serviceId }: Props) {
         <div className="flex flex-col p-2 space-y-1">
             <div className="flex items-center justify-between gap-4 py-2 px-2 rounded-lg hover:bg-muted transition-colors">
                 <Label className="font-medium text-sm text-foreground whitespace-nowrap">Page Mode</Label>
-                <WorshipViewPageModeSelect />
+                <SetlistViewPageModeSelect />
             </div>
 
             <div className="flex items-center justify-between gap-4 py-2 px-2 rounded-lg transition-colors hover:bg-muted">
@@ -45,7 +45,7 @@ export function WorshipSettingsMenu({ teamId, serviceId }: Props) {
                 onClick={handleExit}
             >
                 <DoorOpenIcon className="mr-3 w-4 h-4" />
-                <span className="text-sm">Exit Worship</span>
+                <span className="text-sm">Exit</span>
             </Button>
         </div>
     )

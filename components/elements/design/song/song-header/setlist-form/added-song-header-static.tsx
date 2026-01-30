@@ -1,7 +1,7 @@
 "use client"
 
 import { useRecoilValueLoadable, useSetRecoilState } from "recoil";
-import { WorshipSpecialOrderType } from "@/components/constants/enums";
+import { SetlistSpecialOrderType } from "@/components/constants/enums";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,7 +16,7 @@ import { AddedSongInnerHeader } from "@/components/elements/design/song/song-hea
 
 interface Props {
   teamId: string
-  specialOrderType: WorshipSpecialOrderType
+  specialOrderType: SetlistSpecialOrderType
   songHeader: SetlistSongHeader
   onUpdate: (header: SetlistSongHeader) => void
   onRemove: () => void
@@ -35,7 +35,7 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader, on
     const option = teamLoadable.state === 'hasValue' ? teamLoadable.contents?.option?.worship : null
     if (!option) return
 
-    if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
+    if (specialOrderType === SetlistSpecialOrderType.BEGINNING) {
       if (option?.beginning_song?.id && option?.beginning_song?.id === songHeader?.id) {
         let checked = true
         for (const optionId of option.beginning_song?.selected_music_sheet_ids) {
@@ -89,7 +89,7 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader, on
     try {
       let teamOption: TeamOption = JSON.parse(JSON.stringify(team?.option))
 
-      if (specialOrderType === WorshipSpecialOrderType.BEGINNING) {
+      if (specialOrderType === SetlistSpecialOrderType.BEGINNING) {
         teamOption.worship.beginning_song = (state)
           ? { id: songHeader?.id, note: songHeader?.note, selected_music_sheet_ids: songHeader?.selected_music_sheet_ids }
           : { id: null, note: "", selected_music_sheet_ids: [] }
@@ -113,13 +113,13 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader, on
       setTeam((prev) => ({ ...prev, option: teamOption }))
       if (state) {
         toast({
-          title: `Default ${(specialOrderType === WorshipSpecialOrderType.BEGINNING) ? "Beginning" : "Ending"} song updated`,
-          description: `Now "${song?.title}" will be used as ${(specialOrderType === WorshipSpecialOrderType.BEGINNING) ? "Beginning" : "Ending"} song for the future worship plan.`
+          title: `Default ${(specialOrderType === SetlistSpecialOrderType.BEGINNING) ? "Beginning" : "Ending"} song updated`,
+          description: `Now "${song?.title}" will be used as ${(specialOrderType === SetlistSpecialOrderType.BEGINNING) ? "Beginning" : "Ending"} song for the future setlist.`
         })
       }
       else {
         toast({
-          title: `Default ${(specialOrderType === WorshipSpecialOrderType.BEGINNING) ? "Beginning" : "Ending"} song canceled`,
+          title: `Default ${(specialOrderType === SetlistSpecialOrderType.BEGINNING) ? "Beginning" : "Ending"} song canceled`,
         })
       }
       return true
@@ -141,7 +141,7 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader, on
     <div className="w-full">
       <div className="relative flex flex-col w-full border shadow-sm rounded-md p-2 gap-4 bg-white">
         <div className="flex-center border-b text-sm px-4 py-1 text-gray-500">
-          {specialOrderType === WorshipSpecialOrderType.BEGINNING ? "Beginning Song" : "Ending Song"}
+          {specialOrderType === SetlistSpecialOrderType.BEGINNING ? "Beginning Song" : "Ending Song"}
         </div>
         <AddableSongDetailDialogTrigger
           teamId={teamId}

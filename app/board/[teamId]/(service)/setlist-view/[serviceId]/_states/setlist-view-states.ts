@@ -1,7 +1,7 @@
 import { atom } from "recoil";
-import { DirectionType, WorshipViewPageMode } from "@/components/constants/enums";
+import { DirectionType, SetlistViewPageMode } from "@/components/constants/enums";
 
-export const worshipLiveOptionsAtom = atom({
+export const setlistLiveOptionsAtom = atom({
     key: 'worshipLiveOptionsAtom',
     default: {
         showSongNote: true,
@@ -9,17 +9,17 @@ export const worshipLiveOptionsAtom = atom({
     }
 })
 
-export const worshipMultipleSheetsViewModeAtom = atom<DirectionType>({
+export const setlistMultipleSheetsViewModeAtom = atom<DirectionType>({
     key: 'worshipMultipleSheetsViewModeAtom',
     default: DirectionType.VERTICAL
 })
 
-export const worshipViewPageModeAtom = atom<WorshipViewPageMode>({
+export const setlistViewPageModeAtom = atom<SetlistViewPageMode>({
     key: 'worshipViewPageModeAtom',
-    default: WorshipViewPageMode.SINGLE_PAGE
+    default: SetlistViewPageMode.SINGLE_PAGE
 })
 
-export const worshipIndexAtom = atom({
+export const setlistIndexAtom = atom({
     key: 'worshipIndexAtom',
     default: {
         current: 0,
@@ -27,17 +27,17 @@ export const worshipIndexAtom = atom({
     }
 })
 
-export const worshipIndexChangeEventAtom = atom<number>({
+export const setlistIndexChangeEventAtom = atom<number>({
     key: 'worshipIndexChangeEventAtom',
     default: 0
 })
 
-export const worshipNoteAtom = atom<string>({
+export const setlistNoteAtom = atom<string>({
     key: 'worshipNoteAtom',
     default: ""
 })
 
-export const worshipUIVisibilityAtom = atom<boolean>({
+export const setlistUIVisibilityAtom = atom<boolean>({
     key: 'worshipUIVisibilityAtom',
     default: true
 })

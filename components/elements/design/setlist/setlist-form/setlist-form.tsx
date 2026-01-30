@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import { FormMode, WorshipSpecialOrderType } from "@/components/constants/enums";
+import { FormMode, SetlistSpecialOrderType } from "@/components/constants/enums";
 import { Setlist } from "@/models/setlist";
 import { format } from 'date-fns';
 import { AnimatePresence, motion, Reorder } from "framer-motion";
@@ -215,7 +215,7 @@ export function SetlistForm({ mode, teamId, worship }: Props) {
                 {beginningSong?.id && (
                   <AddedSongHeaderStatic
                     teamId={teamId}
-                    specialOrderType={WorshipSpecialOrderType.BEGINNING}
+                    specialOrderType={SetlistSpecialOrderType.BEGINNING}
                     songHeader={beginningSong}
                     onUpdate={(updated) => setBeginningSong(updated)}
                     onRemove={() => setBeginningSong(null)}
@@ -240,7 +240,7 @@ export function SetlistForm({ mode, teamId, worship }: Props) {
                 {endingSong?.id && (
                   <AddedSongHeaderStatic
                     teamId={teamId}
-                    specialOrderType={WorshipSpecialOrderType.ENDING}
+                    specialOrderType={SetlistSpecialOrderType.ENDING}
                     songHeader={endingSong}
                     onUpdate={(updated) => setEndingSong(updated)}
                     onRemove={() => setEndingSong(null)}

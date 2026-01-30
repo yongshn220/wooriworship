@@ -80,7 +80,7 @@ function FullScreenImageItem({ url }: { url: string }) {
                                 priority
                             />
                             {/* Overlay to catch events and prevent default image behavior if needed, 
-                  similar to worship-live-carousel-item.tsx */}
+                  similar to setlist-live-carousel-item.tsx */}
                             <div
                                 className="absolute inset-0 z-10"
                                 onContextMenu={(e) => e.preventDefault()}

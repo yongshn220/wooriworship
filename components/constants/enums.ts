@@ -50,13 +50,13 @@ export enum DirectionType {
   HORIZONTAL = "Horizontal",
 }
 
-export enum WorshipViewPageMode {
+export enum SetlistViewPageMode {
   SINGLE_PAGE = "singlePage",
   DOUBLE_PAGE = "doublePage",
 }
 
-/* Worship Plan */
-export enum WorshipSpecialOrderType {
+/* Setlist */
+export enum SetlistSpecialOrderType {
   BEGINNING = "beginning",
   ENDING = "ending",
 }

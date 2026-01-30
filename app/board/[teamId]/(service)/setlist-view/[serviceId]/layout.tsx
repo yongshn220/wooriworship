@@ -1,11 +1,11 @@
 "use client"
 
-import { WorshipLivePreference } from "./_components/worship-live-preference";
+import { SetlistLivePreference } from "./_components/setlist-live-preference";
 
 export default function SetlistViewLayout({ children }: any) {
     return (
         <div className="w-full h-full">
-            <WorshipLivePreference />
+            <SetlistLivePreference />
             {children}
         </div>
     )

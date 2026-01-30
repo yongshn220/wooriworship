@@ -4,7 +4,7 @@ import { Calendar, ArrowRight, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
-import { getPathWorshipView } from "@/components/util/helper/routes";
+import { getPathSetlistView } from "@/components/util/helper/routes";
 import { Timestamp } from "@firebase/firestore";
 import { parseLocalDate } from "@/components/util/helper/helper-functions";
 import { ServiceHeaderMenu } from "../service-header-menu";
@@ -13,12 +13,12 @@ interface Props {
     scheduleId: string;
     title: string;
     date: Date | Timestamp | string;
-    worshipId?: string;
+    setlistId?: string;
     teamId: string;
-    onPreview?: (worshipId: string) => void;
+    onPreview?: (setlistId: string) => void;
 }
 
-export function ServiceInfoCard({ scheduleId, title, date, worshipId, teamId, onPreview }: Props) {
+export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, onPreview }: Props) {
     const router = useRouter();
 
     const dateObj = date instanceof Timestamp ? date.toDate() : (date instanceof Date ? date : parseLocalDate(date));
@@ -52,20 +52,20 @@ export function ServiceInfoCard({ scheduleId, title, date, worshipId, teamId, on
                     />
                 </div>
 
-                {worshipId && (
+                {setlistId && (
                     <div className="flex justify-end">
                         <Button
                             variant="ghost"
                             onClick={() => {
                                 if (onPreview) {
-                                    onPreview(worshipId);
+                                    onPreview(setlistId);
                                 } else {
-                                    router.push(getPathWorshipView(teamId, worshipId));
+                                    router.push(getPathSetlistView(teamId, setlistId));
                                 }
                             }}
                             className="bg-card text-blue-600 dark:text-blue-400 hover:bg-muted font-semibold h-11 rounded-xl px-4 shadow-sm border border-transparent transition-all active:scale-95 flex items-center gap-1.5"
                         >
-                            worship plan
+                            setlist view
                             <ArrowRight className="w-4 h-4" />
                         </Button>
                     </div>

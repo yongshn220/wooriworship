@@ -10,9 +10,9 @@ import { useRouter } from "next/navigation";
 import { getPathServing } from "@/components/util/helper/routes";
 import { Button } from "@/components/ui/button";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
-import { worshipLiveOptionsAtom } from "../_states/worship-detail-states";
+import { setlistLiveOptionsAtom } from "../_states/setlist-view-states";
 import { MultipleSheetsViewSelect } from "./multiple-sheets-view-select";
-import { WorshipViewPageModeSelect } from "./worship-view-page-mode-select";
+import { SetlistViewPageModeSelect } from "./setlist-view-page-mode-select";
 
 
 interface Props {
@@ -20,9 +20,9 @@ interface Props {
     serviceId: string,
 }
 
-export function WorshipLiveMenu({ teamId, serviceId }: Props) {
+export function SetlistLiveMenu({ teamId, serviceId }: Props) {
     const [preference, prefSetter] = useUserPreferences()
-    const [option, setOption] = useRecoilState(worshipLiveOptionsAtom)
+    const [option, setOption] = useRecoilState(setlistLiveOptionsAtom)
     const router = useRouter()
 
     function handleExit() {
@@ -31,12 +31,12 @@ export function WorshipLiveMenu({ teamId, serviceId }: Props) {
 
     function toggleShowNoteOption() {
         setOption((prev) => ({ ...prev, showSongNote: !prev.showSongNote }))
-        prefSetter.worshipLiveShowSongNote(!preference.worshipLive.showSongNote)
+        prefSetter.setlistLiveShowSongNote(!preference.setlistLive.showSongNote)
     }
 
     function toggleShowSongNumberOption() {
         setOption((prev) => ({ ...prev, showSongNumber: !prev.showSongNumber }))
-        prefSetter.worshipLiveShowSongNumber(!preference.worshipLive.showSongNumber)
+        prefSetter.setlistLiveShowSongNumber(!preference.setlistLive.showSongNumber)
     }
 
     return (
@@ -59,7 +59,7 @@ export function WorshipLiveMenu({ teamId, serviceId }: Props) {
                     <Separator />
                     <div className="flex-between py-2 px-2 rounded-sm">
                         <Label className="w-full">Page Mode</Label>
-                        <WorshipViewPageModeSelect />
+                        <SetlistViewPageModeSelect />
                     </div>
                     <Separator />
                     <Button disabled variant="ghost" className="w-full flex justify-start cursor-pointer hover:bg-muted pl-2">
@@ -70,7 +70,7 @@ export function WorshipLiveMenu({ teamId, serviceId }: Props) {
                     <Button variant="ghost" className="w-full flex justify-start cursor-pointer hover:bg-muted pl-2"
                         onClick={handleExit}>
                         <DoorOpenIcon className="mr-3 w-5 h-5" />
-                        <Label>Exit Worship</Label>
+                        <Label>Exit</Label>
                     </Button>
                 </PopoverContent>
             </Popover>

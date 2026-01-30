@@ -2,16 +2,16 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { DirectionType } from "@/components/constants/enums";
 import { useRecoilState } from "recoil";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
-import { worshipMultipleSheetsViewModeAtom } from "../_states/worship-detail-states";
+import { setlistMultipleSheetsViewModeAtom } from "../_states/setlist-view-states";
 
 
 export function MultipleSheetsViewSelect() {
     const [_, prefSetter] = useUserPreferences()
-    const [mode, setMode] = useRecoilState(worshipMultipleSheetsViewModeAtom)
+    const [mode, setMode] = useRecoilState(setlistMultipleSheetsViewModeAtom)
 
     function handleSetMode(mode: DirectionType) {
         setMode(mode)
-        prefSetter.worshipLiveMultipleSheetsView(mode)
+        prefSetter.setlistLiveMultipleSheetsView(mode)
     }
 
     return (

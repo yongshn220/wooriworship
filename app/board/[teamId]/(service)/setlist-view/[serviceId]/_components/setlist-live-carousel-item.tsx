@@ -5,12 +5,12 @@ import { SetlistSongHeader } from "@/models/setlist";
 import { useRecoilValue } from "recoil";
 import { musicSheetsByIdsAtom } from "@/global-states/music-sheet-state";
 import { cn } from "@/lib/utils";
-import { worshipViewPageModeAtom } from "../_states/worship-detail-states";
-import { MusicSheetCounts } from "./worship-live-carousel";
+import { setlistViewPageModeAtom } from "../_states/setlist-view-states";
+import { MusicSheetCounts } from "./setlist-live-carousel";
 import { useEffect, useMemo, useState } from "react";
 import { MusicSheet } from "@/models/music_sheet";
-import { DirectionType, WorshipViewPageMode } from "@/components/constants/enums";
-import { worshipMultipleSheetsViewModeAtom } from "../_states/worship-detail-states";
+import { DirectionType, SetlistViewPageMode } from "@/components/constants/enums";
+import { setlistMultipleSheetsViewModeAtom } from "../_states/setlist-view-states";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 
@@ -20,10 +20,10 @@ interface Props {
     setMusicSheetCounts: React.Dispatch<React.SetStateAction<Array<MusicSheetCounts>>>
 }
 
-export function WorshipLiveCarouselItemWrapper({ teamId, songHeader, setMusicSheetCounts }: Props) {
+export function SetlistLiveCarouselItemWrapper({ teamId, songHeader, setMusicSheetCounts }: Props) {
     const musicSheets = useRecoilValue(musicSheetsByIdsAtom({ teamId, songId: songHeader?.id, ids: songHeader?.selected_music_sheet_ids }))
 
-    const multipleSheetsViewMode = useRecoilValue(worshipMultipleSheetsViewModeAtom)
+    const multipleSheetsViewMode = useRecoilValue(setlistMultipleSheetsViewModeAtom)
 
     const modifiedMusicSheets = useMemo(() => {
         const results: Array<MusicSheet> = []
@@ -59,7 +59,7 @@ export function WorshipLiveCarouselItemWrapper({ teamId, songHeader, setMusicShe
         <React.Fragment>
             {
                 modifiedMusicSheets?.map((musicSheet, index) => (
-                    <WorshipLiveCarouselItem key={index} index={index} urls={musicSheet?.urls} />
+                    <SetlistLiveCarouselItem key={index} index={index} urls={musicSheet?.urls} />
                 ))
             }
         </React.Fragment>
@@ -68,17 +68,17 @@ export function WorshipLiveCarouselItemWrapper({ teamId, songHeader, setMusicShe
 
 
 
-interface WorshipLiveCarouselItemProps {
+interface SetlistLiveCarouselItemProps {
     index: number
     urls: Array<string>
 }
 
-export function WorshipLiveCarouselItem({ index, urls }: WorshipLiveCarouselItemProps) {
-    const pageMode = useRecoilValue(worshipViewPageModeAtom)
+export function SetlistLiveCarouselItem({ index, urls }: SetlistLiveCarouselItemProps) {
+    const pageMode = useRecoilValue(setlistViewPageModeAtom)
     const [enablePan, setEnablePan] = useState(false)
 
     return (
-        <CarouselItem className={cn("h-full p-0", { "basis-1/2": pageMode === WorshipViewPageMode.DOUBLE_PAGE })}>
+        <CarouselItem className={cn("h-full p-0", { "basis-1/2": pageMode === SetlistViewPageMode.DOUBLE_PAGE })}>
             <TransformWrapper
                 initialScale={1}
                 minScale={1}

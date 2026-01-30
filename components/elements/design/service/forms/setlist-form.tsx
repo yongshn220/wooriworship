@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFormFooter, FormSectionCard } from "@/components/common/form/full-screen-form";
-import { WorshipSpecialOrderType } from "@/components/constants/enums";
+import { SetlistSpecialOrderType } from "@/components/constants/enums";
 
 // Custom Components
 import { AddedSongHeaderStatic } from "@/components/elements/design/song/song-header/setlist-form/added-song-header-static";
@@ -139,7 +139,7 @@ export function SetlistForm({ teamId, serviceId, initialSetlist, onCompleted, on
                                 {beginningSong?.id && (
                                     <AddedSongHeaderStatic
                                         teamId={teamId}
-                                        specialOrderType={WorshipSpecialOrderType.BEGINNING}
+                                        specialOrderType={SetlistSpecialOrderType.BEGINNING}
                                         songHeader={beginningSong}
                                         onUpdate={(updated) => setBeginningSong(updated)}
                                         onRemove={() => setBeginningSong(null)}
@@ -164,7 +164,7 @@ export function SetlistForm({ teamId, serviceId, initialSetlist, onCompleted, on
                                 {endingSong?.id && (
                                     <AddedSongHeaderStatic
                                         teamId={teamId}
-                                        specialOrderType={WorshipSpecialOrderType.ENDING}
+                                        specialOrderType={SetlistSpecialOrderType.ENDING}
                                         songHeader={endingSong}
                                         onUpdate={(updated) => setEndingSong(updated)}
                                         onRemove={() => setEndingSong(null)}

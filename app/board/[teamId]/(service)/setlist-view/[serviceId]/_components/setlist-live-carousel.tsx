@@ -6,8 +6,8 @@ import { Carousel, type CarouselApi, CarouselContent, } from "@/components/ui/ca
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { setlistAtom } from "@/global-states/setlist-state";
 import { SetlistSongHeader } from "@/models/setlist";
-import { worshipIndexAtom, worshipIndexChangeEventAtom, worshipNoteAtom, worshipMultipleSheetsViewModeAtom } from "../_states/worship-detail-states";
-import { WorshipLiveCarouselItemWrapper } from "./worship-live-carousel-item";
+import { setlistIndexAtom, setlistIndexChangeEventAtom, setlistNoteAtom, setlistMultipleSheetsViewModeAtom } from "../_states/setlist-view-states";
+import { SetlistLiveCarouselItemWrapper } from "./setlist-live-carousel-item";
 
 interface Props {
     teamId: string
@@ -20,11 +20,11 @@ export interface MusicSheetCounts {
     note?: string
 }
 
-export function WorshipLiveCarousel({ teamId, serviceId }: Props) {
+export function SetlistLiveCarousel({ teamId, serviceId }: Props) {
     const setlist = useRecoilValue(setlistAtom({ teamId, setlistId: serviceId }))
-    const setWorshipIndex = useSetRecoilState(worshipIndexAtom)
-    const setWorshipNote = useSetRecoilState(worshipNoteAtom)
-    const worshipIndexChangeEvent = useRecoilValue(worshipIndexChangeEventAtom)
+    const setSetlistIndex = useSetRecoilState(setlistIndexAtom)
+    const setSetlistNote = useSetRecoilState(setlistNoteAtom)
+    const setlistIndexChangeEvent = useRecoilValue(setlistIndexChangeEventAtom)
     const [musicSheetCounts, setMusicSheetCounts] = useState<Array<MusicSheetCounts>>([])
     const [api, setApi] = useState<CarouselApi>()
     const carouselOptions = useMemo(() => ({ align: "start" } as const), [])
@@ -51,16 +51,16 @@ export function WorshipLiveCarousel({ teamId, serviceId }: Props) {
 
     useEffect(() => {
         if (api) {
-            api.scrollTo(worshipIndexChangeEvent);
+            api.scrollTo(setlistIndexChangeEvent);
         }
-    }, [api, worshipIndexChangeEvent]);
+    }, [api, setlistIndexChangeEvent]);
 
     useEffect(() => {
         if (!api) return
 
         const handleSelect = () => {
             const currentIndex = api.selectedScrollSnap()
-            setWorshipIndex((prev) => ({ ...prev, current: currentIndex }))
+            setSetlistIndex((prev) => ({ ...prev, current: currentIndex }))
 
             let accumulatedCount = 0
             let foundNote = ""
@@ -72,7 +72,7 @@ export function WorshipLiveCarousel({ teamId, serviceId }: Props) {
                 }
                 accumulatedCount += item.count
             }
-            setWorshipNote(foundNote)
+            setSetlistNote(foundNote)
         }
 
         api.on("select", handleSelect)
@@ -81,24 +81,24 @@ export function WorshipLiveCarousel({ teamId, serviceId }: Props) {
         return () => {
             api.off("select", handleSelect)
         }
-    }, [sortedMusicSheetCounts, setWorshipIndex, setWorshipNote, api])
+    }, [sortedMusicSheetCounts, setSetlistIndex, setSetlistNote, api])
 
-    const multipleSheetsViewMode = useRecoilValue(worshipMultipleSheetsViewModeAtom)
+    const multipleSheetsViewMode = useRecoilValue(setlistMultipleSheetsViewModeAtom)
 
     useEffect(() => {
-        setWorshipIndex((prev) => ({ ...prev, current: 0 }))
+        setSetlistIndex((prev) => ({ ...prev, current: 0 }))
         if (api) {
             api.scrollTo(0, true)
         }
-    }, [multipleSheetsViewMode, setWorshipIndex, api])
+    }, [multipleSheetsViewMode, setSetlistIndex, api])
 
     useEffect(() => {
         let totalCounts = 0
         sortedMusicSheetCounts.forEach((count) => {
             totalCounts += count?.count
         })
-        setWorshipIndex((prev) => ({ ...prev, total: totalCounts }))
-    }, [sortedMusicSheetCounts, setWorshipIndex]);
+        setSetlistIndex((prev) => ({ ...prev, total: totalCounts }))
+    }, [sortedMusicSheetCounts, setSetlistIndex]);
 
     return (
         <div id="song-carousel" className="w-full h-full">
@@ -106,7 +106,7 @@ export function WorshipLiveCarousel({ teamId, serviceId }: Props) {
                 <CarouselContent className="h-full">
                     {
                         aggregatedSongHeaders?.map((songHeader, index) => (
-                            <WorshipLiveCarouselItemWrapper key={index} teamId={teamId} songHeader={songHeader} setMusicSheetCounts={setMusicSheetCounts} />
+                            <SetlistLiveCarouselItemWrapper key={index} teamId={teamId} songHeader={songHeader} setMusicSheetCounts={setMusicSheetCounts} />
                         ))
                     }
                 </CarouselContent>

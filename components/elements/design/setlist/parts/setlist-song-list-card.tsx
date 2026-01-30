@@ -13,10 +13,10 @@ interface Props {
     teamId: string;
     onEdit?: () => void;
     onDelete?: () => void;
-    onWorshipView?: () => void;
+    onSetlistView?: () => void;
 }
 
-export function SetlistSongListCard({ songs = [], teamId, onEdit, onDelete, onWorshipView }: Props) {
+export function SetlistSongListCard({ songs = [], teamId, onEdit, onDelete, onSetlistView }: Props) {
     const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
 
     return (
@@ -64,14 +64,14 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit, onDelete, onWo
                         No songs added yet.
                     </div>
                 )}
-                {onWorshipView && (
+                {onSetlistView && (
                     <div className="flex justify-end px-3 py-2 border-t border-border">
                         <Button
                             variant="ghost"
-                            onClick={onWorshipView}
+                            onClick={onSetlistView}
                             className="text-blue-600 dark:text-blue-400 hover:bg-muted font-semibold h-9 rounded-xl px-3 text-sm flex items-center gap-1.5"
                         >
-                            worship plan
+                            setlist view
                             <ArrowRight className="w-4 h-4" />
                         </Button>
                     </div>

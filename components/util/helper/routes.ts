@@ -20,7 +20,7 @@ export function getPathEditNotice(teamId: string, noticeId: string) {
   return "/" + Page.BOARD + `/${teamId}` + "/" + Page.EDIT_NOTICE + `/${noticeId}`
 }
 
-// Consolidated: Redirect Schema (Worship -> Service)
+// Legacy redirects (worship -> service)
 
 export function getPathPlan(teamId: string) {
   return getPathServing(teamId);
@@ -30,8 +30,8 @@ export function getPathCreatePlan(teamId: string) {
   return getPathCreateServing(teamId);
 }
 
-export function getPathEditPlan(teamId: string, worshipId: string) {
-  return getPathEditServing(teamId, worshipId);
+export function getPathEditPlan(teamId: string, serviceId: string) {
+  return getPathEditServing(teamId, serviceId);
 }
 
 export function getPathManage(teamId: string) {
@@ -58,12 +58,12 @@ export function getPathServing(teamId: string) {
   return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SERVING
 }
 
-export function getPathWorship(teamId: string, worshipId: string) {
-  // Redirect to Service Board (Service ID)
-  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SERVING // TODO: deep link support
+export function getPathService(teamId: string, serviceId: string) {
+  // Redirect to Service Board
+  return "/" + Page.BOARD + `/${teamId}` + "/" + Page.SERVING
 }
 
-export function getPathWorshipView(teamId: string, serviceId: string) {
+export function getPathSetlistView(teamId: string, serviceId: string) {
   return "/" + Page.BOARD + `/${teamId}` + "/setlist-view" + `/${serviceId}`
 }
 

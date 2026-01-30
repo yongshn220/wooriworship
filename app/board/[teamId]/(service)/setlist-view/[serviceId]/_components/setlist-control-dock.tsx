@@ -2,12 +2,12 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { worshipLiveOptionsAtom, worshipUIVisibilityAtom } from "../_states/worship-detail-states";
-import { WorshipControlItem } from "./worship-control-item";
+import { setlistLiveOptionsAtom, setlistUIVisibilityAtom } from "../_states/setlist-view-states";
+import { SetlistControlItem } from "./setlist-control-item";
 import { LogOut, ChevronLeft, ChevronRight, FileText, Hash, MoreHorizontal } from "lucide-react";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { WorshipSettingsMenu } from "./worship-settings-menu";
+import { SetlistSettingsMenu } from "./setlist-settings-menu";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -18,9 +18,9 @@ interface Props {
     serviceId: string
 }
 
-export function WorshipControlDock({ teamId, serviceId }: Props) {
-    const [option, setOption] = useRecoilState(worshipLiveOptionsAtom)
-    const [uiVisible, setUIVisible] = useRecoilState(worshipUIVisibilityAtom)
+export function SetlistControlDock({ teamId, serviceId }: Props) {
+    const [option, setOption] = useRecoilState(setlistLiveOptionsAtom)
+    const [uiVisible, setUIVisible] = useRecoilState(setlistUIVisibilityAtom)
     const [preference, prefSetter] = useUserPreferences()
     const router = useRouter()
 
@@ -31,13 +31,13 @@ export function WorshipControlDock({ teamId, serviceId }: Props) {
     function toggleShowNote() {
         const newVal = !option.showSongNote
         setOption(prev => ({ ...prev, showSongNote: newVal }))
-        prefSetter.worshipLiveShowSongNote(newVal)
+        prefSetter.setlistLiveShowSongNote(newVal)
     }
 
     function toggleShowNumber() {
         const newVal = !option.showSongNumber
         setOption(prev => ({ ...prev, showSongNumber: newVal }))
-        prefSetter.worshipLiveShowSongNumber(newVal)
+        prefSetter.setlistLiveShowSongNumber(newVal)
     }
 
     return (
@@ -75,7 +75,7 @@ export function WorshipControlDock({ teamId, serviceId }: Props) {
                 }}
             >
                 <motion.div layout className="flex-shrink-0 z-10 p-0">
-                    <WorshipControlItem
+                    <SetlistControlItem
                         icon={uiVisible ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                         onClick={() => setUIVisible(!uiVisible)}
                         variant="button"
@@ -93,13 +93,13 @@ export function WorshipControlDock({ teamId, serviceId }: Props) {
                             <div className="flex items-center gap-2">
                                 <Separator orientation="vertical" className="h-6 bg-border w-[1px] mx-1" />
 
-                                <WorshipControlItem
+                                <SetlistControlItem
                                     icon={<FileText className="w-5 h-5" />}
                                     isActive={option.showSongNote}
                                     variant="toggle"
                                     onClick={toggleShowNote}
                                 />
-                                <WorshipControlItem
+                                <SetlistControlItem
                                     icon={<Hash className="w-5 h-5" />}
                                     isActive={option.showSongNumber}
                                     variant="toggle"
@@ -109,17 +109,17 @@ export function WorshipControlDock({ teamId, serviceId }: Props) {
                                 <Popover modal={true}>
                                     <PopoverTrigger asChild>
                                         <div>
-                                            <WorshipControlItem icon={<MoreHorizontal className="w-5 h-5" />} />
+                                            <SetlistControlItem icon={<MoreHorizontal className="w-5 h-5" />} />
                                         </div>
                                     </PopoverTrigger>
                                     <PopoverContent side="top" className="mb-4 bg-background backdrop-blur-xl border-border w-80 p-0 overflow-hidden shadow-toss rounded-2xl z-[10003]">
-                                        <WorshipSettingsMenu teamId={teamId} serviceId={serviceId} />
+                                        <SetlistSettingsMenu teamId={teamId} serviceId={serviceId} />
                                     </PopoverContent>
                                 </Popover>
 
                                 <Separator orientation="vertical" className="h-6 bg-border w-[1px]" />
 
-                                <WorshipControlItem
+                                <SetlistControlItem
                                     icon={<LogOut className="w-5 h-5" />}
                                     variant="button"
                                     onClick={handleExit}

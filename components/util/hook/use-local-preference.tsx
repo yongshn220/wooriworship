@@ -1,16 +1,16 @@
 import useLocalStorage from "@/components/util/hook/use-local-storage";
-import {DirectionType, WorshipViewPageMode} from "@/components/constants/enums";
+import {DirectionType, SetlistViewPageMode} from "@/components/constants/enums";
 
 interface Preference {
   board: BoardPreference
-  worshipLive: WorshipLivePreference
+  setlistLive: SetlistLivePreference
 }
 
-interface WorshipLivePreference {
+interface SetlistLivePreference {
   showSongNote: boolean
   showSongNumber: boolean
   multipleSheetsView: DirectionType
-  pageMode: WorshipViewPageMode
+  pageMode: SetlistViewPageMode
 }
 interface BoardPreference {
   selectedTeamId: string
@@ -19,24 +19,32 @@ interface BoardPreference {
 type PreferenceSetter = {
   (): void
   boardSelectedTeamId: (teamId: string) => void
-  worshipLiveShowSongNote: (showSongNote: boolean) => void
-  worshipLiveShowSongNumber: (showSongNumber: boolean) => void
-  worshipLiveMultipleSheetsView: (viewMode: DirectionType) => void
-  worshipViewPageMode: (pageMode: WorshipViewPageMode) => void
+  setlistLiveShowSongNote: (showSongNote: boolean) => void
+  setlistLiveShowSongNumber: (showSongNumber: boolean) => void
+  setlistLiveMultipleSheetsView: (viewMode: DirectionType) => void
+  setlistViewPageMode: (pageMode: SetlistViewPageMode) => void
+}
+
+const DEFAULT_SETLIST_LIVE: SetlistLivePreference = {
+  showSongNote: true,
+  showSongNumber: true,
+  multipleSheetsView: DirectionType.VERTICAL,
+  pageMode: SetlistViewPageMode.SINGLE_PAGE,
 }
 
 export default function useUserPreferences(): [Preference, PreferenceSetter] {
-  const [preferences, setPreferences] = useLocalStorage<Preference>('userPreferences', {
+  const [rawPreferences, setPreferences] = useLocalStorage<Preference & { worshipLive?: SetlistLivePreference }>('userPreferences', {
     board: {
       selectedTeamId: "",
     },
-    worshipLive: {
-      showSongNote: true,
-      showSongNumber: true,
-      multipleSheetsView: DirectionType.VERTICAL,
-      pageMode: WorshipViewPageMode.SINGLE_PAGE,
-    },
+    setlistLive: DEFAULT_SETLIST_LIVE,
   });
+
+  // Migrate legacy "worshipLive" → "setlistLive"
+  const preferences: Preference = {
+    ...rawPreferences,
+    setlistLive: rawPreferences.setlistLive ?? rawPreferences.worshipLive ?? DEFAULT_SETLIST_LIVE,
+  };
 
   const setter: PreferenceSetter = Object.assign(
     () => {},
@@ -44,17 +52,17 @@ export default function useUserPreferences(): [Preference, PreferenceSetter] {
       boardSelectedTeamId: (teamId: string) => {
         setPreferences((prev) => ({...prev, board: {...prev.board, selectedTeamId: teamId}}))
       },
-      worshipLiveShowSongNote: (showSongNote: boolean) => {
-        setPreferences((prev) => ({...prev, worshipLive: {...prev.worshipLive, showSongNote}}));
+      setlistLiveShowSongNote: (showSongNote: boolean) => {
+        setPreferences((prev) => ({...prev, setlistLive: {...prev.setlistLive, showSongNote}}));
       },
-      worshipLiveShowSongNumber: (showSongNumber: boolean) => {
-        setPreferences((prev) => ({...prev, worshipLive: {...prev.worshipLive, showSongNumber}}));
+      setlistLiveShowSongNumber: (showSongNumber: boolean) => {
+        setPreferences((prev) => ({...prev, setlistLive: {...prev.setlistLive, showSongNumber}}));
       },
-      worshipLiveMultipleSheetsView: (viewMode: DirectionType) => {
-        setPreferences((prev) => ({...prev, worshipLive: {...prev.worshipLive, multipleSheetsView: viewMode}}));
+      setlistLiveMultipleSheetsView: (viewMode: DirectionType) => {
+        setPreferences((prev) => ({...prev, setlistLive: {...prev.setlistLive, multipleSheetsView: viewMode}}));
       },
-      worshipViewPageMode: (pageMode: WorshipViewPageMode) => {
-        setPreferences((prev) =>({...prev, worshipLive: {...prev.worshipLive, pageMode: pageMode}}));
+      setlistViewPageMode: (pageMode: SetlistViewPageMode) => {
+        setPreferences((prev) =>({...prev, setlistLive: {...prev.setlistLive, pageMode: pageMode}}));
       }
     }
   )

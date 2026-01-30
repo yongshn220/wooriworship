@@ -14,7 +14,7 @@ interface Props {
     className?: string
 }
 
-export function WorshipControlItem({ icon, label, onClick, isActive, variant = "default", className }: Props) {
+export function SetlistControlItem({ icon, label, onClick, isActive, variant = "default", className }: Props) {
     return (
         <Button
             variant="ghost"

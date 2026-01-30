@@ -5,7 +5,7 @@ import { ArrowUpDown } from "lucide-react";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { WorshipSpecialOrderType } from "@/components/constants/enums";
+import { SetlistSpecialOrderType } from "@/components/constants/enums";
 import { SetlistSongHeader } from "@/models/setlist";
 import { selectedSetlistSongHeaderListAtom, setlistBeginningSongHeaderAtom, setlistEndingSongHeaderAtom } from "@/global-states/setlist-creation-state";
 
@@ -14,7 +14,7 @@ interface Props {
   songOrder: number
 }
 
-type OrderValue = WorshipSpecialOrderType | string
+type OrderValue = SetlistSpecialOrderType | string
 
 export function SwapOrderButton({ songHeader, songOrder }: Props) {
   const [selectedSongHeaderList, setSelectedSongHeaderList] = useRecoilState(selectedSetlistSongHeaderListAtom)
@@ -22,10 +22,10 @@ export function SwapOrderButton({ songHeader, songOrder }: Props) {
   const setEndingSongHeader = useSetRecoilState(setlistEndingSongHeaderAtom)
 
   function handleClick(value: OrderValue) {
-    if (value === WorshipSpecialOrderType.BEGINNING) {
+    if (value === SetlistSpecialOrderType.BEGINNING) {
       handleSetBeginningSong(); return;
     }
-    if (value === WorshipSpecialOrderType.ENDING) {
+    if (value === SetlistSpecialOrderType.ENDING) {
       handleSetEndingSong(); return;
     }
 
@@ -75,13 +75,13 @@ export function SwapOrderButton({ songHeader, songOrder }: Props) {
         <DropdownMenuLabel className="border-b">Change Order</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup value={songOrder.toString()} onValueChange={handleClick} className="w-full">
-          <DropdownMenuRadioItem className="w-full cursor-pointer" value={WorshipSpecialOrderType.BEGINNING}>Beginning</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem className="w-full cursor-pointer" value={SetlistSpecialOrderType.BEGINNING}>Beginning</DropdownMenuRadioItem>
           {
             selectedSongHeaderList.map((_, i) => (
               <DropdownMenuRadioItem key={i + 1} value={(i + 1).toString()} className="w-full cursor-pointer">{i + 1}</DropdownMenuRadioItem>
             ))
           }
-          <DropdownMenuRadioItem className="w-full cursor-pointer" value={WorshipSpecialOrderType.ENDING}>Ending</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem className="w-full cursor-pointer" value={SetlistSpecialOrderType.ENDING}>Ending</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>

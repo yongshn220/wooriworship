@@ -1,13 +1,13 @@
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { cn } from "@/lib/utils";
 import * as React from "react";
-import { worshipIndexAtom, worshipIndexChangeEventAtom, worshipLiveOptionsAtom } from "../_states/worship-detail-states";
+import { setlistIndexAtom, setlistIndexChangeEventAtom, setlistLiveOptionsAtom } from "../_states/setlist-view-states";
 
 
-export function WorshipIndexIndicator() {
-    const menu = useRecoilValue(worshipLiveOptionsAtom)
-    const index = useRecoilValue(worshipIndexAtom)
-    const setWorshipIndexChangeEvent = useSetRecoilState(worshipIndexChangeEventAtom)
+export function SetlistIndexIndicator() {
+    const menu = useRecoilValue(setlistLiveOptionsAtom)
+    const index = useRecoilValue(setlistIndexAtom)
+    const setSetlistIndexChangeEvent = useSetRecoilState(setlistIndexChangeEventAtom)
 
     return (
         <div className={cn(
@@ -21,7 +21,7 @@ export function WorshipIndexIndicator() {
             {
                 Array.from(Array(index.total)).map((_, i) => (
                     (i !== index.current) ?
-                        <div key={i} className="relative z-10 group w-6 h-6 flex-center cursor-pointer" onClick={() => setWorshipIndexChangeEvent(i)}>
+                        <div key={i} className="relative z-10 group w-6 h-6 flex-center cursor-pointer" onClick={() => setSetlistIndexChangeEvent(i)}>
                             <div className="w-1 h-1 bg-gray-400/50 rounded-full transition-all duration-300 group-hover:bg-foreground/50 group-hover:scale-150 shadow-sm" />
                         </div>
                         :

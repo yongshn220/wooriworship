@@ -14,7 +14,7 @@ import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
 import { ServiceFlowApi } from "@/apis/ServiceFlowApi";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { getPathWorshipView } from "@/components/util/helper/routes";
+import { getPathSetlistView } from "@/components/util/helper/routes";
 
 // Parts
 import { ServiceInfoCard } from "./parts/service-info-card";
@@ -93,7 +93,7 @@ export function ServiceDetailView({
                 scheduleId={event.id}
                 title={displayTitle}
                 date={event.date}
-                worshipId={null} // V3 uses separate Setlist
+                setlistId={null} // V3 uses separate Setlist
                 teamId={teamId}
                 onPreview={setPreviewSetlistId} // Keeps preview logic if we link V3 setlist to preview?
             />
@@ -121,7 +121,7 @@ export function ServiceDetailView({
                     }))}
                     onEdit={() => setIsEditingSetlist(true)}
                     onDelete={() => setDeletingTarget("setlist")}
-                    onWorshipView={() => router.push(getPathWorshipView(teamId, event.id))}
+                    onSetlistView={() => router.push(getPathSetlistView(teamId, event.id))}
                 />
             ) : (
                 <EmptyStateCard
