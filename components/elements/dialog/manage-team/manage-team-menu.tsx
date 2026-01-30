@@ -1,7 +1,6 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import MenuIcon from "@/public/icons/menuIcon.svg";
 import { DoorOpenIcon, Trash2Icon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { TeamApi } from "@/apis";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -95,16 +94,16 @@ export function ManageTeamMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuGroup className="space-y-2">
-          <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => setLeaveTeamDialogOpen(true)}>
+          <DropdownMenuItem className="cursor-pointer pl-2" onClick={() => setLeaveTeamDialogOpen(true)}>
             <DoorOpenIcon className="mr-3 w-5 h-5" />
-            <p>Leave Team</p>
-          </Button>
+            <span>Leave Team</span>
+          </DropdownMenuItem>
           {
             team.admins.includes(authUser.uid) &&
-            <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteTeamDialogOpen(true)}>
-              <Trash2Icon className="mr-3 w-5 h-5 text-red-600" />
-              <p className="text-red-600">Delete Team</p>
-            </Button>
+            <DropdownMenuItem className="cursor-pointer pl-2 text-destructive focus:text-destructive focus:bg-destructive/10" onClick={() => setDeleteTeamDialogOpen(true)}>
+              <Trash2Icon className="mr-3 w-5 h-5" />
+              <span>Delete Team</span>
+            </DropdownMenuItem>
           }
         </DropdownMenuGroup>
       </DropdownMenuContent>

@@ -46,7 +46,7 @@ export function PendingMember({ invitation }: Props) {
       <Button
         variant="ghost"
         size="icon"
-        className="h-8 w-8 text-muted-foreground hover:text-red-600 hover:bg-red-50"
+        className="min-h-touch min-w-touch h-11 w-11 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
         onClick={handleRemoveInvitation}
       >
         <span className="sr-only">Remove</span>

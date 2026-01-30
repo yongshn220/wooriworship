@@ -28,7 +28,7 @@ export function BoardCard({
                 "overflow-hidden transition-all duration-300 border cursor-pointer bg-card",
                 // Collapsed: very subtle border to blend in, light shadow
                 // Expanded: subtle blue border, deeper shadow but clean
-                isExpanded ? "border-blue-200 shadow-xl" : "border-transparent shadow-sm hover:border-border/50",
+                isExpanded ? "border-primary/30 shadow-xl" : "border-transparent shadow-sm hover:border-border/50",
                 // Hover: gentle lift
                 "hover:-translate-y-[2px]",
                 className

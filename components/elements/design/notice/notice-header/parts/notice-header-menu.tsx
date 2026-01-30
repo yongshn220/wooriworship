@@ -1,4 +1,4 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { SquarePen, Trash2Icon, MoreHorizontal } from "lucide-react";
 import { getPathEditNotice } from "@/components/util/helper/routes";
@@ -52,24 +52,24 @@ export function NoticeHeaderMenu({ noticeId, createdById }: Props) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/20">
+          <Button variant="ghost" size="icon" className="min-h-touch min-w-touch h-11 w-11 text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/20" data-testid="notice-menu">
             <MoreHorizontal className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuGroup>
-            <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => router.push(getPathEditNotice(teamId, noticeId))}>
+            <DropdownMenuItem className="cursor-pointer pl-2" onClick={() => router.push(getPathEditNotice(teamId, noticeId))} data-testid="notice-edit">
               <SquarePen className="mr-3 w-5 h-5" />
-              <p>Edit</p>
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 focus:bg-red-50 cursor-pointer w-full flex-start pl-2"
+              <span>Edit</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer pl-2 text-destructive focus:text-destructive focus:bg-destructive/10"
               onClick={() => setIsDeleteDialogOpen(true)}
+              data-testid="notice-delete"
             >
               <Trash2Icon className="mr-3 w-5 h-5" />
-              <p>Delete</p>
-            </Button>
+              <span>Delete</span>
+            </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
