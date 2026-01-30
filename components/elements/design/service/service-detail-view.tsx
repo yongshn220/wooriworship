@@ -98,8 +98,10 @@ export function ServiceDetailView({
                 date={event.date}
                 setlistId={null} // V3 uses separate Setlist
                 teamId={teamId}
-                onPreview={setPreviewSetlistId} // Keeps preview logic if we link V3 setlist to preview?
+                onPreview={setPreviewSetlistId}
                 myRoles={myRoles}
+                tagId={event.tagId}
+                onEdited={onDataChanged}
             />
 
 

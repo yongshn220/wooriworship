@@ -5,12 +5,18 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, MoreVertical, SquarePen, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { getPathEditServing } from "@/components/util/helper/routes";
+import { MoreHorizontal, MoreVertical, SquarePen, Trash2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
+import { Timestamp } from "firebase/firestore";
 
 import { auth } from "@/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -25,6 +31,9 @@ interface Props {
     iconType?: "horizontal" | "vertical";
     scheduleTitle?: string;
     scheduleDate?: string;
+    tagId?: string;
+    eventDate?: Date;
+    onEdited?: () => void;
 }
 
 export function ServiceHeaderMenu({
@@ -33,16 +42,52 @@ export function ServiceHeaderMenu({
     trigger,
     iconType = "horizontal",
     scheduleTitle,
-    scheduleDate
+    scheduleDate,
+    tagId,
+    eventDate,
+    onEdited
 }: Props) {
     const [user] = useAuthState(auth as any);
-    const router = useRouter();
     const { toast } = useToast();
     const setServices = useSetRecoilState(serviceEventsListAtom);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+    // Edit dialog state
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [editDate, setEditDate] = useState<Date | undefined>(undefined);
+    const [editTagId, setEditTagId] = useState<string>("");
+    const [editCalendarMonth, setEditCalendarMonth] = useState<Date>(new Date());
+    const [isSaving, setIsSaving] = useState(false);
+
     const handleEdit = () => {
-        router.push(getPathEditServing(teamId, scheduleId));
+        setEditDate(eventDate || undefined);
+        setEditTagId(tagId || "");
+        if (eventDate) setEditCalendarMonth(eventDate);
+        setIsEditDialogOpen(true);
+    };
+
+    const handleSave = async () => {
+        if (!editDate) return;
+        setIsSaving(true);
+        try {
+            await ServiceEventApi.updateService(teamId, scheduleId, {
+                date: Timestamp.fromDate(editDate),
+                tagId: editTagId,
+            });
+            toast({ title: "Service updated" });
+            setIsEditDialogOpen(false);
+            setServices(prev => prev.map(s =>
+                s.id === scheduleId
+                    ? { ...s, date: Timestamp.fromDate(editDate), tagId: editTagId }
+                    : s
+            ));
+            onEdited?.();
+        } catch (error) {
+            console.error(error);
+            toast({ variant: "destructive", title: "Error", description: "Failed to update service." });
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const handleDelete = async () => {
@@ -108,6 +153,36 @@ export function ServiceHeaderMenu({
                 description={deleteDescription}
                 onDeleteHandler={handleDelete}
             />
+
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                <DialogContent className="max-w-md rounded-3xl p-6 pt-10">
+                    <DialogHeader>
+                        <DialogTitle className="text-center text-xl font-bold">Edit Service</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <ServiceDateSelector
+                            teamId={teamId}
+                            tagId={editTagId}
+                            onTagIdChange={setEditTagId}
+                            date={editDate}
+                            onDateChange={(d) => {
+                                setEditDate(d);
+                                if (d) setEditCalendarMonth(d);
+                            }}
+                            calendarMonth={editCalendarMonth}
+                            onCalendarMonthChange={setEditCalendarMonth}
+                        />
+                    </div>
+                    <Button
+                        className="w-full h-12 rounded-xl text-base font-semibold shadow-lg"
+                        size="lg"
+                        onClick={handleSave}
+                        disabled={isSaving || !editDate}
+                    >
+                        {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save Changes"}
+                    </Button>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

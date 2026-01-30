@@ -102,8 +102,6 @@ export function useMyAssignments({
     const { myAssignments, assignedServiceIds } = useMemo(() => {
         const assigned: string[] = [];
         const assignments: MyAssignment[] = [];
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
 
         for (const event of events) {
             const cached = cache[event.id];
@@ -144,23 +142,21 @@ export function useMyAssignments({
             if (myRoles.length > 0) {
                 assigned.push(event.id);
                 const eventDate = event.date.toDate();
-                if (eventDate >= now) {
-                    let badgeLabel = "Event";
-                    if (event.tagId) {
-                        const tagName = serviceTags?.find((t: any) => t.id === event.tagId)?.name;
-                        badgeLabel = tagName || event.title;
-                    } else if (event.title) {
-                        badgeLabel = event.title;
-                    }
-
-                    assignments.push({
-                        serviceId: event.id,
-                        serviceDate: eventDate,
-                        serviceTitle: event.title,
-                        serviceBadgeLabel: badgeLabel,
-                        roles: myRoles,
-                    });
+                let badgeLabel = "Event";
+                if (event.tagId) {
+                    const tagName = serviceTags?.find((t: any) => t.id === event.tagId)?.name;
+                    badgeLabel = tagName || event.title;
+                } else if (event.title) {
+                    badgeLabel = event.title;
                 }
+
+                assignments.push({
+                    serviceId: event.id,
+                    serviceDate: eventDate,
+                    serviceTitle: event.title,
+                    serviceBadgeLabel: badgeLabel,
+                    roles: myRoles,
+                });
             }
         }
 

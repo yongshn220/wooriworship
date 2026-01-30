@@ -19,9 +19,11 @@ interface Props {
     teamId: string;
     onPreview?: (setlistId: string) => void;
     myRoles?: MyAssignmentRole[];
+    tagId?: string;
+    onEdited?: () => void;
 }
 
-export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, onPreview, myRoles }: Props) {
+export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, onPreview, myRoles, tagId, onEdited }: Props) {
     const router = useRouter();
 
     const dateObj = date instanceof Timestamp ? date.toDate() : (date instanceof Date ? date : parseLocalDate(date));
@@ -48,6 +50,9 @@ export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, on
                     iconType="horizontal"
                     scheduleTitle={title}
                     scheduleDate={format(dateObj, "yyyy/MM/dd")}
+                    tagId={tagId}
+                    eventDate={dateObj}
+                    onEdited={onEdited}
                     trigger={
                         <button className="inline-flex items-center gap-0.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-lg hover:bg-muted active:scale-95">
                             Edit
