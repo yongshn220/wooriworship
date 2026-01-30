@@ -86,7 +86,10 @@ export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, on
                     <div className="px-5 py-3 flex items-center justify-between gap-2">
                         {/* My Roles */}
                         {myRoles && myRoles.length > 0 ? (
-                            <div className="flex flex-wrap gap-1.5 flex-1">
+                            <div className="flex flex-wrap items-center gap-1.5 flex-1">
+                                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mr-0.5">
+                                    My Roles
+                                </span>
                                 {myRoles.map((role, idx) => (
                                     <span
                                         key={idx}
