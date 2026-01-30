@@ -3,7 +3,6 @@
 
 
 import { useEffect, useState, useMemo, Suspense } from "react";
-import { format } from "date-fns";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom, teamAtom, fetchServiceTagsSelector } from "@/global-states/teamState";
 import { fetchServingRolesSelector } from "@/global-states/serviceRolesState";
@@ -34,9 +33,9 @@ import { SwipeableView } from "@/components/elements/design/service/swipeable-vi
 // import { useServingNavigation } from "./_hooks/use-serving-navigation"; // REMOVED
 import { ServiceDataPrefetcher } from "./_components/service-data-prefetcher";
 import { useMyAssignments } from "@/hooks/use-my-assignments";
-import { ServiceBoardHeaderLeft, ServiceBoardHeaderRight } from "./_components/service-board-header";
+import { ServiceBoardHeaderLeft } from "./_components/service-board-header";
 import { MyAssignmentRole } from "@/models/services/MyAssignment";
-import { GenericCalendarDrawer } from "@/components/common/board-calendar/generic-calendar-drawer";
+import { InlineCalendarView } from "./_components/inline-calendar-view";
 
 export default function ServingPage() {
     const teamId = useRecoilValue(currentTeamIdAtom);
@@ -54,7 +53,6 @@ export default function ServingPage() {
     // My Assignments state
     const [filterMode, setFilterMode] = useRecoilState(serviceFilterModeAtom);
     const [cacheVersion, setCacheVersion] = useState(0);
-    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     // Set Page ID for Navbar Title and Config
     useEffect(() => {
@@ -111,18 +109,8 @@ export default function ServingPage() {
         cacheVersion,
     });
 
-    const handleModeChange = (newMode: 'all' | 'mine') => {
+    const handleModeChange = (newMode: 'all' | 'mine' | 'calendar') => {
         setFilterMode(newMode);
-    };
-
-    const getMonthLabel = () => {
-        if (selectedScheduleId) {
-            const selected = events.find(s => s.id === selectedScheduleId);
-            if (selected) {
-                return format(selected.date.toDate(), "MMMM yyyy");
-            }
-        }
-        return format(new Date(), "MMMM yyyy");
     };
 
     const filteredCalendarItems = useMemo(() => {
@@ -132,9 +120,9 @@ export default function ServingPage() {
         return calendarItems;
     }, [calendarItems, filterMode, assignedServiceIds]);
 
-    // Current user's roles for the selected service (Mine mode)
+    // Current user's roles for the selected service (Mine + Calendar mode)
     const myRolesForSelected = useMemo(() => {
-        if (filterMode !== 'mine' || !selectedScheduleId) return undefined;
+        if (filterMode === 'all' || !selectedScheduleId) return undefined;
         const assignment = myAssignments.find(a => a.serviceId === selectedScheduleId);
         return assignment?.roles;
     }, [filterMode, selectedScheduleId, myAssignments]);
@@ -194,24 +182,20 @@ export default function ServingPage() {
         loadData();
     }, [teamId, setEvents]); // Removed setHeaderActions from dependencies since we use it in separate effect
 
-    // Set Header Content (Left: Toggle + Month, Right: Calendar + Create)
+    // Set Header Content (Left: Toggle, Right: Create)
     useEffect(() => {
         setHeaderLeftContent(
             <ServiceBoardHeaderLeft
                 filterMode={filterMode}
                 onFilterModeChange={handleModeChange}
                 myCount={assignedServiceIds.length}
-                monthLabel={getMonthLabel()}
             />
         );
         setHeaderActions(
-            <div className="flex items-center gap-1">
-                <ServiceBoardHeaderRight onCalendarOpen={() => setIsCalendarOpen(true)} />
-                <ServiceCreationMenu
-                    teamId={teamId || ""}
-                    selectedServiceId={selectedScheduleId}
-                />
-            </div>
+            <ServiceCreationMenu
+                teamId={teamId || ""}
+                selectedServiceId={selectedScheduleId}
+            />
         );
         return () => {
             setHeaderLeftContent(null);
@@ -305,15 +289,24 @@ export default function ServingPage() {
         <div className="flex flex-col h-full bg-surface dark:bg-surface-dark relative font-sans text-slate-800 dark:text-slate-100 overflow-hidden">
             <div className="flex-1 overflow-y-auto pb-safe">
                 <main className="max-w-lg mx-auto px-4 pt-2 space-y-5 pb-24">
-                    <CalendarStrip
-                        items={filteredCalendarItems}
-                        selectedId={selectedScheduleId}
-                        onSelect={setSelectedScheduleId}
-                        onLoadPrev={filterMode === 'all' ? handleLoadPrev : undefined}
-                        isLoadingPrev={isLoadingPast}
-                        hasMorePast={filterMode === 'all' && hasMorePast}
-                        assignedServiceIds={assignedServiceIds}
-                    />
+                    {filterMode === 'calendar' ? (
+                        <InlineCalendarView
+                            items={calendarItems}
+                            selectedId={selectedScheduleId}
+                            onSelect={setSelectedScheduleId}
+                            myAssignments={myAssignments}
+                        />
+                    ) : (
+                        <CalendarStrip
+                            items={filteredCalendarItems}
+                            selectedId={selectedScheduleId}
+                            onSelect={setSelectedScheduleId}
+                            onLoadPrev={filterMode === 'all' ? handleLoadPrev : undefined}
+                            isLoadingPrev={isLoadingPast}
+                            hasMorePast={filterMode === 'all' && hasMorePast}
+                            assignedServiceIds={assignedServiceIds}
+                        />
+                    )}
 
                     {/* Details Section */}
                     <div className="mt-6">
@@ -335,15 +328,6 @@ export default function ServingPage() {
                     </div>
                 </main>
             </div>
-
-            <GenericCalendarDrawer
-                open={isCalendarOpen}
-                onOpenChange={setIsCalendarOpen}
-                items={filteredCalendarItems}
-                selectedId={selectedScheduleId}
-                onSelect={setSelectedScheduleId}
-                assignedIds={filterMode === 'mine' ? assignedServiceIds : undefined}
-            />
         </div>
     );
 }

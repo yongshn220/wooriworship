@@ -83,7 +83,7 @@ export const serviceEventsListAtom = atom<ServiceEvent[]>({
 // =============================================================================
 // 4. My Assignments State
 // =============================================================================
-export const serviceFilterModeAtom = atom<'all' | 'mine'>({
+export const serviceFilterModeAtom = atom<'all' | 'mine' | 'calendar'>({
     key: "serviceFilterModeAtom",
     default: 'all',
 });
