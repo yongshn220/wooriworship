@@ -42,7 +42,7 @@ export function WorshipControlDock({ teamId, serviceId }: Props) {
 
     return (
         <div className={cn(
-            "fixed bottom-8 left-0 w-full z-50 pointer-events-none flex",
+            "fixed bottom-8 left-0 w-full z-[10002] pointer-events-none flex",
             uiVisible ? "justify-center" : "justify-start pl-4"
         )}>
             <motion.div
@@ -112,7 +112,7 @@ export function WorshipControlDock({ teamId, serviceId }: Props) {
                                             <WorshipControlItem icon={<MoreHorizontal className="w-5 h-5" />} />
                                         </div>
                                     </PopoverTrigger>
-                                    <PopoverContent side="top" className="mb-4 bg-background backdrop-blur-xl border-border w-80 p-0 overflow-hidden shadow-toss rounded-2xl z-[60]">
+                                    <PopoverContent side="top" className="mb-4 bg-background backdrop-blur-xl border-border w-80 p-0 overflow-hidden shadow-toss rounded-2xl z-[10003]">
                                         <WorshipSettingsMenu teamId={teamId} serviceId={serviceId} />
                                     </PopoverContent>
                                 </Popover>
