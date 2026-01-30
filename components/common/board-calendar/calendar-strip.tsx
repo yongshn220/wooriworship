@@ -3,8 +3,9 @@
 import { cn } from "@/lib/utils";
 import { format, differenceInCalendarDays } from "date-fns";
 import { Loader2, History, ChevronRight, ChevronLeft } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { CalendarItem } from "./types";
+import { MyAssignment, MyAssignmentRole } from "@/models/services/MyAssignment";
 import { useAnchorScroll } from "./use-anchor-scroll";
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
     onLoadPrev?: () => void;
     isLoadingPrev?: boolean;
     hasMorePast?: boolean;
-    assignedServiceIds?: string[];
+    myAssignments?: MyAssignment[];
 }
 
 export function CalendarStrip({
@@ -24,8 +25,20 @@ export function CalendarStrip({
     onLoadPrev,
     isLoadingPrev,
     hasMorePast = true,
-    assignedServiceIds,
+    myAssignments,
 }: Props) {
+    const myAssignmentMap = useMemo(() => {
+        if (!myAssignments) return new Map<string, MyAssignment>();
+        const map = new Map<string, MyAssignment>();
+        for (const a of myAssignments) map.set(a.serviceId, a);
+        return map;
+    }, [myAssignments]);
+
+    const getRoleLabel = (role: MyAssignmentRole) => {
+        if (role.source === 'flow') return role.flowItemTitle || role.roleName;
+        return role.roleName;
+    };
+
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
@@ -130,7 +143,8 @@ export function CalendarStrip({
     };
 
 
-    const CARD_SIZE_CLASSES = "snap-start scroll-mx-4 shrink-0 w-[5.5rem] h-[7rem] rounded-xl flex flex-col items-center justify-center transition-colors relative";
+    const CARD_CLASSES = "w-[5.5rem] h-[7rem] rounded-xl flex flex-col items-center justify-center transition-colors relative";
+    const ITEM_WRAPPER = "snap-start scroll-mx-4 shrink-0 flex flex-col items-center gap-1";
 
     return (
         <div className="relative group/calendar-strip" data-testid="calendar-strip">
@@ -141,28 +155,40 @@ export function CalendarStrip({
                 className="flex overflow-x-auto gap-3 pb-2 -mx-4 px-4 pt-4 snap-x snap-mandatory items-center no-scrollbar relative"
             >
                 {onLoadPrev && hasMorePast && (
-                    <HistoryButton
-                        onLoadPrev={handleLoadPrev}
-                        isLoadingPrev={!!isLoadingPrev}
-                        hasMorePast={hasMorePast}
-                        baseClasses={CARD_SIZE_CLASSES}
-                    />
+                    <div className={ITEM_WRAPPER}>
+                        <HistoryButton
+                            onLoadPrev={handleLoadPrev}
+                            isLoadingPrev={!!isLoadingPrev}
+                            hasMorePast={hasMorePast}
+                            baseClasses={CARD_CLASSES}
+                        />
+                    </div>
                 )}
 
-                {items.map((item) => (
-                    <DateCard
-                        key={item.id}
-                        item={item}
-                        isSelected={item.id === selectedId}
-                        onSelect={onSelect}
-                        baseClasses={CARD_SIZE_CLASSES}
-                        setRef={(el) => {
-                            if (el) itemRefs.current.set(item.id, el);
-                            else itemRefs.current.delete(item.id);
-                        }}
-                        assignedDot={assignedServiceIds?.includes(item.id)}
-                    />
-                ))}
+                {items.map((item) => {
+                    const assignment = myAssignmentMap.get(item.id);
+                    const firstRole = assignment?.roles?.[0];
+                    const roleLabel = firstRole ? getRoleLabel(firstRole) : null;
+                    return (
+                        <div key={item.id} className={ITEM_WRAPPER}>
+                            <DateCard
+                                item={item}
+                                isSelected={item.id === selectedId}
+                                onSelect={onSelect}
+                                baseClasses={CARD_CLASSES}
+                                setRef={(el) => {
+                                    if (el) itemRefs.current.set(item.id, el);
+                                    else itemRefs.current.delete(item.id);
+                                }}
+                            />
+                            {roleLabel && (
+                                <span className="text-[9px] font-bold text-primary truncate max-w-[5.5rem] text-center leading-tight">
+                                    {roleLabel}
+                                </span>
+                            )}
+                        </div>
+                    );
+                })}
 
                 <div className="w-1 shrink-0"></div>
             </div>
@@ -238,10 +264,9 @@ interface DateCardProps {
     onSelect: (id: string) => void;
     baseClasses: string;
     setRef: (el: HTMLButtonElement | null) => void;
-    assignedDot?: boolean;
 }
 
-function DateCard({ item, isSelected, onSelect, baseClasses, setRef, assignedDot }: DateCardProps) {
+function DateCard({ item, isSelected, onSelect, baseClasses, setRef }: DateCardProps) {
     const day = format(item.date, "d");
     const month = format(item.date, "MMM");
     const weekDay = format(item.date, "EEE");
@@ -312,9 +337,6 @@ function DateCard({ item, isSelected, onSelect, baseClasses, setRef, assignedDot
                 )}
             </div>
 
-            {assignedDot && !isSelected && (
-                <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-500 rounded-full" />
-            )}
         </button>
     );
 }

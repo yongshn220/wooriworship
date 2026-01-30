@@ -1,8 +1,8 @@
 "use client";
 
-import { Calendar, ArrowRight, MoreVertical, Mic, User } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
+import { format, differenceInCalendarDays } from "date-fns";
 import { useRouter } from "next/navigation";
 import { getPathSetlistView } from "@/components/util/helper/routes";
 import { Timestamp } from "@firebase/firestore";
@@ -25,80 +25,96 @@ export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, on
     const router = useRouter();
 
     const dateObj = date instanceof Timestamp ? date.toDate() : (date instanceof Date ? date : parseLocalDate(date));
-    const dateStr = format(dateObj, "yyyy. M. d (EEE)");
+    const dateStr = format(dateObj, "yyyy. MM. dd (EEE)");
+
+    const diffDays = differenceInCalendarDays(dateObj, new Date());
+    const dDayLabel = diffDays === 0 ? "Today" : diffDays > 0 ? `D-${diffDays}` : null;
+
+    const getRoleLabel = (role: MyAssignmentRole) => {
+        if (role.source === 'flow') return role.flowItemTitle || role.roleName;
+        return role.roleName;
+    };
 
     return (
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-5 relative overflow-hidden border border-blue-100 dark:border-blue-800/50" data-testid="service-info-card">
-            <div className="flex flex-col gap-4 relative z-10">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h1 className="text-xl font-bold text-foreground mb-1 tracking-tight pr-8">
-                            {title}
-                        </h1>
-                        <div className="flex items-center gap-2 text-muted-foreground font-medium">
-                            <Calendar className="w-4 h-4" />
-                            <span className="text-sm">{dateStr}</span>
-                        </div>
-                        {myRoles && myRoles.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 mt-2">
+        <div className="rounded-2xl overflow-hidden shadow-sm bg-card border border-border/40 border-l-[3px] border-l-primary" data-testid="service-info-card">
+            {/* Service tag + menu */}
+            <div className="px-5 pt-4 pb-2 flex items-center justify-between">
+                <h1 className="text-lg font-bold text-foreground tracking-tight leading-snug">
+                    {title}
+                </h1>
+                <ServiceHeaderMenu
+                    scheduleId={scheduleId}
+                    teamId={teamId}
+                    iconType="horizontal"
+                    scheduleTitle={title}
+                    scheduleDate={format(dateObj, "yyyy/MM/dd")}
+                    trigger={
+                        <button className="inline-flex items-center gap-0.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-lg hover:bg-muted active:scale-95">
+                            Edit
+                            <ChevronDown className="h-3 w-3" />
+                        </button>
+                    }
+                />
+            </div>
+
+            {/* Date row */}
+            <div className="px-5 pb-3 flex items-center gap-2">
+                <span className="text-sm text-muted-foreground font-medium">
+                    {dateStr}
+                </span>
+                {dDayLabel && (
+                    <span className={cn(
+                        "text-[10px] font-bold px-2 py-0.5 rounded-full",
+                        diffDays === 0
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-primary/10 text-primary"
+                    )}>
+                        {dDayLabel}
+                    </span>
+                )}
+            </div>
+
+            {/* Roles + actions */}
+            {(myRoles && myRoles.length > 0) || setlistId ? (
+                <>
+                    <div className="mx-5 border-t border-border/30" />
+                    <div className="px-5 py-3 flex items-center justify-between gap-2">
+                        {/* My Roles */}
+                        {myRoles && myRoles.length > 0 ? (
+                            <div className="flex flex-wrap gap-1.5 flex-1">
                                 {myRoles.map((role, idx) => (
                                     <span
                                         key={idx}
-                                        className={cn(
-                                            "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold",
-                                            role.source === 'praise_team'
-                                                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-                                                : "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
-                                        )}
+                                        className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-primary/10 text-primary dark:bg-primary/20"
                                     >
-                                        {role.source === 'praise_team' ? (
-                                            <Mic className="w-3 h-3" />
-                                        ) : (
-                                            <User className="w-3 h-3" />
-                                        )}
-                                        {role.roleName}
-                                        {role.flowItemTitle && (
-                                            <span className="text-[10px] opacity-70">· {role.flowItemTitle}</span>
-                                        )}
+                                        {getRoleLabel(role)}
                                     </span>
                                 ))}
                             </div>
+                        ) : (
+                            <div />
+                        )}
+
+                        {/* Setlist view button */}
+                        {setlistId && (
+                            <Button
+                                variant="ghost"
+                                onClick={() => {
+                                    if (onPreview) {
+                                        onPreview(setlistId);
+                                    } else {
+                                        router.push(getPathSetlistView(teamId, setlistId));
+                                    }
+                                }}
+                                className="text-primary hover:bg-primary/5 font-semibold h-9 rounded-lg px-3 transition-all active:scale-95 flex items-center gap-1.5 text-sm shrink-0"
+                            >
+                                Setlist
+                                <ArrowRight className="w-4 h-4" />
+                            </Button>
                         )}
                     </div>
-
-                    <ServiceHeaderMenu
-                        scheduleId={scheduleId}
-                        teamId={teamId}
-                        iconType="vertical"
-                        scheduleTitle={title}
-                        scheduleDate={format(dateObj, "yyyy/MM/dd")}
-                        trigger={
-                            <button className="text-muted-foreground hover:text-foreground transition-colors min-h-touch min-w-touch inline-flex items-center justify-center -mr-2 -mt-2">
-                                <MoreVertical className="w-5 h-5" />
-                            </button>
-                        }
-                    />
-                </div>
-
-                {setlistId && (
-                    <div className="flex justify-end">
-                        <Button
-                            variant="ghost"
-                            onClick={() => {
-                                if (onPreview) {
-                                    onPreview(setlistId);
-                                } else {
-                                    router.push(getPathSetlistView(teamId, setlistId));
-                                }
-                            }}
-                            className="bg-card text-blue-600 dark:text-blue-400 hover:bg-muted font-semibold h-11 rounded-xl px-4 shadow-sm border border-transparent transition-all active:scale-95 flex items-center gap-1.5"
-                        >
-                            setlist view
-                            <ArrowRight className="w-4 h-4" />
-                        </Button>
-                    </div>
-                )}
-            </div>
+                </>
+            ) : null}
         </div>
     );
 }

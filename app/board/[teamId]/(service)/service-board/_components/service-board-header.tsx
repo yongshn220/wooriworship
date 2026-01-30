@@ -34,7 +34,7 @@ export function ServiceBoardHeaderLeft({
             label: (
                 <span className="flex items-center gap-0.5">
                     <CalendarDays className="w-3.5 h-3.5" />
-                    Cal
+                    Calendar
                 </span>
             ),
         },

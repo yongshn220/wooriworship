@@ -122,10 +122,10 @@ export default function ServingPage() {
 
     // Current user's roles for the selected service (Mine + Calendar mode)
     const myRolesForSelected = useMemo(() => {
-        if (filterMode === 'all' || !selectedScheduleId) return undefined;
+        if (!selectedScheduleId) return undefined;
         const assignment = myAssignments.find(a => a.serviceId === selectedScheduleId);
         return assignment?.roles;
-    }, [filterMode, selectedScheduleId, myAssignments]);
+    }, [selectedScheduleId, myAssignments]);
 
     // Load schedules (Initial: Upcoming only)
     useEffect(() => {
@@ -304,7 +304,7 @@ export default function ServingPage() {
                             onLoadPrev={filterMode === 'all' ? handleLoadPrev : undefined}
                             isLoadingPrev={isLoadingPast}
                             hasMorePast={filterMode === 'all' && hasMorePast}
-                            assignedServiceIds={assignedServiceIds}
+                            myAssignments={myAssignments}
                         />
                     )}
 
