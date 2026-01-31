@@ -81,7 +81,6 @@ export class SongApi extends BaseApi {
           keys: data.keys,
           original: data.original,
           tags: data.tags,
-          version: data.version,
           last_used_time: data.last_used_time
         };
       });
@@ -101,11 +100,8 @@ export class SongApi extends BaseApi {
           author: songInput.author,
           url: songInput.link
         },
-        version: songInput.version,
         description: songInput.description,
-        lyrics: "",
         keys: musicSheetContainers?.map(mContainer => mContainer?.key),
-        bpm: songInput.bpm,
         tags: songInput.tags,
         created_by: {
           id: userId,
@@ -154,11 +150,8 @@ export class SongApi extends BaseApi {
           author: songInput.author,
           url: songInput.link
         },
-        version: songInput.version,
         description: songInput.description,
-        lyrics: "",
         keys: musicSheetContainers?.map(mContainer => mContainer?.key),
-        bpm: songInput.bpm,
         tags: songInput.tags,
         updated_by: {
           id: userId,

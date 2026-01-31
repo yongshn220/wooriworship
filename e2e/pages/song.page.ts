@@ -103,7 +103,7 @@ export class SongPage {
   async fillAndSubmit(title: string) {
     await this.titleInput.fill(title);
     // Click through all steps until form closes
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 2; i++) {
       await this.submitButton.click();
       await this.page.waitForTimeout(500);
       const stillVisible = await this.songForm.isVisible().catch(() => false);

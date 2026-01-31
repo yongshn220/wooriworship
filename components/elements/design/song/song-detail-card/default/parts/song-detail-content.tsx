@@ -24,16 +24,6 @@ export function SongDetailContent({ teamId, songId }: Props) {
 
   return (
     <div className="grid gap-6 w-full">
-      {
-        song?.version &&
-        <div className="flex justify-between items-center">
-          <Label htmlFor="name" className="text-base font-semibold">
-            Version
-          </Label>
-          <p>{song?.version}</p>
-        </div>
-      }
-
       {/* Link Section */}
       <div className="flex justify-between items-center">
         <Label htmlFor="name" className="text-base font-semibold">
@@ -59,19 +49,6 @@ export function SongDetailContent({ teamId, songId }: Props) {
           }
         </div>
       </div>
-
-      {/* BPM Section */}
-      {
-        song?.bpm &&
-        <div className="flex justify-between items-center">
-          <Label htmlFor="name" className="text-base font-semibold">
-            BPM
-          </Label>
-          <p>
-            {song?.bpm}
-          </p>
-        </div>
-      }
 
       {/* Last Used Section */}
       <div className="flex justify-between items-center">

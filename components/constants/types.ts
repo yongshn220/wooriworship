@@ -13,6 +13,7 @@ export interface MusicSheetContainer {
   id?: string
   tempId: string
   key: string
+  note?: string
   imageFileContainers: Array<ImageFileContainer>
 }
 

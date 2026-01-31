@@ -7,9 +7,6 @@ export type SongHeader = {
   subtitle: string
   description: string
   tags: Array<string>
-  bpm: number
-  version: string
-  lyrics: string
   keys: Array<string>
   created_by: {
     id: string

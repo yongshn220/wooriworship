@@ -37,10 +37,8 @@ export interface SongInput {
   title: string
   subtitle: string
   author: string
-  version: string
   link: string
   tags: Array<string>
-  bpm: number | null
   description: string
 }
 
@@ -55,18 +53,16 @@ export function SongForm({ mode, teamId, songId }: Props) {
 
 
   // Form State
-  const [step, setStep] = useState(0); // 0: Identity, 1: Details, 2: Context, 3: Sheets
+  const [step, setStep] = useState(0); // 0: Song Info, 1: Sheets
   const [direction, setDirection] = useState(0);
-  const totalSteps = 4;
+  const totalSteps = 2;
 
   const [songInput, setSongInput] = useState<SongInput>({
     title: (mode === FormMode.EDIT) ? song?.title ?? "" : "",
     subtitle: (mode === FormMode.EDIT) ? song?.subtitle ?? "" : "",
     author: (mode === FormMode.EDIT) ? song?.original.author ?? "" : "",
-    version: (mode === FormMode.EDIT) ? song?.version ?? "" : "",
     link: (mode === FormMode.EDIT) ? song?.original.url ?? "" : "",
     tags: (mode === FormMode.EDIT) ? song?.tags ?? [] : [],
-    bpm: (mode === FormMode.EDIT) ? song?.bpm ?? null : null,
     description: (mode === FormMode.EDIT) ? song?.description ?? "" : ""
   })
 
@@ -78,16 +74,15 @@ export function SongForm({ mode, teamId, songId }: Props) {
         title: song.title ?? "",
         subtitle: song.subtitle ?? "",
         author: song.original.author ?? "",
-        version: song.version ?? "",
         link: song.original.url ?? "",
         tags: song.tags ?? [],
-        bpm: song.bpm ?? null,
         description: song.description ?? ""
       }));
     }
   }, [mode, song]);
 
   const [musicSheetContainers, setMusicSheetContainers] = useState<Array<MusicSheetContainer>>([])
+  const [selectedSheetIndex, setSelectedSheetIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
@@ -101,6 +96,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
           id: musicSheet?.id,
           tempId: uuid(),
           key: musicSheet?.key,
+          note: musicSheet?.note ?? "",
           imageFileContainers: musicSheet?.urls?.map(url => {
             const iContainer: ImageFileContainer = { id: "", file: null, url: url, isLoading: false, isUploadedInDatabase: true }
             return iContainer
@@ -126,7 +122,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
   }
 
   function clearContents() {
-    const songInput: SongInput = { title: "", subtitle: "", author: "", version: "", link: "", tags: [], bpm: null, description: "" }
+    const songInput: SongInput = { title: "", subtitle: "", author: "", link: "", tags: [], description: "" }
     setSongInput(songInput)
     setMusicSheetContainers([])
   }
@@ -254,21 +250,25 @@ export function SongForm({ mode, teamId, songId }: Props) {
   }
 
   function handleAddNewMusicSheet() {
-    setMusicSheetContainers((prev) => ([...prev, {
+    const newContainer: MusicSheetContainer = {
       tempId: uuid(),
       key: "",
+      note: "",
       imageFileContainers: []
-    }]))
+    }
+    setMusicSheetContainers((prev) => {
+      const newList = [...prev, newContainer]
+      setSelectedSheetIndex(newList.length - 1)
+      return newList
+    })
   }
 
   function setKeyToMusicSheet(tempId: string, key: string) {
     setMusicSheetContainers((prev) => ([...prev.map((musicSheet) => (musicSheet?.tempId === tempId) ? { ...musicSheet, key: key } : musicSheet)]))
   }
-  function setImageFileContainersToMusicSheet(tempId: string, imageFileContainers: Array<ImageFileContainer>) {
-    setMusicSheetContainers((prev) => ([
-      ...prev.map((musicSheet) => ((musicSheet?.tempId === tempId) ? { ...musicSheet, imageFileContainers } : musicSheet))
-    ])
-    )
+
+  function setNoteToMusicSheet(tempId: string, note: string) {
+    setMusicSheetContainers((prev) => ([...prev.map((musicSheet) => (musicSheet?.tempId === tempId) ? { ...musicSheet, note: note } : musicSheet)]))
   }
 
   function addImageFileContainerToMusicSheet(tempId: string, imageFileContainer: ImageFileContainer) {
@@ -298,7 +298,16 @@ export function SongForm({ mode, teamId, songId }: Props) {
   }
 
   function removeMusicSheetContainer(tempId: string) {
-    setMusicSheetContainers((prev) => ([...prev.filter(mContainer => mContainer.tempId !== tempId)]))
+    setMusicSheetContainers((prev) => {
+      const newList = prev.filter(mContainer => mContainer.tempId !== tempId)
+      // Adjust selected index if needed
+      setSelectedSheetIndex((prevIdx) => {
+        if (newList.length === 0) return 0
+        if (prevIdx >= newList.length) return newList.length - 1
+        return prevIdx
+      })
+      return newList
+    })
   }
 
   // Navigation Logic
@@ -315,11 +324,12 @@ export function SongForm({ mode, teamId, songId }: Props) {
     if (step > 0) goToStep(step - 1);
   }
 
+  const selectedSheet = musicSheetContainers[selectedSheetIndex]
 
   return (
     <FullScreenForm data-testid="song-form">
       <FullScreenFormHeader
-        steps={["Identity", "Details", "Context", "Sheets"]}
+        steps={["Song Info", "Sheets"]}
         currentStep={step}
         onStepChange={goToStep}
         onClose={() => router.back()}
@@ -328,7 +338,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
       <FullScreenFormBody>
         <AnimatePresence initial={false} mode="popLayout" custom={direction}>
 
-          {/* Step 1: Identity */}
+          {/* Step 1: Song Info */}
           {step === 0 && (
             <motion.div
               key="step0"
@@ -338,14 +348,15 @@ export function SongForm({ mode, teamId, songId }: Props) {
               animate="center"
               exit="exit"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 flex flex-col justify-center space-y-8 w-full"
+              className="flex-1 flex flex-col justify-center space-y-6 w-full"
             >
-              <div className="space-y-4 text-center">
+              <div className="space-y-2 text-center">
                 <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 1</Label>
-                <h2 className="text-2xl font-bold text-foreground">Project Identity</h2>
+                <h2 className="text-2xl font-bold text-foreground">Song Info</h2>
               </div>
 
-              <div className="bg-card p-6 rounded-3xl shadow-xl border border-border flex flex-col gap-6">
+              <div className="bg-card p-6 rounded-3xl shadow-xl border border-border flex flex-col gap-5">
+                {/* Title */}
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Title</Label>
                   <Input
@@ -353,24 +364,68 @@ export function SongForm({ mode, teamId, songId }: Props) {
                     placeholder="Song Title..."
                     value={songInput.title}
                     onChange={(e) => setSongInput(prev => ({ ...prev, title: e.target.value }))}
-                    className="text-2xl font-black bg-secondary/40 border-border h-16 rounded-2xl focus-visible:ring-ring"
+                    className="text-xl font-bold bg-secondary/40 border-border h-14 rounded-2xl focus-visible:ring-ring"
                     data-testid="song-title-input"
                   />
                 </div>
+
+                {/* Subtitle */}
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Subtitle</Label>
                   <Input
                     placeholder="Subtitle (Optional)"
                     value={songInput.subtitle}
                     onChange={(e) => setSongInput(prev => ({ ...prev, subtitle: e.target.value }))}
-                    className="text-lg font-medium bg-secondary/40 border-border h-14 rounded-2xl focus-visible:ring-ring"
+                    className="text-base bg-secondary/40 border-border h-12 rounded-xl focus-visible:ring-ring"
+                  />
+                </div>
+
+                {/* Author */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Author</Label>
+                  <Input
+                    placeholder="Original Author"
+                    value={songInput.author}
+                    onChange={(e) => setSongInput(prev => ({ ...prev, author: e.target.value }))}
+                    className="bg-secondary/40 border-border h-12 rounded-xl"
+                  />
+                </div>
+
+                {/* Reference Link */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Reference Link</Label>
+                  <div className="relative">
+                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="https://youtube.com/..."
+                      value={songInput.link}
+                      onChange={(e) => setSongInput(prev => ({ ...prev, link: e.target.value }))}
+                      className="pl-9 bg-secondary/40 border-border h-12 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                {/* Tags */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Tags</Label>
+                  <TagMultiSelect input={songInput} setInput={setSongInput} />
+                </div>
+
+                {/* Description */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Description</Label>
+                  <Textarea
+                    placeholder="Add any notes about the song..."
+                    value={songInput.description}
+                    onChange={(e) => setSongInput(prev => ({ ...prev, description: e.target.value }))}
+                    className="min-h-[80px] text-sm bg-secondary/40 border-border rounded-xl resize-none p-3 focus-visible:ring-ring"
                   />
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* Step 2: Details */}
+          {/* Step 2: Music Sheets */}
           {step === 1 && (
             <motion.div
               key="step1"
@@ -380,148 +435,75 @@ export function SongForm({ mode, teamId, songId }: Props) {
               animate="center"
               exit="exit"
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 flex flex-col justify-center space-y-8 w-full"
+              className="flex-1 flex flex-col h-full space-y-4 w-full"
             >
-              <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 2</Label>
-                <h2 className="text-2xl font-bold text-foreground">Song Details</h2>
-                <h3 className="text-xl font-medium text-primary break-words">{songInput.title}</h3>
+              <div className="space-y-2 text-center">
+                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Final Step</Label>
+                <h2 className="text-2xl font-bold text-foreground">Music Sheets</h2>
               </div>
 
-              <div className="bg-card p-6 rounded-3xl shadow-xl border border-border space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Author</Label>
-                    <Input
-                      placeholder="Original Author"
-                      value={songInput.author}
-                      onChange={(e) => setSongInput(prev => ({ ...prev, author: e.target.value }))}
-                      className="bg-secondary/40 border-border rounded-xl"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Version</Label>
-                    <Input
-                      placeholder="v1.0"
-                      value={songInput.version}
-                      onChange={(e) => setSongInput(prev => ({ ...prev, version: e.target.value }))}
-                      className="bg-secondary/40 border-border rounded-xl"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">BPM</Label>
-                  <Input
-                    type="number"
-                    placeholder="120"
-                    value={songInput.bpm ?? ""}
-                    onChange={(e) => setSongInput(prev => ({ ...prev, bpm: Number(e.target.value) }))}
-                    className="bg-secondary/40 border-border rounded-xl"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Reference Link</Label>
-                  <div className="relative">
-                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="https://youtube.com/..."
-                      value={songInput.link}
-                      onChange={(e) => setSongInput(prev => ({ ...prev, link: e.target.value }))}
-                      className="pl-9 bg-secondary/40 border-border rounded-xl"
-                    />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Step 3: Context */}
-          {step === 2 && (
-            <motion.div
-              key="step2"
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 flex flex-col justify-center space-y-8 w-full"
-            >
-              <div className="space-y-4 text-center">
-                <Label className="text-sm font-bold text-primary uppercase tracking-wider">Step 3</Label>
-                <h2 className="text-2xl font-bold text-foreground">Context & Tags</h2>
+              {/* Key Tab Chips */}
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar px-1 pb-1">
+                {musicSheetContainers.map((sheet, index) => (
+                  <button
+                    key={sheet.tempId}
+                    onClick={() => setSelectedSheetIndex(index)}
+                    className={cn(
+                      "shrink-0 flex flex-col items-center px-4 py-2 rounded-2xl text-sm font-semibold transition-all",
+                      selectedSheetIndex === index
+                        ? "bg-primary text-primary-foreground shadow-md"
+                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary"
+                    )}
+                  >
+                    <span>{sheet.key || "New"}</span>
+                    {sheet.note && (
+                      <span className={cn(
+                        "text-[10px] font-medium mt-0.5 max-w-[80px] truncate",
+                        selectedSheetIndex === index ? "text-primary-foreground/70" : "text-muted-foreground/60"
+                      )}>
+                        {sheet.note}
+                      </span>
+                    )}
+                  </button>
+                ))}
+                <button
+                  onClick={handleAddNewMusicSheet}
+                  className="shrink-0 flex items-center gap-1 px-4 py-2 rounded-2xl text-sm font-semibold border-2 border-dashed border-border text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                >
+                  <PlusIcon className="w-4 h-4" />
+                </button>
               </div>
 
-              <div className="bg-card p-6 rounded-3xl shadow-xl border border-border space-y-5">
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Tags</Label>
-                  <TagMultiSelect input={songInput} setInput={setSongInput} />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Description</Label>
-                  <Textarea
-                    placeholder="Add any notes or description about the song..."
-                    value={songInput.description}
-                    onChange={(e) => setSongInput(prev => ({ ...prev, description: e.target.value }))}
-                    className="min-h-[120px] text-base bg-secondary/40 border-border rounded-xl resize-none p-3 focus-visible:ring-ring"
-                  />
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Step 4: Sheets */}
-          {step === 3 && (
-            <motion.div
-              key="step3"
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="flex-1 flex flex-col h-full space-y-3 w-full"
-            >
-              <div className="flex items-end justify-between px-2 pb-1">
-                <div>
-                  <Label className="text-sm font-bold text-primary uppercase tracking-wider">Final Step</Label>
-                  <h2 className="text-2xl font-bold text-foreground leading-none">Music Sheets</h2>
-                </div>
-                <Button size="sm" variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10" onClick={handleAddNewMusicSheet}>
-                  <PlusIcon className="h-4 w-4 mr-1" /> Add Sheet
-                </Button>
-              </div>
-
+              {/* Content Panel */}
               <div className="flex-1 bg-card rounded-3xl shadow-xl border border-border overflow-hidden flex flex-col">
                 {musicSheetContainers.length === 0 ? (
+                  /* Empty State */
                   <div
-                    className="flex-1 flex flex-col items-center justify-center p-6 text-center text-muted-foreground/50 cursor-pointer hover:bg-muted/10 transition-colors"
+                    className="flex-1 flex flex-col items-center justify-center p-8 text-center cursor-pointer hover:bg-muted/10 transition-colors"
                     onClick={handleAddNewMusicSheet}
                   >
-                    <Music className="w-12 h-12 mb-2 opacity-20" />
-                    <p className="text-sm font-medium">No music sheets yet</p>
-                    <p className="text-xs">Click to add a sheet</p>
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+                      <Music className="w-8 h-8 text-primary/40" />
+                    </div>
+                    <p className="text-base font-semibold text-muted-foreground">Add your first music sheet</p>
+                    <p className="text-xs text-muted-foreground/60 mt-1">Each sheet represents a key (e.g. Em, G)</p>
                   </div>
-                ) : (
-                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    {musicSheetContainers?.map((musicSheet, index) => (
-                      <MusicSheetUploaderBox
-                        key={index}
-                        index={index}
-                        musicKey={musicSheet.key}
-                        setMusicKey={setKeyToMusicSheet}
-                        tempId={musicSheet?.tempId}
-                        imageFileContainers={musicSheet?.imageFileContainers}
-                        handleAddImageFileContainer={addImageFileContainerToMusicSheet}
-                        handleRemoveImageFileContainer={removeImageFromMusicSheet}
-                        handleRemoveMusicSheetContainer={removeMusicSheetContainer}
-                      />
-                    ))}
+                ) : selectedSheet ? (
+                  /* Selected Sheet Content */
+                  <div className="flex-1 overflow-y-auto p-5">
+                    <MusicSheetUploaderBox
+                      tempId={selectedSheet.tempId}
+                      musicKey={selectedSheet.key}
+                      musicNote={selectedSheet.note ?? ""}
+                      setMusicKey={setKeyToMusicSheet}
+                      setMusicNote={setNoteToMusicSheet}
+                      imageFileContainers={selectedSheet.imageFileContainers}
+                      handleAddImageFileContainer={addImageFileContainerToMusicSheet}
+                      handleRemoveImageFileContainer={removeImageFromMusicSheet}
+                      handleRemoveMusicSheetContainer={removeMusicSheetContainer}
+                    />
                   </div>
-                )}
+                ) : null}
               </div>
             </motion.div>
           )}

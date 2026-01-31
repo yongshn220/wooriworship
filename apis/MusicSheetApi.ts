@@ -54,6 +54,7 @@ class MusicSheetApi {
       const newMusicSheet: MusicSheet = {
         song_id: songId,
         key: musicSheetContainer?.key,
+        note: musicSheetContainer?.note || "",
         urls: musicSheetContainer?.imageFileContainers?.map((iContainer) => iContainer?.url),
         created_by: {
           id: userId,
@@ -82,6 +83,7 @@ class MusicSheetApi {
 
       const data = {
         key: musicSheetContainer?.key,
+        note: musicSheetContainer?.note || "",
         urls: musicSheetContainer?.imageFileContainers?.map((iContainer => iContainer.url)),
         updated_by: {
           id: userId,

@@ -31,13 +31,6 @@ export function AddedSongInnerHeader({ teamId, songId, selectedMusicSheetIds, cu
           </div>
           <div className="flex flex-shrink-0 items-center gap-2">
             {
-              song?.version && (
-                <div className="flex-center text-sm font-medium border-2 border-gray-300 rounded-sm h-5 px-1 text-gray-500">
-                  {song?.version}
-                </div>
-              )
-            }
-            {
               customTags.map((tag, index) => (
                 <div key={index} className="flex-center text-sm bg-indigo-300 rounded-sm h-5 p-1 text-white">
                   {tag}

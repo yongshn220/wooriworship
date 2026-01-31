@@ -27,9 +27,6 @@ export function useSetlistFormLogic({ teamId, serviceId, initialSetlist, onCompl
     const setCurrentSetlistId = useSetRecoilState(currentSetlistIdAtom);
 
     // --- Form State ---
-    const [step, setStep] = useState(0);
-    const [direction, setDirection] = useState(0);
-    const totalSteps = 2; // 0: Context, 1: Setlist
 
     // Basic Info (Context)
     const [basicInfo, setBasicInfo] = useState({
@@ -76,14 +73,8 @@ export function useSetlistFormLogic({ teamId, serviceId, initialSetlist, onCompl
         }
     };
 
-    const goToStep = (targetStep: number) => {
-        setDirection(targetStep > step ? 1 : -1);
-        setStep(targetStep);
-    };
-
     return {
         // State
-        step, direction, totalSteps,
         basicInfo, setBasicInfo,
         songs, setSongs,
         beginningSong, setBeginningSong,
@@ -92,8 +83,5 @@ export function useSetlistFormLogic({ teamId, serviceId, initialSetlist, onCompl
 
         // Actions
         handleSave,
-        goToStep,
-        nextStep: () => { if (step < totalSteps - 1) goToStep(step + 1); },
-        prevStep: () => { if (step > 0) goToStep(step - 1); }
     };
 }

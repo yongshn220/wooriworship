@@ -4,6 +4,7 @@ export type MusicSheet = {
   id?: string
   song_id: string
   key: string
+  note?: string
   urls: Array<string>
   created_by: {
     id: string
