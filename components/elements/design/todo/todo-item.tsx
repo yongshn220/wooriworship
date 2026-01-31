@@ -6,7 +6,6 @@ import { Check, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Todo } from "@/models/todo";
-import { format, isBefore, startOfDay } from "date-fns";
 
 interface TodoItemProps {
     todo: Todo;
@@ -18,8 +17,6 @@ interface TodoItemProps {
 }
 
 export function TodoItem({ todo, teamMembers, onToggle, onTap, onDelete }: TodoItemProps) {
-    const isOverdue = todo.dueDate && !todo.completed && isBefore(todo.dueDate.toDate(), startOfDay(new Date()));
-
     const assigneeNames = todo.assigneeIds
         .map(id => teamMembers.find(m => m.id === id)?.name || "Unknown")
         .slice(0, 2);
@@ -53,8 +50,8 @@ export function TodoItem({ todo, teamMembers, onToggle, onTap, onDelete }: TodoI
                     {todo.title}
                 </p>
 
-                {/* Meta row: service chip + assignees + due date */}
-                {(todo.serviceTitle || assigneeNames.length > 0 || todo.dueDate) && (
+                {/* Meta row: service chip + assignees */}
+                {(todo.serviceTitle || assigneeNames.length > 0) && (
                     <div className="flex items-center gap-2 mt-2 flex-wrap">
                         {/* Service chip */}
                         {todo.serviceTitle && (
@@ -71,17 +68,6 @@ export function TodoItem({ todo, teamMembers, onToggle, onTap, onDelete }: TodoI
                             </span>
                         )}
 
-                        {/* Due date */}
-                        {todo.dueDate && (
-                            <span className={cn(
-                                "text-[10px] font-bold px-2 py-0.5 rounded-full",
-                                isOverdue
-                                    ? "text-destructive bg-destructive/10"
-                                    : "text-muted-foreground bg-muted/40"
-                            )}>
-                                {format(todo.dueDate.toDate(), "MMM d")}
-                            </span>
-                        )}
                     </div>
                 )}
             </div>

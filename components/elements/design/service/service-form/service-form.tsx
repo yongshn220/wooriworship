@@ -24,6 +24,7 @@ import { getPathEditServing } from "@/components/util/helper/routes";
 import { AddActionButton } from "./service-components";
 import { PraiseTeamCard } from "../parts/praise-team-card";
 import { ServiceOrderCard } from "../parts/service-order-card";
+import { ServiceTodoStep } from "./parts/service-todo-step";
 
 // Extracted Components
 import { ServiceFormSkeleton } from "./service-form-skeleton";
@@ -57,6 +58,7 @@ export function ServiceForm(props: ServiceFormProps) {
         standardGroups, customMemberNames, deleteConfirm,
         roles, team, teamMembers,
         isDuplicate, duplicateId, duplicateErrorMessage,
+        serviceTodos,
 
         // Setters
         setStep, setDirection, setSelectedDate, setCurrentMonth, setServiceTagIds, setItems,
@@ -69,7 +71,8 @@ export function ServiceForm(props: ServiceFormProps) {
         // Actions
         handleAddMember, handleSubmit, handleCreateRole, handleDeleteRole,
         handleSaveTemplate, handleUpdateTemplate, handleDeleteTemplate, handleUpdateTemplateName,
-        goToStep, nextStep, prevStep, getSuggestionsForTitle
+        goToStep, nextStep, prevStep, getSuggestionsForTitle,
+        addServiceTodo, removeServiceTodo, toggleServiceTodo, updateServiceTodo,
     } = useServiceFormLogic(props);
 
     // Scroll to top on step change (UI Effect)
@@ -101,7 +104,7 @@ export function ServiceForm(props: ServiceFormProps) {
         <>
             <FullScreenForm>
                 <FullScreenFormHeader
-                    steps={["Service", "Roles", "Flow", "Done"]}
+                    steps={["Service", "Roles", "Flow", "Todos", "Done"]}
                     currentStep={step}
                     onStepChange={isDuplicate ? undefined : goToStep}
                     onClose={() => window.history.back()} // Router back
@@ -418,8 +421,29 @@ export function ServiceForm(props: ServiceFormProps) {
                             </motion.div>
                         )}
 
-                        {/* Step 4: Review */}
+                        {/* Step 4: Todos */}
                         {step === 3 && (
+                            <motion.div
+                                key="todos-step"
+                                custom={direction}
+                                variants={slideVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{ type: "spring", stiffness: 500, damping: 40, mass: 0.8 }}
+                            >
+                                <ServiceTodoStep
+                                    todos={serviceTodos}
+                                    onAdd={addServiceTodo}
+                                    onRemove={removeServiceTodo}
+                                    onToggle={toggleServiceTodo}
+                                    onUpdate={updateServiceTodo}
+                                />
+                            </motion.div>
+                        )}
+
+                        {/* Step 5: Review */}
+                        {step === 4 && (
                             <motion.div
                                 key="review-step"
                                 custom={direction}
@@ -430,10 +454,10 @@ export function ServiceForm(props: ServiceFormProps) {
                                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                 className="flex flex-col w-full"
                             >
-                                {/* Minimal Header for Step 4 */}
+                                {/* Minimal Header for Step 5 */}
                                 {selectedDate && (
                                     <div className="flex flex-col items-center justify-center py-4 border-b border-border/10 mb-2 -mx-6 px-6">
-                                        <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 opacity-80">Step 4</span>
+                                        <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 opacity-80">Step 5</span>
                                         <div className="text-center">
                                             <h2 className="text-3xl font-bold text-foreground tracking-tight leading-none mb-1">
                                                 Review & Confirm

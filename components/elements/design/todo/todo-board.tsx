@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { cn } from "@/lib/utils";
-import { Plus, ListChecks } from "lucide-react";
+import { Plus, ListChecks, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyStateCard } from "@/components/elements/design/common/empty-state-card";
@@ -145,13 +145,21 @@ export function TodoBoard({ teamId }: TodoBoardProps) {
                 <button
                     onClick={() => setShowCompleted(!showCompleted)}
                     className={cn(
-                        "px-3 py-1.5 rounded-md text-xs font-semibold transition-all",
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all",
                         showCompleted
-                            ? "text-primary bg-primary/10"
+                            ? "text-primary"
                             : "text-muted-foreground hover:text-foreground"
                     )}
                 >
-                    {showCompleted ? "Hide completed" : "Show completed"}
+                    <div className={cn(
+                        "w-4 h-4 rounded border-2 flex items-center justify-center transition-all",
+                        showCompleted
+                            ? "bg-primary border-primary"
+                            : "border-muted-foreground/30"
+                    )}>
+                        {showCompleted && <Check className="w-3 h-3 text-primary-foreground" />}
+                    </div>
+                    Show completed
                 </button>
             </div>
 

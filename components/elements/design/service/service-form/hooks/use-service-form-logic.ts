@@ -27,6 +27,7 @@ import { useServiceRoles } from "./use-service-roles";
 import { useServiceTemplates } from "./use-service-templates";
 import { useServiceTimeline } from "./use-service-timeline";
 import { useServiceHistory } from "./use-service-history";
+import { useServiceTodos } from "./use-service-todos";
 
 export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialData }: ServiceFormProps) {
     const router = useRouter();
@@ -67,6 +68,15 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         handleAddMember
     } = useServiceTimeline(teamId);
 
+    // --- 2.5. Service Todos Logic ---
+    const {
+        todos: serviceTodos,
+        addTodo: addServiceTodo,
+        removeTodo: removeServiceTodo,
+        toggleTodo: toggleServiceTodo,
+        updateTodo: updateServiceTodo,
+    } = useServiceTodos(teamId, mode, initialData?.id);
+
     // --- 3. Templates Logic ---
     const {
         templates,
@@ -97,7 +107,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
     // --- 4. Main Form State (Date/Steps) ---
     const [step, setStep] = useState(0);
     const [direction, setDirection] = useState(0);
-    const totalSteps = 4;
+    const totalSteps = 5;
 
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
     const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -310,6 +320,17 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                     await ServiceEventApi.updateTagStats(teamId, serviceTagIds, dateStr, "add");
                 }
 
+                // 5. Save Todos
+                if (serviceTodos.length > 0) {
+                    const { TodoApi } = await import("@/apis/TodoApi");
+                    await TodoApi.createServiceTodos(teamId, targetServiceId, title, serviceTodos.map((t, idx) => ({
+                        title: t.title,
+                        assigneeIds: t.assigneeIds,
+                        order: idx,
+                        createdBy: auth.currentUser?.uid || "",
+                    })));
+                }
+
                 toast({ title: "Service created!" });
             } else {
                 if (!initialData) return;
@@ -339,7 +360,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 // Stats Logic
                 // If tags changed, remove old, add new
                 // Simplified: just add new for now to avoid complexity in this migration refactor
-                // Or better: Use ServingService's updateTagStats if we can track old tags. 
+                // Or better: Use ServingService's updateTagStats if we can track old tags.
                 // initialData.service_tags vs serviceTagIds.
                 const oldTags = initialData.service_tags || [];
                 // naive check
@@ -347,6 +368,24 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                     const dateStr = format(selectedDate, "yyyy-MM-dd");
                     if (oldTags.length) await ServiceEventApi.updateTagStats(teamId, oldTags, dateStr, "remove");
                     if (serviceTagIds.length) await ServiceEventApi.updateTagStats(teamId, serviceTagIds, dateStr, "add");
+                }
+
+                // Save Todos (EDIT mode)
+                if (serviceTodos.length > 0) {
+                    const { TodoApi } = await import("@/apis/TodoApi");
+                    // Simple approach: delete existing and recreate
+                    const existingTodos = await TodoApi.getServiceTodos(teamId, targetServiceId);
+                    for (const et of existingTodos) {
+                        await TodoApi.deleteTodo(teamId, et.id);
+                    }
+                    if (serviceTodos.length > 0) {
+                        await TodoApi.createServiceTodos(teamId, targetServiceId, title, serviceTodos.map((t, idx) => ({
+                            title: t.title,
+                            assigneeIds: t.assigneeIds,
+                            order: idx,
+                            createdBy: auth.currentUser?.uid || "",
+                        })));
+                    }
                 }
 
                 toast({ title: "Service updated!" });
@@ -395,6 +434,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         roles, team, teamMembers, historySchedules,
         isDuplicate, duplicateId, duplicateErrorMessage,
         praiseTeam, // Added praiseTeam to return
+        serviceTodos,
 
         // Setters
         setStep, setDirection, setSelectedDate, setCurrentMonth, setServiceTagIds, setItems,
@@ -413,6 +453,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
             if (step < totalSteps - 1) goToStep(step + 1);
         }, prevStep: () => {
             if (step > 0) goToStep(step - 1);
-        }, getSuggestionsForTitle
+        }, getSuggestionsForTitle,
+        addServiceTodo, removeServiceTodo, toggleServiceTodo, updateServiceTodo,
     };
 }

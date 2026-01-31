@@ -90,6 +90,11 @@ service cloud.firestore {
       match /config/{configId} { // e.g. tag_stats
         allow read, write: if isAuthenticated();
       }
+
+      // Todos
+      match /todos/{todoId} {
+        allow read, write: if isAuthenticated();
+      }
     }
   }
 }
