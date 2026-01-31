@@ -1,6 +1,7 @@
 "use client";
 
 import { ListMusic, Users, ListOrdered } from "lucide-react";
+import { ServiceTodoCard } from "./parts/service-todo-card";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -118,9 +119,6 @@ export function ServiceDetailView({
                         subtitle: "",
                         description: "",
                         tags: [],
-                        bpm: 0,
-                        version: "",
-                        lyrics: "",
                         created_by: { id: "", time: { seconds: 0, nanoseconds: 0 } as any },
                         last_used_time: { seconds: 0, nanoseconds: 0 } as any,
                         updated_by: { id: "", time: { seconds: 0, nanoseconds: 0 } as any }
@@ -180,6 +178,13 @@ export function ServiceDetailView({
                     data-testid="create-flow-placeholder"
                 />
             )}
+
+            {/* 5. Tasks */}
+            <ServiceTodoCard
+                teamId={teamId}
+                serviceId={event.id}
+                serviceTitle={displayTitle}
+            />
 
             {/* Preview Drawer (Legacy or V3?) */}
             <SetlistPlanPreviewDrawer
