@@ -176,7 +176,7 @@ export function TodoBoard({ teamId }: TodoBoardProps) {
                                 handleQuickAdd();
                             }
                         }}
-                        placeholder="Add a task..."
+                        placeholder="Add a todo..."
                         className="border-0 shadow-none px-0 h-10 text-[15px] font-medium focus-visible:ring-0 placeholder:text-muted-foreground/40"
                     />
                 </div>
@@ -200,8 +200,8 @@ export function TodoBoard({ teamId }: TodoBoardProps) {
                     <EmptyStateCard
                         icon={ListChecks}
                         iconColorClassName="bg-muted/40 text-muted-foreground"
-                        message="No tasks yet"
-                        description="Add your first task above"
+                        message="No todos yet"
+                        description="Add your first todo above"
                     />
                 ) : (
                     <div className="space-y-2.5 pt-1">

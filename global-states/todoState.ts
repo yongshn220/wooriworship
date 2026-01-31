@@ -13,12 +13,6 @@ export const todoUpdaterAtom = atom<number>({
     default: 0,
 });
 
-// Current filter mode for todo list
-export const todoFilterAtom = atom<'all' | 'mine'>({
-    key: "todoFilterAtom",
-    default: 'all',
-});
-
 // Whether to show completed todos
 export const showCompletedAtom = atom<boolean>({
     key: "showCompletedAtom",

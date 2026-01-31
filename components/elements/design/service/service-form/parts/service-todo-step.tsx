@@ -31,8 +31,8 @@ export function ServiceTodoStep({ todos, onAdd, onRemove, onToggle, onUpdate }: 
         <div className="flex flex-col gap-8 w-full">
             <div className="space-y-2 text-center">
                 <Label className="text-xs font-bold text-primary uppercase tracking-wider">Step 4</Label>
-                <h2 className="text-2xl font-bold text-foreground tracking-tight">Preparation Tasks</h2>
-                <p className="text-sm text-muted-foreground">Add tasks to prepare for this service</p>
+                <h2 className="text-2xl font-bold text-foreground tracking-tight">Preparation Todos</h2>
+                <p className="text-sm text-muted-foreground">Add todos to prepare for this service</p>
             </div>
 
             {/* Quick Add */}
@@ -45,7 +45,7 @@ export function ServiceTodoStep({ todos, onAdd, onRemove, onToggle, onUpdate }: 
                         if (e.nativeEvent.isComposing) return;
                         if (e.key === "Enter") handleAdd();
                     }}
-                    placeholder="Add a prep task..."
+                    placeholder="Add a prep todo..."
                     className="border-0 shadow-none px-0 h-10 text-[15px] font-medium focus-visible:ring-0 placeholder:text-muted-foreground/40"
                 />
             </div>
@@ -80,7 +80,7 @@ export function ServiceTodoStep({ todos, onAdd, onRemove, onToggle, onUpdate }: 
 
                             {/* Title */}
                             <span className={cn(
-                                "flex-1 text-sm font-medium",
+                                "flex-1 text-sm font-semibold leading-snug tracking-tight",
                                 todo.completed && "line-through text-muted-foreground"
                             )}>
                                 {todo.title}
@@ -95,7 +95,7 @@ export function ServiceTodoStep({ todos, onAdd, onRemove, onToggle, onUpdate }: 
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-40 rounded-2xl p-1.5 shadow-xl border-0">
                                     <DropdownMenuItem
-                                        className="rounded-xl py-2.5 cursor-pointer font-semibold text-sm text-destructive focus:text-destructive focus:bg-destructive/10"
+                                        className="rounded-xl py-2.5 px-3 cursor-pointer font-semibold text-sm text-destructive focus:text-destructive focus:bg-destructive/10"
                                         onSelect={() => onRemove(todo.id)}
                                     >
                                         <Trash2 className="mr-2 h-4 w-4" />
@@ -109,8 +109,8 @@ export function ServiceTodoStep({ todos, onAdd, onRemove, onToggle, onUpdate }: 
 
                 {todos.length === 0 && (
                     <div className="py-8 text-center space-y-2">
-                        <p className="text-sm text-muted-foreground/60">No preparation tasks yet</p>
-                        <p className="text-xs text-muted-foreground/40">Add tasks like &quot;Print lyrics&quot; or &quot;Set up projector&quot;</p>
+                        <p className="text-sm text-muted-foreground/60">No preparation todos yet</p>
+                        <p className="text-xs text-muted-foreground/40">Add todos like &quot;Print lyrics&quot; or &quot;Set up projector&quot;</p>
                     </div>
                 )}
             </div>

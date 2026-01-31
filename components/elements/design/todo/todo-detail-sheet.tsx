@@ -70,7 +70,7 @@ export function TodoDetailSheet({ todo, teamMembers, onClose, onUpdate, onDelete
                     <div className="w-12 h-1.5 rounded-full bg-muted/60 mx-auto mb-6" />
 
                     {/* Title */}
-                    <DrawerTitle className="sr-only">Edit Task</DrawerTitle>
+                    <DrawerTitle className="sr-only">Edit Todo</DrawerTitle>
                     <Input
                         value={editTitle}
                         onChange={(e) => { setEditTitle(e.target.value); setHasChanges(true); }}
@@ -79,7 +79,7 @@ export function TodoDetailSheet({ todo, teamMembers, onClose, onUpdate, onDelete
                             if (e.key === "Enter") handleSave();
                         }}
                         className="border-0 shadow-none px-0 h-auto text-2xl font-bold focus-visible:ring-0 placeholder:text-muted-foreground/30 leading-tight tracking-tight mb-4"
-                        placeholder="Task title..."
+                        placeholder="Todo title..."
                     />
 
                     {/* Service Link (read-only) */}
