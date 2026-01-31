@@ -16,6 +16,9 @@ import { TodoApi } from "@/apis/TodoApi";
 import { Todo } from "@/models/todo";
 import { auth } from "@/firebase";
 import { Timestamp } from "firebase/firestore";
+import { AnimatePresence, motion } from "framer-motion";
+import { useSetRecoilState } from "recoil";
+import { todoUpdaterAtom } from "@/global-states/todoState";
 
 interface ServiceTodoCardProps {
   teamId: string;
@@ -31,6 +34,7 @@ export function ServiceTodoCard({
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
   const [newTitle, setNewTitle] = useState("");
+  const setUpdater = useSetRecoilState(todoUpdaterAtom);
 
   const fetchTodos = useCallback(async () => {
     try {
@@ -75,6 +79,7 @@ export function ServiceTodoCard({
       const newId = await TodoApi.createTodo(teamId, newTodo);
 
       setTodos((prev) => [...prev, { ...newTodo, id: newId }]);
+      setUpdater(prev => prev + 1);
       setNewTitle("");
     } catch (error) {
       console.error("Failed to create todo:", error);
@@ -102,6 +107,7 @@ export function ServiceTodoCard({
 
     try {
       await TodoApi.toggleTodo(teamId, todo.id, newCompleted, currentUserId);
+      setUpdater(prev => prev + 1);
     } catch (error) {
       console.error("Failed to toggle todo:", error);
       setTodos((prev) =>
@@ -124,6 +130,7 @@ export function ServiceTodoCard({
 
     try {
       await TodoApi.deleteTodo(teamId, todoId);
+      setUpdater(prev => prev + 1);
     } catch (error) {
       console.error("Failed to delete todo:", error);
       await fetchTodos();
@@ -144,11 +151,11 @@ export function ServiceTodoCard({
       <SectionHeader
         icon={ListChecks}
         iconColorClassName="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
-        title="Tasks"
+        title="Todos"
         badge={incompleteTodosCount > 0 ? `${incompleteTodosCount}` : undefined}
       />
       <SectionCardContainer>
-        <div className="flex items-center gap-2 px-3 py-2 border-b border-border/50">
+        <div className="flex items-center gap-2 px-3 py-2 border-b border-border/50 transition-all focus-within:border-primary/30">
           <Plus className="w-4 h-4 text-muted-foreground/50 flex-shrink-0" />
           <Input
             value={newTitle}
@@ -159,59 +166,74 @@ export function ServiceTodoCard({
                 handleAdd();
               }
             }}
-            placeholder="Add a task..."
+            placeholder="Add a todo..."
             className="border-0 shadow-none px-0 h-9 text-sm font-medium focus-visible:ring-0 placeholder:text-muted-foreground/40"
           />
         </div>
 
         {sortedTodos.length > 0 && (
           <div className="divide-y divide-border">
-            {sortedTodos.map((todo) => (
-              <div key={todo.id} className="flex items-center gap-3 px-3 py-3">
-                <button
-                  onClick={() => handleToggle(todo)}
-                  className={cn(
-                    "flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all active:scale-90",
-                    todo.completed
-                      ? "bg-primary border-primary"
-                      : "border-muted-foreground/30 hover:border-primary/50"
-                  )}
+            <AnimatePresence initial={false}>
+              {sortedTodos.map((todo) => (
+                <motion.div
+                  key={todo.id}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: -100 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center gap-3 px-3 py-3"
                 >
-                  {todo.completed && <Check className="w-3 h-3 text-primary-foreground" />}
-                </button>
+                  <button
+                    onClick={() => handleToggle(todo)}
+                    className={cn(
+                      "flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all active:scale-90",
+                      todo.completed
+                        ? "bg-primary border-primary"
+                        : "border-muted-foreground/30 hover:border-primary/50"
+                    )}
+                  >
+                    {todo.completed && <Check className="w-3 h-3 text-primary-foreground" />}
+                  </button>
 
-                <span
-                  className={cn(
-                    "flex-1 text-sm font-semibold",
-                    todo.completed && "line-through text-muted-foreground"
-                  )}
-                >
-                  {todo.title}
-                </span>
+                  <span
+                    className={cn(
+                      "flex-1 text-sm font-semibold leading-snug tracking-tight",
+                      todo.completed && "line-through text-muted-foreground"
+                    )}
+                  >
+                    {todo.title}
+                  </span>
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 rounded-full flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <MoreHorizontal className="w-3.5 h-3.5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-36 rounded-2xl p-1.5 shadow-xl border-0">
-                    <DropdownMenuItem
-                      className="rounded-xl py-2.5 px-3 cursor-pointer font-semibold text-sm text-destructive focus:text-destructive focus:bg-destructive/10"
-                      onSelect={() => handleDelete(todo.id)}
-                    >
-                      <Trash2 className="mr-3 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ))}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 rounded-full flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreHorizontal className="w-3.5 h-3.5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40 rounded-2xl p-1.5 shadow-xl border-0">
+                      <DropdownMenuItem
+                        className="rounded-xl py-2.5 px-3 cursor-pointer font-semibold text-sm text-destructive focus:text-destructive focus:bg-destructive/10"
+                        onSelect={() => handleDelete(todo.id)}
+                      >
+                        <Trash2 className="mr-3 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
+
+        {sortedTodos.length === 0 && !loading && (
+          <div className="py-6 text-center">
+            <p className="text-sm text-muted-foreground/60">No todos yet</p>
           </div>
         )}
       </SectionCardContainer>
