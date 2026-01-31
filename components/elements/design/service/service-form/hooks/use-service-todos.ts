@@ -15,19 +15,22 @@ export function useServiceTodos(teamId: string, mode: string, serviceId?: string
     const [todos, setTodos] = useState<TodoFormItem[]>([]);
     const [isLoaded, setIsLoaded] = useState(false);
     const isInitialLoadDone = useRef(false);
+    const originalTodosRef = useRef<TodoFormItem[]>([]);
 
     // Load existing todos in EDIT mode
     useEffect(() => {
         if (mode === FormMode.EDIT && serviceId && !isInitialLoadDone.current) {
             TodoApi.getServiceTodos(teamId, serviceId).then(existingTodos => {
-                setTodos(existingTodos.map(t => ({
+                const mapped = existingTodos.map(t => ({
                     id: t.id,
                     title: t.title,
                     completed: t.completed,
                     assigneeIds: t.assigneeIds,
                     order: t.order,
                     isNew: false,
-                })));
+                }));
+                setTodos(mapped);
+                originalTodosRef.current = mapped;
                 setIsLoaded(true);
                 isInitialLoadDone.current = true;
             });
@@ -65,6 +68,7 @@ export function useServiceTodos(teamId: string, mode: string, serviceId?: string
         todos,
         setTodos,
         isLoaded,
+        originalTodosRef,
         addTodo,
         removeTodo,
         toggleTodo,

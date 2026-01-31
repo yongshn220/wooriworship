@@ -212,6 +212,46 @@ export class TodoApi {
     }
 
     /**
+     * Batch deletes multiple todos.
+     * @param teamId - Team ID
+     * @param todoIds - Array of todo IDs to delete
+     */
+    static async batchDeleteTodos(teamId: string, todoIds: string[]): Promise<void> {
+        if (todoIds.length === 0) return;
+
+        const batch = writeBatch(db);
+        for (const todoId of todoIds) {
+            const ref = doc(db, `teams/${teamId}/todos/${todoId}`);
+            batch.delete(ref);
+        }
+        await batch.commit();
+    }
+
+    /**
+     * Batch updates multiple todos with partial data.
+     * @param teamId - Team ID
+     * @param updates - Array of { id, data } objects
+     */
+    static async batchUpdateTodos(
+        teamId: string,
+        updates: Array<{ id: string; data: Partial<Todo> }>
+    ): Promise<void> {
+        if (updates.length === 0) return;
+
+        const batch = writeBatch(db);
+        const now = Timestamp.now();
+
+        for (const { id, data } of updates) {
+            const ref = doc(db, `teams/${teamId}/todos/${id}`);
+            const cleanData = Object.fromEntries(
+                Object.entries(data).filter(([_, v]) => v !== undefined)
+            );
+            batch.update(ref, { ...cleanData, updatedAt: now });
+        }
+        await batch.commit();
+    }
+
+    /**
      * Orphans all todos linked to a service (sets serviceId and serviceTitle to null).
      * Called when a service is deleted.
      * @param teamId - Team ID

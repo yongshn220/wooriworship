@@ -71,6 +71,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
     // --- 2.5. Service Todos Logic ---
     const {
         todos: serviceTodos,
+        originalTodosRef,
         addTodo: addServiceTodo,
         removeTodo: removeServiceTodo,
         toggleTodo: toggleServiceTodo,
@@ -370,22 +371,48 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                     if (serviceTagIds.length) await ServiceEventApi.updateTagStats(teamId, serviceTagIds, dateStr, "add");
                 }
 
-                // Save Todos (EDIT mode)
-                if (serviceTodos.length > 0) {
+                // Save Todos (EDIT mode) — diff-based to preserve completion data
+                {
                     const { TodoApi } = await import("@/apis/TodoApi");
-                    // Simple approach: delete existing and recreate
-                    const existingTodos = await TodoApi.getServiceTodos(teamId, targetServiceId);
-                    for (const et of existingTodos) {
-                        await TodoApi.deleteTodo(teamId, et.id);
-                    }
-                    if (serviceTodos.length > 0) {
-                        await TodoApi.createServiceTodos(teamId, targetServiceId, title, serviceTodos.map((t, idx) => ({
-                            title: t.title,
-                            assigneeIds: t.assigneeIds,
-                            order: idx,
-                            createdBy: auth.currentUser?.uid || "",
-                        })));
-                    }
+                    const originalTodos = originalTodosRef.current;
+
+                    // 1. Find removed todos (in original but not in current)
+                    const currentIds = new Set(serviceTodos.filter(t => !t.isNew).map(t => t.id));
+                    const removedIds = originalTodos
+                        .filter(t => !currentIds.has(t.id))
+                        .map(t => t.id);
+
+                    // 2. Find modified todos (same id, different title or order)
+                    const modifiedTodos = serviceTodos
+                        .filter(t => !t.isNew)
+                        .filter(t => {
+                            const orig = originalTodos.find(o => o.id === t.id);
+                            return orig && (orig.title !== t.title || orig.order !== t.order);
+                        });
+
+                    // 3. Find new todos
+                    const newTodos = serviceTodos.filter(t => t.isNew);
+
+                    // 4. Execute in parallel
+                    await Promise.all([
+                        removedIds.length > 0
+                            ? TodoApi.batchDeleteTodos(teamId, removedIds)
+                            : Promise.resolve(),
+                        modifiedTodos.length > 0
+                            ? TodoApi.batchUpdateTodos(teamId, modifiedTodos.map((t, idx) => ({
+                                id: t.id,
+                                data: { title: t.title, order: serviceTodos.indexOf(t) }
+                            })))
+                            : Promise.resolve(),
+                        newTodos.length > 0
+                            ? TodoApi.createServiceTodos(teamId, targetServiceId, title, newTodos.map((t) => ({
+                                title: t.title,
+                                assigneeIds: t.assigneeIds,
+                                order: serviceTodos.indexOf(t),
+                                createdBy: auth.currentUser?.uid || "",
+                            })))
+                            : Promise.resolve(),
+                    ]);
                 }
 
                 toast({ title: "Service updated!" });
