@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Check, Plus, Trash2, MoreHorizontal } from "lucide-react";
+import { Check, Plus, Trash2, MoreHorizontal, ArrowUp } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ export function ServiceTodoStep({ todos, onAdd, onRemove, onToggle, onUpdate }: 
             </div>
 
             {/* Quick Add */}
-            <div className="flex items-center gap-2 bg-card border border-border/50 rounded-2xl px-4 py-2 shadow-sm">
+            <div className="flex items-center gap-2 bg-card border border-border/50 rounded-2xl px-4 py-2 shadow-sm transition-all focus-within:border-primary/30 focus-within:shadow-md">
                 <Plus className="w-5 h-5 text-muted-foreground/50 flex-shrink-0" />
                 <Input
                     value={newTitle}
@@ -48,6 +48,14 @@ export function ServiceTodoStep({ todos, onAdd, onRemove, onToggle, onUpdate }: 
                     placeholder="Add a prep todo..."
                     className="border-0 shadow-none px-0 h-10 text-[15px] font-medium focus-visible:ring-0 placeholder:text-muted-foreground/40"
                 />
+                {newTitle.trim() && (
+                    <button
+                        onClick={handleAdd}
+                        className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center active:scale-90 transition-transform"
+                    >
+                        <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
+                    </button>
+                )}
             </div>
 
             {/* Todo List */}

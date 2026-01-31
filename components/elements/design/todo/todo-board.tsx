@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { cn } from "@/lib/utils";
-import { Plus, ListChecks, Check } from "lucide-react";
+import { Plus, ListChecks, Check, ArrowUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyStateCard } from "@/components/elements/design/common/empty-state-card";
@@ -179,6 +179,14 @@ export function TodoBoard({ teamId }: TodoBoardProps) {
                         placeholder="Add a todo..."
                         className="border-0 shadow-none px-0 h-10 text-[15px] font-medium focus-visible:ring-0 placeholder:text-muted-foreground/40"
                     />
+                    {newTodoTitle.trim() && (
+                        <button
+                            onClick={handleQuickAdd}
+                            className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center active:scale-90 transition-transform"
+                        >
+                            <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
+                        </button>
+                    )}
                 </div>
             </div>
 

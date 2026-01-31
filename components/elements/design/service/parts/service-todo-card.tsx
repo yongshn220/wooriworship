@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { ListChecks, Plus, Check, MoreHorizontal, Trash2 } from "lucide-react";
+import { ListChecks, Plus, Check, MoreHorizontal, Trash2, ArrowUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -169,6 +169,14 @@ export function ServiceTodoCard({
             placeholder="Add a todo..."
             className="border-0 shadow-none px-0 h-9 text-sm font-medium focus-visible:ring-0 placeholder:text-muted-foreground/40"
           />
+          {newTitle.trim() && (
+            <button
+              onClick={handleAdd}
+              className="flex-shrink-0 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center active:scale-90 transition-transform"
+            >
+              <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
+            </button>
+          )}
         </div>
 
         {sortedTodos.length > 0 && (
