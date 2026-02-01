@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import useLocalStorage from "../hook/use-local-storage";
+import { useNotificationPermission } from "../hook/use-notification-permission";
 import { v4 as uuid } from 'uuid';
 import { isServiceWorkerSupported, registerServiceWorker } from "../helper/push-notification";
 import { auth } from "@/firebase";
@@ -13,26 +14,26 @@ export default function Initialization() {
   const [utility, setUtility] = useLocalStorage<LocalStorageUtility>('utility', {
     deviceId: uuid()
   });
+  const { permission } = useNotificationPermission();
 
   useEffect(() => {
     if (!utility.deviceId) return;
 
     if (!isServiceWorkerSupported()) {
-      console.log("Service Worker is not supported");
       return;
     }
 
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (!user) {
-        console.log("User not authenticated");
         return;
       }
 
       try {
         await registerServiceWorker();
-        console.log("Service Worker registered, refreshing subscription for user:", user.uid);
-        await PushNotificationApi.refreshSubscription(user.uid, utility.deviceId);
-        console.log("Push notification subscription refreshed successfully");
+
+        if (permission === "granted") {
+          await PushNotificationApi.refreshSubscription(user.uid, utility.deviceId);
+        }
       }
       catch (error) {
         console.error("Error in initialization:", error);
@@ -40,7 +41,7 @@ export default function Initialization() {
     });
 
     return () => unsubscribe();
-  }, [utility.deviceId]);
+  }, [utility.deviceId, permission]);
 
   return (
     <>

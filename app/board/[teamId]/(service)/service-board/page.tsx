@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo, Suspense } from "react";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import { currentTeamIdAtom, teamAtom, fetchServiceTagsSelector } from "@/global-states/teamState";
 import { fetchServingRolesSelector } from "@/global-states/serviceRolesState";
-import { serviceEventsListAtom } from "@/global-states/serviceEventState";
+import { serviceEventsListAtom, myAssignmentCountAtom } from "@/global-states/serviceEventState";
 import { currentPageAtom } from "@/global-states/page-state";
 import { Page } from "@/components/constants/enums";
 import { ServiceEvent } from "@/models/services/ServiceEvent";
@@ -15,25 +15,18 @@ import { ServiceListSkeleton } from "./_components/service-list-skeleton";
 import { parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";
 import { Timestamp } from "firebase/firestore";
 import { EmptyServiceBoardPage } from "./_components/empty-service-board-page";
-// import { CalendarStrip } from "@/components/elements/design/serving/calendar-strip"; // REMOVED
-import { CalendarStrip } from "@/components/common/board-calendar/calendar-strip"; // NEW
-import { CalendarItem } from "@/components/common/board-calendar/types"; // NEW
-import { useCalendarNavigation } from "@/components/common/hooks/use-calendar-navigation"; // NEW
+import { CalendarStrip } from "@/components/common/board-calendar/calendar-strip";
+import { CalendarItem } from "@/components/common/board-calendar/types";
+import { useCalendarNavigation } from "@/components/common/hooks/use-calendar-navigation";
 import { ServiceDetailContainer } from "@/components/elements/design/service/service-detail-container";
 
-import { getPathCreateServing } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
 import { auth } from "@/firebase";
-import { headerActionsAtom, headerLeftContentAtom } from "@/app/board/_states/board-states";
 import { serviceFilterModeAtom } from "@/global-states/serviceEventState";
-import { ServiceHeaderMenu } from "@/components/elements/design/service/service-header-menu";
-import { ServiceCreationMenu } from "@/components/elements/design/service/service-creation-menu";
 
 import { SwipeableView } from "@/components/elements/design/service/swipeable-view";
-// import { useServingNavigation } from "./_hooks/use-serving-navigation"; // REMOVED
 import { ServiceDataPrefetcher } from "./_components/service-data-prefetcher";
 import { useMyAssignments } from "@/hooks/use-my-assignments";
-import { ServiceBoardHeaderLeft } from "./_components/service-board-header";
 import { MyAssignmentRole } from "@/models/services/MyAssignment";
 import { InlineCalendarView } from "./_components/inline-calendar-view";
 
@@ -46,9 +39,8 @@ export default function ServingPage() {
     const [isLoadingPast, setIsLoadingPast] = useState(false);
     const [hasMorePast, setHasMorePast] = useState(true);
     const router = useRouter();
-    const setHeaderActions = useSetRecoilState(headerActionsAtom);
-    const setHeaderLeftContent = useSetRecoilState(headerLeftContentAtom);
     const setCurrentPage = useSetRecoilState(currentPageAtom);
+    const setMyAssignmentCount = useSetRecoilState(myAssignmentCountAtom);
 
     // My Assignments state
     const [filterMode, setFilterMode] = useRecoilState(serviceFilterModeAtom);
@@ -108,6 +100,17 @@ export default function ServingPage() {
         serviceTags,
         cacheVersion,
     });
+
+    // Sync upcoming assignment count to Recoil for the header badge
+    const upcomingAssignmentCount = useMemo(() => {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        return myAssignments.filter(a => a.serviceDate >= now).length;
+    }, [myAssignments]);
+
+    useEffect(() => {
+        setMyAssignmentCount(upcomingAssignmentCount);
+    }, [upcomingAssignmentCount, setMyAssignmentCount]);
 
     const handleModeChange = (newMode: 'all' | 'mine' | 'calendar') => {
         setFilterMode(newMode);
@@ -180,30 +183,7 @@ export default function ServingPage() {
             }
         }
         loadData();
-    }, [teamId, setEvents]); // Removed setHeaderActions from dependencies since we use it in separate effect
-
-    // Set Header Content (Left: Toggle, Right: Create)
-    useEffect(() => {
-        setHeaderLeftContent(
-            <ServiceBoardHeaderLeft
-                filterMode={filterMode}
-                onFilterModeChange={handleModeChange}
-                myCount={assignedServiceIds.length}
-            />
-        );
-        setHeaderActions(
-            <ServiceCreationMenu
-                teamId={teamId || ""}
-                selectedServiceId={selectedScheduleId}
-            />
-        );
-        return () => {
-            setHeaderLeftContent(null);
-            setHeaderActions(null);
-        };
-    }, [teamId, selectedScheduleId, filterMode, assignedServiceIds.length, setHeaderActions, setHeaderLeftContent]);
-
-
+    }, [teamId, setEvents]);
 
     const handleLoadPrev = async () => {
         if (!teamId || isLoadingPast || !hasMorePast) return;
@@ -216,9 +196,6 @@ export default function ServingPage() {
             let endDate = new Date();
             if (firstEvent) {
                 endDate = firstEvent.date.toDate();
-                // Subtract 1ms to avoid overlap? Or query strictly less than.
-                // ServiceEventApi has specific query methods list? 
-                // It has `getServiceEvents`. I can re-use it.
             }
 
             // Move back 6 months from END date

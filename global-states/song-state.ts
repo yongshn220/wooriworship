@@ -27,62 +27,73 @@ export const songIdsAtom = atomFamily<Array<string>, string>({
   })
 })
 
-// New: Returns the full sorted list of Song objects
-export const currentTeamSortedSongsAtom = selectorFamily<Array<Song>, string>({
-  key: "currentTeamSortedSongsAtom",
+// Raw unfiltered song list - single source of truth for all songs
+const allTeamSongsAtom = selectorFamily<Array<Song>, string>({
+  key: "allTeamSongsAtom",
   get: (teamId) => async ({ get }) => {
     get(songUpdaterAtom)
     if (!teamId) return []
-
     try {
-      let songList = await SongApi.getSong(teamId) as Song[]
-      if (!songList) return []
-
-      const searchInput = get(songSearchInputAtom)
-      const selectedTags = get(searchSelectedTagsAtom)
-
-      // Search Filter
-      if (searchInput && searchInput !== "") {
-        const normalizedSearchInput = searchInput.toLowerCase().replace(/\s+/g, '');
-        songList = songList.filter((song) =>
-          song?.title?.toLowerCase().replace(/\s+/g, '').includes(normalizedSearchInput) ||
-          song?.subtitle?.toLowerCase().replace(/\s+/g, '').includes(normalizedSearchInput)
-        )
-      }
-      // Tag Filter
-      if (selectedTags && selectedTags.length > 0) {
-        songList = songList.filter((song) => song?.tags?.length === 0 || song?.tags?.some((tag: string) => selectedTags.includes(tag) || selectedTags.length === 0))
-      }
-
-      // Key Filter
-      const selectedKeys = get(searchSelectedKeysAtom)
-      if (selectedKeys && selectedKeys.length > 0) {
-        songList = songList.filter((song) => song?.keys && song.keys.some(key => selectedKeys.includes(key)))
-      }
-
-      // Sort
-      const sortOption = get(songBoardSelectedSortOptionAtom);
-      switch (sortOption) {
-        case SongBoardSortOption.TITLE_ASCENDING:
-          songList = songList.sort((a, b) => a?.title?.localeCompare(b?.title));
-          break;
-        case SongBoardSortOption.TITLE_DESCENDING:
-          songList = songList.sort((a, b) => b?.title?.localeCompare(a?.title));
-          break;
-        case SongBoardSortOption.LAST_USED_DATE_ASCENDING:
-          songList = songList.sort((a, b) => Number(a?.last_used_time || 0) - Number(b?.last_used_time || 0))
-          break;
-        case SongBoardSortOption.LAST_USED_DATE_DESCENDING:
-          songList = songList.sort((a, b) => Number(b?.last_used_time || 0) - Number(a?.last_used_time || 0))
-          break;
-      }
-
-      return songList
-    }
-    catch (e) {
+      const songList = await SongApi.getSong(teamId) as Song[]
+      return songList ?? []
+    } catch (e) {
       console.error(e)
       return []
     }
+  }
+})
+
+// New: Returns the full sorted list of Song objects
+export const currentTeamSortedSongsAtom = selectorFamily<Array<Song>, string>({
+  key: "currentTeamSortedSongsAtom",
+  get: (teamId) => ({ get }) => {
+    if (!teamId) return []
+
+    let songList = [...get(allTeamSongsAtom(teamId))]
+    if (!songList) return []
+
+    const searchInput = get(songSearchInputAtom)
+    const selectedTags = get(searchSelectedTagsAtom)
+
+    // Search Filter
+    if (searchInput && searchInput !== "") {
+      const normalizedSearchInput = searchInput.toLowerCase().replace(/\s+/g, '');
+      songList = songList.filter((song) =>
+        song?.title?.toLowerCase().replace(/\s+/g, '').includes(normalizedSearchInput) ||
+        song?.subtitle?.toLowerCase().replace(/\s+/g, '').includes(normalizedSearchInput) ||
+        song?.original?.author?.toLowerCase().replace(/\s+/g, '').includes(normalizedSearchInput) ||
+        song?.tags?.some((tag: string) => tag.toLowerCase().includes(normalizedSearchInput))
+      )
+    }
+    // Tag Filter
+    if (selectedTags && selectedTags.length > 0) {
+      songList = songList.filter((song) => song?.tags?.some((tag: string) => selectedTags.includes(tag)))
+    }
+
+    // Key Filter
+    const selectedKeys = get(searchSelectedKeysAtom)
+    if (selectedKeys && selectedKeys.length > 0) {
+      songList = songList.filter((song) => song?.keys && song.keys.some(key => selectedKeys.includes(key)))
+    }
+
+    // Sort
+    const sortOption = get(songBoardSelectedSortOptionAtom);
+    switch (sortOption) {
+      case SongBoardSortOption.TITLE_ASCENDING:
+        songList = songList.sort((a, b) => a?.title?.localeCompare(b?.title));
+        break;
+      case SongBoardSortOption.TITLE_DESCENDING:
+        songList = songList.sort((a, b) => b?.title?.localeCompare(a?.title));
+        break;
+      case SongBoardSortOption.LAST_USED_DATE_ASCENDING:
+        songList = songList.sort((a, b) => Number(a?.last_used_time || 0) - Number(b?.last_used_time || 0))
+        break;
+      case SongBoardSortOption.LAST_USED_DATE_DESCENDING:
+        songList = songList.sort((a, b) => Number(b?.last_used_time || 0) - Number(a?.last_used_time || 0))
+        break;
+    }
+
+    return songList
   }
 })
 
@@ -127,8 +138,14 @@ export const songAtom = atomFamily<Song, { teamId: string, songId: string }>({
   default: selectorFamily({
     key: "songAtom/default",
     get: ({ teamId, songId }) => async ({ get }) => {
-      get(songUpdaterAtom)
       if (!teamId || !songId) return null
+
+      // Try to find song in cached list first
+      const allSongs = get(allTeamSongsAtom(teamId))
+      const cachedSong = allSongs.find(song => song.id === songId)
+      if (cachedSong) return cachedSong
+
+      // Fall back to individual API call if not found (e.g., direct URL access)
       try {
         const song = await SongApi.getSongById(teamId, songId) as Song
         if (!song) return null
@@ -150,20 +167,16 @@ export const songUpdaterAtom = atom({
 
 export const teamUniqueKeysSelector = selectorFamily<Array<string>, string>({
   key: "teamUniqueKeysSelector",
-  get: (teamId) => async ({ get }) => {
-    get(songUpdaterAtom)
+  get: (teamId) => ({ get }) => {
     if (!teamId) return []
-    try {
-      const songList = await SongApi.getSong(teamId) as Song[]
-      if (!songList) return []
 
-      const allKeys = new Set<string>()
-      songList.forEach(song => {
-        song.keys?.forEach(key => allKeys.add(key))
-      })
-      return Array.from(allKeys).sort()
-    } catch (e) {
-      return []
-    }
+    const songList = get(allTeamSongsAtom(teamId))
+    if (!songList) return []
+
+    const allKeys = new Set<string>()
+    songList.forEach(song => {
+      song.keys?.forEach(key => allKeys.add(key))
+    })
+    return Array.from(allKeys).sort()
   }
 })

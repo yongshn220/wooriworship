@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 interface Props {
   teamId: string
@@ -22,6 +23,7 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId }: Props
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
   const [count, setCount] = useState(0)
+  const [isZoomed, setIsZoomed] = useState(false)
 
   useEffect(() => {
     if (!api) {
@@ -38,7 +40,7 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId }: Props
 
   if (!musicSheet?.urls || musicSheet.urls.length === 0) {
     return (
-      <div className="w-full h-64 flex-center text-gray-400">
+      <div className="w-full h-64 flex-center text-muted-foreground">
         No sheet available
       </div>
     )
@@ -48,17 +50,26 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId }: Props
   if (musicSheet.urls.length === 1) {
     return (
       <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 py-2 pb-12">
-        <div className="relative w-full flex justify-center items-center">
-          <Image
-            src={musicSheet.urls[0]}
-            alt="Sheet 1"
-            width={0}
-            height={0}
-            sizes="100vw"
-            className="w-full h-auto max-h-[calc(100vh-80px)] object-contain shadow-sm"
-            style={{ width: "100%", height: "auto" }}
-          />
-        </div>
+        <TransformWrapper
+          initialScale={1}
+          minScale={1}
+          maxScale={4}
+          doubleClick={{ mode: "reset" }}
+          wheel={{ step: 0.1 }}
+          panning={{ disabled: false }}
+        >
+          <TransformComponent wrapperStyle={{ width: "100%" }} contentStyle={{ width: "100%" }}>
+            <Image
+              src={musicSheet.urls[0]}
+              alt="Sheet 1"
+              width={0}
+              height={0}
+              sizes="100vw"
+              className="w-full h-auto max-h-[calc(100vh-80px)] object-contain shadow-sm"
+              style={{ width: "100%", height: "auto" }}
+            />
+          </TransformComponent>
+        </TransformWrapper>
       </div>
     )
   }
@@ -66,32 +77,44 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId }: Props
   // Multi Page Carousel Case
   return (
     <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 py-2 pb-12">
-      <Carousel setApi={setApi} className="w-full max-w-full">
+      <Carousel setApi={setApi} className="w-full max-w-full" opts={{ watchDrag: !isZoomed }}>
         <CarouselContent>
           {musicSheet.urls.map((url: string, i: number) => (
             <CarouselItem key={i} className="flex justify-center items-center">
-              <div className="relative w-full flex justify-center items-center">
-                <Image
-                  src={url}
-                  alt={`Sheet ${i + 1}`}
-                  width={0}
-                  height={0}
-                  sizes="100vw"
-                  className="w-full h-auto max-h-[calc(100vh-80px)] object-contain shadow-sm"
-                  style={{ width: "100%", height: "auto" }}
-                />
-              </div>
+              <TransformWrapper
+                initialScale={1}
+                minScale={1}
+                maxScale={4}
+                doubleClick={{ mode: "reset" }}
+                wheel={{ step: 0.1 }}
+                panning={{ disabled: false }}
+                onTransformed={(_, state) => {
+                  setIsZoomed(state.scale > 1)
+                }}
+              >
+                <TransformComponent wrapperStyle={{ width: "100%" }} contentStyle={{ width: "100%" }}>
+                  <Image
+                    src={url}
+                    alt={`Sheet ${i + 1}`}
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    className="w-full h-auto max-h-[calc(100vh-80px)] object-contain shadow-sm"
+                    style={{ width: "100%", height: "auto" }}
+                  />
+                </TransformComponent>
+              </TransformWrapper>
             </CarouselItem>
           ))}
         </CarouselContent>
 
         {/* Arrow Navigation */}
-        <CarouselPrevious className="left-2 bg-white/80 backdrop-blur-sm" />
-        <CarouselNext className="right-2 bg-white/80 backdrop-blur-sm" />
+        <CarouselPrevious className="left-2 bg-background/80 backdrop-blur-sm" />
+        <CarouselNext className="right-2 bg-background/80 backdrop-blur-sm" />
       </Carousel>
 
       {/* Page Indicator */}
-      <div className="text-xs font-medium bg-black/50 text-white px-2 py-1 rounded-full">
+      <div className="text-xs font-medium bg-foreground/60 text-background px-2 py-1 rounded-full">
         {current} / {count}
       </div>
     </div>

@@ -88,6 +88,11 @@ export const serviceFilterModeAtom = atom<'all' | 'mine' | 'calendar'>({
     default: 'all',
 });
 
+export const myAssignmentCountAtom = atom<number>({
+    key: "myAssignmentCountAtom",
+    default: 0,
+});
+
 // Cache: service ID -> unwrapped assignment data
 // PraiseTeamApi.getPraiseTeam() returns ServicePraiseTeam | null -> we store .assignments
 // ServiceFlowApi.getFlow() returns ServiceFlow | null -> we store .items

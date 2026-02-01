@@ -17,3 +17,4 @@ export { ServiceEventApi } from './ServiceEventApi';
 export { SetlistApi } from './SetlistApi';
 export { PraiseTeamApi } from './PraiseTeamApi';
 export { ServiceFlowApi } from './ServiceFlowApi';
+export { TodoApi } from './TodoApi';

@@ -5,12 +5,6 @@ export function SongListSkeleton() {
         <div className="flex flex-col h-full w-full relative">
             <div className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6 content-container-safe-area relative">
 
-                {/* Header Row Skeleton */}
-                <div className="hidden md:flex items-center px-6 py-2 mb-2">
-                    <div className="flex-1 pl-4"><Skeleton className="h-4 w-20 bg-muted/60" /></div>
-                    <div className="w-32 shrink-0 text-center"><Skeleton className="h-4 w-12 mx-auto bg-muted/60" /></div>
-                </div>
-
                 <div className="flex flex-col divide-y divide-border">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                         <SongRowSkeleton key={i} />

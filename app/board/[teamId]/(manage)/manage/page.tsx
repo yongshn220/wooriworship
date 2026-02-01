@@ -1,26 +1,26 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { toast } from "@/components/ui/use-toast"
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState"
 import { AuthApi } from "@/apis"
-import { Bell, LogOut, Mail, MailIcon, Settings, Users, UserPlus } from 'lucide-react'
+import { Bell, BellOff, LogOut, Mail, Users, UserPlus, ChevronRight } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import { useRecoilValue, useSetRecoilState } from "recoil"
 import { auth } from "@/firebase"
 import { pendingReceivedInvitationsAtom } from "@/global-states/invitation-state"
 import { invitationInboxDialogOpenStateAtom } from "@/global-states/dialog-state"
-import { TeamIcon } from "@/components/elements/design/team/team-icon";
 import { MenuItem } from "@/app/board/[teamId]/(manage)/manage/_components/menu-item";
 import { MenuGroup } from "@/app/board/[teamId]/(manage)/manage/_components/menu-group";
 import { TeamProfileCard } from "@/app/board/[teamId]/(manage)/manage/_components/team-profile-card";
 import { accountSettingAtom } from "@/global-states/account-setting"
 import PushNotificationApi from "@/apis/PushNotificationApi"
 import { TeamSelect } from "@/components/elements/design/team/team-select";
-import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { InvitationDrawer } from "@/components/elements/manage/invitation-drawer";
+import { useNotificationPermission } from "@/components/util/hook/use-notification-permission"
+import { NotificationBlockedGuideDialog } from "@/components/elements/dialog/notification/notification-blocked-guide-dialog"
+import useLocalStorage from "@/components/util/hook/use-local-storage"
 
 export default function ManagePage({ params }: { params: { teamId: string } }) {
   const authUser = auth.currentUser
@@ -30,6 +30,9 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
   const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
   const setInvitationDialogState = useSetRecoilState(invitationInboxDialogOpenStateAtom)
   const [isInvitationDrawerOpen, setInvitationDrawerOpen] = useState(false)
+  const { permission, requestPermission } = useNotificationPermission()
+  const [blockedGuideOpen, setBlockedGuideOpen] = useState(false)
+  const [utility] = useLocalStorage<{ deviceId: string }>('utility', { deviceId: '' })
 
   // Badge logic
   const pendingInvitations = useRecoilValue(pendingReceivedInvitationsAtom(authUser?.email || ""))
@@ -54,6 +57,19 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
     if (!authUser?.uid) return;
 
     await PushNotificationApi.updateOptState(authUser.uid, isEnabled)
+  }
+
+  async function handleRequestNotificationPermission() {
+    const result = await requestPermission()
+    if (result === "granted") {
+      await updatePushNotificationOptState(true)
+      if (authUser?.uid && utility.deviceId) {
+        await PushNotificationApi.refreshSubscription(authUser.uid, utility.deviceId)
+      }
+      toast({ title: "Notifications enabled" })
+    } else if (result === "denied") {
+      toast({ title: "Notifications blocked", description: "You can enable them in your browser settings.", variant: "destructive" })
+    }
   }
 
   return (
@@ -118,15 +134,46 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
 
         {/* App Settings Group */}
         <MenuGroup title="App Settings">
-          <MenuItem
-            icon={<Bell className="h-5 w-5" />}
-            title="Push Notifications"
-            description="Get notified about important updates"
-            toggleId="push-notifications"
-            onToggle={(state: boolean) => updatePushNotificationOptState(state)}
-            toggleState={accountSetting?.push_notification?.is_enabled}
-          />
+          {permission === "granted" ? (
+            <MenuItem
+              icon={<Bell className="h-5 w-5" />}
+              title="Push Notifications"
+              description="Get notified about important updates"
+              toggleId="push-notifications"
+              onToggle={(state: boolean) => updatePushNotificationOptState(state)}
+              toggleState={accountSetting?.push_notification?.is_enabled}
+            />
+          ) : permission === "default" ? (
+            <MenuItem
+              icon={<Bell className="h-5 w-5" />}
+              title="Push Notifications"
+              description="Tap to enable notifications"
+              showChevron
+              onClick={handleRequestNotificationPermission}
+            />
+          ) : permission === "denied" ? (
+            <MenuItem
+              icon={<BellOff className="h-5 w-5" />}
+              title="Push Notifications"
+              description="Notifications are blocked"
+              showChevron
+              onClick={() => setBlockedGuideOpen(true)}
+              className="[&>div:first-child]:bg-amber-100 [&>div:first-child]:text-amber-600"
+            />
+          ) : (
+            <MenuItem
+              icon={<BellOff className="h-5 w-5" />}
+              title="Push Notifications"
+              description="Not supported on this browser"
+              className="opacity-50 pointer-events-none"
+            />
+          )}
         </MenuGroup>
+
+        <NotificationBlockedGuideDialog
+          open={blockedGuideOpen}
+          onOpenChange={setBlockedGuideOpen}
+        />
 
         {/* Account Group */}
         <MenuGroup title="Account">
@@ -149,4 +196,3 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
     </div>
   )
 }
-

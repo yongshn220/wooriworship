@@ -1,5 +1,6 @@
-import { HomeIcon, Music2Icon, BellIcon, CalendarDaysIcon, LayoutGridIcon, DownloadIcon, UserIcon } from "lucide-react";
-import { getPathHome, getPathManage, getPathNotice, getPathServing, getPathSong } from "@/components/util/helper/routes";
+import { useRef, useCallback } from "react";
+import { Music2Icon, BellIcon, CalendarDaysIcon, LayoutGridIcon } from "lucide-react";
+import { getPathManage, getPathNotice, getPathServing, getPathSong } from "@/components/util/helper/routes";
 import { useRecoilValue } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
 import { useRouter } from "next/navigation";
@@ -7,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { Page } from "@/components/constants/enums";
 import { BaseBottomNavBar } from "@/components/elements/util/navigation/base-bottom-nav-bar";
 import { currentPageAtom } from "@/global-states/page-state";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 
@@ -28,6 +28,7 @@ export function DefaultBoardBottomNavBar() {
   const currentPage = useRecoilValue(currentPageAtom)
   const currentTeamId = useRecoilValue(currentTeamIdAtom)
   const router = useRouter()
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   const NAV_ITEMS = [
     {
@@ -38,8 +39,8 @@ export function DefaultBoardBottomNavBar() {
     },
     {
       page: Page.SERVING,
-      icon: CalendarDaysIcon, // Changed from UserIcon to CalendarDaysIcon
-      label: "Service", // Renamed from Serving
+      icon: CalendarDaysIcon,
+      label: "Service",
       path: getPathServing(currentTeamId)
     },
     {
@@ -56,37 +57,71 @@ export function DefaultBoardBottomNavBar() {
     },
   ]
 
+  const handleKeyDown = useCallback((e: React.KeyboardEvent, index: number) => {
+    const tabCount = NAV_ITEMS.length;
+    let newIndex: number | null = null;
+
+    switch (e.key) {
+      case "ArrowRight":
+        newIndex = (index + 1) % tabCount;
+        break;
+      case "ArrowLeft":
+        newIndex = (index - 1 + tabCount) % tabCount;
+        break;
+      case "Home":
+        newIndex = 0;
+        break;
+      case "End":
+        newIndex = tabCount - 1;
+        break;
+      default:
+        return;
+    }
+
+    e.preventDefault();
+    tabRefs.current[newIndex]?.focus();
+  }, [NAV_ITEMS.length]);
+
   return (
     <BaseBottomNavBar height={80}>
-      <div className="w-full h-full flex justify-between px-6 pb-2 items-center">
-        {NAV_ITEMS.map((item) => {
+      <div role="tablist" className="w-full h-full flex justify-between px-6 pb-2 items-center">
+        {NAV_ITEMS.map((item, index) => {
           const isActive = currentPage === item.page;
           const Icon = item.icon;
 
           return (
-            <motion.div
+            <motion.button
+              type="button"
+              ref={(el) => { tabRefs.current[index] = el; }}
               key={item.label}
               data-testid={`nav-${item.label.toLowerCase()}`}
+              role="tab"
+              aria-selected={isActive}
+              aria-current={isActive ? "page" : undefined}
+              tabIndex={isActive ? 0 : -1}
               className={cn(
                 "w-16 h-full flex-col flex-center cursor-pointer transition-colors duration-300",
-                isActive ? "text-primary" : "text-muted-foreground"
+                "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none rounded-lg",
+                isActive ? "text-[oklch(0.50_0.188_259.81)] dark:text-primary" : "text-muted-foreground"
               )}
               onClick={() => router.push(item.path)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
               whileTap={{ scale: 0.9 }}
             >
               <div className="relative mb-1">
                 <Icon
+                  aria-hidden="true"
                   strokeWidth={isActive ? 3 : 2}
-                  className={cn("w-6 h-6 transition-all duration-300")}
+                  className={cn("w-6 h-6 transition-colors duration-300")}
                 />
               </div>
-              <p className={cn(
-                "text-xs prevent-text-select transition-all duration-300",
-                isActive ? "font-bold text-primary" : "font-medium text-muted-foreground"
+              <span className={cn(
+                "text-xs prevent-text-select transition-colors duration-300",
+                isActive ? "font-bold text-[oklch(0.50_0.188_259.81)] dark:text-primary" : "font-medium text-muted-foreground"
               )}>
                 {item.label}
-              </p>
-            </motion.div>
+              </span>
+            </motion.button>
           )
         })}
       </div>

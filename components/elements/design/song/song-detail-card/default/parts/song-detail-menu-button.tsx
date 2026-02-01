@@ -33,22 +33,19 @@ export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = fal
 
   async function handleDeleteSong() {
     try {
-      SongApi.deleteSong(teamId, songId).then((isSuccess) => {
-        if (isSuccess) {
-          setSongUpdater((prev) => prev + 1)
-          toast({ title: "Song deleted successfully", description: "" })
-        }
-        else {
-          toast({ title: "Fail to delete song-board", description: "Something went wrong. Please try again later." })
-        }
-      })
+      const isSuccess = await SongApi.deleteSong(teamId, songId)
+      if (isSuccess) {
+        setSongUpdater((prev) => prev + 1)
+        toast({ title: "Song deleted successfully", description: "" })
+        router.replace(getPathSong(teamId))
+      }
+      else {
+        toast({ title: "Fail to delete song-board", description: "Something went wrong. Please try again later." })
+      }
     }
     catch (e) {
       console.log(e)
       toast({ title: "Fail to delete song-board", description: "Something went wrong. Please try again later." })
-    }
-    finally {
-      router.replace(getPathSong(teamId))
     }
   }
 
@@ -85,7 +82,7 @@ export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = fal
               <p>Edit</p>
             </Button>
             {!readOnly && (
-              <Button variant="ghost" className="text-red-600 focus:bg-red-50 focus:text-red-500 cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteDialogOpen((prev) => !prev)} data-testid="song-delete">
+              <Button variant="ghost" className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteDialogOpen((prev) => !prev)} data-testid="song-delete">
                 <Trash2Icon className="mr-3 w-5 h-5" />
                 <p>Delete</p>
               </Button>

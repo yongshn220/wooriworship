@@ -1,6 +1,6 @@
 import { Page } from "@/components/constants/enums";
 import { cn } from "@/lib/utils";
-import { SearchIcon, MenuIcon, XIcon, ArrowLeftIcon, Plus } from "lucide-react";
+import { SearchIcon, MenuIcon, XIcon, ArrowLeftIcon, SlidersHorizontal } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
@@ -12,11 +12,18 @@ import { BaseTopNavBar } from "@/components/elements/util/navigation/base-top-na
 import { MainLogoSmall } from "@/components/elements/util/logo/main-logo";
 import { currentPageAtom } from "@/global-states/page-state";
 import { motion, AnimatePresence } from "framer-motion";
-import { headerActionsAtom, headerLeftContentAtom, planSearchInputAtom, songSearchInputAtom } from "@/app/board/_states/board-states";
+import { planSearchInputAtom, songSearchInputAtom } from "@/app/board/_states/board-states";
+import { CreateActionButton } from "@/app/board/_components/board-navigation/create-action-button";
+import { NoticeBoardHeaderLeft } from "@/app/board/[teamId]/(notice)/notice-board/_components/notice-board-header";
+import { NoticeHeaderActions } from "@/app/board/_components/board-navigation/header-configs/notice-header-actions";
+import { ServiceBoardHeaderLeft } from "@/app/board/[teamId]/(service)/service-board/_components/service-board-header";
+import { ServiceCreationMenu } from "@/components/elements/design/service/service-creation-menu";
+import { SearchFilterPopover } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-filter-popover";
 
 interface HeaderConfig {
   title?: string;
   showLogo?: boolean;
+  leftContent?: React.ReactNode;
   actions?: React.ReactNode;
   searchComponent?: React.ReactNode;
 }
@@ -45,17 +52,6 @@ const ActionButton = ({ onClick, icon: Icon, label, variant = 'default' }: Actio
   </motion.button>
 );
 
-const CreateActionButton = ({ onClick }: { onClick: () => void }) => (
-  <motion.button
-    onClick={onClick}
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    className="flex items-center justify-center w-11 h-11 rounded-full bg-primary text-primary-foreground shadow-sm hover:opacity-90 transition-opacity"
-  >
-    <Plus className="w-5 h-5 stroke-[3px]" />
-  </motion.button>
-);
-
 export function BoardTopNavBar() {
   const currentPage = useRecoilValue(currentPageAtom);
   const teamId = useRecoilValue(currentTeamIdAtom);
@@ -64,8 +60,6 @@ export function BoardTopNavBar() {
 
   const setSongSearch = useSetRecoilState(songSearchInputAtom);
   const setPlanSearch = useSetRecoilState(planSearchInputAtom);
-  const headerActions = useRecoilValue(headerActionsAtom);
-  const headerLeftContent = useRecoilValue(headerLeftContentAtom);
 
   useEffect(() => {
     setIsSearchOpen(false);
@@ -73,12 +67,9 @@ export function BoardTopNavBar() {
 
   const handleCloseSearch = () => {
     setIsSearchOpen(false);
-    // Reset search inputs based on current page or just reset all to be safe/simple
     if (currentPage === Page.SONG_BOARD) setSongSearch("");
     if (currentPage === Page.WORSHIP_BOARD) setPlanSearch("");
   };
-
-
 
   const config: Partial<Record<Page, HeaderConfig>> = useMemo(() => {
     const defaultConfig: HeaderConfig = {
@@ -88,15 +79,24 @@ export function BoardTopNavBar() {
 
     return {
       [Page.NOTICE_BOARD]: {
-        title: "Notice",
-        actions: (
-          <CreateActionButton onClick={() => router.push(getPathCreateNotice(teamId))} />
-        ),
+        leftContent: <NoticeBoardHeaderLeft />,
+        actions: <NoticeHeaderActions teamId={teamId} />,
       },
       [Page.SONG_BOARD]: {
         title: "Song Board",
         actions: (
-          <CreateActionButton onClick={() => router.push(getPathCreateSong(teamId))} />
+          <>
+            <SearchFilterPopover>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="group relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 min-h-touch hover:bg-muted text-muted-foreground hover:text-foreground"
+              >
+                <SlidersHorizontal className="w-5 h-5 stroke-[2px]" />
+              </motion.button>
+            </SearchFilterPopover>
+            <CreateActionButton onClick={() => router.push(getPathCreateSong(teamId))} />
+          </>
         ),
         searchComponent: <SearchInput />
       },
@@ -111,9 +111,8 @@ export function BoardTopNavBar() {
         title: "Manage",
       },
       [Page.SERVING]: {
-        title: "Service",
-        showLogo: false,
-        // actions: Handled by page.tsx via headerActionsAtom
+        leftContent: <ServiceBoardHeaderLeft />,
+        actions: <ServiceCreationMenu teamId={teamId || ""} />,
       },
       [Page.BOARD]: defaultConfig,
       [Page.HOME]: defaultConfig,
@@ -167,8 +166,8 @@ export function BoardTopNavBar() {
             >
               {/* Left Side: Custom Content, Logo, or Title */}
               <div className="flex items-center gap-3">
-                {headerLeftContent ? (
-                  headerLeftContent
+                {currentConfig.leftContent ? (
+                  currentConfig.leftContent
                 ) : currentConfig.showLogo ? (
                   <div className="opacity-90 hover:opacity-100 transition-opacity">
                     <MainLogoSmall />
@@ -190,7 +189,6 @@ export function BoardTopNavBar() {
                   />
                 )}
                 {currentConfig.actions}
-                {headerActions}
               </div>
             </motion.div>
           )}

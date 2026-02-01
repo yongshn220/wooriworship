@@ -1,5 +1,6 @@
 import { atom } from "recoil";
 import { SongBoardSortOption } from "@/components/constants/enums";
+import type { TabKey } from "@/app/board/[teamId]/(notice)/notice-board/_components/notice-board-header";
 
 
 export const songSearchInputAtom = atom<string>({
@@ -12,14 +13,9 @@ export const planSearchInputAtom = atom<string>({
   default: '',
 });
 
-export const headerActionsAtom = atom<React.ReactNode | null>({
-  key: 'headerActionsAtom',
-  default: null,
-});
-
-export const headerLeftContentAtom = atom<React.ReactNode | null>({
-    key: 'headerLeftContentAtom',
-    default: null,
+export const noticeBoardTabAtom = atom<TabKey>({
+  key: 'noticeBoardTabAtom',
+  default: 'announcements',
 });
 
 export const searchSelectedTagsAtom = atom<Array<string>>({

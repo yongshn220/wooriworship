@@ -1,6 +1,7 @@
 import { SongList } from "@/app/board/[teamId]/(song)/song-board/_components/song-list";
 import { Suspense } from "react";
 import { SongListSkeleton } from "@/app/board/[teamId]/(song)/song-board/_components/song-list-skeleton";
+import { SongErrorBoundary } from "@/app/board/[teamId]/(song)/song-board/_components/song-error-boundary";
 
 interface Props {
   params: any
@@ -11,9 +12,11 @@ export default function SongPage({ params }: Props) {
 
   return (
     <div className="w-full h-full flex flex-col items-center">
-      <Suspense fallback={<SongListSkeleton />}>
-        <SongList teamId={teamId} />
-      </Suspense>
+      <SongErrorBoundary fallbackMessage="Failed to load songs. Please try again.">
+        <Suspense fallback={<SongListSkeleton />}>
+          <SongList teamId={teamId} />
+        </Suspense>
+      </SongErrorBoundary>
     </div>
   )
 }

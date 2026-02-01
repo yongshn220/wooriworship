@@ -29,7 +29,7 @@ export function SongDetailContent({ teamId, songId }: Props) {
         <Label htmlFor="name" className="text-base font-semibold">
           Link
         </Label>
-        <Button variant="ghost" className="text-blue-500 hover:text-blue-600 cursor-pointer gap-2 p-0 h-auto"
+        <Button variant="ghost" className="text-primary hover:text-primary/80 cursor-pointer gap-2 p-0 h-auto"
           onClick={handleLinkButtonClick}>
           <LinkIcon className="w-4 h-4" />
           <p>Go to the Link</p>
@@ -61,8 +61,8 @@ export function SongDetailContent({ teamId, songId }: Props) {
       {/* Description Section */}
       {
         song?.description &&
-        <div className="flex flex-col items-start gap-1.5 p-4 bg-gray-50 rounded-lg">
-          <div className="whitespace-pre-wrap text-sm text-gray-700">
+        <div className="flex flex-col items-start gap-1.5 p-4 bg-muted rounded-lg">
+          <div className="whitespace-pre-wrap text-sm text-muted-foreground">
             {song?.description}
           </div>
         </div>

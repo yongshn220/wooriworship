@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SongDetailMenuButton } from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-menu-button";
+import { SongErrorBoundary } from "@/app/board/[teamId]/(song)/song-board/_components/song-error-boundary";
 
 interface Props {
   teamId: string
@@ -77,49 +78,51 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
 
         {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto no-scrollbar bg-muted/30 relative">
-          <Suspense fallback={<div className="h-full flex-center">Loading...</div>}>
+          <SongErrorBoundary fallbackMessage="Failed to load song details. Please try again.">
+            <Suspense fallback={<div className="h-full flex-center">Loading...</div>}>
 
-            {/* Floating Key Selector (Overlay) */}
-            <div className="absolute top-4 right-4 z-10">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="h-9 px-3 text-sm font-semibold bg-card/90 backdrop-blur shadow-sm border-border hover:bg-card gap-2">
-                    <Suspense fallback={<span>-</span>}>
-                      {selectedMusicSheetId ? <SelectedKeyTrigger teamId={teamId} songId={songId} musicSheetId={selectedMusicSheetId} /> : <span>Key</span>}
+              {/* Floating Key Selector (Overlay) */}
+              <div className="absolute top-4 right-4 z-10">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="h-9 px-3 text-sm font-semibold bg-card/90 backdrop-blur shadow-sm border-border hover:bg-card gap-2">
+                      <Suspense fallback={<span>-</span>}>
+                        {selectedMusicSheetId ? <SelectedKeyTrigger teamId={teamId} songId={songId} musicSheetId={selectedMusicSheetId} /> : <span>Key</span>}
+                      </Suspense>
+                      <ChevronDown className="h-4 w-4 opacity-50" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-[100]">
+                    <Suspense fallback={<div className="p-2 text-sm text-muted-foreground">Loading keys...</div>}>
+                      {musicSheetIds?.map((id) => (
+                        <KeyDropdownItem
+                          key={id}
+                          teamId={teamId}
+                          songId={songId}
+                          musicSheetId={id}
+                          onSelect={() => setSelectedMusicSheetId(id)}
+                        />
+                      ))}
                     </Suspense>
-                    <ChevronDown className="h-4 w-4 opacity-50" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-[100]">
-                  <Suspense fallback={<div className="p-2 text-sm text-muted-foreground">Loading keys...</div>}>
-                    {musicSheetIds?.map((id) => (
-                      <KeyDropdownItem
-                        key={id}
-                        teamId={teamId}
-                        songId={songId}
-                        musicSheetId={id}
-                        onSelect={() => setSelectedMusicSheetId(id)}
-                      />
-                    ))}
-                  </Suspense>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
 
-            {/* Full Screen Sheet Area */}
-            <div className="w-full min-h-[calc(100vh-70px)] flex flex-col pb-12">
-              {selectedMusicSheetId && (
-                <SongDetailMusicSheetArea teamId={teamId} songId={songId} musicSheetId={selectedMusicSheetId} />
-              )}
-            </div>
+              {/* Full Screen Sheet Area */}
+              <div className="w-full min-h-[calc(100vh-70px)] flex flex-col pb-12">
+                {selectedMusicSheetId && (
+                  <SongDetailMusicSheetArea teamId={teamId} songId={songId} musicSheetId={selectedMusicSheetId} />
+                )}
+              </div>
 
-            {/* Info Section (Below) */}
-            <div className="bg-card p-4 pb-10 rounded-t-xl -mt-4 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-20">
-              <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-6" />
-              <SongDetailContent teamId={teamId} songId={songId} />
-            </div>
+              {/* Info Section (Below) */}
+              <div className="bg-card p-4 pb-10 rounded-t-xl -mt-4 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-20">
+                <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-6" />
+                <SongDetailContent teamId={teamId} songId={songId} />
+              </div>
 
-          </Suspense>
+            </Suspense>
+          </SongErrorBoundary>
         </div>
       </DrawerContent>
     </Drawer>

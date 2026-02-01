@@ -6,15 +6,23 @@ import { BoardBottomNavBar } from "@/app/board/_components/board-navigation/boar
 import { usePathname } from "next/navigation";
 import { useSetRecoilState } from "recoil";
 import { currentPageAtom } from "@/global-states/page-state";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Page } from "@/components/constants/enums";
 import { DialogManager } from "@/components/elements/dialog/static-dialog/dialog-manager";
 import Initialization from "@/components/util/provider/initialization";
+import useLocalStorage from "@/components/util/hook/use-local-storage";
+import { useNotificationPermission } from "@/components/util/hook/use-notification-permission";
+import { NotificationPromptDialog } from "@/components/elements/dialog/notification/notification-prompt-dialog";
+import PushNotificationApi from "@/apis/PushNotificationApi";
+import { auth } from "@/firebase";
 
 
 export default function BoardLayout({ children }: any) {
   const setPage = useSetRecoilState(currentPageAtom)
   const pathname = usePathname()
+  const { permission } = useNotificationPermission()
+  const [notificationPromptStorage, setNotificationPromptStorage] = useLocalStorage('notification_prompt_dismissed', false)
+  const [showNotificationPrompt, setShowNotificationPrompt] = useState(false)
 
 
   useEffect(() => {
@@ -30,15 +38,45 @@ export default function BoardLayout({ children }: any) {
     }
   }, [pathname, setPage])
 
+  useEffect(() => {
+    if (permission === "default" && !notificationPromptStorage) {
+      // Small delay so it doesn't flash immediately on page load
+      const timer = setTimeout(() => setShowNotificationPrompt(true), 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [permission, notificationPromptStorage])
+
+  function handleNotificationPermissionResult(result: NotificationPermission) {
+    setNotificationPromptStorage(true)
+    if (result === "granted") {
+      const uid = auth.currentUser?.uid
+      if (uid) {
+        PushNotificationApi.updateOptState(uid, true)
+      }
+    }
+  }
+
+  function handleNotificationPromptClose(open: boolean) {
+    if (!open) {
+      setNotificationPromptStorage(true)
+      setShowNotificationPrompt(false)
+    }
+  }
+
   console.log("----BoardLayout")
   return (
     <section className="h-full">
       <BoardAuthenticate>
         <Initialization />
         <DialogManager />
+        <NotificationPromptDialog
+          open={showNotificationPrompt}
+          onOpenChange={handleNotificationPromptClose}
+          onPermissionResult={handleNotificationPermissionResult}
+        />
         <div className="flex flex-col h-full">
           <BoardTopNavBar />
-          <main className="flex-grow min-h-0 overflow-y-auto bg-gray-50 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] overscroll-contain">
+          <main className="flex-grow min-h-0 overflow-y-auto bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] overscroll-contain">
             {children}
           </main>
           <BoardBottomNavBar />

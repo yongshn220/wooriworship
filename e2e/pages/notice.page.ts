@@ -105,20 +105,9 @@ export class NoticePage {
   async fillAndSubmit(title: string, body?: string) {
     await this.titleInput.fill(title);
     if (body) {
-      // Click next to go to body step
-      await this.submitButton.click();
-      await this.page.waitForTimeout(500);
       await this.bodyInput.fill(body);
     }
-    // Click submit (may need to click through remaining steps)
     await this.submitButton.click();
-    // If there's a 3rd step (attachments), skip it
-    await this.page.waitForTimeout(500);
-    // Check if form is still visible (another step)
-    const stillVisible = await this.noticeForm.isVisible().catch(() => false);
-    if (stillVisible) {
-      await this.submitButton.click();
-    }
     await this.page.waitForTimeout(2000);
   }
 

@@ -1,5 +1,5 @@
 "use client"
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import { currentTeamSongIdsAtom } from "@/global-states/song-state";
 import React, { useEffect, useRef, useState, Suspense } from "react";
 import { EmptySongBoardPage } from "@/app/board/[teamId]/(song)/song-board/_components/empty-song-board-page/empty-song-board-page";
@@ -13,11 +13,19 @@ interface Props {
 import { AlphabetIndexer } from "./alphabet-indexer";
 import { ActiveFilterList } from "@/app/board/_components/active-filter-list";
 import { SongRowSkeleton } from "@/app/board/[teamId]/(song)/song-board/_components/song-list-skeleton";
+import { songSearchInputAtom, searchSelectedTagsAtom, searchSelectedKeysAtom } from "@/app/board/_states/board-states";
+import { SearchX } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // ... existing imports
 
 export function SongList({ teamId }: Props) {
   const songIds = useRecoilValue(currentTeamSongIdsAtom(teamId))
+  const searchInput = useRecoilValue(songSearchInputAtom)
+  const setSongSearch = useSetRecoilState(songSearchInputAtom)
+  const [selectedTags, setSelectedTags] = useRecoilState(searchSelectedTagsAtom)
+  const [selectedKeys, setSelectedKeys] = useRecoilState(searchSelectedKeysAtom)
+  const isFiltering = (searchInput && searchInput !== "") || selectedTags.length > 0 || selectedKeys.length > 0
 
   // Infinite Scroll State
   const [displayedCount, setDisplayedCount] = useState(20);
@@ -117,6 +125,29 @@ export function SongList({ teamId }: Props) {
   };
 
   if (!songIds || songIds?.length <= 0) {
+    if (isFiltering) {
+      // Empty search/filter results
+      return (
+        <div className="w-full h-full flex flex-col items-center justify-center p-6 gap-4 text-center">
+          <SearchX className="w-10 h-10 text-muted-foreground" />
+          <div>
+            <p className="text-muted-foreground font-medium">No songs match your search</p>
+            <p className="text-sm text-muted-foreground/60 mt-1">Try different keywords or filters</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSongSearch("")
+              setSelectedTags([])
+              setSelectedKeys([])
+            }}
+          >
+            Clear Filters
+          </Button>
+        </div>
+      )
+    }
     return (
       <div className="w-full h-full flex items-center justify-center bg-background p-6">
         <EmptySongBoardPage />
@@ -133,11 +164,14 @@ export function SongList({ teamId }: Props) {
         <ActiveFilterList />
       </div>
 
-      {/* Header Row for Desktop */}
-      <div className="hidden md:flex items-center px-6 py-2 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-        <div className="flex-1 pl-4">Title</div>
-        <div className="w-32 shrink-0 text-center">Key</div>
-      </div>
+      {/* Results Count (only when filtering) */}
+      {isFiltering && (
+        <div className="px-6 mb-2">
+          <span className="text-xs font-medium text-muted-foreground">
+            {songIds.length} {songIds.length === 1 ? 'song' : 'songs'} found
+          </span>
+        </div>
+      )}
 
       <div className="flex flex-col divide-y divide-border" data-testid="song-list">
         {

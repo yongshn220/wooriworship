@@ -20,20 +20,19 @@ import { Timestamp } from "firebase/firestore";
 
 interface Props {
     teamId: string;
-    selectedServiceId: string | null;
 }
 
 const CreateActionButton = () => (
     <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="flex items-center justify-center w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-sm hover:opacity-90 transition-opacity"
+        className="flex items-center justify-center w-11 h-11 rounded-full bg-primary text-primary-foreground shadow-sm hover:opacity-90 transition-opacity"
     >
         <Plus className="w-5 h-5 stroke-[3px]" />
     </motion.button>
 );
 
-export function ServiceCreationMenu({ teamId, selectedServiceId }: Props) {
+export function ServiceCreationMenu({ teamId }: Props) {
     const router = useRouter();
     const { toast } = useToast();
     const [isOpen, setIsOpen] = useState(false);

@@ -132,6 +132,14 @@ export class ServiceEventApi {
         // 1. Cleanup References (Linking)
         await LinkingApi.cleanupReferencesForServiceDeletion(teamId, serviceId);
 
+        // 1.5 Orphan linked todos (set serviceId to null so they become general todos)
+        try {
+            const { TodoApi } = await import("./TodoApi");
+            await TodoApi.orphanServiceTodos(teamId, serviceId);
+        } catch (e) {
+            console.error("Failed to orphan service todos:", e);
+        }
+
         // 2. Delete Sub-docs (Explicitly)
         const batch = writeBatch(db);
         batch.delete(doc(db, `teams/${teamId}/services/${serviceId}/setlists/main`));

@@ -233,7 +233,7 @@ export function AlphabetIndexer({ teamId, onScrollRequest, activeIndex }: Props)
                                     // Colors optimized for Light Mode (with dark text)
                                     color: char === selectedChar
                                         ? (isActive ? 'var(--primary)' : 'var(--muted-foreground)') // primary : muted
-                                        : 'rgba(0,0,0,0.4)',
+                                        : 'var(--muted-foreground)',
                                     visibility: opacity < 0.1 ? 'hidden' : 'visible'
                                 }}
                             >
