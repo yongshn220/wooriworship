@@ -1,17 +1,14 @@
 "use client"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import MenuIcon from "@/public/icons/menuIcon.svg";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getPathSong, getPathSongEdit } from "@/components/util/helper/routes";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { SongApi } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
-import { CopyIcon, SquarePen, Trash2Icon, LinkIcon, DownloadIcon } from "lucide-react";
-import { currentTeamSongIdsAtom, songAtom, songUpdaterAtom } from "@/global-states/song-state";
-import { Button } from "@/components/ui/button";
+import { SquarePen, Trash2, Download, EllipsisVertical } from "lucide-react";
+import { songAtom, songUpdaterAtom } from "@/global-states/song-state";
 import { downloadMultipleMusicSheets } from "@/components/util/helper/helper-functions";
-import { musicSheetsBySongIdAtom } from "@/global-states/music-sheet-state";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 
 interface Props {
@@ -57,37 +54,34 @@ export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = fal
     <>
       <DeleteConfirmationDialog isOpen={isDeleteDialogOpen} setOpen={setDeleteDialogOpen} title="Delete Song" description={`Do you really want to delete [${songTitle}]? This action can't be undone.`} onDeleteHandler={handleDeleteSong} />
       <DropdownMenu>
-        <DropdownMenuTrigger data-testid="song-menu">
-          <MenuIcon />
+        <DropdownMenuTrigger asChild>
+          <button className="text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted outline-none" data-testid="song-menu">
+            <EllipsisVertical className="w-5 h-5" />
+          </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="min-w-[200px] p-2 flex-center flex-col z-[10002]">
-          <DropdownMenuGroup className="space-y-2 w-full">
-            <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => handleDownloadSong()}>
-              <DownloadIcon className="mr-3 w-5 h-5" />
-              <p>Download Score</p>
-            </Button>
-          </DropdownMenuGroup>
+        <DropdownMenuContent align="end" className="z-[10002]">
+          <DropdownMenuItem className="flex items-center justify-between cursor-pointer" onClick={handleDownloadSong}>
+            Download Score
+            <Download className="w-4 h-4 text-muted-foreground" />
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuGroup className="space-y-2 flex-center flex-col w-full">
-            <Button variant="ghost" disabled className="cursor-pointer w-full flex-start pl-2">
-              <LinkIcon className="mr-3 w-5 h-5" />
-              <p>Copy Link <span className="text-xs text-muted-foreground">(Coming Soon)</span></p>
-            </Button>
-            <Button variant="ghost" disabled className="cursor-pointer w-full flex-start pl-2">
-              <CopyIcon className="mr-3 w-5 h-5" />
-              <p>Duplicate <span className="text-xs text-muted-foreground">(Coming Soon)</span></p>
-            </Button>
-            <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => handleEditSong()} data-testid="song-edit">
-              <SquarePen className="mr-3 w-5 h-5" />
-              <p>Edit</p>
-            </Button>
-            {!readOnly && (
-              <Button variant="ghost" className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer w-full flex-start pl-2" onClick={() => setDeleteDialogOpen((prev) => !prev)} data-testid="song-delete">
-                <Trash2Icon className="mr-3 w-5 h-5" />
-                <p>Delete</p>
-              </Button>
-            )}
-          </DropdownMenuGroup>
+          <DropdownMenuItem className="flex items-center justify-between cursor-pointer" onClick={handleEditSong} data-testid="song-edit">
+            Edit
+            <SquarePen className="w-4 h-4 text-muted-foreground" />
+          </DropdownMenuItem>
+          {!readOnly && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="flex items-center justify-between cursor-pointer text-red-600 dark:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-red-600 dark:focus:text-red-500"
+                onClick={() => setDeleteDialogOpen(true)}
+                data-testid="song-delete"
+              >
+                Delete
+                <Trash2 className="w-4 h-4" />
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </>

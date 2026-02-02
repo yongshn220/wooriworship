@@ -1,6 +1,6 @@
 "use client";
 
-import { ListMusic, ArrowRight } from "lucide-react";
+import { FileMusic, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
 import { SectionHeader, SectionCardContainer } from "@/components/common/section-card";
@@ -23,7 +23,7 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit, onDelete, onSe
         <div data-testid="setlist-card">
             <SectionCardContainer>
                 <SectionHeader
-                    icon={ListMusic}
+                    icon={FileMusic}
                     iconColorClassName="bg-primary/10 text-primary"
                     title="Setlist"
                     onEdit={onEdit}

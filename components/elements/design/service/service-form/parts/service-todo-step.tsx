@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Check, Plus, Trash2, MoreHorizontal, ArrowUp } from "lucide-react";
+import { Check, Plus, Trash2, EllipsisVertical, ArrowUp } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -97,17 +97,17 @@ export function ServiceTodoStep({ todos, onAdd, onRemove, onToggle, onUpdate }: 
                             {/* Delete */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground flex-shrink-0">
-                                        <MoreHorizontal className="w-4 h-4" />
-                                    </Button>
+                                    <button className="h-8 w-8 rounded-full text-muted-foreground flex-shrink-0 hover:text-foreground hover:bg-muted/60 inline-flex items-center justify-center outline-none">
+                                        <EllipsisVertical className="w-4 h-4" />
+                                    </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-40 rounded-2xl p-1.5 shadow-xl border-0">
+                                <DropdownMenuContent align="end">
                                     <DropdownMenuItem
-                                        className="rounded-xl py-2.5 px-3 cursor-pointer font-semibold text-sm text-destructive focus:text-destructive focus:bg-destructive/10"
+                                        className="flex items-center justify-between cursor-pointer text-red-600 dark:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-red-600 dark:focus:text-red-500"
                                         onSelect={() => onRemove(todo.id)}
                                     >
-                                        <Trash2 className="mr-2 h-4 w-4" />
                                         Remove
+                                        <Trash2 className="h-4 w-4" />
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

@@ -176,4 +176,33 @@ export class PraiseTeamApi {
         const ref = doc(db, `teams/${teamId}/services/${serviceId}/praise_team/main`);
         await deleteDoc(ref);
     }
+
+    // =========================================================================
+    // 4. Praise Team Templates (teams/{teamId}/praise_team_templates)
+    // =========================================================================
+
+    static async getTemplates(teamId: string): Promise<any[]> {
+        try {
+            const snapshot = await getDocs(collection(db, "teams", teamId, "praise_team_templates"));
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (e) {
+            console.error("PraiseTeamApi.getTemplates:", e);
+            return [];
+        }
+    }
+
+    static async createTemplate(teamId: string, template: any): Promise<void> {
+        const ref = doc(collection(db, "teams", teamId, "praise_team_templates"));
+        await setDoc(ref, { ...template, id: ref.id });
+    }
+
+    static async updateTemplate(teamId: string, templateId: string, template: any): Promise<void> {
+        const ref = doc(db, "teams", teamId, "praise_team_templates", templateId);
+        await updateDoc(ref, template);
+    }
+
+    static async deleteTemplate(teamId: string, templateId: string): Promise<void> {
+        const ref = doc(db, "teams", teamId, "praise_team_templates", templateId);
+        await deleteDoc(ref);
+    }
 }

@@ -21,7 +21,7 @@ export function useServiceRoles(teamId: string) {
     const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
     const [newRoleName, setNewRoleName] = useState("");
     const [isCreatingRole, setIsCreatingRole] = useState(false);
-    const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'role' | 'template' | 'item' | null; id: string | null; open: boolean }>({ type: null, id: null, open: false });
+    const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'role' | 'template' | 'pt-template' | 'item' | null; id: string | null; open: boolean }>({ type: null, id: null, open: false });
 
     const handleCreateRole = async () => {
         if (!newRoleName.trim() || !teamId) return;

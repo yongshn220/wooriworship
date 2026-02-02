@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useRef, useEffect } from "react";
-import { Check, Plus, MoreHorizontal, Pencil, Save, Trash2, X } from "lucide-react";
+import { Check, Plus, EllipsisVertical, Pencil, Save, Trash2, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 // UI Components
@@ -142,13 +142,13 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
 
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-foreground hover:bg-muted transition-colors flex-shrink-0">
-                                        <MoreHorizontal className="h-5 w-5" />
-                                    </Button>
+                                    <button className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 active:bg-muted transition-colors outline-none flex-shrink-0">
+                                        <EllipsisVertical className="w-5 h-5" />
+                                    </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56 rounded-3xl p-2 shadow-2xl border-0">
+                                <DropdownMenuContent align="end" sideOffset={4} className="min-w-[200px] rounded-xl p-1 bg-popover/95 backdrop-blur-xl shadow-lg border border-border/50">
                                     <DropdownMenuItem
-                                        className="rounded-2xl py-3 cursor-pointer font-bold"
+                                        className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[14px] font-medium cursor-pointer"
                                         disabled={!selectedTemplateId}
                                         onSelect={() => {
                                             setTimeout(() => {
@@ -158,22 +158,22 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                                             }, 150);
                                         }}
                                     >
-                                        <Pencil className="mr-2 h-4 w-4" />
                                         Rename Template
+                                        <Pencil className="w-4 h-4 text-muted-foreground" />
                                     </DropdownMenuItem>
-                                    <DropdownMenuSeparator className="my-2 bg-muted/50" />
+                                    <DropdownMenuSeparator className="mx-1" />
                                     <DropdownMenuItem
-                                        className={cn("rounded-2xl py-3 cursor-pointer", hasTemplateChanges ? "text-primary font-bold bg-primary/5" : "text-muted-foreground")}
+                                        className={cn("flex items-center justify-between rounded-lg px-3 py-2.5 text-[14px] font-medium cursor-pointer", hasTemplateChanges ? "text-primary" : "text-muted-foreground")}
                                         disabled={!selectedTemplateId || !hasTemplateChanges}
                                         onSelect={() => {
                                             handleUpdateTemplate();
                                         }}
                                     >
-                                        <Save className="mr-2 h-4 w-4" />
                                         Save to &quot;{templates.find(t => t.id === selectedTemplateId)?.name}&quot;
+                                        <Save className="w-4 h-4 text-muted-foreground" />
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
-                                        className="rounded-2xl py-3 cursor-pointer font-bold"
+                                        className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[14px] font-medium cursor-pointer"
                                         onSelect={() => {
                                             const currentTemp = templates.find(t => t.id === selectedTemplateId);
                                             setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
@@ -183,20 +183,20 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                                             }, 150);
                                         }}
                                     >
-                                        <Plus className="mr-2 h-4 w-4" />
                                         Save as New
+                                        <Plus className="w-4 h-4 text-muted-foreground" />
                                     </DropdownMenuItem>
-                                    <DropdownMenuSeparator className="my-2 bg-muted/50" />
+                                    <DropdownMenuSeparator className="mx-1" />
                                     <DropdownMenuItem
-                                        className="rounded-2xl py-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 font-bold"
+                                        className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[14px] font-medium cursor-pointer text-red-600 dark:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-red-600 dark:focus:text-red-500"
                                         onSelect={() => {
                                             setTimeout(() => {
                                                 setDeleteConfirm({ type: 'template', id: selectedTemplateId || '', open: true });
                                             }, 150);
                                         }}
                                     >
-                                        <Trash2 className="mr-2 h-4 w-4" />
                                         Delete Template
+                                        <Trash2 className="w-4 h-4" />
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

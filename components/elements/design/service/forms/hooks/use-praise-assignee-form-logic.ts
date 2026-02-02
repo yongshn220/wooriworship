@@ -5,6 +5,7 @@ import { usersAtom } from "@/global-states/userState";
 import { ServicePraiseTeam } from "@/models/services/ServiceEvent";
 import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
 import { useServiceRoles } from "../../service-form/hooks/use-service-roles";
+import { usePraiseTeamTemplates } from "../../service-form/hooks/use-praise-team-templates";
 import { toast } from "@/components/ui/use-toast";
 
 
@@ -46,6 +47,27 @@ export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee,
         }
     }, [initialAssignee, setPraiseTeam]);
 
+    // --- Praise Team Templates ---
+    const {
+        ptTemplates,
+        isPtTemplatesLoaded,
+        selectedPtTemplateId,
+        setSelectedPtTemplateId,
+        hasPtTemplateChanges,
+        isPtTemplateDialogOpen,
+        setIsPtTemplateDialogOpen,
+        isPtRenameDialogOpen,
+        setIsPtRenameDialogOpen,
+        newPtTemplateName,
+        setNewPtTemplateName,
+        tempPtTemplateName,
+        setTempPtTemplateName,
+        handleSavePtTemplate,
+        handleUpdatePtTemplate,
+        handleDeletePtTemplate,
+        handleUpdatePtTemplateName,
+    } = usePraiseTeamTemplates(teamId, praiseTeam, setPraiseTeam);
+
     const [activeSelection, setActiveSelection] = useState<{ roleId: string } | null>(null);
     const [standardGroups, setStandardGroups] = useState<string[]>([]);
     const [customMemberNames, setCustomMemberNames] = useState<string[]>([]);
@@ -85,6 +107,7 @@ export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee,
         isLoading,
         roles,
         praiseTeam,
+        setPraiseTeam,
 
         // UI State
         isRoleDialogOpen,
@@ -107,6 +130,25 @@ export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee,
         handleCreateRole,
         handleDeleteRole,
         handleAssignMemberToRole,
-        handleSave
+        handleSave,
+
+        // Praise Team Templates
+        ptTemplates,
+        isPtTemplatesLoaded,
+        selectedPtTemplateId,
+        setSelectedPtTemplateId,
+        hasPtTemplateChanges,
+        isPtTemplateDialogOpen,
+        setIsPtTemplateDialogOpen,
+        isPtRenameDialogOpen,
+        setIsPtRenameDialogOpen,
+        newPtTemplateName,
+        setNewPtTemplateName,
+        tempPtTemplateName,
+        setTempPtTemplateName,
+        handleSavePtTemplate,
+        handleUpdatePtTemplate,
+        handleDeletePtTemplate,
+        handleUpdatePtTemplateName,
     };
 }

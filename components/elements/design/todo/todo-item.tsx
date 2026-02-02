@@ -3,7 +3,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { Check, MoreHorizontal, Trash2 } from "lucide-react";
+import { Check, EllipsisVertical, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Todo } from "@/models/todo";
@@ -61,22 +61,20 @@ export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
             {/* Context Menu */}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted/60 active:scale-90"
+                    <button
+                        className="h-8 w-8 rounded-full flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted/60 active:scale-90 inline-flex items-center justify-center outline-none"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <MoreHorizontal className="w-4 h-4" strokeWidth={2.5} />
-                    </Button>
+                        <EllipsisVertical className="w-4 h-4" />
+                    </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40 rounded-2xl p-1.5 shadow-xl border-0">
+                <DropdownMenuContent align="end">
                     <DropdownMenuItem
-                        className="rounded-xl py-2.5 px-3 cursor-pointer font-semibold text-sm text-destructive focus:text-destructive focus:bg-destructive/10"
+                        className="flex items-center justify-between cursor-pointer text-red-600 dark:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-red-600 dark:focus:text-red-500"
                         onSelect={onDelete}
                     >
-                        <Trash2 className="mr-3 h-4 w-4" />
                         Delete
+                        <Trash2 className="h-4 w-4" />
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

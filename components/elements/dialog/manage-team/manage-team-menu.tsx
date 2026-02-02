@@ -1,6 +1,5 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import MenuIcon from "@/public/icons/menuIcon.svg";
-import { DoorOpenIcon, Trash2Icon } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { EllipsisVertical, DoorOpen, Trash2 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { TeamApi } from "@/apis";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -72,7 +71,35 @@ export function ManageTeamMenu() {
   }
 
   return (
-    <DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted outline-none">
+            <EllipsisVertical className="w-5 h-5" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem className="flex items-center justify-between cursor-pointer" onClick={() => setLeaveTeamDialogOpen(true)}>
+            Leave Team
+            <DoorOpen className="w-4 h-4 text-muted-foreground" />
+          </DropdownMenuItem>
+          {
+            team.admins.includes(authUser.uid) && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="flex items-center justify-between cursor-pointer text-red-600 dark:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-red-600 dark:focus:text-red-500"
+                  onClick={() => setDeleteTeamDialogOpen(true)}
+                >
+                  Delete Team
+                  <Trash2 className="w-4 h-4" />
+                </DropdownMenuItem>
+              </>
+            )
+          }
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <DeleteConfirmationDialog
         isOpen={isDeleteTeamDialogOpen}
         setOpen={setDeleteTeamDialogOpen}
@@ -89,24 +116,6 @@ export function ManageTeamMenu() {
         onDeleteHandler={handleLeaveTeam}
         callback={() => setLeaveTeamDialogOpen(false)}
       />
-      <DropdownMenuTrigger>
-        <MenuIcon />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuGroup className="space-y-2">
-          <DropdownMenuItem className="cursor-pointer pl-2" onClick={() => setLeaveTeamDialogOpen(true)}>
-            <DoorOpenIcon className="mr-3 w-5 h-5" />
-            <span>Leave Team</span>
-          </DropdownMenuItem>
-          {
-            team.admins.includes(authUser.uid) &&
-            <DropdownMenuItem className="cursor-pointer pl-2 text-destructive focus:text-destructive focus:bg-destructive/10" onClick={() => setDeleteTeamDialogOpen(true)}>
-              <Trash2Icon className="mr-3 w-5 h-5" />
-              <span>Delete Team</span>
-            </DropdownMenuItem>
-          }
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    </>
   )
 }

@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, SquarePen, Trash2, Loader2 } from "lucide-react";
-import { ActionBottomSheet } from "@/components/common/action-bottom-sheet";
+import { EllipsisVertical, SquarePen, Trash2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
@@ -10,6 +9,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
 import { Timestamp } from "firebase/firestore";
 
@@ -43,7 +49,6 @@ export function ServiceHeaderMenu({
     const [user] = useAuthState(auth as any);
     const { toast } = useToast();
     const setServices = useSetRecoilState(serviceEventsListAtom);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     // Edit dialog state
@@ -54,7 +59,6 @@ export function ServiceHeaderMenu({
     const [isSaving, setIsSaving] = useState(false);
 
     const handleEdit = () => {
-        setIsMenuOpen(false);
         setEditDate(eventDate || undefined);
         setEditTagId(tagId || "");
         if (eventDate) setEditCalendarMonth(eventDate);
@@ -92,6 +96,7 @@ export function ServiceHeaderMenu({
                 title: "Schedule deleted",
                 description: "The serving schedule has been successfully removed.",
             });
+            setIsDeleteDialogOpen(false);
             setServices((prev) => prev.filter((s) => s.id !== scheduleId));
         } catch (error) {
             console.error(error);
@@ -100,21 +105,11 @@ export function ServiceHeaderMenu({
                 title: "Error",
                 description: "Failed to delete schedule.",
             });
-        } finally {
             setIsDeleteDialogOpen(false);
         }
     };
 
     if (!user) return null;
-
-    const defaultTrigger = (
-        <button
-            onClick={() => setIsMenuOpen(true)}
-            className="text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted"
-        >
-            <Menu className="w-5 h-5" />
-        </button>
-    );
 
     const deleteDescription = scheduleTitle && scheduleDate
         ? `Are you sure you want to delete "${scheduleTitle}" on ${scheduleDate}? This action cannot be undone.`
@@ -122,30 +117,36 @@ export function ServiceHeaderMenu({
 
     return (
         <>
-            {trigger ? (
-                <span onClick={() => setIsMenuOpen(true)}>{trigger}</span>
-            ) : (
-                defaultTrigger
-            )}
-
-            <ActionBottomSheet
-                open={isMenuOpen}
-                onOpenChange={setIsMenuOpen}
-                title={scheduleTitle || "Service"}
-                actions={[
-                    {
-                        label: "Edit",
-                        icon: SquarePen,
-                        onClick: handleEdit,
-                    },
-                    {
-                        label: "Delete",
-                        icon: Trash2,
-                        onClick: () => { setIsMenuOpen(false); setIsDeleteDialogOpen(true); },
-                        variant: "destructive",
-                    },
-                ]}
-            />
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    {trigger ? (
+                        <span>{trigger}</span>
+                    ) : (
+                        <button
+                            className="text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted outline-none"
+                        >
+                            <EllipsisVertical className="w-5 h-5" />
+                        </button>
+                    )}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                        onClick={handleEdit}
+                        className="flex items-center justify-between cursor-pointer"
+                    >
+                        Edit
+                        <SquarePen className="w-4 h-4 text-muted-foreground" />
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                        onClick={() => setIsDeleteDialogOpen(true)}
+                        className="flex items-center justify-between cursor-pointer text-red-600 dark:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-red-600 dark:focus:text-red-500"
+                    >
+                        Delete
+                        <Trash2 className="w-4 h-4" />
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
 
             <DeleteConfirmationDialog
                 isOpen={isDeleteDialogOpen}

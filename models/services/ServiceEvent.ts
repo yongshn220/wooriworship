@@ -51,6 +51,17 @@ export interface ServiceFlowTemplate {
     items: Omit<ServiceFlowItem, "id">[];  // Includes assignments for member presets
 }
 
+/**
+ * Template for praise team assignments
+ * Stored in: teams/{teamId}/praise_team_templates/{templateId}
+ */
+export interface PraiseTeamTemplate {
+    id: string;
+    teamId: string;
+    name: string;
+    assignments: ServiceAssignment[];
+}
+
 // =============================================================================
 // 1. Root Header (Lightweight)
 // Path: teams/{teamId}/services/{serviceId}

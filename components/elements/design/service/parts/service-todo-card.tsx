@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { ListChecks, Plus, Check, MoreHorizontal, Trash2, ArrowUp } from "lucide-react";
+import { CircleCheck, Plus, Check, MoreHorizontal, Trash2, ArrowUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -153,7 +153,7 @@ export function ServiceTodoCard({
     <div data-testid="service-todo-card">
       <SectionCardContainer>
         <SectionHeader
-          icon={ListChecks}
+          icon={CircleCheck}
           iconColorClassName="bg-emerald-500/10 text-emerald-500"
           title="Todos"
           badge={incompleteTodosCount > 0 ? `${incompleteTodosCount}` : undefined}

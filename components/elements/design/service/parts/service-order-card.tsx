@@ -3,7 +3,7 @@
 import { ServiceFlowItem } from "@/models/services/ServiceEvent";
 import { User } from "@/models/user";
 import { cn } from "@/lib/utils";
-import { ListOrdered } from "lucide-react";
+import { Hash } from "lucide-react";
 import { getMemberName } from "@/components/util/helper/helper-functions";
 import { SectionHeader, SectionCardContainer } from "@/components/common/section-card";
 
@@ -22,7 +22,7 @@ export function ServiceOrderCard({ items, members, currentUserUid, onEdit, onDel
         <div data-testid="service-order-card">
             <SectionCardContainer>
                 <SectionHeader
-                    icon={ListOrdered}
+                    icon={Hash}
                     iconColorClassName="bg-orange-500/10 text-orange-500"
                     title="Service Order"
                     onEdit={onEdit}

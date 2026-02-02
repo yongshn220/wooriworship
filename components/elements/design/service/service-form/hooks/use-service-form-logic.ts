@@ -25,6 +25,7 @@ import { ServiceEvent } from "@/models/services/ServiceEvent";
 // Import Split Hooks
 import { useServiceRoles } from "./use-service-roles";
 import { useServiceTemplates } from "./use-service-templates";
+import { usePraiseTeamTemplates } from "./use-praise-team-templates";
 import { useServiceTimeline } from "./use-service-timeline";
 import { useServiceHistory } from "./use-service-history";
 import { useServiceTodos } from "./use-service-todos";
@@ -105,6 +106,26 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         setHasTemplateChanges
     } = useServiceTemplates(teamId, items, setItems);
 
+    // --- 3.5. Praise Team Templates Logic ---
+    const {
+        ptTemplates,
+        isPtTemplatesLoaded,
+        selectedPtTemplateId,
+        setSelectedPtTemplateId,
+        hasPtTemplateChanges,
+        isPtTemplateDialogOpen,
+        setIsPtTemplateDialogOpen,
+        isPtRenameDialogOpen,
+        setIsPtRenameDialogOpen,
+        newPtTemplateName,
+        setNewPtTemplateName,
+        tempPtTemplateName,
+        setTempPtTemplateName,
+        handleSavePtTemplate,
+        handleUpdatePtTemplate,
+        handleDeletePtTemplate,
+        handleUpdatePtTemplateName,
+    } = usePraiseTeamTemplates(teamId, praiseTeam, setPraiseTeam);
 
     // --- 4. Main Form State (Date/Steps) ---
     const [step, setStep] = useState(0);
@@ -462,6 +483,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         roles, team, teamMembers, historySchedules,
         isDuplicate, duplicateId, duplicateErrorMessage,
         praiseTeam, // Added praiseTeam to return
+        ptTemplates, isPtTemplatesLoaded, selectedPtTemplateId, hasPtTemplateChanges,
         serviceTodos,
 
         // Setters
@@ -473,10 +495,15 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         setNewTemplateName, setTempTemplateName, setCreateEmptyMode, setStandardGroups, setCustomMemberNames,
         setNewGroupInput, setDeleteConfirm, setRoles,
         setPraiseTeam, // Added setter
+        setSelectedPtTemplateId,
+        setIsPtTemplateDialogOpen, setIsPtRenameDialogOpen,
+        setNewPtTemplateName, setTempPtTemplateName,
+        isPtTemplateDialogOpen, isPtRenameDialogOpen, newPtTemplateName, tempPtTemplateName,
 
         // Actions
         handleAddMember, handleAssignMemberToRole, handleSubmit, handleCreateRole, handleDeleteRole,
         handleSaveTemplate, handleUpdateTemplate, handleDeleteTemplate, handleUpdateTemplateName,
+        handleSavePtTemplate, handleUpdatePtTemplate, handleDeletePtTemplate, handleUpdatePtTemplateName,
         goToStep, nextStep: () => {
             if (step < totalSteps - 1) goToStep(step + 1);
         }, prevStep: () => {

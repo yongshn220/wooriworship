@@ -232,8 +232,15 @@ export default function ServingPage() {
 
         const exists = events.some(s => s.id === selectedScheduleId);
         if (!exists) {
-            // Selected item was deleted. Select the first available one as a fallback.
-            setSelectedScheduleId(events[0].id);
+            // Same logic as initial load: first upcoming, or most recent past
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            const firstUpcoming = events.find(e => e.date.toDate() >= now);
+            if (firstUpcoming) {
+                setSelectedScheduleId(firstUpcoming.id);
+            } else {
+                setSelectedScheduleId(events[events.length - 1].id);
+            }
         }
     }, [events, selectedScheduleId]);
 

@@ -1,6 +1,5 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { SquarePen, Trash2Icon, MoreHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { SquarePen, Trash2, EllipsisVertical } from "lucide-react";
 import { getPathEditNotice } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -52,25 +51,28 @@ export function NoticeHeaderMenu({ noticeId, createdById }: Props) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="min-h-touch min-w-touch h-11 w-11 text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/20" data-testid="notice-menu">
-            <MoreHorizontal className="h-5 w-5" />
-          </Button>
+          <button className="text-muted-foreground/50 hover:text-muted-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted outline-none" data-testid="notice-menu">
+            <EllipsisVertical className="w-5 h-5" />
+          </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuGroup>
-            <DropdownMenuItem className="cursor-pointer pl-2" onClick={() => router.push(getPathEditNotice(teamId, noticeId))} data-testid="notice-edit">
-              <SquarePen className="mr-3 w-5 h-5" />
-              <span>Edit</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer pl-2 text-destructive focus:text-destructive focus:bg-destructive/10"
-              onClick={() => setIsDeleteDialogOpen(true)}
-              data-testid="notice-delete"
-            >
-              <Trash2Icon className="mr-3 w-5 h-5" />
-              <span>Delete</span>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            className="flex items-center justify-between cursor-pointer"
+            onClick={() => router.push(getPathEditNotice(teamId, noticeId))}
+            data-testid="notice-edit"
+          >
+            Edit
+            <SquarePen className="w-4 h-4 text-muted-foreground" />
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="flex items-center justify-between cursor-pointer text-red-600 dark:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-red-600 dark:focus:text-red-500"
+            onClick={() => setIsDeleteDialogOpen(true)}
+            data-testid="notice-delete"
+          >
+            Delete
+            <Trash2 className="w-4 h-4" />
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { ListMusic, Users, ListOrdered } from "lucide-react";
+import { FileMusic, Users, Hash } from "lucide-react";
 import { ServiceTodoCard } from "./parts/service-todo-card";
 
 import { useState } from "react";
@@ -130,7 +130,7 @@ export function ServiceDetailView({
             ) : (
                 <EmptyStateCard
                     onClick={() => setIsEditingSetlist(true)}
-                    icon={ListMusic}
+                    icon={FileMusic}
                     iconColorClassName="bg-primary/10 text-primary"
                     message="Create Setlist"
                     description="Add songs to this service"
@@ -171,7 +171,7 @@ export function ServiceDetailView({
             ) : (
                 <EmptyStateCard
                     onClick={() => setIsEditingFlow(true)}
-                    icon={ListOrdered}
+                    icon={Hash}
                     iconColorClassName="bg-orange-500/10 text-orange-500"
                     message="Create Flow"
                     description="Add service sequence items"

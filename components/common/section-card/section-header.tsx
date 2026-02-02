@@ -1,8 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { LucideIcon, Menu, SquarePen, Trash2 } from "lucide-react";
+import { LucideIcon, EllipsisVertical, SquarePen, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   ActionBottomSheet,
   ActionBottomSheetAction,
@@ -35,31 +42,9 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  // Build actions array from onEdit/onDelete if custom actions not provided
-  const sheetActions: ActionBottomSheetAction[] = actions || [
-    ...(onEdit
-      ? [
-          {
-            label: editLabel,
-            icon: SquarePen,
-            onClick: onEdit,
-            variant: "default" as const,
-          },
-        ]
-      : []),
-    ...(onDelete
-      ? [
-          {
-            label: deleteLabel,
-            icon: Trash2,
-            onClick: onDelete,
-            variant: "destructive" as const,
-          },
-        ]
-      : []),
-  ];
-
-  const showMoreButton = (onEdit && onDelete) || (actions && actions.length > 0);
+  const hasSimpleActions = (onEdit || onDelete) && !actions;
+  const hasCustomActions = actions && actions.length > 0;
+  const showMenu = hasSimpleActions || hasCustomActions;
 
   return (
     <>
@@ -77,32 +62,67 @@ export function SectionHeader({
               {badge}
             </span>
           )}
-          {onEdit && !showMoreButton && (
-            <button
-              onClick={onEdit}
-              className="text-xs font-semibold text-foreground/60 hover:text-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted"
-            >
-              {editLabel}
-            </button>
+
+          {/* Simple Edit/Delete → iOS-style dropdown */}
+          {hasSimpleActions && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted outline-none"
+                  data-testid="section-menu"
+                >
+                  <EllipsisVertical className="w-5 h-5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                sideOffset={4}
+                className="min-w-[180px] rounded-xl p-1 bg-popover/95 backdrop-blur-xl shadow-lg border border-border/50"
+              >
+                {onEdit && (
+                  <DropdownMenuItem
+                    onClick={onEdit}
+                    className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[14px] font-medium cursor-pointer focus:bg-accent"
+                  >
+                    {editLabel}
+                    <SquarePen className="w-4 h-4 text-muted-foreground" />
+                  </DropdownMenuItem>
+                )}
+                {onEdit && onDelete && <DropdownMenuSeparator className="mx-1" />}
+                {onDelete && (
+                  <DropdownMenuItem
+                    onClick={onDelete}
+                    className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[14px] font-medium text-red-600 dark:text-red-500 cursor-pointer focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-red-600 dark:focus:text-red-500"
+                  >
+                    {deleteLabel}
+                    <Trash2 className="w-4 h-4" />
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
-          {showMoreButton && (
+
+          {/* Custom actions → ActionBottomSheet (drawer) */}
+          {hasCustomActions && (
             <button
               onClick={() => setSheetOpen(true)}
               className="text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted"
               data-testid="section-menu"
             >
-              <Menu className="w-5 h-5" />
+              <EllipsisVertical className="w-5 h-5" />
             </button>
           )}
         </div>
       </div>
 
-      <ActionBottomSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        title={title}
-        actions={sheetActions}
-      />
+      {hasCustomActions && (
+        <ActionBottomSheet
+          open={sheetOpen}
+          onOpenChange={setSheetOpen}
+          title={title}
+          actions={actions}
+        />
+      )}
     </>
   );
 }
