@@ -12,7 +12,9 @@ import { DialogManager } from "@/components/elements/dialog/static-dialog/dialog
 import Initialization from "@/components/util/provider/initialization";
 import useLocalStorage from "@/components/util/hook/use-local-storage";
 import { useNotificationPermission } from "@/components/util/hook/use-notification-permission";
+import { usePwaInstall } from "@/components/util/hook/use-pwa-install";
 import { NotificationPromptDialog } from "@/components/elements/dialog/notification/notification-prompt-dialog";
+import { PwaInstallPromptDialog } from "@/components/elements/dialog/notification/pwa-install-prompt-dialog";
 import PushNotificationApi from "@/apis/PushNotificationApi";
 import { auth } from "@/firebase";
 import { ScrollContainerContext } from "@/app/board/_contexts/scroll-container-context";
@@ -24,6 +26,9 @@ export default function BoardLayout({ children }: { children: React.ReactNode })
   const { permission } = useNotificationPermission()
   const [notificationPromptStorage, setNotificationPromptStorage] = useLocalStorage('notification_prompt_dismissed', false)
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false)
+  const { isStandalone, canPromptInstall, promptInstall } = usePwaInstall()
+  const [pwaPromptStorage, setPwaPromptStorage] = useLocalStorage('pwa_install_prompt_dismissed', false)
+  const [showPwaInstallPrompt, setShowPwaInstallPrompt] = useState(false)
   const mainRef = useRef<HTMLElement>(null)
 
 
@@ -42,11 +47,18 @@ export default function BoardLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (permission === "default" && !notificationPromptStorage) {
-      // Small delay so it doesn't flash immediately on page load
       const timer = setTimeout(() => setShowNotificationPrompt(true), 1500)
       return () => clearTimeout(timer)
     }
   }, [permission, notificationPromptStorage])
+
+  // Show PWA install prompt after notification prompt is handled
+  const notificationPromptDone = notificationPromptStorage || permission !== "default"
+  useEffect(() => {
+    if (!notificationPromptDone || isStandalone || pwaPromptStorage || showNotificationPrompt) return
+    const timer = setTimeout(() => setShowPwaInstallPrompt(true), 2500)
+    return () => clearTimeout(timer)
+  }, [notificationPromptDone, isStandalone, pwaPromptStorage, showNotificationPrompt])
 
   function handleNotificationPermissionResult(result: NotificationPermission) {
     setNotificationPromptStorage(true)
@@ -65,6 +77,19 @@ export default function BoardLayout({ children }: { children: React.ReactNode })
     }
   }
 
+  function handlePwaPromptClose(open: boolean) {
+    if (!open) {
+      setPwaPromptStorage(true)
+      setShowPwaInstallPrompt(false)
+    }
+  }
+
+  async function handlePwaInstall() {
+    const accepted = await promptInstall()
+    setPwaPromptStorage(true)
+    setShowPwaInstallPrompt(false)
+  }
+
   return (
     <section className="h-full">
       <BoardAuthenticate>
@@ -75,6 +100,12 @@ export default function BoardLayout({ children }: { children: React.ReactNode })
             open={showNotificationPrompt}
             onOpenChange={handleNotificationPromptClose}
             onPermissionResult={handleNotificationPermissionResult}
+          />
+          <PwaInstallPromptDialog
+            open={showPwaInstallPrompt}
+            onOpenChange={handlePwaPromptClose}
+            canPromptInstall={canPromptInstall}
+            onInstall={handlePwaInstall}
           />
           <div className="flex flex-col h-full">
             <BoardTopNavBar />

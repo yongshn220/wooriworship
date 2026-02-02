@@ -20,3 +20,7 @@ self.addEventListener('notificationclick', function (event) {
   event.notification.close()
   event.waitUntil(clients.openWindow('https://www.wooriworship.com/'))
 })
+
+self.addEventListener('fetch', function (event) {
+  event.respondWith(fetch(event.request))
+})
