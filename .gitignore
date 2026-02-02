@@ -45,3 +45,6 @@ next-env.d.ts
 # secrets
 service-account.json
 firebase-admin-private-key.json
+
+# oh-my-claudecode local state
+.omc/
