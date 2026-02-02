@@ -139,11 +139,6 @@ export function CalendarStrip({
         }
     };
 
-    const todayDividerIndex = useMemo(() => {
-        const today = new Date();
-        return items.findIndex(item => differenceInCalendarDays(item.date, today) >= 0);
-    }, [items]);
-
     const CARD_CLASSES = "w-[5.5rem] h-[7rem] rounded-xl flex flex-col items-center justify-center transition-colors relative";
     const ITEM_WRAPPER = "snap-start scroll-mx-4 shrink-0 flex flex-col items-center gap-1";
 
@@ -172,14 +167,6 @@ export function CalendarStrip({
                     const roleLabel = firstRole ? getRoleLabel(firstRole) : null;
                     return (
                         <Fragment key={item.id}>
-                            {index === todayDividerIndex && (
-                                <div className="shrink-0 relative flex items-center mx-0.5">
-                                    <div className="w-[1.5px] h-14 bg-primary/20 rounded-full" />
-                                    <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[9px] font-bold text-primary/60 bg-background px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                                        Today
-                                    </span>
-                                </div>
-                            )}
                             <div className={ITEM_WRAPPER}>
                                 <DateCard
                                     item={item}
@@ -191,11 +178,9 @@ export function CalendarStrip({
                                         else itemRefs.current.delete(item.id);
                                     }}
                                 />
-                                {roleLabel && (
-                                    <span className="text-[9px] font-bold text-primary truncate max-w-[5.5rem] text-center leading-tight">
-                                        {roleLabel}
-                                    </span>
-                                )}
+                                <span className="text-[9px] font-bold text-primary truncate max-w-[5.5rem] text-center leading-tight h-[14px]">
+                                    {roleLabel || '\u00A0'}
+                                </span>
                             </div>
                         </Fragment>
                     );
