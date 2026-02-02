@@ -116,17 +116,14 @@ export function CalendarStrip({
     }, [selectedId, items, isRestoring]);
 
     // 3. Auto-scroll to selection ONLY when selection changes
-    // FIX: Removed isRestoring from dependency to prevent auto-jump after history load
+    // Use instant scroll on first render, smooth on subsequent changes
+    const isFirstScroll = useRef(true);
     useEffect(() => {
         if (selectedId && itemRefs.current.has(selectedId)) {
             const el = itemRefs.current.get(selectedId);
             if (el) {
-                // If we select a new item, we want to scroll to it
-                // We do NOT want this to fire just because 'items' updated (history loaded)
-                // BUT 'items' update might re-render DOM...
-                // Actually, if selectedId doesn't change, this effect shouldn't run if we don't include 'items' or 'isRestoring'.
-                // Ideally trigger only on selectedId change.
-                el.scrollIntoView({ inline: "start", behavior: "smooth", block: "nearest" });
+                el.scrollIntoView({ inline: "start", behavior: isFirstScroll.current ? "instant" : "smooth", block: "nearest" });
+                isFirstScroll.current = false;
             }
         }
     }, [selectedId]);

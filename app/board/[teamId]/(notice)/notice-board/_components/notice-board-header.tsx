@@ -9,27 +9,27 @@ export type TabKey = "announcements" | "todos";
 export function NoticeBoardHeaderLeft() {
   const [tab, setTab] = useRecoilState(noticeBoardTabAtom);
 
-  const options: { key: TabKey; label: string }[] = [
-    { key: "announcements", label: "Announcements" },
+  const tabs: { key: TabKey; label: string }[] = [
+    { key: "announcements", label: "Notice" },
     { key: "todos", label: "Todos" },
   ];
 
   return (
-    <div className="flex bg-muted/60 rounded-lg p-0.5" role="tablist" aria-label="Notice board">
-      {options.map((opt) => (
+    <div className="flex bg-muted rounded-full p-1 gap-0.5" role="tablist" aria-label="Notice board">
+      {tabs.map((t) => (
         <button
-          key={opt.key}
+          key={t.key}
           role="tab"
-          aria-selected={tab === opt.key}
-          onClick={() => setTab(opt.key)}
+          aria-selected={tab === t.key}
+          onClick={() => setTab(t.key)}
           className={cn(
-            "px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide transition-all",
-            tab === opt.key
-              ? "bg-card text-foreground shadow-sm"
+            "px-5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-all",
+            tab === t.key
+              ? "bg-primary text-primary-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground"
           )}
         >
-          {opt.label}
+          {t.label}
         </button>
       ))}
     </div>

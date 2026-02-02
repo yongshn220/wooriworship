@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { format } from "date-fns";
 import { toast } from "@/components/ui/use-toast";
-import { teamAtom } from "@/global-states/teamState";
+import { teamAtom, fetchServiceTagsSelector } from "@/global-states/teamState";
 import { servingSchedulesAtom } from "@/global-states/serviceRolesState";
 import { usersAtom } from "@/global-states/userState";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
@@ -32,6 +32,7 @@ import { useServiceTodos } from "./use-service-todos";
 export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialData }: ServiceFormProps) {
     const router = useRouter();
     const team = useRecoilValue(teamAtom(teamId));
+    const serviceTags = useRecoilValue(fetchServiceTagsSelector(teamId));
     const teamMembers = useRecoilValue(usersAtom(team?.users));
     const setSchedules = useSetRecoilState(servingSchedulesAtom);
 
@@ -239,7 +240,14 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
     }, [selectedDate, teamId, mode, initialData, serviceTagIds, linkedSetlistId]);
 
     // Duplicate Check using ServiceEventApi
-    const serviceTagNames = serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id);
+    const serviceTagNames = serviceTagIds.map(id => serviceTags?.find((t: any) => t.id === id)?.name || id);
+    const duplicateFetcher = useCallback(async (tid: string, start: string, end?: string) => {
+        const s = parseLocalDate(start);
+        const e = end ? parseLocalDate(end) : s;
+        e.setHours(23, 59, 59);
+        const services = await ServiceEventApi.getServiceEvents(tid, s, e);
+        return services as unknown as { id: string; tagId?: string; service_tags?: string[] }[];
+    }, []);
     const { isDuplicate, duplicateId, errorMessage: duplicateErrorMessage } = useServiceDuplicateCheck({
         teamId,
         date: selectedDate,
@@ -247,14 +255,8 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         serviceTagNames,
         mode,
         currentId: initialData?.id,
-        fetcher: async (tid, start, end) => {
-            const s = parseLocalDate(start);
-            const e = end ? parseLocalDate(end) : s;
-            e.setHours(23, 59, 59);
-            // Cast to any or adapted type that satisfies useServiceDuplicateCheck T
-            const services = await ServiceEventApi.getServiceEvents(tid, s, e);
-            return services as unknown as { id: string, service_tags?: string[] }[];
-        }
+        fetcher: duplicateFetcher,
+        enabled: !isLoading,
     });
 
 
@@ -324,7 +326,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                 // 5. Save Todos
                 if (serviceTodos.length > 0) {
                     const { TodoApi } = await import("@/apis/TodoApi");
-                    await TodoApi.createServiceTodos(teamId, targetServiceId, title, serviceTodos.map((t, idx) => ({
+                    await TodoApi.createServiceTodos(teamId, targetServiceId, title, dateTimestamp, serviceTodos.map((t, idx) => ({
                         title: t.title,
                         assigneeIds: t.assigneeIds,
                         order: idx,
@@ -405,7 +407,7 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                             })))
                             : Promise.resolve(),
                         newTodos.length > 0
-                            ? TodoApi.createServiceTodos(teamId, targetServiceId, title, newTodos.map((t) => ({
+                            ? TodoApi.createServiceTodos(teamId, targetServiceId, title, dateTimestamp, newTodos.map((t) => ({
                                 title: t.title,
                                 assigneeIds: t.assigneeIds,
                                 order: serviceTodos.indexOf(t),
@@ -433,7 +435,6 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         } catch (e) {
             console.error(e);
             toast({ title: "Failed to save service", variant: "destructive" });
-        } finally {
             setIsLoading(false);
         }
     };

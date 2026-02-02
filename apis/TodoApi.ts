@@ -113,6 +113,7 @@ export class TodoApi {
         teamId: string,
         serviceId: string,
         serviceTitle: string,
+        serviceDate: Timestamp,
         todos: Array<{
             title: string;
             assigneeIds: string[];
@@ -137,6 +138,7 @@ export class TodoApi {
                 assigneeIds: todoData.assigneeIds,
                 serviceId,
                 serviceTitle,
+                serviceDate,
                 dueDate: null,
                 createdBy: todoData.createdBy,
                 createdAt: now,
@@ -273,6 +275,7 @@ export class TodoApi {
             batch.update(docSnapshot.ref, {
                 serviceId: null,
                 serviceTitle: null,
+                serviceDate: null,
                 updatedAt: now
             });
         });

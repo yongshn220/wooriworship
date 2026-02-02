@@ -1,13 +1,12 @@
 "use client";
 
-import { LucideIcon, MoreHorizontal, SquarePen, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { LucideIcon, Menu, SquarePen, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+  ActionBottomSheet,
+  ActionBottomSheetAction,
+} from "@/components/common/action-bottom-sheet";
 
 interface SectionHeaderProps {
   icon: LucideIcon;
@@ -18,6 +17,7 @@ interface SectionHeaderProps {
   editLabel?: string;
   onDelete?: () => void;
   deleteLabel?: string;
+  actions?: ActionBottomSheetAction[];
   className?: string;
 }
 
@@ -30,64 +30,79 @@ export function SectionHeader({
   editLabel = "Edit",
   onDelete,
   deleteLabel = "Delete",
+  actions,
   className,
 }: SectionHeaderProps) {
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  // Build actions array from onEdit/onDelete if custom actions not provided
+  const sheetActions: ActionBottomSheetAction[] = actions || [
+    ...(onEdit
+      ? [
+          {
+            label: editLabel,
+            icon: SquarePen,
+            onClick: onEdit,
+            variant: "default" as const,
+          },
+        ]
+      : []),
+    ...(onDelete
+      ? [
+          {
+            label: deleteLabel,
+            icon: Trash2,
+            onClick: onDelete,
+            variant: "destructive" as const,
+          },
+        ]
+      : []),
+  ];
+
+  const showMoreButton = (onEdit && onDelete) || (actions && actions.length > 0);
+
   return (
-    <div className={cn("flex items-center justify-between px-1", className)}>
-      <div className="flex items-center space-x-2">
-        <div className={cn("p-1 rounded-md", iconColorClassName)}>
-          <Icon className="w-[18px] h-[18px]" />
+    <>
+      <div className={cn("flex items-center justify-between px-3 pt-3 pb-1", className)}>
+        <div className="flex items-center space-x-2">
+          <div className={cn("p-1 rounded-md", iconColorClassName)}>
+            <Icon className="w-[18px] h-[18px]" />
+          </div>
+          <h3 className="font-bold text-base text-foreground">{title}</h3>
         </div>
-        <h3 className="font-bold text-base text-foreground">{title}</h3>
+
+        <div className="flex items-center gap-2">
+          {badge && (
+            <span className="text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+              {badge}
+            </span>
+          )}
+          {onEdit && !showMoreButton && (
+            <button
+              onClick={onEdit}
+              className="text-xs font-semibold text-foreground/60 hover:text-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted"
+            >
+              {editLabel}
+            </button>
+          )}
+          {showMoreButton && (
+            <button
+              onClick={() => setSheetOpen(true)}
+              className="text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted"
+              data-testid="section-menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        {badge && (
-          <span className="text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-            {badge}
-          </span>
-        )}
-        {onEdit && !onDelete && (
-          <button
-            onClick={onEdit}
-            className="text-[11px] font-bold text-muted-foreground hover:text-primary transition-colors min-h-touch min-w-touch inline-flex items-center justify-center rounded hover:bg-muted"
-          >
-            {editLabel}
-          </button>
-        )}
-        {onEdit && onDelete && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                data-testid="section-menu"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <button
-                onClick={onEdit}
-                data-testid="section-edit"
-                className="flex items-center w-full px-3 py-2 text-sm hover:bg-muted rounded-sm transition-colors"
-              >
-                <SquarePen className="mr-2 w-4 h-4" />
-                {editLabel}
-              </button>
-              <button
-                onClick={onDelete}
-                data-testid="section-delete"
-                className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm transition-colors"
-              >
-                <Trash2 className="mr-2 w-4 h-4" />
-                {deleteLabel}
-              </button>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-    </div>
+      <ActionBottomSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        title={title}
+        actions={sheetActions}
+      />
+    </>
   );
 }

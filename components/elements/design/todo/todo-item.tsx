@@ -2,26 +2,24 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Check, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { format } from "date-fns";
+import { Check, MoreHorizontal, Trash2 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Todo } from "@/models/todo";
 
 interface TodoItemProps {
     todo: Todo;
-    teamMembers: any[];
     onToggle: () => void;
-    onTap: () => void;
     onDelete: () => void;
-    onUpdate: (data: Partial<Todo>) => void;
 }
 
-export function TodoItem({ todo, teamMembers, onToggle, onTap, onDelete }: TodoItemProps) {
-    const assigneeNames = todo.assigneeIds
-        .map(id => teamMembers.find(m => m.id === id)?.name || "Unknown")
-        .slice(0, 2);
-
-    const remainingAssignees = Math.max(0, todo.assigneeIds.length - 2);
+export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
+    const serviceLabel = todo.serviceTitle
+        ? todo.serviceDate
+            ? `${todo.serviceTitle} \u00b7 ${format(todo.serviceDate.toDate(), "MMM d")}`
+            : todo.serviceTitle
+        : null;
 
     return (
         <div className={cn(
@@ -41,8 +39,8 @@ export function TodoItem({ todo, teamMembers, onToggle, onTap, onDelete }: TodoI
                 {todo.completed && <Check className="w-3 h-3 text-primary-foreground" />}
             </button>
 
-            {/* Content - tappable area */}
-            <div className="flex-1 min-w-0 cursor-pointer" onClick={onTap}>
+            {/* Content */}
+            <div className="flex-1 min-w-0">
                 <p className={cn(
                     "text-sm font-semibold leading-snug tracking-tight",
                     todo.completed && "line-through text-muted-foreground"
@@ -50,29 +48,17 @@ export function TodoItem({ todo, teamMembers, onToggle, onTap, onDelete }: TodoI
                     {todo.title}
                 </p>
 
-                {/* Meta row: service chip + assignees */}
-                {(todo.serviceTitle || assigneeNames.length > 0) && (
-                    <div className="flex items-center gap-2 mt-2 flex-wrap">
-                        {/* Service chip */}
-                        {todo.serviceTitle && (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
-                                {todo.serviceTitle}
-                            </span>
-                        )}
-
-                        {/* Assignee names */}
-                        {assigneeNames.length > 0 && (
-                            <span className="text-[11px] text-muted-foreground font-medium">
-                                {assigneeNames.join(", ")}
-                                {remainingAssignees > 0 && ` +${remainingAssignees}`}
-                            </span>
-                        )}
-
+                {/* Service chip */}
+                {serviceLabel && (
+                    <div className="mt-1.5">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
+                            {serviceLabel}
+                        </span>
                     </div>
                 )}
             </div>
 
-            {/* Context Menu - Always visible on mobile */}
+            {/* Context Menu */}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button
@@ -85,14 +71,6 @@ export function TodoItem({ todo, teamMembers, onToggle, onTap, onDelete }: TodoI
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40 rounded-2xl p-1.5 shadow-xl border-0">
-                    <DropdownMenuItem
-                        className="rounded-xl py-2.5 px-3 cursor-pointer font-semibold text-sm"
-                        onSelect={onTap}
-                    >
-                        <Pencil className="mr-3 h-4 w-4" />
-                        Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="my-1.5 bg-border/50" />
                     <DropdownMenuItem
                         className="rounded-xl py-2.5 px-3 cursor-pointer font-semibold text-sm text-destructive focus:text-destructive focus:bg-destructive/10"
                         onSelect={onDelete}

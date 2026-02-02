@@ -23,6 +23,7 @@ interface TagSelectorProps {
     mode?: "song" | "service";
     refreshTrigger?: number;
     knownTags?: { id: string, name: string }[];
+    onTagListChange?: () => void;
 }
 
 export function TagSelector({
@@ -34,6 +35,7 @@ export function TagSelector({
     mode = "song",
     refreshTrigger = 0,
     knownTags = [],
+    onTagListChange,
 }: TagSelectorProps) {
     const [open, setOpen] = React.useState(false);
     const [inputValue, setInputValue] = React.useState("");
@@ -42,6 +44,7 @@ export function TagSelector({
     const [tagToDelete, setTagToDelete] = React.useState<{ id: string, name: string, open: boolean }>({ id: "", name: "", open: false });
     const [tagToRename, setTagToRename] = React.useState<{ id: string, name: string, open: boolean }>({ id: "", name: "", open: false });
     const [newName, setNewName] = React.useState("");
+    const [affectedServiceCount, setAffectedServiceCount] = React.useState<number>(0);
 
     const containerRef = React.useRef<HTMLDivElement>(null);
     const inputRef = React.useRef<HTMLInputElement>(null);
@@ -126,6 +129,7 @@ export function TagSelector({
                 const newId = await TeamApi.addServiceTag(teamId, newTagName);
                 const tags = await TeamApi.getServiceTags(teamId);
                 setAvailableTags(tags as Tag[]);
+                onTagListChange?.();
 
                 if (newId) {
                     if (single) onTagsChange([newId]);
@@ -166,7 +170,7 @@ export function TagSelector({
                                 const displayName = tagObj ? tagObj.name : tagValue;
 
                                 return (
-                                    <Badge variant="secondary" key={tagValue} className="mr-1 mb-1">
+                                    <Badge key={tagValue} className="mr-1 mb-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary/15">
                                         {displayName}
                                         <div
                                             className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
@@ -266,8 +270,12 @@ export function TagSelector({
                                                 size="icon"
                                                 aria-label="Delete tag"
                                                 className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive z-10"
-                                                onClick={(e) => {
+                                                onClick={async (e) => {
                                                     e.stopPropagation();
+                                                    if (mode === "service") {
+                                                        const count = await TeamApi.getServiceCountByTag(teamId, tag.id);
+                                                        setAffectedServiceCount(count);
+                                                    }
                                                     setTagToDelete({ id: tag.id, name: tag.name, open: true });
                                                 }}
                                             >
@@ -286,7 +294,13 @@ export function TagSelector({
                 isOpen={tagToDelete.open}
                 setOpen={(open: boolean) => !open && setTagToDelete(prev => ({ ...prev, open: false }))}
                 title={`Delete '${tagToDelete.name}'?`}
-                description="This action cannot be undone. This tag will be removed from all future selections."
+                description={
+                    mode === "service"
+                        ? affectedServiceCount > 0
+                            ? `This tag is used by ${affectedServiceCount} service(s). Those services will display "Service" as their name.`
+                            : "This tag is not used by any services."
+                        : "This action cannot be undone. This tag will be removed from all future selections."
+                }
                 onDeleteHandler={async () => {
                     const tagName = tagToDelete.name;
                     try {
@@ -294,6 +308,7 @@ export function TagSelector({
                             await TeamApi.deleteServiceTag(teamId, tagToDelete.id);
                             const updatedTags = await TeamApi.getServiceTags(teamId);
                             setAvailableTags(updatedTags as Tag[]);
+                            onTagListChange?.();
                         } else {
                             await TagApi.deleteTag(teamId, tagName);
                             const newTags = await TagApi.getTeamTags(teamId);
@@ -325,6 +340,7 @@ export function TagSelector({
                         await TeamApi.updateServiceTagName(teamId, tagToRename.id, newName.trim());
                         const updatedTags = await TeamApi.getServiceTags(teamId);
                         setAvailableTags(updatedTags as Tag[]);
+                        onTagListChange?.();
 
                         // If renamed tag was selected, update the selection
                         if (selectedTags.includes(tagToRename.id)) {

@@ -60,9 +60,7 @@ export const currentTeamSortedSongsAtom = selectorFamily<Array<Song>, string>({
       const normalizedSearchInput = searchInput.toLowerCase().replace(/\s+/g, '');
       songList = songList.filter((song) =>
         song?.title?.toLowerCase().replace(/\s+/g, '').includes(normalizedSearchInput) ||
-        song?.subtitle?.toLowerCase().replace(/\s+/g, '').includes(normalizedSearchInput) ||
-        song?.original?.author?.toLowerCase().replace(/\s+/g, '').includes(normalizedSearchInput) ||
-        song?.tags?.some((tag: string) => tag.toLowerCase().includes(normalizedSearchInput))
+        song?.subtitle?.toLowerCase().replace(/\s+/g, '').includes(normalizedSearchInput)
       )
     }
     // Tag Filter

@@ -20,16 +20,15 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit, onDelete, onSe
     const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
 
     return (
-        <div className="space-y-2" data-testid="setlist-card">
-            <SectionHeader
-                icon={ListMusic}
-                iconColorClassName="bg-primary/10 text-primary"
-                title="Setlist"
-                onEdit={onEdit}
-                onDelete={onDelete}
-            />
-
+        <div data-testid="setlist-card">
             <SectionCardContainer>
+                <SectionHeader
+                    icon={ListMusic}
+                    iconColorClassName="bg-primary/10 text-primary"
+                    title="Setlist"
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                />
                 {songs && songs.length > 0 ? (
                     <div className="divide-y divide-border">
                         {songs.map((song, idx) => {
@@ -69,9 +68,9 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit, onDelete, onSe
                         <Button
                             variant="ghost"
                             onClick={onSetlistView}
-                            className="text-blue-600 dark:text-blue-400 hover:bg-muted font-semibold h-9 rounded-xl px-3 text-sm flex items-center gap-1.5"
+                            className="text-primary hover:bg-primary/5 font-semibold h-9 rounded-xl px-3 text-sm flex items-center gap-1.5"
                         >
-                            setlist view
+                            View Setlist
                             <ArrowRight className="w-4 h-4" />
                         </Button>
                     </div>

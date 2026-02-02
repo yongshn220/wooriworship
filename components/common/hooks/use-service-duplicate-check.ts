@@ -11,11 +11,12 @@ interface UseServiceDuplicateCheckProps<T> {
     currentId?: string; // ID of the item being edited (to exclude from duplicate check)
     fetcher: (teamId: string, startDate: string, endDate?: string) => Promise<T[]>; // Generic fetcher
     itemDateFormatter?: (date: Date) => string; // Optional custom date formatter
+    enabled?: boolean; // Set to false to suppress checks (e.g. during submission)
 }
 
 const defaultDateFormatter = (d: Date) => format(d, 'yyyy-MM-dd');
 
-export function useServiceDuplicateCheck<T extends { id: string; service_tags?: string[] }>({
+export function useServiceDuplicateCheck<T extends { id: string; tagId?: string; service_tags?: string[] }>({
     teamId,
     date,
     serviceTagIds,
@@ -23,7 +24,8 @@ export function useServiceDuplicateCheck<T extends { id: string; service_tags?: 
     mode,
     currentId,
     fetcher,
-    itemDateFormatter = defaultDateFormatter
+    itemDateFormatter = defaultDateFormatter,
+    enabled = true
 }: UseServiceDuplicateCheckProps<T>) {
     const [isDuplicate, setIsDuplicate] = useState(false);
     const [duplicateId, setDuplicateId] = useState<string | null>(null);
@@ -32,6 +34,13 @@ export function useServiceDuplicateCheck<T extends { id: string; service_tags?: 
 
     useEffect(() => {
         const checkDuplicate = async () => {
+            // Skip check when disabled (e.g. during submission)
+            if (!enabled) {
+                setIsDuplicate(false);
+                setErrorMessage(undefined);
+                return;
+            }
+
             // Clear status if partial info
             if (!date || serviceTagIds.length === 0) {
                 setIsDuplicate(false);
@@ -39,24 +48,18 @@ export function useServiceDuplicateCheck<T extends { id: string; service_tags?: 
                 return;
             }
 
-            // Prevent check if we are already in duplicate state and inputs haven't changed?
-            // Actually, useEffect handles inputs.
-            // But we should verify if the "duplicate" found is strictly not the current one.
-
-            // Optimization: If mode is CREATE and we just submitted, do we need to check? 
-            // We can't know submission state here easily. 
-            // The unstable dependency fix (itemDateFormatter) should prevent re-runs during submission re-renders.
-
             setIsLoading(true);
             try {
                 const dateStr = itemDateFormatter(date);
 
                 const existingItems = await fetcher(teamId, dateStr, dateStr);
 
-                const duplicate = existingItems.find(item =>
-                    serviceTagIds.some((t: string) => item.service_tags?.includes(t)) &&
-                    (mode === FormMode.CREATE || (mode === FormMode.EDIT && item.id !== currentId))
-                );
+                const duplicate = existingItems.find(item => {
+                    const matchesTag = serviceTagIds.some((t: string) =>
+                        item.tagId === t || item.service_tags?.includes(t)
+                    );
+                    return matchesTag && (mode === FormMode.CREATE || (mode === FormMode.EDIT && item.id !== currentId));
+                });
 
                 const isDup = !!duplicate;
                 setIsDuplicate(isDup);
@@ -77,6 +80,6 @@ export function useServiceDuplicateCheck<T extends { id: string; service_tags?: 
         };
 
         checkDuplicate();
-    }, [date, serviceTagIds, teamId, mode, currentId, fetcher, itemDateFormatter, serviceTagNames]);
+    }, [date, serviceTagIds, teamId, mode, currentId, fetcher, itemDateFormatter, serviceTagNames, enabled]);
     return { isDuplicate, duplicateId: isDuplicate ? duplicateId : null, isLoading, errorMessage };
 }

@@ -1,12 +1,13 @@
 "use client"
 
-import React, {useEffect} from "react";
+import React, {useEffect, useCallback} from "react";
 import {useRouter} from "next/navigation";
 import {useRecoilValue, useRecoilValueLoadable, useSetRecoilState} from "recoil";
 import {currentTeamIdAtom, teamAtom} from "@/global-states/teamState";
 import {auth} from "@/firebase";
 import {userAtom} from "@/global-states/userState";
 import {toast} from "@/components/ui/use-toast";
+import useUserPreferences from "@/components/util/hook/use-local-preference";
 
 
 interface Props {
@@ -20,33 +21,38 @@ export function TeamIdValidation({teamId, children}: Props) {
   const setCurrentTeamId = useSetRecoilState(currentTeamIdAtom)
   const teamLoadable = useRecoilValueLoadable(teamAtom(teamId))
   const router = useRouter()
+  const [, setPreferences] = useUserPreferences()
 
+  const handleInvalidTeam = useCallback(() => {
+    setCurrentTeamId(null)
+    setPreferences.boardSelectedTeamId("")
+    router.replace("/board")
+  }, [setCurrentTeamId, setPreferences, router])
 
   useEffect(() => {
     if (!teamId) {
-      setCurrentTeamId(null)
-      router.replace("/")
+      handleInvalidTeam()
       return;
     }
 
     if (teamLoadable.state === 'hasError') {
-      router.replace("/")
+      handleInvalidTeam()
       return;
     }
 
     if (teamLoadable.state === 'hasValue' && teamLoadable.contents === null) {
-      router.replace("/")
+      handleInvalidTeam()
       return;
     }
 
     if (teamLoadable.state === 'hasValue' && !user.teams.includes(teamId)) {
       toast({title: "Unauthorized Member", description: `You have no permission to the team [${teamLoadable.contents.name}].`})
-      router.replace("/")
+      handleInvalidTeam()
       return;
     }
 
     setCurrentTeamId(teamId)
-  }, [setCurrentTeamId, teamId, user.teams, router, teamLoadable]);
+  }, [setCurrentTeamId, teamId, user.teams, router, teamLoadable, handleInvalidTeam]);
 
 
   return (

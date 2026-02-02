@@ -62,7 +62,7 @@ export function SearchFilterPopover({ children }: { children: React.ReactNode })
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3 bg-gradient-to-b from-popover to-transparent z-10 relative">
-          <h3 className="font-bold text-lg text-foreground tracking-tight">Refine</h3>
+          <h3 className="font-bold text-lg text-foreground tracking-tight">Filter</h3>
           {(selectedTags.length > 0 || selectedKeys.length > 0) && (
             <button
               onClick={() => { setSelectedTags([]); setSelectedKeys([]); }}

@@ -1,5 +1,5 @@
 import { useRef, useCallback } from "react";
-import { Music2Icon, BellIcon, CalendarDaysIcon, LayoutGridIcon } from "lucide-react";
+import { Music, Bell, Calendar, LayoutGrid } from "lucide-react";
 import { getPathManage, getPathNotice, getPathServing, getPathSong } from "@/components/util/helper/routes";
 import { useRecoilValue } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
@@ -33,25 +33,25 @@ export function DefaultBoardBottomNavBar() {
   const NAV_ITEMS = [
     {
       page: Page.NOTICE_BOARD,
-      icon: BellIcon,
+      icon: Bell,
       label: "Notice",
       path: getPathNotice(currentTeamId)
     },
     {
       page: Page.SERVING,
-      icon: CalendarDaysIcon,
+      icon: Calendar,
       label: "Service",
       path: getPathServing(currentTeamId)
     },
     {
       page: Page.SONG_BOARD,
-      icon: Music2Icon,
+      icon: Music,
       label: "Song",
       path: getPathSong(currentTeamId)
     },
     {
       page: Page.MANAGE,
-      icon: LayoutGridIcon,
+      icon: LayoutGrid,
       label: "Manage",
       path: getPathManage(currentTeamId)
     },
@@ -84,7 +84,7 @@ export function DefaultBoardBottomNavBar() {
 
   return (
     <BaseBottomNavBar height={80}>
-      <div role="tablist" className="w-full h-full flex justify-between px-6 pb-2 items-center">
+      <div role="tablist" className="w-full h-full flex justify-around pb-2 items-center">
         {NAV_ITEMS.map((item, index) => {
           const isActive = currentPage === item.page;
           const Icon = item.icon;
@@ -108,16 +108,14 @@ export function DefaultBoardBottomNavBar() {
               onKeyDown={(e) => handleKeyDown(e, index)}
               whileTap={{ scale: 0.9 }}
             >
-              <div className="relative mb-1">
-                <Icon
-                  aria-hidden="true"
-                  strokeWidth={isActive ? 3 : 2}
-                  className={cn("w-6 h-6 transition-colors duration-300")}
-                />
-              </div>
+              <Icon
+                aria-hidden="true"
+                strokeWidth={1.8}
+                className={cn("w-[22px] h-[22px] transition-colors duration-300")}
+              />
               <span className={cn(
-                "text-xs prevent-text-select transition-colors duration-300",
-                isActive ? "font-bold text-[oklch(0.50_0.188_259.81)] dark:text-primary" : "font-medium text-muted-foreground"
+                "text-[10px] font-medium prevent-text-select transition-colors duration-300 mt-0.5",
+                isActive ? "text-[oklch(0.50_0.188_259.81)] dark:text-primary" : "text-muted-foreground"
               )}>
                 {item.label}
               </span>

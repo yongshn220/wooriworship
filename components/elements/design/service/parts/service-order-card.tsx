@@ -3,7 +3,7 @@
 import { ServiceFlowItem } from "@/models/services/ServiceEvent";
 import { User } from "@/models/user";
 import { cn } from "@/lib/utils";
-import { List } from "lucide-react";
+import { ListOrdered } from "lucide-react";
 import { getMemberName } from "@/components/util/helper/helper-functions";
 import { SectionHeader, SectionCardContainer } from "@/components/common/section-card";
 
@@ -19,16 +19,15 @@ export function ServiceOrderCard({ items, members, currentUserUid, onEdit, onDel
     if (!items || items.length === 0) return null;
 
     return (
-        <div className="space-y-2" data-testid="service-order-card">
-            <SectionHeader
-                icon={List}
-                iconColorClassName="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400"
-                title="Service Order"
-                onEdit={onEdit}
-                onDelete={onDelete}
-            />
-
+        <div data-testid="service-order-card">
             <SectionCardContainer>
+                <SectionHeader
+                    icon={ListOrdered}
+                    iconColorClassName="bg-orange-500/10 text-orange-500"
+                    title="Service Order"
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                />
                 <div className="divide-y divide-border">
                     {items.slice().sort((a, b) => a.order - b.order).map((item, index) => (
                         <div key={item.id} className="grid grid-cols-[2.5rem_1fr_1.1fr] gap-3 px-3 py-3 items-start hover:bg-muted/50 transition-colors">

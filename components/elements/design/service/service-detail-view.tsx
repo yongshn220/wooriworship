@@ -184,6 +184,7 @@ export function ServiceDetailView({
                 teamId={teamId}
                 serviceId={event.id}
                 serviceTitle={displayTitle}
+                serviceDate={event.date}
             />
 
             {/* Preview Drawer (Legacy or V3?) */}

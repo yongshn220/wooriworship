@@ -8,24 +8,21 @@ import { useEffect, useState } from "react";
 
 // --- Root Container ---
 export const FullScreenForm = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-    const [mounted, setMounted] = useState(false);
+    const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
     useEffect(() => {
-        setMounted(true);
-        // Lock body scroll
-        document.body.style.overflow = "hidden";
-        return () => {
-            document.body.style.overflow = "unset";
-        }
+        // Portal into .app-root so we share the same stacking/scroll context
+        const appRoot = document.querySelector<HTMLElement>(".app-root");
+        setPortalTarget(appRoot || document.body);
     }, []);
 
-    if (!mounted) return null;
+    if (!portalTarget) return null;
 
     return createPortal(
-        <div className={cn("fixed inset-0 z-[9999] bg-background flex flex-col touchscreen-fix", className)}>
+        <div className={cn("fixed inset-0 z-[9999] bg-background flex flex-col", className)}>
             {children}
         </div>,
-        document.body
+        portalTarget
     );
 };
 
@@ -82,7 +79,7 @@ export const FullScreenFormBody = forwardRef<HTMLDivElement, { children: React.R
         return (
             <div
                 ref={ref}
-                className={cn("absolute inset-0 overflow-y-auto overflow-x-hidden no-scrollbar pt-24", className)}
+                className={cn("absolute inset-0 overflow-y-auto overflow-x-hidden pt-24", className)}
             >
                 <main className="w-full max-w-2xl mx-auto px-6 pb-32 relative">
                     {children}

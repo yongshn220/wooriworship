@@ -1,7 +1,7 @@
 import BaseApi from "./BaseApi";
 import { InvitationApi, UserApi } from ".";
 import { Team, TeamOption } from "@/models/team";
-import { arrayUnion, arrayRemove, Timestamp } from "firebase/firestore";
+import { arrayUnion, arrayRemove, Timestamp, collection, query, where, getDocs, writeBatch } from "firebase/firestore";
 import { PraiseTeamApi } from "./PraiseTeamApi";
 import { ServiceFlowApi } from "./ServiceFlowApi";
 
@@ -73,7 +73,9 @@ class TeamApi extends BaseApi {
   async getServiceTags(teamId: string) {
     try {
       const snap = await this.getChildren(teamId, "service_tags");
-      return (snap || []).sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+      return (snap || [])
+        .filter((t: any) => !t.is_deleted)
+        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
     } catch (e) {
       console.error(e);
       return [];
@@ -101,16 +103,47 @@ class TeamApi extends BaseApi {
   }
 
   async deleteServiceTag(teamId: string, tagId: string) {
-    return await this.deleteChild(teamId, "service_tags", tagId);
+    // 1. Soft-delete: mark tag as deleted
+    await this.updateChild(teamId, "service_tags", tagId, { is_deleted: true });
+
+    // 2. Find affected services and batch-update
+    const q = query(
+      collection(this.db, "teams", teamId, "services"),
+      where("tagId", "==", tagId)
+    );
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) return true;
+
+    const batch = writeBatch(this.db);
+    snapshot.docs.forEach(docSnap => {
+      batch.update(docSnap.ref, { tagId: "", title: "Service" });
+    });
+    await batch.commit();
+    return true;
+  }
+
+  async getServiceCountByTag(teamId: string, tagId: string): Promise<number> {
+    try {
+      const q = query(
+        collection(this.db, "teams", teamId, "services"),
+        where("tagId", "==", tagId)
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.size;
+    } catch (e) {
+      console.error(e);
+      return 0;
+    }
   }
 
   async updateServiceTagName(teamId: string, tagId: string, newName: string) {
-    // If ID is Name, we must delete and recreate
+    // If ID is Name, we must hard-delete old doc and recreate with new ID
     const existingTags = await this.getServiceTags(teamId);
     const tag = existingTags.find((t: any) => t.id === tagId) as any;
     if (!tag) return;
 
-    await this.deleteServiceTag(teamId, tagId);
+    await this.deleteChild(teamId, "service_tags", tagId);
     return await this.addChild(teamId, "service_tags", newName, {
       id: newName,
       name: newName,

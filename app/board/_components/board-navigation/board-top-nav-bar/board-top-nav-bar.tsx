@@ -1,6 +1,6 @@
 import { Page } from "@/components/constants/enums";
 import { cn } from "@/lib/utils";
-import { SearchIcon, MenuIcon, XIcon, ArrowLeftIcon, SlidersHorizontal } from "lucide-react";
+import { SearchIcon, MenuIcon, XIcon, ArrowLeftIcon, ListFilter } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
@@ -31,24 +31,15 @@ interface HeaderConfig {
 interface ActionButtonProps {
   onClick: () => void;
   icon: any;
-  label?: string;
-  variant?: 'default' | 'ghost';
 }
 
-const ActionButton = ({ onClick, icon: Icon, label, variant = 'default' }: ActionButtonProps) => (
+const ActionButton = ({ onClick, icon: Icon }: ActionButtonProps) => (
   <motion.button
     onClick={onClick}
-    whileHover={{ scale: 1.05 }}
     whileTap={{ scale: 0.95 }}
-    className={cn(
-      "group relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 min-h-touch",
-      variant === 'default'
-        ? "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground"
-        : "hover:bg-muted text-muted-foreground hover:text-foreground"
-    )}
+    className="flex items-center justify-center w-10 h-10 rounded-full bg-muted text-muted-foreground hover:text-foreground transition-all"
   >
-    <Icon className="w-6 h-6 stroke-[2px]" />
-    {label && <span className="text-sm font-semibold">{label}</span>}
+    <Icon className="w-[18px] h-[18px]" strokeWidth={2} />
   </motion.button>
 );
 
@@ -83,25 +74,23 @@ export function BoardTopNavBar() {
         actions: <NoticeHeaderActions teamId={teamId} />,
       },
       [Page.SONG_BOARD]: {
-        title: "Song Board",
+        leftContent: <SearchInput />,
         actions: (
           <>
             <SearchFilterPopover>
               <motion.button
-                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="group relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 min-h-touch hover:bg-muted text-muted-foreground hover:text-foreground"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-muted text-muted-foreground hover:text-foreground transition-all"
               >
-                <SlidersHorizontal className="w-5 h-5 stroke-[2px]" />
+                <ListFilter className="w-[18px] h-[18px]" strokeWidth={2} />
               </motion.button>
             </SearchFilterPopover>
             <CreateActionButton onClick={() => router.push(getPathCreateSong(teamId))} />
           </>
         ),
-        searchComponent: <SearchInput />
       },
       [Page.WORSHIP_BOARD]: {
-        title: "Worship Plan",
+        title: "Plans",
         actions: (
           <CreateActionButton onClick={() => router.push(getPathCreatePlan(teamId))} />
         ),
@@ -165,7 +154,7 @@ export function BoardTopNavBar() {
               className="w-full flex items-center justify-between"
             >
               {/* Left Side: Custom Content, Logo, or Title */}
-              <div className="flex items-center gap-3">
+              <div className={cn("flex items-center gap-3", currentConfig.leftContent && "flex-1 min-w-0 mr-3")}>
                 {currentConfig.leftContent ? (
                   currentConfig.leftContent
                 ) : currentConfig.showLogo ? (
@@ -173,7 +162,7 @@ export function BoardTopNavBar() {
                     <MainLogoSmall />
                   </div>
                 ) : (
-                  <h1 className="text-2xl font-bold text-foreground tracking-tight">
+                  <h1 className="text-lg font-bold text-foreground tracking-tight">
                     {currentConfig.title}
                   </h1>
                 )}
@@ -185,7 +174,6 @@ export function BoardTopNavBar() {
                   <ActionButton
                     onClick={() => setIsSearchOpen(true)}
                     icon={SearchIcon}
-                    variant="ghost"
                   />
                 )}
                 {currentConfig.actions}

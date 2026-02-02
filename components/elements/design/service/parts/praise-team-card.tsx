@@ -3,7 +3,7 @@
 import { ServiceRole, ServiceAssignment } from "@/models/services/ServiceEvent";
 import { User } from "@/models/user";
 import { cn } from "@/lib/utils";
-import { Music } from "lucide-react";
+import { Users } from "lucide-react";
 import { getMemberName } from "@/components/util/helper/helper-functions";
 import { SectionHeader, SectionCardContainer } from "@/components/common/section-card";
 
@@ -20,16 +20,15 @@ export function PraiseTeamCard({ praiseAssignments, roles, members, currentUserU
     if (!praiseAssignments || praiseAssignments.length === 0) return null;
 
     return (
-        <div className="space-y-2" data-testid="praise-team-card">
-            <SectionHeader
-                icon={Music}
-                iconColorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                title="Praise Team"
-                onEdit={onEdit}
-                onDelete={onDelete}
-            />
-
+        <div data-testid="praise-team-card">
             <SectionCardContainer>
+                <SectionHeader
+                    icon={Users}
+                    iconColorClassName="bg-blue-500/10 text-blue-500"
+                    title="Praise Team"
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                />
                 <div className="divide-y divide-border">
                     {praiseAssignments.map((assign, index) => {
                         const role = roles.find(r => r.id === assign.roleId);

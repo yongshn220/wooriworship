@@ -220,6 +220,7 @@ export function ServiceDateSelector({
                         mode="service"
                         refreshTrigger={tagRefreshTrigger}
                         knownTags={tempKnownTags}
+                        onTagListChange={() => setTagRefresh(prev => prev + 1)}
                     />
                 </div>
 

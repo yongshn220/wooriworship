@@ -118,13 +118,22 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
                   handleToggleKey(sheet.id)
                 }}
                 className={cn(
-                  "h-8 px-2.5 min-w-[2.5rem] rounded-[0.5rem] text-xs font-bold border transition-all active:scale-95",
+                  "px-2.5 min-w-[2.5rem] rounded-[0.5rem] text-xs font-bold border transition-all active:scale-95 flex flex-col items-center justify-center",
+                  sheet.note ? "h-10 py-1" : "h-8",
                   isSelected
                     ? "bg-blue-600 border-blue-600 text-white shadow-md hover:bg-blue-700"
                     : "bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50"
                 )}
               >
-                {sheet.key}
+                <span>{sheet.key}</span>
+                {sheet.note && (
+                  <span className={cn(
+                    "text-[9px] font-medium leading-tight max-w-[70px] truncate",
+                    isSelected ? "text-white/70" : "text-gray-400"
+                  )}>
+                    {sheet.note}
+                  </span>
+                )}
               </button>
             )
           })}

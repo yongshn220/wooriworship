@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { auth } from "@/firebase";
 import { getPathBoard, getPathPlan } from "@/components/util/helper/routes";
 import { useRouter } from "next/navigation";
-import { UserApi } from "@/apis";
+import { UserApi, TeamApi } from "@/apis";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
 import { sendEmailVerification, onAuthStateChanged, signOut } from "firebase/auth";
 
@@ -46,18 +46,32 @@ export default function RoutePage() {
         //   return;
         // }
 
-        UserApi.getById(authUser.uid).then((user: any) => {
+        UserApi.getById(authUser.uid).then(async (user: any) => {
           if (!user) {
             return;
           }
 
-          if (user.teams?.length === 0) {
+          if (!user.teams?.length) {
             router.replace(getPathBoard())
             return
           }
 
-          const teamId = user.teams.includes(preferences.board.selectedTeamId) ? preferences.board.selectedTeamId : user.teams[0]
-          router.replace(getPathPlan(teamId))
+          // Determine preferred team, then verify it exists in Firestore
+          const preferredId = preferences.board.selectedTeamId
+          const candidateIds = preferredId && user.teams.includes(preferredId)
+            ? [preferredId, ...user.teams.filter((id: string) => id !== preferredId)]
+            : [...user.teams]
+
+          for (const candidateId of candidateIds) {
+            const team = await TeamApi.getById(candidateId)
+            if (team) {
+              router.replace(getPathPlan(candidateId))
+              return
+            }
+          }
+
+          // All teams are stale — go to team selector
+          router.replace(getPathBoard())
         })
       }
       else {

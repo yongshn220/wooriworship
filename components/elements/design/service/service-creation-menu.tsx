@@ -7,12 +7,17 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
 import { useToast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useRecoilValue } from "recoil";
+import { fetchServiceTagsSelector } from "@/global-states/teamState";
+import { useServiceDuplicateCheck } from "@/components/common/hooks/use-service-duplicate-check";
+import { FormMode } from "@/components/constants/enums";
+import { parseLocalDate } from "@/components/util/helper/helper-functions";
 import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
 import { Button } from "@/components/ui/button";
 import { addDays, nextSunday } from "date-fns";
@@ -44,6 +49,26 @@ export function ServiceCreationMenu({ teamId }: Props) {
 
     // Calendar Month State (for controlling calendar view if needed)
     const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
+
+    // Duplicate detection
+    const serviceTags = useRecoilValue(fetchServiceTagsSelector(teamId));
+    const serviceTagNames = selectedTagId ? [serviceTags?.find((t: any) => t.id === selectedTagId)?.name || selectedTagId] : [];
+    const duplicateFetcher = useCallback(async (tid: string, start: string, end?: string) => {
+        const s = parseLocalDate(start);
+        const e = end ? parseLocalDate(end) : s;
+        e.setHours(23, 59, 59);
+        const services = await ServiceEventApi.getServiceEvents(tid, s, e);
+        return services as unknown as { id: string; tagId?: string; service_tags?: string[] }[];
+    }, []);
+    const { isDuplicate, duplicateId, errorMessage: duplicateErrorMessage } = useServiceDuplicateCheck({
+        teamId,
+        date,
+        serviceTagIds: selectedTagId ? [selectedTagId] : [],
+        serviceTagNames,
+        mode: FormMode.CREATE,
+        fetcher: duplicateFetcher,
+        enabled: !isSubmitting,
+    });
 
     const handleCreate = async () => {
         if (!date) {
@@ -82,7 +107,6 @@ export function ServiceCreationMenu({ teamId }: Props) {
         } catch (e) {
             console.error(e);
             toast({ title: "Error", description: "Failed to create service.", variant: "destructive" });
-        } finally {
             setIsSubmitting(false);
         }
     };
@@ -112,11 +136,20 @@ export function ServiceCreationMenu({ teamId }: Props) {
                     />
                 </div>
 
+                {isDuplicate && (
+                    <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-orange-50 border border-orange-100">
+                        <AlertCircle className="w-4 h-4 text-orange-500 flex-shrink-0" />
+                        <p className="text-xs font-medium text-orange-800">
+                            {duplicateErrorMessage || "This service already exists."}
+                        </p>
+                    </div>
+                )}
+
                 <Button
                     className="w-full h-12 rounded-xl text-base font-semibold shadow-lg"
                     size="lg"
                     onClick={handleCreate}
-                    disabled={isSubmitting || !date}
+                    disabled={isSubmitting || !date || isDuplicate}
                 >
                     {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Service"}
                 </Button>

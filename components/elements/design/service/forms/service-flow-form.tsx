@@ -97,7 +97,7 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
             <FullScreenFormBody>
                 <div className="flex flex-col gap-8 w-full">
                     <div className="space-y-2 text-center">
-                        <h2 className="text-2xl font-bold text-foreground tracking-tight">Set up Worship Flow</h2>
+                        <h2 className="text-2xl font-bold text-foreground tracking-tight">Set Up Service Flow</h2>
                         <span className="text-muted-foreground font-normal text-sm">Organize service order</span>
                     </div>
 

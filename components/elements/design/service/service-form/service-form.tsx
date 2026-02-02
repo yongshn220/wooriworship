@@ -143,10 +143,7 @@ export function ServiceForm(props: ServiceFormProps) {
                                             <div className="flex flex-col min-w-0">
                                                 <h3 className="text-sm font-bold text-orange-900 truncate">Serving already exists.</h3>
                                                 <p className="text-xs text-orange-800/80 truncate">
-                                                    <span className="mr-1">{format(selectedDate!, "yyyy-MM-dd")}</span>
-                                                    <span className="font-semibold text-orange-900">
-                                                        {serviceTagIds.map(id => team?.service_tags?.find((t: any) => t.id === id)?.name || id).join(", ")}
-                                                    </span>
+                                                    {duplicateErrorMessage}
                                                 </p>
                                             </div>
                                         </div>

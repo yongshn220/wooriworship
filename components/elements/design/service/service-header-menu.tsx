@@ -1,11 +1,6 @@
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, MoreVertical, SquarePen, Trash2, Loader2 } from "lucide-react";
+import { Menu, SquarePen, Trash2, Loader2 } from "lucide-react";
+import { ActionBottomSheet } from "@/components/common/action-bottom-sheet";
 import { useState } from "react";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
@@ -28,7 +23,6 @@ interface Props {
     scheduleId: string;
     teamId: string;
     trigger?: React.ReactNode;
-    iconType?: "horizontal" | "vertical";
     scheduleTitle?: string;
     scheduleDate?: string;
     tagId?: string;
@@ -40,7 +34,6 @@ export function ServiceHeaderMenu({
     scheduleId,
     teamId,
     trigger,
-    iconType = "horizontal",
     scheduleTitle,
     scheduleDate,
     tagId,
@@ -50,6 +43,7 @@ export function ServiceHeaderMenu({
     const [user] = useAuthState(auth as any);
     const { toast } = useToast();
     const setServices = useSetRecoilState(serviceEventsListAtom);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     // Edit dialog state
@@ -60,6 +54,7 @@ export function ServiceHeaderMenu({
     const [isSaving, setIsSaving] = useState(false);
 
     const handleEdit = () => {
+        setIsMenuOpen(false);
         setEditDate(eventDate || undefined);
         setEditTagId(tagId || "");
         if (eventDate) setEditCalendarMonth(eventDate);
@@ -113,14 +108,12 @@ export function ServiceHeaderMenu({
     if (!user) return null;
 
     const defaultTrigger = (
-        <Button variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground data-[state=open]:bg-muted">
-            <span className="sr-only">Open menu</span>
-            {iconType === "horizontal" ? (
-                <MoreHorizontal className="h-5 w-5" />
-            ) : (
-                <MoreVertical className="h-5 w-5" />
-            )}
-        </Button>
+        <button
+            onClick={() => setIsMenuOpen(true)}
+            className="text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted"
+        >
+            <Menu className="w-5 h-5" />
+        </button>
     );
 
     const deleteDescription = scheduleTitle && scheduleDate
@@ -129,22 +122,30 @@ export function ServiceHeaderMenu({
 
     return (
         <>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    {trigger || defaultTrigger}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-[160px]">
-                    <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
-                        <SquarePen className="mr-2 h-4 w-4" />
-                        <span>Edit</span>
-                    </DropdownMenuItem>
+            {trigger ? (
+                <span onClick={() => setIsMenuOpen(true)}>{trigger}</span>
+            ) : (
+                defaultTrigger
+            )}
 
-                    <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)} className="text-red-600 focus:text-red-600 cursor-pointer focus:bg-red-50">
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        <span>Delete</span>
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+            <ActionBottomSheet
+                open={isMenuOpen}
+                onOpenChange={setIsMenuOpen}
+                title={scheduleTitle || "Service"}
+                actions={[
+                    {
+                        label: "Edit",
+                        icon: SquarePen,
+                        onClick: handleEdit,
+                    },
+                    {
+                        label: "Delete",
+                        icon: Trash2,
+                        onClick: () => { setIsMenuOpen(false); setIsDeleteDialogOpen(true); },
+                        variant: "destructive",
+                    },
+                ]}
+            />
 
             <DeleteConfirmationDialog
                 isOpen={isDeleteDialogOpen}

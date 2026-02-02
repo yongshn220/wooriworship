@@ -8,7 +8,10 @@ export function SongKeyBox({ teamId, songId, musicSheetId }: { teamId: string, s
     <>
       {
         musicSheet?.key &&
-        <div className="flex-center text-xs text-white font-medium bg-gray-400 rounded-full min-w-5 h-5 p-1">{musicSheet?.key}</div>
+        <div className="flex-center gap-1 text-xs text-white font-medium bg-gray-400 rounded-full min-w-5 h-5 px-2 py-1">
+          <span>{musicSheet.key}</span>
+          {musicSheet.note && <span className="text-white/70 text-[10px]">{musicSheet.note}</span>}
+        </div>
       }
     </>
   )

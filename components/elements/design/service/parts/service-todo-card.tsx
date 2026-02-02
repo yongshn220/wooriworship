@@ -24,12 +24,14 @@ interface ServiceTodoCardProps {
   teamId: string;
   serviceId: string;
   serviceTitle: string;
+  serviceDate: Timestamp;
 }
 
 export function ServiceTodoCard({
   teamId,
   serviceId,
   serviceTitle,
+  serviceDate,
 }: ServiceTodoCardProps) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,6 +71,7 @@ export function ServiceTodoCard({
         assigneeIds: [],
         serviceId,
         serviceTitle,
+        serviceDate,
         dueDate: null,
         createdBy: currentUserId,
         createdAt: Timestamp.now(),
@@ -147,14 +150,14 @@ export function ServiceTodoCard({
   const incompleteTodosCount = todos.filter((t) => !t.completed).length;
 
   return (
-    <div className="space-y-2" data-testid="service-todo-card">
-      <SectionHeader
-        icon={ListChecks}
-        iconColorClassName="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
-        title="Todos"
-        badge={incompleteTodosCount > 0 ? `${incompleteTodosCount}` : undefined}
-      />
+    <div data-testid="service-todo-card">
       <SectionCardContainer>
+        <SectionHeader
+          icon={ListChecks}
+          iconColorClassName="bg-emerald-500/10 text-emerald-500"
+          title="Todos"
+          badge={incompleteTodosCount > 0 ? `${incompleteTodosCount}` : undefined}
+        />
         <div className="flex items-center gap-2 px-3 py-2 border-b border-border/50 transition-all focus-within:border-primary/30">
           <Plus className="w-4 h-4 text-muted-foreground/50 flex-shrink-0" />
           <Input

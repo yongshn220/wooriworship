@@ -1,7 +1,8 @@
 "use client";
 
+import React from "react";
 import { cn } from "@/lib/utils";
-import { CalendarDays } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { serviceFilterModeAtom, myAssignmentCountAtom } from "@/global-states/serviceEventState";
 
@@ -9,32 +10,24 @@ export function ServiceBoardHeaderLeft() {
     const [filterMode, setFilterMode] = useRecoilState(serviceFilterModeAtom);
     const myCount = useRecoilValue(myAssignmentCountAtom);
 
-    const options: { key: 'all' | 'mine' | 'calendar'; label: React.ReactNode }[] = [
+    const tabs: { key: 'all' | 'mine' | 'calendar'; label: React.ReactNode }[] = [
         { key: 'all', label: 'All' },
         {
             key: 'mine',
             label: (
-                <span className="flex items-center gap-1">
+                <span className="relative">
                     Mine
-                    <span
-                        className={cn(
-                            "text-[9px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none transition-opacity",
-                            myCount > 0
-                                ? "bg-primary text-primary-foreground opacity-100"
-                                : "opacity-0"
-                        )}
-                        aria-label={myCount > 0 ? `${myCount} upcoming assignments` : undefined}
-                    >
-                        {myCount || 0}
-                    </span>
+                    {myCount > 0 && (
+                        <span className="absolute -top-1 -right-2.5 w-2 h-2 bg-red-500 rounded-full" />
+                    )}
                 </span>
             ),
         },
         {
             key: 'calendar',
             label: (
-                <span className="flex items-center gap-0.5">
-                    <CalendarDays className="w-3.5 h-3.5" />
+                <span className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5" strokeWidth={2.2} />
                     Calendar
                 </span>
             ),
@@ -42,21 +35,21 @@ export function ServiceBoardHeaderLeft() {
     ];
 
     return (
-        <div className="flex bg-muted/60 rounded-lg p-0.5" role="tablist" aria-label="Service filter">
-            {options.map((opt) => (
+        <div className="flex bg-muted rounded-full p-1 gap-0.5" role="tablist" aria-label="Service filter">
+            {tabs.map((tab) => (
                 <button
-                    key={opt.key}
+                    key={tab.key}
                     role="tab"
-                    aria-selected={filterMode === opt.key}
-                    onClick={() => setFilterMode(opt.key)}
+                    aria-selected={filterMode === tab.key}
+                    onClick={() => setFilterMode(tab.key)}
                     className={cn(
-                        "px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide transition-all",
-                        filterMode === opt.key
-                            ? "bg-card text-foreground shadow-sm"
+                        "relative px-5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center",
+                        filterMode === tab.key
+                            ? "bg-primary text-primary-foreground shadow-sm"
                             : "text-muted-foreground hover:text-foreground"
                     )}
                 >
-                    {opt.label}
+                    {tab.label}
                 </button>
             ))}
         </div>

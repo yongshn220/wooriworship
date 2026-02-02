@@ -60,7 +60,7 @@ export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = fal
         <DropdownMenuTrigger data-testid="song-menu">
           <MenuIcon />
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="min-w-[200px] p-2 flex-center flex-col">
+        <DropdownMenuContent className="min-w-[200px] p-2 flex-center flex-col z-[10002]">
           <DropdownMenuGroup className="space-y-2 w-full">
             <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => handleDownloadSong()}>
               <DownloadIcon className="mr-3 w-5 h-5" />

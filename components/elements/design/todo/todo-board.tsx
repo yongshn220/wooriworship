@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { cn } from "@/lib/utils";
 import { Plus, ListChecks, Check, ArrowUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -10,12 +10,9 @@ import { EmptyStateCard } from "@/components/elements/design/common/empty-state-
 import { TodoApi } from "@/apis/TodoApi";
 import { Todo } from "@/models/todo";
 import { todoListAtom, todoUpdaterAtom, showCompletedAtom } from "@/global-states/todoState";
-import { teamAtom } from "@/global-states/teamState";
-import { usersAtom } from "@/global-states/userState";
 import { auth } from "@/firebase";
 import { Timestamp } from "firebase/firestore";
 import { TodoItem } from "./todo-item";
-import { TodoDetailSheet } from "./todo-detail-sheet";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface TodoBoardProps {
@@ -23,15 +20,12 @@ interface TodoBoardProps {
 }
 
 export function TodoBoard({ teamId }: TodoBoardProps) {
-    const team = useRecoilValue(teamAtom(teamId));
-    const teamMembers = useRecoilValue(usersAtom(team?.users));
     const [todoList, setTodoList] = useRecoilState(todoListAtom);
     const [updater, setUpdater] = useRecoilState(todoUpdaterAtom);
     const [showCompleted, setShowCompleted] = useRecoilState(showCompletedAtom);
 
     const [newTodoTitle, setNewTodoTitle] = useState("");
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
     const currentUserId = auth.currentUser?.uid || "";
 
@@ -77,6 +71,7 @@ export function TodoBoard({ teamId }: TodoBoardProps) {
                 assigneeIds: [],
                 serviceId: null,
                 serviceTitle: null,
+                serviceDate: null,
                 dueDate: null,
                 createdBy: currentUserId,
                 createdAt: Timestamp.now(),
@@ -121,17 +116,6 @@ export function TodoBoard({ teamId }: TodoBoardProps) {
         } catch (error) {
             console.error("Failed to delete todo:", error);
             setUpdater(prev => prev + 1);
-        }
-    };
-
-    // Update from detail sheet
-    const handleUpdate = async (todoId: string, data: Partial<Todo>) => {
-        try {
-            await TodoApi.updateTodo(teamId, todoId, data);
-            setUpdater(prev => prev + 1);
-            setSelectedTodo(null);
-        } catch (error) {
-            console.error("Failed to update todo:", error);
         }
     };
 
@@ -229,11 +213,8 @@ export function TodoBoard({ teamId }: TodoBoardProps) {
                                 >
                                     <TodoItem
                                         todo={todo}
-                                        teamMembers={teamMembers}
                                         onToggle={() => handleToggle(todo)}
-                                        onTap={() => setSelectedTodo(todo)}
                                         onDelete={() => handleDelete(todo.id)}
-                                        onUpdate={(data) => handleUpdate(todo.id, data)}
                                     />
                                 </motion.div>
                             ))}
@@ -264,11 +245,8 @@ export function TodoBoard({ teamId }: TodoBoardProps) {
                                             >
                                                 <TodoItem
                                                     todo={todo}
-                                                    teamMembers={teamMembers}
                                                     onToggle={() => handleToggle(todo)}
-                                                    onTap={() => setSelectedTodo(todo)}
                                                     onDelete={() => handleDelete(todo.id)}
-                                                    onUpdate={(data) => handleUpdate(todo.id, data)}
                                                 />
                                             </motion.div>
                                         ))}
@@ -279,15 +257,6 @@ export function TodoBoard({ teamId }: TodoBoardProps) {
                     </div>
                 )}
             </div>
-
-            {/* Detail Sheet */}
-            <TodoDetailSheet
-                todo={selectedTodo}
-                teamMembers={teamMembers}
-                onClose={() => setSelectedTodo(null)}
-                onUpdate={handleUpdate}
-                onDelete={handleDelete}
-            />
         </div>
     );
 }

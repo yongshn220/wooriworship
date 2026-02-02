@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format, differenceInCalendarDays } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -47,18 +47,11 @@ export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, on
                 <ServiceHeaderMenu
                     scheduleId={scheduleId}
                     teamId={teamId}
-                    iconType="horizontal"
                     scheduleTitle={title}
                     scheduleDate={format(dateObj, "yyyy/MM/dd")}
                     tagId={tagId}
                     eventDate={dateObj}
                     onEdited={onEdited}
-                    trigger={
-                        <button className="inline-flex items-center gap-0.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-lg hover:bg-muted active:scale-95">
-                            Edit
-                            <ChevronDown className="h-3 w-3" />
-                        </button>
-                    }
                 />
             </div>
 
@@ -69,10 +62,10 @@ export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, on
                 </span>
                 {dDayLabel && (
                     <span className={cn(
-                        "text-[10px] font-bold px-2 py-0.5 rounded-full",
+                        "text-[10px] font-bold px-2.5 py-0.5 rounded-full",
                         diffDays === 0
                             ? "bg-primary text-primary-foreground"
-                            : "bg-primary/10 text-primary"
+                            : "bg-orange-100 text-red-500 dark:bg-orange-500/20 dark:text-red-400"
                     )}>
                         {dDayLabel}
                     </span>
@@ -93,7 +86,7 @@ export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, on
                                 {myRoles.map((role, idx) => (
                                     <span
                                         key={idx}
-                                        className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-primary/10 text-primary dark:bg-primary/20"
+                                        className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold bg-primary/20 text-primary dark:bg-primary/30"
                                     >
                                         {getRoleLabel(role)}
                                     </span>

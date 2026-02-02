@@ -11,7 +11,9 @@ import { songSearchInputAtom } from "@/app/board/_states/board-states";
 import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
+import { SearchFilterPopover } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-filter-popover";
 import { ActiveFilterList } from "@/app/board/_components/active-filter-list";
+import { ListFilter } from "lucide-react";
 import { SetlistSongHeader } from "@/models/setlist";
 
 interface Props {
@@ -53,8 +55,15 @@ export function AddSetlistSongDialog({ teamId, isOpen, setIsOpen, selectedSongs,
             {/* Header Search Area */}
             {!showSelectedOnly ? (
               <>
-                <div className="w-full relative">
-                  <SearchInput />
+                <div className="w-full flex items-center gap-2">
+                  <div className="flex-1">
+                    <SearchInput />
+                  </div>
+                  <SearchFilterPopover>
+                    <Button variant="ghost" size="icon" className="shrink-0 h-9 w-9 rounded-full">
+                      <ListFilter className="h-4 w-4" />
+                    </Button>
+                  </SearchFilterPopover>
                 </div>
                 {/* Active Filters */}
                 <ActiveFilterList />

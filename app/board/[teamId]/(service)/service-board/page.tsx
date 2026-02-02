@@ -264,7 +264,7 @@ export default function ServingPage() {
 
     return (
         <div className="flex flex-col h-full bg-surface dark:bg-surface-dark relative font-sans text-slate-800 dark:text-slate-100 overflow-hidden">
-            <div className="flex-1 overflow-y-auto pb-safe">
+            <div className="flex-1 overflow-y-auto no-scrollbar pb-safe">
                 <main className="max-w-lg mx-auto px-4 pt-2 space-y-5 pb-24">
                     {filterMode === 'calendar' ? (
                         <InlineCalendarView
