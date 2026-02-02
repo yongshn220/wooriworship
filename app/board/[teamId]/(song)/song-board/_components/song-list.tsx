@@ -4,8 +4,6 @@ import { currentTeamSongIdsAtom } from "@/global-states/song-state";
 import React, { useEffect, useRef, useState, Suspense } from "react";
 import { EmptySongBoardPage } from "@/app/board/[teamId]/(song)/song-board/_components/empty-song-board-page/empty-song-board-page";
 import { SongCard } from "./song-card";
-import { motion, AnimatePresence } from "framer-motion";
-
 interface Props {
   teamId: string
 }
@@ -16,10 +14,10 @@ import { SongRowSkeleton } from "@/app/board/[teamId]/(song)/song-board/_compone
 import { songSearchInputAtom, searchSelectedTagsAtom, searchSelectedKeysAtom } from "@/app/board/_states/board-states";
 import { SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-// ... existing imports
+import { useScrollContainer } from "@/app/board/_contexts/scroll-container-context";
 
 export function SongList({ teamId }: Props) {
+  const scrollContainerRef = useScrollContainer()
   const songIds = useRecoilValue(currentTeamSongIdsAtom(teamId))
   const searchInput = useRecoilValue(songSearchInputAtom)
   const setSongSearch = useSetRecoilState(songSearchInputAtom)
@@ -63,7 +61,7 @@ export function SongList({ teamId }: Props) {
   const programmaticScrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const scrollContainer = document.querySelector('main') as HTMLElement; // Based on BoardLayout
+    const scrollContainer = scrollContainerRef?.current;
     if (!scrollContainer) return;
 
     let ticking = false;
@@ -98,7 +96,7 @@ export function SongList({ teamId }: Props) {
 
     scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
     return () => scrollContainer.removeEventListener('scroll', handleScroll);
-  }, [displayedCount]);
+  }, [displayedCount, scrollContainerRef]);
 
   const handleScrollRequest = (index: number) => {
     // Set lock
@@ -156,7 +154,7 @@ export function SongList({ teamId }: Props) {
   }
 
   return (
-    <div className="w-full h-full p-2 sm:p-4 md:p-6 relative">
+    <div className="w-full h-full p-2 sm:p-4 sm:pr-14 md:p-6 md:pr-16 relative">
       <AlphabetIndexer teamId={teamId} onScrollRequest={handleScrollRequest} activeIndex={activeIndex} />
 
       {/* Active Filters */}

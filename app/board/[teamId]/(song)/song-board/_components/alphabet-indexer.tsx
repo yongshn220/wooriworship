@@ -167,7 +167,7 @@ export function AlphabetIndexer({ teamId, onScrollRequest, activeIndex }: Props)
 
     return (
         <div
-            className="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 h-[500px] w-12 flex items-center justify-center pointer-events-auto select-none"
+            className="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 max-h-[60vh] h-[500px] w-12 hidden sm:flex items-center justify-center pointer-events-auto select-none"
             onPointerDown={handleUserInteract}
             onTouchStart={handleUserInteract}
         >

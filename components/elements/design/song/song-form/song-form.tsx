@@ -27,6 +27,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { FullScreenForm, FullScreenFormBody, FullScreenFormFooter, FullScreenFormHeader } from "@/components/common/form/full-screen-form";
 import { slideVariants } from "@/components/constants/animations";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface Props {
   mode: FormMode
@@ -66,6 +67,9 @@ export function SongForm({ mode, teamId, songId }: Props) {
     description: (mode === FormMode.EDIT) ? song?.description ?? "" : ""
   })
 
+  const [linkError, setLinkError] = useState<string>("")
+  const [showExitDialog, setShowExitDialog] = useState(false)
+
   // Sync song data when it loads (Edit Mode)
   useEffect(() => {
     if (mode === FormMode.EDIT && song) {
@@ -86,6 +90,22 @@ export function SongForm({ mode, teamId, songId }: Props) {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
+
+  // URL validation function
+  const isValidUrl = (url: string) => {
+    if (!url) return true;
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return /^(www\.)?[\w-]+(\.[\w-]+)+/.test(url);
+    }
+  }
+
+  // Dirty state tracking
+  const isDirty = mode === FormMode.CREATE
+    ? (songInput.title !== '' || songInput.subtitle !== '' || songInput.author !== '' || songInput.link !== '' || songInput.tags.length > 0 || songInput.description !== '' || musicSheetContainers.length > 0)
+    : (songInput.title !== (song?.title ?? '') || songInput.subtitle !== (song?.subtitle ?? '') || songInput.author !== (song?.original.author ?? '') || songInput.link !== (song?.original.url ?? '') || JSON.stringify(songInput.tags) !== JSON.stringify(song?.tags ?? []) || songInput.description !== (song?.description ?? ''))
 
 
   useEffect(() => {
@@ -111,6 +131,18 @@ export function SongForm({ mode, teamId, songId }: Props) {
       })
     }
   }, [mode, musicSheets])
+
+  // beforeunload warning
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty])
 
   function createValidCheck() {
     if (!authUser?.uid) {
@@ -163,7 +195,6 @@ export function SongForm({ mode, teamId, songId }: Props) {
       })
     }
     finally {
-      clearContents()
       setIsLoading(false)
     }
   }
@@ -213,7 +244,6 @@ export function SongForm({ mode, teamId, songId }: Props) {
       songUpdater(prev => prev + 1)
 
       toast({ title: "Song edited successfully." })
-      setIsLoading(false)
       router.push(getPathSongDetail(teamId, songId))
     }
     catch (e) {
@@ -226,14 +256,18 @@ export function SongForm({ mode, teamId, songId }: Props) {
   }
 
   async function uploadMusicSheetContainers(_musicSheetContainers: MusicSheetContainer[]) {
-    const newMusicSheetContainers = []
-    for (const mContainer of _musicSheetContainers) {
-      const newMContainer = await StorageApi.uploadMusicSheetContainer(teamId, mContainer)
-      if (!newMContainer) {
-        console.log("Song:handleCreate: fail to upload music sheet container."); continue
+    const results = await Promise.allSettled(
+      _musicSheetContainers.map(mContainer => StorageApi.uploadMusicSheetContainer(teamId, mContainer))
+    )
+    const newMusicSheetContainers: MusicSheetContainer[] = []
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled' && result.value) {
+        newMusicSheetContainers.push(result.value)
+      } else {
+        const key = _musicSheetContainers[index]?.key || `Sheet ${index + 1}`
+        toast({ title: `Failed to upload ${key}`, description: "This sheet was skipped." })
       }
-      newMusicSheetContainers.push(newMContainer)
-    }
+    })
     return newMusicSheetContainers
   }
 
@@ -327,13 +361,27 @@ export function SongForm({ mode, teamId, songId }: Props) {
   const selectedSheet = musicSheetContainers[selectedSheetIndex]
 
   return (
-    <FullScreenForm data-testid="song-form">
-      <FullScreenFormHeader
-        steps={["Song Info", "Sheets"]}
-        currentStep={step}
-        onStepChange={goToStep}
-        onClose={() => router.back()}
-      />
+    <>
+      <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Discard changes?</AlertDialogTitle>
+            <AlertDialogDescription>You have unsaved changes. Are you sure you want to leave?</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep Editing</AlertDialogCancel>
+            <AlertDialogAction onClick={() => router.back()}>Discard</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <FullScreenForm data-testid="song-form">
+        <FullScreenFormHeader
+          steps={["Song Info", "Sheets"]}
+          currentStep={step}
+          onStepChange={goToStep}
+          onClose={() => { if (isDirty) { setShowExitDialog(true) } else { router.back() } }}
+        />
 
       <FullScreenFormBody>
         <AnimatePresence initial={false} mode="popLayout" custom={direction}>
@@ -394,14 +442,25 @@ export function SongForm({ mode, teamId, songId }: Props) {
                 {/* Reference Link */}
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Reference Link</Label>
-                  <div className="relative">
-                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="https://youtube.com/..."
-                      value={songInput.link}
-                      onChange={(e) => setSongInput(prev => ({ ...prev, link: e.target.value }))}
-                      className="pl-9 bg-secondary/40 border-border h-12 rounded-xl"
-                    />
+                  <div>
+                    <div className="relative">
+                      <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="https://youtube.com/..."
+                        value={songInput.link}
+                        onChange={(e) => {
+                          const newLink = e.target.value
+                          setSongInput(prev => ({ ...prev, link: newLink }))
+                          if (isValidUrl(newLink)) {
+                            setLinkError("")
+                          } else {
+                            setLinkError("Please enter a valid URL")
+                          }
+                        }}
+                        className="pl-9 bg-secondary/40 border-border h-12 rounded-xl"
+                      />
+                    </div>
+                    {linkError && <p className="text-xs text-destructive ml-1">{linkError}</p>}
                   </div>
                 </div>
 
@@ -519,7 +578,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
         </div>
         <Button
           onClick={step === totalSteps - 1 ? (mode === FormMode.CREATE ? handleCreate : handleEdit) : nextStep}
-          disabled={isLoading || (step === 0 && !songInput.title)}
+          disabled={isLoading || (step === 0 && !songInput.title) || !!linkError}
           className="h-12 flex-1 rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
           data-testid="form-submit"
         >
@@ -528,5 +587,6 @@ export function SongForm({ mode, teamId, songId }: Props) {
         </Button>
       </FullScreenFormFooter>
     </FullScreenForm>
+    </>
   )
 }

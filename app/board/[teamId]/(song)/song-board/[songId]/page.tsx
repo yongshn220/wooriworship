@@ -4,7 +4,7 @@ import {useRouter} from "next/navigation";
 import {getPathSong} from "@/components/util/helper/routes";
 import {SongDetailDialog} from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
 
-export default function SongDetailPage({params}: any) {
+export default function SongDetailPage({params}: {params: { teamId: string; songId: string }}) {
   const teamId = params.teamId
   const songId = params.songId
   const router = useRouter()

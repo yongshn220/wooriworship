@@ -25,16 +25,18 @@ export function SongDetailContent({ teamId, songId }: Props) {
   return (
     <div className="grid gap-6 w-full">
       {/* Link Section */}
-      <div className="flex justify-between items-center">
-        <Label htmlFor="name" className="text-base font-semibold">
-          Link
-        </Label>
-        <Button variant="ghost" className="text-primary hover:text-primary/80 cursor-pointer gap-2 p-0 h-auto"
-          onClick={handleLinkButtonClick}>
-          <LinkIcon className="w-4 h-4" />
-          <p>Go to the Link</p>
-        </Button>
-      </div>
+      {song?.original?.url && (
+        <div className="flex justify-between items-center">
+          <Label htmlFor="name" className="text-base font-semibold">
+            Link
+          </Label>
+          <Button variant="ghost" className="text-primary hover:text-primary/80 cursor-pointer gap-2 p-0 h-auto"
+            onClick={handleLinkButtonClick}>
+            <LinkIcon className="w-4 h-4" />
+            <p>Go to the Link</p>
+          </Button>
+        </div>
+      )}
 
       {/* Tags Section */}
       <div className="flex justify-between items-center">
@@ -55,7 +57,12 @@ export function SongDetailContent({ teamId, songId }: Props) {
         <Label htmlFor="name" className="text-base font-semibold">
           Used on
         </Label>
-        <p className="text-sm">{getTimePassedFromTimestamp(song?.last_used_time)}</p>
+        <div className="text-right">
+          {song?.last_used_time && (
+            <p className="text-sm">{new Date(song.last_used_time.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+          )}
+          <p className="text-xs text-muted-foreground">{getTimePassedFromTimestamp(song?.last_used_time)}</p>
+        </div>
       </div>
 
       {/* Description Section */}

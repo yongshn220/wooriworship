@@ -71,11 +71,11 @@ export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = fal
           <DropdownMenuGroup className="space-y-2 flex-center flex-col w-full">
             <Button variant="ghost" disabled className="cursor-pointer w-full flex-start pl-2">
               <LinkIcon className="mr-3 w-5 h-5" />
-              <p>Copy Link</p>
+              <p>Copy Link <span className="text-xs text-muted-foreground">(Coming Soon)</span></p>
             </Button>
             <Button variant="ghost" disabled className="cursor-pointer w-full flex-start pl-2">
               <CopyIcon className="mr-3 w-5 h-5" />
-              <p>Duplicate</p>
+              <p>Duplicate <span className="text-xs text-muted-foreground">(Coming Soon)</span></p>
             </Button>
             <Button variant="ghost" className="cursor-pointer w-full flex-start pl-2" onClick={() => handleEditSong()} data-testid="song-edit">
               <SquarePen className="mr-3 w-5 h-5" />

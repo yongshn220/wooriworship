@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRecoilValue } from "recoil";
 import { musicSheetAtom } from "@/global-states/music-sheet-state";
@@ -11,6 +11,8 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 interface Props {
   teamId: string
@@ -50,26 +52,7 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId }: Props
   if (musicSheet.urls.length === 1) {
     return (
       <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 py-2 pb-12">
-        <TransformWrapper
-          initialScale={1}
-          minScale={1}
-          maxScale={4}
-          doubleClick={{ mode: "reset" }}
-          wheel={{ step: 0.1 }}
-          panning={{ disabled: false }}
-        >
-          <TransformComponent wrapperStyle={{ width: "100%" }} contentStyle={{ width: "100%" }}>
-            <Image
-              src={musicSheet.urls[0]}
-              alt="Sheet 1"
-              width={0}
-              height={0}
-              sizes="100vw"
-              className="w-full h-auto max-h-[calc(100vh-80px)] object-contain shadow-sm"
-              style={{ width: "100%", height: "auto" }}
-            />
-          </TransformComponent>
-        </TransformWrapper>
+        <SingleSheetItem url={musicSheet.urls[0]} />
       </div>
     )
   }
@@ -81,29 +64,11 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId }: Props
         <CarouselContent>
           {musicSheet.urls.map((url: string, i: number) => (
             <CarouselItem key={i} className="flex justify-center items-center">
-              <TransformWrapper
-                initialScale={1}
-                minScale={1}
-                maxScale={4}
-                doubleClick={{ mode: "reset" }}
-                wheel={{ step: 0.1 }}
-                panning={{ disabled: false }}
-                onTransformed={(_, state) => {
-                  setIsZoomed(state.scale > 1)
-                }}
-              >
-                <TransformComponent wrapperStyle={{ width: "100%" }} contentStyle={{ width: "100%" }}>
-                  <Image
-                    src={url}
-                    alt={`Sheet ${i + 1}`}
-                    width={0}
-                    height={0}
-                    sizes="100vw"
-                    className="w-full h-auto max-h-[calc(100vh-80px)] object-contain shadow-sm"
-                    style={{ width: "100%", height: "auto" }}
-                  />
-                </TransformComponent>
-              </TransformWrapper>
+              <SingleSheetItem
+                url={url}
+                index={i}
+                onZoomChange={(zoomed) => setIsZoomed(zoomed)}
+              />
             </CarouselItem>
           ))}
         </CarouselContent>
@@ -118,5 +83,53 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId }: Props
         {current} / {count}
       </div>
     </div>
+  )
+}
+
+function SingleSheetItem({ url, index = 0, onZoomChange }: { url: string; index?: number; onZoomChange?: (zoomed: boolean) => void }) {
+  const [enablePan, setEnablePan] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  useEffect(() => {
+    setIsLoaded(false)
+  }, [url])
+
+  return (
+    <TransformWrapper
+      initialScale={1}
+      minScale={1}
+      maxScale={4}
+      wheel={{ disabled: true }}
+      doubleClick={{ mode: "toggle" }}
+      panning={{ disabled: !enablePan }}
+      onTransformed={(e) => {
+        const zoomed = e.state.scale > 1.01
+        setEnablePan(zoomed)
+        onZoomChange?.(zoomed)
+      }}
+    >
+      <TransformComponent wrapperStyle={{ width: "100%" }} contentStyle={{ width: "100%" }}>
+        <div className="relative w-full">
+          {!isLoaded && (
+            <div className="w-full aspect-[3/4] flex items-center justify-center">
+              <Skeleton className="w-full h-full rounded-lg" />
+            </div>
+          )}
+          <Image
+            src={url}
+            alt={`Sheet ${index + 1}`}
+            width={0}
+            height={0}
+            sizes="100vw"
+            className={cn(
+              "w-full h-auto max-h-[calc(100vh-80px)] object-contain shadow-sm",
+              !isLoaded && "opacity-0 absolute inset-0"
+            )}
+            style={{ width: "100%", height: "auto" }}
+            onLoad={() => setIsLoaded(true)}
+          />
+        </div>
+      </TransformComponent>
+    </TransformWrapper>
   )
 }

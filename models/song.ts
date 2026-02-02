@@ -8,6 +8,9 @@ export type Song = {
   description: string
   tags: Array<string>
   keys: Array<string>
+  // Note: Song collection uses 'time' field name (see SongApi.ts)
+  // This differs from MusicSheet which uses 'timestamp'
+  // Field names correspond to actual Firestore document fields
   created_by: {
     id: string
     time: Timestamp

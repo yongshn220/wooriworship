@@ -21,7 +21,7 @@ import { SongErrorBoundary } from "@/app/board/[teamId]/(song)/song-board/_compo
 interface Props {
   teamId: string
   isOpen: boolean
-  setIsOpen: Function
+  setIsOpen: (open: boolean) => void
   songId: string
   readOnly: boolean
 }
@@ -79,7 +79,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
         {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto no-scrollbar bg-muted/30 relative">
           <SongErrorBoundary fallbackMessage="Failed to load song details. Please try again.">
-            <Suspense fallback={<div className="h-full flex-center">Loading...</div>}>
+            <Suspense fallback={<SongDetailSkeleton />}>
 
               {/* Floating Key Selector (Overlay) */}
               <div className="absolute top-4 right-4 z-10">
@@ -144,4 +144,34 @@ function KeyDropdownItem({ teamId, songId, musicSheetId, onSelect }: { teamId: s
       {musicSheet?.key || "Unknown Key"}
     </DropdownMenuItem>
   );
+}
+
+function SongDetailSkeleton() {
+  return (
+    <div className="flex flex-col h-full animate-pulse">
+      {/* Sheet Area Skeleton */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full aspect-[3/4] max-h-[calc(100vh-200px)] bg-muted rounded-lg" />
+      </div>
+      {/* Info Section Skeleton */}
+      <div className="bg-card p-4 pb-10 rounded-t-xl -mt-4 space-y-4">
+        <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-6" />
+        <div className="flex justify-between items-center">
+          <div className="h-5 w-12 bg-muted rounded" />
+          <div className="h-5 w-28 bg-muted rounded" />
+        </div>
+        <div className="flex justify-between items-center">
+          <div className="h-5 w-10 bg-muted rounded" />
+          <div className="flex gap-2">
+            <div className="h-6 w-16 bg-muted rounded-full" />
+            <div className="h-6 w-16 bg-muted rounded-full" />
+          </div>
+        </div>
+        <div className="flex justify-between items-center">
+          <div className="h-5 w-16 bg-muted rounded" />
+          <div className="h-5 w-24 bg-muted rounded" />
+        </div>
+      </div>
+    </div>
+  )
 }

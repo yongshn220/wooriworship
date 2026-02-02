@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { SongBoardSortOption } from "@/components/constants/enums";
 import { teamUniqueKeysSelector } from "@/global-states/song-state";
 
-export function SearchFilterPopover({ children }: any) {
+export function SearchFilterPopover({ children }: { children: React.ReactNode }) {
   const teamId = useRecoilValue(currentTeamIdAtom)
   const [teamTags, setTeamTags] = useState<Array<string>>([])
   const [selectedTags, setSelectedTags] = useRecoilState(searchSelectedTagsAtom)

@@ -6,7 +6,7 @@ import { BoardBottomNavBar } from "@/app/board/_components/board-navigation/boar
 import { usePathname } from "next/navigation";
 import { useSetRecoilState } from "recoil";
 import { currentPageAtom } from "@/global-states/page-state";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Page } from "@/components/constants/enums";
 import { DialogManager } from "@/components/elements/dialog/static-dialog/dialog-manager";
 import Initialization from "@/components/util/provider/initialization";
@@ -15,14 +15,16 @@ import { useNotificationPermission } from "@/components/util/hook/use-notificati
 import { NotificationPromptDialog } from "@/components/elements/dialog/notification/notification-prompt-dialog";
 import PushNotificationApi from "@/apis/PushNotificationApi";
 import { auth } from "@/firebase";
+import { ScrollContainerContext } from "@/app/board/_contexts/scroll-container-context";
 
 
-export default function BoardLayout({ children }: any) {
+export default function BoardLayout({ children }: { children: React.ReactNode }) {
   const setPage = useSetRecoilState(currentPageAtom)
   const pathname = usePathname()
   const { permission } = useNotificationPermission()
   const [notificationPromptStorage, setNotificationPromptStorage] = useLocalStorage('notification_prompt_dismissed', false)
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false)
+  const mainRef = useRef<HTMLElement>(null)
 
 
   useEffect(() => {
@@ -63,24 +65,25 @@ export default function BoardLayout({ children }: any) {
     }
   }
 
-  console.log("----BoardLayout")
   return (
     <section className="h-full">
       <BoardAuthenticate>
-        <Initialization />
-        <DialogManager />
-        <NotificationPromptDialog
-          open={showNotificationPrompt}
-          onOpenChange={handleNotificationPromptClose}
-          onPermissionResult={handleNotificationPermissionResult}
-        />
-        <div className="flex flex-col h-full">
-          <BoardTopNavBar />
-          <main className="flex-grow min-h-0 overflow-y-auto bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] overscroll-contain">
-            {children}
-          </main>
-          <BoardBottomNavBar />
-        </div>
+        <ScrollContainerContext.Provider value={mainRef}>
+          <Initialization />
+          <DialogManager />
+          <NotificationPromptDialog
+            open={showNotificationPrompt}
+            onOpenChange={handleNotificationPromptClose}
+            onPermissionResult={handleNotificationPermissionResult}
+          />
+          <div className="flex flex-col h-full">
+            <BoardTopNavBar />
+            <main ref={mainRef} className="flex-grow min-h-0 overflow-y-auto bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] overscroll-contain">
+              {children}
+            </main>
+            <BoardBottomNavBar />
+          </div>
+        </ScrollContainerContext.Provider>
       </BoardAuthenticate>
     </section>
   )

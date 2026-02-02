@@ -4,7 +4,7 @@ import { SongListSkeleton } from "@/app/board/[teamId]/(song)/song-board/_compon
 import { SongErrorBoundary } from "@/app/board/[teamId]/(song)/song-board/_components/song-error-boundary";
 
 interface Props {
-  params: any
+  params: { teamId: string }
 }
 
 export default function SongPage({ params }: Props) {
