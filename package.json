@@ -22,7 +22,7 @@
     "db:restore:prod": "./scripts/copy-snapshot-to-production.sh"
   },
   "dependencies": {
-    "@auth/firebase-adapter": "^1.5.2",
+    "@auth/firebase-adapter": "^2.11.1",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.1.2",
