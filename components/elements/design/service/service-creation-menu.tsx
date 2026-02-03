@@ -116,7 +116,7 @@ export function ServiceCreationMenu({ teamId }: Props) {
             <DialogTrigger asChild>
                 <div><CreateActionButton /></div>
             </DialogTrigger>
-            <DialogContent className="max-w-md rounded-3xl p-6 pt-10">
+            <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto rounded-3xl p-6 pt-10">
                 <DialogHeader>
                     <DialogTitle className="text-center text-xl font-bold">Create New Service</DialogTitle>
                 </DialogHeader>

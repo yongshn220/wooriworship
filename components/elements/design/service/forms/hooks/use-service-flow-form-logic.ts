@@ -5,9 +5,9 @@ import { teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
 import { ServiceFlow } from "@/models/services/ServiceEvent";
 import { ServiceFlowApi } from "@/apis/ServiceFlowApi";
-import { useServiceTimeline } from "../../service-form/hooks/use-service-timeline";
-import { useServiceTemplates } from "../../service-form/hooks/use-service-templates";
-import { useServiceHistory } from "../../service-form/hooks/use-service-history";
+import { useServiceTimeline } from "./use-service-timeline";
+import { useServiceTemplates } from "./use-service-templates";
+import { useServiceHistory } from "./use-service-history";
 import { toast } from "@/components/ui/use-toast";
 
 

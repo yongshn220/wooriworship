@@ -3,7 +3,7 @@ import { ServiceRole, ServiceFormState } from "@/models/services/ServiceEvent";
 import { User } from "@/models/user";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { MemberBadge } from "./service-form/service-components";
+import { MemberBadge } from "./forms/service-components";
 
 interface Props {
     schedule: ServiceFormState;

@@ -49,7 +49,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
       <DrawerContent className="h-screen rounded-none flex flex-col focus:outline-none mt-0">
         <DrawerTitle className="hidden">{song?.title || "Song Detail"}</DrawerTitle>
         {/* Top Header Bar */}
-        <div className="relative flex items-center justify-between p-3 border-b bg-background/80 backdrop-blur-md shrink-0 z-20 h-[60px]">
+        <div className="relative flex items-center justify-between p-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b bg-background/80 backdrop-blur-md shrink-0 z-20 min-h-[60px]">
 
           {/* Left: Close Button */}
           <div className="relative z-10 flex items-center justify-start w-[80px]">
@@ -85,7 +85,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
               <div className="absolute top-4 right-4 z-10">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="h-9 px-3 text-sm font-semibold bg-card/90 backdrop-blur shadow-sm border-border hover:bg-card gap-2">
+                    <Button variant="outline" className="h-9 px-3 text-sm font-semibold bg-card shadow-sm border-border hover:bg-card gap-2">
                       <Suspense fallback={<span>-</span>}>
                         {selectedMusicSheetId ? <SelectedKeyTrigger teamId={teamId} songId={songId} musicSheetId={selectedMusicSheetId} /> : <span>Key</span>}
                       </Suspense>

@@ -23,9 +23,9 @@ import { SortableList } from "@/components/common/list/sortable-list";
 import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
 
 // Shared Components (Relative Paths updated for new location)
-import { SortableRoleItem } from "../service-form/items/sortable-role-item";
-import { AddActionButton } from "../service-form/service-components";
-import { MemberSelector } from "../service-form/member-selector";
+import { SortableRoleItem } from "./items/sortable-role-item";
+import { AddActionButton } from "./service-components";
+import { MemberSelector } from "./member-selector";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 
 interface Props {

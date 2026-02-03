@@ -4,8 +4,8 @@ import { teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
 import { ServicePraiseTeam } from "@/models/services/ServiceEvent";
 import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
-import { useServiceRoles } from "../../service-form/hooks/use-service-roles";
-import { usePraiseTeamTemplates } from "../../service-form/hooks/use-praise-team-templates";
+import { useServiceRoles } from "./use-service-roles";
+import { usePraiseTeamTemplates } from "./use-praise-team-templates";
 import { toast } from "@/components/ui/use-toast";
 
 
