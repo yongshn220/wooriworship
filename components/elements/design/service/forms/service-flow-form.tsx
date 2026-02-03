@@ -415,7 +415,6 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                                 }
                             }}
                             className="h-14 rounded-2xl border-border bg-secondary/30 px-5 text-lg font-medium shadow-inner focus:bg-background transition-all ring-offset-0 focus:ring-2 focus:ring-primary/20"
-                            autoFocus
                         />
                     </div>
                     <DialogFooter className="flex sm:flex-row gap-3">
@@ -449,9 +448,7 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                                 value={tempTemplateName}
                                 onChange={(e) => setTempTemplateName(e.target.value)}
                                 placeholder="Enter template name..."
-
                                 className="h-14 px-5 rounded-2xl bg-secondary/50 border-border focus:bg-background focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all text-lg font-medium"
-                                autoFocus
                             />
                         </div>
                         <div className="flex gap-3 pt-2">

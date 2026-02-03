@@ -22,6 +22,7 @@ interface ServiceDateSelectorProps {
     onDateChange: (date: Date | undefined) => void;
     calendarMonth?: Date;
     onCalendarMonthChange?: (date: Date) => void;
+    showQuickSelect?: boolean;
 }
 
 export function ServiceDateSelector({
@@ -32,6 +33,7 @@ export function ServiceDateSelector({
     onDateChange,
     calendarMonth,
     onCalendarMonthChange,
+    showQuickSelect = true,
 }: ServiceDateSelectorProps) {
 
     // Internal state for calendar month if not provided
@@ -224,6 +226,7 @@ export function ServiceDateSelector({
                     />
                 </div>
 
+                {showQuickSelect && (
                 <div className="flex flex-wrap gap-2">
                     {shortcuts.map((option) => {
                         const isSelected = !!date && isSameDay(date, option.date) && (
@@ -273,6 +276,7 @@ export function ServiceDateSelector({
                         );
                     })}
                 </div>
+                )}
             </FormSectionCard>
 
             {/* Date Selection Card */}
