@@ -8,7 +8,7 @@ interface Props {
 export function BaseBottomNavBar({ children, height }: Props) {
   return (
     <footer
-      className="relative shrink-0 bg-background/80 backdrop-blur-md border-t border-border shadow-sm z-50 pb-[env(safe-area-inset-bottom)] static-shell"
+      className="relative shrink-0 bg-background/80 backdrop-blur-md border-t border-border shadow-sm z-50 static-shell"
       style={{ height: `calc(${height}px + env(safe-area-inset-bottom))` }}
     >
       <nav aria-label="Main navigation" className="h-full">
