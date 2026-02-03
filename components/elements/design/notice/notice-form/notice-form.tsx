@@ -198,18 +198,18 @@ export function NoticeForm({ mode, noticeId }: Props) {
             <Label className="text-xs text-muted-foreground font-bold uppercase ml-1">Attachments</Label>
 
             {/* Upload Buttons */}
-            <div className="flex items-center gap-4 justify-center p-4 bg-muted/30 rounded-2xl border border-dashed border-border">
-              <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
-                <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all")}>
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 justify-center p-4 bg-muted/30 rounded-2xl border border-dashed border-border">
+              <MultipleImageUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-full sm:w-auto">
+                <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full sm:w-auto gap-2 cursor-pointer rounded-xl h-12 bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all")}>
                   <ImageIcon className="h-5 w-5" />
                   <span className="font-bold">Add Image</span>
                 </div>
               </MultipleImageUploader>
 
-              <div className="h-8 w-px bg-border"></div>
+              <div className="hidden sm:block h-8 w-px bg-border"></div>
 
-              <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-auto">
-                <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2 cursor-pointer rounded-xl h-12 bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all")}>
+              <PdfUploader imageFileContainers={imageFileContainers} updateImageFileContainer={updateImageFileContainer} maxNum={5} className="w-full sm:w-auto">
+                <div className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full sm:w-auto gap-2 cursor-pointer rounded-xl h-12 bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all")}>
                   <FileText className="h-5 w-5" />
                   <span className="font-bold">Add PDF</span>
                 </div>
@@ -223,7 +223,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
                   <p className="text-sm font-medium">No files attached</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                   {
                     imageFileContainers?.map((imageFileContainer, i) => (
                       <UploadedImageFileCard key={i} imageFileContainer={imageFileContainer} index={i} handleRemoveImage={(index: number) => handleRemoveImage(index)} />

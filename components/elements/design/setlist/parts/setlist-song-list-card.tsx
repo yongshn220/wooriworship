@@ -36,16 +36,18 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit, onDelete, onSe
                             return (
                                 <div
                                     key={song.id || idx}
-                                    className="grid grid-cols-[2.5rem_1fr_1.1fr] gap-3 px-3 py-3 items-center hover:bg-muted/50 transition-colors cursor-pointer"
+                                    className="flex items-center gap-3 px-3 py-3 hover:bg-muted/50 transition-colors cursor-pointer"
                                     onClick={() => song.id && setSelectedSongId(song.id)}
                                 >
-                                    <div className="text-muted-foreground font-mono text-xs font-medium">
+                                    <div className="text-muted-foreground font-mono text-xs font-medium w-6 shrink-0">
                                         {(idx + 1).toString().padStart(2, '0')}
                                     </div>
-                                    <div className="font-semibold text-sm text-foreground leading-tight truncate">
-                                        {song.title || "Untitled"}
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-semibold text-sm text-foreground leading-snug line-clamp-2">
+                                            {song.title || "Untitled"}
+                                        </p>
                                     </div>
-                                    <div className="text-right flex flex-col items-end">
+                                    <div className="shrink-0">
                                         {song?.keys?.[0] ? (
                                             <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-lg border text-[11px] font-bold shadow-sm whitespace-nowrap bg-card border-border text-muted-foreground">
                                                 {song.keys[0]}

@@ -11,8 +11,8 @@ interface Props {
 
 export function UploadedImageFileCard({imageFileContainer, index, handleRemoveImage}: Props) {
   return (
-    <div className="flex flex-col h-60 aspect-[3/4] border rounded-lg">
-      <div className="relative flex-1 flex-start rounded-md">
+    <div className="flex flex-col w-full border rounded-lg overflow-hidden bg-muted/20">
+      <div className="relative aspect-square w-full">
         {
           imageFileContainer.isLoading ?
           <LoadingCircle/>
@@ -21,15 +21,21 @@ export function UploadedImageFileCard({imageFileContainer, index, handleRemoveIm
             <Image
               src={imageFileContainer.url}
               fill
-              sizes="20vw, 20vw, 20vw"
-              className="object-contain p-1 rounded-md"
+              sizes="(max-width: 640px) 50vw, 33vw"
+              className="object-cover rounded-t-lg"
               alt="Music sheet image"
             />
-            <Cross2Icon className="absolute right-1 top-1 cursor-pointer rounded-full hover:text-blue-500" width={20} height={20} onClick={() => handleRemoveImage(index)}/>
+            <button
+              type="button"
+              onClick={() => handleRemoveImage(index)}
+              className="absolute right-1 top-1 p-1 bg-black/50 rounded-full hover:bg-red-500 transition-colors"
+            >
+              <Cross2Icon className="text-white" width={16} height={16} />
+            </button>
           </>
         }
       </div>
-      <p className="text-center text-xs text-gray-400 mt-1 font-semibold">{index + 1}</p>
+      <p className="text-center text-xs text-muted-foreground py-1.5 font-medium">{index + 1}</p>
     </div>
   )
 }

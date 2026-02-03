@@ -47,13 +47,18 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit }: Props) {
                             return (
                                 <div
                                     key={song.id || idx}
-                                    className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors cursor-pointer active:bg-muted/50"
+                                    className="flex items-center gap-3 p-4 hover:bg-muted/30 transition-colors cursor-pointer active:bg-muted/50"
                                     onClick={() => song.id && setSelectedSongId(song.id)}
                                 >
-                                    <div className="w-8 text-center shrink-0 text-sm font-bold text-muted-foreground/50">
+                                    <div className="w-6 text-center shrink-0 text-sm font-bold text-muted-foreground/50">
                                         {idx + 1}
                                     </div>
-                                    <div className="w-10 flex justify-center shrink-0">
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="font-semibold text-foreground leading-snug line-clamp-2">
+                                            {song.title || "Untitled"}
+                                        </h4>
+                                    </div>
+                                    <div className="shrink-0">
                                         {song?.keys?.[0] ? (
                                             <Badge variant="outline" className="font-mono text-sm font-bold border-border bg-muted/20 px-1.5">
                                                 {song.keys[0]}
@@ -61,11 +66,6 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit }: Props) {
                                         ) : (
                                             <span className="text-xs text-muted-foreground">-</span>
                                         )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="font-semibold text-foreground truncate">
-                                            {song.title || "Untitled"}
-                                        </h4>
                                     </div>
                                 </div>
                             )
