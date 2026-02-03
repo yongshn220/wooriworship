@@ -96,6 +96,12 @@ export function InlineCalendarView({
     setCurrentMonth((prev) => addMonths(prev, 1));
   };
 
+  const handleGoToToday = () => {
+    setCurrentMonth(startOfMonth(new Date()));
+  };
+
+  const isCurrentMonthToday = isSameMonth(currentMonth, new Date());
+
   const handleDayClick = (day: Date) => {
     const dateKey = format(day, "yyyy-MM-dd");
     const events = eventsByDate.get(dateKey);
@@ -150,13 +156,26 @@ export function InlineCalendarView({
         </div>
 
         {viewMode === "days" && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             <button
               onClick={handlePreviousMonth}
               className="p-1.5 hover:bg-background/60 rounded-md transition-colors"
               aria-label="Previous month"
             >
               <ChevronLeft className="w-4 h-4 text-foreground/70" />
+            </button>
+            <button
+              onClick={handleGoToToday}
+              className={cn(
+                "px-2 py-1 rounded-md text-xs font-semibold transition-all",
+                isCurrentMonthToday
+                  ? "text-muted-foreground/40 cursor-default"
+                  : "text-primary hover:bg-primary/10 active:scale-95"
+              )}
+              aria-label="Go to today"
+              disabled={isCurrentMonthToday}
+            >
+              Today
             </button>
             <button
               onClick={handleNextMonth}
