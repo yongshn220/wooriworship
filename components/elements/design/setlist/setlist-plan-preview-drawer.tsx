@@ -16,7 +16,14 @@ function PreviewContent({ teamId, setlistId }: { teamId: string, setlistId: stri
     const songsLoadable = useRecoilValueLoadable(setlistSongListAtom({ teamId, setlistId }));
 
     const songs = useMemo(() => {
-        return songsLoadable.state === 'hasValue' ? songsLoadable.contents : [];
+        const rawSongs = songsLoadable.state === 'hasValue' ? songsLoadable.contents : [];
+        // Map to SetlistSongItem format
+        return rawSongs.map(song => ({
+            id: song?.id || "",
+            title: song?.title || "",
+            key: song?.keys?.[0] || "",
+            keyNote: "" // Legacy setlist doesn't have keyNote
+        }));
     }, [songsLoadable]);
 
     if (!setlist) return null;

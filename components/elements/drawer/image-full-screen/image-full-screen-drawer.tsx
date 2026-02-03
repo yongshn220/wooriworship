@@ -70,13 +70,13 @@ function FullScreenImageItem({ url }: { url: string }) {
                         wrapperStyle={{ width: "100%", height: "100%" }}
                         contentStyle={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}
                     >
-                        <div className="relative w-full h-full flex-center">
+                        <div className="relative w-full h-full max-w-screen max-h-screen flex-center">
                             <Image
                                 alt="Full screen image"
                                 src={url}
                                 fill
                                 sizes="100vw"
-                                className="object-contain"
+                                className="object-contain max-w-full max-h-full"
                                 priority
                             />
                             {/* Overlay to catch events and prevent default image behavior if needed, 

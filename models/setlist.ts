@@ -8,6 +8,7 @@ export interface SetlistSongHeader {
   title?: string
   artist?: string // was subtitle
   key?: string
+  keyNote?: string // e.g. "key up", "female key"
 }
 
 export interface Setlist {

@@ -69,8 +69,13 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
       newSelectedKeys = [...selectedKeys, sheetId]
     }
 
+    // Determine the key to display (first selected sheet's key)
+    const firstSelectedSheetId = newSelectedKeys[0]
+    const firstSelectedSheet = musicSheets?.find((s: MusicSheet) => s.id === firstSelectedSheetId)
+    const displayKey = firstSelectedSheet?.key || ""
+
     // Update State (Allow empty keys)
-    onUpdate({ ...songHeader, selected_music_sheet_ids: newSelectedKeys });
+    onUpdate({ ...songHeader, selected_music_sheet_ids: newSelectedKeys, key: displayKey });
   }
 
 

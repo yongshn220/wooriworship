@@ -24,6 +24,9 @@ export function AddableSongHeaderDefault({ teamId, songId, selectedSongs, onUpda
   const selectedSheetIds = isSelected ? selectedSongs[existingSongIndex].selected_music_sheet_ids : []
 
   function handleToggleKey(sheetId: string) {
+    // Find the sheet to get its key
+    const selectedSheet = musicSheets?.find(s => s.id === sheetId)
+
     if (isSelected) {
       // Song is already added, toggle the key
       const currentSheets = selectedSongs[existingSongIndex].selected_music_sheet_ids || []
@@ -34,10 +37,16 @@ export function AddableSongHeaderDefault({ teamId, songId, selectedSongs, onUpda
         newSheets = [...currentSheets, sheetId]
       }
 
+      // Determine the key to display (first selected sheet's key)
+      const firstSelectedSheetId = newSheets[0]
+      const firstSelectedSheet = musicSheets?.find(s => s.id === firstSelectedSheetId)
+      const displayKey = firstSelectedSheet?.key || ""
+
       const newList = [...selectedSongs]
       newList[existingSongIndex] = {
         ...newList[existingSongIndex],
-        selected_music_sheet_ids: newSheets
+        selected_music_sheet_ids: newSheets,
+        key: displayKey
       }
 
       // OPTIONAL: If newSheets is empty, remove the song?
@@ -53,7 +62,8 @@ export function AddableSongHeaderDefault({ teamId, songId, selectedSongs, onUpda
       onUpdateList([...selectedSongs, {
         id: songId,
         note: song?.description || "",
-        selected_music_sheet_ids: [sheetId]
+        selected_music_sheet_ids: [sheetId],
+        key: selectedSheet?.key || ""
       }])
     }
   }

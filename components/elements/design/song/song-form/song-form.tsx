@@ -164,15 +164,11 @@ export function SongForm({ mode, teamId, songId }: Props) {
     if (!createValidCheck()) return false
 
     try {
-      const newSongId = await SongApi.addNewSong(authUser?.uid, teamId, songInput, musicSheetContainers)
+      const uploadedMusicSheetContainers = await uploadMusicSheetContainers(musicSheetContainers)
+      const newSongId = await SongApi.addNewSong(authUser?.uid, teamId, songInput, uploadedMusicSheetContainers)
       if (!newSongId) {
         toast({ description: `Fail to create a song. Please try again.` })
         return
-      }
-
-      const uploadedMusicSheetContainers = await uploadMusicSheetContainers(musicSheetContainers)
-      if (await MusicSheetApi.addNewMusicSheets(authUser?.uid, teamId, newSongId, uploadedMusicSheetContainers) === false) {
-        console.log("err:song-board-form:handleCreate. Fail to create music sheets."); return
       }
 
       if (await TagApi.addNewTags(teamId, songInput.tags) === false) {
@@ -292,10 +288,21 @@ export function SongForm({ mode, teamId, songId }: Props) {
     }
     setMusicSheetContainers((prev) => {
       const newList = [...prev, newContainer]
-      setSelectedSheetIndex(newList.length - 1)
       return newList
     })
   }
+
+  // Auto-select newly added sheet
+  useEffect(() => {
+    if (musicSheetContainers.length > 0) {
+      const lastIndex = musicSheetContainers.length - 1
+      // Only auto-select if the last item is a new empty sheet (no images yet)
+      const lastSheet = musicSheetContainers[lastIndex]
+      if (lastSheet && lastSheet.imageFileContainers.length === 0 && !lastSheet.key) {
+        setSelectedSheetIndex(lastIndex)
+      }
+    }
+  }, [musicSheetContainers.length])
 
   function setKeyToMusicSheet(tempId: string, key: string) {
     setMusicSheetContainers((prev) => ([...prev.map((musicSheet) => (musicSheet?.tempId === tempId) ? { ...musicSheet, key: key } : musicSheet)]))

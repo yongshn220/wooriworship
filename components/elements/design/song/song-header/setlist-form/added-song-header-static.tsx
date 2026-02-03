@@ -10,6 +10,7 @@ import { TeamOption } from "@/models/team";
 import { TeamApi } from "@/apis";
 import { toast } from "@/components/ui/use-toast";
 import { songAtom } from "@/global-states/song-state";
+import { musicSheetsBySongIdAtom } from "@/global-states/music-sheet-state";
 import { SetlistSongHeader } from "@/models/setlist";
 import { AddableSongDetailDialogTrigger } from "@/components/elements/design/song/song-detail-card/setlist-form/addable-song-detail-dialog-trigger";
 import { AddedSongInnerHeader } from "@/components/elements/design/song/song-header/setlist-form/parts/added-song-inner-header";
@@ -28,6 +29,7 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader, on
   const songLoadable = useRecoilValueLoadable(songAtom({ teamId, songId: songHeader?.id }))
   // Utilize Loadable for teamAtom to prevent Suspense
   const teamLoadable = useRecoilValueLoadable(teamAtom(teamId))
+  const musicSheetsLoadable = useRecoilValueLoadable(musicSheetsBySongIdAtom({ teamId, songId: songHeader?.id }))
   const setTeam = useSetRecoilState(teamAtom(teamId))
   const [isDefaultChecked, setDefaultChecked] = useState<CheckState>(false)
 
@@ -134,7 +136,12 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader, on
   }
 
   function setMusicSheetIds(ids: Array<string>) {
-    onUpdate({ ...songHeader, selected_music_sheet_ids: ids });
+    // Get the key from the first selected music sheet
+    const musicSheets = musicSheetsLoadable.state === 'hasValue' ? musicSheetsLoadable.contents : []
+    const firstSelectedSheet = musicSheets?.find(s => s.id === ids[0])
+    const displayKey = firstSelectedSheet?.key || ""
+
+    onUpdate({ ...songHeader, selected_music_sheet_ids: ids, key: displayKey });
   }
 
   return (

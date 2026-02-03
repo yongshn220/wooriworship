@@ -6,10 +6,15 @@ import { SongDetailDialog } from "@/components/elements/design/song/song-detail-
 import { SectionHeader, SectionCardContainer } from "@/components/common/section-card";
 import { Button } from "@/components/ui/button";
 
-import { Song } from "@/models/song";
+interface SetlistSongItem {
+    id: string;
+    title: string;
+    key?: string;
+    keyNote?: string;
+}
 
 interface Props {
-    songs: Song[];
+    songs: SetlistSongItem[];
     teamId: string;
     onEdit?: () => void;
     onDelete?: () => void;
@@ -48,9 +53,10 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit, onDelete, onSe
                                         </p>
                                     </div>
                                     <div className="shrink-0">
-                                        {song?.keys?.[0] ? (
-                                            <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-lg border text-[11px] font-bold shadow-sm whitespace-nowrap bg-card border-border text-muted-foreground">
-                                                {song.keys[0]}
+                                        {song?.key ? (
+                                            <span className="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg border text-[11px] font-bold shadow-sm whitespace-nowrap bg-card border-border text-muted-foreground">
+                                                {song.key}
+                                                {song.keyNote && <span className="font-medium text-muted-foreground/70">{song.keyNote}</span>}
                                             </span>
                                         ) : (
                                             <span className="text-xs text-muted-foreground">-</span>

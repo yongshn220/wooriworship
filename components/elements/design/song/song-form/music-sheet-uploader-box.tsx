@@ -57,7 +57,7 @@ export function MusicSheetUploaderBox({
           </Select>
         </div>
         <Input
-          placeholder="e.g. Female key"
+          placeholder="e.g. key up"
           value={musicNote}
           onChange={(e) => setMusicNote(tempId, e.target.value)}
           className="h-10 rounded-xl bg-secondary/40 border-border text-sm"

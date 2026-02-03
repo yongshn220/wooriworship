@@ -86,11 +86,12 @@ class StorageApi {
     try {
       const newMusicSheetContainer = { ...musicSheetContainer }
       for (const imageFileContainer of newMusicSheetContainer.imageFileContainers) {
+        // Skip already uploaded images (they don't have file, only url)
+        if (imageFileContainer.isUploadedInDatabase === true) {
+          continue
+        }
         if (!imageFileContainer.file) {
           console.error("uploadMusicSheetContainer: file not exists."); continue
-        }
-        if (imageFileContainer.isUploadedInDatabase === true) {
-          console.error("uploadMusicSheetContainer: file already exists in database."); continue
         }
 
         const downloadUrl = await this.uploadFile(team_id, imageFileContainer.file, imageFileContainer.id)

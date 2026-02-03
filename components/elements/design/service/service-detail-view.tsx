@@ -113,15 +113,8 @@ export function ServiceDetailView({
                     songs={setlist.songs.map(s => ({
                         id: s.id,
                         title: s.title || "",
-                        keys: s.key ? [s.key] : [],
-                        original: { author: s.artist || "", url: "" },
-                        team_id: teamId,
-                        subtitle: "",
-                        description: "",
-                        tags: [],
-                        created_by: { id: "", time: { seconds: 0, nanoseconds: 0 } as any },
-                        last_used_time: { seconds: 0, nanoseconds: 0 } as any,
-                        updated_by: { id: "", time: { seconds: 0, nanoseconds: 0 } as any }
+                        key: s.key || "",
+                        keyNote: s.keyNote || ""
                     }))}
                     onEdit={() => setIsEditingSetlist(true)}
                     onDelete={() => setDeletingTarget("setlist")}

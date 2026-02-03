@@ -3,6 +3,7 @@ import { doc, getDoc, setDoc, deleteDoc, Timestamp } from "firebase/firestore";
 import { ServiceSetlist } from "@/models/services/ServiceEvent";
 import { Song } from "@/models/song";
 import SongApi from "./SongApi";
+import MusicSheetApi from "./MusicSheetApi";
 
 /**
  * SetlistApi (V3)
@@ -28,11 +29,24 @@ export class SetlistApi {
                     // Start with lightweight hydration if possible, or fetch full song
                     // Optimization: Could use a cache or batched fetch
                     const songDetails = await SongApi.getSongById(teamId, s.id) as Song;
+
+                    // Get key and keyNote from selected music sheet (if any)
+                    let selectedKey = "";
+                    let selectedKeyNote = "";
+                    if (s.selected_music_sheet_ids && s.selected_music_sheet_ids.length > 0) {
+                        const firstSheetId = s.selected_music_sheet_ids[0];
+                        const sheet = await MusicSheetApi.getById(teamId, s.id, firstSheetId);
+                        selectedKey = sheet?.key || "";
+                        selectedKeyNote = sheet?.note || "";
+                    }
+
                     return {
                         ...s,
                         title: songDetails?.title || "Unknown Song",
                         artist: songDetails?.original?.author || songDetails?.subtitle || "",
-                        key: songDetails?.keys?.[0] || ""
+                        // Use key from selected music sheet, fallback to song's first key
+                        key: selectedKey || songDetails?.keys?.[0] || "",
+                        keyNote: selectedKeyNote
                     };
                 }));
                 data.songs = hydratedSongs;
