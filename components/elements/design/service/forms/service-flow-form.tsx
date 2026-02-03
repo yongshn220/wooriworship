@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useRef, useEffect } from "react";
-import { Check, Plus, EllipsisVertical, Pencil, Save, Trash2, X } from "lucide-react";
+import { Check, Plus, EllipsisVertical, Pencil, Save, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 // UI Components
@@ -14,6 +14,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFormFooter } from "@/components/common/form/full-screen-form";
 import { cn } from "@/lib/utils";
+import { SearchBar } from "@/components/common/search-bar";
+import { DrawerFloatingFooter, DrawerDoneButton } from "@/components/common/drawer-floating-footer";
 
 // Logic & Types
 import { useServiceFlowFormLogic } from "./hooks/use-service-flow-form-logic";
@@ -84,6 +86,7 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
     // Confirm States for this form
     const [deleteConfirm, setDeleteConfirm] = React.useState<{ type: 'template' | null; id: string | null; open: boolean }>({ type: null, id: null, open: false });
     const [memberSearchQuery, setMemberSearchQuery] = React.useState("");
+    const [isSearchFocused, setIsSearchFocused] = React.useState(false);
 
     return (
         <FullScreenForm data-testid="service-flow-form">
@@ -309,40 +312,29 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                 if (!open) {
                     setActiveSelection(null);
                     setMemberSearchQuery("");
+                    setIsSearchFocused(false);
                 }
             }}>
-                <DrawerContent className="h-[96vh] rounded-t-[2.5rem]">
+                <DrawerContent className="h-[90vh] rounded-t-[2.5rem]">
+                    <DrawerTitle className="sr-only">Select Member</DrawerTitle>
+                    <DrawerDescription className="sr-only">
+                        Select a member to assign to this item.
+                    </DrawerDescription>
                     <div className="mx-auto w-full max-w-lg h-full flex flex-col pt-2 relative">
-                        <div className="flex flex-col gap-1 px-6 pt-6 pb-2">
-                            <div className="flex items-center gap-3">
-                                <div className="relative flex-1">
-                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search h-4 w-4"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-                                    </div>
-                                    <Input
-                                        value={memberSearchQuery}
-                                        onChange={(e) => setMemberSearchQuery(e.target.value)}
-                                        placeholder="Search name or email..."
-                                        className="pl-10 h-12 bg-muted/30 border-0 rounded-2xl text-[16px] ring-offset-0 focus-visible:ring-2 focus-visible:ring-primary/20 placeholder:text-muted-foreground/40 font-medium"
-                                    />
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="rounded-full hover:bg-muted h-10 w-10 flex-shrink-0"
-                                    onClick={() => setActiveSelection(null)}
-                                >
-                                    <X className="h-5 w-5 text-muted-foreground" />
-                                </Button>
-                            </div>
+                        <div className="flex flex-col gap-1 px-6 pt-4 pb-2">
+                            <SearchBar
+                                value={memberSearchQuery}
+                                onChange={setMemberSearchQuery}
+                                placeholder="Search members..."
+                                size="lg"
+                                inputClassName="rounded-2xl"
+                                onFocus={() => setIsSearchFocused(true)}
+                                onBlur={() => setIsSearchFocused(false)}
+                            />
                         </div>
 
                         <ScrollArea className="flex-1">
-                            <div className="flex flex-col gap-6 pb-32 pt-2 px-6">
-                                <DrawerTitle className="text-xl font-bold text-foreground tracking-tight px-1">
-                                    Select Member
-                                </DrawerTitle>
-
+                            <div className="flex flex-col pb-32 pt-2 px-6">
                                 <MemberSelector
                                     searchQuery={memberSearchQuery}
                                     selectedMemberIds={
@@ -373,14 +365,9 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                             </div>
                         </ScrollArea>
 
-                        <div className="absolute bottom-0 left-0 right-0 p-8 pt-10 pb-10 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none">
-                            <Button
-                                className="w-full h-14 rounded-2xl bg-primary text-primary-foreground text-lg font-bold shadow-xl pointer-events-auto active:scale-95 transition-all"
-                                onClick={() => setActiveSelection(null)}
-                            >
-                                Done
-                            </Button>
-                        </div>
+                        <DrawerFloatingFooter hidden={isSearchFocused}>
+                            <DrawerDoneButton onClick={() => setActiveSelection(null)} />
+                        </DrawerFloatingFooter>
                     </div>
                 </DrawerContent>
             </Drawer>

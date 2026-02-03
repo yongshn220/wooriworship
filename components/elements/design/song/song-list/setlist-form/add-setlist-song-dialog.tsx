@@ -9,6 +9,7 @@ import { LoadingCircle } from "@/components/util/animation/loading-indicator";
 import { useRecoilValue } from "recoil";
 import { songSearchInputAtom } from "@/app/board/_states/board-states";
 import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { DrawerFloatingFooter, DrawerDoneButton } from "@/components/common/drawer-floating-footer";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
 import { SearchFilterPopover } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-filter-popover";
@@ -30,17 +31,22 @@ export function AddSetlistSongDialog({ teamId, isOpen, setIsOpen, selectedSongs,
 
   // State for "Cart" view
   const [showSelectedOnly, setShowSelectedOnly] = React.useState(false)
+  // State for keyboard visibility (hide bottom bar when typing)
+  const [isSearchFocused, setIsSearchFocused] = React.useState(false)
 
   // Reset view when dialog opens/closes
   React.useEffect(() => {
-    if (!isOpen) setShowSelectedOnly(false)
+    if (!isOpen) {
+      setShowSelectedOnly(false)
+      setIsSearchFocused(false)
+    }
   }, [isOpen])
 
   const selectedCount = selectedSongs.length
 
   return (
     <Drawer open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
-      <DrawerContent className="h-[96vh] rounded-t-[2.5rem]">
+      <DrawerContent className="h-[90vh] rounded-t-[2.5rem]">
         <div className="w-full h-full flex flex-col overflow-hidden">
           <DrawerHeader className="shrink-0 p-0">
           </DrawerHeader>
@@ -57,7 +63,10 @@ export function AddSetlistSongDialog({ teamId, isOpen, setIsOpen, selectedSongs,
               <>
                 <div className="w-full flex items-center gap-2">
                   <div className="flex-1">
-                    <SearchInput />
+                    <SearchInput
+                      onFocus={() => setIsSearchFocused(true)}
+                      onBlur={() => setIsSearchFocused(false)}
+                    />
                   </div>
                   <SearchFilterPopover>
                     <Button variant="ghost" size="icon" className="shrink-0 h-9 w-9 rounded-full">
@@ -78,7 +87,10 @@ export function AddSetlistSongDialog({ teamId, isOpen, setIsOpen, selectedSongs,
           </div>
 
           {/* Scrollable Song List */}
-          <div className="flex-1 overflow-y-auto no-scrollbar pb-48">
+          <div className={cn(
+            "flex-1 overflow-y-auto no-scrollbar transition-all duration-200 pb-48",
+            isSearchFocused && "max-md:pb-4"
+          )}>
             <Suspense fallback={<LoadingCircle />}>
               <AddableSongHeaderList
                 teamId={teamId}
@@ -89,39 +101,37 @@ export function AddSetlistSongDialog({ teamId, isOpen, setIsOpen, selectedSongs,
             </Suspense>
           </div>
 
-          {/* Bottom Floating Action Bar */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent pt-10">
-            <div className="flex gap-3 max-w-md mx-auto">
-              {/* Done Button */}
-              <DrawerClose asChild>
-                <Button className="h-14 flex-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl transition-all active:scale-95">
-                  Done
-                </Button>
-              </DrawerClose>
+          {/* Bottom Floating Action Bar - hidden on mobile when keyboard is open */}
+          <DrawerFloatingFooter
+            hidden={isSearchFocused}
+            className={cn(isSearchFocused && "max-md:translate-y-full max-md:opacity-0")}
+          >
+            <DrawerClose asChild>
+              <DrawerDoneButton />
+            </DrawerClose>
 
-              {/* Cart Toggle Button */}
-              <Button
-                variant={showSelectedOnly ? "default" : "outline"}
-                onClick={() => setShowSelectedOnly(!showSelectedOnly)}
-                className={cn(
-                  "h-14 aspect-square rounded-full relative shadow-lg transition-all active:scale-95 shrink-0 border-2",
-                  showSelectedOnly ? "bg-blue-600 hover:bg-blue-700 text-white border-transparent" : "bg-white border-blue-100 text-blue-600 hover:bg-blue-50"
-                )}
-              >
-                <div className="flex flex-col items-center justify-center leading-none">
-                  <span className="text-[10px] font-bold uppercase mb-0.5">{showSelectedOnly ? "ALL" : "CART"}</span>
-                  <span className="text-lg font-black">{selectedCount}</span>
-                </div>
-                {/* Badge Overlay if not in selected view and has items */}
-                {!showSelectedOnly && selectedCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
-                  </span>
-                )}
-              </Button>
-            </div>
-          </div>
+            {/* Cart Toggle Button */}
+            <Button
+              variant={showSelectedOnly ? "default" : "outline"}
+              onClick={() => setShowSelectedOnly(!showSelectedOnly)}
+              className={cn(
+                "h-14 aspect-square rounded-full relative shadow-lg transition-all active:scale-95 shrink-0 border-2",
+                showSelectedOnly ? "bg-primary hover:bg-primary/90 text-primary-foreground border-transparent" : "bg-background border-primary/20 text-primary hover:bg-primary/5"
+              )}
+            >
+              <div className="flex flex-col items-center justify-center leading-none">
+                <span className="text-[10px] font-bold uppercase mb-0.5">{showSelectedOnly ? "ALL" : "CART"}</span>
+                <span className="text-lg font-black">{selectedCount}</span>
+              </div>
+              {/* Badge Overlay if not in selected view and has items */}
+              {!showSelectedOnly && selectedCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
+                </span>
+              )}
+            </Button>
+          </DrawerFloatingFooter>
         </div>
       </DrawerContent>
     </Drawer>

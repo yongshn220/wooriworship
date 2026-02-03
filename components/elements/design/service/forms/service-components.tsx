@@ -115,8 +115,8 @@ export function MemberBadge({ name, onRemove, className, isMe = false }: MemberB
                 "bg-primary/10 text-primary hover:bg-primary/20 border-primary/10",
                 // Me (Blue) overrides Default
                 isMe && "bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200",
-                // Remove (Red Hover) overrides all on hover
-                onRemove && "cursor-pointer hover:bg-red-50 hover:text-red-600 hover:border-red-100",
+                // Removable - keep cursor pointer but no aggressive color change
+                onRemove && "cursor-pointer",
                 className
             )}
             onClick={handleBadgeClick}
@@ -125,7 +125,7 @@ export function MemberBadge({ name, onRemove, className, isMe = false }: MemberB
             {displayName}
             {onRemove && (
                 <button
-                    className="hover:text-red-500 transition-colors ml-0.5 rounded-full p-1 active:bg-red-50"
+                    className="hover:text-foreground/70 transition-colors ml-0.5 rounded-full p-1 active:bg-muted"
                     onClick={(e) => {
                         e.stopPropagation();
                         onRemove();

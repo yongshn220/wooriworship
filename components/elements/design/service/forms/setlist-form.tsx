@@ -68,7 +68,7 @@ export function SetlistForm({ teamId, serviceId, initialSetlist, onCompleted, on
                     {/* Context Card */}
                     <FormSectionCard>
                         <Textarea
-                            placeholder="Write a description or note for the team..."
+                            placeholder="Write a note for the team..."
                             value={basicInfo.description}
                             onChange={(e) => setBasicInfo(prev => ({ ...prev, description: e.target.value }))}
                             className="min-h-[80px] text-base bg-transparent border-none p-0 focus-visible:ring-0 placeholder:text-muted-foreground/40 resize-none leading-relaxed"
@@ -76,10 +76,10 @@ export function SetlistForm({ teamId, serviceId, initialSetlist, onCompleted, on
                         <div className="flex items-center gap-2">
                             <LinkIcon className="w-4 h-4 text-muted-foreground" />
                             <Input
-                                placeholder="Add an external link (e.g. YouTube)..."
+                                placeholder="Paste a link (YouTube, etc.)"
                                 value={basicInfo.link}
                                 onChange={(e) => setBasicInfo(prev => ({ ...prev, link: e.target.value }))}
-                                className="border-none shadow-none focus-visible:ring-0 px-0 bg-transparent text-sm"
+                                className="h-auto border-none shadow-none focus-visible:ring-0 p-0 bg-transparent text-sm"
                             />
                         </div>
                     </FormSectionCard>

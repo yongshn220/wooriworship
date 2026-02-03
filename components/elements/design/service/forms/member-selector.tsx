@@ -4,11 +4,8 @@ import React, { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
-import { Input } from "@/components/ui/input";
-import { Check, Plus, Search, Users, User } from "lucide-react";
+import { Check, Plus, User, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Props {
     selectedMemberIds: string[];
@@ -71,11 +68,46 @@ export function MemberSelector({
         }
     };
 
+    // Check if we should show add options
+    const canAddAsMember = searchQuery &&
+        !members.find(m => m.name.toLowerCase() === searchQuery.toLowerCase()) &&
+        !manualEntries.includes(searchQuery) &&
+        !customMemberNames.includes(searchQuery);
+
+    const canAddAsGroup = searchQuery && onAddGroup && !groups.find(g => g.toLowerCase() === searchQuery.toLowerCase());
+
     return (
         <div className="flex flex-col">
-            <div className="space-y-6">
+            <div className="space-y-4">
+                {/* Compact Add Options Row */}
+                {(canAddAsMember || canAddAsGroup) && (
+                    <div className="flex items-center gap-2 px-2">
+                        <span className="text-[13px] text-muted-foreground shrink-0">Add &quot;{searchQuery}&quot; as</span>
+                        <div className="flex gap-2">
+                            {canAddAsMember && (
+                                <button
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-primary text-[13px] font-semibold"
+                                    onClick={handleAddAsMember}
+                                >
+                                    <User className="h-3.5 w-3.5" />
+                                    Member
+                                </button>
+                            )}
+                            {canAddAsGroup && (
+                                <button
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-primary text-[13px] font-semibold"
+                                    onClick={handleAddAsGroup}
+                                >
+                                    <Users className="h-3.5 w-3.5" />
+                                    Group
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 {/* Groups Section */}
-                {(filteredGroups.length > 0 || (searchQuery && onAddGroup)) && (
+                {filteredGroups.length > 0 && (
                     <div className="space-y-2">
                         <p className="text-[10px] font-bold tracking-wider text-muted-foreground/50 uppercase px-4">
                             Groups
@@ -109,17 +141,6 @@ export function MemberSelector({
                                     </div>
                                 );
                             })}
-
-                            {/* Add as Group Button */}
-                            {searchQuery && onAddGroup && !groups.find(g => g.toLowerCase() === searchQuery.toLowerCase()) && (
-                                <button
-                                    className="w-full flex items-center gap-3 py-2.5 px-4 rounded-xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left"
-                                    onClick={handleAddAsGroup}
-                                >
-                                    <Plus className="h-4 w-4 text-primary" />
-                                    <span className="font-semibold text-[15px] text-primary truncate flex-1">Add &quot;{searchQuery}&quot;</span>
-                                </button>
-                            )}
                         </div>
                     </div>
                 )}
@@ -173,20 +194,6 @@ export function MemberSelector({
                                 );
                             });
                         })()}
-
-                        {/* Add as Member Button */}
-                        {searchQuery &&
-                            !members.find(m => m.name.toLowerCase() === searchQuery.toLowerCase()) &&
-                            !manualEntries.includes(searchQuery) &&
-                            !customMemberNames.includes(searchQuery) && (
-                                <button
-                                    className="w-full flex items-center gap-3 py-2.5 px-4 rounded-xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left mb-1"
-                                    onClick={handleAddAsMember}
-                                >
-                                    <Plus className="h-4 w-4 text-primary" />
-                                    <span className="font-semibold text-[15px] text-primary truncate flex-1">Add &quot;{searchQuery}&quot;</span>
-                                </button>
-                            )}
 
                         {/* Team Members List */}
                         {filteredMembers.map((member) => {

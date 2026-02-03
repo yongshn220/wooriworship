@@ -2,11 +2,9 @@
 
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer";
 import Image from "next/image";
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import * as React from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { X } from "lucide-react";
 
@@ -17,9 +15,15 @@ interface Props {
 }
 
 export function ImageFullScreenDrawer({ isOpen, setIsOpen, imageUrls }: Props) {
+    const [enablePan, setEnablePan] = useState(false)
+    const imageUrl = imageUrls?.[0]
+
     return (
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
-            <DrawerContent className="h-[100dvh] bg-black border-none p-0 overflow-hidden">
+            <DrawerContent
+                className="bg-black border-none p-0 overflow-hidden [&>div:first-child]:hidden"
+                style={{ position: 'fixed', inset: 0, marginTop: 0, height: '100dvh', borderRadius: 0 }}
+            >
                 <VisuallyHidden>
                     <DrawerHeader>
                         <DrawerTitle>Notice Image Attachment Viewer</DrawerTitle>
@@ -35,61 +39,41 @@ export function ImageFullScreenDrawer({ isOpen, setIsOpen, imageUrls }: Props) {
                     </DrawerClose>
                 </div>
 
-                <div className="w-full h-full">
-                    <Carousel className="w-full h-full">
-                        <CarouselContent>
-                            {imageUrls?.map((url, index) => (
-                                <FullScreenImageItem key={index} url={url} />
-                            ))}
-                        </CarouselContent>
-                    </Carousel>
-                </div>
+                {imageUrl && (
+                    <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+                        <TransformWrapper
+                            initialScale={1}
+                            minScale={1}
+                            maxScale={4}
+                            wheel={{ disabled: true }}
+                            doubleClick={{ mode: "toggle" }}
+                            panning={{ disabled: !enablePan }}
+                            centerOnInit={true}
+                            onTransformed={(e) => {
+                                setEnablePan(e.state.scale > 1.01)
+                            }}
+                        >
+                            <TransformComponent
+                                wrapperClass="!w-full !h-full"
+                                contentClass="!w-full !h-full !flex !items-center !justify-center"
+                            >
+                                <Image
+                                    alt="Full screen image"
+                                    src={imageUrl}
+                                    width={0}
+                                    height={0}
+                                    sizes="100vw"
+                                    className="object-contain"
+                                    style={{ width: "auto", height: "auto", maxWidth: "100vw", maxHeight: "100dvh" }}
+                                    priority
+                                    onContextMenu={(e) => e.preventDefault()}
+                                    onDragStart={(e) => e.preventDefault()}
+                                />
+                            </TransformComponent>
+                        </TransformWrapper>
+                    </div>
+                )}
             </DrawerContent>
         </Drawer>
-    )
-}
-
-function FullScreenImageItem({ url }: { url: string }) {
-    const [enablePan, setEnablePan] = useState(false)
-
-    return (
-        <CarouselItem className="h-[100dvh] p-0">
-            <div className="relative h-full w-full flex-center bg-black overflow-hidden">
-                <TransformWrapper
-                    initialScale={1}
-                    minScale={1}
-                    maxScale={4}
-                    wheel={{ disabled: true }}
-                    doubleClick={{ mode: "toggle" }}
-                    panning={{ disabled: !enablePan }}
-                    onTransformed={(e) => {
-                        setEnablePan(e.state.scale > 1.01)
-                    }}
-                >
-                    <TransformComponent
-                        wrapperStyle={{ width: "100%", height: "100%" }}
-                        contentStyle={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}
-                    >
-                        <div className="relative w-full h-full max-w-screen max-h-screen flex-center">
-                            <Image
-                                alt="Full screen image"
-                                src={url}
-                                fill
-                                sizes="100vw"
-                                className="object-contain max-w-full max-h-full"
-                                priority
-                            />
-                            {/* Overlay to catch events and prevent default image behavior if needed, 
-                  similar to setlist-live-carousel-item.tsx */}
-                            <div
-                                className="absolute inset-0 z-10"
-                                onContextMenu={(e) => e.preventDefault()}
-                                onDragStart={(e) => e.preventDefault()}
-                            />
-                        </div>
-                    </TransformComponent>
-                </TransformWrapper>
-            </div>
-        </CarouselItem>
     )
 }

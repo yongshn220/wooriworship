@@ -115,18 +115,23 @@ export function CalendarStrip({
         return () => container.removeEventListener("scroll", onScroll);
     }, [selectedId, items, isRestoring]);
 
-    // 3. Auto-scroll to selection ONLY when selection changes
+    // 3. Auto-scroll to selection when selection changes OR when items change (e.g., mode switch)
     // Use instant scroll on first render, smooth on subsequent changes
     const isFirstScroll = useRef(true);
+    const prevItemsLengthRef = useRef(items.length);
     useEffect(() => {
         if (selectedId && itemRefs.current.has(selectedId)) {
             const el = itemRefs.current.get(selectedId);
             if (el) {
-                el.scrollIntoView({ inline: "start", behavior: isFirstScroll.current ? "instant" : "smooth", block: "nearest" });
+                // Use instant scroll on first render or when items change (mode switch)
+                const itemsChanged = prevItemsLengthRef.current !== items.length;
+                const useInstant = isFirstScroll.current || itemsChanged;
+                el.scrollIntoView({ inline: "start", behavior: useInstant ? "instant" : "smooth", block: "nearest" });
                 isFirstScroll.current = false;
+                prevItemsLengthRef.current = items.length;
             }
         }
-    }, [selectedId]);
+    }, [selectedId, items.length]);
 
 
     // 4. "Back to Selection" Action

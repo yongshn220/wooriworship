@@ -4,7 +4,7 @@ import React from "react";
 import { useRecoilValue } from "recoil";
 import { songAtom } from "@/global-states/song-state";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
+import { DrawerDoneButton } from "@/components/common/drawer-floating-footer";
 import { MusicKeySelector } from "@/components/elements/design/song/song-detail-card/setlist-form/parts/music-key-selector";
 import { SongDetailMenuButton } from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-menu-button";
 import { SongDetailContent } from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-content";
@@ -59,9 +59,7 @@ export function AddableSongDetailDialog({ teamId, isOpen, setIsOpen, songId, sel
             </div>
             <div className="w-full mt-6">
               <DrawerClose asChild>
-                <Button className="w-full h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold shadow-xl">
-                  Done
-                </Button>
+                <DrawerDoneButton className="w-full" />
               </DrawerClose>
             </div>
           </div>
