@@ -1,6 +1,6 @@
 "use client"
 
-import { DoorOpenIcon } from "lucide-react";
+import { DoorOpenIcon, Download } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import { getPathServing } from "@/components/util/helper/routes";
@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { SetlistViewPageModeSelect } from "./setlist-view-page-mode-select";
 import { Label } from "@/components/ui/label";
 import { MultipleSheetsViewSelect } from "./multiple-sheets-view-select";
+import { DownloadSetlistSheetsDrawer } from "./download-setlist-sheets-drawer";
+import { useState } from "react";
 
 interface Props {
     teamId: string,
@@ -16,6 +18,7 @@ interface Props {
 
 export function SetlistSettingsMenu({ teamId, serviceId }: Props) {
     const router = useRouter()
+    const [isDownloadDrawerOpen, setIsDownloadDrawerOpen] = useState(false)
 
     function handleExit() {
         router.replace(getPathServing(teamId))
@@ -38,6 +41,22 @@ export function SetlistSettingsMenu({ teamId, serviceId }: Props) {
             </p>
 
             <Separator className="my-1 bg-border" />
+
+            <Button
+                variant="ghost"
+                className="w-full flex justify-start h-10 px-2 hover:bg-muted text-foreground hover:text-foreground rounded-lg font-normal"
+                onClick={() => setIsDownloadDrawerOpen(true)}
+            >
+                <Download className="mr-3 w-4 h-4" />
+                <span className="text-sm">Download Sheets</span>
+            </Button>
+
+            <DownloadSetlistSheetsDrawer
+                teamId={teamId}
+                serviceId={serviceId}
+                open={isDownloadDrawerOpen}
+                onOpenChange={setIsDownloadDrawerOpen}
+            />
 
             <Button
                 variant="ghost"
