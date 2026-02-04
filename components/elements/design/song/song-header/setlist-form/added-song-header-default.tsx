@@ -62,7 +62,6 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
   function handleToggleKey(sheetId: string) {
     let newSelectedKeys = []
     if (selectedKeys.includes(sheetId)) {
-      // Toggle Off
       newSelectedKeys = selectedKeys.filter(id => id !== sheetId)
     } else {
       // Toggle On
@@ -115,6 +114,7 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
         <div className={cn("flex flex-wrap gap-2", dragHandle && "pl-16")}>
           {musicSheets?.map((sheet: MusicSheet) => {
             const isSelected = selectedKeys.includes(sheet.id)
+            const orderIndex = selectedKeys.indexOf(sheet.id)
             return (
               <button
                 key={sheet.id}
@@ -123,7 +123,7 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
                   handleToggleKey(sheet.id)
                 }}
                 className={cn(
-                  "px-2.5 min-w-[2.5rem] rounded-[0.5rem] text-xs font-bold border transition-all active:scale-95 flex flex-col items-center justify-center",
+                  "relative px-2.5 min-w-[2.5rem] rounded-[0.5rem] text-xs font-bold border transition-all active:scale-95 flex flex-col items-center justify-center",
                   sheet.note ? "h-10 py-1" : "h-8",
                   isSelected
                     ? "bg-blue-600 border-blue-600 text-white shadow-md hover:bg-blue-700"
@@ -137,6 +137,11 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
                     isSelected ? "text-white/70" : "text-gray-400"
                   )}>
                     {sheet.note}
+                  </span>
+                )}
+                {isSelected && selectedKeys.length > 1 && (
+                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-blue-800 text-white text-[10px] font-bold flex items-center justify-center">
+                    {orderIndex + 1}
                   </span>
                 )}
               </button>

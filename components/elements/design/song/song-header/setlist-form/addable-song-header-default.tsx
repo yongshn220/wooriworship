@@ -135,12 +135,13 @@ export function AddableSongHeaderDefault({ teamId, songId, selectedSongs, onUpda
 
               {musicSheets?.map((sheet, idx) => {
                 const isKeySelected = selectedSheetIds.includes(sheet.id)
+                const orderIndex = selectedSheetIds.indexOf(sheet.id)
                 return (
                   <button
                     key={sheet.id}
                     onClick={() => handleToggleKey(sheet.id)}
                     className={cn(
-                      "min-w-[3rem] px-3 rounded-lg text-sm font-bold transition-all border flex flex-col items-center justify-center",
+                      "relative min-w-[3rem] px-3 rounded-lg text-sm font-bold transition-all border flex flex-col items-center justify-center",
                       sheet.note ? "h-12 py-1" : "h-9",
                       isKeySelected
                         ? "bg-blue-600 border-blue-600 text-white shadow-md scale-100 ring-2 ring-blue-600 ring-offset-1"
@@ -154,6 +155,11 @@ export function AddableSongHeaderDefault({ teamId, songId, selectedSongs, onUpda
                         isKeySelected ? "text-white/70" : "text-gray-400"
                       )}>
                         {sheet.note}
+                      </span>
+                    )}
+                    {isKeySelected && selectedSheetIds.length > 1 && (
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-blue-800 text-white text-[10px] font-bold flex items-center justify-center">
+                        {orderIndex + 1}
                       </span>
                     )}
                   </button>
