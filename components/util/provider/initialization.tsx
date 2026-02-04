@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { isServiceWorkerSupported, registerServiceWorker } from "../helper/push-notification";
 import { auth } from "@/firebase";
 import PushNotificationApi from "@/apis/PushNotificationApi";
+import AccountSettingApi from "@/apis/AccountSettingApi";
 
 export interface LocalStorageUtility {
   deviceId: string
@@ -33,6 +34,12 @@ export default function Initialization() {
 
         if (permission === "granted") {
           await PushNotificationApi.refreshSubscription(user.uid, utility.deviceId);
+        } else if (permission === "denied" || permission === "default") {
+          // Auto-sync: if OS permission is revoked but Firestore still has is_enabled=true, disable it
+          const setting = await AccountSettingApi.getAccountSetting(user.uid);
+          if (setting?.push_notification?.is_enabled) {
+            await PushNotificationApi.updateOptState(user.uid, false);
+          }
         }
       }
       catch (error) {
