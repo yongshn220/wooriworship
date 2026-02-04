@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LucideIcon, EllipsisVertical, SquarePen, Trash2 } from "lucide-react";
+import { LucideIcon, EllipsisVertical, SquarePen, Trash2, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -22,6 +22,8 @@ interface SectionHeaderProps {
   badge?: string;
   onEdit?: () => void;
   editLabel?: string;
+  onDownload?: () => void;
+  downloadLabel?: string;
   onDelete?: () => void;
   deleteLabel?: string;
   actions?: ActionBottomSheetAction[];
@@ -35,6 +37,8 @@ export function SectionHeader({
   badge,
   onEdit,
   editLabel = "Edit",
+  onDownload,
+  downloadLabel = "Download",
   onDelete,
   deleteLabel = "Delete",
   actions,
@@ -42,7 +46,7 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const hasSimpleActions = (onEdit || onDelete) && !actions;
+  const hasSimpleActions = (onEdit || onDownload || onDelete) && !actions;
   const hasCustomActions = actions && actions.length > 0;
   const showMenu = hasSimpleActions || hasCustomActions;
 
@@ -88,7 +92,16 @@ export function SectionHeader({
                     <SquarePen className="w-4 h-4 text-muted-foreground" />
                   </DropdownMenuItem>
                 )}
-                {onEdit && onDelete && <DropdownMenuSeparator className="mx-1" />}
+                {onDownload && (
+                  <DropdownMenuItem
+                    onClick={onDownload}
+                    className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[14px] font-medium cursor-pointer focus:bg-accent"
+                  >
+                    {downloadLabel}
+                    <Download className="w-4 h-4 text-muted-foreground" />
+                  </DropdownMenuItem>
+                )}
+                {(onEdit || onDownload) && onDelete && <DropdownMenuSeparator className="mx-1" />}
                 {onDelete && (
                   <DropdownMenuItem
                     onClick={onDelete}

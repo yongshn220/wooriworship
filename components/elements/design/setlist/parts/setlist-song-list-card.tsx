@@ -17,11 +17,12 @@ interface Props {
     songs: SetlistSongItem[];
     teamId: string;
     onEdit?: () => void;
+    onDownload?: () => void;
     onDelete?: () => void;
     onSetlistView?: () => void;
 }
 
-export function SetlistSongListCard({ songs = [], teamId, onEdit, onDelete, onSetlistView }: Props) {
+export function SetlistSongListCard({ songs = [], teamId, onEdit, onDownload, onDelete, onSetlistView }: Props) {
     const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
 
     return (
@@ -32,6 +33,7 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit, onDelete, onSe
                     iconColorClassName="bg-primary/10 text-primary"
                     title="Setlist"
                     onEdit={onEdit}
+                    onDownload={onDownload}
                     onDelete={onDelete}
                 />
                 {songs && songs.length > 0 ? (

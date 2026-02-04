@@ -15,6 +15,7 @@ import { SetlistApi } from "@/apis/SetlistApi";
 import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
 import { ServiceFlowApi } from "@/apis/ServiceFlowApi";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
+import { DownloadSetlistSheetsDrawer } from "@/app/board/[teamId]/(service)/setlist-view/[serviceId]/_components/download-setlist-sheets-drawer";
 import { useToast } from "@/components/ui/use-toast";
 import { getPathSetlistView } from "@/components/util/helper/routes";
 
@@ -64,6 +65,7 @@ export function ServiceDetailView({
     const [isEditingFlow, setIsEditingFlow] = useState(false);
     const { toast } = useToast();
     const [deletingTarget, setDeletingTarget] = useState<"setlist" | "assignee" | "flow" | null>(null);
+    const [isDownloadDrawerOpen, setIsDownloadDrawerOpen] = useState(false);
 
     const handleDeleteSetlist = async () => {
         await SetlistApi.deleteSetlist(teamId, event.id);
@@ -117,6 +119,7 @@ export function ServiceDetailView({
                         keyNote: s.keyNote || ""
                     }))}
                     onEdit={() => setIsEditingSetlist(true)}
+                    onDownload={() => setIsDownloadDrawerOpen(true)}
                     onDelete={() => setDeletingTarget("setlist")}
                     onSetlistView={() => router.push(getPathSetlistView(teamId, event.id))}
                 />
@@ -250,6 +253,14 @@ export function ServiceDetailView({
                 title="Delete Service Flow?"
                 description="All flow items will be removed. This action cannot be undone."
                 onDeleteHandler={handleDeleteFlow}
+            />
+
+            {/* Download Setlist Sheets Drawer */}
+            <DownloadSetlistSheetsDrawer
+                teamId={teamId}
+                serviceId={event.id}
+                open={isDownloadDrawerOpen}
+                onOpenChange={setIsDownloadDrawerOpen}
             />
         </div>
     );
