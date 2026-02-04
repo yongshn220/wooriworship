@@ -4,19 +4,25 @@ import { teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
 import { ServicePraiseTeam } from "@/models/services/ServiceEvent";
 import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
+import PushNotificationApi from "@/apis/PushNotificationApi";
 import { useServiceRoles } from "./use-service-roles";
 import { usePraiseTeamTemplates } from "./use-praise-team-templates";
 import { toast } from "@/components/ui/use-toast";
+import { auth } from "@/firebase";
+import { Timestamp } from "firebase/firestore";
+import { format } from "date-fns";
+import { getNewlyAddedMemberIds } from "@/components/util/helper/push-notification-helpers";
 
 
 interface UsePraiseAssigneeFormLogicProps {
     teamId: string;
     serviceId: string;
     initialAssignee?: ServicePraiseTeam | null;
+    serviceDate?: Timestamp;
     onCompleted: () => void;
 }
 
-export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee, onCompleted }: UsePraiseAssigneeFormLogicProps) {
+export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee, serviceDate, onCompleted }: UsePraiseAssigneeFormLogicProps) {
     const [isLoading, setIsLoading] = useState(false);
 
     // Team Members
@@ -93,6 +99,17 @@ export function usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee,
                 assignments: praiseTeam
             });
             toast({ title: "Team assignments saved!" });
+
+            // Notify newly added members
+            const newMembers = getNewlyAddedMemberIds(initialAssignee?.assignments, praiseTeam);
+            if (newMembers.length > 0) {
+                const url = `/board/${teamId}/service-board`;
+                const dateStr = serviceDate ? format(serviceDate.toDate(), "yyyy/MM/dd") : "";
+                PushNotificationApi.notifyNewlyAssignedMembers(
+                    teamId, auth.currentUser?.uid || "", newMembers, dateStr, url
+                ).catch(console.error);
+            }
+
             onCompleted();
         } catch (error) {
             console.error("Failed to save praise assignments:", error);

@@ -197,6 +197,7 @@ export function ServiceDetailView({
                     teamId={teamId}
                     serviceId={event.id}
                     initialSetlist={setlist}
+                    serviceDate={event.date}
                     onCompleted={() => {
                         onDataChanged?.();
                         setIsEditingSetlist(false);
@@ -210,6 +211,7 @@ export function ServiceDetailView({
                     teamId={teamId}
                     serviceId={event.id}
                     initialAssignee={praiseAssignee}
+                    serviceDate={event.date}
                     onCompleted={() => {
                         onDataChanged?.();
                         setIsEditingAssignee(false);
@@ -224,6 +226,7 @@ export function ServiceDetailView({
                     serviceId={event.id}
                     initialFlow={flow}
                     serviceTagIds={event.tagId ? [event.tagId] : []}
+                    serviceDate={event.date}
                     onCompleted={() => {
                         onDataChanged?.();
                         setIsEditingFlow(false);

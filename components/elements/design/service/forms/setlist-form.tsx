@@ -22,16 +22,18 @@ import { SortableList } from "@/components/common/list/sortable-list";
 // Logic Hook
 import { useSetlistFormLogic } from "./hooks/use-setlist-form-logic";
 import { ServiceSetlist } from "@/models/services/ServiceEvent";
+import { Timestamp } from "firebase/firestore";
 
 interface Props {
     teamId: string;
     serviceId: string;
     initialSetlist?: ServiceSetlist | null;
+    serviceDate?: Timestamp;
     onCompleted: () => void;
     onClose: () => void;
 }
 
-export function SetlistForm({ teamId, serviceId, initialSetlist, onCompleted, onClose }: Props) {
+export function SetlistForm({ teamId, serviceId, initialSetlist, serviceDate, onCompleted, onClose }: Props) {
 
     const {
         // State
@@ -43,7 +45,7 @@ export function SetlistForm({ teamId, serviceId, initialSetlist, onCompleted, on
 
         // Actions
         handleSave,
-    } = useSetlistFormLogic({ teamId, serviceId, initialSetlist, onCompleted });
+    } = useSetlistFormLogic({ teamId, serviceId, initialSetlist, serviceDate, onCompleted });
 
     return (
         <FullScreenForm data-testid="setlist-form">

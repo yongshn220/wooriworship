@@ -8,18 +8,21 @@ import { auth } from "@/firebase";
 import { setlistUpdaterAtom, setlistIdsUpdaterAtom, currentSetlistIdAtom } from "@/global-states/setlist-state";
 import { SetlistSongHeader } from "@/models/setlist";
 import { ServiceSetlist } from "@/models/services/ServiceEvent";
+import { Timestamp } from "firebase/firestore";
 
 // Services
 import { SetlistApi } from "@/apis/SetlistApi";
+import PushNotificationApi from "@/apis/PushNotificationApi";
 
 interface UseSetlistFormLogicProps {
     teamId: string;
     serviceId: string;
     initialSetlist?: ServiceSetlist | null;
+    serviceDate?: Timestamp;
     onCompleted?: () => void;
 }
 
-export function useSetlistFormLogic({ teamId, serviceId, initialSetlist, onCompleted }: UseSetlistFormLogicProps) {
+export function useSetlistFormLogic({ teamId, serviceId, initialSetlist, serviceDate, onCompleted }: UseSetlistFormLogicProps) {
 
     // Global updaters
     const setSetlistUpdater = useSetRecoilState(setlistUpdaterAtom);
@@ -56,6 +59,10 @@ export function useSetlistFormLogic({ teamId, serviceId, initialSetlist, onCompl
             });
 
             toast({ title: "Setlist updated" });
+
+            // Send notification to team
+            const url = `/board/${teamId}/service-board`;
+            PushNotificationApi.notifyTeamSetlistUpdate(teamId, auth.currentUser?.uid || "", url).catch(console.error);
 
             // Trigger global updates
             setSetlistUpdater(prev => prev + 1);

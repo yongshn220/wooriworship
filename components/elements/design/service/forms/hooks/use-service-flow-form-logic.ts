@@ -5,21 +5,27 @@ import { teamAtom } from "@/global-states/teamState";
 import { usersAtom } from "@/global-states/userState";
 import { ServiceFlow } from "@/models/services/ServiceEvent";
 import { ServiceFlowApi } from "@/apis/ServiceFlowApi";
+import PushNotificationApi from "@/apis/PushNotificationApi";
 import { useServiceTimeline } from "./use-service-timeline";
 import { useServiceTemplates } from "./use-service-templates";
 import { useServiceHistory } from "./use-service-history";
 import { toast } from "@/components/ui/use-toast";
+import { auth } from "@/firebase";
+import { Timestamp } from "firebase/firestore";
+import { format } from "date-fns";
+import { getNewlyAddedMemberIdsFromFlowItems } from "@/components/util/helper/push-notification-helpers";
 
 
 interface UseServiceFlowFormLogicProps {
     teamId: string;
     serviceId: string;
     initialFlow?: ServiceFlow | null;
-    serviceTagIds?: string[]; // Optional for history filtering
+    serviceTagIds?: string[];
+    serviceDate?: Timestamp;
     onCompleted: () => void;
 }
 
-export function useServiceFlowFormLogic({ teamId, serviceId, initialFlow, serviceTagIds = [], onCompleted }: UseServiceFlowFormLogicProps) {
+export function useServiceFlowFormLogic({ teamId, serviceId, initialFlow, serviceTagIds = [], serviceDate, onCompleted }: UseServiceFlowFormLogicProps) {
     const [isLoading, setIsLoading] = useState(false);
 
     // Team Members (for suggestions & timeline assignments)
@@ -84,6 +90,17 @@ export function useServiceFlowFormLogic({ teamId, serviceId, initialFlow, servic
                 items: items
             });
             toast({ title: "Service flow saved!" });
+
+            // Notify newly added members
+            const newMembers = getNewlyAddedMemberIdsFromFlowItems(initialFlow?.items, items);
+            if (newMembers.length > 0) {
+                const url = `/board/${teamId}/service-board`;
+                const dateStr = serviceDate ? format(serviceDate.toDate(), "yyyy/MM/dd") : "";
+                PushNotificationApi.notifyNewlyAssignedMembers(
+                    teamId, auth.currentUser?.uid || "", newMembers, dateStr, url
+                ).catch(console.error);
+            }
+
             onCompleted();
         } catch (error) {
             console.error("Failed to save service flow:", error);

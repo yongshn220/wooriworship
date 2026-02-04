@@ -136,7 +136,7 @@ export function NoticeForm({ mode, noticeId }: Props) {
         title: `New Notice created!`,
         description: input.title,
       })
-      await PushNotificationApi.notifyTeamNewNotice(teamId, authUser.uid, input.title);
+      await PushNotificationApi.notifyTeamNewNotice(teamId, authUser.uid, input.title, `/board/${teamId}/notice-board`);
       setNoticeIdsUpdater((prev) => prev + 1)
 
       clearContents()

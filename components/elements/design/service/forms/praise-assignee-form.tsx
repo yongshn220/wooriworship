@@ -20,6 +20,7 @@ import { DrawerFloatingFooter, DrawerDoneButton } from "@/components/common/draw
 // Logic & Types
 import { usePraiseAssigneeFormLogic } from "./hooks/use-praise-assignee-form-logic";
 import { ServicePraiseTeam } from "@/models/services/ServiceEvent";
+import { Timestamp } from "firebase/firestore";
 import { slideVariants } from "@/components/constants/animations";
 import { SortableList } from "@/components/common/list/sortable-list";
 import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
@@ -34,11 +35,12 @@ interface Props {
     teamId: string;
     serviceId: string;
     initialAssignee?: ServicePraiseTeam | null;
+    serviceDate?: Timestamp;
     onCompleted: () => void;
     onClose: () => void;
 }
 
-export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompleted, onClose }: Props) {
+export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, serviceDate, onCompleted, onClose }: Props) {
     const {
         isLoading,
         roles,
@@ -86,7 +88,7 @@ export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompl
         handleUpdatePtTemplate,
         handleDeletePtTemplate,
         handleUpdatePtTemplateName,
-    } = usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee, onCompleted });
+    } = usePraiseAssigneeFormLogic({ teamId, serviceId, initialAssignee, serviceDate, onCompleted });
 
     const [memberSearchQuery, setMemberSearchQuery] = React.useState("");
     const [isSearchFocused, setIsSearchFocused] = React.useState(false);
@@ -141,7 +143,7 @@ export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompl
                                     </button>
                                 </div>
 
-                                <DropdownMenu>
+                                <DropdownMenu modal={false}>
                                     <DropdownMenuTrigger asChild>
                                         <button className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 active:bg-muted transition-colors outline-none flex-shrink-0">
                                             <EllipsisVertical className="w-5 h-5" />
@@ -152,11 +154,9 @@ export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompl
                                             className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[14px] font-medium cursor-pointer"
                                             disabled={!selectedPtTemplateId}
                                             onSelect={() => {
-                                                setTimeout(() => {
-                                                    const currentTemp = ptTemplates.find(t => t.id === selectedPtTemplateId);
-                                                    setTempPtTemplateName(currentTemp?.name || "");
-                                                    setIsPtRenameDialogOpen(true);
-                                                }, 150);
+                                                const currentTemp = ptTemplates.find(t => t.id === selectedPtTemplateId);
+                                                setTempPtTemplateName(currentTemp?.name || "");
+                                                setIsPtRenameDialogOpen(true);
                                             }}
                                         >
                                             Rename Template
@@ -178,9 +178,7 @@ export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompl
                                             onSelect={() => {
                                                 const currentTemp = ptTemplates.find(t => t.id === selectedPtTemplateId);
                                                 setNewPtTemplateName(`${currentTemp?.name || "Template"} copy`);
-                                                setTimeout(() => {
-                                                    setIsPtTemplateDialogOpen(true);
-                                                }, 150);
+                                                setIsPtTemplateDialogOpen(true);
                                             }}
                                         >
                                             Save as New
@@ -190,9 +188,7 @@ export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompl
                                         <DropdownMenuItem
                                             className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[14px] font-medium cursor-pointer text-red-600 dark:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-red-600 dark:focus:text-red-500"
                                             onSelect={() => {
-                                                setTimeout(() => {
-                                                    setDeleteConfirm({ type: 'pt-template', id: selectedPtTemplateId || '', open: true });
-                                                }, 150);
+                                                setDeleteConfirm({ type: 'pt-template', id: selectedPtTemplateId || '', open: true });
                                             }}
                                         >
                                             Delete Template
@@ -339,7 +335,7 @@ export function PraiseAssigneeForm({ teamId, serviceId, initialAssignee, onCompl
 
             {/* Role Creation Dialog */}
             <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
-                <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl">
+                <DialogContent className="sm:max-w-md rounded-3xl p-8 border-0 shadow-2xl" onOpenAutoFocus={(e) => e.preventDefault()}>
                     <DialogHeader className="space-y-3">
                         <DialogTitle className="text-2xl font-bold text-center">New Role</DialogTitle>
                         <p className="text-sm text-center text-muted-foreground font-medium">

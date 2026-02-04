@@ -15,6 +15,7 @@ import PushNotificationApi from "@/apis/PushNotificationApi";
 import { auth } from "@/firebase";
 import { getPathServing } from "@/components/util/helper/routes";
 import { FormMode } from "@/components/constants/enums";
+import { getNewlyAddedMemberIds, getNewlyAddedMemberIdsFromFlowItems } from "@/components/util/helper/push-notification-helpers";
 import { useServiceDuplicateCheck } from "@/components/common/hooks/use-service-duplicate-check";
 import { ServiceFormProps } from "../types";
 import { ServiceFormState, ServiceFlowItem, ServiceAssignment } from "@/models/services/ServiceEvent";
@@ -326,17 +327,22 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                     await LinkingApi.linkSetlistAndService(teamId, linkedSetlistId, targetServiceId);
                 }
 
-                // 4. Notify & Stats
-                const allAssignedMembers = Array.from(new Set([
-                    ...items.flatMap(item => item.assignments.flatMap(a => a.memberIds)),
-                    ...praiseTeam.flatMap(r => r.memberIds)
-                ]));
-                await PushNotificationApi.notifyMembersServingAssignment(
-                    teamId,
-                    auth.currentUser?.uid || "",
-                    selectedDate,
-                    allAssignedMembers
-                );
+                // 4. Notify assigned members
+                const url = `/board/${teamId}/service-board`;
+                const creatorUid = auth.currentUser?.uid || "";
+                const dateStr = format(selectedDate, "yyyy/MM/dd");
+
+                // Praise assign notification (CREATE: all members are new)
+                const praiseMembers = Array.from(new Set(praiseTeam.flatMap(r => r.memberIds)));
+                if (praiseMembers.filter(id => id !== creatorUid).length > 0) {
+                    PushNotificationApi.notifyNewlyAssignedMembers(teamId, creatorUid, praiseMembers, dateStr, url).catch(console.error);
+                }
+
+                // Flow assign notification (CREATE: all members are new)
+                const flowMembers = Array.from(new Set(items.flatMap(item => item.assignments.flatMap(a => a.memberIds))));
+                if (flowMembers.filter(id => id !== creatorUid).length > 0) {
+                    PushNotificationApi.notifyNewlyAssignedMembers(teamId, creatorUid, flowMembers, dateStr, url).catch(console.error);
+                }
 
                 // Keep Stats Logic
                 if (serviceTagIds.length > 0) {
@@ -370,6 +376,23 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
                     PraiseTeamApi.updatePraiseTeam(teamId, targetServiceId, { assignments: praiseTeam }),
                     ServiceFlowApi.updateFlow(teamId, targetServiceId, { items: items })
                 ]);
+
+                // 2.5. Notify newly assigned members (EDIT: diff-based)
+                {
+                    const editUrl = `/board/${teamId}/service-board`;
+                    const editCreatorUid = auth.currentUser?.uid || "";
+                    const editDateStr = format(selectedDate, "yyyy/MM/dd");
+
+                    const newPraiseMembers = getNewlyAddedMemberIds(initialData.praise_team, praiseTeam);
+                    if (newPraiseMembers.length > 0) {
+                        PushNotificationApi.notifyNewlyAssignedMembers(teamId, editCreatorUid, newPraiseMembers, editDateStr, editUrl).catch(console.error);
+                    }
+
+                    const newFlowMembers = getNewlyAddedMemberIdsFromFlowItems(initialData.items, items);
+                    if (newFlowMembers.length > 0) {
+                        PushNotificationApi.notifyNewlyAssignedMembers(teamId, editCreatorUid, newFlowMembers, editDateStr, editUrl).catch(console.error);
+                    }
+                }
 
                 // 3. Update Link
                 if (linkedSetlistId !== initialData.setlist_id) {

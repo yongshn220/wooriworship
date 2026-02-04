@@ -20,6 +20,7 @@ import { DrawerFloatingFooter, DrawerDoneButton } from "@/components/common/draw
 // Logic & Types
 import { useServiceFlowFormLogic } from "./hooks/use-service-flow-form-logic";
 import { ServiceFlow } from "@/models/services/ServiceEvent";
+import { Timestamp } from "firebase/firestore";
 import { slideVariants } from "@/components/constants/animations";
 import { SortableList } from "@/components/common/list/sortable-list";
 import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
@@ -35,11 +36,12 @@ interface Props {
     serviceId: string;
     initialFlow?: ServiceFlow | null;
     serviceTagIds?: string[];
+    serviceDate?: Timestamp;
     onCompleted: () => void;
     onClose: () => void;
 }
 
-export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds, onCompleted, onClose }: Props) {
+export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds, serviceDate, onCompleted, onClose }: Props) {
     const {
         isLoading,
         items,
@@ -81,7 +83,7 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
         handleUpdateTemplateName,
         handleSave,
         getSuggestionsForTitle
-    } = useServiceFlowFormLogic({ teamId, serviceId, initialFlow, serviceTagIds, onCompleted });
+    } = useServiceFlowFormLogic({ teamId, serviceId, initialFlow, serviceTagIds, serviceDate, onCompleted });
 
     // Confirm States for this form
     const [deleteConfirm, setDeleteConfirm] = React.useState<{ type: 'template' | null; id: string | null; open: boolean }>({ type: null, id: null, open: false });
@@ -143,7 +145,7 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                                 </button>
                             </div>
 
-                            <DropdownMenu>
+                            <DropdownMenu modal={false}>
                                 <DropdownMenuTrigger asChild>
                                     <button className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 active:bg-muted transition-colors outline-none flex-shrink-0">
                                         <EllipsisVertical className="w-5 h-5" />
@@ -154,11 +156,9 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                                         className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[14px] font-medium cursor-pointer"
                                         disabled={!selectedTemplateId}
                                         onSelect={() => {
-                                            setTimeout(() => {
-                                                const currentTemp = templates.find(t => t.id === selectedTemplateId);
-                                                setTempTemplateName(currentTemp?.name || "");
-                                                setIsRenameDialogOpen(true);
-                                            }, 150);
+                                            const currentTemp = templates.find(t => t.id === selectedTemplateId);
+                                            setTempTemplateName(currentTemp?.name || "");
+                                            setIsRenameDialogOpen(true);
                                         }}
                                     >
                                         Rename Template
@@ -181,9 +181,7 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                                             const currentTemp = templates.find(t => t.id === selectedTemplateId);
                                             setNewTemplateName(`${currentTemp?.name || "Template"} copy`);
                                             setCreateEmptyMode(false);
-                                            setTimeout(() => {
-                                                setIsTemplateDialogOpen(true);
-                                            }, 150);
+                                            setIsTemplateDialogOpen(true);
                                         }}
                                     >
                                         Save as New
@@ -193,9 +191,7 @@ export function ServiceFlowForm({ teamId, serviceId, initialFlow, serviceTagIds,
                                     <DropdownMenuItem
                                         className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[14px] font-medium cursor-pointer text-red-600 dark:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-red-600 dark:focus:text-red-500"
                                         onSelect={() => {
-                                            setTimeout(() => {
-                                                setDeleteConfirm({ type: 'template', id: selectedTemplateId || '', open: true });
-                                            }, 150);
+                                            setDeleteConfirm({ type: 'template', id: selectedTemplateId || '', open: true });
                                         }}
                                     >
                                         Delete Template
