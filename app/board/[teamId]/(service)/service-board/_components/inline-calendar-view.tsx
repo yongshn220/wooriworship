@@ -22,6 +22,7 @@ import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CalendarItem } from "@/components/common/board-calendar/types";
 import { MyAssignment } from "@/models/services/MyAssignment";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
 interface InlineCalendarViewProps {
   items: CalendarItem[];
@@ -46,6 +47,7 @@ export function InlineCalendarView({
   });
 
   const [viewMode, setViewMode] = useState<"days" | "months" | "years">("days");
+  const [openPopoverKey, setOpenPopoverKey] = useState<string | null>(null);
 
   // Sync current month when selection changes (NOT when month changes)
   useEffect(() => {
@@ -105,7 +107,7 @@ export function InlineCalendarView({
   const handleDayClick = (day: Date) => {
     const dateKey = format(day, "yyyy-MM-dd");
     const events = eventsByDate.get(dateKey);
-    if (events && events.length > 0) {
+    if (events && events.length === 1) {
       onSelect(events[0].id);
     }
   };
@@ -208,36 +210,33 @@ export function InlineCalendarView({
             {calendarDays.map((day, index) => {
               const dateKey = format(day, "yyyy-MM-dd");
               const events = eventsByDate.get(dateKey) || [];
-              const firstEvent = events[0];
               const isOutsideMonth = !isSameMonth(day, currentMonth);
-              const isSelected = firstEvent && selectedId === firstEvent.id;
               const todayDate = isToday(day);
               const hasEvent = events.length > 0;
-              const assignment = firstEvent
-                ? assignmentMap.get(firstEvent.id)
-                : null;
-              const firstRole = assignment?.roles?.[0];
-              const firstRoleLabel = firstRole
-                ? (firstRole.source === 'flow' ? firstRole.flowItemTitle || firstRole.roleName : firstRole.roleName)
+              const hasMultipleEvents = events.length > 1;
+              const isAnySelected = events.some(e => e.id === selectedId);
+
+              // For single-event days, show assignment role in cell
+              const singleEvent = events.length === 1 ? events[0] : null;
+              const singleAssignment = singleEvent ? assignmentMap.get(singleEvent.id) : null;
+              const singleRole = singleAssignment?.roles?.[0];
+              const singleRoleLabel = singleRole
+                ? (singleRole.source === 'flow' ? singleRole.flowItemTitle || singleRole.roleName : singleRole.roleName)
                 : null;
 
-              return (
-                <button
-                  key={day.toISOString()}
-                  onClick={() => handleDayClick(day)}
-                  disabled={!hasEvent}
-                  className={cn(
-                    "relative h-[4.5rem] p-2 border-t border-r border-border/20 transition-all",
-                    "flex flex-col items-start gap-0.5",
-                    index % 7 === 0 && "border-l",
-                    isOutsideMonth && "opacity-30 bg-muted/5",
-                    !isOutsideMonth && "hover:bg-accent/30",
-                    isSelected &&
-                      "ring-2 ring-primary ring-inset bg-primary/5 z-10",
-                    hasEvent && !isOutsideMonth && "cursor-pointer",
-                    !hasEvent && "cursor-default"
-                  )}
-                >
+              const cellClassName = cn(
+                "relative min-h-[4.5rem] p-2 border-t border-r border-border/20 transition-all",
+                "flex flex-col items-start gap-0.5",
+                index % 7 === 0 && "border-l",
+                isOutsideMonth && "opacity-30 bg-muted/5",
+                !isOutsideMonth && "hover:bg-accent/30",
+                isAnySelected && "ring-2 ring-primary ring-inset bg-primary/5 z-10",
+                hasEvent && !isOutsideMonth && "cursor-pointer",
+                !hasEvent && "cursor-default"
+              );
+
+              const cellContent = (
+                <>
                   {/* Day Number */}
                   <div
                     className={cn(
@@ -250,19 +249,93 @@ export function InlineCalendarView({
                     {format(day, "d")}
                   </div>
 
-                  {/* Service Tag Badge */}
-                  {firstEvent && firstEvent.badgeLabel && (
-                    <div className="text-[9px] font-medium px-1 py-0.5 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 truncate w-full shadow-sm border border-blue-200/30 dark:border-blue-800/30">
-                      {firstEvent.badgeLabel}
+                  {/* Service Tag Badges - Vertical List */}
+                  {events.map((event) => (
+                    <div
+                      key={event.id}
+                      className={cn(
+                        "text-[9px] font-medium px-1 py-0.5 rounded truncate w-full shadow-sm border",
+                        selectedId === event.id
+                          ? "bg-primary/15 text-primary border-primary/30 dark:bg-primary/20"
+                          : "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border-blue-200/30 dark:border-blue-800/30"
+                      )}
+                    >
+                      {event.badgeLabel}
                     </div>
-                  )}
+                  ))}
 
-                  {/* My Assignment Role */}
-                  {firstRoleLabel && (
+                  {/* My Assignment Role (single event only) */}
+                  {singleRoleLabel && (
                     <div className="text-[8px] font-bold px-1 rounded bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/30 dark:to-amber-900/30 text-orange-600 dark:text-orange-300 truncate w-full shadow-sm border border-orange-200/40 dark:border-orange-800/40">
-                      {firstRoleLabel}
+                      {singleRoleLabel}
                     </div>
                   )}
+                </>
+              );
+
+              // Multi-event days: Popover for service selection
+              if (hasMultipleEvents && !isOutsideMonth) {
+                return (
+                  <Popover
+                    key={day.toISOString()}
+                    open={openPopoverKey === dateKey}
+                    onOpenChange={(open) => setOpenPopoverKey(open ? dateKey : null)}
+                  >
+                    <PopoverTrigger asChild>
+                      <button className={cellClassName}>
+                        {cellContent}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-48 p-1.5" align="center" sideOffset={4}>
+                      <div className="flex flex-col gap-0.5">
+                        <p className="text-[11px] font-medium text-muted-foreground px-2 py-1">
+                          {format(day, "M월 d일")}
+                        </p>
+                        {events.map((event) => {
+                          const eventAssignment = assignmentMap.get(event.id);
+                          const eventRole = eventAssignment?.roles?.[0];
+                          const eventRoleLabel = eventRole
+                            ? (eventRole.source === 'flow' ? eventRole.flowItemTitle || eventRole.roleName : eventRole.roleName)
+                            : null;
+
+                          return (
+                            <button
+                              key={event.id}
+                              onClick={() => {
+                                onSelect(event.id);
+                                setOpenPopoverKey(null);
+                              }}
+                              className={cn(
+                                "text-left px-2.5 py-2 rounded-lg text-sm transition-colors",
+                                selectedId === event.id
+                                  ? "bg-primary/10 text-primary font-semibold"
+                                  : "hover:bg-accent text-foreground"
+                              )}
+                            >
+                              <div className="font-medium">{event.badgeLabel}</div>
+                              {eventRoleLabel && (
+                                <div className="text-[11px] text-orange-500 dark:text-orange-400 mt-0.5">
+                                  {eventRoleLabel}
+                                </div>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                );
+              }
+
+              // Single or no event: simple button
+              return (
+                <button
+                  key={day.toISOString()}
+                  onClick={() => handleDayClick(day)}
+                  disabled={!hasEvent}
+                  className={cellClassName}
+                >
+                  {cellContent}
                 </button>
               );
             })}
