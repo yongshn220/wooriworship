@@ -49,7 +49,7 @@ export function NoticeHeaderMenu({ noticeId, createdById }: Props) {
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <button className="text-muted-foreground/50 hover:text-muted-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted outline-none" data-testid="notice-menu">
             <EllipsisVertical className="w-5 h-5" />

@@ -117,7 +117,7 @@ export function ServiceHeaderMenu({
 
     return (
         <>
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                     {trigger ? (
                         <span>{trigger}</span>
@@ -131,7 +131,7 @@ export function ServiceHeaderMenu({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuItem
-                        onClick={handleEdit}
+                        onSelect={handleEdit}
                         className="flex items-center justify-between cursor-pointer"
                     >
                         Edit
