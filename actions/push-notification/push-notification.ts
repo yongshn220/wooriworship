@@ -12,6 +12,7 @@ export interface PushNotificationPayload {
   title: string
   body: string
   icon?: string
+  url?: string
 }
 
 export async function sendNotificationToSubscription(subscription: any, payload: PushNotificationPayload) {
@@ -32,12 +33,18 @@ export async function sendNotificationToSubscription(subscription: any, payload:
         title: payload.title,
         body: payload.body,
         icon: payload.icon || '/icon.png',
+        url: payload.url,
       })
     )
-    return { success: true }
-  } catch (error) {
+    return { success: true, gone: false, endpoint: '' }
+  } catch (error: any) {
+    const statusCode = error?.statusCode;
+    if (statusCode === 410 || statusCode === 404) {
+      console.warn('Stale subscription detected:', subscription.endpoint);
+      return { success: false, gone: true, endpoint: subscription.endpoint }
+    }
     console.error('Error sending push notification:', error)
-    return { success: false, error: 'Failed to send notification' }
+    return { success: false, gone: false, endpoint: '' }
   }
 }
 
@@ -49,8 +56,14 @@ export async function sendNotificationToMultipleSubscriptions(subscriptions: Pus
   const successful = results.filter(result => result.status === 'fulfilled' && result.value.success).length;
   const failed = results.filter(result => result.status === 'rejected' || (result.status === 'fulfilled' && !result.value.success)).length;
 
+  const staleEndpoints = results
+    .filter(result => result.status === 'fulfilled' && result.value.gone)
+    .map(result => (result as PromiseFulfilledResult<any>).value.endpoint as string)
+    .filter(Boolean);
+
   return {
     success: successful > 0,
-    stats: { successful, failed }
+    stats: { successful, failed },
+    staleEndpoints,
   };
 }

@@ -7,18 +7,18 @@ self.addEventListener('push', function (event) {
       badge: '/badge.png',
       vibrate: [100, 50, 100],
       data: {
+        url: data.url || '/',
         dateOfArrival: Date.now(),
-        primaryKey: '2',
       },
     }
     event.waitUntil(self.registration.showNotification(data.title, options))
   }
 })
- 
+
 self.addEventListener('notificationclick', function (event) {
-  console.log('Notification click received.')
   event.notification.close()
-  event.waitUntil(clients.openWindow('https://www.wooriworship.com/'))
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(clients.openWindow('https://www.wooriworship.com' + url))
 })
 
 self.addEventListener('fetch', function (event) {
