@@ -30,22 +30,27 @@ export class SetlistApi {
                     // Optimization: Could use a cache or batched fetch
                     const songDetails = await SongApi.getSongById(teamId, s.id) as Song;
 
-                    // Get key and keyNote from selected music sheet (if any)
-                    let selectedKey = "";
+                    // Get keys from all selected music sheets
+                    const selectedKeys: string[] = [];
                     let selectedKeyNote = "";
                     if (s.selected_music_sheet_ids && s.selected_music_sheet_ids.length > 0) {
-                        const firstSheetId = s.selected_music_sheet_ids[0];
-                        const sheet = await MusicSheetApi.getById(teamId, s.id, firstSheetId);
-                        selectedKey = sheet?.key || "";
-                        selectedKeyNote = sheet?.note || "";
+                        const sheets = await Promise.all(
+                            s.selected_music_sheet_ids.map(sheetId =>
+                                MusicSheetApi.getById(teamId, s.id, sheetId)
+                            )
+                        );
+                        sheets.forEach(sheet => {
+                            if (sheet?.key) selectedKeys.push(sheet.key);
+                        });
+                        selectedKeyNote = sheets[0]?.note || "";
                     }
 
                     return {
                         ...s,
                         title: songDetails?.title || "Unknown Song",
                         artist: songDetails?.original?.author || songDetails?.subtitle || "",
-                        // Use key from selected music sheet, fallback to song's first key
-                        key: selectedKey || songDetails?.keys?.[0] || "",
+                        // Use keys from selected music sheets, fallback to song's first key
+                        key: selectedKeys.length > 0 ? selectedKeys.join(" · ") : (songDetails?.keys?.[0] || ""),
                         keyNote: selectedKeyNote
                     };
                 }));
