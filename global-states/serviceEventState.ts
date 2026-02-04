@@ -103,3 +103,25 @@ export const myAssignmentsCacheAtom = atom<Record<string, {
     key: "myAssignmentsCacheAtom",
     default: {},
 });
+
+// =============================================================================
+// 5. Service Detail Cache (Combined)
+// =============================================================================
+export interface ServiceDetailData {
+    event: ServiceEvent;
+    setlist: ServiceSetlist | null;
+    praiseAssignee: ServicePraiseTeam | null;
+    flow: ServiceFlow | null;
+}
+
+// Cache for service details by serviceId
+export const serviceDetailCacheAtom = atomFamily<ServiceDetailData | null, string>({
+    key: "serviceDetailCacheAtom",
+    default: null,
+});
+
+// Loading state per serviceId
+export const serviceDetailLoadingAtom = atomFamily<boolean, string>({
+    key: "serviceDetailLoadingAtom",
+    default: false,
+});
