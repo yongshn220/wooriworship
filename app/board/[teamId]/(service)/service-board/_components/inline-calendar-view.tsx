@@ -219,7 +219,7 @@ export function InlineCalendarView({
               // For single-event days, show assignment role in cell
               const singleEvent = events.length === 1 ? events[0] : null;
               const singleAssignment = singleEvent ? assignmentMap.get(singleEvent.id) : null;
-              const singleRole = singleAssignment?.roles?.[0];
+              const singleRole = singleAssignment?.roles?.find(r => r.roleName);
               const singleRoleLabel = singleRole
                 ? (singleRole.source === 'flow' ? singleRole.flowItemTitle || singleRole.roleName : singleRole.roleName)
                 : null;
@@ -293,7 +293,7 @@ export function InlineCalendarView({
                         </p>
                         {events.map((event) => {
                           const eventAssignment = assignmentMap.get(event.id);
-                          const eventRole = eventAssignment?.roles?.[0];
+                          const eventRole = eventAssignment?.roles?.find(r => r.roleName);
                           const eventRoleLabel = eventRole
                             ? (eventRole.source === 'flow' ? eventRole.flowItemTitle || eventRole.roleName : eventRole.roleName)
                             : null;

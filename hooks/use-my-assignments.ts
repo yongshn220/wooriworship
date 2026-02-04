@@ -112,6 +112,10 @@ export function useMyAssignments({
             // Check praise team assignments
             for (const assignment of cached.praiseTeamAssignments) {
                 if (assignment.memberIds.includes(currentUserUid)) {
+                    // Skip assignments whose role has been deleted
+                    if (assignment.roleId && !roles.find(r => r.id === assignment.roleId)) {
+                        continue;
+                    }
                     const roleName = (assignment.roleId
                         ? roles.find(r => r.id === assignment.roleId)?.name
                         : null)

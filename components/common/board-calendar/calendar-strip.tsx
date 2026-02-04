@@ -168,7 +168,7 @@ export function CalendarStrip({
 
                 {items.map((item, index) => {
                     const assignment = myAssignmentMap.get(item.id);
-                    const firstRole = assignment?.roles?.[0];
+                    const firstRole = assignment?.roles?.find(r => getRoleLabel(r));
                     const roleLabel = firstRole ? getRoleLabel(firstRole) : null;
                     return (
                         <Fragment key={item.id}>

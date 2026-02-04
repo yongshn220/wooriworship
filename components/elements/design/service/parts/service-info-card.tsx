@@ -83,7 +83,7 @@ export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, on
                                 <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mr-0.5">
                                     My Roles
                                 </span>
-                                {myRoles.map((role, idx) => (
+                                {myRoles.filter(role => getRoleLabel(role)).map((role, idx) => (
                                     <span
                                         key={idx}
                                         className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
