@@ -27,17 +27,20 @@ export default function NoticePage({ params }: any) {
   }, [setTab]);
 
   return (
-    <div className="w-full h-full flex flex-col">
-      {/* Content Area */}
-      <div className="flex-1 flex justify-center">
-        {tab === "announcements" ? (
-          <Suspense fallback={<NoticeListSkeleton />}>
-            <NoticeHeaderList teamId={teamId} />
-          </Suspense>
-        ) : (
+    <div className="flex flex-col h-full bg-surface dark:bg-surface-dark relative">
+      {tab === "announcements" ? (
+        <div className="flex-1">
+          <div className="max-w-lg mx-auto px-4 pt-2 space-y-5 pb-24">
+            <Suspense fallback={<NoticeListSkeleton />}>
+              <NoticeHeaderList teamId={teamId} />
+            </Suspense>
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 min-h-0 max-w-lg mx-auto w-full px-4">
           <TodoBoard teamId={teamId} />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

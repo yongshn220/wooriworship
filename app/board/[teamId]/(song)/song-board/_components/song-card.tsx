@@ -26,14 +26,14 @@ export function SongCard({ teamId, songId, index }: Props) {
             data-testid="song-item"
         >
             <SongDetailDialogTrigger teamId={teamId} songId={songId}>
-                <div className="flex items-center w-full h-full p-3 sm:p-5 gap-3 cursor-pointer">
+                <div className="flex items-center w-full h-full px-3 py-3 gap-3 cursor-pointer">
 
                     {/* Left Column: Content (Title/Subtitle, Author, Key) */}
                     <div className="flex-1 min-w-0 flex flex-col justify-center gap-1 h-full px-1">
 
                         {/* Row 1: Title + Subtitle (Max 1 line) */}
                         <div className="flex items-baseline gap-2 min-w-0">
-                            <div className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors truncate leading-tight -tracking-[0.03em]">
+                            <div className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate leading-tight">
                                 {song.title}
                             </div>
                             {song.subtitle && (

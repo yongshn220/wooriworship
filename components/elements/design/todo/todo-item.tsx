@@ -23,7 +23,7 @@ export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
 
     return (
         <div className={cn(
-            "flex items-start gap-3 p-4 rounded-xl bg-card border border-border shadow-sm transition-all active:scale-[0.98] group",
+            "flex items-start gap-3 px-3 py-3 rounded-xl bg-card border border-border shadow-sm transition-all active:scale-[0.98] group",
             todo.completed && "opacity-50 bg-muted/20"
         )}>
             {/* Checkbox */}
@@ -59,7 +59,7 @@ export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
             </div>
 
             {/* Context Menu */}
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                     <button
                         className="h-8 w-8 rounded-full flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-muted/60 active:scale-90 inline-flex items-center justify-center outline-none"

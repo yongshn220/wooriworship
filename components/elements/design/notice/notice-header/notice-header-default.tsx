@@ -42,12 +42,12 @@ export function NoticeHeaderDefault({ noticeId, teamId }: Props) {
         }}
         data-testid="notice-item"
       >
-        <div className="p-5 sm:p-6">
+        <div className="px-3 py-3">
           <div className="flex justify-between items-start">
             <div className="flex flex-col w-full pr-4">
               {/* Title */}
               {/* Title */}
-              <h3 className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors leading-snug tracking-tight">
+              <h3 className="flex items-center gap-2 text-lg font-bold text-foreground group-hover:text-primary transition-colors leading-snug tracking-tight">
                 {notice?.title}
 
               </h3>
@@ -78,7 +78,7 @@ export function NoticeHeaderDefault({ noticeId, teamId }: Props) {
                 exit={{ opacity: 0, height: 0 }}
                 className="mt-4"
               >
-                <p className="text-muted-foreground line-clamp-2 leading-relaxed text-sm sm:text-base">
+                <p className="text-muted-foreground line-clamp-2 leading-relaxed text-sm">
                   {notice?.body}
                 </p>
                 {hasFiles && (
@@ -97,7 +97,7 @@ export function NoticeHeaderDefault({ noticeId, teamId }: Props) {
                 className="mt-6"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="whitespace-pre-line break-all text-base sm:text-lg text-foreground leading-8 space-y-4">
+                <div className="whitespace-pre-line break-all text-sm text-foreground leading-7 space-y-4">
                   <Linkify>
                     {notice?.body || ""}
                   </Linkify>

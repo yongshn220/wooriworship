@@ -43,7 +43,7 @@ export function MenuItem({
   return (
     <div
       className={cn(
-        "flex items-center gap-4 p-4 transition-colors relative group",
+        "flex items-center gap-3 px-3 py-3 transition-colors relative group",
         onClick && "cursor-pointer hover:bg-muted/50 active:bg-muted",
         className
       )}
@@ -52,7 +52,7 @@ export function MenuItem({
       {/* Icon Area */}
       {icon && (
         <div className={cn(
-          "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
+          "flex items-center justify-center p-1 rounded-md transition-colors",
           isDestructive
             ? "bg-destructive/10 text-destructive"
             : "bg-primary/10 text-primary"
@@ -64,7 +64,7 @@ export function MenuItem({
       {/* Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         <span className={cn(
-          "text-sm font-medium leading-none mb-1",
+          "text-sm font-semibold leading-none mb-1",
           isDestructive ? "text-destructive" : "text-foreground"
         )}>
           {title}

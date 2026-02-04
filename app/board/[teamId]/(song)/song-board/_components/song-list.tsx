@@ -126,7 +126,7 @@ export function SongList({ teamId }: Props) {
     if (isFiltering) {
       // Empty search/filter results
       return (
-        <div className="w-full h-full flex flex-col items-center justify-center p-6 gap-4 text-center">
+        <div className="w-full h-full flex flex-col items-center justify-center gap-4 text-center">
           <SearchX className="w-10 h-10 text-muted-foreground" />
           <div>
             <p className="text-muted-foreground font-medium">No songs match your search</p>
@@ -147,24 +147,24 @@ export function SongList({ teamId }: Props) {
       )
     }
     return (
-      <div className="w-full h-full flex items-center justify-center bg-background p-6">
+      <div className="w-full h-full flex items-center justify-center p-6">
         <EmptySongBoardPage />
       </div>
     )
   }
 
   return (
-    <div className="w-full h-full p-2 sm:p-4 sm:pr-14 md:p-6 md:pr-16 relative">
+    <div className="w-full h-full px-4 pt-2 pb-24 sm:pr-14 md:pr-16 relative max-w-lg mx-auto">
       <AlphabetIndexer teamId={teamId} onScrollRequest={handleScrollRequest} activeIndex={activeIndex} />
 
       {/* Active Filters */}
-      <div className="px-6 mb-2">
+      <div className="mb-2">
         <ActiveFilterList />
       </div>
 
       {/* Results Count (only when filtering) */}
       {isFiltering && (
-        <div className="px-6 mb-2">
+        <div className="mb-2">
           <span className="text-xs font-medium text-muted-foreground">
             {songIds.length} {songIds.length === 1 ? 'song' : 'songs'} found
           </span>

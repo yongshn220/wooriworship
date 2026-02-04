@@ -9,9 +9,9 @@ interface Props {
 
 export function MenuGroup({ children, title, className }: Props) {
     return (
-        <div className={cn("mb-6", className)}>
+        <div className={cn("mb-5", className)}>
             {title && (
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 ml-4">
+                <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-2 ml-1">
                     {title}
                 </h3>
             )}

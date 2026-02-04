@@ -11,7 +11,7 @@ interface Props {
 
 export function TeamProfileCard({ name, description, teamCount, action }: Props) {
     return (
-        <div className="bg-card p-6 rounded-2xl border border-border shadow-sm flex flex-col items-center justify-center text-center mb-6">
+        <div className="bg-card px-3 py-4 rounded-xl border border-border shadow-sm flex flex-col items-center justify-center text-center mb-5">
             <div className="mb-4 transform scale-125">
                 <TeamIcon name={name} />
             </div>

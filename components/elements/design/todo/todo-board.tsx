@@ -125,7 +125,7 @@ export function TodoBoard({ teamId }: TodoBoardProps) {
     return (
         <div className="w-full h-full flex flex-col">
             {/* Show Completed Toggle */}
-            <div className="flex items-center justify-end px-5 py-3">
+            <div className="flex items-center justify-end px-1 py-3">
                 <button
                     onClick={() => setShowCompleted(!showCompleted)}
                     className={cn(
@@ -148,7 +148,7 @@ export function TodoBoard({ teamId }: TodoBoardProps) {
             </div>
 
             {/* Quick Add Input */}
-            <div className="px-5 pb-4">
+            <div className="pb-4">
                 <div className="flex items-center gap-2 bg-card border border-border/50 rounded-2xl px-4 py-2 shadow-sm transition-all focus-within:border-primary/30 focus-within:shadow-md">
                     <Plus className="w-5 h-5 text-muted-foreground/50 flex-shrink-0" />
                     <Input
@@ -175,7 +175,7 @@ export function TodoBoard({ teamId }: TodoBoardProps) {
             </div>
 
             {/* Todo List */}
-            <div className="flex-1 overflow-y-auto px-5 pb-32">
+            <div className="flex-1 overflow-y-auto pb-24">
                 {isLoading && todoList.length === 0 ? (
                     <div className="space-y-3">
                         {[1, 2, 3, 4].map((i) => (

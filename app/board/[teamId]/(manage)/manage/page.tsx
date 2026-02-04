@@ -73,8 +73,8 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
   }
 
   return (
-    <div className="flex flex-col w-full h-full bg-muted/30 overflow-y-auto">
-      <div className="w-full pb-10">
+    <div className="flex flex-col w-full h-full bg-surface dark:bg-surface-dark overflow-y-auto">
+      <div className="max-w-lg mx-auto w-full px-4 pt-2 pb-24">
 
         {/* Profile Section */}
         <TeamProfileCard
@@ -100,7 +100,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
         {/* Team Management Group */}
         <MenuGroup title="Team Management">
           <MenuItem
-            icon={<Users className="h-5 w-5" />}
+            icon={<Users className="w-[18px] h-[18px]" />}
             title="Team Members"
             description="Manage roles and permissions"
             showChevron
@@ -108,7 +108,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
           />
 
           <MenuItem
-            icon={<UserPlus className="h-5 w-5" />}
+            icon={<UserPlus className="w-[18px] h-[18px]" />}
             title="Invite Members"
             description="Send team invitations"
             showChevron
@@ -122,7 +122,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
 
           <div onClick={() => setInvitationDialogState(true)}>
             <MenuItem
-              icon={<Mail className="h-5 w-5" />}
+              icon={<Mail className="w-[18px] h-[18px]" />}
               title="Invitation Inbox"
               description="Manage team invitations"
               badge={badgeCount > 0 ? badgeCount : undefined}
@@ -136,7 +136,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
         <MenuGroup title="App Settings">
           {permission === "granted" ? (
             <MenuItem
-              icon={<Bell className="h-5 w-5" />}
+              icon={<Bell className="w-[18px] h-[18px]" />}
               title="Push Notifications"
               description="Get notified about important updates"
               toggleId="push-notifications"
@@ -145,7 +145,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
             />
           ) : permission === "default" ? (
             <MenuItem
-              icon={<Bell className="h-5 w-5" />}
+              icon={<Bell className="w-[18px] h-[18px]" />}
               title="Push Notifications"
               description="Tap to enable notifications"
               showChevron
@@ -153,7 +153,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
             />
           ) : permission === "denied" ? (
             <MenuItem
-              icon={<BellOff className="h-5 w-5" />}
+              icon={<BellOff className="w-[18px] h-[18px]" />}
               title="Push Notifications"
               description="Notifications are blocked"
               showChevron
@@ -162,7 +162,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
             />
           ) : (
             <MenuItem
-              icon={<BellOff className="h-5 w-5" />}
+              icon={<BellOff className="w-[18px] h-[18px]" />}
               title="Push Notifications"
               description="Not supported on this browser"
               className="opacity-50 pointer-events-none"
@@ -178,7 +178,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
         {/* Account Group */}
         <MenuGroup title="Account">
           <MenuItem
-            icon={<LogOut className="h-5 w-5" />}
+            icon={<LogOut className="w-[18px] h-[18px]" />}
             title="Sign Out"
             onClick={handleSignOut}
             variant="destructive"

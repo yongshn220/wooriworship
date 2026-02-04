@@ -41,15 +41,15 @@ export function NoticeHeaderList({ teamId }: Props) {
 
   if (noticeIdList.length === 0) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-background p-6">
+      <div className="w-full h-full flex items-center justify-center p-6">
         <EmptyNoticeBoardPage />
       </div>
     )
   }
 
   return (
-    <div className="w-full items-center p-4">
-      <div className="w-full flex-start flex-col gap-4" data-testid="notice-list">
+    <div className="w-full">
+      <div className="w-full flex flex-col gap-4" data-testid="notice-list">
         {
           visibleNoticeIdList.map((noticeId) => (
             <Suspense key={noticeId} fallback={<NoticeSkeleton />}>
@@ -70,7 +70,7 @@ export function NoticeHeaderList({ teamId }: Props) {
 
 function NoticeSkeleton() {
   return (
-    <div className="w-full p-4 border border-border rounded-lg bg-card relative animate-pulse flex flex-col gap-4">
+    <div className="w-full p-4 border border-border rounded-xl bg-card relative animate-pulse flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <div className="w-32 h-4 bg-muted rounded"></div>
         <div className="w-8 h-8 rounded-full bg-muted"></div>
