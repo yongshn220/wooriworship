@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/use-toast"
 import { currentTeamIdAtom, teamAtom } from "@/global-states/teamState"
-import { AuthApi } from "@/apis"
+import { AuthApi, UserApi } from "@/apis"
 import { Bell, BellOff, LogOut, Mail, Users, UserPlus, ChevronRight } from 'lucide-react'
 import { useRouter } from "next/navigation"
 import { useRecoilValue, useSetRecoilState } from "recoil"
@@ -16,11 +16,13 @@ import { TeamProfileCard } from "@/app/board/[teamId]/(manage)/manage/_component
 import { accountSettingAtom } from "@/global-states/account-setting"
 import PushNotificationApi from "@/apis/PushNotificationApi"
 import { TeamSelect } from "@/components/elements/design/team/team-select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { InvitationDrawer } from "@/components/elements/manage/invitation-drawer";
 import { useNotificationPermission } from "@/components/util/hook/use-notification-permission"
 import { NotificationBlockedGuideDialog } from "@/components/elements/dialog/notification/notification-blocked-guide-dialog"
 import useLocalStorage from "@/components/util/hook/use-local-storage"
+import { userAtom, userUpdaterAtom } from "@/global-states/userState"
+import { EditNameDialog } from "@/app/board/[teamId]/(manage)/manage/_components/edit-name-dialog"
 
 export default function ManagePage({ params }: { params: { teamId: string } }) {
   const authUser = auth.currentUser
@@ -39,6 +41,40 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
   const badgeCount = pendingInvitations?.length || 0
 
   const router = useRouter()
+
+  const user = useRecoilValue(userAtom(authUser?.uid || ""))
+  const setUserUpdater = useSetRecoilState(userUpdaterAtom)
+  const [isEditNameDialogOpen, setEditNameDialogOpen] = useState(false)
+  const [isResending, setIsResending] = useState(false)
+  const [isEmailVerified, setIsEmailVerified] = useState(false)
+
+  // Calculate user role
+  const userRole = team?.admins?.includes(authUser?.uid || "")
+    ? "Admin"
+    : team?.users?.includes(authUser?.uid || "")
+      ? "Member"
+      : undefined
+
+  useEffect(() => {
+    async function syncVerificationStatus() {
+      if (!authUser) return
+      try {
+        await authUser.reload()
+        const verified = authUser.emailVerified
+        setIsEmailVerified(verified)
+        if (verified && user && !user.email_verified) {
+          await UserApi.update(authUser.uid, { email_verified: true })
+          setUserUpdater(prev => prev + 1)
+        }
+      } catch (error) {
+        // Silently fail on reload error; use cached Firestore value
+        if (user) {
+          setIsEmailVerified(user.email_verified)
+        }
+      }
+    }
+    syncVerificationStatus()
+  }, [authUser, user?.email_verified])
 
   async function handleSignOut() {
     try {
@@ -72,6 +108,36 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
     }
   }
 
+  async function handleUpdateName(newName: string) {
+    if (!authUser?.uid) return
+    try {
+      await UserApi.updateName(authUser.uid, newName)
+      setUserUpdater(prev => prev + 1)
+      toast({ title: "Name updated successfully" })
+      setEditNameDialogOpen(false)
+    } catch (error) {
+      toast({ title: "Failed to update name", variant: "destructive" })
+      throw error  // re-throw so EditNameDialog knows save failed
+    }
+  }
+
+  async function handleResendVerification() {
+    if (!authUser) return
+    setIsResending(true)
+    try {
+      await AuthApi.sendEmailVerification(authUser)
+      toast({ title: "Verification email sent", description: "Please check your inbox." })
+    } catch (error: any) {
+      if (error?.code === "auth/too-many-requests") {
+        toast({ title: "Too many requests", description: "Please wait before trying again.", variant: "destructive" })
+      } else {
+        toast({ title: "Failed to send email", description: "Please try again.", variant: "destructive" })
+      }
+    } finally {
+      setIsResending(false)
+    }
+  }
+
   return (
     <div className="flex flex-col w-full h-full bg-surface dark:bg-surface-dark overflow-y-auto">
       <div className="max-w-lg mx-auto w-full px-4 pt-2 pb-24">
@@ -79,6 +145,13 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
         {/* Profile Section */}
         <TeamProfileCard
           name={team?.name}
+          userName={user?.name}
+          userEmail={authUser?.email || user?.email}
+          userRole={userRole}
+          isEmailVerified={isEmailVerified}
+          onEditName={() => setEditNameDialogOpen(true)}
+          onResendVerification={handleResendVerification}
+          isResending={isResending}
           action={
             <TeamSelect
               createOption={true}
@@ -95,6 +168,13 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
               }
             />
           }
+        />
+
+        <EditNameDialog
+          open={isEditNameDialogOpen}
+          onOpenChange={setEditNameDialogOpen}
+          currentName={user?.name || ""}
+          onSave={handleUpdateName}
         />
 
         {/* Team Management Group */}

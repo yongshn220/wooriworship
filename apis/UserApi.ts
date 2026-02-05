@@ -39,7 +39,9 @@ class UserApi extends BaseApi {
 
     }
 
-
+    async updateName(userId: string, name: string) {
+        await this.update(userId, { name })
+    }
 
     async leaveTeam(userId: string, teamId: string, singleSide: Boolean) {
         if (userId && teamId) {

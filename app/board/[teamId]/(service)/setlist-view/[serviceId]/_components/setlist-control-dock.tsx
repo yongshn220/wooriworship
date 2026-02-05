@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { setlistLiveOptionsAtom, setlistUIVisibilityAtom } from "../_states/setlist-view-states";
 import { SetlistControlItem } from "./setlist-control-item";
-import { LogOut, ChevronLeft, ChevronRight, FileText, Hash, MoreHorizontal } from "lucide-react";
+import { LogOut, ChevronLeft, ChevronRight, FileText, Hash, MoreHorizontal, Pencil } from "lucide-react";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SetlistSettingsMenu } from "./setlist-settings-menu";
@@ -12,6 +12,12 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { getPathServing } from "@/components/util/helper/routes";
+import { useState } from "react";
+import { DownloadSetlistSheetsDrawer } from "./download-setlist-sheets-drawer";
+import { annotationDrawingModeAtom } from "../_states/annotation-states";
+import { setlistMultipleSheetsViewModeAtom } from "../_states/setlist-view-states";
+import { DirectionType } from "@/components/constants/enums";
+import { toast } from "@/components/ui/use-toast";
 
 interface Props {
     teamId: string
@@ -22,6 +28,10 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
     const [option, setOption] = useRecoilState(setlistLiveOptionsAtom)
     const [uiVisible, setUIVisible] = useRecoilState(setlistUIVisibilityAtom)
     const [preference, prefSetter] = useUserPreferences()
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+    const [isDownloadDrawerOpen, setIsDownloadDrawerOpen] = useState(false)
+    const [drawingMode, setDrawingMode] = useRecoilState(annotationDrawingModeAtom)
+    const [multipleSheetsViewMode, setMultipleSheetsViewMode] = useRecoilState(setlistMultipleSheetsViewModeAtom)
     const router = useRouter()
 
     function handleExit() {
@@ -38,6 +48,15 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
         const newVal = !option.showSongNumber
         setOption(prev => ({ ...prev, showSongNumber: newVal }))
         prefSetter.setlistLiveShowSongNumber(newVal)
+    }
+
+    function toggleDrawingMode() {
+        const newVal = !drawingMode
+        if (newVal && multipleSheetsViewMode === DirectionType.VERTICAL) {
+            setMultipleSheetsViewMode(DirectionType.HORIZONTAL)
+            toast({ description: "가로 보기로 전환됩니다" })
+        }
+        setDrawingMode(newVal)
     }
 
     return (
@@ -94,6 +113,13 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
                                 <Separator orientation="vertical" className="h-6 bg-border w-[1px] mx-1" />
 
                                 <SetlistControlItem
+                                    icon={<Pencil className="w-5 h-5" />}
+                                    isActive={drawingMode}
+                                    variant="toggle"
+                                    onClick={toggleDrawingMode}
+                                />
+
+                                <SetlistControlItem
                                     icon={<FileText className="w-5 h-5" />}
                                     isActive={option.showSongNote}
                                     variant="toggle"
@@ -106,16 +132,23 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
                                     onClick={toggleShowNumber}
                                 />
 
-                                <Popover modal={true}>
+                                <Popover modal={true} open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
                                     <PopoverTrigger asChild>
                                         <div>
                                             <SetlistControlItem icon={<MoreHorizontal className="w-5 h-5" />} />
                                         </div>
                                     </PopoverTrigger>
                                     <PopoverContent side="top" className="mb-4 bg-background backdrop-blur-xl border-border w-80 p-0 overflow-hidden shadow-toss rounded-2xl z-[10003]">
-                                        <SetlistSettingsMenu teamId={teamId} serviceId={serviceId} />
+                                        <SetlistSettingsMenu teamId={teamId} serviceId={serviceId} onDownloadSheets={() => { setIsPopoverOpen(false); setIsDownloadDrawerOpen(true); }} />
                                     </PopoverContent>
                                 </Popover>
+
+                                <DownloadSetlistSheetsDrawer
+                                    teamId={teamId}
+                                    serviceId={serviceId}
+                                    open={isDownloadDrawerOpen}
+                                    onOpenChange={setIsDownloadDrawerOpen}
+                                />
 
                                 <Separator orientation="vertical" className="h-6 bg-border w-[1px]" />
 

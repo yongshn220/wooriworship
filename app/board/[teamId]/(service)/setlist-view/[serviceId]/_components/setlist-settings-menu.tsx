@@ -8,17 +8,15 @@ import { Button } from "@/components/ui/button";
 import { SetlistViewPageModeSelect } from "./setlist-view-page-mode-select";
 import { Label } from "@/components/ui/label";
 import { MultipleSheetsViewSelect } from "./multiple-sheets-view-select";
-import { DownloadSetlistSheetsDrawer } from "./download-setlist-sheets-drawer";
-import { useState } from "react";
 
 interface Props {
     teamId: string,
     serviceId: string,
+    onDownloadSheets?: () => void,
 }
 
-export function SetlistSettingsMenu({ teamId, serviceId }: Props) {
+export function SetlistSettingsMenu({ teamId, serviceId, onDownloadSheets }: Props) {
     const router = useRouter()
-    const [isDownloadDrawerOpen, setIsDownloadDrawerOpen] = useState(false)
 
     function handleExit() {
         router.replace(getPathServing(teamId))
@@ -45,18 +43,11 @@ export function SetlistSettingsMenu({ teamId, serviceId }: Props) {
             <Button
                 variant="ghost"
                 className="w-full flex justify-start h-10 px-2 hover:bg-muted text-foreground hover:text-foreground rounded-lg font-normal"
-                onClick={() => setIsDownloadDrawerOpen(true)}
+                onClick={() => onDownloadSheets?.()}
             >
                 <Download className="mr-3 w-4 h-4" />
                 <span className="text-sm">Download Sheets</span>
             </Button>
-
-            <DownloadSetlistSheetsDrawer
-                teamId={teamId}
-                serviceId={serviceId}
-                open={isDownloadDrawerOpen}
-                onOpenChange={setIsDownloadDrawerOpen}
-            />
 
             <Button
                 variant="ghost"

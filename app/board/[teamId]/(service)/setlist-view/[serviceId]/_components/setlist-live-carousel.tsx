@@ -7,6 +7,7 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { setlistAtom } from "@/global-states/setlist-state";
 import { SetlistSongHeader } from "@/models/setlist";
 import { setlistIndexAtom, setlistIndexChangeEventAtom, setlistNoteAtom, setlistMultipleSheetsViewModeAtom } from "../_states/setlist-view-states";
+import { annotationDrawingModeAtom } from "../_states/annotation-states";
 import { SetlistLiveCarouselItemWrapper } from "./setlist-live-carousel-item";
 
 interface Props {
@@ -27,7 +28,8 @@ export function SetlistLiveCarousel({ teamId, serviceId }: Props) {
     const setlistIndexChangeEvent = useRecoilValue(setlistIndexChangeEventAtom)
     const [musicSheetCounts, setMusicSheetCounts] = useState<Array<MusicSheetCounts>>([])
     const [api, setApi] = useState<CarouselApi>()
-    const carouselOptions = useMemo(() => ({ align: "start" } as const), [])
+    const drawingMode = useRecoilValue(annotationDrawingModeAtom)
+    const carouselOptions = useMemo(() => ({ align: "start" as const, watchDrag: !drawingMode }), [drawingMode])
 
     const aggregatedSongHeaders = useMemo(() => {
         const headers: Array<SetlistSongHeader> = []
@@ -105,9 +107,17 @@ export function SetlistLiveCarousel({ teamId, serviceId }: Props) {
             <Carousel opts={carouselOptions} setApi={setApi} className="w-full h-full">
                 <CarouselContent className="h-full">
                     {
-                        aggregatedSongHeaders?.map((songHeader, index) => (
-                            <SetlistLiveCarouselItemWrapper key={index} teamId={teamId} songHeader={songHeader} setMusicSheetCounts={setMusicSheetCounts} />
-                        ))
+                        (() => {
+                            let cumulativeIndex = 0
+                            return aggregatedSongHeaders?.map((songHeader, index) => {
+                                const startIndex = cumulativeIndex
+                                const countEntry = sortedMusicSheetCounts.find(c => c.id === songHeader.id)
+                                cumulativeIndex += countEntry?.count || 0
+                                return (
+                                    <SetlistLiveCarouselItemWrapper key={index} teamId={teamId} songHeader={songHeader} setMusicSheetCounts={setMusicSheetCounts} globalStartIndex={startIndex} />
+                                )
+                            })
+                        })()
                     }
                 </CarouselContent>
             </Carousel>

@@ -6,6 +6,7 @@ import { SetlistLiveCarousel } from "./_components/setlist-live-carousel";
 import { SetlistControlDock } from "./_components/setlist-control-dock";
 import { SetlistIndexIndicator } from "./_components/setlist-index-indicator";
 import { SetlistNote } from "./_components/setlist-note";
+import { AnnotationToolbar } from "./_components/annotation-toolbar";
 
 import { useRef } from "react";
 import * as React from "react";
@@ -39,6 +40,8 @@ export default function SetlistViewPage({ params }: any) {
                     <SetlistLiveCarousel teamId={teamId} serviceId={serviceId} />
 
                     <SetlistNote constraintsRef={containerRef} />
+
+                    <AnnotationToolbar />
 
                     <SetlistControlDock teamId={teamId} serviceId={serviceId} />
 
