@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 export function BoardBottomNavBar() {
   const currentPage = useRecoilValue(currentPageAtom)
 
-  if (currentPage === Page.BOARD) {
+  if (currentPage === Page.BOARD || currentPage === Page.SETLIST_VIEW) {
     return (<></>)
   }
 

@@ -19,7 +19,7 @@ class SheetAnnotationApi {
   }
 
   private getDocRef(teamId: string, songId: string, sheetId: string, pageIndex: number, userId: string) {
-    return doc(this.db, "teams", teamId, "songs", songId, "sheets", sheetId, "annotations", `${userId}_page_${pageIndex}`)
+    return doc(this.db, "teams", teamId, "songs", songId, "sheets", sheetId, "annotations", userId, "pages", String(pageIndex))
   }
 
   async getAnnotation(teamId: string, songId: string, sheetId: string, pageIndex: number, userId: string): Promise<SheetAnnotation | null> {
@@ -40,6 +40,7 @@ class SheetAnnotationApi {
       await setDoc(ref, { ...data, updated_at: getFirebaseTimestampNow() }, { merge: true })
     } catch (e) {
       console.error("DEBUG_ERROR:", e)
+      throw e
     }
   }
 

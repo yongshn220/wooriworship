@@ -39,6 +39,10 @@ export enum PenColor {
   BLACK = "#000000",
   RED = "#EF4444",
   BLUE = "#3B82F6",
+  GREEN = "#22C55E",
+  ORANGE = "#F97316",
+  PURPLE = "#A855F7",
+  GRAY = "#6B7280",
 }
 
 export enum PenSize {
@@ -51,6 +55,7 @@ export enum AnnotationMode {
   SELECT = "SELECT",
   PEN = "PEN",
   TEXT = "TEXT",
+  ERASER = "ERASER",
 }
 
 export enum FontSize {
@@ -70,4 +75,6 @@ export type AnnotationCanvasCallbacks = {
   canRedo: boolean
   canClear: boolean
   hasSelection: boolean
+  isSaving: boolean
+  saveError: string | null
 } | null

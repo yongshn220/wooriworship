@@ -110,10 +110,15 @@ service cloud.firestore {
             allow read, write: if isAuthenticated();
 
             // Annotations subcollection - user-specific pen annotations on sheet music
-            // Document ID format: {userId}_page_{pageIndex}
-            // Security: Each user can only query/write their own docs (by doc ID containing their uid)
-            match /annotations/{annotationId} {
-                allow read, write: if isAuthenticated();
+            // Path: /annotations/{userId}/pages/{pageIndex}
+            match /annotations/{userId} {
+                allow read: if isAuthenticated();
+                allow write: if isOwner(userId);
+
+                match /pages/{pageIndex} {
+                    allow read: if isAuthenticated();
+                    allow write: if isOwner(userId);
+                }
             }
         }
         match /comments/{commentId} {

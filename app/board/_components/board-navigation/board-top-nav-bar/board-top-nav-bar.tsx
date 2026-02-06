@@ -112,7 +112,7 @@ export function BoardTopNavBar() {
   const currentConfig = config[currentPage];
 
   // Explicitly hidden pages logic
-  if ([Page.CREATE_WORSHIP, Page.EDIT_WORSHIP, Page.CREATE_SONG, Page.EDIT_SONG, Page.CREATE_SERVING, Page.EDIT_SERVING, Page.MANAGE_SUBPAGE].includes(currentPage)) {
+  if ([Page.CREATE_WORSHIP, Page.EDIT_WORSHIP, Page.CREATE_SONG, Page.EDIT_SONG, Page.CREATE_SERVING, Page.EDIT_SERVING, Page.MANAGE_SUBPAGE, Page.SETLIST_VIEW].includes(currentPage)) {
     return null;
   }
 

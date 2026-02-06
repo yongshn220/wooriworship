@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useEffect, useCallback, useState } from "react"
+import { useRef, useEffect, useCallback, useState, useMemo } from "react"
 import { useRecoilValue, useSetRecoilState } from "recoil"
 import { Stage, Layer, Line, Text, Rect, Transformer } from "react-konva"
 import type Konva from "konva"
@@ -14,7 +14,7 @@ import {
   activeAnnotationCanvasAtom,
   selectedAnnotationIdAtom,
 } from "../_states/annotation-states"
-import { AnnotationMode, FreehandObject, TextObject, FreehandPoint } from "@/models/sheet_annotation"
+import { AnnotationMode, AnnotationObject, FreehandObject, TextObject, FreehandPoint } from "@/models/sheet_annotation"
 import { useAnnotation } from "../_hooks/use-annotation"
 import { useImageBounds } from "../_hooks/use-image-bounds"
 
@@ -73,6 +73,8 @@ export function AnnotationCanvas({
     clearAll,
     canUndo,
     canRedo,
+    isSaving,
+    saveError,
   } = useAnnotation({ teamId, songId, sheetId, pageIndex })
 
   // Image bounds
@@ -105,6 +107,11 @@ export function AnnotationCanvas({
   const selectionStartRef = useRef<{ x: number; y: number } | null>(null)
   const isMarqueeRef = useRef(false)
 
+  // Eraser state
+  const isErasingRef = useRef(false)
+  const erasedIdsRef = useRef(new Set<string>())
+  const preEraseSnapshotRef = useRef<AnnotationObject[] | null>(null)
+
   const shouldPassthrough = passthroughMode
   const isInteractive = drawingMode
 
@@ -129,6 +136,9 @@ export function AnnotationCanvas({
     isMarqueeRef.current = false
     selectionStartRef.current = null
     setSelectionRect(null)
+    isErasingRef.current = false
+    erasedIdsRef.current.clear()
+    preEraseSnapshotRef.current = null
   }, [])
 
   // ---------------------------------------------------------------------------
@@ -330,6 +340,31 @@ export function AnnotationCanvas({
         }
         return
       }
+
+      // ERASER mode: start erasing
+      if (mode === AnnotationMode.ERASER) {
+        isErasingRef.current = true
+        erasedIdsRef.current.clear()
+        preEraseSnapshotRef.current = [...objects]
+
+        // Check if pointer is already over an object
+        const pos = stage.getPointerPosition()
+        if (pos) {
+          const layer = stage.findOne("Layer") as Konva.Layer | null
+          if (layer) {
+            const hits = layer.getAllIntersections(pos)
+            for (const node of hits) {
+              const nodeId = node.id()
+              if (nodeId && node.className !== "Transformer" && node.className !== "Rect") {
+                erasedIdsRef.current.add(nodeId)
+                node.opacity(0.3)
+              }
+            }
+            layer.batchDraw()
+          }
+        }
+        return
+      }
     },
     [
       mode,
@@ -342,6 +377,7 @@ export function AnnotationCanvas({
       color,
       addObject,
       editingTextId,
+      objects,
     ],
   )
 
@@ -361,6 +397,27 @@ export function AnnotationCanvas({
           width: Math.abs(pos.x - start.x),
           height: Math.abs(pos.y - start.y),
         })
+        return
+      }
+
+      // ERASER mode: continuous hit detection
+      if (mode === AnnotationMode.ERASER && isErasingRef.current) {
+        const stage = stageRef.current
+        if (!stage) return
+        const pos = stage.getPointerPosition()
+        if (!pos) return
+        const layer = stage.findOne("Layer") as Konva.Layer | null
+        if (layer) {
+          const hits = layer.getAllIntersections(pos)
+          for (const node of hits) {
+            const nodeId = node.id()
+            if (nodeId && node.className !== "Transformer" && node.className !== "Rect" && !erasedIdsRef.current.has(nodeId)) {
+              erasedIdsRef.current.add(nodeId)
+              node.opacity(0.3)
+              layer.batchDraw()
+            }
+          }
+        }
         return
       }
 
@@ -420,6 +477,36 @@ export function AnnotationCanvas({
         return
       }
 
+      // ERASER mode: batch delete erased objects
+      if (mode === AnnotationMode.ERASER && isErasingRef.current) {
+        isErasingRef.current = false
+        const idsToRemove = Array.from(erasedIdsRef.current)
+        erasedIdsRef.current.clear()
+
+        if (idsToRemove.length > 0 && preEraseSnapshotRef.current) {
+          // Push pre-erase snapshot for single undo entry, then set filtered objects
+          // We need to directly manipulate the objects to achieve batch undo
+          // Use removeObject for each (the undo snapshot was taken before first erase)
+          for (const id of idsToRemove) {
+            removeObject(id)
+          }
+        } else {
+          // Restore opacity for objects that weren't deleted (shouldn't happen, but safety)
+          const stage = stageRef.current
+          if (stage) {
+            const layer = stage.findOne("Layer") as Konva.Layer | null
+            if (layer) {
+              layer.getChildren().forEach((node) => {
+                if (node.opacity() < 1) node.opacity(1)
+              })
+              layer.batchDraw()
+            }
+          }
+        }
+        preEraseSnapshotRef.current = null
+        return
+      }
+
       if (mode !== AnnotationMode.PEN || !isDrawingRef.current) return
 
       isDrawingRef.current = false
@@ -449,7 +536,7 @@ export function AnnotationCanvas({
       currentStrokeRef.current = []
       setCurrentStroke(null)
     },
-    [mode, selectionRect, bounds.visibleWidth, bounds.visibleHeight, color, penSize, addObject, setSelectedIds],
+    [mode, selectionRect, bounds.visibleWidth, bounds.visibleHeight, color, penSize, addObject, removeObject, setSelectedIds],
   )
 
   // ---------------------------------------------------------------------------
@@ -497,6 +584,8 @@ export function AnnotationCanvas({
         canRedo,
         canClear: objects.length > 0,
         hasSelection: selectedIds.length > 0,
+        isSaving,
+        saveError,
       })
     }
     return () => {
@@ -515,6 +604,8 @@ export function AnnotationCanvas({
     removeObject,
     setActiveCanvas,
     setSelectedIds,
+    isSaving,
+    saveError,
   ])
 
   // Deselect when leaving drawing mode or changing mode
@@ -527,6 +618,15 @@ export function AnnotationCanvas({
   useEffect(() => {
     setSelectedIds([])
   }, [mode, setSelectedIds])
+
+  // Reset eraser state when leaving eraser mode
+  useEffect(() => {
+    if (mode !== AnnotationMode.ERASER) {
+      isErasingRef.current = false
+      erasedIdsRef.current.clear()
+      preEraseSnapshotRef.current = null
+    }
+  }, [mode])
 
   // ---------------------------------------------------------------------------
   // Determine selected object type for Transformer anchors
@@ -565,10 +665,8 @@ export function AnnotationCanvas({
     }
 
     // Create native DOM textarea (Konva docs pattern)
-    // Append inside the Radix Dialog to stay within its focus trap
     textarea = document.createElement("textarea")
-    const dialogEl = stage.container().closest('[role="dialog"]')
-    ;(dialogEl || document.body).appendChild(textarea)
+    document.body.appendChild(textarea)
     textareaElRef.current = textarea
 
     // Set value — handle placeholder space
@@ -596,7 +694,7 @@ export function AnnotationCanvas({
     textarea.style.fontWeight = textNode.fontStyle().includes("bold") ? "bold" : "normal"
     textarea.style.height = "auto"
     textarea.style.height = textarea.scrollHeight + 3 + "px"
-    textarea.style.zIndex = "10010"
+    textarea.style.zIndex = "40"
     textarea.focus()
 
     // Cleanup helper
@@ -701,6 +799,24 @@ export function AnnotationCanvas({
   }, [editingTextId])
 
   // ---------------------------------------------------------------------------
+  // Cursor style based on annotation mode
+  // ---------------------------------------------------------------------------
+
+  const cursorStyle = useMemo(() => {
+    switch (mode) {
+      case AnnotationMode.PEN:
+        return "crosshair"
+      case AnnotationMode.TEXT:
+        return "text"
+      case AnnotationMode.ERASER:
+        return "pointer"
+      case AnnotationMode.SELECT:
+      default:
+        return "default"
+    }
+  }, [mode])
+
+  // ---------------------------------------------------------------------------
   // Early returns
   // ---------------------------------------------------------------------------
 
@@ -727,6 +843,7 @@ export function AnnotationCanvas({
           left: bounds.offsetLeft,
           pointerEvents: isInteractive && !shouldPassthrough ? "auto" : "none",
           touchAction: isInteractive ? "none" : "auto",
+          cursor: cursorStyle,
         }}
         onPointerDown={handleStagePointerDown}
         onPointerMove={handleStagePointerMove}

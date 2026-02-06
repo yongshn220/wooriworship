@@ -574,3 +574,42 @@ Say "setup omc" or run `/oh-my-claudecode:omc-setup` to configure. After that, e
 ## Migration
 
 For migration guides from earlier versions, see [MIGRATION.md](./MIGRATION.md).
+
+---
+
+## Project Conventions
+
+### Firestore
+
+**Document ID**
+- 항상 단일 값만 사용 (compound key 금지)
+- 복합 키가 필요하면 subcollection으로 분리
+- 예시: `annotations/{userId}_page_{pageIndex}` (X) → `annotations/{userId}/pages/{pageIndex}` (O)
+
+**Document 크기**
+- 단일 문서에 unbounded array 저장 금지 (Firestore 문서 제한: 1MB)
+- 배열이 무한히 커질 수 있으면 subcollection으로 분리
+- 예시: `objects: AnnotationObject[]`가 수백 개 이상 가능하면 각 object를 subcollection 문서로
+
+**Timestamp**
+- 쓰기 시 항상 서버 타임스탬프 사용 (`serverTimestamp()` 또는 `getFirebaseTimestampNow()`)
+- 클라이언트 `Date.now()`를 Firestore 타임스탬프 대용으로 쓰지 않음
+
+**필드 네이밍**
+- Firestore 필드명은 `snake_case` 통일 (기존 패턴: `page_index`, `updated_at`, `team_id`)
+- TypeScript 모델은 camelCase 허용하되, Firestore에 저장되는 필드명과 매핑 일관성 유지
+
+**다중 문서 쓰기**
+- 2개 이상 문서를 동시에 변경해야 하면 `writeBatch()` 또는 `runTransaction()` 사용
+- 개별 `setDoc` 여러 번 호출하면 중간 실패 시 데이터 불일치 발생
+
+**Security Rules 동기화**
+- 새 collection/subcollection 추가 시 반드시 Firestore Security Rules도 함께 업데이트
+- 클라이언트에서 접근하는 모든 경로는 rules에 명시되어야 함
+
+### UI / 레이아웃
+
+- **가장 단순한 요소를 선택한다** — 요구사항을 충족하는 최소한의 요소를 사용. 기능을 막기 위해 override하느니 처음부터 안 쓴다.
+- **보이지 않으면 존재하지 않는다** — 화면에 없는 요소는 DOM에도 없어야 한다. 조건부 렌더링 우선, overlay/z-index는 양쪽이 동시에 보일 때만.
+- **흐름은 위에서 아래로** — visibility와 모드 전환은 부모가 결정한다. 자식은 항상 보이는 전제로 작성.
+- **레이어는 예측 가능해야 한다** — z-index는 Tailwind 기본 스케일(z-10, z-20 ...) 사용, 매직넘버 금지.

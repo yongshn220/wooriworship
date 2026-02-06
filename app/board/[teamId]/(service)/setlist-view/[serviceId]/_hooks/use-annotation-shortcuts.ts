@@ -1,11 +1,15 @@
 import { useEffect } from "react"
 import { useRecoilValue, useSetRecoilState } from "recoil"
-import { annotationDrawingModeAtom, activeAnnotationCanvasAtom, annotationEditorTargetAtom } from "../_states/annotation-states"
+import { annotationDrawingModeAtom, activeAnnotationCanvasAtom, annotationEditorTargetAtom, annotationModeAtom, selectedAnnotationIdAtom } from "../_states/annotation-states"
+import { AnnotationMode } from "@/models/sheet_annotation"
 
 export function useAnnotationShortcuts() {
   const drawingMode = useRecoilValue(annotationDrawingModeAtom)
   const setEditorTarget = useSetRecoilState(annotationEditorTargetAtom)
   const activeCanvas = useRecoilValue(activeAnnotationCanvasAtom)
+  const mode = useRecoilValue(annotationModeAtom)
+  const setMode = useSetRecoilState(annotationModeAtom)
+  const setSelectedIds = useSetRecoilState(selectedAnnotationIdAtom)
 
   useEffect(() => {
     if (!drawingMode) return
@@ -29,14 +33,26 @@ export function useAnnotationShortcuts() {
         activeCanvas?.redo()
       }
 
-      // Escape: close editor
+      // Escape: progressive dismissal
       if (e.key === "Escape") {
         e.preventDefault()
+        // 1. If selection exists, deselect first
+        if (activeCanvas?.hasSelection) {
+          setSelectedIds([])
+          return
+        }
+        // 2. If not in SELECT mode, switch to SELECT
+        if (mode !== AnnotationMode.SELECT) {
+          setMode(AnnotationMode.SELECT)
+          return
+        }
+        // 3. Otherwise close editor
         setEditorTarget(null)
       }
 
-      // Delete: delete selected
+      // Delete: delete selected (only when selection exists)
       if (e.key === "Delete" || e.key === "Backspace") {
+        if (!activeCanvas?.hasSelection) return
         e.preventDefault()
         activeCanvas?.deleteSelected()
       }
@@ -44,5 +60,5 @@ export function useAnnotationShortcuts() {
 
     window.addEventListener("keydown", handler)
     return () => window.removeEventListener("keydown", handler)
-  }, [drawingMode, activeCanvas, setEditorTarget])
+  }, [drawingMode, activeCanvas, setEditorTarget, mode, setMode, setSelectedIds])
 }

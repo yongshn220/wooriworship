@@ -24,7 +24,7 @@ export function SetlistNote({ constraintsRef }: Props) {
                     animate={{ opacity: 1, y: 0, x: "-50%" }}
                     exit={{ opacity: 0, y: -20, x: "-50%" }}
                     transition={{ duration: 0.3 }}
-                    className="fixed top-20 left-1/2 max-w-lg w-full z-40 mx-auto cursor-grab"
+                    className="fixed top-20 left-1/2 max-w-lg w-full z-20 mx-auto cursor-grab"
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div

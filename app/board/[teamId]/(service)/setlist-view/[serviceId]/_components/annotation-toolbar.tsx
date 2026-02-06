@@ -1,9 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { AnimatePresence, motion } from "framer-motion"
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil"
-import { MousePointer2, Pencil, Type, Bold, Undo2, Redo2, Trash2, X, ChevronDown } from "lucide-react"
+import { useRecoilState, useRecoilValue } from "recoil"
+import { MousePointer2, Pencil, Type, Bold, Undo2, Redo2, Trash2, ChevronDown, Eraser, ListX } from "lucide-react"
 import {
   annotationDrawingModeAtom,
   annotationModeAtom,
@@ -12,11 +11,21 @@ import {
   annotationFontSizeAtom,
   annotationFontWeightAtom,
   activeAnnotationCanvasAtom,
-  annotationEditorTargetAtom,
 } from "../_states/annotation-states"
 import { AnnotationMode, PenColor, PenSize, FontSize } from "@/models/sheet_annotation"
 import { cn } from "@/lib/utils"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { useAnnotationShortcuts } from "../_hooks/use-annotation-shortcuts"
 
 // ---------------------------------------------------------------------------
@@ -27,6 +36,10 @@ const COLORS = [
   { value: PenColor.BLACK, bg: "bg-black", ring: "ring-black" },
   { value: PenColor.RED, bg: "bg-red-500", ring: "ring-red-500" },
   { value: PenColor.BLUE, bg: "bg-blue-500", ring: "ring-blue-500" },
+  { value: PenColor.GREEN, bg: "bg-green-500", ring: "ring-green-500" },
+  { value: PenColor.ORANGE, bg: "bg-orange-500", ring: "ring-orange-500" },
+  { value: PenColor.PURPLE, bg: "bg-purple-500", ring: "ring-purple-500" },
+  { value: PenColor.GRAY, bg: "bg-gray-500", ring: "ring-gray-500" },
 ]
 
 const SIZES = [
@@ -75,6 +88,7 @@ const MODES = [
   { mode: AnnotationMode.SELECT, Icon: MousePointer2, label: "Select", compactLabel: "Sel" },
   { mode: AnnotationMode.PEN, Icon: Pencil, label: "Pen", compactLabel: "Pen" },
   { mode: AnnotationMode.TEXT, Icon: Type, label: "Text", compactLabel: "Txt" },
+  { mode: AnnotationMode.ERASER, Icon: Eraser, label: "Eraser", compactLabel: "Era" },
 ] as const
 
 function ModeToggle({
@@ -91,7 +105,7 @@ function ModeToggle({
           key={m}
           onClick={() => setMode(m)}
           className={cn(
-            "p-2 rounded-full transition-colors",
+            "p-2.5 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center",
             mode === m
               ? "bg-foreground text-background"
               : "text-foreground hover:bg-muted"
@@ -116,7 +130,7 @@ function ColorPickerInline({ color, setColor }: { color: string; setColor: (c: s
           key={c.value}
           onClick={() => setColor(c.value)}
           className={cn(
-            "w-6 h-6 rounded-full flex-center",
+            "w-8 h-8 rounded-full flex-center",
             color === c.value && "ring-2 ring-offset-2 ring-offset-background"
           )}
         >
@@ -139,7 +153,7 @@ function ColorPickerCompact({ color, setColor }: { color: string; setColor: (c: 
           <ChevronDown className="w-2.5 h-2.5 text-muted-foreground" />
         </button>
       </PopoverTrigger>
-      <PopoverContent side="top" className="w-auto p-2 rounded-xl z-[10003]" sideOffset={8}>
+      <PopoverContent side="top" className="w-auto p-2 rounded-xl z-50" sideOffset={8}>
         <div className="flex items-center gap-1">
           {COLORS.map((c) => (
             <button
@@ -171,7 +185,7 @@ function SizePickerInline({ size, setSize }: { size: PenSize; setSize: (s: PenSi
           key={s.value}
           onClick={() => setSize(s.value)}
           className={cn(
-            "w-6 h-6 rounded-full flex-center",
+            "w-8 h-8 rounded-full flex-center",
             size === s.value && "ring-2 ring-offset-2 ring-offset-background ring-foreground"
           )}
         >
@@ -194,7 +208,7 @@ function SizePickerCompact({ size, setSize }: { size: PenSize; setSize: (s: PenS
           <ChevronDown className="w-2.5 h-2.5 text-muted-foreground" />
         </button>
       </PopoverTrigger>
-      <PopoverContent side="top" className="w-auto p-2 rounded-xl z-[10003]" sideOffset={8}>
+      <PopoverContent side="top" className="w-auto p-2 rounded-xl z-50" sideOffset={8}>
         <div className="flex items-center gap-2">
           {SIZES.map((s) => (
             <button
@@ -263,7 +277,7 @@ function FontSizePickerCompact({
           <ChevronDown className="w-2.5 h-2.5 text-muted-foreground" />
         </button>
       </PopoverTrigger>
-      <PopoverContent side="top" className="w-auto p-2 rounded-xl z-[10003]" sideOffset={8}>
+      <PopoverContent side="top" className="w-auto p-2 rounded-xl z-50" sideOffset={8}>
         <div className="flex items-center gap-1">
           {FONT_SIZES.map((f) => (
             <button
@@ -300,7 +314,7 @@ function BoldToggle({
     <button
       onClick={() => setFontWeight(fontWeight === "bold" ? "normal" : "bold")}
       className={cn(
-        "p-2 rounded-full transition-colors",
+        "p-2.5 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center",
         fontWeight === "bold"
           ? "bg-foreground text-background"
           : "text-foreground hover:bg-muted"
@@ -319,7 +333,7 @@ function DeleteButton({ onDelete }: { onDelete: () => void }) {
   return (
     <button
       onClick={onDelete}
-      className="p-2 rounded-full transition-colors text-red-500 hover:bg-red-500/10"
+      className="p-2.5 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center text-red-500 hover:bg-red-500/10"
     >
       <Trash2 className="w-4 h-4" />
     </button>
@@ -425,101 +439,95 @@ export function AnnotationToolbar() {
   const [fontSize, setFontSize] = useRecoilState(annotationFontSizeAtom)
   const [fontWeight, setFontWeight] = useRecoilState(annotationFontWeightAtom)
   const activeCanvas = useRecoilValue(activeAnnotationCanvasAtom)
-  const setEditorTarget = useSetRecoilState(annotationEditorTargetAtom)
   const isCompact = useIsCompact()
   useAnnotationShortcuts()
 
-  const handleClose = () => {
-    setEditorTarget(null)
-  }
+  if (!drawingMode) return null
 
   return (
-    <AnimatePresence>
-      {drawingMode && (
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 50, opacity: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="absolute bottom-8 left-0 w-full z-[10002] flex justify-center pointer-events-none"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-background shadow-lg border border-border p-1">
-            {/* Close (exit editor) */}
-            <button
-              onClick={handleClose}
-              className="p-2 rounded-full transition-colors text-foreground hover:bg-muted"
-            >
-              <X className="w-4 h-4" />
-            </button>
+    <div className="flex items-center gap-1 rounded-full bg-background shadow-lg border border-border p-1">
+      {/* Mode toggle: Select / Pen / Text */}
+      <ModeToggle mode={mode} setMode={setMode} />
 
-            <Divider />
+      {/* Contextual controls per mode */}
+      <ContextualControls
+        mode={mode}
+        isCompact={isCompact}
+        color={color}
+        setColor={setColor}
+        size={size}
+        setSize={setSize}
+        fontSize={fontSize}
+        setFontSize={setFontSize}
+        fontWeight={fontWeight}
+        setFontWeight={setFontWeight}
+        hasSelection={activeCanvas?.hasSelection ?? false}
+        onDeleteSelected={() => activeCanvas?.deleteSelected()}
+      />
 
-            {/* Mode toggle: Select / Pen / Text */}
-            <ModeToggle mode={mode} setMode={setMode} />
+      <Divider />
 
-            {/* Contextual controls per mode */}
-            <ContextualControls
-              mode={mode}
-              isCompact={isCompact}
-              color={color}
-              setColor={setColor}
-              size={size}
-              setSize={setSize}
-              fontSize={fontSize}
-              setFontSize={setFontSize}
-              fontWeight={fontWeight}
-              setFontWeight={setFontWeight}
-              hasSelection={activeCanvas?.hasSelection ?? false}
-              onDeleteSelected={() => activeCanvas?.deleteSelected()}
-            />
+      {/* Undo / Redo */}
+      <button
+        onClick={() => activeCanvas?.undo()}
+        disabled={!activeCanvas?.canUndo}
+        className={cn(
+          "p-2.5 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center",
+          activeCanvas?.canUndo
+            ? "text-foreground hover:bg-muted"
+            : "text-foreground/20 cursor-default"
+        )}
+      >
+        <Undo2 className="w-4 h-4" />
+      </button>
+      <button
+        onClick={() => activeCanvas?.redo()}
+        disabled={!activeCanvas?.canRedo}
+        className={cn(
+          "p-2.5 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center",
+          activeCanvas?.canRedo
+            ? "text-foreground hover:bg-muted"
+            : "text-foreground/20 cursor-default"
+        )}
+      >
+        <Redo2 className="w-4 h-4" />
+      </button>
 
-            <Divider />
+      <Divider />
 
-            {/* Undo / Redo */}
-            <button
-              onClick={() => activeCanvas?.undo()}
-              disabled={!activeCanvas?.canUndo}
-              className={cn(
-                "p-2 rounded-full transition-colors",
-                activeCanvas?.canUndo
-                  ? "text-foreground hover:bg-muted"
-                  : "text-foreground/20 cursor-default"
-              )}
-            >
-              <Undo2 className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => activeCanvas?.redo()}
-              disabled={!activeCanvas?.canRedo}
-              className={cn(
-                "p-2 rounded-full transition-colors",
-                activeCanvas?.canRedo
-                  ? "text-foreground hover:bg-muted"
-                  : "text-foreground/20 cursor-default"
-              )}
-            >
-              <Redo2 className="w-4 h-4" />
-            </button>
-
-            <Divider />
-
-            {/* Clear all */}
-            <button
+      {/* Clear all with confirmation */}
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <button
+            disabled={!activeCanvas?.canClear}
+            className={cn(
+              "p-2.5 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center",
+              activeCanvas?.canClear
+                ? "text-red-500 hover:bg-red-500/10"
+                : "text-foreground/20 cursor-default"
+            )}
+          >
+            <ListX className="w-4 h-4" />
+          </button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>모든 주석을 삭제할까요?</AlertDialogTitle>
+            <AlertDialogDescription>
+              이 페이지의 모든 주석이 삭제됩니다. 에디터를 닫은 후에는 되돌릴 수 없습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction
               onClick={() => activeCanvas?.clearAll()}
-              disabled={!activeCanvas?.canClear}
-              className={cn(
-                "p-2 rounded-full transition-colors",
-                activeCanvas?.canClear
-                  ? "text-red-500 hover:bg-red-500/10"
-                  : "text-foreground/20 cursor-default"
-              )}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+              모두 삭제
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   )
 }

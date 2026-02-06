@@ -16,6 +16,7 @@ export enum Page {
   SERVING = "service-board",
   CREATE_SERVING = "create-service", // Route renamed: create-serving → create-service
   EDIT_SERVING = "edit-service", // Route renamed: edit-serving → edit-service
+  SETLIST_VIEW = "setlist-view",
   MANAGE = "manage",
   MANAGE_SUBPAGE = "manage-subpage",
   TODO_BOARD = "todo-board",

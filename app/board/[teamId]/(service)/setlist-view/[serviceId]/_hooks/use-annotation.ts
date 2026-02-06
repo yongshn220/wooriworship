@@ -15,6 +15,7 @@ export function useAnnotation({ teamId, songId, sheetId, pageIndex }: UseAnnotat
   const [objects, setObjects] = useState<AnnotationObject[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const undoStackRef = useRef<AnnotationObject[][]>([])
   const redoStackRef = useRef<AnnotationObject[][]>([])
   const [canUndo, setCanUndo] = useState(false)
@@ -29,7 +30,15 @@ export function useAnnotation({ teamId, songId, sheetId, pageIndex }: UseAnnotat
       SheetAnnotationApi.saveAnnotation(teamId, songId, sheetId, pageIndex, userId, {
         objects: objectsToSave,
         page_index: pageIndex,
-      }).finally(() => setIsSaving(false))
+      })
+        .then(() => {
+          setIsSaving(false)
+          setSaveError(null)
+        })
+        .catch((e) => {
+          setIsSaving(false)
+          setSaveError(e instanceof Error ? e.message : "Save failed")
+        })
     },
     2000
   )
@@ -140,5 +149,6 @@ export function useAnnotation({ teamId, songId, sheetId, pageIndex }: UseAnnotat
     canRedo,
     isLoading,
     isSaving,
+    saveError,
   }
 }

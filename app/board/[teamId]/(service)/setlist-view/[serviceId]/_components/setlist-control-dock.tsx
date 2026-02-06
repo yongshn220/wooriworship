@@ -16,6 +16,7 @@ import { useState } from "react";
 import { DownloadSetlistSheetsDrawer } from "./download-setlist-sheets-drawer";
 import { annotationEditorTargetAtom } from "../_states/annotation-states";
 import { setlistIndexAtom } from "../_states/setlist-view-states";
+
 import { DirectionType } from "@/components/constants/enums";
 import { toast } from "@/components/ui/use-toast";
 
@@ -30,7 +31,6 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
     const [preference, prefSetter] = useUserPreferences()
     const [isPopoverOpen, setIsPopoverOpen] = useState(false)
     const [isDownloadDrawerOpen, setIsDownloadDrawerOpen] = useState(false)
-    const editorTarget = useRecoilValue(annotationEditorTargetAtom)
     const setEditorTarget = useSetRecoilState(annotationEditorTargetAtom)
     const setlistIndex = useRecoilValue(setlistIndexAtom)
     const [multipleSheetsViewMode, setMultipleSheetsViewMode] = useRecoilState(setlistMultipleSheetsViewModeAtom)
@@ -60,11 +60,9 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
         setEditorTarget({ initialGlobalIndex: setlistIndex.current })
     }
 
-    if (editorTarget) return null
-
     return (
         <div className={cn(
-            "fixed bottom-8 left-0 w-full z-[10002] pointer-events-none flex",
+            "fixed left-0 w-full z-30 pointer-events-none flex bottom-[max(2rem,env(safe-area-inset-bottom))]",
             uiVisible ? "justify-center" : "justify-start pl-4"
         )}>
             <motion.div
@@ -140,7 +138,7 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
                                             <SetlistControlItem icon={<MoreHorizontal className="w-5 h-5" />} />
                                         </div>
                                     </PopoverTrigger>
-                                    <PopoverContent side="top" className="mb-4 bg-background backdrop-blur-xl border-border w-80 p-0 overflow-hidden shadow-toss rounded-2xl z-[10003]">
+                                    <PopoverContent side="top" className="mb-4 bg-background backdrop-blur-xl border-border w-80 p-0 overflow-hidden shadow-toss rounded-2xl z-40">
                                         <SetlistSettingsMenu teamId={teamId} serviceId={serviceId} onDownloadSheets={() => { setIsPopoverOpen(false); setIsDownloadDrawerOpen(true); }} />
                                     </PopoverContent>
                                 </Popover>
