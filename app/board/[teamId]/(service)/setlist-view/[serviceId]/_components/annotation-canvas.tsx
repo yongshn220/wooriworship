@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useEffect, useCallback, useState } from "react"
+import { useRef, useEffect, useLayoutEffect, useCallback, useState } from "react"
 import { createPortal } from "react-dom"
 import { useRecoilValue, useSetRecoilState } from "recoil"
 import { Stage, Layer, Line, Text, Rect, Transformer } from "react-konva"
@@ -566,28 +566,49 @@ export function AnnotationCanvas({
   // Text editing textarea position calculation
   // ---------------------------------------------------------------------------
 
+  // Force re-render after Konva commit so textarea can find the Text node
+  const [, forceUpdate] = useState(0)
+  useLayoutEffect(() => {
+    if (editingTextId) {
+      forceUpdate((c) => c + 1)
+    }
+  }, [editingTextId])
+
   const getTextareaStyle = useCallback((): React.CSSProperties => {
     if (!editingTextId || !stageRef.current) {
       return { display: "none" }
     }
 
     const stageBox = stageRef.current.container().getBoundingClientRect()
+    const scaleX = stageBox.width / bounds.visibleWidth
+    const obj = objects.find((o) => o.id === editingTextId) as TextObject | undefined
+
+    // Try Konva node first, fallback to object coordinates
     const textNode = stageRef.current.findOne(`#${editingTextId}`) as Konva.Text | null
-    if (!textNode) {
+    let posX: number
+    let posY: number
+    let nodeWidth = 0
+    let nodeHeight = 0
+
+    if (textNode) {
+      const textRect = textNode.getClientRect()
+      posX = textRect.x
+      posY = textRect.y
+      nodeWidth = textRect.width
+      nodeHeight = textRect.height
+    } else if (obj) {
+      posX = obj.x * bounds.visibleWidth
+      posY = obj.y * bounds.visibleHeight
+    } else {
       return { display: "none" }
     }
 
-    const textRect = textNode.getClientRect()
-    const scaleX = stageBox.width / bounds.visibleWidth
-
-    const obj = objects.find((o) => o.id === editingTextId) as TextObject | undefined
-
     return {
       position: "fixed" as const,
-      top: stageBox.top + textRect.y * scaleX,
-      left: stageBox.left + textRect.x * scaleX,
-      width: Math.max(textRect.width * scaleX + 20, 100),
-      minHeight: Math.max(textRect.height * scaleX + 10, 30),
+      top: stageBox.top + posY * scaleX,
+      left: stageBox.left + posX * scaleX,
+      width: Math.max(nodeWidth * scaleX + 20, 100),
+      minHeight: Math.max(nodeHeight * scaleX + 10, 30),
       fontSize: (obj?.fontSize ?? fontSize) * scaleX,
       fontWeight: obj?.fontWeight ?? fontWeight,
       fontFamily: "sans-serif",
@@ -602,7 +623,7 @@ export function AnnotationCanvas({
       zIndex: 10010,
       lineHeight: 1.2,
     }
-  }, [editingTextId, bounds.visibleWidth, objects, fontSize, fontWeight, color])
+  }, [editingTextId, bounds.visibleWidth, bounds.visibleHeight, objects, fontSize, fontWeight, color])
 
   // ---------------------------------------------------------------------------
   // Early returns
