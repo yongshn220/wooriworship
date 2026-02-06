@@ -10,6 +10,7 @@ export interface FreehandObject {
   points: FreehandPoint[]       // normalized 0-1
   color: string                 // hex color
   strokeWidth: number           // pixel value for rendering: 2, 4, 8
+  opacity?: number              // 0-1, default 1 for pen, 0.3 for highlighter
   timestamp: number
 }
 
@@ -43,6 +44,7 @@ export enum PenColor {
   ORANGE = "#F97316",
   PURPLE = "#A855F7",
   GRAY = "#6B7280",
+  WHITE = "#FFFFFF",
 }
 
 export enum PenSize {
@@ -56,6 +58,7 @@ export enum AnnotationMode {
   PEN = "PEN",
   TEXT = "TEXT",
   ERASER = "ERASER",
+  HIGHLIGHTER = "HIGHLIGHTER",
 }
 
 export enum FontSize {

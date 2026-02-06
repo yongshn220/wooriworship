@@ -84,6 +84,7 @@ export function AnnotationCanvas({
   const [currentStroke, setCurrentStroke] = useState<number[] | null>(null)
   const currentStrokeRef = useRef<number[]>([])
   const isDrawingRef = useRef(false)
+  const [showCancelFlash, setShowCancelFlash] = useState(false)
 
   // Text editing state
   const [editingTextId, setEditingTextId] = useState<string | null>(null)
@@ -130,6 +131,7 @@ export function AnnotationCanvas({
   // ---------------------------------------------------------------------------
 
   const cancelDrawing = useCallback(() => {
+    const wasDrawing = isDrawingRef.current && currentStrokeRef.current.length > 0
     isDrawingRef.current = false
     currentStrokeRef.current = []
     setCurrentStroke(null)
@@ -139,7 +141,20 @@ export function AnnotationCanvas({
     isErasingRef.current = false
     erasedIdsRef.current.clear()
     preEraseSnapshotRef.current = null
+    if (wasDrawing) {
+      setShowCancelFlash(true)
+    }
   }, [])
+
+  // ---------------------------------------------------------------------------
+  // Cancel flash auto-hide
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (!showCancelFlash) return
+    const timer = setTimeout(() => setShowCancelFlash(false), 600)
+    return () => clearTimeout(timer)
+  }, [showCancelFlash])
 
   // ---------------------------------------------------------------------------
   // Multi-touch passthrough: reset when all pointers released
@@ -312,6 +327,16 @@ export function AnnotationCanvas({
         return
       }
 
+      // HIGHLIGHTER mode: same as PEN
+      if (mode === AnnotationMode.HIGHLIGHTER) {
+        const pos = stage.getPointerPosition()
+        if (!pos) return
+        isDrawingRef.current = true
+        currentStrokeRef.current = [pos.x, pos.y]
+        setCurrentStroke([pos.x, pos.y])
+        return
+      }
+
       // TEXT mode
       if (mode === AnnotationMode.TEXT) {
         const clickedOnEmpty = e.target === stage
@@ -421,7 +446,7 @@ export function AnnotationCanvas({
         return
       }
 
-      if (mode !== AnnotationMode.PEN || !isDrawingRef.current) return
+      if ((mode !== AnnotationMode.PEN && mode !== AnnotationMode.HIGHLIGHTER) || !isDrawingRef.current) return
 
       const stage = stageRef.current
       if (!stage) return
@@ -507,7 +532,7 @@ export function AnnotationCanvas({
         return
       }
 
-      if (mode !== AnnotationMode.PEN || !isDrawingRef.current) return
+      if ((mode !== AnnotationMode.PEN && mode !== AnnotationMode.HIGHLIGHTER) || !isDrawingRef.current) return
 
       isDrawingRef.current = false
       const points = currentStrokeRef.current
@@ -527,7 +552,8 @@ export function AnnotationCanvas({
           type: "freehand",
           points: normalizedPoints,
           color,
-          strokeWidth: penSize,
+          strokeWidth: mode === AnnotationMode.HIGHLIGHTER ? Math.max(penSize * 3, 12) : penSize,
+          opacity: mode === AnnotationMode.HIGHLIGHTER ? 0.3 : undefined,
           timestamp: Date.now(),
         }
         addObject(freehandObj)
@@ -806,6 +832,8 @@ export function AnnotationCanvas({
     switch (mode) {
       case AnnotationMode.PEN:
         return "crosshair"
+      case AnnotationMode.HIGHLIGHTER:
+        return "crosshair"
       case AnnotationMode.TEXT:
         return "text"
       case AnnotationMode.ERASER:
@@ -862,6 +890,7 @@ export function AnnotationCanvas({
                   points={denormalizePoints(obj.points)}
                   stroke={obj.color}
                   strokeWidth={obj.strokeWidth}
+                  opacity={obj.opacity ?? 1}
                   lineCap="round"
                   lineJoin="round"
                   tension={0.3}
@@ -925,7 +954,8 @@ export function AnnotationCanvas({
             <Line
               points={currentStroke}
               stroke={color}
-              strokeWidth={penSize}
+              strokeWidth={mode === AnnotationMode.HIGHLIGHTER ? Math.max(penSize * 3, 12) : penSize}
+              opacity={mode === AnnotationMode.HIGHLIGHTER ? 0.3 : 1}
               lineCap="round"
               lineJoin="round"
               tension={0.3}
@@ -969,6 +999,12 @@ export function AnnotationCanvas({
           )}
         </Layer>
       </Stage>
+      {showCancelFlash && (
+        <div
+          className="absolute inset-0 bg-red-500/10 pointer-events-none z-30 animate-pulse"
+          style={{ animationDuration: "0.3s", animationIterationCount: 1 }}
+        />
+      )}
     </div>
   )
 }

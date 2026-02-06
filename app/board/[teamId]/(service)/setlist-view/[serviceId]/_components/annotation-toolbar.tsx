@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRecoilState, useRecoilValue } from "recoil"
-import { MousePointer2, Pencil, Type, Bold, Undo2, Redo2, Trash2, ChevronDown, Eraser, ListX } from "lucide-react"
+import { MousePointer2, Pencil, Type, Bold, Undo2, Redo2, Trash2, ChevronDown, Eraser, ListX, Highlighter } from "lucide-react"
 import {
   annotationDrawingModeAtom,
   annotationModeAtom,
@@ -40,6 +40,7 @@ const COLORS = [
   { value: PenColor.ORANGE, bg: "bg-orange-500", ring: "ring-orange-500" },
   { value: PenColor.PURPLE, bg: "bg-purple-500", ring: "ring-purple-500" },
   { value: PenColor.GRAY, bg: "bg-gray-500", ring: "ring-gray-500" },
+  { value: PenColor.WHITE, bg: "bg-white border border-border", ring: "ring-gray-400" },
 ]
 
 const SIZES = [
@@ -72,6 +73,36 @@ function useIsCompact(breakpoint: number = 420) {
   return isCompact
 }
 
+function useIsDarkMode() {
+  const [isDarkMode, setIsDarkMode] = useState(false)
+
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const hasDarkClass = document.documentElement.classList.contains("dark")
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+      setIsDarkMode(hasDarkClass || prefersDark)
+    }
+
+    checkDarkMode()
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+    const observer = new MutationObserver(checkDarkMode)
+
+    mediaQuery.addEventListener("change", checkDarkMode)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    })
+
+    return () => {
+      mediaQuery.removeEventListener("change", checkDarkMode)
+      observer.disconnect()
+    }
+  }, [])
+
+  return isDarkMode
+}
+
 // ---------------------------------------------------------------------------
 // Divider
 // ---------------------------------------------------------------------------
@@ -89,6 +120,7 @@ const MODES = [
   { mode: AnnotationMode.PEN, Icon: Pencil, label: "Pen", compactLabel: "Pen" },
   { mode: AnnotationMode.TEXT, Icon: Type, label: "Text", compactLabel: "Txt" },
   { mode: AnnotationMode.ERASER, Icon: Eraser, label: "Eraser", compactLabel: "Era" },
+  { mode: AnnotationMode.HIGHLIGHTER, Icon: Highlighter, label: "Highlight", compactLabel: "Hi" },
 ] as const
 
 function ModeToggle({
@@ -401,6 +433,26 @@ function ContextualControls({
     )
   }
 
+  if (mode === AnnotationMode.HIGHLIGHTER) {
+    return (
+      <>
+        <Divider />
+        {isCompact ? (
+          <>
+            <ColorPickerCompact color={color} setColor={setColor} />
+            <SizePickerCompact size={size} setSize={setSize} />
+          </>
+        ) : (
+          <>
+            <ColorPickerInline color={color} setColor={setColor} />
+            <Divider />
+            <SizePickerInline size={size} setSize={setSize} />
+          </>
+        )}
+      </>
+    )
+  }
+
   if (mode === AnnotationMode.TEXT) {
     return (
       <>
@@ -440,7 +492,16 @@ export function AnnotationToolbar() {
   const [fontWeight, setFontWeight] = useRecoilState(annotationFontWeightAtom)
   const activeCanvas = useRecoilValue(activeAnnotationCanvasAtom)
   const isCompact = useIsCompact()
+  const isDarkMode = useIsDarkMode()
+
   useAnnotationShortcuts()
+
+  useEffect(() => {
+    if (drawingMode && isDarkMode && color === PenColor.BLACK) {
+      setColor(PenColor.WHITE)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally only fire on mode/theme change, not color
+  }, [drawingMode, isDarkMode])
 
   if (!drawingMode) return null
 
