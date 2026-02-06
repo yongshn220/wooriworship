@@ -11,6 +11,10 @@ export function useAnnotationShortcuts() {
     if (!drawingMode) return
 
     const handler = (e: KeyboardEvent) => {
+      // Don't intercept when user is typing in textarea/input
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === "TEXTAREA" || tag === "INPUT") return
+
       const isMod = e.metaKey || e.ctrlKey
 
       // Undo: Ctrl/Cmd + Z

@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState, useCallback } from "react"
-import { createPortal } from "react-dom"
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil"
 import { AnimatePresence, motion } from "framer-motion"
 import Image from "next/image"
@@ -129,16 +128,14 @@ export function AnnotationEditor({ teamId }: Props) {
   const page = flatPages[currentPageIndex]
   if (!page) return null
 
-  if (typeof document === "undefined") return null
-
-  return createPortal(
+  return (
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-[10000] flex flex-col bg-background"
+        className="absolute inset-0 z-50 flex flex-col bg-background"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background z-10">
@@ -233,7 +230,6 @@ export function AnnotationEditor({ teamId }: Props) {
         {/* Toolbar */}
         <AnnotationToolbar />
       </motion.div>
-    </AnimatePresence>,
-    document.body,
+    </AnimatePresence>
   )
 }

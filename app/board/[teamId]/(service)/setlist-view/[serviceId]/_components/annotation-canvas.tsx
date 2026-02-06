@@ -1,7 +1,6 @@
 "use client"
 
-import { useRef, useEffect, useLayoutEffect, useCallback, useState } from "react"
-import { createPortal } from "react-dom"
+import { useRef, useEffect, useCallback, useState } from "react"
 import { useRecoilValue, useSetRecoilState } from "recoil"
 import { Stage, Layer, Line, Text, Rect, Transformer } from "react-konva"
 import type Konva from "konva"
@@ -86,8 +85,16 @@ export function AnnotationCanvas({
 
   // Text editing state
   const [editingTextId, setEditingTextId] = useState<string | null>(null)
-  const [editTextValue, setEditTextValue] = useState("")
   const isNewTextRef = useRef(false)
+  const textareaElRef = useRef<HTMLTextAreaElement | null>(null)
+
+  // Refs for stable access in native textarea event listeners
+  const objectsRef = useRef(objects)
+  objectsRef.current = objects
+  const removeObjectRef = useRef(removeObject)
+  removeObjectRef.current = removeObject
+  const updateObjectRef = useRef(updateObject)
+  updateObjectRef.current = updateObject
 
   // Multi-touch passthrough
   const pointerIdsRef = useRef(new Set<number>())
@@ -211,7 +218,6 @@ export function AnnotationCanvas({
       if (!obj || obj.type !== "text") return
       isNewTextRef.current = false
       setEditingTextId(id)
-      setEditTextValue((obj as TextObject).text)
     },
     [objects],
   )
@@ -296,10 +302,13 @@ export function AnnotationCanvas({
         return
       }
 
-      // TEXT mode: click empty area -> create new text
+      // TEXT mode
       if (mode === AnnotationMode.TEXT) {
         const clickedOnEmpty = e.target === stage
         if (clickedOnEmpty) {
+          // If currently editing, just return — the outside click handler will save
+          if (editingTextId) return
+
           const pos = stage.getPointerPosition()
           if (!pos) return
 
@@ -318,7 +327,6 @@ export function AnnotationCanvas({
           addObject(textObj)
           isNewTextRef.current = true
           setEditingTextId(newId)
-          setEditTextValue("")
         }
         return
       }
@@ -333,6 +341,7 @@ export function AnnotationCanvas({
       fontWeight,
       color,
       addObject,
+      editingTextId,
     ],
   )
 
@@ -444,42 +453,6 @@ export function AnnotationCanvas({
   )
 
   // ---------------------------------------------------------------------------
-  // Text editing: save / cancel
-  // ---------------------------------------------------------------------------
-
-  const saveTextEdit = useCallback(() => {
-    if (!editingTextId) return
-    const trimmed = editTextValue.trim()
-
-    if (trimmed === "") {
-      // Empty text -> remove the object
-      removeObject(editingTextId)
-    } else {
-      updateObject(editingTextId, { text: trimmed } as Partial<TextObject>)
-    }
-
-    setEditingTextId(null)
-    setEditTextValue("")
-    isNewTextRef.current = false
-  }, [editingTextId, editTextValue, removeObject, updateObject])
-
-  const cancelTextEdit = useCallback(() => {
-    if (!editingTextId) return
-
-    // If it was a new empty text, remove it
-    if (isNewTextRef.current) {
-      const obj = objects.find((o) => o.id === editingTextId)
-      if (obj && obj.type === "text" && (obj as TextObject).text === "") {
-        removeObject(editingTextId)
-      }
-    }
-
-    setEditingTextId(null)
-    setEditTextValue("")
-    isNewTextRef.current = false
-  }, [editingTextId, objects, removeObject])
-
-  // ---------------------------------------------------------------------------
   // Transformer attachment (multi-select)
   // ---------------------------------------------------------------------------
 
@@ -563,67 +536,169 @@ export function AnnotationCanvas({
   const selectedObjectType = singleSelectedObj?.type ?? null
 
   // ---------------------------------------------------------------------------
-  // Text editing textarea position calculation
+  // Native DOM textarea for text editing (following Konva docs exactly)
   // ---------------------------------------------------------------------------
 
-  // Force re-render after Konva commit so textarea can find the Text node
-  const [, forceUpdate] = useState(0)
-  useLayoutEffect(() => {
-    if (editingTextId) {
-      forceUpdate((c) => c + 1)
+  useEffect(() => {
+    if (!editingTextId || !stageRef.current) return
+
+    const id = editingTextId
+    const stage = stageRef.current
+    let textarea: HTMLTextAreaElement | null = null
+    let outsideClickHandler: ((e: MouseEvent) => void) | null = null
+
+    const textNode = stage.findOne(`#${id}`) as Konva.Text | null
+    if (!textNode) return
+
+    // Hide the Konva text node while editing (Konva docs pattern)
+    textNode.hide()
+    stage.batchDraw()
+
+    // Calculate position accounting for CSS transform (TransformWrapper zoom)
+    const stageBox = stage.container().getBoundingClientRect()
+    const textPosition = textNode.absolutePosition()
+    const cssScale = stage.width() > 0 ? stageBox.width / stage.width() : 1
+
+    const areaPosition = {
+      x: stageBox.left + textPosition.x * cssScale,
+      y: stageBox.top + textPosition.y * cssScale,
+    }
+
+    // Create native DOM textarea (Konva docs pattern)
+    // Append inside the Radix Dialog to stay within its focus trap
+    textarea = document.createElement("textarea")
+    const dialogEl = stage.container().closest('[role="dialog"]')
+    ;(dialogEl || document.body).appendChild(textarea)
+    textareaElRef.current = textarea
+
+    // Set value — handle placeholder space
+    textarea.value = textNode.text() === " " ? "" : textNode.text()
+
+    // Style to match Konva text node exactly
+    textarea.style.position = "fixed"
+    textarea.style.top = areaPosition.y + "px"
+    textarea.style.left = areaPosition.x + "px"
+    textarea.style.width = Math.max(textNode.width() * cssScale, 100) + "px"
+    textarea.style.fontSize = textNode.fontSize() * cssScale + "px"
+    textarea.style.border = "none"
+    textarea.style.padding = "0px"
+    textarea.style.margin = "0px"
+    textarea.style.overflow = "hidden"
+    textarea.style.background = "none"
+    textarea.style.outline = "2px solid #3B82F6"
+    textarea.style.outlineOffset = "2px"
+    textarea.style.resize = "none"
+    textarea.style.lineHeight = textNode.lineHeight().toString()
+    textarea.style.fontFamily = textNode.fontFamily()
+    textarea.style.transformOrigin = "left top"
+    textarea.style.textAlign = textNode.align()
+    textarea.style.color = textNode.fill() as string
+    textarea.style.fontWeight = textNode.fontStyle().includes("bold") ? "bold" : "normal"
+    textarea.style.height = "auto"
+    textarea.style.height = textarea.scrollHeight + 3 + "px"
+    textarea.style.zIndex = "10010"
+    textarea.focus()
+
+    // Cleanup helper
+    function removeTextarea() {
+      if (outsideClickHandler) {
+        window.removeEventListener("mousedown", outsideClickHandler)
+        outsideClickHandler = null
+      }
+      if (textarea && textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea)
+      }
+      textareaElRef.current = null
+      textarea = null
+      textNode.show()
+      stage.batchDraw()
+    }
+
+    // Save text and close textarea
+    function saveAndClose() {
+      if (!textarea) return
+      const value = textarea.value.trim()
+      if (value === "") {
+        removeObjectRef.current(id)
+      } else {
+        updateObjectRef.current(id, { text: value } as Partial<TextObject>)
+      }
+      removeTextarea()
+      setEditingTextId(null)
+      isNewTextRef.current = false
+    }
+
+    // Cancel edit and close textarea
+    function cancelAndClose() {
+      if (!textarea) return
+      if (isNewTextRef.current) {
+        const obj = objectsRef.current.find((o) => o.id === id)
+        if (obj?.type === "text" && (obj as TextObject).text === "") {
+          removeObjectRef.current(id)
+        }
+      }
+      removeTextarea()
+      setEditingTextId(null)
+      isNewTextRef.current = false
+    }
+
+    // Keyboard: Enter saves, Escape cancels
+    textarea.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault()
+        saveAndClose()
+      }
+      if (e.key === "Escape") {
+        e.preventDefault()
+        e.stopPropagation()
+        cancelAndClose()
+      }
+    })
+
+    // Auto-resize textarea height
+    textarea.addEventListener("input", function () {
+      if (textarea) {
+        textarea.style.height = "auto"
+        textarea.style.height = textarea.scrollHeight + 3 + "px"
+      }
+    })
+
+    // Outside mousedown saves (use mousedown, not click, to avoid same-click trigger)
+    outsideClickHandler = function (e: MouseEvent) {
+      if (e.target !== textarea) {
+        saveAndClose()
+      }
+    }
+    setTimeout(() => {
+      if (outsideClickHandler) {
+        window.addEventListener("mousedown", outsideClickHandler)
+      }
+    })
+
+    // Cleanup: save text and remove textarea when editingTextId changes or unmount
+    return () => {
+      if (textarea) {
+        const value = textarea.value.trim()
+        if (value === "") {
+          removeObjectRef.current(id)
+        } else {
+          updateObjectRef.current(id, { text: value } as Partial<TextObject>)
+        }
+      }
+      if (outsideClickHandler) {
+        window.removeEventListener("mousedown", outsideClickHandler)
+      }
+      if (textarea && textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea)
+      }
+      textareaElRef.current = null
+      const tn = stageRef.current?.findOne(`#${id}`) as Konva.Text | null
+      if (tn) {
+        tn.show()
+        stageRef.current?.batchDraw()
+      }
     }
   }, [editingTextId])
-
-  const getTextareaStyle = useCallback((): React.CSSProperties => {
-    if (!editingTextId || !stageRef.current) {
-      return { display: "none" }
-    }
-
-    const stageBox = stageRef.current.container().getBoundingClientRect()
-    const scaleX = stageBox.width / bounds.visibleWidth
-    const obj = objects.find((o) => o.id === editingTextId) as TextObject | undefined
-
-    // Try Konva node first, fallback to object coordinates
-    const textNode = stageRef.current.findOne(`#${editingTextId}`) as Konva.Text | null
-    let posX: number
-    let posY: number
-    let nodeWidth = 0
-    let nodeHeight = 0
-
-    if (textNode) {
-      const textRect = textNode.getClientRect()
-      posX = textRect.x
-      posY = textRect.y
-      nodeWidth = textRect.width
-      nodeHeight = textRect.height
-    } else if (obj) {
-      posX = obj.x * bounds.visibleWidth
-      posY = obj.y * bounds.visibleHeight
-    } else {
-      return { display: "none" }
-    }
-
-    return {
-      position: "fixed" as const,
-      top: stageBox.top + posY * scaleX,
-      left: stageBox.left + posX * scaleX,
-      width: Math.max(nodeWidth * scaleX + 20, 100),
-      minHeight: Math.max(nodeHeight * scaleX + 10, 30),
-      fontSize: (obj?.fontSize ?? fontSize) * scaleX,
-      fontWeight: obj?.fontWeight ?? fontWeight,
-      fontFamily: "sans-serif",
-      color: obj?.color ?? color,
-      background: "rgba(255,255,255,0.9)",
-      border: "2px solid #3B82F6",
-      borderRadius: 4,
-      outline: "none",
-      padding: "2px 4px",
-      resize: "none" as const,
-      overflow: "hidden",
-      zIndex: 10010,
-      lineHeight: 1.2,
-    }
-  }, [editingTextId, bounds.visibleWidth, bounds.visibleHeight, objects, fontSize, fontWeight, color])
 
   // ---------------------------------------------------------------------------
   // Early returns
@@ -693,14 +768,33 @@ export function AnnotationCanvas({
                   id={obj.id}
                   x={obj.x * bounds.visibleWidth}
                   y={obj.y * bounds.visibleHeight}
-                  text={obj.text}
+                  text={obj.text || " "}
                   fontSize={obj.fontSize}
                   fontStyle={obj.fontWeight === "bold" ? "bold" : "normal"}
                   fill={obj.color}
                   width={obj.width ? obj.width * bounds.visibleWidth : undefined}
                   draggable={mode === AnnotationMode.SELECT}
-                  onClick={mode === AnnotationMode.SELECT ? handleObjectClick : undefined}
-                  onTap={mode === AnnotationMode.SELECT ? handleObjectClick : undefined}
+                  onClick={(e) => {
+                    if (mode === AnnotationMode.SELECT) {
+                      handleObjectClick(e)
+                    } else if (mode === AnnotationMode.TEXT) {
+                      e.cancelBubble = true
+                      e.evt.stopPropagation()
+                      if (editingTextId === obj.id) return
+                      isNewTextRef.current = false
+                      setEditingTextId(obj.id)
+                    }
+                  }}
+                  onTap={(e) => {
+                    if (mode === AnnotationMode.SELECT) {
+                      handleObjectClick(e as unknown as Konva.KonvaEventObject<MouseEvent | TouchEvent>)
+                    } else if (mode === AnnotationMode.TEXT) {
+                      e.cancelBubble = true
+                      if (editingTextId === obj.id) return
+                      isNewTextRef.current = false
+                      setEditingTextId(obj.id)
+                    }
+                  }}
                   onDblClick={handleTextDblClick}
                   onDblTap={handleTextDblClick}
                   onDragEnd={handleDragEnd}
@@ -758,30 +852,6 @@ export function AnnotationCanvas({
           )}
         </Layer>
       </Stage>
-
-      {/* Text editing textarea via Portal */}
-      {editingTextId &&
-        typeof document !== "undefined" &&
-        createPortal(
-          <textarea
-            autoFocus
-            value={editTextValue}
-            onChange={(e) => setEditTextValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault()
-                saveTextEdit()
-              }
-              if (e.key === "Escape") {
-                e.preventDefault()
-                cancelTextEdit()
-              }
-            }}
-            onBlur={saveTextEdit}
-            style={getTextareaStyle()}
-          />,
-          document.body,
-        )}
     </div>
   )
 }
