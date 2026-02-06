@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, useCallback } from "react"
+import { createPortal } from "react-dom"
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil"
 import { AnimatePresence, motion } from "framer-motion"
 import Image from "next/image"
@@ -29,6 +30,7 @@ export function AnnotationEditor({ teamId }: Props) {
   const [naturalDimensions, setNaturalDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 })
   const transformRef = useRef<ReactZoomPanPinchRef>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   // Set drawing mode on mount/unmount
   useEffect(() => {
@@ -47,6 +49,35 @@ export function AnnotationEditor({ teamId }: Props) {
       setCurrentPageIndex(idx >= 0 ? idx : 0)
     }
   }, [editorTarget, flatPages])
+
+  // Poll for image dimensions (cached images may not fire onLoad)
+  useEffect(() => {
+    if (!editorTarget || naturalDimensions.width > 0) return
+
+    let mounted = true
+    const checkDimensions = () => {
+      const img = contentRef.current?.querySelector('img[alt="Music score"]') as HTMLImageElement | null
+      if (img && img.naturalWidth > 0 && img.naturalHeight > 0 && mounted) {
+        setNaturalDimensions({ width: img.naturalWidth, height: img.naturalHeight })
+        return true
+      }
+      return false
+    }
+
+    if (checkDimensions()) return
+
+    const interval = setInterval(() => {
+      if (checkDimensions()) clearInterval(interval)
+    }, 100)
+
+    const timeout = setTimeout(() => clearInterval(interval), 5000)
+
+    return () => {
+      mounted = false
+      clearInterval(interval)
+      clearTimeout(timeout)
+    }
+  }, [editorTarget, currentPageIndex, naturalDimensions.width])
 
   // Custom wheel handler for scroll pan (non-zoom wheel)
   useEffect(() => {
@@ -98,7 +129,9 @@ export function AnnotationEditor({ teamId }: Props) {
   const page = flatPages[currentPageIndex]
   if (!page) return null
 
-  return (
+  if (typeof document === "undefined") return null
+
+  return createPortal(
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
@@ -162,9 +195,13 @@ export function AnnotationEditor({ teamId }: Props) {
           >
             <TransformComponent
               wrapperStyle={{ width: "100%", height: "100%" }}
-              contentStyle={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
+              contentStyle={{ width: "100%", height: "100%" }}
             >
-              <div className="relative w-full h-full flex-center select-none" style={{ WebkitTouchCallout: "none" }}>
+              <div
+                ref={contentRef}
+                className="relative w-full h-full select-none"
+                style={{ WebkitTouchCallout: "none" }}
+              >
                 <Image
                   alt="Music score"
                   src={page.url}
@@ -196,6 +233,7 @@ export function AnnotationEditor({ teamId }: Props) {
         {/* Toolbar */}
         <AnnotationToolbar />
       </motion.div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }
