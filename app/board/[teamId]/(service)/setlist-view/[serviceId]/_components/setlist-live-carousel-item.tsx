@@ -1,20 +1,21 @@
+"use client";
 import * as React from "react";
 import Image from "next/image";
 import { CarouselItem } from "@/components/ui/carousel";
 import { SetlistSongHeader } from "@/models/setlist";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { musicSheetsByIdsAtom } from "@/global-states/music-sheet-state";
 import { cn } from "@/lib/utils";
-import { setlistViewPageModeAtom } from "../_states/setlist-view-states";
+import { setlistViewPageModeAtom, setlistFlatPagesAtom } from "../_states/setlist-view-states";
 import { MusicSheetCounts } from "./setlist-live-carousel";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { MusicSheet } from "@/models/music_sheet";
 import { DirectionType, SetlistViewPageMode } from "@/components/constants/enums";
 import { setlistMultipleSheetsViewModeAtom } from "../_states/setlist-view-states";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { annotationDrawingModeAtom } from "../_states/annotation-states";
 import { setlistIndexAtom } from "../_states/setlist-view-states";
-import { AnnotationCanvas } from "./annotation-canvas";
+import dynamic from "next/dynamic";
+const AnnotationReadonlyOverlay = dynamic(() => import("./annotation-readonly-overlay").then(mod => mod.AnnotationReadonlyOverlay), { ssr: false });
 
 
 interface Props {
@@ -85,14 +86,23 @@ interface SetlistLiveCarouselItemProps {
 
 export function SetlistLiveCarouselItem({ globalIndex, urls, teamId, songId, sheetId, pageIndex }: SetlistLiveCarouselItemProps) {
     const pageMode = useRecoilValue(setlistViewPageModeAtom)
-    const drawingMode = useRecoilValue(annotationDrawingModeAtom)
-    const setlistIndex = useRecoilValue(setlistIndexAtom)
     const [enablePan, setEnablePan] = useState(false)
     const [currentScale, setCurrentScale] = useState(1)
     const [naturalDimensions, setNaturalDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 })
     const containerRef = useRef<HTMLDivElement>(null)
+    const setFlatPages = useSetRecoilState(setlistFlatPagesAtom)
 
-    const isActiveSlide = setlistIndex.current === globalIndex
+    // Register this page into setlistFlatPagesAtom
+    useEffect(() => {
+        const entry = { teamId, songId, sheetId, pageIndex, url: urls[0], globalIndex }
+        setFlatPages((prev) => {
+            const filtered = prev.filter((p) => p.globalIndex !== globalIndex)
+            return [...filtered, entry].sort((a, b) => a.globalIndex - b.globalIndex)
+        })
+        return () => {
+            setFlatPages((prev) => prev.filter((p) => p.globalIndex !== globalIndex))
+        }
+    }, [teamId, songId, sheetId, pageIndex, urls, globalIndex, setFlatPages])
 
     // Check image dimensions after mount (for cached images where onLoad may not fire)
     useEffect(() => {
@@ -135,16 +145,34 @@ export function SetlistLiveCarouselItem({ globalIndex, urls, teamId, songId, she
         }
     }, [urls])
 
+    // Prevent Safari native pinch-zoom gestures
+    useEffect(() => {
+        const el = containerRef.current
+        if (!el) return
+        const prevent = (e: Event) => e.preventDefault()
+        el.addEventListener("gesturestart", prevent, { passive: false })
+        el.addEventListener("gesturechange", prevent, { passive: false })
+        return () => {
+            el.removeEventListener("gesturestart", prevent)
+            el.removeEventListener("gesturechange", prevent)
+        }
+    }, [])
+
     return (
         <CarouselItem className={cn("h-full p-0", { "basis-1/2": pageMode === SetlistViewPageMode.DOUBLE_PAGE })}>
             <TransformWrapper
                 initialScale={1}
                 minScale={1}
                 maxScale={4}
-                wheel={{ disabled: true }}
-                doubleClick={{ mode: "toggle", disabled: drawingMode }}
-                panning={{ disabled: drawingMode || !enablePan }}
-                pinch={{ disabled: drawingMode }}
+                wheel={{ activationKeys: ["Control", "Meta"], step: 0.07 }}
+                doubleClick={{ mode: "toggle" }}
+                panning={{
+                    disabled: !enablePan,
+                    allowLeftClickPan: true,
+                    allowMiddleClickPan: true,
+                    allowRightClickPan: true,
+                }}
+                pinch={{ disabled: false }}
                 onTransformed={(e) => {
                     setEnablePan(e.state.scale > 1.01)
                     setCurrentScale(e.state.scale)
@@ -154,7 +182,7 @@ export function SetlistLiveCarouselItem({ globalIndex, urls, teamId, songId, she
                     wrapperStyle={{ width: "100%", height: "100%" }}
                     contentStyle={{ width: "100%", height: "100%" }}
                 >
-                    <div ref={containerRef} className="h-full w-full flex flex-col bg-background overflow-y-auto scrollbar-hide overscroll-contain">
+                    <div ref={containerRef} className="h-full w-full flex flex-col bg-background overflow-y-auto scrollbar-hide overscroll-contain" style={{ touchAction: "none" }}>
                         {
                             urls.map((url, idx) => (
                                 <div
@@ -178,13 +206,11 @@ export function SetlistLiveCarouselItem({ globalIndex, urls, teamId, songId, she
                                         }}
                                     />
                                     <div className="absolute inset-0 z-10" />
-                                    <AnnotationCanvas
+                                    <AnnotationReadonlyOverlay
                                         teamId={teamId}
                                         songId={songId}
                                         sheetId={sheetId}
                                         pageIndex={pageIndex}
-                                        isActiveSlide={isActiveSlide}
-                                        currentScale={currentScale}
                                         naturalWidth={naturalDimensions.width}
                                         naturalHeight={naturalDimensions.height}
                                     />

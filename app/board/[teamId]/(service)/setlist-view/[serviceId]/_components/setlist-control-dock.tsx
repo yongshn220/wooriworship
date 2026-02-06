@@ -1,8 +1,8 @@
 "use client"
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { setlistLiveOptionsAtom, setlistUIVisibilityAtom } from "../_states/setlist-view-states";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { setlistLiveOptionsAtom, setlistUIVisibilityAtom, setlistMultipleSheetsViewModeAtom } from "../_states/setlist-view-states";
 import { SetlistControlItem } from "./setlist-control-item";
 import { LogOut, ChevronLeft, ChevronRight, FileText, Hash, MoreHorizontal, Pencil } from "lucide-react";
 import useUserPreferences from "@/components/util/hook/use-local-preference";
@@ -14,8 +14,8 @@ import { useRouter } from "next/navigation";
 import { getPathServing } from "@/components/util/helper/routes";
 import { useState } from "react";
 import { DownloadSetlistSheetsDrawer } from "./download-setlist-sheets-drawer";
-import { annotationDrawingModeAtom } from "../_states/annotation-states";
-import { setlistMultipleSheetsViewModeAtom } from "../_states/setlist-view-states";
+import { annotationEditorTargetAtom } from "../_states/annotation-states";
+import { setlistIndexAtom } from "../_states/setlist-view-states";
 import { DirectionType } from "@/components/constants/enums";
 import { toast } from "@/components/ui/use-toast";
 
@@ -30,7 +30,9 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
     const [preference, prefSetter] = useUserPreferences()
     const [isPopoverOpen, setIsPopoverOpen] = useState(false)
     const [isDownloadDrawerOpen, setIsDownloadDrawerOpen] = useState(false)
-    const [drawingMode, setDrawingMode] = useRecoilState(annotationDrawingModeAtom)
+    const editorTarget = useRecoilValue(annotationEditorTargetAtom)
+    const setEditorTarget = useSetRecoilState(annotationEditorTargetAtom)
+    const setlistIndex = useRecoilValue(setlistIndexAtom)
     const [multipleSheetsViewMode, setMultipleSheetsViewMode] = useRecoilState(setlistMultipleSheetsViewModeAtom)
     const router = useRouter()
 
@@ -50,14 +52,15 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
         prefSetter.setlistLiveShowSongNumber(newVal)
     }
 
-    function toggleDrawingMode() {
-        const newVal = !drawingMode
-        if (newVal && multipleSheetsViewMode === DirectionType.VERTICAL) {
+    function openEditor() {
+        if (multipleSheetsViewMode === DirectionType.VERTICAL) {
             setMultipleSheetsViewMode(DirectionType.HORIZONTAL)
             toast({ description: "가로 보기로 전환됩니다" })
         }
-        setDrawingMode(newVal)
+        setEditorTarget({ initialGlobalIndex: setlistIndex.current })
     }
+
+    if (editorTarget) return null
 
     return (
         <div className={cn(
@@ -114,9 +117,8 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
 
                                 <SetlistControlItem
                                     icon={<Pencil className="w-5 h-5" />}
-                                    isActive={drawingMode}
-                                    variant="toggle"
-                                    onClick={toggleDrawingMode}
+                                    variant="button"
+                                    onClick={openEditor}
                                 />
 
                                 <SetlistControlItem

@@ -41,3 +41,17 @@ export const setlistUIVisibilityAtom = atom<boolean>({
     key: 'worshipUIVisibilityAtom',
     default: true
 })
+
+export interface FlatPage {
+    teamId: string
+    songId: string
+    sheetId: string
+    pageIndex: number
+    url: string
+    globalIndex: number
+}
+
+export const setlistFlatPagesAtom = atom<FlatPage[]>({
+    key: 'setlistFlatPagesAtom',
+    default: [],
+})

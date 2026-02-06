@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useDebouncedCallback } from "use-debounce"
-import { Stroke, SheetAnnotation } from "@/models/sheet_annotation"
+import { AnnotationObject, SheetAnnotation } from "@/models/sheet_annotation"
 import SheetAnnotationApi from "@/apis/SheetAnnotationApi"
 import { auth } from "@/firebase"
 
@@ -12,22 +12,22 @@ interface UseAnnotationParams {
 }
 
 export function useAnnotation({ teamId, songId, sheetId, pageIndex }: UseAnnotationParams) {
-  const [strokes, setStrokes] = useState<Stroke[]>([])
+  const [objects, setObjects] = useState<AnnotationObject[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
-  const undoStackRef = useRef<Stroke[][]>([])
-  const redoStackRef = useRef<Stroke[][]>([])
+  const undoStackRef = useRef<AnnotationObject[][]>([])
+  const redoStackRef = useRef<AnnotationObject[][]>([])
   const [canUndo, setCanUndo] = useState(false)
   const [canRedo, setCanRedo] = useState(false)
 
   const userId = auth.currentUser?.uid
 
   const debouncedSave = useDebouncedCallback(
-    (strokesToSave: Stroke[]) => {
+    (objectsToSave: AnnotationObject[]) => {
       if (!userId) return
       setIsSaving(true)
       SheetAnnotationApi.saveAnnotation(teamId, songId, sheetId, pageIndex, userId, {
-        strokes: strokesToSave,
+        objects: objectsToSave,
         page_index: pageIndex,
       }).finally(() => setIsSaving(false))
     },
@@ -43,8 +43,8 @@ export function useAnnotation({ teamId, songId, sheetId, pageIndex }: UseAnnotat
     setIsLoading(true)
     SheetAnnotationApi.getAnnotation(teamId, songId, sheetId, pageIndex, userId)
       .then((data) => {
-        if (data?.strokes) {
-          setStrokes(data.strokes)
+        if (data?.objects) {
+          setObjects(data.objects)
         }
       })
       .finally(() => setIsLoading(false))
@@ -62,22 +62,35 @@ export function useAnnotation({ teamId, songId, sheetId, pageIndex }: UseAnnotat
     setCanRedo(redoStackRef.current.length > 0)
   }, [])
 
-  const addStroke = useCallback((stroke: Stroke) => {
-    setStrokes((prev) => {
+  const addObject = useCallback((object: AnnotationObject) => {
+    setObjects((prev) => {
       undoStackRef.current.push([...prev])
       redoStackRef.current = []
-      const next = [...prev, stroke]
+      const next = [...prev, object]
       debouncedSave(next)
       updateUndoRedoState()
       return next
     })
   }, [debouncedSave, updateUndoRedoState])
 
-  const removeStroke = useCallback((strokeId: string) => {
-    setStrokes((prev) => {
+  const removeObject = useCallback((objectId: string) => {
+    setObjects((prev) => {
       undoStackRef.current.push([...prev])
       redoStackRef.current = []
-      const next = prev.filter((s) => s.id !== strokeId)
+      const next = prev.filter((obj) => obj.id !== objectId)
+      debouncedSave(next)
+      updateUndoRedoState()
+      return next
+    })
+  }, [debouncedSave, updateUndoRedoState])
+
+  const updateObject = useCallback((id: string, updates: Partial<AnnotationObject>) => {
+    setObjects((prev) => {
+      undoStackRef.current.push([...prev])
+      redoStackRef.current = []
+      const next = prev.map((obj) =>
+        obj.id === id ? { ...obj, ...updates } as AnnotationObject : obj
+      )
       debouncedSave(next)
       updateUndoRedoState()
       return next
@@ -87,7 +100,7 @@ export function useAnnotation({ teamId, songId, sheetId, pageIndex }: UseAnnotat
   const undo = useCallback(() => {
     const prevState = undoStackRef.current.pop()
     if (prevState === undefined) return
-    setStrokes((current) => {
+    setObjects((current) => {
       redoStackRef.current.push([...current])
       debouncedSave(prevState)
       updateUndoRedoState()
@@ -98,7 +111,7 @@ export function useAnnotation({ teamId, songId, sheetId, pageIndex }: UseAnnotat
   const redo = useCallback(() => {
     const nextState = redoStackRef.current.pop()
     if (nextState === undefined) return
-    setStrokes((current) => {
+    setObjects((current) => {
       undoStackRef.current.push([...current])
       debouncedSave(nextState)
       updateUndoRedoState()
@@ -107,18 +120,19 @@ export function useAnnotation({ teamId, songId, sheetId, pageIndex }: UseAnnotat
   }, [debouncedSave, updateUndoRedoState])
 
   const clearAll = useCallback(() => {
-    if (strokes.length === 0) return
-    undoStackRef.current.push([...strokes])
+    if (objects.length === 0) return
+    undoStackRef.current.push([...objects])
     redoStackRef.current = []
-    setStrokes([])
+    setObjects([])
     debouncedSave([])
     updateUndoRedoState()
-  }, [strokes, debouncedSave, updateUndoRedoState])
+  }, [objects, debouncedSave, updateUndoRedoState])
 
   return {
-    strokes,
-    addStroke,
-    removeStroke,
+    objects,
+    addObject,
+    removeObject,
+    updateObject,
     undo,
     redo,
     clearAll,

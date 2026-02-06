@@ -1,25 +1,40 @@
 import { Timestamp } from "firebase/firestore"
 
-export type StrokePoint = {
-  x: number        // normalized 0-1 (relative to visible image width)
-  y: number        // normalized 0-1 (relative to visible image height)
-  pressure: number  // 0-1
+export type AnnotationObjectType = "freehand" | "text"
+
+export type FreehandPoint = { x: number; y: number }  // normalized 0-1
+
+export interface FreehandObject {
+  id: string
+  type: "freehand"
+  points: FreehandPoint[]       // normalized 0-1
+  color: string                 // hex color
+  strokeWidth: number           // pixel value for rendering: 2, 4, 8
+  timestamp: number
 }
 
-export type Stroke = {
-  id: string                // uuid
-  points: StrokePoint[]     // array of points
-  color: string             // hex color: "#000000" | "#EF4444" | "#3B82F6"
-  size: number              // thickness: 4 | 8 | 12
-  timestamp: number         // Date.now() for ordering
+export interface TextObject {
+  id: string
+  type: "text"
+  x: number                     // normalized 0-1
+  y: number                     // normalized 0-1
+  text: string
+  fontSize: number              // 14, 18, 24, 32
+  fontWeight: "normal" | "bold"
+  color: string                 // hex color
+  width?: number                // normalized 0-1 (optional, for text wrapping)
+  timestamp: number
 }
+
+export type AnnotationObject = FreehandObject | TextObject
 
 export type SheetAnnotation = {
-  strokes: Stroke[]         // all strokes for this page
-  page_index: number        // which page (url index) within the sheet
-  updated_at: Timestamp     // Firestore server timestamp
+  objects: AnnotationObject[]
+  page_index: number
+  updated_at: Timestamp
 }
 
+// Toolbar enums
 export enum PenColor {
   BLACK = "#000000",
   RED = "#EF4444",
@@ -27,21 +42,32 @@ export enum PenColor {
 }
 
 export enum PenSize {
-  THIN = 4,
-  MEDIUM = 8,
-  THICK = 12,
+  THIN = 2,
+  MEDIUM = 4,
+  THICK = 8,
 }
 
-export enum DrawingTool {
+export enum AnnotationMode {
+  SELECT = "SELECT",
   PEN = "PEN",
-  ERASER = "ERASER",
+  TEXT = "TEXT",
 }
 
+export enum FontSize {
+  SMALL = 14,
+  MEDIUM = 18,
+  LARGE = 24,
+  XLARGE = 32,
+}
+
+// Callback bridge between canvas and toolbar
 export type AnnotationCanvasCallbacks = {
   undo: () => void
   redo: () => void
   clearAll: () => void
+  deleteSelected: () => void
   canUndo: boolean
   canRedo: boolean
   canClear: boolean
+  hasSelection: boolean
 } | null
