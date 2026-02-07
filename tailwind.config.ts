@@ -103,6 +103,13 @@ const config = {
       minWidth: {
         'touch': '44px',
       },
+      padding: {
+        'safe': 'env(safe-area-inset-bottom)',
+        'safe-t': 'env(safe-area-inset-top)',
+        'safe-b': 'env(safe-area-inset-bottom)',
+        'safe-l': 'env(safe-area-inset-left)',
+        'safe-r': 'env(safe-area-inset-right)',
+      },
     },
   },
   plugins: [

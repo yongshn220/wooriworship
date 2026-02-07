@@ -61,7 +61,7 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
 
     return (
         <div className={cn(
-            "fixed bottom-8 left-0 w-full z-[10002] pointer-events-none flex",
+            "fixed left-0 w-full z-[10002] pointer-events-none flex bottom-[calc(2rem+env(safe-area-inset-bottom))]",
             uiVisible ? "justify-center" : "justify-start pl-4"
         )}>
             <motion.div

@@ -34,7 +34,7 @@ export function AnnotationToolbar() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 50, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed bottom-20 left-0 w-full z-[10001] flex justify-center pointer-events-none"
+          className="fixed left-0 w-full z-[10001] flex justify-center pointer-events-none bottom-[calc(5rem+env(safe-area-inset-bottom))]"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-background shadow-lg border border-border p-1">
