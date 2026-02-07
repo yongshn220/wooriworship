@@ -2,8 +2,16 @@
 
 import { useRef, useEffect, useCallback, useState, useMemo } from "react"
 import { useRecoilValue, useSetRecoilState } from "recoil"
-import { Stage, Layer, Line, Text, Rect, Transformer } from "react-konva"
-import type Konva from "konva"
+import {
+  Canvas,
+  PencilBrush,
+  IText,
+  Path,
+  FabricObject,
+  FabricImage,
+  Point as FabricPoint,
+} from "fabric"
+import type { TEvent, TPointerEventInfo } from "fabric"
 import {
   annotationDrawingModeAtom,
   annotationModeAtom,
@@ -14,9 +22,62 @@ import {
   activeAnnotationCanvasAtom,
   selectedAnnotationIdAtom,
 } from "../_states/annotation-states"
-import { AnnotationMode, AnnotationObject, FreehandObject, TextObject, FreehandPoint } from "@/models/sheet_annotation"
+import {
+  AnnotationMode,
+  FreehandObject,
+  TextObject,
+  FreehandPoint,
+} from "@/models/sheet_annotation"
 import { useAnnotation } from "../_hooks/use-annotation"
 import { useImageBounds } from "../_hooks/use-image-bounds"
+import { useFabricCanvas } from "../_hooks/use-fabric-canvas"
+
+// ---------------------------------------------------------------------------
+// Type helper for accessing .data on Fabric objects (runtime property, not in TS defs)
+// ---------------------------------------------------------------------------
+
+type AnnotationData = { id: string; type: "freehand" | "text"; opacity?: number }
+
+function getObjData(obj: FabricObject): AnnotationData | undefined {
+  return (obj as unknown as Record<string, unknown>).data as AnnotationData | undefined
+}
+
+function setObjData(obj: FabricObject, data: AnnotationData): void {
+  ;(obj as unknown as Record<string, unknown>).data = data
+}
+
+// ---------------------------------------------------------------------------
+// Custom PencilBrush that captures raw points before decimation
+// ---------------------------------------------------------------------------
+
+class PointCapturingBrush extends PencilBrush {
+  rawPoints: Array<{ x: number; y: number }> = []
+
+  onMouseDown(pointer: FabricPoint, ev: TEvent): void {
+    this.rawPoints = [{ x: pointer.x, y: pointer.y }]
+    super.onMouseDown(pointer, ev)
+  }
+
+  onMouseMove(pointer: FabricPoint, ev: TEvent): void {
+    this.rawPoints.push({ x: pointer.x, y: pointer.y })
+    super.onMouseMove(pointer, ev)
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Normalize helper
+// ---------------------------------------------------------------------------
+
+function normalize(
+  canvasPoint: { x: number; y: number },
+  visibleWidth: number,
+  visibleHeight: number,
+): FreehandPoint {
+  return {
+    x: canvasPoint.x / visibleWidth,
+    y: canvasPoint.y / visibleHeight,
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Props
@@ -28,9 +89,9 @@ interface Props {
   sheetId: string
   pageIndex: number
   isActiveSlide: boolean
-  currentScale: number
   naturalWidth: number
   naturalHeight: number
+  imageUrl: string
 }
 
 // ---------------------------------------------------------------------------
@@ -43,13 +104,12 @@ export function AnnotationCanvas({
   sheetId,
   pageIndex,
   isActiveSlide,
-  currentScale,
   naturalWidth,
   naturalHeight,
+  imageUrl,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const stageRef = useRef<Konva.Stage>(null)
-  const transformerRef = useRef<Konva.Transformer>(null)
+  const canvasElRef = useRef<HTMLCanvasElement>(null)
 
   // Recoil state
   const drawingMode = useRecoilValue(annotationDrawingModeAtom)
@@ -61,6 +121,7 @@ export function AnnotationCanvas({
   const setActiveCanvas = useSetRecoilState(activeAnnotationCanvasAtom)
   const selectedIds = useRecoilValue(selectedAnnotationIdAtom)
   const setSelectedIds = useSetRecoilState(selectedAnnotationIdAtom)
+  const setMode = useSetRecoilState(annotationModeAtom)
 
   // Annotation data
   const {
@@ -80,71 +141,67 @@ export function AnnotationCanvas({
   // Image bounds
   const bounds = useImageBounds(containerRef, naturalWidth, naturalHeight)
 
-  // Drawing state
-  const [currentStroke, setCurrentStroke] = useState<number[] | null>(null)
-  const currentStrokeRef = useRef<number[]>([])
-  const isDrawingRef = useRef(false)
+  const isInteractive = drawingMode
+
+  // Fabric canvas lifecycle
+  const { fabricCanvas, fabricObjectMap, skipNextSync, isReady } = useFabricCanvas({
+    canvasElRef,
+    containerRef,
+    objects,
+    bounds,
+    interactive: isInteractive,
+  })
+
+  // Cancel flash state
   const [showCancelFlash, setShowCancelFlash] = useState(false)
-
-  // Text editing state
-  const [editingTextId, setEditingTextId] = useState<string | null>(null)
-  const isNewTextRef = useRef(false)
-  const textareaElRef = useRef<HTMLTextAreaElement | null>(null)
-
-  // Refs for stable access in native textarea event listeners
-  const objectsRef = useRef(objects)
-  objectsRef.current = objects
-  const removeObjectRef = useRef(removeObject)
-  removeObjectRef.current = removeObject
-  const updateObjectRef = useRef(updateObject)
-  updateObjectRef.current = updateObject
-
-  // Multi-touch passthrough
-  const pointerIdsRef = useRef(new Set<number>())
-  const [passthroughMode, setPassthroughMode] = useState(false)
-
-  // Marquee selection state
-  const [selectionRect, setSelectionRect] = useState<{ x: number; y: number; width: number; height: number } | null>(null)
-  const selectionStartRef = useRef<{ x: number; y: number } | null>(null)
-  const isMarqueeRef = useRef(false)
 
   // Eraser state
   const isErasingRef = useRef(false)
   const erasedIdsRef = useRef(new Set<string>())
-  const preEraseSnapshotRef = useRef<AnnotationObject[] | null>(null)
 
-  const shouldPassthrough = passthroughMode
-  const isInteractive = drawingMode
+  // Pinch state
+  const activePointersRef = useRef(new Map<number, PointerEvent>())
+  const lastPinchDistanceRef = useRef<number | null>(null)
+  const lastPinchCenterRef = useRef<{ x: number; y: number } | null>(null)
+  const isPinchingRef = useRef(false)
+  const wasDrawingModeRef = useRef(false)
 
-  // ---------------------------------------------------------------------------
-  // Coordinate helpers
-  // ---------------------------------------------------------------------------
+  // Passthrough state for multi-touch
+  const [shouldPassthrough, setShouldPassthrough] = useState(false)
 
-  const denormalizePoints = useCallback(
-    (points: FreehandPoint[]): number[] =>
-      points.flatMap((p) => [p.x * bounds.visibleWidth, p.y * bounds.visibleHeight]),
-    [bounds.visibleWidth, bounds.visibleHeight],
-  )
+  // Refs for stable callbacks
+  const modeRef = useRef(mode)
+  modeRef.current = mode
+  const addObjectRef = useRef(addObject)
+  addObjectRef.current = addObject
+  const removeObjectRef = useRef(removeObject)
+  removeObjectRef.current = removeObject
+  const updateObjectRef = useRef(updateObject)
+  updateObjectRef.current = updateObject
+  const objectsRef = useRef(objects)
+  objectsRef.current = objects
+  const colorRef = useRef(color)
+  colorRef.current = color
+  const penSizeRef = useRef(penSize)
+  penSizeRef.current = penSize
+  const fontSizeRef = useRef(fontSize)
+  fontSizeRef.current = fontSize
+  const fontWeightRef = useRef(fontWeight)
+  fontWeightRef.current = fontWeight
+  const setSelectedIdsRef = useRef(setSelectedIds)
+  setSelectedIdsRef.current = setSelectedIds
+  const setModeRef = useRef(setMode)
+  setModeRef.current = setMode
+  const boundsRef = useRef(bounds)
+  boundsRef.current = bounds
+  const skipNextSyncRef = useRef(skipNextSync)
+  skipNextSyncRef.current = skipNextSync
+  const fabricObjectMapRef = useRef(fabricObjectMap)
+  fabricObjectMapRef.current = fabricObjectMap
 
-  // ---------------------------------------------------------------------------
-  // Cancel in-progress drawing
-  // ---------------------------------------------------------------------------
-
-  const cancelDrawing = useCallback(() => {
-    const wasDrawing = isDrawingRef.current && currentStrokeRef.current.length > 0
-    isDrawingRef.current = false
-    currentStrokeRef.current = []
-    setCurrentStroke(null)
-    isMarqueeRef.current = false
-    selectionStartRef.current = null
-    setSelectionRect(null)
-    isErasingRef.current = false
-    erasedIdsRef.current.clear()
-    preEraseSnapshotRef.current = null
-    if (wasDrawing) {
-      setShowCancelFlash(true)
-    }
-  }, [])
+  // Track if a new IText is being edited
+  const isNewTextRef = useRef(false)
+  const editingITextRef = useRef<IText | null>(null)
 
   // ---------------------------------------------------------------------------
   // Cancel flash auto-hide
@@ -157,436 +214,638 @@ export function AnnotationCanvas({
   }, [showCancelFlash])
 
   // ---------------------------------------------------------------------------
-  // Multi-touch passthrough: reset when all pointers released
+  // Reset zoom/pan when page changes
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
-    if (!passthroughMode) return
-
-    const handleGlobalPointerUp = (e: PointerEvent) => {
-      pointerIdsRef.current.delete(e.pointerId)
-      if (pointerIdsRef.current.size === 0) {
-        setPassthroughMode(false)
-      }
-    }
-
-    document.addEventListener("pointerup", handleGlobalPointerUp)
-    document.addEventListener("pointercancel", handleGlobalPointerUp)
-    return () => {
-      document.removeEventListener("pointerup", handleGlobalPointerUp)
-      document.removeEventListener("pointercancel", handleGlobalPointerUp)
-    }
-  }, [passthroughMode])
+    if (!fabricCanvas || !isReady) return
+    const canvas = fabricCanvas as Canvas
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0])
+    canvas.requestRenderAll()
+  }, [fabricCanvas, isReady, pageIndex])
 
   // ---------------------------------------------------------------------------
-  // Konva container touchAction
+  // Background Image
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
-    if (stageRef.current) {
-      stageRef.current.container().style.touchAction = "none"
-    }
-  }, [])
+    if (!fabricCanvas || !isReady || !imageUrl) return
+    const canvas = fabricCanvas as Canvas
+
+    FabricImage.fromURL(imageUrl, { crossOrigin: "anonymous" }).then((img) => {
+      const cw = canvas.width ?? 1
+      const ch = canvas.height ?? 1
+      const scaleX = cw / (img.width ?? 1)
+      const scaleY = ch / (img.height ?? 1)
+      const scale = Math.min(scaleX, scaleY)
+      img.set({
+        scaleX: scale,
+        scaleY: scale,
+        originX: "center",
+        originY: "center",
+        left: cw / 2,
+        top: ch / 2,
+      })
+      canvas.backgroundImage = img
+      canvas.requestRenderAll()
+    })
+  }, [fabricCanvas, isReady, imageUrl])
 
   // ---------------------------------------------------------------------------
-  // Hover feedback helpers
+  // Mode-specific setup
   // ---------------------------------------------------------------------------
 
-  const handleMouseEnter = useCallback(
-    (e: Konva.KonvaEventObject<MouseEvent>) => {
-      if (mode === AnnotationMode.SELECT) {
-        e.target.getStage()?.container().style.setProperty("cursor", "move")
-      }
-    },
-    [mode],
-  )
+  useEffect(() => {
+    if (!fabricCanvas || !isReady) return
+    const canvas = fabricCanvas as Canvas
 
-  const handleMouseLeave = useCallback(
-    (e: Konva.KonvaEventObject<MouseEvent>) => {
-      e.target.getStage()?.container().style.setProperty("cursor", "default")
-    },
-    [],
-  )
+    // Clean up previous event listeners
+    canvas.off("path:created")
+    canvas.off("mouse:down")
+    canvas.off("mouse:dblclick")
+    canvas.off("selection:created")
+    canvas.off("selection:updated")
+    canvas.off("selection:cleared")
+    canvas.off("object:modified")
+    canvas.off("text:editing:exited")
 
-  // ---------------------------------------------------------------------------
-  // Object click (SELECT mode) — supports Shift+click multi-select
-  // ---------------------------------------------------------------------------
+    // Reset canvas interaction state
+    canvas.isDrawingMode = false
+    canvas.selection = false
 
-  const handleObjectClick = useCallback(
-    (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
-      if (mode !== AnnotationMode.SELECT) return
-      e.cancelBubble = true
-      const id = e.target.id()
+    // Reset all objects to non-interactive by default
+    canvas.getObjects().forEach((obj) => {
+      obj.set({ selectable: false, evented: false })
+    })
 
-      const nativeEvt = e.evt as MouseEvent
-      if (nativeEvt.shiftKey) {
-        // Toggle in/out of selection
-        setSelectedIds((prev) =>
-          prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
+    // -----------------------------------------------------------------------
+    // PEN / HIGHLIGHTER mode
+    // -----------------------------------------------------------------------
+    if (mode === AnnotationMode.PEN || mode === AnnotationMode.HIGHLIGHTER) {
+      canvas.isDrawingMode = true
+      const brush = new PointCapturingBrush(canvas)
+      brush.color = color
+      brush.width =
+        mode === AnnotationMode.HIGHLIGHTER ? Math.max(penSize * 3, 12) : penSize
+      brush.strokeLineCap = "round"
+      brush.strokeLineJoin = "round"
+      canvas.freeDrawingBrush = brush
+
+      canvas.on("path:created", (e: { path: FabricObject }) => {
+        const createdPath = e.path
+        const capturingBrush = canvas.freeDrawingBrush as PointCapturingBrush
+        const rawPts = capturingBrush.rawPoints || []
+
+        if (rawPts.length < 2) {
+          canvas.remove(createdPath)
+          return
+        }
+
+        const b = boundsRef.current
+        const normalizedPoints: FreehandPoint[] = rawPts.map((p) =>
+          normalize(p, b.visibleWidth, b.visibleHeight),
         )
-      } else {
-        setSelectedIds([id])
-      }
-    },
-    [mode, setSelectedIds],
-  )
-
-  // ---------------------------------------------------------------------------
-  // Text double-click -> edit
-  // ---------------------------------------------------------------------------
-
-  const handleTextDblClick = useCallback(
-    (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
-      e.cancelBubble = true
-      const id = e.target.id()
-      const obj = objects.find((o) => o.id === id)
-      if (!obj || obj.type !== "text") return
-      isNewTextRef.current = false
-      setEditingTextId(id)
-    },
-    [objects],
-  )
-
-  // ---------------------------------------------------------------------------
-  // Drag end (SELECT mode)
-  // ---------------------------------------------------------------------------
-
-  const handleDragEnd = useCallback(
-    (e: Konva.KonvaEventObject<DragEvent>) => {
-      const node = e.target
-      const id = node.id()
-      const obj = objects.find((o) => o.id === id)
-      if (!obj) return
-
-      if (obj.type === "freehand") {
-        const dx = node.x() / bounds.visibleWidth
-        const dy = node.y() / bounds.visibleHeight
-        const newPoints = (obj as FreehandObject).points.map((p) => ({
-          x: p.x + dx,
-          y: p.y + dy,
-        }))
-        updateObject(obj.id, { points: newPoints } as Partial<FreehandObject>)
-        node.position({ x: 0, y: 0 })
-      } else if (obj.type === "text") {
-        updateObject(obj.id, {
-          x: node.x() / bounds.visibleWidth,
-          y: node.y() / bounds.visibleHeight,
-        } as Partial<TextObject>)
-      }
-    },
-    [objects, bounds.visibleWidth, bounds.visibleHeight, updateObject],
-  )
-
-  // ---------------------------------------------------------------------------
-  // Stage pointer handlers
-  // ---------------------------------------------------------------------------
-
-  const handleStagePointerDown = useCallback(
-    (e: Konva.KonvaEventObject<PointerEvent>) => {
-      const evt = e.evt
-      pointerIdsRef.current.add(evt.pointerId)
-
-      // Multi-touch -> passthrough for pinch-zoom
-      if (pointerIdsRef.current.size >= 2) {
-        cancelDrawing()
-        setPassthroughMode(true)
-        return
-      }
-
-      // Only respond to primary (left) mouse button
-      if (evt.button !== 0) return
-
-      const stage = stageRef.current
-      if (!stage) return
-
-      // SELECT mode
-      if (mode === AnnotationMode.SELECT) {
-        const clickedOnEmpty = e.target === stage
-        if (clickedOnEmpty) {
-          // Start marquee drag-select
-          const pos = stage.getPointerPosition()
-          if (pos) {
-            selectionStartRef.current = { x: pos.x, y: pos.y }
-            isMarqueeRef.current = true
-            setSelectionRect({ x: pos.x, y: pos.y, width: 0, height: 0 })
-          }
-          if (!evt.shiftKey) {
-            setSelectedIds([])
-          }
-        }
-        return
-      }
-
-      // PEN mode: start stroke
-      if (mode === AnnotationMode.PEN) {
-        const pos = stage.getPointerPosition()
-        if (!pos) return
-        isDrawingRef.current = true
-        currentStrokeRef.current = [pos.x, pos.y]
-        setCurrentStroke([pos.x, pos.y])
-        return
-      }
-
-      // HIGHLIGHTER mode: same as PEN
-      if (mode === AnnotationMode.HIGHLIGHTER) {
-        const pos = stage.getPointerPosition()
-        if (!pos) return
-        isDrawingRef.current = true
-        currentStrokeRef.current = [pos.x, pos.y]
-        setCurrentStroke([pos.x, pos.y])
-        return
-      }
-
-      // TEXT mode
-      if (mode === AnnotationMode.TEXT) {
-        const clickedOnEmpty = e.target === stage
-        if (clickedOnEmpty) {
-          // If currently editing, just return — the outside click handler will save
-          if (editingTextId) return
-
-          const pos = stage.getPointerPosition()
-          if (!pos) return
-
-          const newId = crypto.randomUUID()
-          const textObj: TextObject = {
-            id: newId,
-            type: "text",
-            x: pos.x / bounds.visibleWidth,
-            y: pos.y / bounds.visibleHeight,
-            text: "",
-            fontSize,
-            fontWeight,
-            color,
-            timestamp: Date.now(),
-          }
-          addObject(textObj)
-          isNewTextRef.current = true
-          setEditingTextId(newId)
-        }
-        return
-      }
-
-      // ERASER mode: start erasing
-      if (mode === AnnotationMode.ERASER) {
-        isErasingRef.current = true
-        erasedIdsRef.current.clear()
-        preEraseSnapshotRef.current = [...objects]
-
-        // Check if pointer is already over an object
-        const pos = stage.getPointerPosition()
-        if (pos) {
-          const layer = stage.findOne("Layer") as Konva.Layer | null
-          if (layer) {
-            const hits = layer.getAllIntersections(pos)
-            for (const node of hits) {
-              const nodeId = node.id()
-              if (nodeId && node.className !== "Transformer" && node.className !== "Rect") {
-                erasedIdsRef.current.add(nodeId)
-                node.opacity(0.3)
-              }
-            }
-            layer.batchDraw()
-          }
-        }
-        return
-      }
-    },
-    [
-      mode,
-      cancelDrawing,
-      setSelectedIds,
-      bounds.visibleWidth,
-      bounds.visibleHeight,
-      fontSize,
-      fontWeight,
-      color,
-      addObject,
-      editingTextId,
-      objects,
-    ],
-  )
-
-  const handleStagePointerMove = useCallback(
-    (e: Konva.KonvaEventObject<PointerEvent>) => {
-      // Marquee drag in SELECT mode
-      if (mode === AnnotationMode.SELECT && isMarqueeRef.current && selectionStartRef.current) {
-        const stage = stageRef.current
-        if (!stage) return
-        const pos = stage.getPointerPosition()
-        if (!pos) return
-
-        const start = selectionStartRef.current
-        setSelectionRect({
-          x: Math.min(start.x, pos.x),
-          y: Math.min(start.y, pos.y),
-          width: Math.abs(pos.x - start.x),
-          height: Math.abs(pos.y - start.y),
-        })
-        return
-      }
-
-      // ERASER mode: continuous hit detection
-      if (mode === AnnotationMode.ERASER && isErasingRef.current) {
-        const stage = stageRef.current
-        if (!stage) return
-        const pos = stage.getPointerPosition()
-        if (!pos) return
-        const layer = stage.findOne("Layer") as Konva.Layer | null
-        if (layer) {
-          const hits = layer.getAllIntersections(pos)
-          for (const node of hits) {
-            const nodeId = node.id()
-            if (nodeId && node.className !== "Transformer" && node.className !== "Rect" && !erasedIdsRef.current.has(nodeId)) {
-              erasedIdsRef.current.add(nodeId)
-              node.opacity(0.3)
-              layer.batchDraw()
-            }
-          }
-        }
-        return
-      }
-
-      if ((mode !== AnnotationMode.PEN && mode !== AnnotationMode.HIGHLIGHTER) || !isDrawingRef.current) return
-
-      const stage = stageRef.current
-      if (!stage) return
-
-      const pos = stage.getPointerPosition()
-      if (!pos) return
-
-      currentStrokeRef.current = [...currentStrokeRef.current, pos.x, pos.y]
-      setCurrentStroke([...currentStrokeRef.current])
-    },
-    [mode],
-  )
-
-  const handleStagePointerUp = useCallback(
-    (e: Konva.KonvaEventObject<PointerEvent>) => {
-      const evt = e.evt
-      pointerIdsRef.current.delete(evt.pointerId)
-
-      // Marquee end in SELECT mode
-      if (mode === AnnotationMode.SELECT && isMarqueeRef.current) {
-        isMarqueeRef.current = false
-        selectionStartRef.current = null
-
-        if (selectionRect && (selectionRect.width > 3 || selectionRect.height > 3)) {
-          const stage = stageRef.current
-          if (stage) {
-            const layer = stage.findOne("Layer") as Konva.Layer | null
-            if (layer) {
-              const hits: string[] = []
-              layer.getChildren().forEach((node) => {
-                const nodeId = node.id()
-                if (!nodeId || node.className === "Transformer" || node.className === "Rect") return
-                const rect = node.getClientRect({ relativeTo: stage })
-                // Check intersection
-                if (
-                  rect.x < selectionRect.x + selectionRect.width &&
-                  rect.x + rect.width > selectionRect.x &&
-                  rect.y < selectionRect.y + selectionRect.height &&
-                  rect.y + rect.height > selectionRect.y
-                ) {
-                  hits.push(nodeId)
-                }
-              })
-              if (hits.length > 0) {
-                setSelectedIds((prev) =>
-                  evt.shiftKey ? Array.from(new Set([...prev, ...hits])) : hits,
-                )
-              }
-            }
-          }
-        }
-        setSelectionRect(null)
-        return
-      }
-
-      // ERASER mode: batch delete erased objects
-      if (mode === AnnotationMode.ERASER && isErasingRef.current) {
-        isErasingRef.current = false
-        const idsToRemove = Array.from(erasedIdsRef.current)
-        erasedIdsRef.current.clear()
-
-        if (idsToRemove.length > 0 && preEraseSnapshotRef.current) {
-          // Push pre-erase snapshot for single undo entry, then set filtered objects
-          // We need to directly manipulate the objects to achieve batch undo
-          // Use removeObject for each (the undo snapshot was taken before first erase)
-          for (const id of idsToRemove) {
-            removeObject(id)
-          }
-        } else {
-          // Restore opacity for objects that weren't deleted (shouldn't happen, but safety)
-          const stage = stageRef.current
-          if (stage) {
-            const layer = stage.findOne("Layer") as Konva.Layer | null
-            if (layer) {
-              layer.getChildren().forEach((node) => {
-                if (node.opacity() < 1) node.opacity(1)
-              })
-              layer.batchDraw()
-            }
-          }
-        }
-        preEraseSnapshotRef.current = null
-        return
-      }
-
-      if ((mode !== AnnotationMode.PEN && mode !== AnnotationMode.HIGHLIGHTER) || !isDrawingRef.current) return
-
-      isDrawingRef.current = false
-      const points = currentStrokeRef.current
-
-      if (points.length >= 2) {
-        // Normalize all points
-        const normalizedPoints: FreehandPoint[] = []
-        for (let i = 0; i < points.length; i += 2) {
-          normalizedPoints.push({
-            x: points[i] / bounds.visibleWidth,
-            y: points[i + 1] / bounds.visibleHeight,
-          })
-        }
 
         const freehandObj: FreehandObject = {
           id: crypto.randomUUID(),
           type: "freehand",
           points: normalizedPoints,
-          color,
-          strokeWidth: mode === AnnotationMode.HIGHLIGHTER ? Math.max(penSize * 3, 12) : penSize,
-          opacity: mode === AnnotationMode.HIGHLIGHTER ? 0.3 : undefined,
+          color: colorRef.current,
+          strokeWidth:
+            modeRef.current === AnnotationMode.HIGHLIGHTER
+              ? Math.max(penSizeRef.current * 3, 12)
+              : penSizeRef.current,
+          opacity:
+            modeRef.current === AnnotationMode.HIGHLIGHTER ? 0.3 : undefined,
           timestamp: Date.now(),
         }
-        addObject(freehandObj)
-      }
 
-      currentStrokeRef.current = []
-      setCurrentStroke(null)
-    },
-    [mode, selectionRect, bounds.visibleWidth, bounds.visibleHeight, color, penSize, addObject, removeObject, setSelectedIds],
-  )
+        skipNextSyncRef.current.current = true
+        addObjectRef.current(freehandObj)
+
+        // Remove the auto-created path; reconciliation will create ours
+        canvas.remove(createdPath)
+      })
+    }
+
+    // -----------------------------------------------------------------------
+    // ERASER mode
+    // -----------------------------------------------------------------------
+    if (mode === AnnotationMode.ERASER) {
+      canvas.isDrawingMode = false
+      canvas.selection = false
+      canvas.getObjects().forEach((obj) => {
+        obj.set({ selectable: false, evented: false })
+      })
+    }
+
+    // -----------------------------------------------------------------------
+    // TEXT mode
+    // -----------------------------------------------------------------------
+    if (mode === AnnotationMode.TEXT) {
+      canvas.isDrawingMode = false
+      canvas.selection = false
+
+      // Make existing text objects clickable for editing
+      canvas.getObjects().forEach((obj) => {
+        const data = getObjData(obj)
+        if (data?.type === "text") {
+          obj.set({ selectable: false, evented: true })
+        }
+      })
+
+      canvas.on("mouse:down", (opt: TPointerEventInfo) => {
+        // If we clicked on an existing text object, enter editing
+        if (opt.target) {
+          const targetData = getObjData(opt.target)
+          if (targetData?.type === "text" && opt.target instanceof IText) {
+            const itext = opt.target
+            itext.set({ selectable: true, evented: true })
+            canvas.setActiveObject(itext)
+            itext.enterEditing()
+            isNewTextRef.current = false
+            editingITextRef.current = itext
+            return
+          }
+        }
+
+        // If clicked on empty canvas, create new IText
+        if (!opt.target) {
+          const pointer = canvas.getScenePoint(opt.e)
+          const newId = crypto.randomUUID()
+          const fs = fontSizeRef.current
+          const fw = fontWeightRef.current
+          const c = colorRef.current
+
+          const itext = new IText("", {
+            left: pointer.x,
+            top: pointer.y,
+            fontSize: fs,
+            fontWeight: fw,
+            fill: c,
+            selectable: true,
+            evented: true,
+          })
+          setObjData(itext, { id: newId, type: "text" })
+
+          // Override keyboard behavior
+          const originalOnKeyDown = itext.onKeyDown.bind(itext)
+          itext.onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault()
+              itext.exitEditing()
+              return
+            }
+            if (e.key === "Escape") {
+              e.preventDefault()
+              e.stopPropagation()
+              // Clear text to signal cancel
+              itext.set({ text: "" })
+              itext.exitEditing()
+              return
+            }
+            originalOnKeyDown(e)
+          }
+
+          canvas.add(itext)
+          canvas.setActiveObject(itext)
+          itext.enterEditing()
+          isNewTextRef.current = true
+          editingITextRef.current = itext
+        }
+      })
+
+      canvas.on("text:editing:exited", (opt: { target: IText }) => {
+        const itext = opt.target
+        const data = getObjData(itext)
+        const id = data?.id
+        if (!id) return
+
+        const text = (itext.text ?? "").trim()
+        const b = boundsRef.current
+
+        if (text === "") {
+          // Empty text: remove from canvas and data
+          canvas.remove(itext)
+          fabricObjectMapRef.current.current.delete(id)
+          if (isNewTextRef.current) {
+            // New text that was never saved: no need to call removeObject
+          } else {
+            removeObjectRef.current(id)
+          }
+        } else {
+          const nx = (itext.left ?? 0) / b.visibleWidth
+          const ny = (itext.top ?? 0) / b.visibleHeight
+          const nw = itext.width ? itext.width / b.visibleWidth : undefined
+
+          const textObj: TextObject = {
+            id,
+            type: "text",
+            x: nx,
+            y: ny,
+            text,
+            fontSize: itext.fontSize ?? fontSizeRef.current,
+            fontWeight: (itext.fontWeight as "normal" | "bold") ?? "normal",
+            color: (itext.fill as string) ?? colorRef.current,
+            width: nw,
+            timestamp: Date.now(),
+          }
+
+          skipNextSyncRef.current.current = true
+          if (isNewTextRef.current) {
+            addObjectRef.current(textObj)
+          } else {
+            updateObjectRef.current(id, {
+              text,
+              x: nx,
+              y: ny,
+              width: nw,
+            })
+          }
+          // Update fabricObjectMap
+          fabricObjectMapRef.current.current.set(id, itext)
+        }
+
+        isNewTextRef.current = false
+        editingITextRef.current = null
+
+        // Non-sticky: revert to SELECT mode
+        // We do this asynchronously to not interfere with Fabric's event cycle
+        setTimeout(() => {
+          setSelectedIdsRef.current([])
+          setModeRef.current(AnnotationMode.SELECT)
+        }, 0)
+      })
+    }
+
+    // -----------------------------------------------------------------------
+    // SELECT mode
+    // -----------------------------------------------------------------------
+    if (mode === AnnotationMode.SELECT) {
+      canvas.isDrawingMode = false
+      canvas.selection = true
+
+      canvas.getObjects().forEach((obj) => {
+        const data = getObjData(obj)
+        if (data?.type === "freehand") {
+          obj.set({
+            selectable: true,
+            evented: true,
+            lockRotation: true,
+            hasControls: false,
+          })
+        } else if (data?.type === "text") {
+          obj.set({
+            selectable: true,
+            evented: true,
+            lockRotation: true,
+          })
+          // Horizontal resize handles only for text
+          obj.setControlsVisibility({
+            mt: false,
+            mb: false,
+            ml: true,
+            mr: true,
+            tl: false,
+            tr: false,
+            bl: false,
+            br: false,
+            mtr: false,
+          })
+        }
+      })
+
+      canvas.on("selection:created", (e: { selected: FabricObject[] }) => {
+        const ids = e.selected
+          .map((obj) => getObjData(obj)?.id)
+          .filter((id): id is string => !!id)
+        setSelectedIdsRef.current(ids)
+      })
+
+      canvas.on("selection:updated", (e: { selected: FabricObject[] }) => {
+        const ids = e.selected
+          .map((obj) => getObjData(obj)?.id)
+          .filter((id): id is string => !!id)
+        setSelectedIdsRef.current(ids)
+      })
+
+      canvas.on("selection:cleared", () => {
+        setSelectedIdsRef.current([])
+      })
+
+      // Double-click to edit text in SELECT mode
+      canvas.on("mouse:dblclick", (opt: TPointerEventInfo) => {
+        if (opt.target) {
+          const targetData = getObjData(opt.target)
+          if (targetData?.type === "text" && opt.target instanceof IText) {
+            const itext = opt.target
+            itext.enterEditing()
+            isNewTextRef.current = false
+            editingITextRef.current = itext
+          }
+        }
+      })
+
+      canvas.on("object:modified", (e: { target: FabricObject }) => {
+        const obj = e.target
+        const data = getObjData(obj)
+        if (!data?.id) return
+
+        const b = boundsRef.current
+        const id = data.id
+
+        if (data.type === "freehand" && obj instanceof Path) {
+          // After drag: the path's left/top represent the displacement
+          // We need to compute the offset and apply it to all normalized points
+          const objLeft = obj.left ?? 0
+          const objTop = obj.top ?? 0
+          // Find original annotation object to get its original points
+          const origObj = objectsRef.current.find((o) => o.id === id)
+          if (origObj && origObj.type === "freehand") {
+            const pathBounds = obj.getBoundingRect()
+            // Calculate the delta in normalized space from original position
+            // The path was created at the denormalized positions, so offset = current pos shift
+            const dx = objLeft / b.visibleWidth
+            const dy = objTop / b.visibleHeight
+            if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
+              const newPoints = origObj.points.map((p) => ({
+                x: p.x + dx,
+                y: p.y + dy,
+              }))
+              skipNextSyncRef.current.current = true
+              updateObjectRef.current(id, { points: newPoints } as Partial<FreehandObject>)
+            }
+          }
+        } else if (data.type === "text") {
+          const nx = (obj.left ?? 0) / b.visibleWidth
+          const ny = (obj.top ?? 0) / b.visibleHeight
+          const nw = obj.width ? (obj.width * (obj.scaleX ?? 1)) / b.visibleWidth : undefined
+          skipNextSyncRef.current.current = true
+          updateObjectRef.current(id, {
+            x: nx,
+            y: ny,
+            width: nw,
+          } as Partial<TextObject>)
+        }
+      })
+
+      // Register text editing:exited for SELECT mode too (for dblclick editing)
+      canvas.on("text:editing:exited", (opt: { target: IText }) => {
+        const itext = opt.target
+        const data = getObjData(itext)
+        if (!data?.id) return
+
+        const id = data.id
+        const text = (itext.text ?? "").trim()
+        const b = boundsRef.current
+
+        if (text === "") {
+          canvas.remove(itext)
+          fabricObjectMapRef.current.current.delete(id)
+          removeObjectRef.current(id)
+        } else {
+          skipNextSyncRef.current.current = true
+          updateObjectRef.current(id, {
+            text,
+            x: (itext.left ?? 0) / b.visibleWidth,
+            y: (itext.top ?? 0) / b.visibleHeight,
+          } as Partial<TextObject>)
+        }
+
+        isNewTextRef.current = false
+        editingITextRef.current = null
+      })
+    }
+
+    canvas.requestRenderAll()
+  }, [fabricCanvas, isReady, mode, color, penSize])
 
   // ---------------------------------------------------------------------------
-  // Transformer attachment (multi-select)
+  // Zoom/Pan: Ctrl+Wheel zoom, plain wheel pan
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
-    if (!transformerRef.current || !stageRef.current) {
-      return
-    }
-    if (selectedIds.length === 0) {
-      transformerRef.current.nodes([])
-      transformerRef.current.getLayer()?.batchDraw()
-      return
+    if (!fabricCanvas || !isReady) return
+    const canvas = fabricCanvas as Canvas
+
+    const handleWheel = (opt: TPointerEventInfo<WheelEvent>) => {
+      const e = opt.e
+      if (e.ctrlKey || e.metaKey) {
+        // Zoom
+        const delta = e.deltaY
+        let zoom = canvas.getZoom()
+        zoom *= 0.999 ** delta
+        zoom = Math.min(Math.max(0.5, zoom), 5)
+        canvas.zoomToPoint(new FabricPoint(e.offsetX, e.offsetY), zoom)
+        e.preventDefault()
+        e.stopPropagation()
+      } else {
+        // Pan
+        canvas.relativePan(new FabricPoint(-e.deltaX, -e.deltaY))
+        e.preventDefault()
+      }
     }
 
-    const nodes: Konva.Node[] = []
-    for (const id of selectedIds) {
-      const node = stageRef.current.findOne(`#${id}`)
-      if (node) nodes.push(node)
+    canvas.on("mouse:wheel", handleWheel)
+
+    return () => {
+      canvas.off("mouse:wheel", handleWheel)
     }
-    transformerRef.current.nodes(nodes)
-    transformerRef.current.getLayer()?.batchDraw()
-  }, [selectedIds])
+  }, [fabricCanvas, isReady])
+
+  // ---------------------------------------------------------------------------
+  // Eraser: pointer events on the wrapper div
+  // ---------------------------------------------------------------------------
+
+  const handleEraserPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (mode !== AnnotationMode.ERASER || !fabricCanvas) return
+      const canvas = fabricCanvas as Canvas
+
+      isErasingRef.current = true
+      erasedIdsRef.current.clear()
+
+      // Check immediate hits
+      const rect = canvasElRef.current?.getBoundingClientRect()
+      if (!rect) return
+      const px = e.clientX - rect.left
+      const py = e.clientY - rect.top
+      const pointer = new FabricPoint(px, py)
+
+      canvas.getObjects().forEach((obj) => {
+        const data = getObjData(obj)
+        if (!data?.id) return
+        if (obj.containsPoint(pointer)) {
+          erasedIdsRef.current.add(data.id)
+          obj.set({ opacity: 0.3 })
+        }
+      })
+      canvas.requestRenderAll()
+    },
+    [mode, fabricCanvas],
+  )
+
+  const handleEraserPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (mode !== AnnotationMode.ERASER || !isErasingRef.current || !fabricCanvas) return
+      const canvas = fabricCanvas as Canvas
+
+      const rect = canvasElRef.current?.getBoundingClientRect()
+      if (!rect) return
+      const px = e.clientX - rect.left
+      const py = e.clientY - rect.top
+      const pointer = new FabricPoint(px, py)
+
+      canvas.getObjects().forEach((obj) => {
+        const data = getObjData(obj)
+        if (!data?.id || erasedIdsRef.current.has(data.id)) return
+        if (obj.containsPoint(pointer)) {
+          erasedIdsRef.current.add(data.id)
+          obj.set({ opacity: 0.3 })
+        }
+      })
+      canvas.requestRenderAll()
+    },
+    [mode, fabricCanvas],
+  )
+
+  const handleEraserPointerUp = useCallback(() => {
+    if (mode !== AnnotationMode.ERASER || !isErasingRef.current) return
+    isErasingRef.current = false
+
+    const idsToRemove = Array.from(erasedIdsRef.current)
+    erasedIdsRef.current.clear()
+
+    if (idsToRemove.length > 0) {
+      skipNextSyncRef.current.current = true
+      for (const id of idsToRemove) {
+        removeObject(id)
+      }
+    } else {
+      // Restore opacity if nothing was erased
+      if (fabricCanvas) {
+        const canvas = fabricCanvas as Canvas
+        canvas.getObjects().forEach((obj) => {
+          const data = getObjData(obj)
+          const origOpacity = data?.type === "freehand" ? (data.opacity ?? 1) : 1
+          if (obj.opacity !== origOpacity) {
+            obj.set({ opacity: origOpacity })
+          }
+        })
+        canvas.requestRenderAll()
+      }
+    }
+  }, [mode, fabricCanvas, removeObject])
+
+  // ---------------------------------------------------------------------------
+  // Pinch zoom on wrapper div
+  // ---------------------------------------------------------------------------
+
+  const handlePinchPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      activePointersRef.current.set(e.pointerId, e.nativeEvent)
+
+      if (activePointersRef.current.size >= 2 && fabricCanvas) {
+        const canvas = fabricCanvas as Canvas
+        isPinchingRef.current = true
+        wasDrawingModeRef.current = canvas.isDrawingMode
+        canvas.isDrawingMode = false
+        setShouldPassthrough(true)
+        setShowCancelFlash(false)
+      }
+    },
+    [fabricCanvas],
+  )
+
+  const handlePinchPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      activePointersRef.current.set(e.pointerId, e.nativeEvent)
+
+      if (!isPinchingRef.current || activePointersRef.current.size < 2 || !fabricCanvas)
+        return
+
+      const canvas = fabricCanvas as Canvas
+      const pointers = Array.from(activePointersRef.current.values())
+      const [p1, p2] = pointers
+
+      const dx = p2.clientX - p1.clientX
+      const dy = p2.clientY - p1.clientY
+      const distance = Math.sqrt(dx * dx + dy * dy)
+      const centerX = (p1.clientX + p2.clientX) / 2
+      const centerY = (p1.clientY + p2.clientY) / 2
+
+      const rect = canvasElRef.current?.getBoundingClientRect()
+      if (!rect) return
+
+      const canvasCenterX = centerX - rect.left
+      const canvasCenterY = centerY - rect.top
+
+      if (lastPinchDistanceRef.current !== null && lastPinchCenterRef.current !== null) {
+        const scaleFactor = distance / lastPinchDistanceRef.current
+        let zoom = canvas.getZoom() * scaleFactor
+        zoom = Math.min(Math.max(0.5, zoom), 5)
+        canvas.zoomToPoint(new FabricPoint(canvasCenterX, canvasCenterY), zoom)
+
+        const panDx = canvasCenterX - lastPinchCenterRef.current.x
+        const panDy = canvasCenterY - lastPinchCenterRef.current.y
+        canvas.relativePan(new FabricPoint(panDx, panDy))
+      }
+
+      lastPinchDistanceRef.current = distance
+      lastPinchCenterRef.current = { x: canvasCenterX, y: canvasCenterY }
+    },
+    [fabricCanvas],
+  )
+
+  const handlePinchPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      activePointersRef.current.delete(e.pointerId)
+
+      if (activePointersRef.current.size < 2) {
+        if (isPinchingRef.current && fabricCanvas) {
+          const canvas = fabricCanvas as Canvas
+          isPinchingRef.current = false
+          lastPinchDistanceRef.current = null
+          lastPinchCenterRef.current = null
+
+          // Re-enable drawing mode if it was active
+          if (
+            wasDrawingModeRef.current &&
+            (modeRef.current === AnnotationMode.PEN ||
+              modeRef.current === AnnotationMode.HIGHLIGHTER)
+          ) {
+            canvas.isDrawingMode = true
+          }
+
+          if (activePointersRef.current.size === 0) {
+            setShouldPassthrough(false)
+          }
+        }
+      }
+    },
+    [fabricCanvas],
+  )
+
+  // ---------------------------------------------------------------------------
+  // Safari gesture prevention
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    const wrapper = containerRef.current
+    if (!wrapper) return
+
+    const preventGesture = (e: Event) => {
+      e.preventDefault()
+    }
+
+    wrapper.addEventListener("gesturestart", preventGesture, { passive: false })
+    wrapper.addEventListener("gesturechange", preventGesture, { passive: false })
+
+    return () => {
+      wrapper.removeEventListener("gesturestart", preventGesture)
+      wrapper.removeEventListener("gesturechange", preventGesture)
+    }
+  }, [])
 
   // ---------------------------------------------------------------------------
   // Register active canvas callbacks for toolbar bridge
@@ -604,6 +863,11 @@ export function AnnotationCanvas({
               removeObject(id)
             }
             setSelectedIds([])
+            if (fabricCanvas) {
+              const canvas = fabricCanvas as Canvas
+              canvas.discardActiveObject()
+              canvas.requestRenderAll()
+            }
           }
         },
         canUndo,
@@ -612,6 +876,22 @@ export function AnnotationCanvas({
         hasSelection: selectedIds.length > 0,
         isSaving,
         saveError,
+        getSelectionBounds: () => {
+          if (!fabricCanvas) return null
+          const canvas = fabricCanvas as Canvas
+          const active = canvas.getActiveObject()
+          if (!active) return null
+          const rect = active.getBoundingRect()
+          const canvasEl = canvasElRef.current
+          if (!canvasEl) return null
+          const canvasRect = canvasEl.getBoundingClientRect()
+          return {
+            top: canvasRect.top + rect.top,
+            left: canvasRect.left + rect.left,
+            width: rect.width,
+            height: rect.height,
+          }
+        },
       })
     }
     return () => {
@@ -632,6 +912,7 @@ export function AnnotationCanvas({
     setSelectedIds,
     isSaving,
     saveError,
+    fabricCanvas,
   ])
 
   // Deselect when leaving drawing mode or changing mode
@@ -643,195 +924,30 @@ export function AnnotationCanvas({
 
   useEffect(() => {
     setSelectedIds([])
-  }, [mode, setSelectedIds])
+    if (fabricCanvas) {
+      const canvas = fabricCanvas as Canvas
+      if (canvas.discardActiveObject) {
+        canvas.discardActiveObject()
+        canvas.requestRenderAll()
+      }
+    }
+  }, [mode, setSelectedIds, fabricCanvas])
 
   // Reset eraser state when leaving eraser mode
   useEffect(() => {
     if (mode !== AnnotationMode.ERASER) {
       isErasingRef.current = false
       erasedIdsRef.current.clear()
-      preEraseSnapshotRef.current = null
     }
   }, [mode])
 
   // ---------------------------------------------------------------------------
-  // Determine selected object type for Transformer anchors
-  // ---------------------------------------------------------------------------
-
-  const singleSelectedObj = selectedIds.length === 1 ? objects.find((o) => o.id === selectedIds[0]) : null
-  const selectedObjectType = singleSelectedObj?.type ?? null
-
-  // ---------------------------------------------------------------------------
-  // Native DOM textarea for text editing (following Konva docs exactly)
-  // ---------------------------------------------------------------------------
-
-  useEffect(() => {
-    if (!editingTextId || !stageRef.current) return
-
-    const id = editingTextId
-    const stage = stageRef.current
-    let textarea: HTMLTextAreaElement | null = null
-    let outsideClickHandler: ((e: MouseEvent) => void) | null = null
-
-    const textNode = stage.findOne(`#${id}`) as Konva.Text | null
-    if (!textNode) return
-
-    // Hide the Konva text node while editing (Konva docs pattern)
-    textNode.hide()
-    stage.batchDraw()
-
-    // Calculate position accounting for CSS transform (TransformWrapper zoom)
-    const stageBox = stage.container().getBoundingClientRect()
-    const textPosition = textNode.absolutePosition()
-    const cssScale = stage.width() > 0 ? stageBox.width / stage.width() : 1
-
-    const areaPosition = {
-      x: stageBox.left + textPosition.x * cssScale,
-      y: stageBox.top + textPosition.y * cssScale,
-    }
-
-    // Create native DOM textarea (Konva docs pattern)
-    textarea = document.createElement("textarea")
-    document.body.appendChild(textarea)
-    textareaElRef.current = textarea
-
-    // Set value — handle placeholder space
-    textarea.value = textNode.text() === " " ? "" : textNode.text()
-
-    // Style to match Konva text node exactly
-    textarea.style.position = "fixed"
-    textarea.style.top = areaPosition.y + "px"
-    textarea.style.left = areaPosition.x + "px"
-    textarea.style.width = Math.max(textNode.width() * cssScale, 100) + "px"
-    textarea.style.fontSize = textNode.fontSize() * cssScale + "px"
-    textarea.style.border = "none"
-    textarea.style.padding = "0px"
-    textarea.style.margin = "0px"
-    textarea.style.overflow = "hidden"
-    textarea.style.background = "none"
-    textarea.style.outline = "2px solid #3B82F6"
-    textarea.style.outlineOffset = "2px"
-    textarea.style.resize = "none"
-    textarea.style.lineHeight = textNode.lineHeight().toString()
-    textarea.style.fontFamily = textNode.fontFamily()
-    textarea.style.transformOrigin = "left top"
-    textarea.style.textAlign = textNode.align()
-    textarea.style.color = textNode.fill() as string
-    textarea.style.fontWeight = textNode.fontStyle().includes("bold") ? "bold" : "normal"
-    textarea.style.height = "auto"
-    textarea.style.height = textarea.scrollHeight + 3 + "px"
-    textarea.style.zIndex = "40"
-    textarea.focus()
-
-    // Cleanup helper
-    function removeTextarea() {
-      if (outsideClickHandler) {
-        window.removeEventListener("mousedown", outsideClickHandler)
-        outsideClickHandler = null
-      }
-      if (textarea && textarea.parentNode) {
-        textarea.parentNode.removeChild(textarea)
-      }
-      textareaElRef.current = null
-      textarea = null
-      textNode.show()
-      stage.batchDraw()
-    }
-
-    // Save text and close textarea
-    function saveAndClose() {
-      if (!textarea) return
-      const value = textarea.value.trim()
-      if (value === "") {
-        removeObjectRef.current(id)
-      } else {
-        updateObjectRef.current(id, { text: value } as Partial<TextObject>)
-      }
-      removeTextarea()
-      setEditingTextId(null)
-      isNewTextRef.current = false
-    }
-
-    // Cancel edit and close textarea
-    function cancelAndClose() {
-      if (!textarea) return
-      if (isNewTextRef.current) {
-        const obj = objectsRef.current.find((o) => o.id === id)
-        if (obj?.type === "text" && (obj as TextObject).text === "") {
-          removeObjectRef.current(id)
-        }
-      }
-      removeTextarea()
-      setEditingTextId(null)
-      isNewTextRef.current = false
-    }
-
-    // Keyboard: Enter saves, Escape cancels
-    textarea.addEventListener("keydown", function (e) {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault()
-        saveAndClose()
-      }
-      if (e.key === "Escape") {
-        e.preventDefault()
-        e.stopPropagation()
-        cancelAndClose()
-      }
-    })
-
-    // Auto-resize textarea height
-    textarea.addEventListener("input", function () {
-      if (textarea) {
-        textarea.style.height = "auto"
-        textarea.style.height = textarea.scrollHeight + 3 + "px"
-      }
-    })
-
-    // Outside mousedown saves (use mousedown, not click, to avoid same-click trigger)
-    outsideClickHandler = function (e: MouseEvent) {
-      if (e.target !== textarea) {
-        saveAndClose()
-      }
-    }
-    setTimeout(() => {
-      if (outsideClickHandler) {
-        window.addEventListener("mousedown", outsideClickHandler)
-      }
-    })
-
-    // Cleanup: save text and remove textarea when editingTextId changes or unmount
-    return () => {
-      if (textarea) {
-        const value = textarea.value.trim()
-        if (value === "") {
-          removeObjectRef.current(id)
-        } else {
-          updateObjectRef.current(id, { text: value } as Partial<TextObject>)
-        }
-      }
-      if (outsideClickHandler) {
-        window.removeEventListener("mousedown", outsideClickHandler)
-      }
-      if (textarea && textarea.parentNode) {
-        textarea.parentNode.removeChild(textarea)
-      }
-      textareaElRef.current = null
-      const tn = stageRef.current?.findOne(`#${id}`) as Konva.Text | null
-      if (tn) {
-        tn.show()
-        stageRef.current?.batchDraw()
-      }
-    }
-  }, [editingTextId])
-
-  // ---------------------------------------------------------------------------
-  // Cursor style based on annotation mode
+  // Cursor style
   // ---------------------------------------------------------------------------
 
   const cursorStyle = useMemo(() => {
     switch (mode) {
       case AnnotationMode.PEN:
-        return "crosshair"
       case AnnotationMode.HIGHLIGHTER:
         return "crosshair"
       case AnnotationMode.TEXT:
@@ -859,12 +975,25 @@ export function AnnotationCanvas({
       ref={containerRef}
       className="absolute inset-0 z-20"
       style={{ pointerEvents: "none" }}
+      onPointerDown={(e) => {
+        handlePinchPointerDown(e)
+        handleEraserPointerDown(e)
+      }}
+      onPointerMove={(e) => {
+        handlePinchPointerMove(e)
+        handleEraserPointerMove(e)
+      }}
+      onPointerUp={(e) => {
+        handlePinchPointerUp(e)
+        handleEraserPointerUp()
+      }}
+      onPointerCancel={(e) => {
+        handlePinchPointerUp(e)
+        handleEraserPointerUp()
+      }}
     >
-      <Stage
-        ref={stageRef}
-        width={bounds.visibleWidth}
-        height={bounds.visibleHeight}
-        listening={isInteractive && !shouldPassthrough}
+      <canvas
+        ref={canvasElRef}
         style={{
           position: "absolute",
           top: bounds.offsetTop,
@@ -873,132 +1002,7 @@ export function AnnotationCanvas({
           touchAction: isInteractive ? "none" : "auto",
           cursor: cursorStyle,
         }}
-        onPointerDown={handleStagePointerDown}
-        onPointerMove={handleStagePointerMove}
-        onPointerUp={handleStagePointerUp}
-        onContextMenu={(e) => e.evt.preventDefault()}
-      >
-        <Layer listening={isActiveSlide}>
-          {/* Saved freehand strokes */}
-          {bounds.visibleWidth > 0 &&
-            objects
-              .filter((obj): obj is FreehandObject => obj.type === "freehand")
-              .map((obj) => (
-                <Line
-                  key={obj.id}
-                  id={obj.id}
-                  points={denormalizePoints(obj.points)}
-                  stroke={obj.color}
-                  strokeWidth={obj.strokeWidth}
-                  opacity={obj.opacity ?? 1}
-                  lineCap="round"
-                  lineJoin="round"
-                  tension={0.3}
-                  draggable={mode === AnnotationMode.SELECT}
-                  onClick={mode === AnnotationMode.SELECT ? handleObjectClick : undefined}
-                  onTap={mode === AnnotationMode.SELECT ? handleObjectClick : undefined}
-                  onDragEnd={handleDragEnd}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
-                  hitStrokeWidth={20}
-                />
-              ))}
-
-          {/* Saved text objects */}
-          {bounds.visibleWidth > 0 &&
-            objects
-              .filter((obj): obj is TextObject => obj.type === "text")
-              .map((obj) => (
-                <Text
-                  key={obj.id}
-                  id={obj.id}
-                  x={obj.x * bounds.visibleWidth}
-                  y={obj.y * bounds.visibleHeight}
-                  text={obj.text || " "}
-                  fontSize={obj.fontSize}
-                  fontStyle={obj.fontWeight === "bold" ? "bold" : "normal"}
-                  fill={obj.color}
-                  width={obj.width ? obj.width * bounds.visibleWidth : undefined}
-                  draggable={mode === AnnotationMode.SELECT}
-                  onClick={(e) => {
-                    if (mode === AnnotationMode.SELECT) {
-                      handleObjectClick(e)
-                    } else if (mode === AnnotationMode.TEXT) {
-                      e.cancelBubble = true
-                      e.evt.stopPropagation()
-                      if (editingTextId === obj.id) return
-                      isNewTextRef.current = false
-                      setEditingTextId(obj.id)
-                    }
-                  }}
-                  onTap={(e) => {
-                    if (mode === AnnotationMode.SELECT) {
-                      handleObjectClick(e as unknown as Konva.KonvaEventObject<MouseEvent | TouchEvent>)
-                    } else if (mode === AnnotationMode.TEXT) {
-                      e.cancelBubble = true
-                      if (editingTextId === obj.id) return
-                      isNewTextRef.current = false
-                      setEditingTextId(obj.id)
-                    }
-                  }}
-                  onDblClick={handleTextDblClick}
-                  onDblTap={handleTextDblClick}
-                  onDragEnd={handleDragEnd}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
-                />
-              ))}
-
-          {/* In-progress stroke */}
-          {currentStroke && currentStroke.length >= 4 && (
-            <Line
-              points={currentStroke}
-              stroke={color}
-              strokeWidth={mode === AnnotationMode.HIGHLIGHTER ? Math.max(penSize * 3, 12) : penSize}
-              opacity={mode === AnnotationMode.HIGHLIGHTER ? 0.3 : 1}
-              lineCap="round"
-              lineJoin="round"
-              tension={0.3}
-              listening={false}
-            />
-          )}
-
-          {/* Marquee selection rectangle */}
-          {selectionRect && (selectionRect.width > 1 || selectionRect.height > 1) && (
-            <Rect
-              x={selectionRect.x}
-              y={selectionRect.y}
-              width={selectionRect.width}
-              height={selectionRect.height}
-              fill="rgba(59, 130, 246, 0.1)"
-              stroke="#3B82F6"
-              strokeWidth={1 / currentScale}
-              dash={[6 / currentScale, 3 / currentScale]}
-              listening={false}
-            />
-          )}
-
-          {/* Transformer for selected objects */}
-          {selectedIds.length > 0 && mode === AnnotationMode.SELECT && (
-            <Transformer
-              ref={transformerRef}
-              enabledAnchors={
-                selectedObjectType === "text"
-                  ? ["middle-left", "middle-right"]
-                  : []
-              }
-              rotateEnabled={false}
-              anchorSize={8 / currentScale}
-              borderStrokeWidth={1.5 / currentScale}
-              boundBoxFunc={(oldBox, newBox) => {
-                // Prevent negative dimensions
-                if (newBox.width < 5 || newBox.height < 5) return oldBox
-                return newBox
-              }}
-            />
-          )}
-        </Layer>
-      </Stage>
+      />
       {showCancelFlash && (
         <div
           className="absolute inset-0 bg-red-500/10 pointer-events-none z-30 animate-pulse"

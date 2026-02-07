@@ -1,6 +1,6 @@
 import { RefObject, useCallback, useEffect, useState } from "react"
 
-interface ImageBounds {
+export interface ImageBounds {
   offsetTop: number
   offsetLeft: number
   visibleWidth: number

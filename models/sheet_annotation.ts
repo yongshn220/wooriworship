@@ -80,4 +80,5 @@ export type AnnotationCanvasCallbacks = {
   hasSelection: boolean
   isSaving: boolean
   saveError: string | null
+  getSelectionBounds?: () => { top: number; left: number; width: number; height: number } | null
 } | null
