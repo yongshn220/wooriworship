@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Image from "next/image";
 import { useRecoilValue } from "recoil";
 import { musicSheetAtom } from "@/global-states/music-sheet-state";
@@ -13,19 +13,29 @@ import {
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 interface Props {
   teamId: string
   songId: string
   musicSheetId: string
+  musicSheetIds?: string[]
+  onMusicSheetChange?: (id: string) => void
 }
 
-export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId }: Props) {
+export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId, musicSheetIds, onMusicSheetChange }: Props) {
   const musicSheet = useRecoilValue(musicSheetAtom({ teamId, songId, sheetId: musicSheetId }))
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
   const [count, setCount] = useState(0)
   const [isZoomed, setIsZoomed] = useState(false)
+  const hasMultipleKeys = musicSheetIds && musicSheetIds.length > 1
 
   useEffect(() => {
     if (!api) {
@@ -51,56 +61,137 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId }: Props
   // Single Page Case
   if (musicSheet.urls.length === 1) {
     return (
-      <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 py-2 pb-12">
-        <SingleSheetItem url={musicSheet.urls[0]} />
+      <div className="w-full flex-1 flex flex-col items-center gap-3 py-2 pb-12">
+        {/* Key Display/Selector - Right Aligned */}
+        <div className="w-full flex items-center justify-end px-4 shrink-0">
+          {hasMultipleKeys && onMusicSheetChange ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="h-10 px-4 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center gap-2 hover:bg-background active:scale-95 transition-all">
+                  <Suspense fallback={<span className="text-sm font-semibold">-</span>}>
+                    <KeyLabel teamId={teamId} songId={songId} musicSheetId={musicSheetId} />
+                  </Suspense>
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-1200">
+                <Suspense fallback={<div className="p-2 text-sm text-muted-foreground">Loading keys...</div>}>
+                  {musicSheetIds?.map((id) => (
+                    <KeyDropdownItem
+                      key={id}
+                      teamId={teamId}
+                      songId={songId}
+                      musicSheetId={id}
+                      isSelected={id === musicSheetId}
+                      onSelect={() => onMusicSheetChange(id)}
+                    />
+                  ))}
+                </Suspense>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="h-10 px-4 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center">
+              <Suspense fallback={<span className="text-sm font-semibold">-</span>}>
+                <KeyLabel teamId={teamId} songId={songId} musicSheetId={musicSheetId} />
+              </Suspense>
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1 flex items-center justify-center">
+          <SingleSheetItem url={musicSheet.urls[0]} />
+        </div>
       </div>
     )
   }
 
   // Multi Page Carousel Case
   return (
-    <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 py-2 pb-12 relative">
-      {/* Top Navigation Controls */}
-      <div className="absolute top-4 left-0 right-0 z-30 flex items-center justify-between px-4 pointer-events-none">
-        {/* Previous Button */}
-        <button
-          onClick={() => api?.scrollPrev()}
-          disabled={current === 1}
-          className={cn(
-            "pointer-events-auto min-h-touch min-w-touch h-10 w-10 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center justify-center transition-all",
-            current === 1 ? "opacity-40 cursor-not-allowed" : "hover:bg-background active:scale-95"
-          )}
-          aria-label="Previous sheet"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m15 18-6-6 6-6"/>
-          </svg>
-        </button>
+    <div className="w-full flex-1 flex flex-col items-center gap-3 py-2 pb-12">
+      {/* Unified Navigation Bar */}
+      <div className="w-full flex items-center justify-between px-4 shrink-0">
+        {/* Left Spacer */}
+        <div className="flex-1" />
 
-        {/* Page Indicator */}
-        <div className="pointer-events-auto px-4 py-2 bg-background/90 backdrop-blur-md border border-border rounded-full shadow-lg">
-          <span className="text-sm font-bold text-foreground">
-            {current} / {count}
-          </span>
+        {/* Center: Page Navigation */}
+        <div className="flex items-center gap-2">
+          {/* Previous Page Button */}
+          <button
+            onClick={() => api?.scrollPrev()}
+            disabled={current === 1}
+            className={cn(
+              "min-h-touch min-w-touch h-10 w-10 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center justify-center transition-all",
+              current === 1 ? "opacity-40 cursor-not-allowed" : "hover:bg-background active:scale-95"
+            )}
+            aria-label="Previous sheet"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m15 18-6-6 6-6"/>
+            </svg>
+          </button>
+
+          {/* Page Indicator */}
+          <div className="h-10 px-4 bg-background/90 backdrop-blur-md border border-border rounded-full shadow-lg flex items-center">
+            <span className="text-sm font-bold text-foreground whitespace-nowrap">
+              {current} / {count}
+            </span>
+          </div>
+
+          {/* Next Page Button */}
+          <button
+            onClick={() => api?.scrollNext()}
+            disabled={current === count}
+            className={cn(
+              "min-h-touch min-w-touch h-10 w-10 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center justify-center transition-all",
+              current === count ? "opacity-40 cursor-not-allowed" : "hover:bg-background active:scale-95"
+            )}
+            aria-label="Next sheet"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </button>
         </div>
 
-        {/* Next Button */}
-        <button
-          onClick={() => api?.scrollNext()}
-          disabled={current === count}
-          className={cn(
-            "pointer-events-auto min-h-touch min-w-touch h-10 w-10 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center justify-center transition-all",
-            current === count ? "opacity-40 cursor-not-allowed" : "hover:bg-background active:scale-95"
+        {/* Right: Key Display/Selector */}
+        <div className="flex-1 flex justify-end">
+          {hasMultipleKeys && onMusicSheetChange ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="h-10 px-4 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center gap-2 hover:bg-background active:scale-95 transition-all">
+                  <Suspense fallback={<span className="text-sm font-semibold">-</span>}>
+                    <KeyLabel teamId={teamId} songId={songId} musicSheetId={musicSheetId} />
+                  </Suspense>
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-1200">
+                <Suspense fallback={<div className="p-2 text-sm text-muted-foreground">Loading keys...</div>}>
+                  {musicSheetIds?.map((id) => (
+                    <KeyDropdownItem
+                      key={id}
+                      teamId={teamId}
+                      songId={songId}
+                      musicSheetId={id}
+                      isSelected={id === musicSheetId}
+                      onSelect={() => onMusicSheetChange(id)}
+                    />
+                  ))}
+                </Suspense>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="h-10 px-4 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center">
+              <Suspense fallback={<span className="text-sm font-semibold">-</span>}>
+                <KeyLabel teamId={teamId} songId={songId} musicSheetId={musicSheetId} />
+              </Suspense>
+            </div>
           )}
-          aria-label="Next sheet"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m9 18 6-6-6-6"/>
-          </svg>
-        </button>
+        </div>
       </div>
 
-      <Carousel setApi={setApi} className="w-full max-w-full" opts={{ watchDrag: !isZoomed }}>
+      {/* Music Sheet Carousel */}
+      <Carousel setApi={setApi} className="w-full max-w-full flex-1" opts={{ watchDrag: !isZoomed }}>
         <CarouselContent>
           {musicSheet.urls.map((url: string, i: number) => (
             <CarouselItem key={i} className="flex justify-center items-center">
@@ -153,7 +244,7 @@ function SingleSheetItem({ url, index = 0, onZoomChange }: { url: string; index?
             height={0}
             sizes="100vw"
             className={cn(
-              "w-full h-auto max-h-[calc(100vh-80px)] object-contain shadow-sm",
+              "w-full h-auto shadow-sm",
               !isLoaded && "opacity-0 absolute inset-0"
             )}
             style={{ width: "100%", height: "auto" }}
@@ -163,4 +254,44 @@ function SingleSheetItem({ url, index = 0, onZoomChange }: { url: string; index?
       </TransformComponent>
     </TransformWrapper>
   )
+}
+
+function KeyLabel({ teamId, songId, musicSheetId }: { teamId: string; songId: string; musicSheetId: string }) {
+  const musicSheet = useRecoilValue(musicSheetAtom({ teamId, songId, sheetId: musicSheetId }));
+  return (
+    <span className="text-sm font-semibold text-foreground truncate max-w-[120px]">
+      {musicSheet?.key || "Key"}
+    </span>
+  );
+}
+
+function KeyDropdownItem({
+  teamId,
+  songId,
+  musicSheetId,
+  isSelected,
+  onSelect
+}: {
+  teamId: string;
+  songId: string;
+  musicSheetId: string;
+  isSelected: boolean;
+  onSelect: () => void;
+}) {
+  const musicSheet = useRecoilValue(musicSheetAtom({ teamId, songId, sheetId: musicSheetId }));
+  return (
+    <DropdownMenuItem
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect();
+      }}
+      className={cn(
+        "cursor-pointer",
+        isSelected && "bg-accent"
+      )}
+    >
+      <span className="font-medium">{musicSheet?.key || "Unknown Key"}</span>
+      {musicSheet?.note && <span className="text-muted-foreground text-xs ml-2 truncate">{musicSheet.note}</span>}
+    </DropdownMenuItem>
+  );
 }

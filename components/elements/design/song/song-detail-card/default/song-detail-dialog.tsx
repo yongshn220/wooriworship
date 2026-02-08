@@ -1,20 +1,14 @@
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { Suspense, useEffect, useState, useMemo } from "react";
-import { useRecoilValue, useRecoilValueLoadable } from "recoil";
-import { X, ChevronDown } from "lucide-react";
+import { useRecoilValueLoadable } from "recoil";
+import { X } from "lucide-react";
 
 import { songAtom } from "@/global-states/song-state";
-import { musicSheetAtom, musicSheetIdsAtom } from "@/global-states/music-sheet-state";
+import { musicSheetIdsAtom } from "@/global-states/music-sheet-state";
 
 import { SongDetailContent } from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-content";
 import { SongDetailMusicSheetArea } from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-music-sheet-area";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { SongDetailMenuButton } from "@/components/elements/design/song/song-detail-card/default/parts/song-detail-menu-button";
 import { SongErrorBoundary } from "@/app/board/[teamId]/(song)/song-board/_components/song-error-boundary";
 
@@ -81,37 +75,16 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
           <SongErrorBoundary fallbackMessage="Failed to load song details. Please try again.">
             <Suspense fallback={<SongDetailSkeleton />}>
 
-              {/* Floating Key Selector (Overlay) */}
-              <div className="absolute top-4 right-4 z-10">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="h-9 px-3 text-sm font-semibold bg-card shadow-sm border-border hover:bg-card gap-2">
-                      <Suspense fallback={<span>-</span>}>
-                        {selectedMusicSheetId ? <SelectedKeyTrigger teamId={teamId} songId={songId} musicSheetId={selectedMusicSheetId} /> : <span>Key</span>}
-                      </Suspense>
-                      <ChevronDown className="h-4 w-4 opacity-50" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-1200">
-                    <Suspense fallback={<div className="p-2 text-sm text-muted-foreground">Loading keys...</div>}>
-                      {musicSheetIds?.map((id) => (
-                        <KeyDropdownItem
-                          key={id}
-                          teamId={teamId}
-                          songId={songId}
-                          musicSheetId={id}
-                          onSelect={() => setSelectedMusicSheetId(id)}
-                        />
-                      ))}
-                    </Suspense>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
               {/* Full Screen Sheet Area */}
               <div className="w-full min-h-[calc(100dvh-70px)] flex flex-col pb-12">
                 {selectedMusicSheetId && (
-                  <SongDetailMusicSheetArea teamId={teamId} songId={songId} musicSheetId={selectedMusicSheetId} />
+                  <SongDetailMusicSheetArea
+                    teamId={teamId}
+                    songId={songId}
+                    musicSheetId={selectedMusicSheetId}
+                    musicSheetIds={musicSheetIds}
+                    onMusicSheetChange={setSelectedMusicSheetId}
+                  />
                 )}
               </div>
 
@@ -127,29 +100,6 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
       </DrawerContent>
     </Drawer>
   )
-}
-
-function SelectedKeyTrigger({ teamId, songId, musicSheetId }: { teamId: string, songId: string, musicSheetId: string }) {
-  const musicSheet = useRecoilValue(musicSheetAtom({ teamId, songId, sheetId: musicSheetId }));
-  return (
-    <span className="truncate max-w-[16ch] inline-block align-bottom">
-      {musicSheet?.key || "?"}
-      {musicSheet?.note && <span className="text-muted-foreground font-normal ml-1">({musicSheet.note})</span>}
-    </span>
-  );
-}
-
-function KeyDropdownItem({ teamId, songId, musicSheetId, onSelect }: { teamId: string, songId: string, musicSheetId: string, onSelect: () => void }) {
-  const musicSheet = useRecoilValue(musicSheetAtom({ teamId, songId, sheetId: musicSheetId }));
-  return (
-    <DropdownMenuItem onClick={(e) => {
-      e.stopPropagation();
-      onSelect();
-    }} className="cursor-pointer">
-      <span className="font-medium">{musicSheet?.key || "Unknown Key"}</span>
-      {musicSheet?.note && <span className="text-muted-foreground text-xs ml-2 truncate">{musicSheet.note}</span>}
-    </DropdownMenuItem>
-  );
 }
 
 function SongDetailSkeleton() {
