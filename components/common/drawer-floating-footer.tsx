@@ -18,7 +18,7 @@ export function DrawerFloatingFooter({ children, className, hidden }: DrawerFloa
     return (
         <div
             className={cn(
-                "absolute bottom-0 left-0 right-0 p-6 pt-10 pb-8 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none transition-all duration-200",
+                "absolute bottom-0 left-0 right-0 p-6 pt-10 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none transition-all duration-200 pb-[calc(2rem+env(safe-area-inset-bottom))]",
                 hidden && "translate-y-full opacity-0",
                 className
             )}

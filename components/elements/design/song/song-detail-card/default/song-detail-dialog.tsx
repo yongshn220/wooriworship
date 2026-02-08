@@ -46,10 +46,10 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
 
   return (
     <Drawer open={isOpen} onOpenChange={(state) => setIsOpen(state)}>
-      <DrawerContent className="h-screen rounded-none flex flex-col focus:outline-none mt-0">
+      <DrawerContent className="h-[95dvh] rounded-none flex flex-col focus:outline-none mt-0">
         <DrawerTitle className="hidden">{song?.title || "Song Detail"}</DrawerTitle>
         {/* Top Header Bar */}
-        <div className="relative flex items-center justify-between p-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b bg-background/80 backdrop-blur-md shrink-0 z-20 min-h-[60px]">
+        <div className="relative flex items-center justify-between p-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b bg-background/80 backdrop-blur-md shrink-0 z-50 min-h-[60px]">
 
           {/* Left: Close Button */}
           <div className="relative z-10 flex items-center justify-start w-[80px]">
@@ -59,7 +59,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
           </div>
 
           {/* Center: Title & Subtitle (Absolute) */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-180px)] flex flex-col items-center justify-center pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-180px)] flex flex-col items-center justify-center pointer-events-none z-0">
             <h3 className="font-bold text-[15px] leading-tight text-center text-foreground line-clamp-2">
               {song?.title || "Untitled"}
             </h3>
@@ -109,14 +109,14 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
               </div>
 
               {/* Full Screen Sheet Area */}
-              <div className="w-full min-h-[calc(100vh-70px)] flex flex-col pb-12">
+              <div className="w-full min-h-[calc(100dvh-70px)] flex flex-col pb-12">
                 {selectedMusicSheetId && (
                   <SongDetailMusicSheetArea teamId={teamId} songId={songId} musicSheetId={selectedMusicSheetId} />
                 )}
               </div>
 
               {/* Info Section (Below) */}
-              <div className="bg-card p-4 pb-10 rounded-t-xl -mt-4 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-20">
+              <div className="bg-card p-4 pb-[calc(2.5rem+env(safe-area-inset-bottom))] rounded-t-xl -mt-4 relative shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-20">
                 <div className="w-10 h-1 bg-muted rounded-full mx-auto mb-6" />
                 <SongDetailContent teamId={teamId} songId={songId} />
               </div>
