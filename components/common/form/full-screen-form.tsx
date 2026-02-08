@@ -11,15 +11,15 @@ export const FullScreenForm = ({ children, className }: { children: React.ReactN
     const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
     useEffect(() => {
-        // Portal into .app-root so we share the same stacking/scroll context
-        const appRoot = document.querySelector<HTMLElement>(".app-root");
-        setPortalTarget(appRoot || document.body);
+        // Portal into document.body to escape .app-root's stacking context (z-index: 0)
+        // This ensures z-2000 works correctly and covers all navigation elements
+        setPortalTarget(document.body);
     }, []);
 
     if (!portalTarget) return null;
 
     return createPortal(
-        <div className={cn("fixed inset-0 z-[9999] bg-background flex flex-col", className)}>
+        <div className={cn("fixed inset-0 z-2000 bg-background flex flex-col", className)}>
             {children}
         </div>,
         portalTarget

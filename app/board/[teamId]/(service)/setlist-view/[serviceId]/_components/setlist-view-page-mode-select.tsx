@@ -19,7 +19,7 @@ export function SetlistViewPageModeSelect() {
             <SelectTrigger className="w-[140px] border-none shadow-none focus:ring-0 focus:ring-offset-0 ring-0 outline-none text-right justify-end px-0 font-medium text-foreground" >
                 <SelectValue placeholder="Mode" />
             </SelectTrigger>
-            <SelectContent className="z-[10004]">
+            <SelectContent className="z-1200">
                 <SelectGroup>
                     <SelectItem value={SetlistViewPageMode.SINGLE_PAGE}>Single Page</SelectItem>
                     <SelectItem value={SetlistViewPageMode.DOUBLE_PAGE}>Double Page</SelectItem>

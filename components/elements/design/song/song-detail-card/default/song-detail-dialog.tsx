@@ -49,7 +49,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
       <DrawerContent className="h-[95dvh] rounded-none flex flex-col focus:outline-none mt-0">
         <DrawerTitle className="hidden">{song?.title || "Song Detail"}</DrawerTitle>
         {/* Top Header Bar */}
-        <div className="relative flex items-center justify-between p-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b bg-background/80 backdrop-blur-md shrink-0 z-50 min-h-[60px]">
+        <div className="relative flex items-center justify-between p-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b bg-background/80 backdrop-blur-md shrink-0 z-10 min-h-[60px]">
 
           {/* Left: Close Button */}
           <div className="relative z-10 flex items-center justify-start w-[80px]">
@@ -92,7 +92,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
                       <ChevronDown className="h-4 w-4 opacity-50" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-[10002]">
+                  <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-1200">
                     <Suspense fallback={<div className="p-2 text-sm text-muted-foreground">Loading keys...</div>}>
                       {musicSheetIds?.map((id) => (
                         <KeyDropdownItem

@@ -200,7 +200,7 @@ export function CalendarStrip({
             {selectionDirection === 'left' && (
                 <button
                     onClick={scrollToSelection}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 mt-4 z-30 bg-card shadow-lg border border-border rounded-full p-2 min-h-touch min-w-touch flex items-center justify-center text-primary hover:bg-muted transition-all animate-in fade-in zoom-in slide-in-from-left-2 duration-200"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 mt-4 z-20 bg-card shadow-lg border border-border rounded-full p-2 min-h-touch min-w-touch flex items-center justify-center text-primary hover:bg-muted transition-all animate-in fade-in zoom-in slide-in-from-left-2 duration-200"
                     aria-label="Scroll left to selected date"
                 >
                     <ChevronLeft className="w-4 h-4" />
@@ -211,7 +211,7 @@ export function CalendarStrip({
             {selectionDirection === 'right' && (
                 <button
                     onClick={scrollToSelection}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 mt-4 z-30 bg-card shadow-lg border border-border rounded-full p-2 min-h-touch min-w-touch flex items-center justify-center text-primary hover:bg-muted transition-all animate-in fade-in zoom-in slide-in-from-right-2 duration-200"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 mt-4 z-20 bg-card shadow-lg border border-border rounded-full p-2 min-h-touch min-w-touch flex items-center justify-center text-primary hover:bg-muted transition-all animate-in fade-in zoom-in slide-in-from-right-2 duration-200"
                     aria-label="Scroll right to selected date"
                 >
                     <ChevronRight className="w-4 h-4" />

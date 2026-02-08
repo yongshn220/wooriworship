@@ -31,7 +31,7 @@ export function ImageFullScreenDrawer({ isOpen, setIsOpen, imageUrls }: Props) {
                 </VisuallyHidden>
 
                 {/* Custom Gradient Header with Close Button */}
-                <div className="absolute top-0 left-0 right-0 z-[60] h-20 bg-gradient-to-b from-black/60 to-transparent flex items-start justify-end p-5 pointer-events-none">
+                <div className="absolute top-0 left-0 right-0 z-30 h-20 bg-gradient-to-b from-black/60 to-transparent flex items-start justify-end p-5 pointer-events-none">
                     <DrawerClose asChild>
                         <button className="text-white/80 hover:text-white transition-colors p-2 pointer-events-auto">
                             <X className="h-7 w-7" />

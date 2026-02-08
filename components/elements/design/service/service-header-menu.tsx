@@ -1,14 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { EllipsisVertical, SquarePen, Trash2, Loader2 } from "lucide-react";
+import { EllipsisVertical, SquarePen, Trash2, Loader2, Check } from "lucide-react";
 import { useState } from "react";
 import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,6 +11,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
+import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFormFooter } from "@/components/common/form/full-screen-form";
 import { Timestamp } from "firebase/firestore";
 
 import { auth } from "@/firebase";
@@ -156,35 +151,51 @@ export function ServiceHeaderMenu({
                 onDeleteHandler={handleDelete}
             />
 
-            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                <DialogContent className="max-md:w-full max-md:h-full max-md:max-w-full max-md:rounded-none max-md:p-4 max-md:pt-8 md:max-w-md md:rounded-3xl md:p-6 md:pt-10">
-                    <DialogHeader>
-                        <DialogTitle className="text-center text-xl font-bold">Edit Service</DialogTitle>
-                    </DialogHeader>
-                    <div className="py-4 max-md:flex-1 max-md:overflow-y-auto">
-                        <ServiceDateSelector
-                            teamId={teamId}
-                            tagId={editTagId}
-                            onTagIdChange={setEditTagId}
-                            date={editDate}
-                            onDateChange={(d) => {
-                                setEditDate(d);
-                                if (d) setEditCalendarMonth(d);
-                            }}
-                            calendarMonth={editCalendarMonth}
-                            onCalendarMonthChange={setEditCalendarMonth}
-                        />
-                    </div>
-                    <Button
-                        className="w-full h-12 rounded-xl text-base font-semibold shadow-lg"
-                        size="lg"
-                        onClick={handleSave}
-                        disabled={isSaving || !editDate}
-                    >
-                        {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save Changes"}
-                    </Button>
-                </DialogContent>
-            </Dialog>
+            {isEditDialogOpen && (
+                <FullScreenForm data-testid="edit-service-form">
+                    <FullScreenFormHeader
+                        steps={["Edit Service"]}
+                        currentStep={0}
+                        onStepChange={() => {}}
+                        onClose={() => setIsEditDialogOpen(false)}
+                    />
+
+                    <FullScreenFormBody>
+                        <div className="flex flex-col gap-6 w-full">
+                            {/* Header */}
+                            <div className="space-y-2 text-center">
+                                <h2 className="text-2xl font-bold text-foreground tracking-tight">Edit Service</h2>
+                                <span className="text-muted-foreground font-normal text-sm">Update service date and type</span>
+                            </div>
+
+                            {/* Date Selector */}
+                            <ServiceDateSelector
+                                teamId={teamId}
+                                tagId={editTagId}
+                                onTagIdChange={setEditTagId}
+                                date={editDate}
+                                onDateChange={(d) => {
+                                    setEditDate(d);
+                                    if (d) setEditCalendarMonth(d);
+                                }}
+                                calendarMonth={editCalendarMonth}
+                                onCalendarMonthChange={setEditCalendarMonth}
+                            />
+                        </div>
+                    </FullScreenFormBody>
+
+                    <FullScreenFormFooter>
+                        <Button
+                            data-testid="form-submit"
+                            className="h-12 w-full rounded-full bg-primary text-white text-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                            onClick={handleSave}
+                            disabled={isSaving || !editDate}
+                        >
+                            {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Save Changes <Check className="w-5 h-5 ml-1" /></>}
+                        </Button>
+                    </FullScreenFormFooter>
+                </FullScreenForm>
+            )}
         </>
     );
 }

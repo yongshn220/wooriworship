@@ -53,13 +53,13 @@ export function SongDetailMenuButton({ teamId, songTitle, songId, readOnly = fal
   return (
     <>
       <DeleteConfirmationDialog isOpen={isDeleteDialogOpen} setOpen={setDeleteDialogOpen} title="Delete Song" description={`Do you really want to delete [${songTitle}]? This action can't be undone.`} onDeleteHandler={handleDeleteSong} />
-      <DropdownMenu modal={false}>
+      <DropdownMenu modal={true}>
         <DropdownMenuTrigger asChild>
           <button className="text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted outline-none" data-testid="song-menu">
             <EllipsisVertical className="w-5 h-5" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="z-[10002]">
+        <DropdownMenuContent align="end" className="z-1200 bg-white dark:bg-background">
           <DropdownMenuItem className="flex items-center justify-between cursor-pointer" onClick={handleDownloadSong}>
             Download Score
             <Download className="w-4 h-4 text-muted-foreground" />

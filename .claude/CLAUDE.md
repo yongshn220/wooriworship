@@ -612,4 +612,81 @@ For migration guides from earlier versions, see [MIGRATION.md](./MIGRATION.md).
 - **가장 단순한 요소를 선택한다** — 요구사항을 충족하는 최소한의 요소를 사용. 기능을 막기 위해 override하느니 처음부터 안 쓴다.
 - **보이지 않으면 존재하지 않는다** — 화면에 없는 요소는 DOM에도 없어야 한다. 조건부 렌더링 우선, overlay/z-index는 양쪽이 동시에 보일 때만.
 - **흐름은 위에서 아래로** — visibility와 모드 전환은 부모가 결정한다. 자식은 항상 보이는 전제로 작성.
-- **레이어는 예측 가능해야 한다** — z-index는 Tailwind 기본 스케일(z-10, z-20 ...) 사용, 매직넘버 금지.
+- **레이어는 예측 가능해야 한다** — z-index는 아래 정의된 체계를 따른다. 임의의 값 사용 금지.
+
+#### Z-Index 체계
+
+프로젝트 전체에서 일관된 레이어 관리를 위한 z-index 규칙:
+
+**Level 0: Base Elements (0-9)**
+- `z-0`: 기본값
+- `z-10`: Sticky elements (sticky headers, sticky navigation)
+
+**Level 1: Fixed UI Elements (10-99)**
+- `z-10`: Sticky headers, navigation bars
+- `z-20`: Floating action buttons, badges
+- `z-30`: Image overlays, gradients
+- `z-40`: Regular dropdowns, popovers (일반 페이지)
+- `z-50`: Tooltips
+
+**Level 2: Notifications (100-199)**
+- `z-100`: Toast notifications
+
+**Level 3: Modal System (1000-1499)**
+- `z-1000`: Dialog/Drawer/Sheet overlays (backdrop)
+- `z-1100`: Dialog/Drawer/Sheet content
+- `z-1200`: Dropdowns, popovers, selects inside modals/drawers
+- `z-1300`: Nested modal overlays
+- `z-1400`: Nested modal content
+
+**Level 4: Full-Screen Overlays (2000-2499)**
+- `z-2000`: Full-screen forms, loading screens
+- `z-2100`: Dropdowns inside full-screen forms
+
+**사용 예시:**
+```tsx
+// ✅ Good: 규칙을 따름
+<div className="z-1000">Modal Overlay</div>
+<div className="z-1100">Modal Content</div>
+<DropdownMenuContent className="z-1200">Menu in Modal</DropdownMenuContent>
+
+// ❌ Bad: 임의의 값
+<div className="z-[9999]">...</div>
+<div className="z-[10003]">...</div>
+```
+
+**주의사항:**
+- 같은 레벨 내에서는 DOM 순서로 자연스럽게 쌓임
+- 다른 컨텍스트(modal, drawer)는 다른 레벨 사용
+- z-index를 추가할 때는 이 규칙을 먼저 확인하고 적절한 레벨 선택
+
+**🚨 중요: Stacking Context 주의사항**
+
+`.app-root` 요소는 `z-index: 0`을 가지고 있어 **stacking context**를 생성한다 (globals.css 참조).
+이는 내부의 모든 자식 요소들이 격리된 레이어 컨텍스트에 갇히게 됨을 의미한다.
+
+**문제 상황:**
+```tsx
+// ❌ 이렇게 하면 z-2000이 작동하지 않음
+// .app-root (z-index: 0) 내부에서 portal하면
+// navigation (z-10)과 full-screen form (z-2000)이 같은 컨텍스트에 갇힘
+<FullScreenForm> // portals to .app-root
+  {children}
+</FullScreenForm>
+```
+
+**해결책:**
+```tsx
+// ✅ document.body로 portal하여 stacking context를 탈출
+// full-screen-form.tsx에서 사용하는 방식
+useEffect(() => {
+  // Portal to document.body to escape .app-root's stacking context
+  setPortalTarget(document.body);
+}, []);
+```
+
+**규칙:**
+- **Full-screen overlays (z-2000+)는 반드시 `document.body`로 portal해야 함**
+- Modal/Dialog/Drawer (z-1000+)는 `.app-root` 내부에서 괜찮음 (같은 레벨의 navigation보다 높음)
+- Navigation 요소들 (z-10, z-20)은 `.app-root` 내부에 위치
+- 새로운 overlay 컴포넌트를 만들 때는 portal 대상을 신중히 선택할 것

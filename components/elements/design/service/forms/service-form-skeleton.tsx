@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function ServiceFormSkeleton() {
     return (
-        <div className="fixed inset-0 z-[100] bg-gray-50 flex flex-col overflow-hidden">
+        <div className="fixed inset-0 z-2000 bg-gray-50 flex flex-col overflow-hidden">
             {/* Header Skeleton */}
             <div className="sticky top-0 z-50 w-full px-6 pt-8 pb-4 flex items-center justify-between pointer-events-none">
                 <Skeleton className="h-10 w-10 rounded-full bg-gray-200" />

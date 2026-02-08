@@ -49,7 +49,7 @@ export function MusicSheetUploaderBox({
             <SelectTrigger className="h-10 rounded-xl bg-secondary/40 border-border">
               <SelectValue placeholder="Key" />
             </SelectTrigger>
-            <SelectContent className="z-[10000]">
+            <SelectContent className="z-1200">
               {MUSIC_KEYS.map((key) => (
                 <SelectItem key={key} value={key}>{key}</SelectItem>
               ))}
