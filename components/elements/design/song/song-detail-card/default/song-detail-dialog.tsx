@@ -49,7 +49,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
       <DrawerContent className="h-[95dvh] rounded-none flex flex-col focus:outline-none mt-0">
         <DrawerTitle className="hidden">{song?.title || "Song Detail"}</DrawerTitle>
         {/* Top Header Bar */}
-        <div className="relative flex items-center justify-between p-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b bg-background/80 backdrop-blur-md shrink-0 z-20 min-h-[60px]">
+        <div className="relative flex items-center justify-between p-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b bg-background/80 backdrop-blur-md shrink-0 z-50 min-h-[60px]">
 
           {/* Left: Close Button */}
           <div className="relative z-10 flex items-center justify-start w-[80px]">
@@ -59,7 +59,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
           </div>
 
           {/* Center: Title & Subtitle (Absolute) */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-180px)] flex flex-col items-center justify-center pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-180px)] flex flex-col items-center justify-center pointer-events-none z-0">
             <h3 className="font-bold text-[15px] leading-tight text-center text-foreground line-clamp-2">
               {song?.title || "Untitled"}
             </h3>

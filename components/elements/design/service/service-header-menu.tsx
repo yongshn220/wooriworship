@@ -157,11 +157,11 @@ export function ServiceHeaderMenu({
             />
 
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                <DialogContent className="max-w-md rounded-3xl p-6 pt-10">
+                <DialogContent className="max-md:w-full max-md:h-full max-md:max-w-full max-md:rounded-none max-md:p-4 max-md:pt-8 md:max-w-md md:rounded-3xl md:p-6 md:pt-10">
                     <DialogHeader>
                         <DialogTitle className="text-center text-xl font-bold">Edit Service</DialogTitle>
                     </DialogHeader>
-                    <div className="py-4">
+                    <div className="py-4 max-md:flex-1 max-md:overflow-y-auto">
                         <ServiceDateSelector
                             teamId={teamId}
                             tagId={editTagId}
