@@ -213,9 +213,9 @@ export function SheetViewer({
       </AnimatePresence>
 
       {/* Sheet Content */}
-      <div className="flex-1 flex items-center justify-center overflow-hidden pt-24 pointer-events-none">
+      <div className="flex-1 flex items-center justify-center overflow-hidden pt-24">
         {isSinglePage ? (
-          <div className="w-full h-full flex items-center justify-center pointer-events-auto">
+          <div className="w-full h-full flex items-center justify-center">
             <SingleSheetItem
               url={musicSheet.urls[0]}
               onZoomChange={setScale}
@@ -226,7 +226,7 @@ export function SheetViewer({
         ) : (
           <Carousel
             setApi={setApi}
-            className="w-full h-full pointer-events-auto"
+            className="w-full h-full"
             opts={{ watchDrag: scale <= 1.01 }}
           >
             <CarouselContent className="h-full">
