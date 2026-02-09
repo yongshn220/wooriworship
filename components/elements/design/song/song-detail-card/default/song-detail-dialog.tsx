@@ -77,7 +77,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
               <Suspense fallback={<SongDetailSkeleton />}>
 
                 {/* Full Screen Sheet Area */}
-                <div className="w-full flex flex-col pb-12 overflow-hidden">
+                <div className="w-full flex flex-col pb-12 overflow-hidden relative z-30">
                 {selectedMusicSheetId && (
                   <SongDetailMusicSheetArea
                     teamId={teamId}

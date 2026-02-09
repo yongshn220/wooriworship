@@ -63,8 +63,8 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId, musicSh
     return (
       <div className="w-full flex-1 flex flex-col items-center gap-3 py-2 pb-12">
         {/* Key Display/Selector - Right Aligned */}
-        <div className="w-full flex items-center justify-end px-4 shrink-0">
-          {hasMultipleKeys && onMusicSheetChange ? (
+        <div className="w-full flex items-center justify-end px-4 shrink-0 relative z-30">
+          {onMusicSheetChange ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button type="button" className="h-10 px-4 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center gap-2 hover:bg-background active:scale-95 transition-all">
@@ -74,7 +74,7 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId, musicSh
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-[1200]">
+              <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-[1200] bg-white">
                 <Suspense fallback={<div className="p-2 text-sm text-muted-foreground">Loading keys...</div>}>
                   {musicSheetIds?.map((id) => (
                     <KeyDropdownItem
@@ -109,7 +109,7 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId, musicSh
   return (
     <div className="w-full flex-1 flex flex-col items-center gap-3 py-2 pb-12">
       {/* Unified Navigation Bar */}
-      <div className="w-full flex items-center justify-between px-4 shrink-0">
+      <div className="w-full flex items-center justify-between px-4 shrink-0 relative z-30">
         {/* Left Spacer */}
         <div className="flex-1" />
 
@@ -157,7 +157,7 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId, musicSh
 
         {/* Right: Key Display/Selector */}
         <div className="flex-1 flex justify-end">
-          {hasMultipleKeys && onMusicSheetChange ? (
+          {onMusicSheetChange ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button type="button" className="h-10 px-4 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center gap-2 hover:bg-background active:scale-95 transition-all">
@@ -167,7 +167,7 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId, musicSh
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-[1200]">
+              <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-[1200] bg-white">
                 <Suspense fallback={<div className="p-2 text-sm text-muted-foreground">Loading keys...</div>}>
                   {musicSheetIds?.map((id) => (
                     <KeyDropdownItem
