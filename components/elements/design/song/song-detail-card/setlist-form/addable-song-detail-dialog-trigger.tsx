@@ -1,7 +1,7 @@
 "use client"
 
-import {useState} from "react";
 import {AddableSongDetailDialog} from "@/components/elements/design/song/song-detail-card/setlist-form/addable-song-detail-dialog";
+import {useDialogState} from "@/components/common/hooks/use-dialog-state";
 
 interface Props {
   children: React.ReactNode
@@ -13,23 +13,28 @@ interface Props {
   onSelectHandler?: () => void
 }
 export function AddableSongDetailDialogTrigger({children, teamId, songId, selectedMusicSheetIds, setMusicSheetIds, isStatic, onSelectHandler}: Props) {
-  const [isOpen, setIsOpen] = useState(false)
+  const dialog = useDialogState();
 
   return (
     <>
       <AddableSongDetailDialog
         teamId={teamId}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
+        isOpen={dialog.isOpen}
+        setIsOpen={dialog.setIsOpen}
         songId={songId} readOnly={true}
         selectedMusicSheetIds={selectedMusicSheetIds}
         setMusicSheetIds={setMusicSheetIds}
         isStatic={isStatic}
         onSelectHandler={() => onSelectHandler()}
       />
-      <div onClick={() => setIsOpen(prev => !prev)} className="w-full">
+      <button
+        type="button"
+        onClick={dialog.toggle}
+        className="w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+        aria-label="View song details"
+      >
         {children}
-      </div>
+      </button>
     </>
   )
 }

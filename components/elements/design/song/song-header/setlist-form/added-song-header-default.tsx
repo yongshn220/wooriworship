@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { MusicSheetKeyButton } from "@/components/elements/design/song/music-sheet-key-button";
 
 interface Props {
   teamId: string
@@ -116,35 +117,15 @@ export function AddedSongHeaderDefault({ teamId, songOrder, songHeader, onUpdate
             const isSelected = selectedKeys.includes(sheet.id)
             const orderIndex = selectedKeys.indexOf(sheet.id)
             return (
-              <button
+              <MusicSheetKeyButton
                 key={sheet.id}
-                onClick={(e) => {
-                  e.stopPropagation() // Prevent opening detail dialog
-                  handleToggleKey(sheet.id)
-                }}
-                className={cn(
-                  "relative px-2.5 min-w-[2.5rem] rounded-[0.5rem] text-xs font-bold border transition-all active:scale-95 flex flex-col items-center justify-center",
-                  sheet.note ? "h-10 py-1" : "h-8",
-                  isSelected
-                    ? "bg-blue-600 border-blue-600 text-white shadow-md hover:bg-blue-700"
-                    : "bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50"
-                )}
-              >
-                <span>{sheet.key}</span>
-                {sheet.note && (
-                  <span className={cn(
-                    "text-[9px] font-medium leading-tight max-w-[70px] truncate",
-                    isSelected ? "text-white/70" : "text-gray-400"
-                  )}>
-                    {sheet.note}
-                  </span>
-                )}
-                {isSelected && selectedKeys.length > 1 && (
-                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-blue-800 text-white text-[10px] font-bold flex items-center justify-center">
-                    {orderIndex + 1}
-                  </span>
-                )}
-              </button>
+                musicKey={sheet.key}
+                keyNote={sheet.note}
+                isSelected={isSelected}
+                onToggle={() => handleToggleKey(sheet.id)}
+                orderIndex={selectedKeys.length > 1 ? orderIndex : undefined}
+                variant="compact"
+              />
             )
           })}
         </div>

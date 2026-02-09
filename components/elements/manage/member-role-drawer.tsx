@@ -130,7 +130,7 @@ export function MemberRoleDrawer({ userId, teamId, open, onOpenChange }: Props) 
                 setOpen={setShowRevokeDialog}
                 title="Revoke Admin Access"
                 description={`Are you sure you want to remove admin privileges from ${user?.name}? They will no longer be able to manage team settings.`}
-                onDeleteHandler={handleRevokeAdmin}
+                onConfirm={handleRevokeAdmin}
             />
 
             <div className="flex flex-col gap-6 pb-6">

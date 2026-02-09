@@ -4,9 +4,11 @@ export function NoticeListSkeleton() {
     return (
         <div className="flex flex-col h-full w-full bg-muted/30 relative">
             <div className="flex-1 overflow-y-auto p-4 content-container-safe-area pb-24 space-y-4">
-                {[1, 2, 3].map((i) => (
-                    <NoticeItemSkeleton key={i} />
-                ))}
+                <div className="max-w-[512px] md:max-w-[896px] mx-auto w-full space-y-4">
+                    {[1, 2, 3].map((i) => (
+                        <NoticeItemSkeleton key={i} />
+                    ))}
+                </div>
             </div>
         </div>
     );

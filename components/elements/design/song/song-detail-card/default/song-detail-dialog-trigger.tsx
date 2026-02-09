@@ -1,7 +1,8 @@
 "use client"
 
-import {Suspense, useState} from "react";
+import {Suspense} from "react";
 import {SongDetailDialog} from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
+import {useDialogState} from "@/components/common/hooks/use-dialog-state";
 
 interface Props {
   teamId: string
@@ -9,20 +10,20 @@ interface Props {
   children: React.ReactNode
 }
 export function SongDetailDialogTrigger({teamId, songId, children}: Props) {
-  const [isOpen, setIsOpen] = useState(false)
+  const dialog = useDialogState();
 
   return (
     <>
       {/* P1-6: Only mount dialog when open to prevent unnecessary Recoil evaluations */}
-      {isOpen && (
+      {dialog.isOpen && (
         <Suspense fallback={<></>}>
-          <SongDetailDialog teamId={teamId} isOpen={isOpen} setIsOpen={setIsOpen} songId={songId} readOnly={false}/>
+          <SongDetailDialog teamId={teamId} isOpen={dialog.isOpen} setIsOpen={dialog.setIsOpen} songId={songId} readOnly={false}/>
         </Suspense>
       )}
       {/* P1-5: Use button for keyboard accessibility (Enter/Space opens dialog, focusable, screen reader support) */}
       <button
         type="button"
-        onClick={() => setIsOpen(prev => !prev)}
+        onClick={dialog.toggle}
         className="w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
         aria-label="View song details"
       >

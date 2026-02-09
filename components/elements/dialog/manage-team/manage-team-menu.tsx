@@ -113,7 +113,7 @@ export function ManageTeamMenu() {
         setOpen={setLeaveTeamDialogOpen}
         title="Leave Team"
         description={`Do you really want to leave team [${team?.name}]? This action cannot be undone.`}
-        onDeleteHandler={handleLeaveTeam}
+        onConfirm={handleLeaveTeam}
         callback={() => setLeaveTeamDialogOpen(false)}
       />
     </>

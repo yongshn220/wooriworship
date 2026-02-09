@@ -1,24 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { EllipsisVertical, SquarePen, Trash2, Loader2, Check } from "lucide-react";
+import { Loader2, Check } from "lucide-react";
 import { useState } from "react";
-import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-confirmation/delete-confirmation-dialog";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ServiceDateSelector } from "@/components/common/form/service-date-selector";
 import { FullScreenForm, FullScreenFormHeader, FullScreenFormBody, FullScreenFormFooter } from "@/components/common/form/full-screen-form";
 import { Timestamp } from "firebase/firestore";
-
 import { auth } from "@/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useSetRecoilState } from "recoil";
 import { serviceEventsListAtom } from "@/global-states/serviceEventState";
 import { useToast } from "@/components/ui/use-toast";
+import { EntityMenu } from "@/components/common/menu/entity-menu";
 
 interface Props {
     scheduleId: string;
@@ -44,7 +36,6 @@ export function ServiceHeaderMenu({
     const [user] = useAuthState(auth as any);
     const { toast } = useToast();
     const setServices = useSetRecoilState(serviceEventsListAtom);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     // Edit dialog state
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -91,7 +82,6 @@ export function ServiceHeaderMenu({
                 title: "Schedule deleted",
                 description: "The serving schedule has been successfully removed.",
             });
-            setIsDeleteDialogOpen(false);
             setServices((prev) => prev.filter((s) => s.id !== scheduleId));
         } catch (error) {
             console.error(error);
@@ -100,7 +90,6 @@ export function ServiceHeaderMenu({
                 title: "Error",
                 description: "Failed to delete schedule.",
             });
-            setIsDeleteDialogOpen(false);
         }
     };
 
@@ -112,43 +101,15 @@ export function ServiceHeaderMenu({
 
     return (
         <>
-            <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                    {trigger ? (
-                        <span>{trigger}</span>
-                    ) : (
-                        <button
-                            className="text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-muted/60 active:bg-muted outline-none"
-                        >
-                            <EllipsisVertical className="w-5 h-5" />
-                        </button>
-                    )}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                        onSelect={handleEdit}
-                        className="flex items-center justify-between cursor-pointer"
-                    >
-                        Edit
-                        <SquarePen className="w-4 h-4 text-muted-foreground" />
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                        onClick={() => setIsDeleteDialogOpen(true)}
-                        className="flex items-center justify-between cursor-pointer text-red-600 dark:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-red-600 dark:focus:text-red-500"
-                    >
-                        Delete
-                        <Trash2 className="w-4 h-4" />
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-
-            <DeleteConfirmationDialog
-                isOpen={isDeleteDialogOpen}
-                setOpen={setIsDeleteDialogOpen}
-                title="Delete Schedule?"
-                description={deleteDescription}
-                onDeleteHandler={handleDelete}
+            <EntityMenu
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                deleteConfig={{
+                    title: "Delete Schedule?",
+                    description: deleteDescription,
+                }}
+                trigger={trigger}
+                modal={false}
             />
 
             {isEditDialogOpen && (

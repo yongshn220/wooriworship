@@ -1,6 +1,4 @@
-import { ModernDialog } from "@/components/ui/modern-dialog";
-import { useState } from "react";
-import { AlertTriangle } from "lucide-react";
+import { ConfirmationDialog } from "./confirmation-dialog";
 
 interface Props {
   isOpen: boolean;
@@ -11,33 +9,27 @@ interface Props {
   callback?: () => void;
 }
 
-export function DeleteConfirmationDialog({ isOpen, setOpen, title, description, onDeleteHandler, callback }: Props) {
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const handleConfirm = async () => {
-    setIsDeleting(true);
-    try {
-      await onDeleteHandler();
-      setOpen(false);
-      if (callback) callback();
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
+/**
+ * DeleteConfirmationDialog is a wrapper around ConfirmationDialog with variant="destructive"
+ * Kept for backward compatibility with existing code.
+ */
+export function DeleteConfirmationDialog({
+  isOpen,
+  setOpen,
+  title,
+  description,
+  onDeleteHandler,
+  callback
+}: Props) {
   return (
-    <ModernDialog
-      open={isOpen}
-      onOpenChange={setOpen}
+    <ConfirmationDialog
+      isOpen={isOpen}
+      setOpen={setOpen}
       title={title}
       description={description}
-      icon={<AlertTriangle className="w-6 h-6 fill-red-100/50" strokeWidth={2} />}
+      onConfirm={onDeleteHandler}
+      callback={callback}
       variant="destructive"
-      actionText="Delete"
-      onAction={handleConfirm}
-      isLoading={isDeleting}
     />
   );
 }

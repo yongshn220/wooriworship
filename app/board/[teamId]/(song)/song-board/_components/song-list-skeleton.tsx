@@ -4,11 +4,12 @@ export function SongListSkeleton() {
     return (
         <div className="flex flex-col h-full w-full relative">
             <div className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6 content-container-safe-area relative">
-
-                <div className="flex flex-col divide-y divide-border">
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                        <SongRowSkeleton key={i} />
-                    ))}
+                <div className="max-w-[512px] md:max-w-[896px] mx-auto w-full">
+                    <div className="flex flex-col divide-y divide-border">
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                            <SongRowSkeleton key={i} />
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
