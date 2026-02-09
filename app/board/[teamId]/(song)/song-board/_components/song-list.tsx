@@ -154,7 +154,7 @@ export function SongList({ teamId }: Props) {
   }
 
   return (
-    <div className="w-full h-full px-4 pt-2 pb-24 sm:pr-14 md:pr-16 relative max-w-lg mx-auto">
+    <div className="w-full h-full px-4 pt-2 pb-24 sm:pr-14 md:pr-16 relative max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto">
       <AlphabetIndexer teamId={teamId} onScrollRequest={handleScrollRequest} activeIndex={activeIndex} />
 
       {/* Active Filters */}

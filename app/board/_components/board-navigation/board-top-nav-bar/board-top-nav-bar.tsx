@@ -120,8 +120,8 @@ export function BoardTopNavBar() {
   if (!currentConfig) return <></>;
 
   return (
-    <BaseTopNavBar height={64} className="bg-background/80 backdrop-blur-xl border-b border-border shadow-sm z-10 supports-[backdrop-filter]:bg-background/60 transition-all duration-300 overflow-hidden">
-      <div className="w-full h-full max-w-7xl mx-auto px-4 relative flex items-center static-shell">
+    <BaseTopNavBar height={64} className="bg-transparent border-b md:border-none border-border z-10 transition-all duration-300 overflow-visible">
+      <div className="w-full h-full max-w-7xl mx-auto px-4 md:px-8 relative flex items-center static-shell">
         <AnimatePresence mode="wait">
           {isSearchOpen && currentConfig.searchComponent ? (
             <motion.div

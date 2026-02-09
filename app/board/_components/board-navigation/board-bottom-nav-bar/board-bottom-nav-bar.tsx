@@ -84,7 +84,7 @@ export function DefaultBoardBottomNavBar() {
 
   return (
     <BaseBottomNavBar height={80}>
-      <div role="tablist" className="w-full h-full flex justify-around pb-2 items-center">
+      <div role="tablist" className="w-full h-full flex justify-around pb-2 md:pb-0 items-center">
         {NAV_ITEMS.map((item, index) => {
           const isActive = currentPage === item.page;
           const Icon = item.icon;
