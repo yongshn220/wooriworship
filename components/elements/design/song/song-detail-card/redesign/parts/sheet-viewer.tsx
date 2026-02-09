@@ -323,10 +323,9 @@ function SingleSheetItem({
                 !isLoaded && "opacity-0 absolute"
               )}
               style={{
-                width: "auto",
-                height: "auto",
-                maxWidth: "100vw",
-                maxHeight: "100dvh",
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
               }}
               onLoad={() => setIsLoaded(true)}
               onError={() => setHasError(true)}
