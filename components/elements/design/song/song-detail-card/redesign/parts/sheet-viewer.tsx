@@ -213,7 +213,7 @@ export function SheetViewer({
       </AnimatePresence>
 
       {/* Sheet Content */}
-      <div className="flex-1 flex items-center justify-center overflow-hidden pt-20">
+      <div className="flex-1 flex items-center justify-center overflow-hidden pt-24">
         {isSinglePage ? (
           <div className="w-full h-full flex items-center justify-center">
             <SingleSheetItem
