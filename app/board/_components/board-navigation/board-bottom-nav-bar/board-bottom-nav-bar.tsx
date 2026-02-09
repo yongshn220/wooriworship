@@ -1,5 +1,5 @@
 import { useRef, useCallback } from "react";
-import { Music, Bell, Calendar, LayoutGrid } from "lucide-react";
+import { Music, Bell, Calendar, Settings } from "lucide-react";
 import { getPathManage, getPathNotice, getPathServing, getPathSong } from "@/components/util/helper/routes";
 import { useRecoilValue } from "recoil";
 import { currentTeamIdAtom } from "@/global-states/teamState";
@@ -51,7 +51,7 @@ export function DefaultBoardBottomNavBar() {
     },
     {
       page: Page.MANAGE,
-      icon: LayoutGrid,
+      icon: Settings,
       label: "Manage",
       path: getPathManage(currentTeamId)
     },
@@ -83,8 +83,8 @@ export function DefaultBoardBottomNavBar() {
   }, [NAV_ITEMS.length]);
 
   return (
-    <BaseBottomNavBar height={80}>
-      <div role="tablist" className="w-full h-full flex justify-around pb-2 md:pb-0 items-center">
+    <BaseBottomNavBar height={72}>
+      <div role="tablist" className="w-full h-full flex justify-around items-center px-3">
         {NAV_ITEMS.map((item, index) => {
           const isActive = currentPage === item.page;
           const Icon = item.icon;
@@ -100,22 +100,30 @@ export function DefaultBoardBottomNavBar() {
               aria-current={isActive ? "page" : undefined}
               tabIndex={isActive ? 0 : -1}
               className={cn(
-                "w-16 h-full flex-col flex-center cursor-pointer transition-colors duration-300",
-                "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none rounded-lg",
-                isActive ? "text-[oklch(0.50_0.188_259.81)] dark:text-primary" : "text-muted-foreground"
+                "flex-1 h-full flex-col flex-center cursor-pointer transition-all duration-300",
+                "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none rounded-full",
+                isActive ? "text-[oklch(0.50_0.188_259.81)] dark:text-primary" : "text-muted-foreground/80"
               )}
               onClick={() => router.push(item.path)}
               onKeyDown={(e) => handleKeyDown(e, index)}
-              whileTap={{ scale: 0.9 }}
+              whileTap={{ scale: 0.88 }}
             >
-              <Icon
-                aria-hidden="true"
-                strokeWidth={1.8}
-                className={cn("w-[22px] h-[22px] transition-colors duration-300")}
-              />
+              <motion.div
+                initial={false}
+                animate={{
+                  scale: isActive ? 1 : 0.95,
+                }}
+                transition={{ duration: 0.2 }}
+              >
+                <Icon
+                  aria-hidden="true"
+                  strokeWidth={isActive ? 2.4 : 1.8}
+                  className={cn("w-[26px] h-[26px] transition-all duration-300")}
+                />
+              </motion.div>
               <span className={cn(
-                "text-[10px] font-medium prevent-text-select transition-colors duration-300 mt-0.5",
-                isActive ? "text-[oklch(0.50_0.188_259.81)] dark:text-primary" : "text-muted-foreground"
+                "text-[10px] font-medium prevent-text-select transition-all duration-300 mt-1",
+                isActive ? "text-[oklch(0.50_0.188_259.81)] dark:text-primary font-semibold" : "text-muted-foreground/80"
               )}>
                 {item.label}
               </span>
