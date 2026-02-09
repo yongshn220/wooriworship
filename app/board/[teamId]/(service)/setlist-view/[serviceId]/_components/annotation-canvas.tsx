@@ -21,6 +21,7 @@ import {
   annotationFontWeightAtom,
   activeAnnotationCanvasAtom,
   selectedAnnotationIdAtom,
+  annotationSelectionBoundsAtom,
 } from "../_states/annotation-states"
 import {
   AnnotationMode,
@@ -30,7 +31,7 @@ import {
 } from "@/models/sheet_annotation"
 import { useAnnotation } from "../_hooks/use-annotation"
 import { useImageBounds } from "../_hooks/use-image-bounds"
-import { useFabricCanvas } from "../_hooks/use-fabric-canvas"
+import { useFabricCanvas, normalize } from "../_hooks/use-fabric-canvas"
 
 // ---------------------------------------------------------------------------
 // Type helper for accessing .data on Fabric objects (runtime property, not in TS defs)
@@ -61,21 +62,6 @@ class PointCapturingBrush extends PencilBrush {
   onMouseMove(pointer: FabricPoint, ev: TEvent): void {
     this.rawPoints.push({ x: pointer.x, y: pointer.y })
     super.onMouseMove(pointer, ev)
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Normalize helper
-// ---------------------------------------------------------------------------
-
-function normalize(
-  canvasPoint: { x: number; y: number },
-  visibleWidth: number,
-  visibleHeight: number,
-): FreehandPoint {
-  return {
-    x: canvasPoint.x / visibleWidth,
-    y: canvasPoint.y / visibleHeight,
   }
 }
 
@@ -122,6 +108,7 @@ export function AnnotationCanvas({
   const selectedIds = useRecoilValue(selectedAnnotationIdAtom)
   const setSelectedIds = useSetRecoilState(selectedAnnotationIdAtom)
   const setMode = useSetRecoilState(annotationModeAtom)
+  const setSelectionBounds = useSetRecoilState(annotationSelectionBoundsAtom)
 
   // Annotation data
   const {
@@ -198,6 +185,29 @@ export function AnnotationCanvas({
   skipNextSyncRef.current = skipNextSync
   const fabricObjectMapRef = useRef(fabricObjectMap)
   fabricObjectMapRef.current = fabricObjectMap
+  const setSelectionBoundsRef = useRef(setSelectionBounds)
+  setSelectionBoundsRef.current = setSelectionBounds
+
+  // Compute selection bounds in screen coordinates
+  const computeSelectionBounds = useCallback(() => {
+    if (!fabricCanvas) return null
+    const canvas = fabricCanvas as Canvas
+    const active = canvas.getActiveObject()
+    if (!active) return null
+    const rect = active.getBoundingRect()
+    const canvasEl = canvasElRef.current
+    if (!canvasEl) return null
+    const canvasRect = canvasEl.getBoundingClientRect()
+    return {
+      top: canvasRect.top + rect.top,
+      left: canvasRect.left + rect.left,
+      width: rect.width,
+      height: rect.height,
+    }
+  }, [fabricCanvas])
+
+  const computeSelectionBoundsRef = useRef(computeSelectionBounds)
+  computeSelectionBoundsRef.current = computeSelectionBounds
 
   // Track if a new IText is being edited
   const isNewTextRef = useRef(false)
@@ -230,9 +240,14 @@ export function AnnotationCanvas({
 
   useEffect(() => {
     if (!fabricCanvas || !isReady || !imageUrl) return
+    // Skip when bounds are zero — canvas is 0×0 so image would load at scale 0
+    // (invisible). The effect re-runs once bounds become valid.
+    if (bounds.visibleWidth === 0 || bounds.visibleHeight === 0) return
     const canvas = fabricCanvas as Canvas
+    let cancelled = false
 
     FabricImage.fromURL(imageUrl, { crossOrigin: "anonymous" }).then((img) => {
+      if (cancelled) return
       const cw = canvas.width ?? 1
       const ch = canvas.height ?? 1
       const scaleX = cw / (img.width ?? 1)
@@ -249,6 +264,8 @@ export function AnnotationCanvas({
       canvas.backgroundImage = img
       canvas.requestRenderAll()
     })
+
+    return () => { cancelled = true }
   }, [fabricCanvas, isReady, imageUrl, bounds.visibleWidth, bounds.visibleHeight])
 
   // ---------------------------------------------------------------------------
@@ -258,16 +275,7 @@ export function AnnotationCanvas({
   useEffect(() => {
     if (!fabricCanvas || !isReady) return
     const canvas = fabricCanvas as Canvas
-
-    // Clean up previous event listeners
-    canvas.off("path:created")
-    canvas.off("mouse:down")
-    canvas.off("mouse:dblclick")
-    canvas.off("selection:created")
-    canvas.off("selection:updated")
-    canvas.off("selection:cleared")
-    canvas.off("object:modified")
-    canvas.off("text:editing:exited")
+    const disposers: (() => void)[] = []
 
     // Reset canvas interaction state
     canvas.isDrawingMode = false
@@ -291,7 +299,7 @@ export function AnnotationCanvas({
       brush.strokeLineJoin = "round"
       canvas.freeDrawingBrush = brush
 
-      canvas.on("path:created", (e: { path: FabricObject }) => {
+      disposers.push(canvas.on("path:created", (e: { path: FabricObject }) => {
         const createdPath = e.path
         const capturingBrush = canvas.freeDrawingBrush as PointCapturingBrush
         const rawPts = capturingBrush.rawPoints || []
@@ -303,7 +311,7 @@ export function AnnotationCanvas({
 
         const b = boundsRef.current
         const normalizedPoints: FreehandPoint[] = rawPts.map((p) =>
-          normalize(p, b.visibleWidth, b.visibleHeight),
+          normalize(p, b),
         )
 
         const freehandObj: FreehandObject = {
@@ -327,7 +335,7 @@ export function AnnotationCanvas({
 
         skipNextSyncRef.current.current = true
         addObjectRef.current(freehandObj)
-      })
+      }))
     }
 
     // -----------------------------------------------------------------------
@@ -356,7 +364,7 @@ export function AnnotationCanvas({
         }
       })
 
-      canvas.on("mouse:down", (opt: TPointerEventInfo) => {
+      disposers.push(canvas.on("mouse:down", (opt: TPointerEventInfo) => {
         // If we clicked on an existing text object, enter editing
         if (opt.target) {
           const targetData = getObjData(opt.target)
@@ -415,9 +423,9 @@ export function AnnotationCanvas({
           isNewTextRef.current = true
           editingITextRef.current = itext
         }
-      })
+      }))
 
-      canvas.on("text:editing:exited", (opt: { target: IText }) => {
+      disposers.push(canvas.on("text:editing:exited", (opt: { target: IText }) => {
         const itext = opt.target
         const data = getObjData(itext)
         const id = data?.id
@@ -477,7 +485,7 @@ export function AnnotationCanvas({
           setSelectedIdsRef.current([])
           setModeRef.current(AnnotationMode.SELECT)
         }, 0)
-      })
+      }))
     }
 
     // -----------------------------------------------------------------------
@@ -517,26 +525,29 @@ export function AnnotationCanvas({
         }
       })
 
-      canvas.on("selection:created", (e: { selected: FabricObject[] }) => {
+      disposers.push(canvas.on("selection:created", (e: { selected: FabricObject[] }) => {
         const ids = e.selected
           .map((obj) => getObjData(obj)?.id)
           .filter((id): id is string => !!id)
         setSelectedIdsRef.current(ids)
-      })
+        setSelectionBoundsRef.current(computeSelectionBoundsRef.current())
+      }))
 
-      canvas.on("selection:updated", (e: { selected: FabricObject[] }) => {
+      disposers.push(canvas.on("selection:updated", (e: { selected: FabricObject[] }) => {
         const ids = e.selected
           .map((obj) => getObjData(obj)?.id)
           .filter((id): id is string => !!id)
         setSelectedIdsRef.current(ids)
-      })
+        setSelectionBoundsRef.current(computeSelectionBoundsRef.current())
+      }))
 
-      canvas.on("selection:cleared", () => {
+      disposers.push(canvas.on("selection:cleared", () => {
         setSelectedIdsRef.current([])
-      })
+        setSelectionBoundsRef.current(null)
+      }))
 
       // Double-click to edit text in SELECT mode
-      canvas.on("mouse:dblclick", (opt: TPointerEventInfo) => {
+      disposers.push(canvas.on("mouse:dblclick", (opt: TPointerEventInfo) => {
         if (opt.target) {
           const targetData = getObjData(opt.target)
           if (targetData?.type === "text" && opt.target instanceof IText) {
@@ -546,9 +557,14 @@ export function AnnotationCanvas({
             editingITextRef.current = itext
           }
         }
-      })
+      }))
 
-      canvas.on("object:modified", (e: { target: FabricObject }) => {
+      // Real-time drag position updates for selection bounds
+      disposers.push(canvas.on("object:moving", () => {
+        setSelectionBoundsRef.current(computeSelectionBoundsRef.current())
+      }))
+
+      disposers.push(canvas.on("object:modified", (e: { target: FabricObject }) => {
         const obj = e.target
         const data = getObjData(obj)
         if (!data?.id) return
@@ -564,7 +580,6 @@ export function AnnotationCanvas({
           // Find original annotation object to get its original points
           const origObj = objectsRef.current.find((o) => o.id === id)
           if (origObj && origObj.type === "freehand") {
-            const pathBounds = obj.getBoundingRect()
             // Calculate the delta in normalized space from original position
             // The path was created at the denormalized positions, so offset = current pos shift
             const dx = objLeft / b.visibleWidth
@@ -589,10 +604,12 @@ export function AnnotationCanvas({
             width: nw,
           } as Partial<TextObject>)
         }
-      })
+
+        setSelectionBoundsRef.current(computeSelectionBoundsRef.current())
+      }))
 
       // Register text editing:exited for SELECT mode too (for dblclick editing)
-      canvas.on("text:editing:exited", (opt: { target: IText }) => {
+      disposers.push(canvas.on("text:editing:exited", (opt: { target: IText }) => {
         const itext = opt.target
         const data = getObjData(itext)
         if (!data?.id) return
@@ -616,10 +633,15 @@ export function AnnotationCanvas({
 
         isNewTextRef.current = false
         editingITextRef.current = null
-      })
+      }))
     }
 
     canvas.requestRenderAll()
+
+    // Cleanup: dispose all event listeners registered in this effect
+    return () => {
+      disposers.forEach(d => d())
+    }
   }, [fabricCanvas, isReady, mode, color, penSize])
 
   // ---------------------------------------------------------------------------
@@ -667,12 +689,8 @@ export function AnnotationCanvas({
       isErasingRef.current = true
       erasedIdsRef.current.clear()
 
-      // Check immediate hits
-      const rect = canvasElRef.current?.getBoundingClientRect()
-      if (!rect) return
-      const px = e.clientX - rect.left
-      const py = e.clientY - rect.top
-      const pointer = new FabricPoint(px, py)
+      // Use getScenePoint to properly account for zoom/pan viewport transform
+      const pointer = canvas.getScenePoint(e.nativeEvent)
 
       canvas.getObjects().forEach((obj) => {
         const data = getObjData(obj)
@@ -692,11 +710,8 @@ export function AnnotationCanvas({
       if (mode !== AnnotationMode.ERASER || !isErasingRef.current || !fabricCanvas) return
       const canvas = fabricCanvas as Canvas
 
-      const rect = canvasElRef.current?.getBoundingClientRect()
-      if (!rect) return
-      const px = e.clientX - rect.left
-      const py = e.clientY - rect.top
-      const pointer = new FabricPoint(px, py)
+      // Use getScenePoint to properly account for zoom/pan viewport transform
+      const pointer = canvas.getScenePoint(e.nativeEvent)
 
       canvas.getObjects().forEach((obj) => {
         const data = getObjData(obj)
@@ -921,11 +936,13 @@ export function AnnotationCanvas({
   useEffect(() => {
     if (!drawingMode) {
       setSelectedIds([])
+      setSelectionBounds(null)
     }
-  }, [drawingMode, setSelectedIds])
+  }, [drawingMode, setSelectedIds, setSelectionBounds])
 
   useEffect(() => {
     setSelectedIds([])
+    setSelectionBounds(null)
     if (fabricCanvas) {
       const canvas = fabricCanvas as Canvas
       if (canvas.discardActiveObject) {
@@ -933,7 +950,7 @@ export function AnnotationCanvas({
         canvas.requestRenderAll()
       }
     }
-  }, [mode, setSelectedIds, fabricCanvas])
+  }, [mode, setSelectedIds, setSelectionBounds, fabricCanvas])
 
   // Reset eraser state when leaving eraser mode
   useEffect(() => {

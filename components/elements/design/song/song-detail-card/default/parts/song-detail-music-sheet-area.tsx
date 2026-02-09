@@ -98,7 +98,7 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId, musicSh
           )}
         </div>
 
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center min-h-0">
           <SingleSheetItem url={musicSheet.urls[0]} />
         </div>
       </div>
@@ -193,7 +193,7 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId, musicSh
       </div>
 
       {/* Music Sheet Carousel */}
-      <Carousel setApi={setApi} className="w-full max-w-full flex-1" opts={{ watchDrag: !isZoomed }}>
+      <Carousel setApi={setApi} className="w-full max-w-full flex-1 min-h-0" opts={{ watchDrag: !isZoomed }}>
         <CarouselContent>
           {musicSheet.urls.map((url: string, i: number) => (
             <CarouselItem key={i} className="flex justify-center items-center">
@@ -232,10 +232,10 @@ function SingleSheetItem({ url, index = 0, onZoomChange }: { url: string; index?
         onZoomChange?.(zoomed)
       }}
     >
-      <TransformComponent wrapperStyle={{ width: "100%" }} contentStyle={{ width: "100%" }}>
-        <div className="relative w-full">
+      <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }} contentStyle={{ width: "100%", height: "100%" }}>
+        <div className="relative w-full h-full">
           {!isLoaded && (
-            <div className="w-full aspect-[3/4] flex items-center justify-center">
+            <div className="w-full h-full flex items-center justify-center">
               <Skeleton className="w-full h-full rounded-lg" />
             </div>
           )}
@@ -246,10 +246,10 @@ function SingleSheetItem({ url, index = 0, onZoomChange }: { url: string; index?
             height={0}
             sizes="100vw"
             className={cn(
-              "w-full h-auto shadow-sm",
+              "max-w-full max-h-full w-auto h-auto shadow-sm object-contain",
               !isLoaded && "opacity-0 absolute inset-0"
             )}
-            style={{ width: "100%", height: "auto" }}
+            style={{ width: "auto", height: "auto", maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
             onLoad={() => setIsLoaded(true)}
           />
         </div>

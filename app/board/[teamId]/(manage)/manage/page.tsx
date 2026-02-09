@@ -140,8 +140,9 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
   }
 
   return (
-    <div className="flex flex-col w-full h-full bg-surface dark:bg-surface-dark overflow-y-auto">
-      <ContentContainer className="pt-2 pb-24">
+    <div className="flex flex-col min-h-full bg-surface dark:bg-surface-dark relative">
+      <div className="flex-1 overflow-y-auto">
+        <ContentContainer className="pt-2 pb-24">
 
         {/* Profile Section */}
         <TeamProfileCard
@@ -273,7 +274,8 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
           </p>
         </div>
 
-      </ContentContainer>
+        </ContentContainer>
+      </div>
     </div>
   )
 }

@@ -27,7 +27,16 @@ export function AnnotationEditor({ teamId }: Props) {
   const setIndexChangeEvent = useSetRecoilState(setlistIndexChangeEventAtom)
   const annotationMode = useRecoilValue(annotationModeAtom)
 
-  const [currentPageIndex, setCurrentPageIndex] = useState(0)
+  // Initialize currentPageIndex from editorTarget so the first render already
+  // shows the correct page (avoids a flash of page 0 → target page transition
+  // that causes async race conditions in image loading).
+  const [currentPageIndex, setCurrentPageIndex] = useState(() => {
+    if (editorTarget && flatPages.length > 0) {
+      const idx = flatPages.findIndex((p) => p.globalIndex === editorTarget.initialGlobalIndex)
+      return idx >= 0 ? idx : 0
+    }
+    return 0
+  })
   const [naturalDimensions, setNaturalDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 })
   const wrapperRef = useRef<HTMLDivElement>(null)
 
@@ -51,16 +60,20 @@ export function AnnotationEditor({ teamId }: Props) {
     }
   }, [editorTarget, flatPages])
 
-  // Probe image natural dimensions
+  // Probe image natural dimensions (with cleanup to prevent stale callbacks)
   useEffect(() => {
     const page = flatPages[currentPageIndex]
     if (!page?.url) return
+    let cancelled = false
     const img = new window.Image()
     img.crossOrigin = "anonymous"
     img.onload = () => {
-      setNaturalDimensions({ width: img.naturalWidth, height: img.naturalHeight })
+      if (!cancelled) {
+        setNaturalDimensions({ width: img.naturalWidth, height: img.naturalHeight })
+      }
     }
     img.src = page.url
+    return () => { cancelled = true }
   }, [currentPageIndex, flatPages])
 
   const handleClose = useCallback(() => {

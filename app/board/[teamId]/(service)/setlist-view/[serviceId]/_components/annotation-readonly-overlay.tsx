@@ -135,15 +135,18 @@ export function AnnotationReadonlyOverlay({
       className="absolute inset-0 z-20"
       style={{ pointerEvents: "none" }}
     >
-      <canvas
-        ref={canvasRef}
+      <div
         style={{
           position: "absolute",
           top: bounds.offsetTop,
           left: bounds.offsetLeft,
+          width: bounds.visibleWidth || 0,
+          height: bounds.visibleHeight || 0,
           pointerEvents: "none",
         }}
-      />
+      >
+        <canvas ref={canvasRef} />
+      </div>
     </div>
   )
 }

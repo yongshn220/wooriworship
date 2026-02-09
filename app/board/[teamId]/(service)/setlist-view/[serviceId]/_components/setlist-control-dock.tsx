@@ -113,11 +113,12 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
                             <div className="flex items-center gap-2">
                                 <Separator orientation="vertical" className="h-6 bg-border w-[1px] mx-1" />
 
-                                <SetlistControlItem
+                                {/* Temporarily disabled - Annotation mode */}
+                                {/* <SetlistControlItem
                                     icon={<Pencil className="w-5 h-5" />}
                                     variant="button"
                                     onClick={openEditor}
-                                />
+                                /> */}
 
                                 <SetlistControlItem
                                     icon={<FileText className="w-5 h-5" />}

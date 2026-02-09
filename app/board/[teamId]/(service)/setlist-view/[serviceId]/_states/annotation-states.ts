@@ -45,3 +45,13 @@ export const activeAnnotationCanvasAtom = atom<AnnotationCanvasCallbacks>({
   key: 'activeAnnotationCanvasAtom',
   default: null,
 })
+
+export const annotationSelectionBoundsAtom = atom<{
+  top: number
+  left: number
+  width: number
+  height: number
+} | null>({
+  key: 'annotationSelectionBoundsAtom',
+  default: null,
+})

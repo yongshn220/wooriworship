@@ -71,13 +71,13 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
         </div>
 
         {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto no-scrollbar bg-muted/30 relative">
+        <div className="flex-1 overflow-y-auto max-h-[calc(100dvh-140px)] no-scrollbar bg-muted/30 relative">
           <div className="max-w-content mx-auto">
             <SongErrorBoundary fallbackMessage="Failed to load song details. Please try again.">
               <Suspense fallback={<SongDetailSkeleton />}>
 
                 {/* Full Screen Sheet Area */}
-                <div className="w-full min-h-[calc(100dvh-70px)] flex flex-col pb-12">
+                <div className="w-full flex flex-col pb-12 overflow-hidden">
                 {selectedMusicSheetId && (
                   <SongDetailMusicSheetArea
                     teamId={teamId}

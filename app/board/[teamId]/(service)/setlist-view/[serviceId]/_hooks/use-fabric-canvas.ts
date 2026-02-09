@@ -45,7 +45,7 @@ function denormalize(
 /**
  * Normalize a canvas point to 0-1 space
  */
-function normalize(
+export function normalize(
   canvasPoint: { x: number; y: number },
   bounds: ImageBounds
 ): FreehandPoint {
@@ -184,11 +184,13 @@ export function useFabricCanvas({
 
   const fabricObjectMap = useRef<Map<string, FabricObject>>(new Map());
   const skipNextSync = useRef(false);
+  const initializedRef = useRef(false);
 
   // Initialize canvas on mount
   useEffect(() => {
     const canvasEl = canvasElRef.current;
     if (!canvasEl) return;
+    if (initializedRef.current) return; // Already initialized (StrictMode guard)
 
     const canvas = interactive
       ? new Canvas(canvasEl, {
@@ -203,6 +205,7 @@ export function useFabricCanvas({
           renderOnAddRemove: false,
         });
 
+    initializedRef.current = true;
     setFabricCanvas(canvas);
     setIsReady(true);
 
@@ -211,6 +214,7 @@ export function useFabricCanvas({
       canvas.dispose();
       setFabricCanvas(null);
       setIsReady(false);
+      initializedRef.current = false;
     };
   }, [canvasElRef, interactive]);
 
