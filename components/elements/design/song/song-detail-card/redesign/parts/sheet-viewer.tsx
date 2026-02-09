@@ -79,7 +79,7 @@ export function SheetViewer({
   return (
     <div className="relative w-full h-full flex flex-col bg-muted/20">
       {/* Always visible: Key Selector */}
-      <div className="absolute top-20 right-4 z-[110] pointer-events-auto">
+      <div className="absolute top-20 right-4 z-[200] pointer-events-auto">
         {hasMultipleKeys && onMusicSheetChange ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
