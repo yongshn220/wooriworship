@@ -85,7 +85,7 @@ export function SheetViewer({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="h-11 px-4 rounded-full bg-background/95 backdrop-blur-xl border border-border/50 shadow-toss flex items-center gap-2 hover:bg-background active:scale-95 transition-all"
+                className="h-11 px-4 rounded-full bg-white dark:bg-panel-dark border border-border/50 shadow-toss flex items-center gap-2 hover:bg-muted/50 active:scale-95 transition-all"
               >
                 <Music2 className="h-4 w-4 text-muted-foreground" />
                 <Suspense fallback={<span className="text-sm font-semibold">-</span>}>
@@ -112,7 +112,7 @@ export function SheetViewer({
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <div className="h-11 px-4 rounded-full bg-background/95 backdrop-blur-xl border border-border/50 shadow-toss flex items-center gap-2">
+          <div className="h-11 px-4 rounded-full bg-white dark:bg-panel-dark border border-border/50 shadow-toss flex items-center gap-2">
             <Music2 className="h-4 w-4 text-muted-foreground" />
             <Suspense fallback={<span className="text-sm font-semibold">-</span>}>
               <KeyLabel teamId={teamId} songId={songId} musicSheetId={musicSheetId} />

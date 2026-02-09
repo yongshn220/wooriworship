@@ -140,11 +140,11 @@ export function SongDetailRedesign({ teamId, isOpen, setIsOpen, songId, readOnly
         </AnimatePresence>
 
         {/* Main Content Area - Vertical Scroll */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden snap-y snap-mandatory scrollbar-hide">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide">
           <SongErrorBoundary fallbackMessage="Failed to load song details">
             <Suspense fallback={<SheetViewerSkeleton />}>
               {/* Sheet Viewer - Full Screen */}
-              <div className="h-[100dvh] snap-start snap-always">
+              <div className="h-[100dvh]">
                 {selectedMusicSheetId && (
                   <SheetViewer
                     teamId={teamId}
@@ -164,7 +164,7 @@ export function SongDetailRedesign({ teamId, isOpen, setIsOpen, songId, readOnly
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.3, delay: 0.1 }}
-                  className="h-[100dvh] snap-start snap-always bg-background overflow-y-auto"
+                  className="min-h-[100dvh] bg-background overflow-y-auto"
                 >
                   <div className="max-w-2xl mx-auto p-6 pb-safe-b">
                     <SongMetadata teamId={teamId} songId={songId} />
