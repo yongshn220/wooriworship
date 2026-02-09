@@ -15,6 +15,7 @@ import { songSearchInputAtom, searchSelectedTagsAtom, searchSelectedKeysAtom } f
 import { SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useScrollContainer } from "@/app/board/_contexts/scroll-container-context";
+import { ContentContainer } from "@/components/common/layout/content-container";
 
 export function SongList({ teamId }: Props) {
   const scrollContainerRef = useScrollContainer()
@@ -154,7 +155,7 @@ export function SongList({ teamId }: Props) {
   }
 
   return (
-    <div className="w-full h-full px-4 pt-2 pb-24 sm:pr-14 md:pr-16 relative max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto">
+    <ContentContainer className="w-full h-full pt-2 pb-24 sm:pr-14 md:pr-16 relative">
       <AlphabetIndexer teamId={teamId} onScrollRequest={handleScrollRequest} activeIndex={activeIndex} />
 
       {/* Active Filters */}
@@ -193,7 +194,7 @@ export function SongList({ teamId }: Props) {
           </div>
         </div>
       )}
-    </div>
+    </ContentContainer>
   )
 }
 

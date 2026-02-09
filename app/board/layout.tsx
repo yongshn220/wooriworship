@@ -3,6 +3,7 @@
 import { BoardAuthenticate } from "@/app/board/_components/auth/board-authenticate";
 import { BoardTopNavBar } from "@/app/board/_components/board-navigation/board-top-nav-bar/board-top-nav-bar";
 import { BoardBottomNavBar } from "@/app/board/_components/board-navigation/board-bottom-nav-bar/board-bottom-nav-bar";
+import { SideNavRail } from "@/components/elements/util/navigation/side-nav-rail";
 import { usePathname } from "next/navigation";
 import { useSetRecoilState } from "recoil";
 import { currentPageAtom } from "@/global-states/page-state";
@@ -107,12 +108,24 @@ export default function BoardLayout({ children }: { children: React.ReactNode })
             canPromptInstall={canPromptInstall}
             onInstall={handlePwaInstall}
           />
-          <div className="flex flex-col h-full">
-            <BoardTopNavBar />
-            <main ref={mainRef} className="flex-grow min-h-0 overflow-y-auto bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] overscroll-contain">
-              {children}
-            </main>
-            <BoardBottomNavBar />
+          <div className="flex h-full">
+            {/* Side nav - hidden on mobile/tablet, visible on desktop (lg+) */}
+            <aside className="hidden lg:flex">
+              <SideNavRail />
+            </aside>
+
+            {/* Main content area */}
+            <div className="flex flex-col flex-1 min-w-0">
+              <BoardTopNavBar />
+              <main ref={mainRef} className="flex-grow min-h-0 overflow-y-auto bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] overscroll-contain">
+                {children}
+              </main>
+
+              {/* Bottom nav - visible on mobile/tablet, hidden on desktop */}
+              <div className="lg:hidden">
+                <BoardBottomNavBar />
+              </div>
+            </div>
           </div>
         </ScrollContainerContext.Provider>
       </BoardAuthenticate>

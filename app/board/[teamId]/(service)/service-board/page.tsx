@@ -29,6 +29,7 @@ import { ServiceDataPrefetcher } from "./_components/service-data-prefetcher";
 import { useMyAssignments } from "@/hooks/use-my-assignments";
 import { MyAssignmentRole } from "@/models/services/MyAssignment";
 import { InlineCalendarView } from "./_components/inline-calendar-view";
+import { ContentContainer } from "@/components/common/layout/content-container";
 
 export default function ServingPage() {
     const teamId = useRecoilValue(currentTeamIdAtom);
@@ -272,7 +273,7 @@ export default function ServingPage() {
     return (
         <div className="flex flex-col h-full bg-surface dark:bg-surface-dark relative font-sans text-slate-800 dark:text-slate-100 overflow-hidden">
             <div className="flex-1 overflow-y-auto no-scrollbar pb-[env(safe-area-inset-bottom)]">
-                <main className="max-w-lg mx-auto px-4 pt-2 space-y-5 pb-24">
+                <ContentContainer className="pt-2 space-y-5 pb-24">
                     {filterMode === 'calendar' ? (
                         <InlineCalendarView
                             items={calendarItems}
@@ -310,7 +311,7 @@ export default function ServingPage() {
                             )}
                         </Suspense>
                     </div>
-                </main>
+                </ContentContainer>
             </div>
         </div>
     );

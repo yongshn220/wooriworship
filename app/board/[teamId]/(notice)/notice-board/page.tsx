@@ -4,6 +4,7 @@ import { NoticeHeaderList } from "@/app/board/[teamId]/(notice)/notice-board/_co
 import { Suspense, useEffect } from "react";
 import { NoticeListSkeleton } from "@/app/board/[teamId]/(notice)/notice-board/_components/notice-list-skeleton";
 import { TodoBoard } from "@/components/elements/design/todo";
+import { ContentContainer } from "@/components/common/layout/content-container";
 
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { noticeBoardTabAtom } from "@/app/board/_states/board-states";
@@ -30,16 +31,16 @@ export default function NoticePage({ params }: any) {
     <div className="flex flex-col min-h-full bg-surface dark:bg-surface-dark relative">
       {tab === "announcements" ? (
         <div className="flex-1">
-          <div className="max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto px-4 pt-2 space-y-5 pb-24">
+          <ContentContainer className="pt-2 space-y-5 pb-24">
             <Suspense fallback={<NoticeListSkeleton />}>
               <NoticeHeaderList teamId={teamId} />
             </Suspense>
-          </div>
+          </ContentContainer>
         </div>
       ) : (
-        <div className="flex-1 min-h-0 max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto w-full px-4">
+        <ContentContainer className="flex-1 min-h-0 w-full">
           <TodoBoard teamId={teamId} />
-        </div>
+        </ContentContainer>
       )}
     </div>
   );

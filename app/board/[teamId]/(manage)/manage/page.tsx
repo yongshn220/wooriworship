@@ -23,6 +23,7 @@ import { NotificationBlockedGuideDialog } from "@/components/elements/dialog/not
 import useLocalStorage from "@/components/util/hook/use-local-storage"
 import { userAtom, userUpdaterAtom } from "@/global-states/userState"
 import { EditNameDialog } from "@/app/board/[teamId]/(manage)/manage/_components/edit-name-dialog"
+import { ContentContainer } from "@/components/common/layout/content-container"
 
 export default function ManagePage({ params }: { params: { teamId: string } }) {
   const authUser = auth.currentUser
@@ -140,7 +141,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
 
   return (
     <div className="flex flex-col w-full h-full bg-surface dark:bg-surface-dark overflow-y-auto">
-      <div className="max-w-lg mx-auto w-full px-4 pt-2 pb-24">
+      <ContentContainer className="pt-2 pb-24">
 
         {/* Profile Section */}
         <TeamProfileCard
@@ -272,7 +273,7 @@ export default function ManagePage({ params }: { params: { teamId: string } }) {
           </p>
         </div>
 
-      </div>
+      </ContentContainer>
     </div>
   )
 }

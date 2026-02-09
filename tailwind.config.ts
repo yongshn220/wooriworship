@@ -110,6 +110,12 @@ const config = {
         'safe-l': 'env(safe-area-inset-left)',
         'safe-r': 'env(safe-area-inset-right)',
       },
+      maxWidth: {
+        'content': 'var(--content-max-width)',
+      },
+      width: {
+        'side-nav': 'var(--nav-width-side)',
+      },
     },
   },
   plugins: [

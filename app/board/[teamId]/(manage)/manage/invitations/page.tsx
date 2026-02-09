@@ -16,6 +16,7 @@ import { StatusCodes } from 'http-status-codes';
 import { UserPlusIcon, Mail, ChevronLeft } from "lucide-react";
 import { PendingMember } from "@/components/elements/dialog/manage-team/pending-member";
 import { useRouter } from "next/navigation";
+import { ContentContainer } from "@/components/common/layout/content-container";
 
 export default function InvitationsPage() {
     const router = useRouter();
@@ -91,7 +92,8 @@ export default function InvitationsPage() {
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-6">
+            <div className="flex-1 overflow-y-auto p-4">
+                <ContentContainer className="space-y-6">
 
                 {/* Invite Box */}
                 <div className="space-y-3">
@@ -145,6 +147,7 @@ export default function InvitationsPage() {
                         </div>
                     )}
                 </div>
+                </ContentContainer>
             </div>
         </div>
     );

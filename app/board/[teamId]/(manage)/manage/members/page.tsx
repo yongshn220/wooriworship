@@ -14,6 +14,7 @@ import { usersAtom } from "@/global-states/userState";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { fetchServingRolesSelector } from "@/global-states/serviceRolesState";
+import { ContentContainer } from "@/components/common/layout/content-container";
 
 export default function MembersPage() {
     const router = useRouter();
@@ -71,7 +72,8 @@ export default function MembersPage() {
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-6">
+            <div className="flex-1 overflow-y-auto p-4">
+                <ContentContainer className="space-y-6">
 
                 <div className="space-y-2">
                     <Label className="uppercase text-xs text-muted-foreground font-semibold tracking-wider pl-1">
@@ -94,6 +96,7 @@ export default function MembersPage() {
                         Tap on a member to manage their roles, permissions, or remove them from the team.
                     </p>
                 </div>
+                </ContentContainer>
             </div>
 
             {/* Drawer */}
