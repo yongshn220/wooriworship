@@ -1,7 +1,7 @@
 "use client"
 
 import {Suspense} from "react";
-import {SongDetailDialog} from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
+import {SongDetailRedesign} from "@/components/elements/design/song/song-detail-card/redesign/song-detail-redesign";
 import {useDialogState} from "@/components/common/hooks/use-dialog-state";
 
 interface Props {
@@ -17,7 +17,7 @@ export function SongDetailDialogTrigger({teamId, songId, children}: Props) {
       {/* P1-6: Only mount dialog when open to prevent unnecessary Recoil evaluations */}
       {dialog.isOpen && (
         <Suspense fallback={<></>}>
-          <SongDetailDialog teamId={teamId} isOpen={dialog.isOpen} setIsOpen={dialog.setIsOpen} songId={songId} readOnly={false}/>
+          <SongDetailRedesign teamId={teamId} isOpen={dialog.isOpen} setIsOpen={dialog.setIsOpen} songId={songId} readOnly={false}/>
         </Suspense>
       )}
       {/* P1-5: Use button for keyboard accessibility (Enter/Space opens dialog, focusable, screen reader support) */}
