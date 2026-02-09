@@ -12,7 +12,11 @@ import { currentPageAtom } from "@/global-states/page-state";
 import { Page } from "@/components/constants/enums";
 import type { TabKey } from "./_components/notice-board-header";
 
-export default function NoticePage({ params }: any) {
+interface PageProps {
+  params: { teamId: string };
+}
+
+export default function NoticePage({ params }: PageProps) {
   const teamId = params.teamId;
   const [tab, setTab] = useRecoilState(noticeBoardTabAtom);
   const setCurrentPage = useSetRecoilState(currentPageAtom);

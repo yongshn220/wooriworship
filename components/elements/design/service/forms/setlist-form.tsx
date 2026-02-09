@@ -104,12 +104,12 @@ export function SetlistForm({ teamId, serviceId, initialSetlist, serviceDate, on
                         <SortableList items={songs} onReorder={setSongs}>
                             {songs.map((songHeader, i) => (
                                 <SortableSetlistSongItem
-                                    key={songHeader.id || i}
+                                    key={`${songHeader.id}-${i}`}
                                     item={songHeader}
                                     teamId={teamId}
                                     index={i}
-                                    onUpdate={(updated) => setSongs(prev => prev.map(s => s.id === updated.id ? updated : s))}
-                                    onRemove={() => setSongs(prev => prev.filter(s => s.id !== songHeader.id))}
+                                    onUpdate={(updated) => setSongs(prev => prev.map((s, idx) => idx === i ? updated : s))}
+                                    onRemove={() => setSongs(prev => prev.filter((_, idx) => idx !== i))}
                                 />
                             ))}
                         </SortableList>

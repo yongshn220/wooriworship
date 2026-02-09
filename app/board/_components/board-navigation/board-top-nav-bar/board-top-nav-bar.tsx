@@ -1,6 +1,7 @@
 import { Page } from "@/components/constants/enums";
 import { cn } from "@/lib/utils";
 import { SearchIcon, MenuIcon, XIcon, ArrowLeftIcon, ListFilter } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { SearchInput } from "@/app/board/_components/board-navigation/board-top-nav-bar/search-input";
@@ -30,7 +31,7 @@ interface HeaderConfig {
 
 interface ActionButtonProps {
   onClick: () => void;
-  icon: any;
+  icon: LucideIcon;
 }
 
 const ActionButton = ({ onClick, icon: Icon }: ActionButtonProps) => (
@@ -120,8 +121,8 @@ export function BoardTopNavBar() {
   if (!currentConfig) return <></>;
 
   return (
-    <BaseTopNavBar height={64} className="bg-transparent border-b md:border-none border-border z-10 transition-all duration-300 overflow-visible">
-      <div className="w-full h-full max-w-7xl mx-auto px-4 md:px-8 relative flex items-center static-shell">
+    <BaseTopNavBar height={64} className="bg-transparent border-b border-zinc-200 dark:border-zinc-800 z-10 transition-all duration-300 overflow-visible">
+      <div className="w-full h-full max-w-content mx-auto px-[var(--content-padding-x)] relative flex items-center static-shell">
         <AnimatePresence mode="wait">
           {isSearchOpen && currentConfig.searchComponent ? (
             <motion.div

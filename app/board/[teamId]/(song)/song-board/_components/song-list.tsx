@@ -16,6 +16,7 @@ import { SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useScrollContainer } from "@/app/board/_contexts/scroll-container-context";
 import { ContentContainer } from "@/components/common/layout/content-container";
+import { Card } from "@/components/ui/card";
 
 export function SongList({ teamId }: Props) {
   const scrollContainerRef = useScrollContainer()
@@ -172,7 +173,7 @@ export function SongList({ teamId }: Props) {
         </div>
       )}
 
-      <div className="flex flex-col divide-y divide-border" data-testid="song-list">
+      <Card className="overflow-hidden shadow-sm divide-y divide-border" data-testid="song-list">
         {
           visibleSongIds.map((songId, index) => (
             <div key={songId} id={`song-row-${index}`}>
@@ -182,7 +183,7 @@ export function SongList({ teamId }: Props) {
             </div>
           ))
         }
-      </div>
+      </Card>
 
       {/* Load More Trigger */}
       {visibleSongIds.length < songIds.length && (

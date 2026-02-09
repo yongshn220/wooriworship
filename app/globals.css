@@ -171,16 +171,9 @@ a {
 
   @media (min-width: 768px) {
     :root {
-      --content-max-width: 42rem;    /* 672px - tablet */
-      --content-padding-x: 1.5rem;   /* 24px */
-    }
-  }
-
-  @media (min-width: 1024px) {
-    :root {
       --content-max-width: 56rem;    /* 896px - desktop */
       --content-padding-x: 2rem;     /* 32px */
-      --nav-width-side: 240px;       /* Sidebar width for desktop */
+      --nav-width-side: 72px;        /* Sidebar width for desktop */
     }
   }
 }

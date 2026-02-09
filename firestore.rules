@@ -18,6 +18,12 @@ service cloud.firestore {
         && name.size() <= 50;
     }
 
+    function isFieldBeingChanged(fieldName) {
+      return fieldName in request.resource.data
+        && fieldName in resource.data
+        && request.resource.data[fieldName] != resource.data[fieldName];
+    }
+
     // Users Collection
     match /users/{userId} {
       // Anyone authenticated can read user profiles
@@ -29,14 +35,12 @@ service cloud.firestore {
         && (!('name' in request.resource.data) || isValidName(request.resource.data.name));
 
       allow update: if isOwner(userId)
-        // Prevent client-side modification of email_verified field
-        && (!('email_verified' in request.resource.data)
-            || request.resource.data.email_verified == resource.data.email_verified)
+        // Prevent client from CHANGING email_verified (allow if unchanged or field doesn't exist in old doc)
+        && !isFieldBeingChanged('email_verified')
         // Validate name field if present
         && (!('name' in request.resource.data) || isValidName(request.resource.data.name))
-        // Prevent email changes (Firebase Auth manages this)
-        && (!('email' in request.resource.data)
-            || request.resource.data.email == resource.data.email);
+        // Prevent client from CHANGING email (Firebase Auth manages this)
+        && !isFieldBeingChanged('email');
 
       allow delete: if isOwner(userId);
 

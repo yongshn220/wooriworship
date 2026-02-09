@@ -22,7 +22,7 @@ export function SongCard({ teamId, songId, index }: Props) {
 
     return (
         <div
-            className="relative transition-all duration-200 group min-h-[80px] bg-panel dark:bg-panel-dark hover:bg-muted/50 active:bg-muted/80 active:scale-[0.99]"
+            className="relative transition-all duration-200 group min-h-[80px] bg-card hover:bg-muted/50 active:bg-muted/80 active:scale-[0.99]"
             data-testid="song-item"
         >
             <SongDetailDialogTrigger teamId={teamId} songId={songId}>

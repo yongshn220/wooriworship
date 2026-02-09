@@ -242,12 +242,23 @@ export default class BaseApi {
 
   async update(id: string, data: any) {
     try {
+      if (process.env.NODE_ENV === 'development') {
+        console.debug(`[BaseApi] Updating ${this.collectionName}/${id}`);
+        console.debug(`[BaseApi] Fields being updated:`, Object.keys(data));
+        console.debug(`[BaseApi] Full data:`, data);
+      }
+
       const docRef = doc(this.db, this.collectionName, id);
       await setDoc(docRef, data, { merge: true });
       return true
     }
     catch (e) {
-      console.error(e)
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`[BaseApi] ❌ Failed to update ${this.collectionName}/${id}`);
+        console.error(`[BaseApi] Error:`, e);
+        console.error(`[BaseApi] Attempted data:`, data);
+        console.error(`[BaseApi] Document path: ${this.collectionName}/${id}`);
+      }
       return false
     }
   }

@@ -249,7 +249,7 @@ export function AnnotationCanvas({
       canvas.backgroundImage = img
       canvas.requestRenderAll()
     })
-  }, [fabricCanvas, isReady, imageUrl])
+  }, [fabricCanvas, isReady, imageUrl, bounds.visibleWidth, bounds.visibleHeight])
 
   // ---------------------------------------------------------------------------
   // Mode-specific setup
@@ -316,15 +316,17 @@ export function AnnotationCanvas({
               ? Math.max(penSizeRef.current * 3, 12)
               : penSizeRef.current,
           opacity:
-            modeRef.current === AnnotationMode.HIGHLIGHTER ? 0.3 : undefined,
+            modeRef.current === AnnotationMode.HIGHLIGHTER ? 0.3 : 1,
           timestamp: Date.now(),
         }
 
+        // Register the Fabric-created path in our tracking map so it stays on canvas.
+        // This avoids the remove+skip pattern that caused drawings to disappear.
+        setObjData(createdPath, { id: freehandObj.id, type: "freehand", opacity: freehandObj.opacity })
+        fabricObjectMapRef.current.current.set(freehandObj.id, createdPath)
+
         skipNextSyncRef.current.current = true
         addObjectRef.current(freehandObj)
-
-        // Remove the auto-created path; reconciliation will create ours
-        canvas.remove(createdPath)
       })
     }
 
@@ -992,17 +994,24 @@ export function AnnotationCanvas({
         handleEraserPointerUp()
       }}
     >
-      <canvas
-        ref={canvasElRef}
+      {/* Wrapper div positions the canvas area; Fabric v7 wraps the <canvas> in its
+          own container with upper/lower canvases. Positioning the wrapper instead of
+          the <canvas> directly avoids Fabric overriding our styles and creating a
+          ~200px offset between pointer events (upper canvas) and rendering (lower canvas). */}
+      <div
         style={{
           position: "absolute",
           top: bounds.offsetTop,
           left: bounds.offsetLeft,
+          width: bounds.visibleWidth || 0,
+          height: bounds.visibleHeight || 0,
           pointerEvents: isInteractive && !shouldPassthrough ? "auto" : "none",
           touchAction: isInteractive ? "none" : "auto",
           cursor: cursorStyle,
         }}
-      />
+      >
+        <canvas ref={canvasElRef} />
+      </div>
       {showCancelFlash && (
         <div
           className="absolute inset-0 bg-red-500/10 pointer-events-none z-30 animate-pulse"

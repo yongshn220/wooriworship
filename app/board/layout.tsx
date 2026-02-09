@@ -5,7 +5,7 @@ import { BoardTopNavBar } from "@/app/board/_components/board-navigation/board-t
 import { BoardBottomNavBar } from "@/app/board/_components/board-navigation/board-bottom-nav-bar/board-bottom-nav-bar";
 import { SideNavRail } from "@/components/elements/util/navigation/side-nav-rail";
 import { usePathname } from "next/navigation";
-import { useSetRecoilState } from "recoil";
+import { useSetRecoilState, useRecoilValue } from "recoil";
 import { currentPageAtom } from "@/global-states/page-state";
 import { useEffect, useState, useRef } from "react";
 import { Page } from "@/components/constants/enums";
@@ -23,6 +23,7 @@ import { ScrollContainerContext } from "@/app/board/_contexts/scroll-container-c
 
 export default function BoardLayout({ children }: { children: React.ReactNode }) {
   const setPage = useSetRecoilState(currentPageAtom)
+  const currentPage = useRecoilValue(currentPageAtom)
   const pathname = usePathname()
   const { permission } = useNotificationPermission()
   const [notificationPromptStorage, setNotificationPromptStorage] = useLocalStorage('notification_prompt_dismissed', false)
@@ -109,10 +110,12 @@ export default function BoardLayout({ children }: { children: React.ReactNode })
             onInstall={handlePwaInstall}
           />
           <div className="flex h-full">
-            {/* Side nav - hidden on mobile/tablet, visible on desktop (lg+) */}
-            <aside className="hidden lg:flex">
-              <SideNavRail />
-            </aside>
+            {/* Side nav - hidden on mobile/tablet/setlist-view, visible on desktop */}
+            {currentPage !== Page.SETLIST_VIEW && (
+              <aside className="hidden md:flex">
+                <SideNavRail />
+              </aside>
+            )}
 
             {/* Main content area */}
             <div className="flex flex-col flex-1 min-w-0">
@@ -122,7 +125,7 @@ export default function BoardLayout({ children }: { children: React.ReactNode })
               </main>
 
               {/* Bottom nav - visible on mobile/tablet, hidden on desktop */}
-              <div className="lg:hidden">
+              <div className="md:hidden">
                 <BoardBottomNavBar />
               </div>
             </div>

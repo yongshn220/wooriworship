@@ -47,7 +47,7 @@ export function SongDetailDialog({ teamId, isOpen, setIsOpen, songId, readOnly =
 
           {/* Left: Close Button */}
           <div className="relative z-10 flex items-center justify-start w-[80px]">
-            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="-ml-2 hover:bg-muted/50">
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="-ml-2 hover:bg-muted/50" aria-label="Close dialog">
               <X className="h-6 w-6 text-muted-foreground" />
             </Button>
           </div>

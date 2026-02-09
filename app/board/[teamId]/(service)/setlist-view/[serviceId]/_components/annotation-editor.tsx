@@ -55,7 +55,6 @@ export function AnnotationEditor({ teamId }: Props) {
   useEffect(() => {
     const page = flatPages[currentPageIndex]
     if (!page?.url) return
-    setNaturalDimensions({ width: 0, height: 0 })
     const img = new window.Image()
     img.crossOrigin = "anonymous"
     img.onload = () => {

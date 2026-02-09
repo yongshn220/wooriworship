@@ -291,25 +291,15 @@ export function useFabricCanvas({
       }
     }
 
-    // Reorder z-index to match array order
-    const canvasObjects = fabricCanvas.getObjects();
+    // Reorder z-index to match array order using moveTo (no remove/re-add)
     const orderedIds = objects.map((obj) => obj.id);
-
-    // Sort canvas objects by their index in orderedIds
-    const sortedObjects = canvasObjects
-      .map((fabricObj) => {
-        const data = (fabricObj as unknown as Record<string, unknown>).data as { id: string; type: string } | undefined;
-        const id = data?.id;
-        const index = id ? orderedIds.indexOf(id) : -1;
-        return { fabricObj, index };
-      })
-      .filter(({ index }) => index >= 0)
-      .sort((a, b) => a.index - b.index)
-      .map(({ fabricObj }) => fabricObj);
-
-    // Clear and re-add in correct order
-    fabricCanvas.remove(...canvasObjects);
-    fabricCanvas.add(...sortedObjects);
+    for (let targetIdx = 0; targetIdx < orderedIds.length; targetIdx++) {
+      const fabricObj = fabricObjectMap.current.get(orderedIds[targetIdx]);
+      if (fabricObj) {
+        // moveTo sets the object's z-index position on the canvas
+        fabricCanvas.moveObjectTo(fabricObj, targetIdx);
+      }
+    }
 
     fabricCanvas.requestRenderAll();
   }, [fabricCanvas, objects, bounds, isReady]);

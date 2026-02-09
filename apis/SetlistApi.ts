@@ -1,5 +1,5 @@
 import { db } from "@/firebase";
-import { doc, getDoc, setDoc, deleteDoc, Timestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import { ServiceSetlist } from "@/models/services/ServiceEvent";
 import { Song } from "@/models/song";
 import SongApi from "./SongApi";
@@ -93,7 +93,7 @@ export class SetlistApi {
             await setDoc(ref, {
                 ...cleanData,
                 id: 'main',
-                updated_at: Timestamp.now()
+                updated_at: serverTimestamp()
             }, { merge: true });
         } catch (e) {
             console.error("SetlistApi.updateSetlist:", e);

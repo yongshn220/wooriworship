@@ -171,7 +171,7 @@ export function AddedSongHeaderStatic({ teamId, specialOrderType, songHeader, on
           </label>
         </div>
 
-        <div className="flex-end text-smnpx shadcn-ui@latest add dropdown-menu">
+        <div className="flex-end text-sm">
           <div className="text-gray-500 hover:text-gray-700 cursor-pointer text-sm" onClick={() => handleRemoveSong()}>remove</div>
         </div>
       </div>

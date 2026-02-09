@@ -77,7 +77,7 @@ export default function ServingPage() {
                 originalData: e
             };
         });
-    }, [events, team]);
+    }, [events, serviceTags]);
 
     // Navigation Hook
     const { navigateNext, navigatePrev } = useCalendarNavigation(

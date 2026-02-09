@@ -37,7 +37,9 @@ class SheetAnnotationApi {
   async saveAnnotation(teamId: string, songId: string, sheetId: string, pageIndex: number, userId: string, data: Partial<SheetAnnotation>): Promise<void> {
     try {
       const ref = this.getDocRef(teamId, songId, sheetId, pageIndex, userId)
-      await setDoc(ref, { ...data, updated_at: getFirebaseTimestampNow() }, { merge: true })
+      // Deep-clean undefined values that Firestore rejects
+      const cleanData = JSON.parse(JSON.stringify(data))
+      await setDoc(ref, { ...cleanData, updated_at: getFirebaseTimestampNow() }, { merge: true })
     } catch (e) {
       console.error("DEBUG_ERROR:", e)
       throw e

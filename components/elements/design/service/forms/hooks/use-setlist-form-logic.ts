@@ -47,13 +47,13 @@ export function useSetlistFormLogic({ teamId, serviceId, initialSetlist, service
     // --- Handlers ---
 
     const handleSave = async () => {
-        setIsLoading(true);
         if (!auth.currentUser) return;
+        setIsLoading(true);
         try {
             await SetlistApi.updateSetlist(teamId, serviceId, {
                 songs: songs,
-                beginning_song: beginningSong || undefined,
-                ending_song: endingSong || undefined,
+                beginning_song: beginningSong ?? null,
+                ending_song: endingSong ?? null,
                 description: basicInfo.description,
                 link: basicInfo.link
             });

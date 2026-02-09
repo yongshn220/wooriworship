@@ -67,14 +67,14 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId, musicSh
           {hasMultipleKeys && onMusicSheetChange ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="h-10 px-4 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center gap-2 hover:bg-background active:scale-95 transition-all">
+                <button type="button" className="h-10 px-4 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center gap-2 hover:bg-background active:scale-95 transition-all">
                   <Suspense fallback={<span className="text-sm font-semibold">-</span>}>
                     <KeyLabel teamId={teamId} songId={songId} musicSheetId={musicSheetId} />
                   </Suspense>
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-1200">
+              <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-[1200]">
                 <Suspense fallback={<div className="p-2 text-sm text-muted-foreground">Loading keys...</div>}>
                   {musicSheetIds?.map((id) => (
                     <KeyDropdownItem
@@ -117,6 +117,7 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId, musicSh
         <div className="flex items-center gap-2">
           {/* Previous Page Button */}
           <button
+            type="button"
             onClick={() => api?.scrollPrev()}
             disabled={current === 1}
             className={cn(
@@ -139,6 +140,7 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId, musicSh
 
           {/* Next Page Button */}
           <button
+            type="button"
             onClick={() => api?.scrollNext()}
             disabled={current === count}
             className={cn(
@@ -158,14 +160,14 @@ export function SongDetailMusicSheetArea({ teamId, songId, musicSheetId, musicSh
           {hasMultipleKeys && onMusicSheetChange ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="h-10 px-4 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center gap-2 hover:bg-background active:scale-95 transition-all">
+                <button type="button" className="h-10 px-4 rounded-full bg-background/90 backdrop-blur-md border border-border shadow-lg flex items-center gap-2 hover:bg-background active:scale-95 transition-all">
                   <Suspense fallback={<span className="text-sm font-semibold">-</span>}>
                     <KeyLabel teamId={teamId} songId={songId} musicSheetId={musicSheetId} />
                   </Suspense>
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-1200">
+              <DropdownMenuContent align="end" className="w-48 max-h-[50vh] overflow-y-auto z-[1200]">
                 <Suspense fallback={<div className="p-2 text-sm text-muted-foreground">Loading keys...</div>}>
                   {musicSheetIds?.map((id) => (
                     <KeyDropdownItem

@@ -563,10 +563,10 @@ export function AnnotationToolbar({
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <button
-              disabled={!activeCanvas?.canClear}
+              disabled={!activeCanvas || !activeCanvas.canClear}
               className={cn(
                 "p-2 rounded-lg transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center",
-                activeCanvas?.canClear
+                (activeCanvas && activeCanvas.canClear)
                   ? "text-red-500 hover:bg-red-500/10"
                   : "text-foreground/20 cursor-default"
               )}
