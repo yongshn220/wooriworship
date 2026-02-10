@@ -6,30 +6,26 @@ import { Carousel, type CarouselApi, CarouselContent, } from "@/components/ui/ca
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { setlistAtom } from "@/global-states/setlist-state";
 import { SetlistSongHeader } from "@/models/setlist";
-import { setlistIndexAtom, setlistIndexChangeEventAtom, setlistNoteAtom, setlistMultipleSheetsViewModeAtom } from "../_states/setlist-view-states";
+import { setlistIndexAtom, setlistIndexChangeEventAtom, setlistNoteAtom, setlistMultipleSheetsViewModeAtom, setlistFlatPagesSelector } from "../_states/setlist-view-states";
 import { annotationDrawingModeAtom } from "../_states/annotation-states";
-import { SetlistLiveCarouselItemWrapper } from "./setlist-live-carousel-item";
+import { SetlistLiveCarouselItem } from "./setlist-live-carousel-item";
 
 interface Props {
     teamId: string
     serviceId: string
+    initialPage: number
 }
 
-export interface MusicSheetCounts {
-    id: string,
-    count: number,
-    note?: string
-}
-
-export function SetlistLiveCarousel({ teamId, serviceId }: Props) {
+export function SetlistLiveCarousel({ teamId, serviceId, initialPage }: Props) {
     const setlist = useRecoilValue(setlistAtom({ teamId, setlistId: serviceId }))
     const setSetlistIndex = useSetRecoilState(setlistIndexAtom)
     const setSetlistNote = useSetRecoilState(setlistNoteAtom)
     const setlistIndexChangeEvent = useRecoilValue(setlistIndexChangeEventAtom)
-    const [musicSheetCounts, setMusicSheetCounts] = useState<Array<MusicSheetCounts>>([])
+    const flatPages = useRecoilValue(setlistFlatPagesSelector({ teamId, serviceId }))
     const [api, setApi] = useState<CarouselApi>()
     const drawingMode = useRecoilValue(annotationDrawingModeAtom)
-    const carouselOptions = useMemo(() => ({ align: "start" as const, watchDrag: !drawingMode }), [drawingMode])
+    const [startIndex] = useState(initialPage)
+    const carouselOptions = useMemo(() => ({ align: "start" as const, watchDrag: !drawingMode, startIndex }), [drawingMode, startIndex])
 
     const aggregatedSongHeaders = useMemo(() => {
         const headers: Array<SetlistSongHeader> = []
@@ -45,15 +41,11 @@ export function SetlistLiveCarousel({ teamId, serviceId }: Props) {
         return headers
     }, [setlist?.beginning_song, setlist?.ending_song, setlist?.songs])
 
-    const sortedMusicSheetCounts = useMemo(() => {
-        return aggregatedSongHeaders.map(header =>
-            musicSheetCounts.find(c => c.id === header.id)
-        ).filter((item): item is MusicSheetCounts => !!item)
-    }, [aggregatedSongHeaders, musicSheetCounts])
+    const initialTimestampRef = React.useRef(setlistIndexChangeEvent.timestamp)
 
     useEffect(() => {
-        if (api) {
-            api.scrollTo(setlistIndexChangeEvent);
+        if (api && setlistIndexChangeEvent.timestamp !== initialTimestampRef.current) {
+            api.scrollTo(setlistIndexChangeEvent.page);
         }
     }, [api, setlistIndexChangeEvent]);
 
@@ -64,17 +56,12 @@ export function SetlistLiveCarousel({ teamId, serviceId }: Props) {
             const currentIndex = api.selectedScrollSnap()
             setSetlistIndex((prev) => ({ ...prev, current: currentIndex }))
 
-            let accumulatedCount = 0
-            let foundNote = ""
-
-            for (const item of sortedMusicSheetCounts) {
-                if (currentIndex < accumulatedCount + item.count) {
-                    foundNote = item.note || ""
-                    break
-                }
-                accumulatedCount += item.count
+            // Find note for current page using flatPages and aggregatedSongHeaders
+            const currentPage = flatPages[currentIndex]
+            if (currentPage) {
+                const songHeader = aggregatedSongHeaders.find(h => h.id === currentPage.songId)
+                setSetlistNote(songHeader?.note || "")
             }
-            setSetlistNote(foundNote)
         }
 
         api.on("select", handleSelect)
@@ -83,11 +70,17 @@ export function SetlistLiveCarousel({ teamId, serviceId }: Props) {
         return () => {
             api.off("select", handleSelect)
         }
-    }, [sortedMusicSheetCounts, setSetlistIndex, setSetlistNote, api])
+    }, [flatPages, aggregatedSongHeaders, setSetlistIndex, setSetlistNote, api])
 
     const multipleSheetsViewMode = useRecoilValue(setlistMultipleSheetsViewModeAtom)
 
+    const prevViewModeRef = React.useRef(multipleSheetsViewMode)
+
     useEffect(() => {
+        // Only reset when view mode actually changes, not on initial mount or api init
+        if (prevViewModeRef.current === multipleSheetsViewMode) return
+        prevViewModeRef.current = multipleSheetsViewMode
+
         setSetlistIndex((prev) => ({ ...prev, current: 0 }))
         if (api) {
             api.scrollTo(0, true)
@@ -95,30 +88,24 @@ export function SetlistLiveCarousel({ teamId, serviceId }: Props) {
     }, [multipleSheetsViewMode, setSetlistIndex, api])
 
     useEffect(() => {
-        let totalCounts = 0
-        sortedMusicSheetCounts.forEach((count) => {
-            totalCounts += count?.count
-        })
-        setSetlistIndex((prev) => ({ ...prev, total: totalCounts }))
-    }, [sortedMusicSheetCounts, setSetlistIndex]);
+        setSetlistIndex((prev) => ({ ...prev, total: flatPages.length }))
+    }, [flatPages.length, setSetlistIndex])
 
     return (
         <div id="song-carousel" className="w-full h-full">
             <Carousel opts={carouselOptions} setApi={setApi} className="w-full h-full">
                 <CarouselContent className="h-full">
-                    {
-                        (() => {
-                            let cumulativeIndex = 0
-                            return aggregatedSongHeaders?.map((songHeader, index) => {
-                                const startIndex = cumulativeIndex
-                                const countEntry = sortedMusicSheetCounts.find(c => c.id === songHeader.id)
-                                cumulativeIndex += countEntry?.count || 0
-                                return (
-                                    <SetlistLiveCarouselItemWrapper key={index} teamId={teamId} songHeader={songHeader} setMusicSheetCounts={setMusicSheetCounts} globalStartIndex={startIndex} />
-                                )
-                            })
-                        })()
-                    }
+                    {flatPages.map((page) => (
+                        <SetlistLiveCarouselItem
+                            key={page.globalIndex}
+                            globalIndex={page.globalIndex}
+                            urls={[page.url]}
+                            teamId={page.teamId}
+                            songId={page.songId}
+                            sheetId={page.sheetId}
+                            pageIndex={page.pageIndex}
+                        />
+                    ))}
                 </CarouselContent>
             </Carousel>
         </div>

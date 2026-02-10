@@ -95,7 +95,12 @@ export function AnnotationCanvas({
   imageUrl,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const canvasElRef = useRef<HTMLCanvasElement>(null)
+  const canvasElRef = useRef<HTMLCanvasElement | null>(null)
+  const [canvasEl, setCanvasEl] = useState<HTMLCanvasElement | null>(null)
+  const canvasRefCallback = useCallback((node: HTMLCanvasElement | null) => {
+    canvasElRef.current = node
+    setCanvasEl(node)
+  }, [])
 
   // Recoil state
   const drawingMode = useRecoilValue(annotationDrawingModeAtom)
@@ -132,8 +137,7 @@ export function AnnotationCanvas({
 
   // Fabric canvas lifecycle
   const { fabricCanvas, fabricObjectMap, skipNextSync, isReady } = useFabricCanvas({
-    canvasElRef,
-    containerRef,
+    canvasEl,
     objects,
     bounds,
     interactive: isInteractive,
@@ -1027,7 +1031,7 @@ export function AnnotationCanvas({
           cursor: cursorStyle,
         }}
       >
-        <canvas ref={canvasElRef} />
+        <canvas ref={canvasRefCallback} />
       </div>
       {showCancelFlash && (
         <div

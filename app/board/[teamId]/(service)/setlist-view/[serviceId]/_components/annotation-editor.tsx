@@ -6,43 +6,53 @@ import {
   annotationDrawingModeAtom,
   annotationModeAtom,
   annotationEditorTargetAtom,
+  AnnotationEditorTarget,
 } from "../_states/annotation-states"
-import { setlistFlatPagesAtom, setlistIndexChangeEventAtom } from "../_states/setlist-view-states"
+import { musicSheetAtom } from "@/global-states/music-sheet-state"
 import { AnnotationToolbar } from "./annotation-toolbar"
 import { AnnotationObjectMenu } from "./annotation-object-menu"
 import { AnnotationMode } from "@/models/sheet_annotation"
 import { clearUndoStackCache } from "../_hooks/use-annotation"
+import { useEdgeSwipe } from "../_hooks/use-edge-swipe"
+import { useNaturalDimensions } from "../_hooks/use-natural-dimensions"
+import { toast } from "@/components/ui/use-toast"
 import dynamic from "next/dynamic"
 const AnnotationCanvas = dynamic(() => import("./annotation-canvas").then(mod => mod.AnnotationCanvas), { ssr: false })
 
+// Props are kept for API compatibility but no longer used internally.
+// The component now gets all info from annotationEditorTargetAtom.
 interface Props {
   teamId: string
+  serviceId: string
 }
 
-export function AnnotationEditor({ teamId }: Props) {
-  const flatPages = useRecoilValue(setlistFlatPagesAtom)
+export function AnnotationEditor({ }: Props) {
   const editorTarget = useRecoilValue(annotationEditorTargetAtom)
   const setEditorTarget = useSetRecoilState(annotationEditorTargetAtom)
   const setDrawingMode = useSetRecoilState(annotationDrawingModeAtom)
-  const setIndexChangeEvent = useSetRecoilState(setlistIndexChangeEventAtom)
   const annotationMode = useRecoilValue(annotationModeAtom)
 
-  // Initialize currentPageIndex from editorTarget so the first render already
-  // shows the correct page (avoids a flash of page 0 → target page transition
-  // that causes async race conditions in image loading).
-  const [currentPageIndex, setCurrentPageIndex] = useState(() => {
-    if (editorTarget && flatPages.length > 0) {
-      const idx = flatPages.findIndex((p) => p.globalIndex === editorTarget.initialGlobalIndex)
-      return idx >= 0 ? idx : 0
-    }
-    return 0
-  })
-  const [naturalDimensions, setNaturalDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 })
+  // Current page state - initialized from editorTarget
+  const [currentPage, setCurrentPage] = useState<AnnotationEditorTarget | null>(editorTarget)
   const wrapperRef = useRef<HTMLDivElement>(null)
 
-  // Edge-swipe navigation state
-  const swipeStartRef = useRef<{ x: number; y: number; time: number } | null>(null)
-  const isEdgeSwipeRef = useRef(false)
+  // Get the current music sheet
+  const currentSheet = useRecoilValue(musicSheetAtom({
+    teamId: currentPage?.teamId || "",
+    songId: currentPage?.songId || "",
+    sheetId: currentPage?.sheetId || ""
+  }))
+
+  // Compute current image URL and probe natural dimensions
+  const currentImageUrl = currentSheet?.urls?.[currentPage?.pageIndex ?? 0]
+  const naturalDimensions = useNaturalDimensions(currentPage ? currentImageUrl : undefined)
+
+  // Sync currentPage when editorTarget changes
+  useEffect(() => {
+    if (editorTarget) {
+      setCurrentPage(editorTarget)
+    }
+  }, [editorTarget])
 
   // Set drawing mode on mount/unmount
   useEffect(() => {
@@ -52,121 +62,42 @@ export function AnnotationEditor({ teamId }: Props) {
     }
   }, [setDrawingMode])
 
-  // Sync initial page index from editor target
-  useEffect(() => {
-    if (editorTarget && flatPages.length > 0) {
-      const idx = flatPages.findIndex((p) => p.globalIndex === editorTarget.initialGlobalIndex)
-      setCurrentPageIndex(idx >= 0 ? idx : 0)
-    }
-  }, [editorTarget, flatPages])
-
-  // Probe image natural dimensions (with cleanup to prevent stale callbacks)
-  useEffect(() => {
-    const page = flatPages[currentPageIndex]
-    if (!page?.url) return
-    let cancelled = false
-    const img = new window.Image()
-    img.crossOrigin = "anonymous"
-    img.onload = () => {
-      if (!cancelled) {
-        setNaturalDimensions({ width: img.naturalWidth, height: img.naturalHeight })
-      }
-    }
-    img.src = page.url
-    return () => { cancelled = true }
-  }, [currentPageIndex, flatPages])
-
   const handleClose = useCallback(() => {
-    // Sync carousel position before closing
-    const page = flatPages[currentPageIndex]
-    if (page) {
-      setIndexChangeEvent(page.globalIndex)
-    }
     clearUndoStackCache()
     setEditorTarget(null)
-  }, [currentPageIndex, flatPages, setEditorTarget, setIndexChangeEvent])
+  }, [setEditorTarget])
 
   const handlePrevPage = useCallback(() => {
-    setCurrentPageIndex((prev) => Math.max(0, prev - 1))
-  }, [])
+    if (!currentPage) return
+
+    if (currentPage.pageIndex > 0) {
+      setCurrentPage(prev => prev ? { ...prev, pageIndex: prev.pageIndex - 1 } : null)
+    } else {
+      toast({ description: "첫 페이지입니다" })
+    }
+  }, [currentPage])
 
   const handleNextPage = useCallback(() => {
-    setCurrentPageIndex((prev) => Math.min(flatPages.length - 1, prev + 1))
-  }, [flatPages.length])
+    if (!currentPage || !currentSheet?.urls) return
+
+    if (currentPage.pageIndex < currentSheet.urls.length - 1) {
+      setCurrentPage(prev => prev ? { ...prev, pageIndex: prev.pageIndex + 1 } : null)
+    } else {
+      toast({ description: "마지막 페이지입니다" })
+    }
+  }, [currentPage, currentSheet])
 
   // Edge-swipe page navigation
-  useEffect(() => {
-    const el = wrapperRef.current
-    if (!el) return
+  useEdgeSwipe({ wrapperRef, annotationMode, onPrevPage: handlePrevPage, onNextPage: handleNextPage })
 
-    const EDGE_THRESHOLD = 20 // pixels from edge
-    const MIN_SWIPE_DISTANCE = 50 // pixels
+  // Early return if no editor target or current page
+  if (!editorTarget || !currentPage) return null
+  if (!currentSheet?.urls || currentSheet.urls.length === 0) return null
 
-    const handlePointerDown = (e: PointerEvent) => {
-      // Only trigger in SELECT mode
-      if (annotationMode !== AnnotationMode.SELECT) return
+  const imageUrl = currentSheet.urls[currentPage.pageIndex]
+  if (!imageUrl) return null
 
-      const rect = el.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const isLeftEdge = x <= EDGE_THRESHOLD
-      const isRightEdge = x >= rect.width - EDGE_THRESHOLD
-
-      if (isLeftEdge || isRightEdge) {
-        isEdgeSwipeRef.current = true
-        swipeStartRef.current = { x: e.clientX, y: e.clientY, time: Date.now() }
-      }
-    }
-
-    const handlePointerMove = (e: PointerEvent) => {
-      if (!isEdgeSwipeRef.current || !swipeStartRef.current) return
-      // Track movement (could add visual feedback here if desired)
-    }
-
-    const handlePointerUp = (e: PointerEvent) => {
-      if (!isEdgeSwipeRef.current || !swipeStartRef.current) return
-
-      const deltaX = e.clientX - swipeStartRef.current.x
-      const deltaY = e.clientY - swipeStartRef.current.y
-      const distance = Math.abs(deltaX)
-
-      // Check if it's a horizontal swipe with sufficient distance
-      if (distance >= MIN_SWIPE_DISTANCE && Math.abs(deltaX) > Math.abs(deltaY)) {
-        if (deltaX > 0) {
-          // Swipe right → previous page
-          handlePrevPage()
-        } else {
-          // Swipe left → next page
-          handleNextPage()
-        }
-      }
-
-      // Reset state
-      isEdgeSwipeRef.current = false
-      swipeStartRef.current = null
-    }
-
-    const handlePointerCancel = () => {
-      isEdgeSwipeRef.current = false
-      swipeStartRef.current = null
-    }
-
-    el.addEventListener("pointerdown", handlePointerDown)
-    el.addEventListener("pointermove", handlePointerMove)
-    el.addEventListener("pointerup", handlePointerUp)
-    el.addEventListener("pointercancel", handlePointerCancel)
-
-    return () => {
-      el.removeEventListener("pointerdown", handlePointerDown)
-      el.removeEventListener("pointermove", handlePointerMove)
-      el.removeEventListener("pointerup", handlePointerUp)
-      el.removeEventListener("pointercancel", handlePointerCancel)
-    }
-  }, [annotationMode, handlePrevPage, handleNextPage])
-
-  if (flatPages.length === 0) return null
-
-  const page = flatPages[currentPageIndex]
-  if (!page) return null
+  const totalPages = currentSheet.urls.length
 
   return (
     <div className="flex flex-col w-full h-full bg-background">
@@ -175,8 +106,8 @@ export function AnnotationEditor({ teamId }: Props) {
         onClose={handleClose}
         onPrevPage={handlePrevPage}
         onNextPage={handleNextPage}
-        currentPage={currentPageIndex + 1}
-        totalPages={flatPages.length}
+        currentPage={currentPage.pageIndex + 1}
+        totalPages={totalPages}
       />
 
       {/* Object Context Menu */}
@@ -185,14 +116,14 @@ export function AnnotationEditor({ teamId }: Props) {
       {/* Body */}
       <div ref={wrapperRef} className="flex-1 overflow-hidden relative" style={{ touchAction: "none" }}>
         <AnnotationCanvas
-          teamId={page.teamId}
-          songId={page.songId}
-          sheetId={page.sheetId}
-          pageIndex={page.pageIndex}
+          teamId={currentPage.teamId}
+          songId={currentPage.songId}
+          sheetId={currentPage.sheetId}
+          pageIndex={currentPage.pageIndex}
           isActiveSlide={true}
           naturalWidth={naturalDimensions.width}
           naturalHeight={naturalDimensions.height}
-          imageUrl={page.url}
+          imageUrl={imageUrl}
         />
       </div>
     </div>

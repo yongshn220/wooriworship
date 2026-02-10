@@ -1,7 +1,7 @@
 "use client"
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { setlistLiveOptionsAtom, setlistUIVisibilityAtom, setlistMultipleSheetsViewModeAtom } from "../_states/setlist-view-states";
 import { SetlistControlItem } from "./setlist-control-item";
 import { LogOut, ChevronLeft, ChevronRight, FileText, Hash, MoreHorizontal, Pencil } from "lucide-react";
@@ -14,7 +14,6 @@ import { useRouter } from "next/navigation";
 import { getPathServing } from "@/components/util/helper/routes";
 import { useState } from "react";
 import { DownloadSetlistSheetsDrawer } from "./download-setlist-sheets-drawer";
-import { annotationEditorTargetAtom } from "../_states/annotation-states";
 import { setlistIndexAtom } from "../_states/setlist-view-states";
 
 import { DirectionType } from "@/components/constants/enums";
@@ -31,7 +30,6 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
     const [preference, prefSetter] = useUserPreferences()
     const [isPopoverOpen, setIsPopoverOpen] = useState(false)
     const [isDownloadDrawerOpen, setIsDownloadDrawerOpen] = useState(false)
-    const setEditorTarget = useSetRecoilState(annotationEditorTargetAtom)
     const setlistIndex = useRecoilValue(setlistIndexAtom)
     const [multipleSheetsViewMode, setMultipleSheetsViewMode] = useRecoilState(setlistMultipleSheetsViewModeAtom)
     const router = useRouter()
@@ -53,11 +51,12 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
     }
 
     function openEditor() {
-        if (multipleSheetsViewMode === DirectionType.VERTICAL) {
-            setMultipleSheetsViewMode(DirectionType.HORIZONTAL)
-            toast({ description: "가로 보기로 전환됩니다" })
-        }
-        setEditorTarget({ initialGlobalIndex: setlistIndex.current })
+        // Annotation mode는 single page만 표시하므로 view mode 변경 불필요
+        // (view mode 변경 시 carousel이 0으로 리셋되는 문제 방지)
+
+        // 현재 페이지 번호로 edit 모드 열기
+        const currentPageIndex = setlistIndex.current
+        router.push(`/board/${teamId}/setlist-view/${serviceId}/edit?page=${currentPageIndex}`)
     }
 
     return (
@@ -113,12 +112,11 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
                             <div className="flex items-center gap-2">
                                 <Separator orientation="vertical" className="h-6 bg-border w-[1px] mx-1" />
 
-                                {/* Temporarily disabled - Annotation mode */}
-                                {/* <SetlistControlItem
+                                <SetlistControlItem
                                     icon={<Pencil className="w-5 h-5" />}
                                     variant="button"
                                     onClick={openEditor}
-                                /> */}
+                                />
 
                                 <SetlistControlItem
                                     icon={<FileText className="w-5 h-5" />}

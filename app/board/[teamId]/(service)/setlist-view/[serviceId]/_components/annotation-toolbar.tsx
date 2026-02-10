@@ -94,10 +94,11 @@ function useIsCompact(breakpoint: number = 420) {
   const [isCompact, setIsCompact] = useState(false)
 
   useEffect(() => {
-    const check = () => setIsCompact(window.innerWidth < breakpoint)
-    check()
-    window.addEventListener("resize", check)
-    return () => window.removeEventListener("resize", check)
+    const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`)
+    setIsCompact(mql.matches)
+    const handler = (e: MediaQueryListEvent) => setIsCompact(e.matches)
+    mql.addEventListener("change", handler)
+    return () => mql.removeEventListener("change", handler)
   }, [breakpoint])
 
   return isCompact

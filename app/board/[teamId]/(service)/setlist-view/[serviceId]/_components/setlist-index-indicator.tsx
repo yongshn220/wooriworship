@@ -14,14 +14,13 @@ export function SetlistIndexIndicator() {
             "fixed right-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5",
             "transition-opacity duration-300",
             menu.showSongNumber ? "opacity-100" : "opacity-0 pointer-events-none",
-            "pointer-events-auto"
         )}>
             <div className="absolute top-2 bottom-2 w-[3px] bg-transparent rounded-full" />
 
             {
                 Array.from(Array(index.total)).map((_, i) => (
                     (i !== index.current) ?
-                        <div key={i} className="relative z-10 group w-6 h-6 flex-center cursor-pointer" onClick={() => setSetlistIndexChangeEvent(i)}>
+                        <div key={i} className="relative z-10 group w-6 h-6 flex-center cursor-pointer" onClick={() => setSetlistIndexChangeEvent({ page: i, timestamp: Date.now() })}>
                             <div className="w-1 h-1 bg-gray-400/50 rounded-full transition-all duration-300 group-hover:bg-foreground/50 group-hover:scale-150 shadow-sm" />
                         </div>
                         :

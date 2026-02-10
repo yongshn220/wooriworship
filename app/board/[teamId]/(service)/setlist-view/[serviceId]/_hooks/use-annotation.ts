@@ -32,7 +32,7 @@ export function useAnnotation({ teamId, songId, sheetId, pageIndex }: UseAnnotat
   const [canRedo, setCanRedo] = useState(false)
 
   const userId = auth.currentUser?.uid
-  const cacheKey = `${sheetId}_${pageIndex}`
+  const cacheKey = `${teamId}_${songId}_${sheetId}_${pageIndex}`
 
   // Restore stacks from cache on mount
   useEffect(() => {
@@ -193,17 +193,19 @@ export function useAnnotation({ teamId, songId, sheetId, pageIndex }: UseAnnotat
   }, [debouncedSave, updateUndoRedoState, saveToCache])
 
   const clearAll = useCallback(() => {
-    if (objects.length === 0) return
-    undoStackRef.current.push([...objects])
-    if (undoStackRef.current.length > MAX_STACK_SIZE) {
-      undoStackRef.current.shift()
-    }
-    redoStackRef.current = []
-    setObjects([])
-    debouncedSave([])
-    updateUndoRedoState()
-    saveToCache()
-  }, [objects, debouncedSave, updateUndoRedoState, saveToCache])
+    setObjects((prev) => {
+      if (prev.length === 0) return prev
+      undoStackRef.current.push([...prev])
+      if (undoStackRef.current.length > MAX_STACK_SIZE) {
+        undoStackRef.current.shift()
+      }
+      redoStackRef.current = []
+      debouncedSave([])
+      updateUndoRedoState()
+      saveToCache()
+      return []
+    })
+  }, [debouncedSave, updateUndoRedoState, saveToCache])
 
   return {
     objects,

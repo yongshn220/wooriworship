@@ -15,8 +15,7 @@ import type {
 import type { ImageBounds } from './use-image-bounds';
 
 interface UseFabricCanvasOptions {
-  canvasElRef: React.RefObject<HTMLCanvasElement | null>;
-  containerRef: React.RefObject<HTMLDivElement | null>;
+  canvasEl: HTMLCanvasElement | null;
   objects: AnnotationObject[];
   bounds: ImageBounds;
   interactive?: boolean; // true for editor canvas, false for readonly
@@ -171,8 +170,7 @@ function textChanged(
 }
 
 export function useFabricCanvas({
-  canvasElRef,
-  containerRef,
+  canvasEl,
   objects,
   bounds,
   interactive = true,
@@ -184,13 +182,10 @@ export function useFabricCanvas({
 
   const fabricObjectMap = useRef<Map<string, FabricObject>>(new Map());
   const skipNextSync = useRef(false);
-  const initializedRef = useRef(false);
 
   // Initialize canvas on mount
   useEffect(() => {
-    const canvasEl = canvasElRef.current;
     if (!canvasEl) return;
-    if (initializedRef.current) return; // Already initialized (StrictMode guard)
 
     const canvas = interactive
       ? new Canvas(canvasEl, {
@@ -205,7 +200,6 @@ export function useFabricCanvas({
           renderOnAddRemove: false,
         });
 
-    initializedRef.current = true;
     setFabricCanvas(canvas);
     setIsReady(true);
 
@@ -214,9 +208,8 @@ export function useFabricCanvas({
       canvas.dispose();
       setFabricCanvas(null);
       setIsReady(false);
-      initializedRef.current = false;
     };
-  }, [canvasElRef, interactive]);
+  }, [canvasEl, interactive]);
 
   // Resize canvas when bounds change
   useEffect(() => {

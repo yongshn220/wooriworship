@@ -36,7 +36,14 @@ export const selectedAnnotationIdAtom = atom<string[]>({
   default: [],
 })
 
-export const annotationEditorTargetAtom = atom<{ initialGlobalIndex: number } | null>({
+export interface AnnotationEditorTarget {
+  teamId: string
+  songId: string
+  sheetId: string
+  pageIndex: number
+}
+
+export const annotationEditorTargetAtom = atom<AnnotationEditorTarget | null>({
   key: 'annotationEditorTargetAtom',
   default: null,
 })
