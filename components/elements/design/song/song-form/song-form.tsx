@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { FullScreenForm, FullScreenFormBody, FullScreenFormFooter, FullScreenFormHeader } from "@/components/common/form/full-screen-form";
 import { slideVariants } from "@/components/constants/animations";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { invalidateCache } from "@/components/util/helper/local-cache";
 
 interface Props {
   mode: FormMode
@@ -235,6 +236,7 @@ export function SongForm({ mode, teamId, songId }: Props) {
 
       await Promise.all(promises)
 
+      invalidateCache(`sheet:${teamId}:${song!.id}`)
       musicSheetIdsUpdater(prev => prev + 1)
       musicSheetUpdater(prev => prev + 1)
       songUpdater(prev => prev + 1)

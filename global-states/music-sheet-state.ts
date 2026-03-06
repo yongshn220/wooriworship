@@ -1,6 +1,7 @@
 import { atom, atomFamily, selectorFamily } from "recoil";
 import { MusicSheet } from "@/models/music_sheet";
 import MusicSheetApi from "@/apis/MusicSheetApi";
+import { getCached, setCache } from "@/components/util/helper/local-cache";
 
 
 export const musicSheetIdsAtom = atomFamily<Array<string>, { teamId: string, songId: string }>({
@@ -64,10 +65,16 @@ export const musicSheetAtom = atomFamily<MusicSheet, { teamId: string, songId: s
     key: "musicSheetAtom/default",
     get: ({ teamId, songId, sheetId }) => async ({ get }) => {
       get(musicSheetUpdaterAtom)
+
+      const cacheKey = `sheet:${teamId}:${songId}:${sheetId}`
+      const cached = getCached<MusicSheet>(cacheKey)
+      if (cached) return cached
+
       try {
         const musicSheet = await MusicSheetApi.getById(teamId, songId, sheetId) as MusicSheet
         if (!musicSheet) return null
 
+        setCache(cacheKey, musicSheet)
         return musicSheet
       }
       catch (e) {

@@ -13,6 +13,7 @@ import { Timestamp } from "firebase/firestore";
 // Services
 import { SetlistApi } from "@/apis/SetlistApi";
 import PushNotificationApi from "@/apis/PushNotificationApi";
+import { invalidateCache } from "@/components/util/helper/local-cache";
 
 interface UseSetlistFormLogicProps {
     teamId: string;
@@ -64,7 +65,8 @@ export function useSetlistFormLogic({ teamId, serviceId, initialSetlist, service
             const url = `/board/${teamId}/service-board`;
             PushNotificationApi.notifyTeamSetlistUpdate(teamId, auth.currentUser?.uid || "", url).catch(console.error);
 
-            // Trigger global updates
+            // Invalidate cache and trigger global updates
+            invalidateCache(`setlist:${teamId}:${serviceId}`)
             setSetlistUpdater(prev => prev + 1);
             setSetlistIdsUpdater(prev => prev + 1);
 

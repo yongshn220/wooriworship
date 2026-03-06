@@ -1,6 +1,6 @@
 "use client";
 
-import { FileMusic, ArrowRight } from "lucide-react";
+import { FileMusic, ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { SongDetailDialog } from "@/components/elements/design/song/song-detail-card/default/song-detail-dialog";
 import { SectionHeader, SectionCardContainer } from "@/components/common/section-card";
@@ -25,6 +25,8 @@ interface Props {
 
 export function SetlistSongListCard({ songs = [], teamId, onEdit, onDownload, onDelete, onSetlistView, onSongClick }: Props) {
     const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
+    const [navigatingId, setNavigatingId] = useState<string | null>(null);
+    const [isNavigatingToSetlist, setIsNavigatingToSetlist] = useState(false);
 
     return (
         <div data-testid="setlist-card">
@@ -44,10 +46,15 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit, onDownload, on
                             return (
                                 <div
                                     key={song.id || idx}
-                                    className="flex items-center gap-3 px-3 py-3 hover:bg-muted/50 transition-colors cursor-pointer"
+                                    className={`flex items-center gap-3 px-3 py-3 hover:bg-muted/50 transition-colors cursor-pointer ${navigatingId === song.id ? "opacity-60" : ""}`}
                                     onClick={() => {
-                                        if (song.id) {
-                                            onSongClick ? onSongClick(song.id) : setSelectedSongId(song.id)
+                                        if (song.id && !navigatingId) {
+                                            if (onSongClick) {
+                                                setNavigatingId(song.id);
+                                                onSongClick(song.id);
+                                            } else {
+                                                setSelectedSongId(song.id);
+                                            }
                                         }
                                     }}
                                 >
@@ -60,7 +67,9 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit, onDownload, on
                                         </p>
                                     </div>
                                     <div className="shrink-0">
-                                        {song?.key ? (
+                                        {navigatingId === song.id ? (
+                                            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                                        ) : song?.key ? (
                                             <span className="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-lg border text-[11px] font-bold shadow-sm whitespace-nowrap bg-card border-border text-muted-foreground">
                                                 {song.key}
                                                 {song.keyNote && <span className="font-medium text-muted-foreground/70">{song.keyNote}</span>}
@@ -82,11 +91,19 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit, onDownload, on
                     <div className="flex justify-end px-3 py-2 border-t border-border">
                         <Button
                             variant="ghost"
-                            onClick={onSetlistView}
+                            disabled={isNavigatingToSetlist}
+                            onClick={() => {
+                                setIsNavigatingToSetlist(true);
+                                onSetlistView?.();
+                            }}
                             className="text-primary hover:bg-primary/5 font-semibold h-9 rounded-xl px-3 text-sm flex items-center gap-1.5"
                         >
                             View Setlist
-                            <ArrowRight className="w-4 h-4" />
+                            {isNavigatingToSetlist ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <ArrowRight className="w-4 h-4" />
+                            )}
                         </Button>
                     </div>
                 )}

@@ -18,10 +18,12 @@ import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-conf
 import { DownloadSetlistSheetsDrawer } from "@/app/board/[teamId]/(service)/setlist-view/[serviceId]/_components/download-setlist-sheets-drawer";
 import { useToast } from "@/components/ui/use-toast";
 import { getPathSetlistView } from "@/components/util/helper/routes";
+import { invalidateCache } from "@/components/util/helper/local-cache";
 
 // Parts
 import { ServiceInfoCard } from "./parts/service-info-card";
 import { SetlistSongListCard } from "@/components/elements/design/setlist/parts/setlist-song-list-card";
+import { SetlistImagePrefetcher } from "@/components/elements/design/setlist/parts/setlist-image-prefetcher";
 import { PraiseTeamCard } from "./parts/praise-team-card";
 import { ServiceOrderCard } from "./parts/service-order-card";
 import { SetlistPlanPreviewDrawer } from "@/components/elements/design/setlist/setlist-plan-preview-drawer";
@@ -69,6 +71,7 @@ export function ServiceDetailView({
 
     const handleDeleteSetlist = async () => {
         await SetlistApi.deleteSetlist(teamId, event.id);
+        invalidateCache(`setlist:${teamId}:${event.id}`)
         toast({ title: "Setlist deleted" });
         onDataChanged?.();
     };
@@ -99,6 +102,7 @@ export function ServiceDetailView({
                 scheduleId={event.id}
                 title={displayTitle}
                 date={event.date}
+                dateString={event.date_string}
                 setlistId={null} // V3 uses separate Setlist
                 teamId={teamId}
                 onPreview={setPreviewSetlistId}
@@ -107,6 +111,11 @@ export function ServiceDetailView({
                 onEdited={onDataChanged}
             />
 
+
+            {/* Prefetch setlist images while user is on this page */}
+            {setlist && setlist.songs.length > 0 && (
+                <SetlistImagePrefetcher teamId={teamId} serviceId={event.id} />
+            )}
 
             {/* 2. Set List */}
             {setlist && setlist.songs.length > 0 ? (
