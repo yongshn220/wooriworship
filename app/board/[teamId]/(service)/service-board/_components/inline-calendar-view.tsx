@@ -225,12 +225,12 @@ export function InlineCalendarView({
                 : null;
 
               const cellClassName = cn(
-                "relative min-h-[4.5rem] p-2 border-t border-r border-border/20 transition-all",
+                "relative min-h-[4.5rem] px-0 pt-1 pb-0.5 border-t border-r border-border/20 transition-all",
                 "flex flex-col items-start gap-0.5",
                 index % 7 === 0 && "border-l",
                 isOutsideMonth && "opacity-30 bg-muted/5",
                 !isOutsideMonth && "hover:bg-accent/30",
-                isAnySelected && "ring-2 ring-primary ring-inset bg-primary/5 z-10",
+                isAnySelected && "bg-primary/5 z-10 after:absolute after:inset-0 after:ring-2 after:ring-inset after:ring-primary after:pointer-events-none after:z-20",
                 hasEvent && !isOutsideMonth && "cursor-pointer",
                 !hasEvent && "cursor-default"
               );
@@ -240,7 +240,7 @@ export function InlineCalendarView({
                   {/* Day Number */}
                   <div
                     className={cn(
-                      "text-xs font-medium leading-none",
+                      "text-xs font-medium leading-none px-1",
                       todayDate
                         ? "bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center shadow-sm"
                         : "text-foreground/80"
@@ -254,10 +254,8 @@ export function InlineCalendarView({
                     <div
                       key={event.id}
                       className={cn(
-                        "text-[9px] font-medium px-1 py-0.5 rounded w-full shadow-sm overflow-hidden whitespace-nowrap",
-                        selectedId === event.id
-                          ? "bg-primary/15 text-primary dark:bg-primary/20"
-                          : "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300"
+                        "text-[9px] font-medium px-1 py-0.5 rounded w-full shadow-sm border overflow-hidden whitespace-nowrap",
+                        "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border-blue-200/30 dark:border-blue-800/30"
                       )}
                     >
                       {event.badgeLabel}
