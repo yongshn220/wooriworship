@@ -216,7 +216,6 @@ function ColorPickerInline({ color, setColor }: { color: string; setColor: (c: s
               boxShadow: c.value !== PenColor.BLACK && c.value !== PenColor.WHITE
                 ? `0 0 10px ${c.hex}50, 0 0 4px ${c.hex}30`
                 : undefined,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ["--tw-ring-color" as any]: c.hex,
             } : undefined}
             whileTap={{ scale: 0.85 }}
@@ -266,7 +265,6 @@ function ColorPickerCompact({ color, setColor }: { color: string; setColor: (c: 
                   boxShadow: c.value !== PenColor.BLACK && c.value !== PenColor.WHITE
                     ? `0 0 10px ${c.hex}50`
                     : undefined,
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   ["--tw-ring-color" as any]: c.hex,
                 } : undefined}
                 whileTap={{ scale: 0.85 }}
