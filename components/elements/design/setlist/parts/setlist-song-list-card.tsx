@@ -20,9 +20,10 @@ interface Props {
     onDownload?: () => void;
     onDelete?: () => void;
     onSetlistView?: () => void;
+    onSongClick?: (songId: string) => void;
 }
 
-export function SetlistSongListCard({ songs = [], teamId, onEdit, onDownload, onDelete, onSetlistView }: Props) {
+export function SetlistSongListCard({ songs = [], teamId, onEdit, onDownload, onDelete, onSetlistView, onSongClick }: Props) {
     const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
 
     return (
@@ -44,7 +45,11 @@ export function SetlistSongListCard({ songs = [], teamId, onEdit, onDownload, on
                                 <div
                                     key={song.id || idx}
                                     className="flex items-center gap-3 px-3 py-3 hover:bg-muted/50 transition-colors cursor-pointer"
-                                    onClick={() => song.id && setSelectedSongId(song.id)}
+                                    onClick={() => {
+                                        if (song.id) {
+                                            onSongClick ? onSongClick(song.id) : setSelectedSongId(song.id)
+                                        }
+                                    }}
                                 >
                                     <div className="text-muted-foreground font-mono text-xs font-medium w-6 shrink-0">
                                         {(idx + 1).toString().padStart(2, '0')}

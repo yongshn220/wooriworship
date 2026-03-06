@@ -14,9 +14,10 @@ interface Props {
     teamId: string
     serviceId: string
     initialPage: number
+    initialSongId?: string
 }
 
-export function SetlistLiveCarousel({ teamId, serviceId, initialPage }: Props) {
+export function SetlistLiveCarousel({ teamId, serviceId, initialPage, initialSongId }: Props) {
     const setlist = useRecoilValue(setlistAtom({ teamId, setlistId: serviceId }))
     const setSetlistIndex = useSetRecoilState(setlistIndexAtom)
     const setSetlistNote = useSetRecoilState(setlistNoteAtom)
@@ -49,11 +50,24 @@ export function SetlistLiveCarousel({ teamId, serviceId, initialPage }: Props) {
         }
     }, [api, setlistIndexChangeEvent]);
 
+    const initialSongIdRef = React.useRef(initialSongId)
+
+    useEffect(() => {
+        if (api && initialSongIdRef.current && flatPages.length > 0) {
+            const songPage = flatPages.find(p => p.songId === initialSongIdRef.current)
+            if (songPage) {
+                api.scrollTo(songPage.globalIndex)
+                initialSongIdRef.current = undefined
+            }
+        }
+    }, [api, flatPages]);
+
     useEffect(() => {
         if (!api) return
 
         const handleSelect = () => {
             const currentIndex = api.selectedScrollSnap()
+            if (currentIndex >= flatPages.length) return
             setSetlistIndex((prev) => ({ ...prev, current: currentIndex }))
 
             // Find note for current page using flatPages and aggregatedSongHeaders
@@ -90,6 +104,15 @@ export function SetlistLiveCarousel({ teamId, serviceId, initialPage }: Props) {
     useEffect(() => {
         setSetlistIndex((prev) => ({ ...prev, total: flatPages.length }))
     }, [flatPages.length, setSetlistIndex])
+
+    useEffect(() => {
+        if (!api || flatPages.length === 0) return
+        const currentSnap = api.selectedScrollSnap()
+        if (currentSnap >= flatPages.length) {
+            const safePage = Math.max(0, flatPages.length - 1)
+            api.scrollTo(safePage, true)
+        }
+    }, [api, flatPages.length])
 
     return (
         <div id="song-carousel" className="w-full h-full">

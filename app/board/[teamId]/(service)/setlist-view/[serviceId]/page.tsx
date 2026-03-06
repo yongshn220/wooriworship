@@ -12,7 +12,7 @@ import { annotationDrawingModeAtom } from "./_states/annotation-states"
 
 interface Props {
     params: { teamId: string; serviceId: string }
-    searchParams: { page?: string }
+    searchParams: { page?: string; songId?: string }
 }
 
 export default function SetlistViewPage({ params, searchParams }: Props) {
@@ -63,7 +63,7 @@ export default function SetlistViewPage({ params, searchParams }: Props) {
             ref={containerRef}
             className="relative w-full h-full bg-background overflow-hidden touch-none"
         >
-            <SetlistLiveCarousel teamId={teamId} serviceId={serviceId} initialPage={targetPage} />
+            <SetlistLiveCarousel teamId={teamId} serviceId={serviceId} initialPage={targetPage} initialSongId={searchParams.songId} />
             <SetlistNote constraintsRef={containerRef} />
             <SetlistControlDock teamId={teamId} serviceId={serviceId} />
             <SetlistIndexIndicator />

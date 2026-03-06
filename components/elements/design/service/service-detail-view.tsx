@@ -122,6 +122,7 @@ export function ServiceDetailView({
                     onDownload={() => setIsDownloadDrawerOpen(true)}
                     onDelete={() => setDeletingTarget("setlist")}
                     onSetlistView={() => router.push(getPathSetlistView(teamId, event.id))}
+                    onSongClick={(songId) => router.push(getPathSetlistView(teamId, event.id) + `?songId=${songId}`)}
                 />
             ) : (
                 <EmptyStateCard
