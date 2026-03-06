@@ -254,10 +254,10 @@ export function InlineCalendarView({
                     <div
                       key={event.id}
                       className={cn(
-                        "text-[9px] font-medium px-1 py-0.5 rounded w-full shadow-sm border overflow-hidden whitespace-nowrap",
+                        "text-[9px] font-medium px-1 py-0.5 rounded w-full shadow-sm overflow-hidden whitespace-nowrap",
                         selectedId === event.id
-                          ? "bg-primary/15 text-primary border-primary/30 dark:bg-primary/20"
-                          : "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border-blue-200/30 dark:border-blue-800/30"
+                          ? "bg-primary/15 text-primary dark:bg-primary/20"
+                          : "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300"
                       )}
                     >
                       {event.badgeLabel}
