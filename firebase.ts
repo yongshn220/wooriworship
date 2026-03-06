@@ -1,6 +1,6 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, initializeFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -22,10 +22,16 @@ export const firebaseApp = !getApps().length
 const dbId = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_ID;
 console.log("🔥 Configured DB ID:", dbId);
 
-// Initialize Modular Firestore
+// Initialize Modular Firestore with offline persistence
+const firestoreSettings = {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager()
+  })
+};
+
 export const db = (dbId && dbId !== "(default)")
-  ? initializeFirestore(firebaseApp, {}, dbId)
-  : getFirestore(firebaseApp);
+  ? initializeFirestore(firebaseApp, firestoreSettings, dbId)
+  : initializeFirestore(firebaseApp, firestoreSettings);
 
 console.log(`🔥 Initialized Modular Firestore with DB ID: ${dbId || "(default)"}`);
 // Check internal ID if accessible (for debugging, though properties are private in Modular SDK)

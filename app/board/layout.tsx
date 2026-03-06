@@ -19,6 +19,7 @@ import { PwaInstallPromptDialog } from "@/components/elements/dialog/notificatio
 import PushNotificationApi from "@/apis/PushNotificationApi";
 import { auth } from "@/firebase";
 import { ScrollContainerContext } from "@/app/board/_contexts/scroll-container-context";
+import { OfflineBanner } from "@/components/common/feedback/offline-banner";
 
 
 export default function BoardLayout({ children }: { children: React.ReactNode }) {
@@ -98,6 +99,7 @@ export default function BoardLayout({ children }: { children: React.ReactNode })
         <ScrollContainerContext.Provider value={mainRef}>
           <Initialization />
           <DialogManager />
+          <OfflineBanner />
           <NotificationPromptDialog
             open={showNotificationPrompt}
             onOpenChange={handleNotificationPromptClose}

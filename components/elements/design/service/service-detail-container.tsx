@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useCallback } from "react";
+import { useEffect, useRef, useMemo, useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { usersAtom } from "@/global-states/userState";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
-import { ServiceRole } from "@/models/services/ServiceEvent";
+import { ServiceEvent, ServiceRole } from "@/models/services/ServiceEvent";
 import { MyAssignmentRole } from "@/models/services/MyAssignment";
 import { ServiceDetailView } from "./service-detail-view";
 import { Loader2 } from "lucide-react";
 import { serviceDetailCacheAtom, serviceDetailLoadingAtom } from "@/global-states/serviceEventState";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "@/firebase";
+import { SetlistApi } from "@/apis/SetlistApi";
 
 interface Props {
     serviceId: string;
@@ -22,24 +25,53 @@ export function ServiceDetailContainer({ serviceId, teamId, roles, currentUserUi
     const [cachedData, setCachedData] = useRecoilState(serviceDetailCacheAtom(serviceId));
     const [loading, setLoading] = useRecoilState(serviceDetailLoadingAtom(serviceId));
 
-    // Fetch data only if not cached
+    const initialFetchDone = useRef(false);
+
+    // Initial fetch + real-time sync for service and setlist
     useEffect(() => {
-        if (!serviceId) return;
+        if (!serviceId || !teamId) return;
+        initialFetchDone.current = false;
 
-        // Skip if already cached
-        if (cachedData) return;
-
-        // Skip if already loading
-        if (loading) return;
-
+        // Initial full fetch (includes praise_team, flow which change less often)
         setLoading(true);
         ServiceEventApi.getServiceDetails(teamId, serviceId)
             .then(res => {
                 setCachedData(res);
+                initialFetchDone.current = true;
             })
             .catch(console.error)
             .finally(() => setLoading(false));
-    }, [serviceId, teamId, cachedData, loading, setCachedData, setLoading]);
+
+        // Real-time listener on service document
+        const unsubService = onSnapshot(
+            doc(db, `teams/${teamId}/services/${serviceId}`),
+            (snap) => {
+                if (!snap.exists() || !initialFetchDone.current) return;
+                const event = { id: snap.id, ...snap.data() } as ServiceEvent;
+                setCachedData(prev => prev ? { ...prev, event } : prev);
+            }
+        );
+
+        // Real-time listener on setlist document
+        const unsubSetlist = onSnapshot(
+            doc(db, `teams/${teamId}/services/${serviceId}/setlists/main`),
+            async (snap) => {
+                if (!initialFetchDone.current) return;
+                if (!snap.exists()) {
+                    setCachedData(prev => prev ? { ...prev, setlist: null } : prev);
+                    return;
+                }
+                // Re-hydrate with song titles via SetlistApi
+                const setlist = await SetlistApi.getSetlist(teamId, serviceId);
+                setCachedData(prev => prev ? { ...prev, setlist } : prev);
+            }
+        );
+
+        return () => {
+            unsubService();
+            unsubSetlist();
+        };
+    }, [serviceId, teamId, setCachedData, setLoading]);
 
     // Refetch function for use after form saves (invalidates cache)
     const refetchData = useCallback(async () => {
