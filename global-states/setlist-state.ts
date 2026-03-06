@@ -3,7 +3,6 @@ import { Setlist } from "@/models/setlist";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
 import { Song } from "@/models/song";
 import { songAtom } from "@/global-states/song-state";
-import { getCached, setCache } from "@/components/util/helper/local-cache";
 
 // Workaround for Next.js HMR Duplicate Atom Key
 const globalForRecoil = global as unknown as { recoilAtoms: Record<string, any> };
@@ -80,11 +79,6 @@ export const setlistAtom = (globalForRecoil.recoilAtoms['setlistAtom'] || atomFa
     key: "setlistAtom/default",
     get: ({ teamId, setlistId }) => async ({ get }) => {
       get(setlistUpdaterAtom)
-
-      const cacheKey = `setlist:${teamId}:${setlistId}`
-      const cached = getCached<Setlist>(cacheKey)
-      if (cached) return cached
-
       try {
         const details = await ServiceEventApi.getServiceDetails(teamId, setlistId)
         if (!details) return null
@@ -103,7 +97,6 @@ export const setlistAtom = (globalForRecoil.recoilAtoms['setlistAtom'] || atomFa
           serving_schedule_id: details.event.id, // V3 is unified
         } as unknown as Setlist;
 
-        setCache(cacheKey, setlist)
         return setlist
       }
       catch (e) {

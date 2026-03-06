@@ -18,8 +18,6 @@ import { DeleteConfirmationDialog } from "@/components/elements/dialog/user-conf
 import { DownloadSetlistSheetsDrawer } from "@/app/board/[teamId]/(service)/setlist-view/[serviceId]/_components/download-setlist-sheets-drawer";
 import { useToast } from "@/components/ui/use-toast";
 import { getPathSetlistView } from "@/components/util/helper/routes";
-import { invalidateCache } from "@/components/util/helper/local-cache";
-
 // Parts
 import { ServiceInfoCard } from "./parts/service-info-card";
 import { SetlistSongListCard } from "@/components/elements/design/setlist/parts/setlist-song-list-card";
@@ -71,7 +69,6 @@ export function ServiceDetailView({
 
     const handleDeleteSetlist = async () => {
         await SetlistApi.deleteSetlist(teamId, event.id);
-        invalidateCache(`setlist:${teamId}:${event.id}`)
         toast({ title: "Setlist deleted" });
         onDataChanged?.();
     };
