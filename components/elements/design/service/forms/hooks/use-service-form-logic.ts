@@ -295,12 +295,14 @@ export function useServiceFormLogic({ teamId, mode = FormMode.CREATE, initialDat
         setIsLoading(true);
         try {
             const dateTimestamp = Timestamp.fromDate(selectedDate);
+            const dateString = format(selectedDate, "yyyy-MM-dd");
             const title = getServiceTitleFromTags(serviceTagIds, team?.service_tags);
 
             // Prepare Service Data (V3)
             const serviceData: Partial<ServiceEvent> = {
                 teamId,
                 date: dateTimestamp,
+                date_string: dateString,
                 title,
                 tagId: serviceTagIds[0] || "",
                 setlist_id: linkedSetlistId || undefined

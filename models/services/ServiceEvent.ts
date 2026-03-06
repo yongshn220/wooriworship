@@ -70,6 +70,7 @@ export interface ServiceEvent {
     id: string; // Auto-ID (UUID)
     teamId: string;
     date: Timestamp;
+    date_string: string; // "YYYY-MM-DD" — timezone-safe display date (creator's local date)
     title: string;
     tagId?: string; // Optimized single tag reference
     // service_tags?: string[]; // Multiple tags support (Deprecated: use tagId)

@@ -13,6 +13,7 @@ import { ServiceEvent } from "@/models/services/ServiceEvent";
 import { ServiceEventApi } from "@/apis/ServiceEventApi";
 import { ServiceListSkeleton } from "./_components/service-list-skeleton";
 import { parseLocalDate, timestampToDateString } from "@/components/util/helper/helper-functions";
+import { getServiceDisplayDate } from "@/lib/date-utils";
 import { Timestamp } from "firebase/firestore";
 import { EmptyServiceBoardPage } from "./_components/empty-service-board-page";
 import { CalendarStrip } from "@/components/common/board-calendar/calendar-strip";
@@ -58,7 +59,7 @@ export default function ServingPage() {
     // Map events to CalendarItem
     const calendarItems: CalendarItem[] = useMemo(() => {
         return events.map(e => {
-            const date = e.date.toDate();
+            const date = getServiceDisplayDate(e);
             let badgeLabel = "Event";
             if (e.tagId) {
                 // Resolve tag name
@@ -166,7 +167,7 @@ export default function ServingPage() {
                     now.setHours(0, 0, 0, 0);
 
                     // Find first event strictly >= today (Upcoming)
-                    const firstUpcoming = data.find(e => e.date.toDate() >= now);
+                    const firstUpcoming = data.find(e => getServiceDisplayDate(e) >= now);
 
                     if (firstUpcoming) {
                         setSelectedScheduleId(firstUpcoming.id);
@@ -196,7 +197,7 @@ export default function ServingPage() {
 
             let endDate = new Date();
             if (firstEvent) {
-                endDate = firstEvent.date.toDate();
+                endDate = getServiceDisplayDate(firstEvent);
             }
 
             // Move back 6 months from END date
@@ -236,7 +237,7 @@ export default function ServingPage() {
             // Same logic as initial load: first upcoming, or most recent past
             const now = new Date();
             now.setHours(0, 0, 0, 0);
-            const firstUpcoming = events.find(e => e.date.toDate() >= now);
+            const firstUpcoming = events.find(e => getServiceDisplayDate(e) >= now);
             if (firstUpcoming) {
                 setSelectedScheduleId(firstUpcoming.id);
             } else {

@@ -7,6 +7,7 @@ import { MyAssignment, MyAssignmentRole } from "@/models/services/MyAssignment";
 import { PraiseTeamApi } from "@/apis/PraiseTeamApi";
 import { ServiceFlowApi } from "@/apis/ServiceFlowApi";
 import { myAssignmentsCacheAtom } from "@/global-states/serviceEventState";
+import { getServiceDisplayDate } from "@/lib/date-utils";
 
 interface UseMyAssignmentsParams {
     teamId: string;
@@ -145,7 +146,7 @@ export function useMyAssignments({
 
             if (myRoles.length > 0) {
                 assigned.push(event.id);
-                const eventDate = event.date.toDate();
+                const eventDate = getServiceDisplayDate(event);
                 let badgeLabel = "Event";
                 if (event.tagId) {
                     const tagName = serviceTags?.find((t: any) => t.id === event.tagId)?.name;

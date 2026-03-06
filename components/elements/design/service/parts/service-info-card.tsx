@@ -15,6 +15,7 @@ interface Props {
     scheduleId: string;
     title: string;
     date: Date | Timestamp | string;
+    dateString?: string; // "YYYY-MM-DD" timezone-safe date
     setlistId?: string;
     teamId: string;
     onPreview?: (setlistId: string) => void;
@@ -23,10 +24,10 @@ interface Props {
     onEdited?: () => void;
 }
 
-export function ServiceInfoCard({ scheduleId, title, date, setlistId, teamId, onPreview, myRoles, tagId, onEdited }: Props) {
+export function ServiceInfoCard({ scheduleId, title, date, dateString, setlistId, teamId, onPreview, myRoles, tagId, onEdited }: Props) {
     const router = useRouter();
 
-    const dateObj = date instanceof Timestamp ? date.toDate() : (date instanceof Date ? date : parseLocalDate(date));
+    const dateObj = dateString ? parseLocalDate(dateString) : (date instanceof Timestamp ? date.toDate() : (date instanceof Date ? date : parseLocalDate(date)));
     const dateStr = format(dateObj, "yyyy. MM. dd (EEE)");
 
     const diffDays = differenceInCalendarDays(dateObj, new Date());

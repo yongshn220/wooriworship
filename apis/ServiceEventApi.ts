@@ -4,6 +4,7 @@ import {
     query, where, orderBy, Timestamp,
     writeBatch, setDoc, updateDoc, increment, limit
 } from "firebase/firestore";
+import { format } from "date-fns";
 import { ServiceEvent } from "@/models/services/ServiceEvent";
 import { SetlistApi } from "./SetlistApi";
 import { PraiseTeamApi } from "./PraiseTeamApi";
@@ -79,10 +80,12 @@ export class ServiceEventApi {
         const serviceId = newDocRef.id;
 
         const now = Timestamp.now();
+        const dateValue = data.date || now;
         const eventData: ServiceEvent = {
             id: serviceId,
             teamId,
-            date: data.date || now,
+            date: dateValue,
+            date_string: data.date_string || format(dateValue.toDate(), "yyyy-MM-dd"),
             title: data.title || "New Service",
             tagId: data.tagId || "",
             created_at: now,

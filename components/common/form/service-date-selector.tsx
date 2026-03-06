@@ -106,7 +106,7 @@ export function ServiceDateSelector({
                             // Calculate mode weekday from recent schedules
                             const dayCounts: Record<number, number> = {};
                             recent.forEach(s => {
-                                const dateStr = typeof s.date === 'string' ? s.date : timestampToDateString(s.date);
+                                const dateStr = s.date_string || (typeof s.date === 'string' ? s.date : timestampToDateString(s.date));
                                 const [y, m, d] = dateStr.split('-').map(Number); // Safe local parsing
                                 const day = new Date(y, m - 1, d).getDay();
                                 dayCounts[day] = (dayCounts[day] || 0) + 1;

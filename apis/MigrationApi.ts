@@ -326,6 +326,88 @@ export class MigrationApi {
         if (count > 0) await batch.commit();
     }
     // =========================================================================================
+    // Backfill: date_string for timezone-safe display
+    // =========================================================================================
+
+    /**
+     * Backfills `date_string` field for all services across all teams.
+     * Converts Timestamp → "YYYY-MM-DD" in the creator's timezone (America/New_York).
+     * Safe to run multiple times (skips documents that already have date_string).
+     */
+    async backfillDateString(
+        creatorTimezone: string = "America/New_York",
+        onProgress?: (log: string) => void
+    ): Promise<{ updated: number; skipped: number }> {
+        const log = (msg: string) => {
+            console.log(msg);
+            onProgress?.(msg);
+        };
+
+        log(`Backfilling date_string (timezone: ${creatorTimezone})...`);
+
+        const teamsSnap = await getDocs(collection(this.db, "teams"));
+        log(`Found ${teamsSnap.size} teams`);
+
+        let totalUpdated = 0;
+        let totalSkipped = 0;
+
+        for (const teamDoc of teamsSnap.docs) {
+            const teamId = teamDoc.id;
+            const servicesSnap = await getDocs(collection(this.db, `teams/${teamId}/services`));
+            if (servicesSnap.empty) continue;
+
+            log(`Team ${teamId}: ${servicesSnap.size} services`);
+
+            const batch = writeBatch(this.db);
+            let batchCount = 0;
+
+            for (const serviceDoc of servicesSnap.docs) {
+                const data = serviceDoc.data();
+
+                if (data.date_string) {
+                    totalSkipped++;
+                    continue;
+                }
+
+                if (!data.date) {
+                    log(`  [SKIP] ${serviceDoc.id} — no date field`);
+                    totalSkipped++;
+                    continue;
+                }
+
+                const timestamp = data.date as Timestamp;
+                const dateString = new Intl.DateTimeFormat('en-CA', {
+                    timeZone: creatorTimezone,
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                }).format(timestamp.toDate());
+
+                log(`  ${serviceDoc.id}: ${timestamp.toDate().toISOString()} → ${dateString} (${data.title || 'untitled'})`);
+
+                batch.update(serviceDoc.ref, { date_string: dateString });
+                batchCount++;
+
+                if (batchCount >= 400) {
+                    await batch.commit();
+                    log(`  Committed batch of ${batchCount}`);
+                    totalUpdated += batchCount;
+                    batchCount = 0;
+                }
+            }
+
+            if (batchCount > 0) {
+                await batch.commit();
+                totalUpdated += batchCount;
+                log(`  Committed batch of ${batchCount}`);
+            }
+        }
+
+        log(`\nDone! Updated: ${totalUpdated}, Skipped: ${totalSkipped}`);
+        return { updated: totalUpdated, skipped: totalSkipped };
+    }
+
+    // =========================================================================================
     // Phase 3: Cleanup (Destructive)
     // =========================================================================================
 
