@@ -254,7 +254,7 @@ export function InlineCalendarView({
                     <div
                       key={event.id}
                       className={cn(
-                        "text-[9px] font-medium px-1 py-0.5 rounded truncate w-full shadow-sm border",
+                        "text-[9px] font-medium px-1 py-0.5 rounded w-full shadow-sm border overflow-hidden whitespace-nowrap",
                         selectedId === event.id
                           ? "bg-primary/15 text-primary border-primary/30 dark:bg-primary/20"
                           : "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border-blue-200/30 dark:border-blue-800/30"
@@ -266,7 +266,7 @@ export function InlineCalendarView({
 
                   {/* My Assignment Role (single event only) */}
                   {singleRoleLabel && (
-                    <div className="text-[8px] font-bold px-1 rounded bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/30 dark:to-amber-900/30 text-orange-600 dark:text-orange-300 truncate w-full shadow-sm border border-orange-200/40 dark:border-orange-800/40">
+                    <div className="text-[8px] font-bold px-1 rounded bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/30 dark:to-amber-900/30 text-orange-600 dark:text-orange-300 w-full shadow-sm border border-orange-200/40 dark:border-orange-800/40 overflow-hidden whitespace-nowrap">
                       {singleRoleLabel}
                     </div>
                   )}

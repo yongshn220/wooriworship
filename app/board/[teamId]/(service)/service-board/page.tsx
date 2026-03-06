@@ -251,7 +251,15 @@ export default function ServingPage() {
         if (filterMode === 'mine' && !isAssignmentsLoading && myAssignments.length > 0) {
             const currentIsInFiltered = assignedServiceIds.includes(selectedScheduleId || "");
             if (!currentIsInFiltered) {
-                setSelectedScheduleId(myAssignments[0].serviceId);
+                const now = new Date();
+                now.setHours(0, 0, 0, 0);
+                const firstUpcoming = myAssignments.find(a => a.serviceDate >= now);
+                if (firstUpcoming) {
+                    setSelectedScheduleId(firstUpcoming.serviceId);
+                } else {
+                    // All past — pick the most recent
+                    setSelectedScheduleId(myAssignments[myAssignments.length - 1].serviceId);
+                }
             }
         }
     }, [filterMode, isAssignmentsLoading, myAssignments, assignedServiceIds, selectedScheduleId]);

@@ -183,7 +183,7 @@ export function CalendarStrip({
                                         else itemRefs.current.delete(item.id);
                                     }}
                                 />
-                                <span className="text-[9px] font-bold text-primary truncate max-w-[5.5rem] text-center leading-tight h-[14px]">
+                                <span className="text-[9px] font-bold text-primary text-center leading-tight">
                                     {roleLabel || '\u00A0'}
                                 </span>
                             </div>
@@ -272,8 +272,7 @@ function DateCard({ item, isSelected, onSelect, baseClasses, setRef }: DateCardP
     const month = format(item.date, "MMM");
     const weekDay = format(item.date, "EEE");
 
-    let topLabel = item.badgeLabel || "Event";
-    if (topLabel.length > 6) topLabel = topLabel.substring(0, 6);
+    const topLabel = item.badgeLabel || "Event";
 
     const today = new Date();
     const diffDays = differenceInCalendarDays(item.date, today);
