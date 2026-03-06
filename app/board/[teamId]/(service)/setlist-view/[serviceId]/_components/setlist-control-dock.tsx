@@ -112,11 +112,12 @@ export function SetlistControlDock({ teamId, serviceId }: Props) {
                             <div className="flex items-center gap-2">
                                 <Separator orientation="vertical" className="h-6 bg-border w-[1px] mx-1" />
 
-                                <SetlistControlItem
+                                {/* TODO: annotation edit mode - 개발중이므로 비활성화 */}
+                                {/* <SetlistControlItem
                                     icon={<Pencil className="w-5 h-5" />}
                                     variant="button"
                                     onClick={openEditor}
-                                />
+                                /> */}
 
                                 <SetlistControlItem
                                     icon={<FileText className="w-5 h-5" />}
