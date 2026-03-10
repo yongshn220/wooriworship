@@ -1,7 +1,24 @@
-const CACHE_NAME = 'ww-cache-v1'
-const IMAGE_CACHE_NAME = 'ww-images-v1'
-const IMAGE_CACHE_MAX_AGE = 30 * 24 * 60 * 60 * 1000 // 30 days
-const IMAGE_CACHE_MAX_ENTRIES = 200
+const CACHE_NAME = 'ww-cache-v2'
+
+// --- Lifecycle ---
+
+self.addEventListener('install', function (event) {
+  self.skipWaiting()
+})
+
+self.addEventListener('activate', function (event) {
+  event.waitUntil(
+    caches.keys().then(function (cacheNames) {
+      return Promise.all(
+        cacheNames
+          .filter(function (name) { return name !== CACHE_NAME })
+          .map(function (name) { return caches.delete(name) })
+      )
+    }).then(function () {
+      return self.clients.claim()
+    })
+  )
+})
 
 // --- Push Notifications ---
 
@@ -30,48 +47,8 @@ self.addEventListener('notificationclick', function (event) {
 
 // --- Caching Strategies ---
 
-function isFirebaseStorageImage(url) {
-  return url.includes('firebasestorage.googleapis.com')
-}
-
 function isStaticAsset(url) {
   return url.includes('/_next/static/')
-}
-
-async function cacheFirstWithExpiry(request, cacheName, maxAge) {
-  const cache = await caches.open(cacheName)
-  const cached = await cache.match(request)
-
-  if (cached) {
-    const cachedTime = cached.headers.get('sw-cache-time')
-    if (cachedTime && (Date.now() - parseInt(cachedTime)) < maxAge) {
-      return cached
-    }
-  }
-
-  try {
-    const response = await fetch(request)
-    if (response.ok) {
-      const headers = new Headers(response.headers)
-      headers.set('sw-cache-time', Date.now().toString())
-      const cachedResponse = new Response(await response.blob(), {
-        status: response.status,
-        statusText: response.statusText,
-        headers,
-      })
-      await cache.put(request, cachedResponse)
-
-      // Evict old entries if over limit
-      const keys = await cache.keys()
-      if (keys.length > IMAGE_CACHE_MAX_ENTRIES) {
-        await cache.delete(keys[0])
-      }
-    }
-    return response
-  } catch (err) {
-    if (cached) return cached
-    throw err
-  }
 }
 
 async function cacheFirst(request) {
@@ -109,24 +86,15 @@ async function networkFirst(request) {
 self.addEventListener('fetch', function (event) {
   const url = event.request.url
 
-  // Firebase Storage images: cache first (30 days)
-  if (isFirebaseStorageImage(url)) {
-    event.respondWith(cacheFirstWithExpiry(event.request, IMAGE_CACHE_NAME, IMAGE_CACHE_MAX_AGE))
-    return
-  }
-
   // Static assets: cache first (immutable by hash)
   if (isStaticAsset(url)) {
     event.respondWith(cacheFirst(event.request))
     return
   }
 
-  // Navigation and other requests: network first with cache fallback
+  // Navigation requests: network first with cache fallback
   if (event.request.mode === 'navigate') {
     event.respondWith(networkFirst(event.request))
     return
   }
-
-  // Default: network passthrough
-  event.respondWith(fetch(event.request))
 })

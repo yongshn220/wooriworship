@@ -32,7 +32,7 @@ export function OfflineBanner() {
     return (
         <div
             className={cn(
-                "fixed top-[env(safe-area-inset-top)] left-0 right-0 z-[2500] flex items-center justify-center gap-2 py-2 px-4 text-xs font-semibold transition-all duration-300",
+                "fixed top-[env(safe-area-inset-top)] left-0 right-0 z-2000 flex items-center justify-center gap-2 py-2 px-4 text-xs font-semibold transition-all duration-300",
                 isOffline
                     ? "bg-amber-500 text-white"
                     : "bg-emerald-500 text-white animate-in fade-in slide-in-from-top-2"
